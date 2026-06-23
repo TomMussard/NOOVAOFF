@@ -217,8 +217,9 @@ p{color:var(--ink2)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
 
 /* ---------- STICKY TOPBAR ---------- */
-.topbar{position:fixed;transition:background .35s,backdrop-filter .35s,box-shadow .35s}
+.topbar{position:fixed;transition:background .35s,backdrop-filter .35s,box-shadow .35s,transform .3s cubic-bezier(.4,0,.2,1)}
 .topbar.scrolled{background:rgba(15,13,18,.88);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 1px 0 rgba(255,255,255,.08)}
+.topbar.nav-hidden{transform:translateY(-110%)}
 
 /* ---------- HERO COUNTER ---------- */
 .hero-counter{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:100px;padding:7px 16px 7px 10px;font-size:13px;font-weight:600;color:rgba(255,255,255,.78);margin-top:22px}
@@ -2088,12 +2089,26 @@ async function submitWaitlist(e) {
   }catch(e){}
 })();
 
-/* Sticky topbar */
+/* Sticky topbar — hide on scroll down, show on scroll up */
 (function(){
   var bar = document.querySelector('.topbar');
-  function onScroll(){ bar.classList.toggle('scrolled', window.scrollY > 30); }
-  window.addEventListener('scroll', onScroll, {passive:true});
-  onScroll();
+  var lastY = 0;
+  var ticking = false;
+  function update(){
+    var y = window.scrollY;
+    bar.classList.toggle('scrolled', y > 30);
+    if(y > lastY && y > 80){
+      bar.classList.add('nav-hidden');
+    } else if(y < lastY - 4){
+      bar.classList.remove('nav-hidden');
+    }
+    lastY = y;
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if(!ticking){ requestAnimationFrame(update); ticking=true; }
+  }, {passive:true});
+  update();
 })();
 
 /* Animated number counter */
