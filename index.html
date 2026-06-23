@@ -163,11 +163,7 @@ p{color:var(--ink2)}
 .how-steps{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 .hw-step{display:flex;gap:18px;align-items:flex-start;background:#fff;border:1px solid #ECE8E0;border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow-sm);transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s}
 .hw-step:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(249,167,22,.3)}
-.hw-ico{flex:none;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:25px;background:var(--coral-soft)}
-.hw-step:nth-child(2) .hw-ico{background:rgba(249,167,22,.14)}
-.hw-step:nth-child(3) .hw-ico{background:rgba(11,171,132,.12)}
-.hw-step:nth-child(4) .hw-ico{background:rgba(161,78,8,.1)}
-.hw-step:nth-child(5) .hw-ico{background:rgba(249,167,22,.1)}
+.hw-ico{flex:none;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(249,167,22,.12);color:var(--amber)}
 .hw-txt{flex:1}
 .hw-lbl{display:block;font-family:var(--fd);font-weight:800;font-stretch:125%;font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--coral);margin-bottom:5px}
 .hw-txt h3{margin-bottom:5px}
@@ -182,9 +178,7 @@ p{color:var(--ink2)}
 @media(min-width:940px){.cards4{grid-template-columns:repeat(4,1fr)}}
 .card{background:#fff;border:1px solid #ECE8E0;border-radius:var(--r);padding:24px 21px;box-shadow:var(--shadow-sm);transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s}
 .card:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:rgba(249,167,22,.28)}
-.card-ico{width:46px;height:46px;border-radius:13px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;box-shadow:0 8px 18px -8px rgba(249,167,22,.5)}
-
-.hw-ico,.card-ico{background:linear-gradient(135deg,#f9a716 0%,#f08c2f 100%);box-shadow:0 14px 30px -18px rgba(249,167,22,.75)}
+.card-ico{width:46px;height:46px;border-radius:13px;background:rgba(249,167,22,.12);display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:var(--amber)}
 
 .card h3{margin-bottom:6px}
 .card p{font-size:13.5px;line-height:1.48}
@@ -271,6 +265,55 @@ html{scroll-padding-top:76px}
 .hw-step{transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s,background .22s}
 .card{transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s}
 .hero{padding-top:110px}
+
+/* stat iOS/Android : always nowrap, smaller font */
+.stat:last-child .stat-n{font-size:clamp(13px,2.5vw,22px);white-space:nowrap}
+
+/* ---------- RESPONSIVE MOBILE ---------- */
+@media(max-width:680px){
+  .topbar .wrap{padding-top:14px;gap:10px}
+  .topbar .logo-img{height:38px}
+  .hero{padding-top:90px}
+  .hero h1{font-size:clamp(26px,7.5vw,36px);line-height:1.02}
+  .hero-sub{font-size:15px;margin-bottom:24px}
+  .hero-left{padding-bottom:40px}
+  .hero .btn{font-size:14px;padding:14px 20px}
+  .urgency{flex-wrap:wrap;gap:8px;font-size:12px;padding:9px 14px}
+  .urgency-bar{min-width:60px}
+  .hero-counter{font-size:12px;padding:6px 12px 6px 8px}
+  .bonus{display:none}
+  .sec{padding:56px 0}
+  .how-head p,.control-head p,.faq-head p{font-size:15px}
+  .how-steps{gap:10px}
+  .hw-step{padding:16px 16px;gap:14px}
+  .hw-ico{width:44px;height:44px;border-radius:12px}
+  .hw-ico svg,.card-ico svg{width:20px;height:20px}
+  .cards4{grid-template-columns:1fr 1fr;gap:12px}
+  .card{padding:18px 16px}
+  .card-ico{width:40px;height:40px;border-radius:11px}
+  .faq-btn{font-size:14px;padding:16px 18px}
+  .faq-a p{padding:0 18px 16px;font-size:14px}
+  .final{padding:60px 0}
+  .final h2{font-size:clamp(22px,7vw,32px)}
+  .final-sub{font-size:15px}
+  .waitlist-wrap{max-width:100%!important}
+  .reassure{gap:10px 16px}
+  .reassure span{font-size:13px}
+  .footer-in{gap:24px}
+  .footer-cols{gap:32px}
+  .stats-strip .wrap{flex-wrap:wrap}
+  .stat{min-width:50%;padding:16px 12px}
+  .stat:nth-child(3)::before,.stat:nth-child(4)::before{display:none}
+}
+@media(max-width:400px){
+  .wrap{padding:0 16px}
+  .hero h1{font-size:26px}
+  .cards4{grid-template-columns:1fr}
+  .phone-scaler{--s:.68}
+  .stat{min-width:50%}
+  h2{font-size:clamp(22px,7vw,32px)}
+  .stats-strip .stat-n{font-size:16px}
+}
 </style>
 </head>
 <body>
@@ -317,7 +360,7 @@ html{scroll-padding-top:76px}
         <span><span class="tick">✓</span>Ton avis te rapporte</span>
       </div>
       <div class="urgency">
-        <span>🎁 Bonus offert aux <b>500 premiers</b></span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Bonus offert aux <b>500 premiers</b></span>
         <div class="urgency-bar"><div class="urgency-fill" id="urgencyFill"></div></div>
       </div>
       <div class="hero-counter">
@@ -344,7 +387,7 @@ html{scroll-padding-top:76px}
     <div class="stat reveal"><span class="stat-n"><em class="count-stat" data-target="312">312</em></span><span class="stat-l">déjà inscrits</span></div>
     <div class="stat reveal d1"><span class="stat-n">30<em>s</em></span><span class="stat-l">par jour</span></div>
     <div class="stat reveal d2"><span class="stat-n">100<em>%</em></span><span class="stat-l">gratuit</span></div>
-    <div class="stat reveal d3"><span class="stat-n">iOS <em>&amp;</em> Android</span><span class="stat-l">bientôt disponible</span></div>
+    <div class="stat reveal d3"><span class="stat-n">iOS<em> &amp; </em>Android</span><span class="stat-l">bientôt disponible</span></div>
   </div>
 </div>
 
@@ -357,11 +400,11 @@ html{scroll-padding-top:76px}
       <p>Quelques secondes par jour suffisent. Voici le déroulé, étape par étape.</p>
     </div>
     <div class="how-steps">
-      <div class="hw-step reveal d1"><div class="hw-ico">💬</div><div class="hw-txt"><span class="hw-lbl">Étape 1</span><h3>Réponds à une question</h3><p>Une question par jour pour commencer. Plus si tu veux aller plus loin.</p></div></div>
-      <div class="hw-step reveal d1"><div class="hw-ico">⭐</div><div class="hw-txt"><span class="hw-lbl">Étape 2</span><h3>Gagne des points</h3><p>Chaque réponse te permet de gagner des points.</p></div></div>
-      <div class="hw-step reveal d2"><div class="hw-ico">🎁</div><div class="hw-txt"><span class="hw-lbl">Étape 3</span><h3>Transforme tes points en récompenses</h3><p>Tes points deviennent des récompenses que tu peux vraiment utiliser.</p></div></div>
-      <div class="hw-step reveal d2"><div class="hw-ico">🎛️</div><div class="hw-txt"><span class="hw-lbl">Étape 4</span><h3>Garde le contrôle</h3><p>Tu choisis les marques qui peuvent te poser des questions, tu sais toujours pourquoi elles te sollicitent, et tu peux décider à tout moment de ne plus recevoir leurs questions.</p></div></div>
-      <div class="hw-step reveal d3"><div class="hw-ico">👥</div><div class="hw-txt"><span class="hw-lbl">Étape 5</span><h3>Avec tes amis</h3><p>Découvre les réponses de tes amis, réagis, commente et rends l'expérience plus fun au quotidien.</p></div></div>
+      <div class="hw-step reveal d1"><div class="hw-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="hw-txt"><span class="hw-lbl">Étape 1</span><h3>Réponds à une question</h3><p>Une question par jour pour commencer. Plus si tu veux aller plus loin.</p></div></div>
+      <div class="hw-step reveal d1"><div class="hw-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="hw-txt"><span class="hw-lbl">Étape 2</span><h3>Gagne des points</h3><p>Chaque réponse te permet de gagner des points.</p></div></div>
+      <div class="hw-step reveal d2"><div class="hw-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div><div class="hw-txt"><span class="hw-lbl">Étape 3</span><h3>Transforme tes points en récompenses</h3><p>Tes points deviennent des récompenses que tu peux vraiment utiliser.</p></div></div>
+      <div class="hw-step reveal d2"><div class="hw-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div><div class="hw-txt"><span class="hw-lbl">Étape 4</span><h3>Garde le contrôle</h3><p>Tu choisis les marques qui peuvent te poser des questions, tu sais toujours pourquoi elles te sollicitent, et tu peux décider à tout moment de ne plus recevoir leurs questions.</p></div></div>
+      <div class="hw-step reveal d3"><div class="hw-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="hw-txt"><span class="hw-lbl">Étape 5</span><h3>Avec tes amis</h3><p>Découvre les réponses de tes amis, réagis, commente et rends l'expérience plus fun au quotidien.</p></div></div>
     </div>
   </div>
 </section>
@@ -375,10 +418,10 @@ html{scroll-padding-top:76px}
       <p>Avec Noova, chaque question est claire : tu sais quelle marque te sollicite, pourquoi elle te pose la question, et tu peux arrêter de recevoir ses questions à tout moment. Chaque réponse utile te permet aussi de cumuler des points à échanger contre des récompenses concrètes.</p>
     </div>
     <div class="cards4">
-      <div class="card reveal d1"><div class="card-ico">✅</div><h3>Marques autorisées</h3><p>Tu réponds uniquement aux marques que tu acceptes.</p></div>
-      <div class="card reveal d2"><div class="card-ico">🎯</div><h3>Objectif clair</h3><p>Chaque question explique pourquoi elle t'est posée.</p></div>
-      <div class="card reveal d3"><div class="card-ico">⭐</div><h3>Points cumulés</h3><p>Chaque réponse utile te permet de gagner des points.</p></div>
-      <div class="card reveal d4"><div class="card-ico">🎁</div><h3>Récompenses concrètes</h3><p>Tes points deviennent des récompenses que tu peux vraiment utiliser.</p></div>
+      <div class="card reveal d1"><div class="card-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><h3>Marques autorisées</h3><p>Tu réponds uniquement aux marques que tu acceptes.</p></div>
+      <div class="card reveal d2"><div class="card-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><h3>Objectif clair</h3><p>Chaque question explique pourquoi elle t'est posée.</p></div>
+      <div class="card reveal d3"><div class="card-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><h3>Points cumulés</h3><p>Chaque réponse utile te permet de gagner des points.</p></div>
+      <div class="card reveal d4"><div class="card-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div><h3>Récompenses concrètes</h3><p>Tes points deviennent des récompenses que tu peux vraiment utiliser.</p></div>
     </div>
     <p class="reassure-line reveal">Rien n'est automatique : tu choisis, tu comprends, tu peux changer d'avis.</p>
   </div>
