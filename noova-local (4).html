@@ -1,547 +1,9 @@
-﻿<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noova · Tes avis valent de l'argent</title>
-<meta name="description" content="30 secondes par jour. Une question. Des points. Des récompenses. Rejoins la liste d'attente de Noova, l'app où tes avis te rapportent enfin quelque chose.">
-
-<!-- Favicon -->
-<link rel="icon" type="image/png" href="Plan%20de%20travail%208LOGO_NOOVAV2.png">
-<link rel="apple-touch-icon" href="Plan%20de%20travail%208LOGO_NOOVAV2.png">
-
-<!-- Canonical -->
-<link rel="canonical" href="https://noovaoff.vercel.app/">
-
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://noovaoff.vercel.app/">
-<meta property="og:title" content="Noova, Là où tes avis ont de la valeur">
-<meta property="og:description" content="30 secondes par jour. Une question. Des points. Des récompenses. L'app où tes avis te rapportent enfin quelque chose.">
-<meta property="og:image" content="https://noovaoff.vercel.app/Plan%20de%20travail%208LOGO_NOOVAV2.png">
-<meta property="og:locale" content="fr_FR">
-<meta property="og:site_name" content="Noova">
-
-<!-- Twitter / X -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Noova, Là où tes avis ont de la valeur">
-<meta name="twitter:description" content="30 secondes par jour. Une question. Des points. Des récompenses.">
-<meta name="twitter:image" content="https://noovaoff.vercel.app/Plan%20de%20travail%208LOGO_NOOVAV2.png">
-
-<!-- Misc -->
-<meta name="robots" content="index, follow">
-<meta name="theme-color" content="#f9a716">
-
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,400;100,500;100,600;100,700;125,700;125,800;125,900&display=swap" rel="stylesheet">
-
-<!-- Structured data -->
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"MobileApplication","name":"Noova","description":"L'application mobile où tes avis te rapportent des points et des récompenses.","applicationCategory":"Lifestyle","operatingSystem":"iOS, Android","url":"https://noovaoff.vercel.app/","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@type":"Organization","name":"Noova","url":"https://noovaoff.vercel.app/"}}
-</script>
-<style>
-:root{
-  --bg:#F7F6F2;--bg2:#EFEDE8;--bg3:#E6E3DC;--card:#FFFFFF;
-  --ink:#17141A;--ink2:#605A68;--ink3:#A9A4B0;
-  --coral:#f9a716;--coral-d:#d4900f;--coral-soft:rgba(249,167,22,.10);
-  --amber:#f9a716;--gold:#fce1a7;
-  --grad:linear-gradient(135deg,#f9a716 0%,#fcc86a 50%,#fce1a7 100%);
-  --grad-warm:linear-gradient(135deg,#f9a716,#fcc86a);
-  --grad-soft:linear-gradient(135deg,#fef7e5,#fffdf8);
-  --dark:#161318;--dark2:#211D27;--darker:#0F0D12;
-  --r:20px;--rs:14px;--rl:30px;
-  /* display = Archivo Expanded ; body = Archivo */
-  --fd:'Archivo',sans-serif;--fb:'Archivo',sans-serif;
-  --shadow:0 14px 38px -16px rgba(23,20,26,.16);
-  --shadow-sm:0 4px 16px -8px rgba(23,20,26,.12);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{font-family:var(--fb);font-weight:400;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-a{color:inherit;text-decoration:none}
-body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-
-/* ---------- typography (impact) ---------- */
-.eyebrow{font-family:var(--fd);font-weight:800;font-stretch:125%;font-size:12.5px;letter-spacing:2px;text-transform:uppercase;color:var(--coral)}
-h1,h2{font-family:var(--fd);font-weight:900;font-stretch:125%;text-transform:uppercase;line-height:.98;letter-spacing:-.5px}
-h1{font-size:clamp(30px,5.4vw,52px)}
-h2{font-size:clamp(25px,4vw,40px)}
-h3{font-family:var(--fd);font-weight:700;font-stretch:110%;font-size:17px;letter-spacing:-.2px;line-height:1.12}
-p{color:var(--ink2)}
-
-/* ---------- buttons ---------- */
-.btn{font-family:var(--fd);font-weight:700;font-size:15px;border:none;cursor:pointer;background:var(--grad-warm);color:#241600;padding:15px 26px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 26px -8px rgba(249,167,22,.6);transition:transform .18s cubic-bezier(.2,.8,.3,1),box-shadow .18s,filter .18s;white-space:nowrap}
-.btn:hover{transform:translateY(-2px) scale(1.015);box-shadow:0 16px 34px -8px rgba(249,167,22,.66);filter:saturate(1.06)}
-.btn:active{transform:translateY(0) scale(.99)}
-.btn svg{transition:transform .2s}
-.btn:hover svg{transform:translateX(3px)}
-
-/* ---------- waitlist form ---------- */
-.waitlist-form{display:flex;gap:10px;width:100%;max-width:470px;margin:0 auto}
-.waitlist-form input{flex:1;min-width:0;font-family:var(--fb);font-weight:500;font-size:15px;color:var(--ink);background:#fff;border:1.5px solid transparent;border-radius:14px;padding:14px 17px;transition:border-color .2s,box-shadow .2s;outline:none}
-.waitlist-form input:focus{border-color:var(--amber);box-shadow:0 0 0 4px rgba(249,167,22,.18)}
-.waitlist-done{display:none;align-items:center;gap:10px;font-weight:700;font-family:var(--fd);color:#fff;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.16);border-radius:14px;padding:14px 19px;max-width:470px;margin:0 auto;animation:fadeUp .4s both}
-.waitlist-done .chk{width:23px;height:23px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#241600;flex:none;font-size:12px}
-.waitlist-error{font-size:13px;color:#f9a716;margin-top:8px;text-align:center;min-height:18px}
-@media(max-width:560px){.waitlist-form{flex-direction:column}.waitlist-form .btn{width:100%}}
-
-.reassure{display:flex;flex-wrap:wrap;gap:14px 24px;margin-top:20px}
-.reassure span{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--ink2)}
-.reassure .tick{color:var(--coral);font-weight:800}
-.reassure.dark span{color:rgba(255,255,255,.78)}
-.reassure.dark .tick{color:var(--amber)}
-
-.pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;font-family:var(--fd);letter-spacing:.8px;text-transform:uppercase;padding:8px 15px;border-radius:100px;background:var(--coral-soft);color:var(--coral-d);border:1px solid rgba(249,167,22,.18)}
-.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 4px rgba(249,167,22,.18);animation:blink 2.4s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-
-/* ---------- TOP BAR ---------- */
-.topbar{position:absolute;top:0;left:0;right:0;z-index:20}
-.topbar .wrap{display:flex;align-items:center;justify-content:space-between;padding-top:18px;gap:16px}
-.brand{display:flex;align-items:center}
-.topbar .logo-img{height:48px}
-.logo-img{height:64px;width:auto;display:block}
-.nav-cta{display:none}
-@media(min-width:760px){.nav-cta{display:inline-flex;font-size:14px;padding:11px 19px;flex:none}}
-@media(min-width:900px){.nav-cta{display:none}}
-/* header inline form */
-.header-waitlist{display:none;flex:1;max-width:360px}
-@media(min-width:900px){.header-waitlist{display:block}}
-.header-waitlist .waitlist-form{max-width:none;margin:0;gap:8px}
-.header-waitlist .waitlist-form input{padding:10px 14px;font-size:13.5px;background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.18);color:#fff}
-.header-waitlist .waitlist-form input::placeholder{color:rgba(255,255,255,.48)}
-.header-waitlist .waitlist-form input:focus{border-color:var(--amber);background:rgba(255,255,255,.15);box-shadow:0 0 0 3px rgba(249,167,22,.22)}
-.header-waitlist .waitlist-form .btn{font-size:13px;padding:10px 16px;flex:none}
-.header-waitlist .waitlist-done{max-width:none;margin:0;padding:10px 14px;font-size:13px}
-.header-waitlist .waitlist-error{font-size:12px;text-align:left}
-
-/* ---------- HERO (deux colonnes) ---------- */
-.hero{position:relative;padding:100px 0 0;overflow:hidden;background:radial-gradient(125% 115% at 60% -10%,#241F2B 0%,var(--darker) 58%);color:#fff}
-.hero .wrap{display:grid;grid-template-columns:1fr;gap:40px;align-items:end;position:relative;z-index:1}
-@media(min-width:920px){.hero .wrap{grid-template-columns:1fr minmax(0,370px);gap:60px;align-items:center;padding-bottom:0}}
-.blob{position:absolute;border-radius:50%;filter:blur(70px);z-index:0;pointer-events:none}
-.blob.a{width:520px;height:520px;background:radial-gradient(circle,rgba(251,191,36,.28),transparent 70%);top:-180px;right:-60px}
-.blob.b{width:380px;height:380px;background:radial-gradient(circle,rgba(249,167,22,.14),transparent 70%);bottom:-110px;left:-110px}
-.hero-left{text-align:left;padding-bottom:60px}
-@media(min-width:920px){.hero-left{padding-bottom:80px}}
-.hero .pill{margin-bottom:28px;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:rgba(255,255,255,.85)}
-.hero .pill .dot{background:var(--amber);box-shadow:0 0 0 4px rgba(249,167,22,.2)}
-.hero h1{margin-bottom:22px;color:#fff;line-height:1.0;font-size:clamp(29px,4.3vw,45px)}
-.hero h1 .l2{display:block;background:linear-gradient(175deg,#f9a716 0%,#fce1a7 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-top:10px}
-.hero-sub{font-size:clamp(15px,1.7vw,17px);margin-bottom:32px;color:rgba(255,255,255,.68);font-weight:400;line-height:1.65;max-width:52ch}
-.hero-sub strong{color:rgba(255,255,255,.92);font-weight:600}
-.hero .reassure{justify-content:flex-start}
-.hero-right{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:0;align-self:end}
-@media(max-width:919px){.hero-right{display:flex;align-self:center;padding-top:8px;padding-bottom:48px}}
-.bonus{margin-top:22px;display:inline-flex;align-items:center;gap:11px;background:var(--grad-soft);border:1px solid rgba(249,167,22,.4);border-radius:15px;padding:12px 19px;font-weight:600;font-size:13.5px;color:#5a3d05;box-shadow:var(--shadow-sm)}
-
-/* ---------- sections ---------- */
-.sec{padding:74px 0}
-.sec-light2{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
-
-/* HOW IT WORKS */
-.how-head{text-align:center;max-width:640px;margin:0 auto 42px}
-.how-head .eyebrow{display:block;margin-bottom:12px}
-.how-head h2{margin-bottom:13px}
-.how-head p{font-size:16px}
-.phone-stage{position:relative;display:flex;flex-direction:column;align-items:center;justify-self:center}
-.phone-hint{display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;font-size:12.5px;font-weight:800;font-family:var(--fd);font-stretch:110%;letter-spacing:.3px;color:var(--coral-d);background:#fff;border:1px solid rgba(249,167,22,.2);border-radius:100px;padding:8px 14px;box-shadow:var(--shadow-sm)}
-.phone-hint .tap{animation:tap 1.8s ease-in-out infinite;display:inline-block}
-@keyframes tap{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-.phone-halo{position:absolute;width:115%;height:80%;top:14%;left:-7.5%;border-radius:50%;background:radial-gradient(circle,rgba(249,167,22,.26),transparent 68%);filter:blur(34px);z-index:0;animation:halo 5s ease-in-out infinite}
-@keyframes halo{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
-.phone-scaler{--s:.82;width:calc(390px * var(--s));height:calc(844px * var(--s));position:relative;z-index:2;animation:float 6s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0) rotate(-.4deg)}50%{transform:translateY(-14px) rotate(.4deg)}}
-.phone-wrap{position:absolute;top:0;left:0;width:390px;height:844px;transform:scale(var(--s));transform-origin:top left;background:#14121a;border-radius:54px;padding:11px;box-shadow:0 40px 80px -30px rgba(23,20,26,.5),inset 0 0 0 1.5px #2c2733}
-.phone-wrap iframe{width:100%;height:100%;border:none;border-radius:44px;display:block;background:var(--bg)}
-@media(max-width:520px){.phone-scaler{--s:.72}}
-@media(max-width:380px){.phone-scaler{--s:.63}}
-/* HOW IT WORKS — étapes au propre */
-.how-steps{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-.hw-step{display:flex;gap:18px;align-items:flex-start;background:#fff;border:1px solid #ECE8E0;border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow-sm);transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s}
-.hw-step:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(249,167,22,.3)}
-.hw-ico{flex:none;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(249,167,22,.12);color:var(--amber)}
-.hw-txt{flex:1}
-.hw-lbl{display:block;font-family:var(--fd);font-weight:800;font-stretch:125%;font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--coral);margin-bottom:5px}
-.hw-txt h3{margin-bottom:5px}
-.hw-txt p{font-size:14px;line-height:1.5;color:var(--ink2)}
-
-/* CONTROL + REWARD */
-.control-head{max-width:660px;margin-bottom:38px}
-.control-head .eyebrow{display:block;margin-bottom:13px}
-.control-head h2{margin-bottom:16px}
-.control-head p{font-size:16px}
-.cards4{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-@media(min-width:940px){.cards4{grid-template-columns:repeat(4,1fr)}}
-.card{background:#fff;border:1px solid #ECE8E0;border-radius:var(--r);padding:24px 21px;box-shadow:var(--shadow-sm);transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s}
-.card:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:rgba(249,167,22,.28)}
-.card-ico{width:46px;height:46px;border-radius:13px;background:rgba(249,167,22,.12);display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:var(--amber)}
-
-.card h3{margin-bottom:6px}
-.card p{font-size:13.5px;line-height:1.48}
-.reassure-line{text-align:center;margin-top:32px;font-size:15px;font-weight:600;color:var(--ink2)}
-
-/* FINAL CTA */
-.final{background:radial-gradient(120% 120% at 50% 0%,#241F2B 0%,var(--dark) 55%);color:#fff;padding:84px 0;text-align:center;overflow:hidden;position:relative}
-.final .glow{position:absolute;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(249,167,22,.22),transparent 68%);filter:blur(50px);top:-210px;left:50%;transform:translateX(-50%)}
-.final>*{position:relative;z-index:1}
-.final .eyebrow{color:var(--amber);display:block;margin-bottom:16px}
-.final h2{color:#fff;margin-bottom:16px;max-width:18ch;margin-left:auto;margin-right:auto}
-.final-sub{color:rgba(255,255,255,.7);font-size:16px;max-width:560px;margin:0 auto 32px;font-weight:450}
-.final .reassure{justify-content:center}
-.final-sign{margin-top:46px;font-family:var(--fd);font-weight:800;font-stretch:110%;font-size:15px;color:rgba(255,255,255,.5);letter-spacing:.2px}
-.final-sign b{color:#fff;font-weight:900}
-
-/* FOOTER (noir) */
-.footer{background:var(--darker);color:#fff;padding:56px 0 30px;border-top:1px solid rgba(255,255,255,.07)}
-.footer-in{display:flex;flex-wrap:wrap;gap:40px;justify-content:space-between;align-items:flex-start}
-.footer-brand{max-width:300px}
-.footer-brand .logo-img{height:38px;margin-bottom:14px}
-.footer-brand p{color:rgba(255,255,255,.6);font-size:14px;margin-bottom:14px;line-height:1.5}
-.footer-brand .pill{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:rgba(255,255,255,.8)}
-.footer-brand .pill .dot{background:var(--amber);box-shadow:0 0 0 4px rgba(249,167,22,.2)}
-.footer-cols{display:flex;gap:54px;flex-wrap:wrap}
-.footer-col h4{font-family:var(--fd);font-weight:800;font-stretch:110%;text-transform:uppercase;letter-spacing:1.2px;font-size:11.5px;color:rgba(255,255,255,.45);margin-bottom:14px}
-.footer-col a{display:block;color:rgba(255,255,255,.75);font-size:14px;font-weight:500;margin-bottom:10px;transition:color .18s}
-.footer-col a:hover{color:var(--amber)}
-.footer-bottom{margin-top:42px;padding-top:22px;border-top:1px solid rgba(255,255,255,.07);font-size:12.5px;color:rgba(255,255,255,.4)}
-
-/* reveal */
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.2,.8,.3,1),transform .7s cubic-bezier(.2,.8,.3,1)}
-.reveal.in{opacity:1;transform:none}
-.reveal.d1{transition-delay:.07s}.reveal.d2{transition-delay:.14s}.reveal.d3{transition-delay:.21s}.reveal.d4{transition-delay:.28s}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important}.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
-
-/* ---------- STICKY TOPBAR ---------- */
-.topbar{position:fixed;transition:background .35s,backdrop-filter .35s,box-shadow .35s}
-.topbar.scrolled{background:rgba(15,13,18,.88);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 1px 0 rgba(255,255,255,.08)}
-
-/* ---------- HERO COUNTER ---------- */
-.hero-counter{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:100px;padding:7px 16px 7px 10px;font-size:13px;font-weight:600;color:rgba(255,255,255,.78);margin-top:22px}
-.hc-dots{display:flex;gap:3px;align-items:center}
-.hc-dots span{width:5px;height:5px;border-radius:50%;background:var(--amber);animation:blink 1.8s infinite}
-.hc-dots span:nth-child(2){animation-delay:.3s}.hc-dots span:nth-child(3){animation-delay:.6s}
-.hc-num{font-family:var(--fd);font-weight:900;font-size:15px;color:var(--amber);margin:0 2px}
-
-/* ---------- URGENCY BANNER (500 spots) ---------- */
-.urgency{display:inline-flex;align-items:center;gap:10px;margin-top:16px;background:rgba(249,167,22,.1);border:1px solid rgba(249,167,22,.28);border-radius:12px;padding:10px 16px;font-size:13px;font-weight:600;color:rgba(255,255,255,.9)}
-.urgency-bar{flex:1;min-width:80px;height:5px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden}
-.urgency-fill{height:100%;background:var(--grad-warm);border-radius:99px;width:0;transition:width 1.4s cubic-bezier(.2,.8,.3,1) .6s}
-
-/* ---------- STATS STRIP ---------- */
-.stats-strip{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
-.stats-strip .wrap{display:flex;align-items:stretch;justify-content:center;flex-wrap:wrap}
-.stat{flex:1;min-width:130px;padding:22px 20px;text-align:center;position:relative}
-.stat+.stat::before{content:'';position:absolute;left:0;top:20%;height:60%;width:1px;background:rgba(255,255,255,.1)}
-.stat-n{display:block;font-family:var(--fd);font-weight:900;font-stretch:125%;font-size:clamp(24px,3vw,34px);color:#fff;letter-spacing:-.5px;line-height:1}
-.stat-n em{color:var(--amber);font-style:normal}
-.stat-l{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.6px;color:rgba(255,255,255,.42);margin-top:5px}
-@media(max-width:540px){.stat{min-width:50%;padding:16px 12px}.stat:nth-child(3)::before,.stat:nth-child(4)::before{display:none}}
-
-/* ---------- FAQ ---------- */
-.faq{background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%)}
-.faq-head{text-align:center;max-width:600px;margin:0 auto 40px}
-.faq-head .eyebrow{display:block;margin-bottom:12px}
-.faq-head h2{margin-bottom:12px}
-.faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
-.faq-item{background:#fff;border:1px solid #ECE8E0;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .22s,border-color .22s}
-.faq-item.open{border-color:rgba(249,167,22,.35);box-shadow:var(--shadow)}
-.faq-btn{width:100%;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:none;border:none;cursor:pointer;text-align:left;font-family:var(--fd);font-weight:700;font-stretch:110%;font-size:15px;color:var(--ink);line-height:1.3}
-.faq-ico{width:30px;height:30px;border-radius:9px;background:var(--coral-soft);display:flex;align-items:center;justify-content:center;flex:none;transition:background .22s,transform .3s}
-.faq-ico svg{transition:transform .3s;color:var(--coral)}
-.faq-item.open .faq-ico{background:var(--grad-warm);transform:rotate(45deg)}
-.faq-item.open .faq-ico svg{color:#241600}
-.faq-a{max-height:0;overflow:hidden;transition:max-height .42s cubic-bezier(.2,.8,.3,1)}
-.faq-item.open .faq-a{max-height:500px}
-.faq-a p{padding:0 22px 20px;font-size:14.5px;color:var(--ink2);line-height:1.75;margin:0}
-
-/* ---------- global polish ---------- */
-html{scroll-padding-top:76px}
-.sec{padding:80px 0}
-.hw-step{transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s,background .22s}
-.card{transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s}
-.hero{padding-top:110px}
-
-/* stat iOS/Android : always nowrap, smaller font */
-.stat:last-child .stat-n{font-size:clamp(13px,2.5vw,22px);white-space:nowrap}
-
-/* ---------- RESPONSIVE MOBILE ---------- */
-@media(max-width:680px){
-  .topbar .wrap{padding-top:14px;gap:10px}
-  .topbar .logo-img{height:38px}
-  .hero{padding-top:90px}
-  .hero h1{font-size:clamp(26px,7.5vw,36px);line-height:1.02}
-  .hero-sub{font-size:15px;margin-bottom:24px}
-  .hero-left{padding-bottom:40px}
-  .hero .btn{font-size:14px;padding:14px 20px}
-  .urgency{flex-wrap:wrap;gap:8px;font-size:12px;padding:9px 14px}
-  .urgency-bar{min-width:60px}
-  .hero-counter{font-size:12px;padding:6px 12px 6px 8px}
-  .bonus{display:none}
-  .sec{padding:56px 0}
-  .how-head p,.control-head p,.faq-head p{font-size:15px}
-  .how-steps{gap:10px}
-  .hw-step{padding:16px 16px;gap:14px}
-  .hw-ico{width:44px;height:44px;border-radius:12px}
-  .hw-ico svg,.card-ico svg{width:20px;height:20px}
-  .cards4{grid-template-columns:1fr 1fr;gap:12px}
-  .card{padding:18px 16px}
-  .card-ico{width:40px;height:40px;border-radius:11px}
-  .faq-btn{font-size:14px;padding:16px 18px}
-  .faq-a p{padding:0 18px 16px;font-size:14px}
-  .final{padding:60px 0}
-  .final h2{font-size:clamp(22px,7vw,32px)}
-  .final-sub{font-size:15px}
-  .waitlist-wrap{max-width:100%!important}
-  .reassure{gap:10px 16px}
-  .reassure span{font-size:13px}
-  .footer-in{gap:24px}
-  .footer-cols{gap:32px}
-  .stats-strip .wrap{flex-wrap:wrap}
-  .stat{min-width:50%;padding:16px 12px}
-  .stat:nth-child(3)::before,.stat:nth-child(4)::before{display:none}
-}
-@media(max-width:400px){
-  .wrap{padding:0 16px}
-  .hero h1{font-size:26px}
-  .cards4{grid-template-columns:1fr}
-  .phone-scaler{--s:.68}
-  .stat{min-width:50%}
-  h2{font-size:clamp(22px,7vw,32px)}
-  .stats-strip .stat-n{font-size:16px}
-}
-</style>
-</head>
-<body>
-
-<!-- TOP BAR -->
-<header class="topbar">
-  <div class="wrap">
-    <div class="brand">
-      <img class="logo-img" src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Noova" fetchpriority="high">
-    </div>
-    <div class="waitlist-wrap header-waitlist">
-      <form class="waitlist-form" onsubmit="submitWaitlist(event)">
-        <input type="email" placeholder="ton@email.com" autocomplete="email" required>
-        <button type="submit" class="btn">Rejoindre</button>
-      </form>
-      <div class="waitlist-error"></div>
-      <div class="waitlist-done">
-        <div class="chk">✓</div>
-        <span>Tu es sur la liste !</span>
-      </div>
-    </div>
-    <a href="#liste" class="btn nav-cta">Être prévenu</a>
-  </div>
-</header>
-
-<!-- HERO (deux colonnes : texte gauche + téléphone droite) -->
-<section class="hero">
-  <div class="blob a"></div>
-  <div class="blob b"></div>
-  <div class="wrap">
-    <!-- LEFT: copy + CTA -->
-    <div class="hero-left">
-      <span class="pill"><span class="dot"></span>Bientôt sur iOS &amp; Android</span>
-      <h1>30 SECONDES PAS JOUR.<span class="l2">UNE QUESTIONS.<br>DES POINTS.<br>DES récompenses</span></h1>
-      <p class="hero-sub">Tu donnes déjà ton avis partout, tout le temps, gratuitement, souvent sans même t'en rendre compte.<strong>Avec Noova, tu le fais volontairement</strong>, tu sais pourquoi on te pose chaque question, et tes réponses te rapportent enfin quelque chose.</p>
-      <div class="hero-form-cta">
-        <a class="btn" href="#liste">Rejoindre la liste d'attente
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
-      </div>
-      <div class="reassure dark">
-        <span><span class="tick">✓</span>Gratuit</span>
-        <span><span class="tick">✓</span>Tu gardes le contrôle</span>
-        <span><span class="tick">✓</span>Ton avis te rapporte</span>
-      </div>
-      <div class="urgency">
-        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Bonus offert aux <b>500 premiers</b></span>
-        <div class="urgency-bar"><div class="urgency-fill" id="urgencyFill"></div></div>
-      </div>
-      <div class="hero-counter">
-        <div class="hc-dots"><span></span><span></span><span></span></div>
-        <span><b class="hc-num" data-target="312">0</b> personnes déjà inscrites</span>
-      </div>
-    </div>
-    <!-- RIGHT: phone demo -->
-    <div class="hero-right">
-      <div class="phone-stage">
-        <span class="phone-hint"><span class="tap">↗</span>Démo interactive · touche l'écran</span>
-        <div class="phone-halo"></div>
-        <div class="phone-scaler">
-          <div class="phone-wrap"><iframe id="demoFrame" title="Démo interactive de l'application Noova" scrolling="no"></iframe></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- STATS STRIP -->
-<div class="stats-strip">
-  <div class="wrap">
-    <div class="stat reveal"><span class="stat-n"><em class="count-stat" data-target="312">312</em></span><span class="stat-l">déjà inscrits</span></div>
-    <div class="stat reveal d1"><span class="stat-n">30<em>s</em></span><span class="stat-l">par jour</span></div>
-    <div class="stat reveal d2"><span class="stat-n">100<em>%</em></span><span class="stat-l">gratuit</span></div>
-    <div class="stat reveal d3"><span class="stat-n">iOS<em> &amp; </em>Android</span><span class="stat-l">bientôt disponible</span></div>
-  </div>
-</div>
-
-<!-- HOW IT WORKS (étapes détaillées) -->
-<section class="sec sec-light2" id="demo">
-  <div class="wrap">
-    <div class="how-head reveal">
-      <span class="eyebrow">Comment ça marche</span>
-      <h2>De la question à la récompense</h2>
-      <p>Quelques secondes par jour suffisent. Voici le déroulé, étape par étape.</p>
-    </div>
-    <div class="how-steps">
-      <div class="hw-step reveal d1"><div class="hw-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="hw-txt"><span class="hw-lbl">Étape 1</span><h3>Réponds à une question</h3><p>Une question par jour pour commencer. Plus si tu veux aller plus loin.</p></div></div>
-      <div class="hw-step reveal d1"><div class="hw-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="hw-txt"><span class="hw-lbl">Étape 2</span><h3>Gagne des points</h3><p>Chaque réponse te permet de gagner des points.</p></div></div>
-      <div class="hw-step reveal d2"><div class="hw-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div><div class="hw-txt"><span class="hw-lbl">Étape 3</span><h3>Transforme tes points en récompenses</h3><p>Tes points deviennent des récompenses que tu peux vraiment utiliser.</p></div></div>
-      <div class="hw-step reveal d2"><div class="hw-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div><div class="hw-txt"><span class="hw-lbl">Étape 4</span><h3>Garde le contrôle</h3><p>Tu choisis les marques qui peuvent te poser des questions, tu sais toujours pourquoi elles te sollicitent, et tu peux décider à tout moment de ne plus recevoir leurs questions.</p></div></div>
-      <div class="hw-step reveal d3"><div class="hw-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="hw-txt"><span class="hw-lbl">Étape 5</span><h3>Avec tes amis</h3><p>Découvre les réponses de tes amis, réagis, commente et rends l'expérience plus fun au quotidien.</p></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTROL + REWARD -->
-<section class="sec">
-  <div class="wrap">
-    <div class="control-head reveal">
-      <span class="eyebrow">Tes avis, tes règles</span>
-      <h2>Tu gardes le contrôle. Tu y gagnes.</h2>
-      <p>Avec Noova, chaque question est claire : tu sais quelle marque te sollicite, pourquoi elle te pose la question, et tu peux arrêter de recevoir ses questions à tout moment. Chaque réponse utile te permet aussi de cumuler des points à échanger contre des récompenses concrètes.</p>
-    </div>
-    <div class="cards4">
-      <div class="card reveal d1"><div class="card-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><h3>Marques autorisées</h3><p>Tu réponds uniquement aux marques que tu acceptes.</p></div>
-      <div class="card reveal d2"><div class="card-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><h3>Objectif clair</h3><p>Chaque question explique pourquoi elle t'est posée.</p></div>
-      <div class="card reveal d3"><div class="card-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><h3>Points cumulés</h3><p>Chaque réponse utile te permet de gagner des points.</p></div>
-      <div class="card reveal d4"><div class="card-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div><h3>Récompenses concrètes</h3><p>Tes points deviennent des récompenses que tu peux vraiment utiliser.</p></div>
-    </div>
-    <p class="reassure-line reveal">Rien n'est automatique : tu choisis, tu comprends, tu peux changer d'avis.</p>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section class="faq sec" id="faq">
-  <div class="wrap">
-    <div class="faq-head reveal">
-      <span class="eyebrow">Questions fréquentes</span>
-      <h2>On répond à tout.</h2>
-      <p>Tu as encore des doutes ? Voici les questions qu'on nous pose le plus souvent.</p>
-    </div>
-    <div class="faq-list">
-
-      <div class="faq-item reveal">
-        <button class="faq-btn" onclick="toggleFaq(this)">
-          <span>Quand l'application sera-t-elle disponible ?</span>
-          <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
-        </button>
-        <div class="faq-a"><p>Très bientôt. En t'inscrivant sur la liste d'attente, tu es parmi les premiers avertis au lancement. Tu reçois aussi un bonus de bienvenue si tu fais partie des 500 premiers inscrits.</p></div>
-      </div>
-
-      <div class="faq-item reveal d1">
-        <button class="faq-btn" onclick="toggleFaq(this)">
-          <span>Est-ce vraiment gratuit ?</span>
-          <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
-        </button>
-        <div class="faq-a"><p>Oui, totalement. Noova est gratuit pour les utilisateurs. Ce sont les marques qui financent l'app, exactement comme sur les réseaux sociaux. Sauf qu'ici, c'est toi qui es rémunéré pour tes réponses.</p></div>
-      </div>
-
-      <div class="faq-item reveal d2">
-        <button class="faq-btn" onclick="toggleFaq(this)">
-          <span>Comment mes réponses sont-elles utilisées ?</span>
-          <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
-        </button>
-        <div class="faq-a"><p>Tes réponses sont transmises de façon anonyme uniquement aux marques que tu as expressément autorisées. Tu sais toujours pourquoi une question t'est posée et ce qu'une marque cherche à comprendre. Aucune donnée n'est revendue à des tiers sans ton accord.</p></div>
-      </div>
-
-      <div class="faq-item reveal d3">
-        <button class="faq-btn" onclick="toggleFaq(this)">
-          <span>Quelles récompenses puis-je gagner ?</span>
-          <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
-        </button>
-        <div class="faq-a"><p>Bons de réduction, cashback, produits gratuits, accès exclusifs… Les récompenses varient selon les marques partenaires. Tes points n'expirent pas. Tu les cumules à ton rythme et tu les échanges quand tu veux.</p></div>
-      </div>
-
-      <div class="faq-item reveal d4">
-        <button class="faq-btn" onclick="toggleFaq(this)">
-          <span>Puis-je me désinscrire à tout moment ?</span>
-          <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
-        </button>
-        <div class="faq-a"><p>Oui, sans aucune contrainte. Tu peux à tout moment bloquer une marque, supprimer tes données ou fermer ton compte. Aucun abonnement, aucun engagement. Tu restes libre.</p></div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- FINAL CTA -->
-<section class="final" id="liste">
-  <div class="glow"></div>
-  <div class="wrap">
-    <span class="eyebrow reveal">Liste d'attente</span>
-    <h2 class="reveal">Fais partie des premiers à découvrir Noova.</h2>
-    <p class="final-sub reveal">L'application arrive bientôt. Inscris-toi pour être prévenu au lancement et recevoir ton bonus de bienvenue si tu fais partie des 500 premiers inscrits.</p>
-    <div class="waitlist-wrap reveal" style="max-width:520px;margin:0 auto;">
-      <form class="waitlist-form" id="waitlist-form" onsubmit="submitWaitlist(event)">
-        <input type="email" id="waitlist-email" placeholder="ton@email.com" autocomplete="email" required>
-        <button type="submit" class="btn">Rejoindre
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </button>
-      </form>
-      <div class="waitlist-error" id="waitlist-error"></div>
-      <div class="waitlist-done" id="waitlist-done">
-        <div class="chk">✓</div>
-        <span>Tu es sur la liste ! On te prévient au lancement 🎉</span>
-      </div>
-    </div>
-    <div class="reassure dark">
-      <span><span class="tick">✓</span>Gratuit</span>
-      <span><span class="tick">✓</span>Pas de spam</span>
-      <span><span class="tick">✓</span>Désinscription possible à tout moment</span>
-    </div>
-    <div class="final-sign reveal"><b>Noova</b>, là où tes avis ont de la valeur.</div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="wrap footer-in">
-    <div class="footer-brand">
-      <img class="logo-img" src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Noova">
-      <p>L'app où tes avis te rapportent quelque chose. Tu réponds, tu gagnes des points, tu gardes le contrôle.</p>
-      <span class="pill"><span class="dot"></span>Bientôt sur iOS &amp; Android</span>
-    </div>
-    <nav class="footer-cols">
-      <div class="footer-col">
-        <h4>Produit</h4>
-        <a href="#demo">Comment ça marche</a>
-        <a href="#faq">Questions fréquentes</a>
-        <a href="#liste">Rejoindre la liste d'attente</a>
-      </div>
-      <div class="footer-col">
-        <h4>Légal</h4>
-        <a href="#">Mentions légales</a>
-        <a href="#">Confidentialité</a>
-      </div>
-    </nav>
-  </div>
-  <div class="wrap footer-bottom">© 2026 Noova · Tous droits réservés</div>
-</footer>
-
-<!-- Démo de l'app embarquée (chargée dans le téléphone via srcdoc) -->
-<script type="text/html" id="noova-demo-src"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Noova App</title>
+<title>Noova — Prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -906,10 +368,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .bnav.show{display:flex}
 .nav-it{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 2px;border-radius:13px;transition:all .13s;position:relative}
 .nav-it:active{transform:scale(.85)}
-.nav-ico{line-height:1;display:flex;align-items:center;justify-content:center;width:24px;height:24px;color:var(--ink3);transition:color .15s}
+.nav-ico{font-size:21px;line-height:1}
 .nav-lbl{font-size:9px;font-weight:500;color:var(--ink3);transition:color .13s}
 .nav-it.on .nav-lbl{color:var(--coral);font-weight:700}
-.nav-it.on .nav-ico{color:var(--amber);filter:drop-shadow(0 0 5px rgba(245,166,35,.35))}
+.nav-it.on .nav-ico{filter:drop-shadow(0 0 4px rgba(224,125,10,.3))}
 .nav-badge{position:absolute;top:1px;right:calc(50% - 16px);width:7px;height:7px;background:var(--coral);border-radius:50%;border:2px solid var(--bg)}
 /* BUTTONS */
 .btn-p{width:100%;padding:14px;border-radius:12px;background:var(--grad);border:none;color:var(--gi);font-family:var(--fd);font-size:14px;font-weight:700;cursor:pointer;transition:all .13s;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 6px 18px var(--cg);letter-spacing:-.2px}
@@ -981,7 +443,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 </style>
 </head>
 <body>
-<div class="bg-label">Noova · Démo interactive</div>
+<div class="bg-label">Noova — Prototype interactif complet</div>
 <div id="shell">
 <div id="app">
 
@@ -1041,7 +503,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
           </div>
         </div>
         <h1 class="ob-title">Réponds.<br><em>Gagne.</em><br>Régale-toi.</h1>
-        <p class="ob-desc">Chaque réponse rapporte des points. Échange-les contre un café, un kebab, une place de ciné, dans les commerces de ton quartier, par paliers comme une carte de fidélité.</p>
+        <p class="ob-desc">Chaque réponse rapporte des points. Échange-les contre un café, un kebab, une place de ciné — chez les commerces de ton quartier, par paliers comme une carte de fidélité.</p>
       </div>
     </div>
     <div class="ob-dots"><div class="ob-dot on" id="d0"></div><div class="ob-dot" id="d1"></div><div class="ob-dot" id="d2"></div></div>
@@ -1125,7 +587,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <div id="home" class="screen">
   <div class="si">
     <div class="home-hdr">
-      <div><div class="h-greet" id="home-greet">Bonjour</div><div class="h-name" id="home-name">Alex</div></div>
+      <div><div class="h-greet" id="home-greet">Bonjour 👋</div><div class="h-name" id="home-name">Alex</div></div>
       <div class="pts-chip" onclick="goNav('rewards-tab')"><span class="pc-n" id="home-pts">0</span><span class="pc-l">pts</span></div>
     </div>
     <div class="near-miss">
@@ -1134,7 +596,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="nm-bot"><span class="nm-txt" id="nm-txt">Il te reste <strong>496 pts</strong> avant 500</span></div>
     </div>
     <div class="streak-card">
-      <div class="s-fire"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="color:var(--amber)"><path d="M12 2C10 7 7 9 7 14a5 5 0 0 0 10 0c0-5-3-7-5-12z"/></svg></div>
+      <div class="s-fire">🔥</div>
       <div style="flex:1"><div class="s-num" id="streak-num">1</div><div class="s-lbl">jour(s) consécutif(s)</div></div>
       <div class="s-dots" id="streak-dots"></div>
     </div>
@@ -1193,12 +655,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- REWARD -->
 <div id="reward" class="screen">
   <div class="conf-layer" id="conf-layer"></div>
-  <div class="rw-circle"><svg width="42" height="42" viewBox="0 0 24 24" fill="currentColor" style="color:#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+  <div class="rw-circle">🎉</div>
   <div class="rw-title">Bien joué !</div>
   <div class="rw-sub">Ta réponse a été envoyée</div>
   <div class="pts-earned"><div class="pe-plus">+</div><div class="pe-num" id="rw-pts">25</div><div class="pe-right"><div class="pe-lbl">Total cumulé</div><div class="pe-tot" id="rw-total">25 pts</div></div></div>
-  <div class="usage-card"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amber);flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div style="font-size:11px;color:var(--ink2);line-height:1.6" id="rw-usage">Ta réponse aidera <strong>Decathlon</strong> à optimiser sa stratégie.</div></div>
-  <div class="share-row"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--coral);flex-shrink:0"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">Partager ma réponse</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">Montre-la à tes amis</div></div><span style="color:var(--ink3)">→</span></div>
+  <div class="usage-card"><span style="font-size:16px;flex-shrink:0;margin-top:1px">💡</span><div style="font-size:11px;color:var(--ink2);line-height:1.6" id="rw-usage">Ta réponse aidera <strong>Decathlon</strong> à optimiser sa stratégie.</div></div>
+  <div class="share-row"><span style="font-size:19px">📣</span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">Partager ma réponse</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">Montre-la à tes amis</div></div><span style="color:var(--ink3)">→</span></div>
   <div id="rw-actions" style="width:100%;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1"></div>
 </div>
 
@@ -1207,7 +669,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="social-wrap">
     <div class="soc-hdr">
       <div class="soc-title">Communauté</div>
-      <div class="soc-bell"><div class="bell-dot"></div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink2)"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+      <div class="soc-bell"><div class="bell-dot"></div>🔔</div>
     </div>
     <div class="tab-bar">
       <button class="tab-btn on" onclick="socTab('feed',this)">Feed</button>
@@ -1246,13 +708,13 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="wc-level"><span id="wc-level">Niveau 1 — Curieux</span><span id="wc-next">1000 pts</span></div>
     </div>
     <div class="cashout-c">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--coral);flex-shrink:0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">Que des cadeaux locaux</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">Pas de retrait en argent : ça permet de garder des cadeaux généreux</div></div></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><span style="font-size:22px">📍</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">Que des cadeaux locaux</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">Pas de retrait en argent — c'est ce qui garde les cadeaux généreux</div></div></div>
       <div class="co-req"><div class="req-dot" style="background:var(--mint)"></div><span>Bons à usage unique, à présenter au comptoir</span></div>
       <div class="co-req"><div class="req-dot" style="background:var(--mint)"></div><span>Valables uniquement chez les commerces de ta ville</span></div>
     </div>
-    <div style="font-family:var(--fd);font-weight:700;font-size:16px;letter-spacing:-.4px;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:7px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--coral)"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Récompenses près de toi</div>
+    <div style="font-family:var(--fd);font-weight:700;font-size:16px;letter-spacing:-.4px;color:var(--ink);margin-bottom:10px">🎁 Récompenses près de toi</div>
     <div class="gift-grid" id="gift-grid"></div>
-    <div style="font-family:var(--fd);font-weight:700;font-size:16px;letter-spacing:-.4px;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amber)"><polyline points="14.5 17 9.5 17 6 21 18 21 14.5 17"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M5 3H19V13A7 7 0 0 1 12 20A7 7 0 0 1 5 13V3"/><line x1="5" y1="8" x2="1" y2="8"/><line x1="19" y1="8" x2="23" y2="8"/></svg>Paliers</div>
+    <div style="font-family:var(--fd);font-weight:700;font-size:16px;letter-spacing:-.4px;color:var(--ink);margin-bottom:10px">🏆 Paliers</div>
     <div id="tiers-list"></div>
   </div>
 </div>
@@ -1272,23 +734,23 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="stats-grid">
       <div class="stat-c"><div class="stat-n" style="color:var(--violet)" id="s-pts">0</div><div class="stat-l">Points</div></div>
       <div class="stat-c"><div class="stat-n" style="color:var(--coral)" id="s-ans">0</div><div class="stat-l">Réponses</div></div>
-      <div class="stat-c"><div class="stat-n" style="color:var(--amber)" id="s-str">1</div><div class="stat-l" style="display:flex;align-items:center;justify-content:center;gap:3px"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="color:var(--amber)"><path d="M12 2C10 7 7 9 7 14a5 5 0 0 0 10 0c0-5-3-7-5-12z"/></svg>Streak</div></div>
+      <div class="stat-c"><div class="stat-n" style="color:var(--amber)" id="s-str">1</div><div class="stat-l">🔥 Streak</div></div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;background:var(--md);border:1.5px solid var(--mg);border-radius:12px;padding:11px 13px;margin-bottom:11px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--mint);flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Révoque chaque consentement ou supprime ton compte ci-dessous. Conforme RGPD.</div></div>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--md);border:1.5px solid var(--mg);border-radius:12px;padding:11px 13px;margin-bottom:11px"><span style="font-size:20px">🛡️</span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Révoque chaque consentement ou supprime ton compte ci-dessous. Conforme RGPD.</div></div>
     <div class="sec-card">
-      <div class="sc-hdr"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--coral);flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--coral);font-weight:700;cursor:pointer" onclick="goNav('brands')">Gérer</span></div>
+      <div class="sc-hdr"><span style="font-size:18px">🔐</span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--coral);font-weight:700;cursor:pointer" onclick="goNav('brands')">Gérer</span></div>
       <div id="consent-mgmt"></div>
     </div>
     <div class="sec-card">
-      <div class="sc-hdr"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amber);flex-shrink:0"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg><div class="sc-title">Badges</div></div>
+      <div class="sc-hdr"><span style="font-size:18px">🏅</span><div class="sc-title">Badges</div></div>
       <div class="badge-list" id="badges-list"></div>
     </div>
     <div class="sec-card">
-      <div class="sc-hdr"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--violet);flex-shrink:0"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg><div class="sc-title">Historique des réponses</div></div>
+      <div class="sc-hdr"><span style="font-size:18px">📋</span><div class="sc-title">Historique des réponses</div></div>
       <div id="hist-list"></div>
     </div>
     <div class="danger-c">
-      <div style="font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#EF4444;flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Zone danger</div>
+      <div style="font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink);margin-bottom:10px">⚠️ Zone danger</div>
       <button class="dbtn">Révoquer tous les consentements</button>
       <button class="dbtn">Supprimer mon compte et mes données</button>
     </div>
@@ -1459,36 +921,25 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 <!-- BOTTOM NAV -->
 <nav class="bnav" id="bnav">
-  <div class="nav-it" id="nav-home" onclick="goNav('home')"><div class="nav-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-lbl">Accueil</div></div>
-  <div class="nav-it" id="nav-social" onclick="goNav('social')"><div class="nav-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="nav-lbl">Communauté</div><div class="nav-badge"></div></div>
-  <div class="nav-it" id="nav-rewards-tab" onclick="goNav('rewards-tab')"><div class="nav-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div><div class="nav-lbl">Récompenses</div></div>
-  <div class="nav-it" id="nav-profile" onclick="goNav('profile')"><div class="nav-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="nav-lbl">Profil</div></div>
+  <div class="nav-it" id="nav-home" onclick="goNav('home')"><div class="nav-ico">🏠</div><div class="nav-lbl">Accueil</div></div>
+  <div class="nav-it" id="nav-social" onclick="goNav('social')"><div class="nav-ico">👥</div><div class="nav-lbl">Communauté</div><div class="nav-badge"></div></div>
+  <div class="nav-it" id="nav-rewards-tab" onclick="goNav('rewards-tab')"><div class="nav-ico">🎁</div><div class="nav-lbl">Récompenses</div></div>
+  <div class="nav-it" id="nav-profile" onclick="goNav('profile')"><div class="nav-ico">👤</div><div class="nav-lbl">Profil</div></div>
 </nav>
 
 </div>
 </div>
 <script>
-const SVGI={
-flame:'<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--amber);vertical-align:middle;flex-shrink:0"><path d="M12 2C10 7 7 9 7 14a5 5 0 0 0 10 0c0-5-3-7-5-12z"/></svg>',
-star:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--amber);vertical-align:middle"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
-target:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--amber);vertical-align:middle"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>',
-users:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--amber);vertical-align:middle"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-bolt:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--amber);vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-lock:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.45;vertical-align:middle;flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
-check:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="color:#0BAB84;vertical-align:middle"><polyline points="20 6 9 17 4 12"/></svg>',
-trophy:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amber);vertical-align:middle"><polyline points="14.5 17 9.5 17 6 21 18 21 14.5 17"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M5 3H19V13A7 7 0 0 1 12 20A7 7 0 0 1 5 13V3"/><line x1="5" y1="8" x2="1" y2="8"/><line x1="19" y1="8" x2="23" y2="8"/></svg>',
-gift:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--coral);vertical-align:middle"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>'
-};
 const S={user:null,pts:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],friends:[{n:'Marie',pts:340,str:5,online:true},{n:'Lucas',pts:210,str:3,online:false},{n:'Yasmine',pts:520,str:9,online:true},{n:'Tom',pts:155,str:2,online:false}],chats:{}};
 const BD=[{id:'kebab',n:"Kebab O'Coin",ico:'🌯',theme:'Manger & boire',use:'Kebab · à 600 m'},{id:'tacos',n:'Tacos du Port',ico:'🌮',theme:'Manger & boire',use:'Tacos · à 1,1 km'},{id:'cafe',n:'Café de la Place',ico:'☕',theme:'Cafés & boulangeries',use:'Café · à 350 m'},{id:'fournil',n:'Le Fournil',ico:'🥖',theme:'Cafés & boulangeries',use:'Boulangerie · à 800 m'},{id:'bio',n:'Comptoir Bio',ico:'🥬',theme:'Courses & alimentation',use:'Épicerie bio · à 1,3 km'},{id:'forme',n:'Studio Forme',ico:'🏋️',theme:'Sport & bien-être',use:'Salle de sport · à 900 m'},{id:'cine',n:'Cinéville',ico:'🎬',theme:'Sorties & loisirs',use:'Cinéma · à 1,2 km'},{id:'coiffure',n:'Coiffure Léa',ico:'💇',theme:'Beauté',use:'Salon de coiffure · à 700 m'}];
 const QS=[{brand:"Kebab O'Coin",ico:'🌯',theme:'Manger & boire',pts:30,type:'text',q:"Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?",hint:'Dis-nous franchement — horaires, sorties, habitudes…',usage:"Kebab O'Coin (à 600 m) réfléchit à ses horaires du week-end",aiTips:['Oui, parce que…','Surtout le vendredi/samedi','Ça dépend de…','Non, je préfère…']},{brand:'Café de la Place',ico:'☕',theme:'Cafés & boulangeries',pts:25,type:'mcq',q:"On lance un nouveau latté. Quel nom te donne le plus envie ?",hint:'Choisis une réponse.',opts:['☀️ "Le Doré"','🍯 "Caramel du Port"','🌿 "Latté des Remparts"','✨ Aucun des trois'],usage:"Le Café de la Place (à 350 m) teste le nom de sa nouvelle boisson avant de l'imprimer sur l'ardoise"},{brand:'Studio Forme',ico:'🏋️',theme:'Sport & bien-être',pts:30,type:'scale',q:'Sur 10, à quel point des créneaux tôt le matin (avant 8h) t\'intéresseraient ?',hint:'Glisse le curseur',usage:'Studio Forme (à 900 m) étudie l\'ouverture de créneaux matinaux'},{brand:'Cinéville',ico:'🎬',theme:'Sorties & loisirs',pts:25,type:'rank',q:"Classe ce qui te ferait venir plus souvent au ciné :",hint:'Glisse pour réordonner',items:['🎟️ Tarifs réduits','🍿 Snacks moins chers','🕐 Séances tardives','🎬 Plus d\'avant-premières','🛋️ Confort des salles'],usage:"Cinéville (à 1,2 km) ajuste son offre pour les habitants du quartier"},{brand:'Le Fournil',ico:'🥖',theme:'Cafés & boulangeries',pts:20,type:'text',q:'Qu\'est-ce qui te ferait venir le matin plutôt qu\'à la grande surface ?',hint:'Sois précis — prix, proximité, qualité, accueil…',usage:'Le Fournil (à 800 m) veut comprendre ce qui compte pour le quartier le matin',aiTips:['Le prix','La proximité','La qualité du pain','Les horaires','L\'accueil']}];
 const BRANDMETA={"Kebab O'Coin":{ab:'K',c:'#D6442E'},'Tacos du Port':{ab:'T',c:'#C0392B'},'Café de la Place':{ab:'C',c:'#6B4226'},'Le Fournil':{ab:'F',c:'#C9821A'},'Comptoir Bio':{ab:'B',c:'#1E8449'},'Studio Forme':{ab:'S',c:'#0BAB84'},'Cinéville':{ab:'C',c:'#2D6CDF'},'Coiffure Léa':{ab:'L',c:'#A14E08'}};
 function logoHTML(name,size){const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#6A6470'};const s=size||44;const r=Math.round(s*0.27),fs=Math.round(s*0.44);return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;}
-const GROUPS=[{ico:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amber)"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',n:'Groupe Tech',meta:'1 243 membres · Actif'},{ico:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amber)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',n:'Groupe Parents',meta:'842 membres · Actif'},{ico:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amber)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',n:'Runners Community',meta:'2 105 membres · Très actif'},{ico:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amber)"><path d="M17 8C8 10 5.9 16.17 3.82 22H5C7.5 16 12 11 22 10c-1.88-2.35-4.5-3.5-5-2z"/></svg>',n:'Éco-conscients',meta:'673 membres · Actif'}];
+const GROUPS=[{ico:'💻',n:'Groupe Tech',meta:'1 243 membres · Actif'},{ico:'👨‍👩‍👧',n:'Groupe Parents',meta:'842 membres · Actif'},{ico:'🏃',n:'Runners Community',meta:'2 105 membres · Très actif'},{ico:'🌱',n:'Éco-conscients',meta:'673 membres · Actif'}];
 const AVC=['#E07D0A','#A14E08','#0BAB84','#F5A623','#E8A33C'];
-const BDGS=[{id:'first',e:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--amber)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',n:'Première réponse'},{id:'trio',e:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--amber)"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>',n:'3 réponses'},{id:'streak3',e:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--amber)"><path d="M12 2C10 7 7 9 7 14a5 5 0 0 0 10 0c0-5-3-7-5-12z"/></svg>',n:'Streak 3 jours'},{id:'social',e:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--amber)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',n:'Premier ami'},{id:'qual',e:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--amber)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',n:'Qualité A+'}];
+const BDGS=[{id:'first',e:'🌟',n:'Première réponse'},{id:'trio',e:'🎯',n:'3 réponses'},{id:'streak3',e:'🔥',n:'Streak 3 jours'},{id:'social',e:'👥',n:'Premier ami'},{id:'qual',e:'✨',n:'Qualité A+'}];
 const GIFTS=[{e:'☕',br:'Café de la Place',val:'1 café offert',cost:200,req:200,c:'#6B4226'},{e:'🥐',br:'Le Fournil',val:'1 viennoiserie',cost:300,req:300,c:'#C9821A'},{e:'🥤',br:"Kebab O'Coin",val:'Boisson + frites',cost:450,req:450,c:'#D6442E'},{e:'💇',br:'Coiffure Léa',val:'−5€ sur ta coupe',cost:600,req:600,c:'#A14E08'},{e:'🌯',br:"Kebab O'Coin",val:'1 kebab complet',cost:800,req:800,c:'#D6442E'},{e:'🎬',br:'Cinéville',val:'1 place de ciné',cost:1200,req:1200,c:'#2D6CDF'}];
-const TIERS=[{n:'Curieux',min:0,max:1000,ico:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 22H5C7.5 16 12 11 22 10c-1.88-2.35-4.5-3.5-5-2z"/></svg>',c:'#6A6470'},{n:'Actif',min:1000,max:3000,ico:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',c:'#A14E08'},{n:'Expert',min:3000,max:6000,ico:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>',c:'#E07D0A'},{n:'Ambassadeur',min:6000,max:10000,ico:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17 9.5 17 6 21 18 21 14.5 17"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M5 3H19V13A7 7 0 0 1 12 20A7 7 0 0 1 5 13V3"/><line x1="5" y1="8" x2="1" y2="8"/><line x1="19" y1="8" x2="23" y2="8"/></svg>',c:'#F5A623'},{n:'Légende',min:10000,max:99999,ico:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2 19h20l-2-9-5 3-3-6-3 6-5-3z"/></svg>',c:'#0BAB84'}];
+const TIERS=[{n:'Curieux',min:0,max:1000,ico:'🌱',c:'#6A6470'},{n:'Actif',min:1000,max:3000,ico:'⚡',c:'#A14E08'},{n:'Expert',min:3000,max:6000,ico:'🎯',c:'#E07D0A'},{n:'Ambassadeur',min:6000,max:10000,ico:'🏆',c:'#F5A623'},{n:'Légende',min:10000,max:99999,ico:'👑',c:'#0BAB84'}];
 const FEED=[{av:'M',avc:'#A14E08',n:'Marie',t:'12 min',theme:'Café de la Place',tc:'#E07D0A',tbg:'rgba(224,125,10,.09)',action:'a répondu à une question du Café de la Place',quote:'Ouvrez un peu plus tard le week-end, je sors du ciné et tout est fermé !',type:'answer'},{av:'L',avc:'#0BAB84',n:'Lucas',t:'34 min',theme:'Récompense',tc:'#A14E08',tbg:'rgba(161,78,8,.09)',action:'a gagné un café offert ☕',badge:'☕ Café de la Place',type:'badge'},{av:'Y',avc:'#F5A623',n:'Yasmine',t:'1h',theme:'Le Fournil',tc:'#E8A33C',tbg:'rgba(232,163,60,.09)',action:'a répondu à une question du Fournil',quote:"Le pain frais à 7h et un sourire, c'est tout ce qui me ferait venir tous les jours.",type:'answer'},{av:'T',avc:'#E07D0A',n:'Tom',t:'2h',theme:'Vannes',tc:'#0BAB84',tbg:'rgba(11,171,132,.09)',action:'a pris la 2e place du classement de Vannes 🎉',type:'level'}];
 const MOCK={Marie:[{f:'them',t:"Salut ! T'as répondu à la question Nike aujourd'hui ? 👟",ts:'14:32'},{f:'me',t:"Oui ! J'ai gagné 25 pts. Et toi ?",ts:'14:33'},{f:'them',t:"Pareil ! J'en suis à 340 pts 🎉",ts:'14:34'},{f:'me',t:"Top ! On se bat pour le classement 😄",ts:'14:34'},{f:'them',t:"T'as vu la question Decathlon ?",ts:'14:35'}]};
 let cur='splash',obIdx=0,boFmt='text',chUser='Marie',navS=['home','social','rewards-tab','profile'];
@@ -1533,7 +984,7 @@ function renderBrands(){
 function doBrands(){S.qs=[...QS];goTo('home');document.getElementById('bnav').classList.add('show');refreshHome();renderSocial()}
 function refreshHome(){
   if(!S.user)return;
-  const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour':hr<18?'Bon après-midi':'Bonsoir';
+  const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour 👋':hr<18?'Bon après-midi ☀️':'Bonsoir 🌙';
   document.getElementById('home-name').textContent=S.user.name;document.getElementById('home-pts').textContent=S.pts;
   const targets=[1000,3000,5000,6000,10000];const tgt=targets.find(t=>t>S.pts)||10000;const prev=targets.filter(t=>t<=S.pts).pop()||0;
   const pct=Math.min(95,Math.max(4,((S.pts-prev)/(tgt-prev))*100));
@@ -1599,7 +1050,7 @@ function submitAns(){
   const q=S.curQ;S.pts+=q.pts;S.ans++;if(!S.hist)S.hist=[];S.hist.unshift({brand:q.brand,ico:q.ico,q:q.q.substring(0,40),pts:q.pts});
   S.qs=S.qs.filter((_,i)=>i!==S.qIdx);
   document.getElementById('rw-pts').textContent=q.pts;document.getElementById('rw-total').textContent=S.pts+' pts';
-  document.getElementById('rw-usage').innerHTML='Ta réponse aidera <strong>'+q.brand+'</strong> à : '+q.usage+'.';
+  document.getElementById('rw-usage').innerHTML='Ta réponse aidera <strong>'+q.brand+'</strong> — '+q.usage;
   spawnConfetti();goTo('reward');refreshHome();refreshWallet();
 }
 function nextQ(){if(S.qs&&S.qs.length>0)openQ(0);else{refreshHome();goNav('home')}}
@@ -1634,19 +1085,19 @@ function renderSocial(){
 }
 function initFriendsPanel(){
   const fp=document.getElementById('panel-friends');fp.innerHTML='';
-  fp.innerHTML=`<div class="inv-c"><div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:6px">${SVGI.gift} Invite un ami, gagne 50 pts</div><div style="font-size:12px;color:var(--ink2);margin-bottom:11px;line-height:1.5">Partage ton code. Quand ton ami répond à sa 1re question, vous gagnez tous les deux 50 pts.</div><div style="display:flex;align-items:center;gap:8px"><div class="inv-code" id="inv-code">NOVA-ALEX42</div><button class="copy-btn" onclick="this.textContent='Copié !';setTimeout(()=>this.textContent='Copier',2000)">Copier</button></div></div>
+  fp.innerHTML=`<div class="inv-c"><div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink);margin-bottom:4px">🎁 Invite un ami, gagne 50 pts</div><div style="font-size:12px;color:var(--ink2);margin-bottom:11px;line-height:1.5">Partage ton code. Quand ton ami répond à sa 1re question, vous gagnez tous les deux 50 pts.</div><div style="display:flex;align-items:center;gap:8px"><div class="inv-code" id="inv-code">NOVA-ALEX42</div><button class="copy-btn" onclick="this.textContent='Copié !';setTimeout(()=>this.textContent='Copier',2000)">Copier</button></div></div>
   <div style="display:flex;gap:8px;margin:0 18px 12px"><input style="flex:1;padding:10px 12px;background:var(--card);border:1.5px solid var(--bg3);border-radius:11px;font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOVA-AB12)" id="fi-inp"><button style="padding:10px 14px;background:var(--coral);color:#fff;font-size:12px;font-weight:700;border:none;border-radius:11px;cursor:pointer;font-family:var(--fd);box-shadow:0 4px 10px var(--cg)" onclick="addFriend()">Ajouter</button></div>
   <div style="padding:0 18px"><div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">MES AMIS</div><div id="friends-list"></div></div>`;
   renderFriends();
 }
 function initRankingPanel(){
   const rp=document.getElementById('panel-ranking');rp.innerHTML='';
-  rp.innerHTML=`<div class="rank-hero"><div><div style="font-family:var(--fd);font-weight:800;font-size:44px;color:#fff;line-height:1;text-align:center" id="my-rank">—</div><div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:2px;text-align:center">Ma position</div></div><div style="width:1px;height:46px;background:rgba(255,255,255,.1)"></div><div style="flex:1;margin-left:2px"><div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:5px">${SVGI.trophy} Classement semaine</div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:3px">Se remet à zéro lundi · <span id="total-p">—</span> participants</div></div></div><div style="padding:0 18px"><div id="ranking-list"></div></div>`;
+  rp.innerHTML=`<div class="rank-hero"><div><div style="font-family:var(--fd);font-weight:800;font-size:44px;color:#fff;line-height:1;text-align:center" id="my-rank">—</div><div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:2px;text-align:center">Ma position</div></div><div style="width:1px;height:46px;background:rgba(255,255,255,.1)"></div><div style="flex:1;margin-left:2px"><div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.85)">🏆 Classement semaine</div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:3px">Se remet à zéro lundi · <span id="total-p">—</span> participants</div></div></div><div style="padding:0 18px"><div id="ranking-list"></div></div>`;
   renderRanking();
 }
 function renderFriends(){
   const el=document.getElementById('friends-list');if(!el)return;el.innerHTML='';
-  S.friends.forEach((f,i)=>{const c=AVC[i%AVC.length];const d=document.createElement('div');d.className='fi';d.onclick=()=>openChatFor(f.n);d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${f.n}</div><div class="fi-pts">${f.pts} pts · <span style="color:var(--amber);font-weight:600;display:inline-flex;align-items:center;gap:2px">${SVGI.flame} ${f.str}</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;el.appendChild(d)});
+  S.friends.forEach((f,i)=>{const c=AVC[i%AVC.length];const d=document.createElement('div');d.className='fi';d.onclick=()=>openChatFor(f.n);d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${f.n}</div><div class="fi-pts">${f.pts} pts · <span style="color:var(--amber);font-weight:600">🔥 ${f.str}</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;el.appendChild(d)});
 }
 function renderRanking(){
   const all=[...S.friends,{n:S.user?S.user.name:'Moi',pts:S.pts,str:S.streak,isMe:true}];
@@ -1654,8 +1105,8 @@ function renderRanking(){
   const mre=document.getElementById('my-rank');if(mre)mre.textContent=mr;
   const tpe=document.getElementById('total-p');if(tpe)tpe.textContent=all.length;
   const el=document.getElementById('ranking-list');if(!el)return;el.innerHTML='';
-  const medals=['<span style="color:#f9a716;font-family:var(--fd);font-weight:900">1</span>','<span style="color:#94A3B8;font-family:var(--fd);font-weight:900">2</span>','<span style="color:#CD7F32;font-family:var(--fd);font-weight:900">3</span>'];
-  all.forEach((f,i)=>{const c=f.isMe?'#E07D0A':AVC[i%AVC.length];const d=document.createElement('div');d.className='fi';d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}</div><div style="flex:1"><div class="fi-name" style="${f.isMe?'color:var(--coral);font-weight:700':''}">${f.n}${f.isMe?' (moi)':''}</div><div class="fi-pts">${f.pts} pts · <span style="color:var(--amber);font-weight:600;display:inline-flex;align-items:center;gap:2px">${SVGI.flame} ${f.str}</span></div></div><div style="font-size:15px">${i<3?medals[i]:'<span style="font-family:var(--fd);font-weight:700;color:var(--ink3);font-size:12px">#'+(i+1)+'</span>'}</div>`;el.appendChild(d)});
+  const medals=['🥇','🥈','🥉'];
+  all.forEach((f,i)=>{const c=f.isMe?'#E07D0A':AVC[i%AVC.length];const d=document.createElement('div');d.className='fi';d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}</div><div style="flex:1"><div class="fi-name" style="${f.isMe?'color:var(--coral);font-weight:700':''}">${f.n}${f.isMe?' (moi)':''}</div><div class="fi-pts">${f.pts} pts · <span style="color:var(--amber);font-weight:600">🔥 ${f.str}</span></div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;el.appendChild(d)});
 }
 function socTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
@@ -1663,7 +1114,7 @@ function socTab(tab,btn){
   if(tab==='friends')renderFriends();if(tab==='ranking')renderRanking();if(tab==='groups')renderGroups();
 }
 function renderGroups(){
-  const el=document.getElementById('panel-groups');el.innerHTML='<div style="padding:0 18px 10px;font-size:13px;color:var(--ink2);line-height:1.6">Rejoins des communautés thématiques, compare tes réponses et progresse avec des inconnus. Inspiré de Strava.</div>';
+  const el=document.getElementById('panel-groups');el.innerHTML='<div style="padding:0 18px 10px;font-size:13px;color:var(--ink2);line-height:1.6">Communautés thématiques — compare tes réponses et progresse avec des inconnus. Inspiré de Strava.</div>';
   GROUPS.forEach(g=>{const d=document.createElement('div');d.className='group-c';d.innerHTML=`<div class="gc-ico" style="background:var(--vd)">${g.ico}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink)">${g.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${g.meta}</div></div><div style="font-size:11px;font-weight:700;color:var(--violet);background:var(--vd);padding:5px 11px;border-radius:99px;white-space:nowrap;cursor:pointer">Rejoindre</div>`;el.appendChild(d)});
 }
 function addFriend(){const inp=document.getElementById('fi-inp');const code=inp.value.trim();if(!code)return;S.friends.push({n:'Ami '+code.slice(-4),pts:Math.floor(Math.random()*200)+50,str:Math.floor(Math.random()*7)+1,online:true});inp.value='';renderFriends();renderRanking()}
@@ -1691,7 +1142,7 @@ function refreshWallet(){
   const gg=document.getElementById('gift-grid');gg.innerHTML='';
   GIFTS.forEach(g=>{const locked=S.pts<g.req;const d=document.createElement('div');d.className='gift-c'+(locked?' locked':'');d.innerHTML=`<div style="margin-bottom:7px">${logoHTML(g.br,38)}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${g.br}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${g.val}</div><div style="margin-top:7px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${g.c}15;color:${g.c};display:inline-block">${g.cost} pts</div>`;if(!locked)d.onclick=()=>{const code=(Math.random().toString(36).substring(2,5)+'-'+Math.random().toString(36).substring(2,5)).toUpperCase();alert('🎟️ Bon débloqué !\n\n'+g.val+' — '+g.br+'\n\nCode à usage unique : '+code+'\nÀ présenter au comptoir. Valable 15 min, non partageable.');};gg.appendChild(d)});
   const tl=document.getElementById('tiers-list');tl.innerHTML='';
-  TIERS.forEach((t,i)=>{const reached=S.pts>=t.min;const d=document.createElement('div');d.style.cssText=`background:var(--card);border:1.5px solid ${reached?t.c+'33':'var(--bg3)'};border-radius:var(--r);padding:12px 13px;margin-bottom:8px`;d.innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:11px;background:${t.c}14;display:flex;align-items:center;justify-content:center;color:${t.c}">${t.ico}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:${reached?t.c:'var(--ink)'}">${t.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${t.min===0?'Dès le départ':t.min+' pts requis'}</div></div><div style="font-size:11px;font-weight:700;color:${reached?t.c:'var(--ink3)'};display:flex;align-items:center;gap:3px">${reached?SVGI.check+' Atteint':SVGI.lock}</div></div>`;tl.appendChild(d)});
+  TIERS.forEach((t,i)=>{const reached=S.pts>=t.min;const d=document.createElement('div');d.style.cssText=`background:var(--card);border:1.5px solid ${reached?t.c+'33':'var(--bg3)'};border-radius:var(--r);padding:12px 13px;margin-bottom:8px`;d.innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:11px;background:${t.c}14;display:flex;align-items:center;justify-content:center;font-size:20px">${t.ico}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:${reached?t.c:'var(--ink)'}">${t.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${t.min===0?'Dès le départ':t.min+' pts requis'}</div></div><div style="font-size:12px;font-weight:700;color:${reached?t.c:'var(--ink3)'}">${reached?'✅ Atteint':'🔒'}</div></div>`;tl.appendChild(d)});
 }
 function refreshProfile(){
   if(!S.user)return;
@@ -1704,10 +1155,10 @@ function refreshProfile(){
   BD.slice(0,4).forEach(b=>{const on=S.brands[b.id];const d=document.createElement('div');d.className='consent-it';d.innerHTML=`${logoHTML(b.n,32)}<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">${b.n}</div><div style="font-size:10px;color:var(--ink3);margin-top:1px">${b.use}</div></div><label class="tgl"><input type="checkbox" ${on?'checked':''} onchange="S.brands['${b.id}']=this.checked"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;cm.appendChild(d)});
   const bl=document.getElementById('badges-list');bl.innerHTML='';
   const earned=[S.ans>0&&'first',S.ans>=3&&'trio',S.streak>=3&&'streak3',S.friends.length>0&&'social'].filter(Boolean);
-  BDGS.forEach(b=>{const e=earned.includes(b.id);const d=document.createElement('div');d.className='bp '+(e?'earned':'locked');d.innerHTML=(e?b.e:SVGI.lock)+' '+b.n;bl.appendChild(d)});
+  BDGS.forEach(b=>{const e=earned.includes(b.id);const d=document.createElement('div');d.className='bp '+(e?'earned':'locked');d.textContent=(e?b.e:'🔒')+' '+b.n;bl.appendChild(d)});
   const hl=document.getElementById('hist-list');hl.innerHTML='';
   if(!S.hist||!S.hist.length){hl.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:13px">Aucune réponse pour l\'instant.</div>';return}
-  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`${logoHTML(h.brand,34)}<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:12px;font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">+${h.pts} pts</div>`;hl.appendChild(d)});
+  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--cd);flex-shrink:0">${h.ico||'❓'}</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:12px;font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">+${h.pts} pts</div>`;hl.appendChild(d)});
 }
 function boTab(tab,btn){document.querySelectorAll('.bo-tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');['dashboard','create','results'].forEach(t=>document.getElementById('bo-'+t).style.display=t===tab?'block':'none');if(tab==='create')wzStep(0)}
 function renderCampaigns(){
@@ -1783,11 +1234,11 @@ const BRANDPROFILE={
     why:"Tes préférences orientent la programmation, et tu peux gagner une place. Avis des habitants proches uniquement.",
     extra:[{q:'Des séances tardives t\'intéressent ?',status:'soon'}]},
   'Tacos du Port':{sector:'Restauration · Tacos',tagline:'Généreux, comme le quartier.',loc:'Quai Éric Tabarly, Vannes',founded:'2020',size:'Commerce local',avgpts:'—',resp:'~20s',rate:'—',
-    about:"Tacos du Port, à 1,1 km, prépare ses prochaines questions pour les habitants du coin.",why:"Avis du quartier uniquement, jamais revendus.",extra:[]},
+    about:"Tacos du Port, à 1,1 km, prépare ses prochaines questions pour les habitants du coin.",why:"Avis du quartier uniquement — jamais revendus.",extra:[]},
   'Comptoir Bio':{sector:'Épicerie bio',tagline:'Local et de saison.',loc:'Rue du Mené, Vannes',founded:'2018',size:'Commerce local',avgpts:'—',resp:'~25s',rate:'—',
-    about:"Le Comptoir Bio, à 1,3 km, prépare ses sondages pour ses clients du quartier.",why:"Avis du quartier uniquement, jamais revendus.",extra:[]},
+    about:"Le Comptoir Bio, à 1,3 km, prépare ses sondages pour ses clients du quartier.",why:"Avis du quartier uniquement — jamais revendus.",extra:[]},
   'Coiffure Léa':{sector:'Beauté · Coiffure',tagline:'Le salon du coin.',loc:'Rue Hoche, Vannes',founded:'2017',size:'Commerce local',avgpts:'—',resp:'~25s',rate:'—',
-    about:"Coiffure Léa, à 700 m, prépare ses questions pour sa clientèle de proximité.",why:"Avis du quartier uniquement, jamais revendus.",extra:[]}
+    about:"Coiffure Léa, à 700 m, prépare ses questions pour sa clientèle de proximité.",why:"Avis du quartier uniquement — jamais revendus.",extra:[]}
 };
 
 S.mode=S.mode||'hook';S.sv=S.sv||null;S.brandBack=S.brandBack||'home';
@@ -1887,7 +1338,7 @@ function openReward(o){
   const s=document.querySelector('#reward .rw-sub');if(s)s.textContent=o.sub||'Ta réponse a été envoyée';
   document.getElementById('rw-pts').textContent=o.pts;
   document.getElementById('rw-total').textContent=o.total+' pts';
-  document.getElementById('rw-usage').innerHTML='Ta réponse aide <strong>'+o.brand+'</strong> à : '+(o.usage||'mieux te comprendre')+'.';
+  document.getElementById('rw-usage').innerHTML='Ta réponse aide <strong>'+o.brand+'</strong> — '+(o.usage||'à mieux te comprendre.');
   const act=document.getElementById('rw-actions');act.innerHTML='';
   const mk=(cls,txt,fn)=>{const b=document.createElement('button');b.className=cls;b.textContent=txt;b.onclick=fn;act.appendChild(b);};
   if(S.qs&&S.qs.length>0)mk('btn-p','Question suivante →',nextQ);
@@ -1995,148 +1446,6 @@ function gameReveal(mine){
 }
 function shareGame(b){const t=b.textContent;b.textContent='✓ Partagé en story';setTimeout(()=>b.textContent=t,1600);}
 
-<\/script>
-</body>
-</html>
-</script>
-
-<script>
-// @ts-nocheck
-/* ============================================================
-   WAITLIST — Supabase
-   Supabase Dashboard > Settings > API
-   SUPABASE_URL  : Project URL (https://xxxx.supabase.co)
-   SUPABASE_ANON_KEY : anon public key — JWT commençant par "eyJ..."
-   eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjeHllbWhwdmhla2pwenloaWNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMTE1ODQsImV4cCI6MjA5Nzc4NzU4NH0.PJFLJ0-h427GGrl45m1tLfALJNDO_mRXwyeFo8Aa9XQ
-   ============================================================ */
-var SUPABASE_URL = 'https://xcxyemhpvhekjpzyhici.supabase.co';
-var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjeHllbWhwdmhla2pwenloaWNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMTE1ODQsImV4cCI6MjA5Nzc4NzU4NH0.PJFLJ0-h427GGrl45m1tLfALJNDO_mRXwyeFo8Aa9XQ';
-
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(email) &&
-    email.length >= 6 &&
-    !email.includes('..') &&
-    email.split('@')[1].includes('.');
-}
-
-async function submitWaitlist(e) {
-  e.preventDefault();
-  var form = e.target;
-  var wrap = form.closest('.waitlist-wrap');
-  var email = form.querySelector('input[type="email"]').value.trim().toLowerCase();
-  var btn = form.querySelector('button[type="submit"]');
-  var origBtn = btn.innerHTML;
-  var errorEl = wrap ? wrap.querySelector('.waitlist-error') : null;
-  var doneEl  = wrap ? wrap.querySelector('.waitlist-done')  : null;
-  var doneSpan = doneEl ? doneEl.querySelector('span') : null;
-
-  if (errorEl) errorEl.textContent = '';
-
-  if (!isValidEmail(email)) {
-    if (errorEl) errorEl.textContent = 'Adresse email invalide. Vérifie le format (ex: prenom@domaine.com)';
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = '…';
-
-  try {
-    var res = await fetch(SUPABASE_URL + '/rest/v1/subscribers', {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({ email: email })
-    });
-
-    if (res.status === 409) {
-      if (doneSpan) doneSpan.textContent = 'Tu es déjà dans la liste, à bientôt au lancement !';
-      form.style.display = 'none';
-      if (errorEl) errorEl.style.display = 'none';
-      if (doneEl) doneEl.style.display = 'flex';
-    } else if (res.ok) {
-      if (doneSpan) doneSpan.textContent = 'Tu es sur la liste ! On te prévient au lancement 🎉';
-      form.style.display = 'none';
-      if (errorEl) errorEl.style.display = 'none';
-      if (doneEl) doneEl.style.display = 'flex';
-    } else {
-      if (errorEl) errorEl.textContent = 'Une erreur s\'est produite. Réessaie plus tard.';
-      btn.disabled = false;
-      btn.innerHTML = origBtn;
-    }
-  } catch(err) {
-    if (errorEl) errorEl.textContent = 'Connexion impossible. Vérifie ta connexion internet.';
-    btn.disabled = false;
-    btn.innerHTML = origBtn;
-  }
-}
-
-/* Charge la démo dans le téléphone */
-(function(){
-  try{
-    var tpl=document.getElementById('noova-demo-src');
-    var src=tpl.textContent.split('<\\/script>').join('<\/script>');
-    document.getElementById('demoFrame').srcdoc=src;
-  }catch(e){}
-})();
-
-/* Sticky topbar */
-(function(){
-  var bar = document.querySelector('.topbar');
-  function onScroll(){ bar.classList.toggle('scrolled', window.scrollY > 30); }
-  window.addEventListener('scroll', onScroll, {passive:true});
-  onScroll();
-})();
-
-/* Animated number counter */
-function animateNum(el, from, to, dur) {
-  var start = null;
-  function step(ts) {
-    if (!start) start = ts;
-    var p = Math.min((ts - start) / dur, 1);
-    var ease = 1 - Math.pow(1 - p, 3);
-    el.textContent = Math.round(from + (to - from) * ease).toLocaleString('fr-FR');
-    if (p < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-/* Urgency fill bar */
-(function(){
-  var fill = document.getElementById('urgencyFill');
-  if (fill) setTimeout(function(){ fill.style.width = '62%'; }, 400);
-})();
-
-/* FAQ accordion */
-function toggleFaq(btn) {
-  var item = btn.closest('.faq-item');
-  var isOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item.open').forEach(function(el){ el.classList.remove('open'); });
-  if (!isOpen) item.classList.add('open');
-}
-
-/* Reveal au scroll + counter trigger */
-var io=new IntersectionObserver(function(en){
-  en.forEach(function(x){
-    if(x.isIntersecting){
-      x.target.classList.add('in');
-      var num = x.target.querySelector('[data-target]');
-      if (num) animateNum(num, 0, parseInt(num.dataset.target), 1600);
-      io.unobserve(x.target);
-    }
-  });
-},{threshold:.14,rootMargin:'0px 0px -8% 0px'});
-document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
-
-/* Hero counter (always visible, trigger on load) */
-(function(){
-  var el = document.querySelector('.hc-num');
-  if (el) setTimeout(function(){ animateNum(el, 0, parseInt(el.dataset.target||0), 1800); }, 600);
-})();
 </script>
 </body>
 </html>
-
