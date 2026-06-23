@@ -221,6 +221,56 @@ p{color:var(--ink2)}
 .reveal.d1{transition-delay:.07s}.reveal.d2{transition-delay:.14s}.reveal.d3{transition-delay:.21s}.reveal.d4{transition-delay:.28s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+
+/* ---------- STICKY TOPBAR ---------- */
+.topbar{position:fixed;transition:background .35s,backdrop-filter .35s,box-shadow .35s}
+.topbar.scrolled{background:rgba(15,13,18,.88);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 1px 0 rgba(255,255,255,.08)}
+
+/* ---------- HERO COUNTER ---------- */
+.hero-counter{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:100px;padding:7px 16px 7px 10px;font-size:13px;font-weight:600;color:rgba(255,255,255,.78);margin-top:22px}
+.hc-dots{display:flex;gap:3px;align-items:center}
+.hc-dots span{width:5px;height:5px;border-radius:50%;background:var(--amber);animation:blink 1.8s infinite}
+.hc-dots span:nth-child(2){animation-delay:.3s}.hc-dots span:nth-child(3){animation-delay:.6s}
+.hc-num{font-family:var(--fd);font-weight:900;font-size:15px;color:var(--amber);margin:0 2px}
+
+/* ---------- URGENCY BANNER (500 spots) ---------- */
+.urgency{display:inline-flex;align-items:center;gap:10px;margin-top:16px;background:rgba(249,167,22,.1);border:1px solid rgba(249,167,22,.28);border-radius:12px;padding:10px 16px;font-size:13px;font-weight:600;color:rgba(255,255,255,.9)}
+.urgency-bar{flex:1;min-width:80px;height:5px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden}
+.urgency-fill{height:100%;background:var(--grad-warm);border-radius:99px;width:0;transition:width 1.4s cubic-bezier(.2,.8,.3,1) .6s}
+
+/* ---------- STATS STRIP ---------- */
+.stats-strip{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
+.stats-strip .wrap{display:flex;align-items:stretch;justify-content:center;flex-wrap:wrap}
+.stat{flex:1;min-width:130px;padding:22px 20px;text-align:center;position:relative}
+.stat+.stat::before{content:'';position:absolute;left:0;top:20%;height:60%;width:1px;background:rgba(255,255,255,.1)}
+.stat-n{display:block;font-family:var(--fd);font-weight:900;font-stretch:125%;font-size:clamp(24px,3vw,34px);color:#fff;letter-spacing:-.5px;line-height:1}
+.stat-n em{color:var(--amber);font-style:normal}
+.stat-l{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.6px;color:rgba(255,255,255,.42);margin-top:5px}
+@media(max-width:540px){.stat{min-width:50%;padding:16px 12px}.stat:nth-child(3)::before,.stat:nth-child(4)::before{display:none}}
+
+/* ---------- FAQ ---------- */
+.faq{background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%)}
+.faq-head{text-align:center;max-width:600px;margin:0 auto 40px}
+.faq-head .eyebrow{display:block;margin-bottom:12px}
+.faq-head h2{margin-bottom:12px}
+.faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.faq-item{background:#fff;border:1px solid #ECE8E0;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .22s,border-color .22s}
+.faq-item.open{border-color:rgba(249,167,22,.35);box-shadow:var(--shadow)}
+.faq-btn{width:100%;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:none;border:none;cursor:pointer;text-align:left;font-family:var(--fd);font-weight:700;font-stretch:110%;font-size:15px;color:var(--ink);line-height:1.3}
+.faq-ico{width:30px;height:30px;border-radius:9px;background:var(--coral-soft);display:flex;align-items:center;justify-content:center;flex:none;transition:background .22s,transform .3s}
+.faq-ico svg{transition:transform .3s;color:var(--coral)}
+.faq-item.open .faq-ico{background:var(--grad-warm);transform:rotate(45deg)}
+.faq-item.open .faq-ico svg{color:#241600}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .42s cubic-bezier(.2,.8,.3,1)}
+.faq-item.open .faq-a{max-height:500px}
+.faq-a p{padding:0 22px 20px;font-size:14.5px;color:var(--ink2);line-height:1.75;margin:0}
+
+/* ---------- global polish ---------- */
+html{scroll-padding-top:76px}
+.sec{padding:80px 0}
+.hw-step{transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s,background .22s}
+.card{transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s}
+.hero{padding-top:110px}
 </style>
 </head>
 <body>
@@ -254,10 +304,10 @@ p{color:var(--ink2)}
     <!-- LEFT: copy + CTA -->
     <div class="hero-left">
       <span class="pill"><span class="dot"></span>Bientôt sur iOS &amp; Android</span>
-      <h1>30 secondes par jour.<span class="l2">Une question.<br>Des points.<br>Récompenses.</span></h1>
-      <p class="hero-sub">Tu donnes déjà ton avis partout, tout le temps, gratuitement, souvent sans même t'en rendre compte. <strong>Avec Noova, tu le fais volontairement</strong>, tu sais pourquoi on te pose chaque question, et tes réponses te rapportent enfin quelque chose.</p>
+      <h1>Tes avis valent<span class="l2">de l'argent.<br>T'as juste pas<br>encore l'app.</span></h1>
+      <p class="hero-sub">Tu donnes ton avis partout, tout le temps, gratuitement. <strong>Avec Noova, chaque réponse te rapporte des points</strong> — tu sais pourquoi on te pose la question, tu choisis les marques, et tu gardes le contrôle à 100%.</p>
       <div class="hero-form-cta">
-        <a class="btn" href="#liste">Être prévenu au lancement
+        <a class="btn" href="#liste">Rejoindre la liste d'attente
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
       </div>
@@ -266,7 +316,14 @@ p{color:var(--ink2)}
         <span><span class="tick">✓</span>Tu gardes le contrôle</span>
         <span><span class="tick">✓</span>Ton avis te rapporte</span>
       </div>
-      <div class="bonus">Les 500 premiers inscrits démarrent avec un bonus de bienvenue</div>
+      <div class="urgency">
+        <span>🎁 Bonus offert aux <b>500 premiers</b></span>
+        <div class="urgency-bar"><div class="urgency-fill" id="urgencyFill"></div></div>
+      </div>
+      <div class="hero-counter">
+        <div class="hc-dots"><span></span><span></span><span></span></div>
+        <span><b class="hc-num" data-target="312">0</b> personnes déjà inscrites</span>
+      </div>
     </div>
     <!-- RIGHT: phone demo -->
     <div class="hero-right">
@@ -280,6 +337,16 @@ p{color:var(--ink2)}
     </div>
   </div>
 </section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="wrap">
+    <div class="stat reveal"><span class="stat-n"><em class="count-stat" data-target="312">312</em></span><span class="stat-l">déjà inscrits</span></div>
+    <div class="stat reveal d1"><span class="stat-n">30<em>s</em></span><span class="stat-l">par jour</span></div>
+    <div class="stat reveal d2"><span class="stat-n">100<em>%</em></span><span class="stat-l">gratuit</span></div>
+    <div class="stat reveal d3"><span class="stat-n">iOS <em>&amp;</em> Android</span><span class="stat-l">bientôt disponible</span></div>
+  </div>
+</div>
 
 <!-- HOW IT WORKS (étapes détaillées) -->
 <section class="sec sec-light2" id="demo">
@@ -314,6 +381,60 @@ p{color:var(--ink2)}
       <div class="card reveal d4"><div class="card-ico">🎁</div><h3>Récompenses concrètes</h3><p>Tes points deviennent des récompenses que tu peux vraiment utiliser.</p></div>
     </div>
     <p class="reassure-line reveal">Rien n'est automatique : tu choisis, tu comprends, tu peux changer d'avis.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq sec" id="faq">
+  <div class="wrap">
+    <div class="faq-head reveal">
+      <span class="eyebrow">Questions fréquentes</span>
+      <h2>On répond à tout.</h2>
+      <p>Tu as encore des doutes ? Voici les questions qu'on nous pose le plus souvent.</p>
+    </div>
+    <div class="faq-list">
+
+      <div class="faq-item reveal">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>Quand l'application sera-t-elle disponible ?</span>
+          <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+        </button>
+        <div class="faq-a"><p>Très bientôt. En t'inscrivant sur la liste d'attente, tu es parmi les premiers avertis au lancement — et tu reçois un bonus de bienvenue si tu es parmi les 500 premiers inscrits.</p></div>
+      </div>
+
+      <div class="faq-item reveal d1">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>Est-ce vraiment gratuit ?</span>
+          <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+        </button>
+        <div class="faq-a"><p>Oui, totalement. Noova est gratuit pour les utilisateurs. Ce sont les marques qui financent l'app — exactement comme sur les réseaux sociaux, sauf qu'ici c'est toi qui es rémunéré pour tes réponses.</p></div>
+      </div>
+
+      <div class="faq-item reveal d2">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>Comment mes réponses sont-elles utilisées ?</span>
+          <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+        </button>
+        <div class="faq-a"><p>Tes réponses sont transmises de façon anonyme uniquement aux marques que tu as expressément autorisées. Tu sais toujours pourquoi une question t'est posée et ce qu'une marque cherche à comprendre. Aucune donnée n'est revendue à des tiers sans ton accord.</p></div>
+      </div>
+
+      <div class="faq-item reveal d3">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>Quelles récompenses puis-je gagner ?</span>
+          <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+        </button>
+        <div class="faq-a"><p>Bons de réduction, cashback, produits gratuits, accès exclusifs… Les récompenses varient selon les marques partenaires. Tes points ne expirent pas — tu les cumules à ton rythme et tu les échanges quand tu veux.</p></div>
+      </div>
+
+      <div class="faq-item reveal d4">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>Puis-je me désinscrire à tout moment ?</span>
+          <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+        </button>
+        <div class="faq-a"><p>Oui, sans aucune contrainte. Tu peux à tout moment bloquer une marque, supprimer tes données ou fermer ton compte. Aucun abonnement, aucun engagement. Tu restes libre.</p></div>
+      </div>
+
+    </div>
   </div>
 </section>
 
@@ -358,7 +479,8 @@ p{color:var(--ink2)}
       <div class="footer-col">
         <h4>Produit</h4>
         <a href="#demo">Comment ça marche</a>
-        <a href="#liste">Être prévenu au lancement</a>
+        <a href="#faq">Questions fréquentes</a>
+        <a href="#liste">Rejoindre la liste d'attente</a>
       </div>
       <div class="footer-col">
         <h4>Légal</h4>
@@ -1535,9 +1657,59 @@ async function submitWaitlist(e) {
   }catch(e){}
 })();
 
-/* Reveal au scroll */
-var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}})},{threshold:.14,rootMargin:'0px 0px -8% 0px'});
+/* Sticky topbar */
+(function(){
+  var bar = document.querySelector('.topbar');
+  function onScroll(){ bar.classList.toggle('scrolled', window.scrollY > 30); }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+
+/* Animated number counter */
+function animateNum(el, from, to, dur) {
+  var start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    var p = Math.min((ts - start) / dur, 1);
+    var ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(from + (to - from) * ease).toLocaleString('fr-FR');
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* Urgency fill bar */
+(function(){
+  var fill = document.getElementById('urgencyFill');
+  if (fill) setTimeout(function(){ fill.style.width = '62%'; }, 400);
+})();
+
+/* FAQ accordion */
+function toggleFaq(btn) {
+  var item = btn.closest('.faq-item');
+  var isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(function(el){ el.classList.remove('open'); });
+  if (!isOpen) item.classList.add('open');
+}
+
+/* Reveal au scroll + counter trigger */
+var io=new IntersectionObserver(function(en){
+  en.forEach(function(x){
+    if(x.isIntersecting){
+      x.target.classList.add('in');
+      var num = x.target.querySelector('[data-target]');
+      if (num) animateNum(num, 0, parseInt(num.dataset.target), 1600);
+      io.unobserve(x.target);
+    }
+  });
+},{threshold:.14,rootMargin:'0px 0px -8% 0px'});
 document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+
+/* Hero counter (always visible, trigger on load) */
+(function(){
+  var el = document.querySelector('.hc-num');
+  if (el) setTimeout(function(){ animateNum(el, 0, parseInt(el.dataset.target||0), 1800); }, 600);
+})();
 </script>
 </body>
 </html>
