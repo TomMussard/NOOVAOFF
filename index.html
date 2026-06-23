@@ -1464,17 +1464,31 @@ window.addEventListener('load',()=>{
 var SUPABASE_URL = 'https://xcxyemhpvhekjpzyhici.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjeHllbWhwdmhla2pwenloaWNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMTE1ODQsImV4cCI6MjA5Nzc4NzU4NH0.PJFLJ0-h427GGrl45m1tLfALJNDO_mRXwyeFo8Aa9XQ';
 
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(email) &&
+    email.length >= 6 &&
+    !email.includes('..') &&
+    email.split('@')[1].includes('.');
+}
+
 async function submitWaitlist(e) {
   e.preventDefault();
   var form = e.target;
   var wrap = form.closest('.waitlist-wrap');
-  var email = form.querySelector('input[type="email"]').value.trim();
+  var email = form.querySelector('input[type="email"]').value.trim().toLowerCase();
   var btn = form.querySelector('button[type="submit"]');
   var origBtn = btn.innerHTML;
   var errorEl = wrap ? wrap.querySelector('.waitlist-error') : null;
   var doneEl  = wrap ? wrap.querySelector('.waitlist-done')  : null;
+  var doneSpan = doneEl ? doneEl.querySelector('span') : null;
 
   if (errorEl) errorEl.textContent = '';
+
+  if (!isValidEmail(email)) {
+    if (errorEl) errorEl.textContent = 'Adresse email invalide. Vérifie le format (ex: prenom@domaine.com)';
+    return;
+  }
+
   btn.disabled = true;
   btn.textContent = '…';
 
@@ -1490,7 +1504,13 @@ async function submitWaitlist(e) {
       body: JSON.stringify({ email: email })
     });
 
-    if (res.ok || res.status === 409) {
+    if (res.status === 409) {
+      if (doneSpan) doneSpan.textContent = 'Tu es déjà dans la liste — à bientôt au lancement ! 👋';
+      form.style.display = 'none';
+      if (errorEl) errorEl.style.display = 'none';
+      if (doneEl) doneEl.style.display = 'flex';
+    } else if (res.ok) {
+      if (doneSpan) doneSpan.textContent = 'Tu es sur la liste ! On te prévient au lancement 🎉';
       form.style.display = 'none';
       if (errorEl) errorEl.style.display = 'none';
       if (doneEl) doneEl.style.display = 'flex';
