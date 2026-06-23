@@ -347,8 +347,8 @@ html{scroll-padding-top:76px}
     <!-- LEFT: copy + CTA -->
     <div class="hero-left">
       <span class="pill"><span class="dot"></span>Bientôt sur iOS &amp; Android</span>
-      <h1>30 SECONDES PAS JOUR.<span class="l2">UNE QUESTIONS.<br>DES POINTS.<br>DES récompenses</span></h1>
-      <p class="hero-sub">Tu donnes déjà ton avis partout, tout le temps, gratuitement, souvent sans même t'en rendre compte.<strong>Avec Noova, tu le fais volontairement</strong>, tu sais pourquoi on te pose chaque question, et tes réponses te rapportent enfin quelque chose.</p>
+      <h1>30 SECONDES PAR JOUR.<span class="l2">UNE QUESTION.<br>DES POINTS.<br>DES RÉCOMPENSES.</span></h1>
+      <p class="hero-sub">Tu donnes déjà ton avis partout, tout le temps, gratuitement, souvent sans même t'en rendre compte. <strong>Avec Noova, tu le fais volontairement</strong>, tu sais pourquoi on te pose chaque question, et tes réponses te rapportent enfin quelque chose.</p>
       <div class="hero-form-cta">
         <a class="btn" href="#liste">Rejoindre la liste d'attente
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -1243,7 +1243,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="wc-lbl">Mon solde</div>
       <div class="wc-pts" id="wc-pts">0 <small>pts</small></div>
       <div class="wc-bar"><div class="wc-fill" id="wc-fill" style="width:4%"></div></div>
-      <div class="wc-level"><span id="wc-level">Niveau 1 — Curieux</span><span id="wc-next">1000 pts</span></div>
+      <div class="wc-level"><span id="wc-level">Niveau 1 : Curieux</span><span id="wc-next">1000 pts</span></div>
     </div>
     <div class="cashout-c">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--coral);flex-shrink:0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">Que des cadeaux locaux</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">Pas de retrait en argent : ça permet de garder des cadeaux généreux</div></div></div>
@@ -1265,7 +1265,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div style="font-family:var(--fd);font-weight:700;font-size:21px;letter-spacing:-.8px;color:var(--ink)" id="prof-name">Alex</div>
       <div style="font-size:12px;color:var(--ink2);margin-top:2px" id="prof-email">alex@noova.app</div>
       <div style="margin-top:12px;background:var(--bg2);border-radius:11px;padding:10px 12px">
-        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span style="font-weight:700;color:var(--ink)" id="pl-name">Niveau 1 — Curieux</span><span style="color:var(--ink2)" id="pl-xp">0 / 1000 pts</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span style="font-weight:700;color:var(--ink)" id="pl-name">Niveau 1 : Curieux</span><span style="color:var(--ink2)" id="pl-xp">0 / 1000 pts</span></div>
         <div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden"><div style="height:100%;background:var(--grad);border-radius:99px;transition:width 1s" id="pl-fill"></div></div>
       </div>
     </div>
@@ -1416,7 +1416,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       </div>
       <div style="background:rgba(224,125,10,.07);border:1px solid rgba(224,125,10,.18);border-radius:14px;padding:13px">
         <div style="font-family:var(--fd);font-weight:700;font-size:13px;color:#fff;margin-bottom:9px">💡 Recommandations actionnables</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.8">→ <strong style="color:#fff">Teste l'ouverture jusqu'à 23h le vendredi/samedi</strong> (71% des voisins demandeurs).<br>→ <strong style="color:#fff">Mets en avant la sauce maison</strong> dans ta com — c'est ton vrai atout.<br>→ <strong style="color:#fff">Lance un menu étudiant le soir</strong> pour fidéliser les proches.</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.8">→ <strong style="color:#fff">Teste l'ouverture jusqu'à 23h le vendredi/samedi</strong> (71% des voisins demandeurs).<br>→ <strong style="color:#fff">Mets en avant la sauce maison</strong> dans ta com, c'est ton vrai atout.<br>→ <strong style="color:#fff">Lance un menu étudiant le soir</strong> pour fidéliser les proches.</div>
       </div>
     </div>
   </div>
@@ -1685,7 +1685,7 @@ function refreshWallet(){
   document.getElementById('wc-pts').innerHTML=S.pts+' <small>pts</small>';
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(4,((S.pts-l.min)/(l.max-l.min))*100));
   document.getElementById('wc-fill').style.width=pct+'%';
-  document.getElementById('wc-level').textContent='Niveau '+(li+1)+' — '+l.n;
+  document.getElementById('wc-level').textContent='Niveau '+(li+1)+' : '+l.n;
   document.getElementById('wc-next').textContent=l.max===9999?'Max !':l.max+' pts';
   const rpv=document.getElementById('req-pts-v');if(rpv)rpv.textContent=S.pts+' / 10000';
   const gg=document.getElementById('gift-grid');gg.innerHTML='';
@@ -1699,7 +1699,7 @@ function refreshProfile(){
   document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.email;
   document.getElementById('s-pts').textContent=S.pts;document.getElementById('s-ans').textContent=S.ans;document.getElementById('s-str').textContent=S.streak;
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(2,((S.pts-l.min)/(l.max-l.min))*100));
-  document.getElementById('pl-name').textContent='Niveau '+(li+1)+' — '+l.n;document.getElementById('pl-xp').textContent=S.pts+' / '+(l.max===9999?'∞':l.max)+' pts';document.getElementById('pl-fill').style.width=pct+'%';
+  document.getElementById('pl-name').textContent='Niveau '+(li+1)+' : '+l.n;document.getElementById('pl-xp').textContent=S.pts+' / '+(l.max===9999?'∞':l.max)+' pts';document.getElementById('pl-fill').style.width=pct+'%';
   const cm=document.getElementById('consent-mgmt');cm.innerHTML='';
   BD.slice(0,4).forEach(b=>{const on=S.brands[b.id];const d=document.createElement('div');d.className='consent-it';d.innerHTML=`${logoHTML(b.n,32)}<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">${b.n}</div><div style="font-size:10px;color:var(--ink3);margin-top:1px">${b.use}</div></div><label class="tgl"><input type="checkbox" ${on?'checked':''} onchange="S.brands['${b.id}']=this.checked"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;cm.appendChild(d)});
   const bl=document.getElementById('badges-list');bl.innerHTML='';
@@ -1725,7 +1725,7 @@ function wzStep(n){
 }
 function selFmt(el,fmt){document.querySelectorAll('.fmt-opt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle 1–10',rank:'Classement'}[fmt]}
 function useTmpl(txt){document.getElementById('bo-q').value=txt}
-function launchCampaign(){alert('🚀 Ta question est en ligne ! Tes voisins vont y répondre — premiers avis sous quelques heures.');boTab('dashboard',document.querySelectorAll('.bo-tab')[0])}
+function launchCampaign(){alert('🚀 Ta question est en ligne ! Tes voisins vont y répondre, premiers avis sous quelques heures.');boTab('dashboard',document.querySelectorAll('.bo-tab')[0])}
 window.addEventListener('load',()=>{renderBrands();renderCampaigns();setTimeout(()=>goTo('onboard'),2200)});
 
 /* ============================================================
@@ -1738,7 +1738,7 @@ window.addEventListener('load',()=>{renderBrands();renderCampaigns();setTimeout(
     "Kebab O'Coin":[
       {type:'mcq',pts:15,q:"À quelle heure aimerais-tu pouvoir commander le week-end ?",hint:'Choisis une réponse.',opts:['Avant 22h ça me suffit','Jusqu\'à 23h','Jusqu\'à minuit','Encore plus tard']},
       {type:'scale',pts:20,q:"À quel point un menu étudiant moins cher te ferait revenir ?",hint:'Glisse le curseur'},
-      {type:'text',pts:25,q:"Qu'est-ce qu'on pourrait améliorer pour que tu viennes plus souvent ?",hint:'Sois honnête — on lit tout.',aiTips:['Les horaires','Le rapport qualité-prix','Le choix au menu','L\'accueil ou la rapidité']}
+      {type:'text',pts:25,q:"Qu'est-ce qu'on pourrait améliorer pour que tu viennes plus souvent ?",hint:'Sois honnête, on lit tout.',aiTips:['Les horaires','Le rapport qualité-prix','Le choix au menu','L\'accueil ou la rapidité']}
     ],
     'Café de la Place':[
       {type:'mcq',pts:15,q:"Tu viens plutôt au café à quel moment ?",hint:'Choisis une réponse.',opts:['☀️ Le matin','🥪 Le midi','☕ L\'après-midi','🌙 En soirée']},
@@ -1764,7 +1764,7 @@ window.addEventListener('load',()=>{renderBrands();renderCampaigns();setTimeout(
 const BRANDPROFILE={
   "Kebab O'Coin":{sector:'Restauration · Kebab',tagline:'Le goût du quartier.',loc:'Rue Thiers, Vannes',founded:'2019',size:'Commerce local',avgpts:'30',resp:'~20s',rate:'—',
     about:"Kebab O'Coin est un commerce de quartier à 600 m de chez toi. Sur Noova, il demande l'avis de ses voisins pour ajuster ses horaires, son menu et son offre.",
-    why:"Tes réponses l'aident à mieux servir le quartier — et tu gagnes des points échangeables chez lui. Rien n'est revendu : seuls les avis des habitants proches lui parviennent.",
+    why:"Tes réponses l'aident à mieux servir le quartier, et tu gagnes des points échangeables chez lui. Rien n'est revendu : seuls les avis des habitants proches lui parviennent.",
     extra:[{q:'Quel accompagnement te manque le plus ?',status:'soon'}]},
   'Café de la Place':{sector:'Café · Salon de thé',tagline:'Ton café de tous les jours.',loc:'Place des Lices, Vannes',founded:'2016',size:'Commerce local',avgpts:'25',resp:'~20s',rate:'—',
     about:"Le Café de la Place est à 350 m de chez toi. Il utilise Noova pour tester ses nouveautés (boissons, formules) auprès des gens du coin.",
@@ -1827,7 +1827,7 @@ function openSurveyQ(){
 function startSurvey(){if(!S.sv)return;S.sv.idx=0;openSurveyQ();}
 function endSurveyEarly(){
   refreshHome();refreshWallet();
-  openReward({pts:S.sv.hookPts,total:S.pts,brand:S.sv.brand,usage:S.sv.base.usage,title:'Merci !',sub:'Tu gardes tes points — reviens quand tu veux pour le reste.',brandName:S.sv.brand});
+  openReward({pts:S.sv.hookPts,total:S.pts,brand:S.sv.brand,usage:S.sv.base.usage,title:'Merci !',sub:'Tu gardes tes points, reviens quand tu veux !',brandName:S.sv.brand});
   S.mode='hook';
 }
 function finishSurvey(){
@@ -1835,7 +1835,7 @@ function finishSurvey(){
   const done=sv.idx;
   openReward({pts:sv.earned,total:S.pts,brand:sv.brand,usage:sv.base.usage,
     title:done>=sv.list.length?'Questionnaire terminé 🎉':'Bien joué !',
-    sub:done>=sv.list.length?('Tu as répondu à tout le questionnaire '+sv.brand):'Tu gardes tes points — à bientôt !',
+    sub:done>=sv.list.length?('Tu as répondu à tout le questionnaire '+sv.brand):'Tu gardes tes points, à bientôt !',
     brandName:sv.brand});
   S.mode='hook';
 }
