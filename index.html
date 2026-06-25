@@ -2026,6 +2026,32 @@ function isValidEmail(email) {
     email.split('@')[1].includes('.');
 }
 
+/* Vérifie que le domaine accepte des emails via Google DNS-over-HTTPS.
+   Retourne true si OK ou si la vérification échoue (fail open). */
+async function checkEmailDomain(email) {
+  var domain = email.split('@')[1];
+  if (!domain) return false;
+  try {
+    var res = await fetch('https://dns.google/resolve?name=' + encodeURIComponent(domain) + '&type=MX', { mode: 'cors' });
+    if (!res.ok) return true;
+    var data = await res.json();
+    /* Status 3 = NXDOMAIN : le domaine n'existe pas */
+    if (data.Status === 3) return false;
+    /* Status 0 avec MX records = domaine mail valide */
+    if (data.Status === 0 && data.Answer && data.Answer.length > 0) return true;
+    /* Status 0 sans MX mais domaine existant : on vérifie l'enregistrement A */
+    if (data.Status === 0) {
+      var a = await fetch('https://dns.google/resolve?name=' + encodeURIComponent(domain) + '&type=A', { mode: 'cors' });
+      if (!a.ok) return true;
+      var ad = await a.json();
+      return ad.Status !== 3;
+    }
+    return true;
+  } catch (err) {
+    return true; /* En cas d'erreur réseau, on laisse passer */
+  }
+}
+
 async function submitWaitlist(e) {
   e.preventDefault();
   var form = e.target;
@@ -2045,6 +2071,16 @@ async function submitWaitlist(e) {
   }
 
   btn.disabled = true;
+  btn.textContent = 'Vérification…';
+
+  var domainOk = await checkEmailDomain(email);
+  if (!domainOk) {
+    if (errorEl) errorEl.textContent = 'Ce domaine email n\'existe pas. Vérifie l\'adresse (ex : gmail.com, outlook.fr…)';
+    btn.disabled = false;
+    btn.innerHTML = origBtn;
+    return;
+  }
+
   btn.textContent = '…';
 
   try {
