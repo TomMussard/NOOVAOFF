@@ -1,0 +1,19 @@
+{
+  "name": "Noova",
+  "short_name": "Noova",
+  "description": "Là où tes avis ont de la valeur",
+  "start_url": "/app.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F6F2",
+  "theme_color": "#F7F6F2",
+  "icons": [
+    {
+      "src": "Plan%20de%20travail%208LOGO_NOOVAV2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -2,8 +2,19 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Noova — Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Noova</title>
+
+<!-- PWA — iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Noova">
+<link rel="apple-touch-icon" href="Plan%20de%20travail%208LOGO_NOOVAV2.png">
+
+<!-- PWA — Android / Chrome -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#F7F6F2">
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,15 +29,14 @@
   --r:20px;--rs:13px;--fd:'Bricolage Grotesque',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-webkit-font-smoothing:antialiased}
-#shell{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:390px;height:844px;background:var(--bg);border-radius:50px;overflow:hidden;box-shadow:0 60px 120px rgba(0,0,0,.5),0 0 0 12px #2A2535,0 0 0 13px #1A1820}
-#shell::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:37px;background:#17141A;border-radius:0 0 22px 22px;z-index:999}
-.bg-label{position:fixed;top:18px;left:50%;transform:translateX(-50%);font-family:var(--fd);font-weight:700;font-size:12px;color:rgba(255,255,255,.3);letter-spacing:1.2px;text-transform:uppercase}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb);-webkit-font-smoothing:antialiased}
+#shell{position:fixed;inset:0;background:var(--bg);overflow:hidden}
+.bg-label{display:none}
 #app{position:absolute;inset:0;overflow:hidden;background:var(--bg)}
-.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;transform:translateX(26px);-webkit-overflow-scrolling:touch;background:var(--bg)}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;transform:translateX(26px);-webkit-overflow-scrolling:touch;background:var(--bg);padding-top:env(safe-area-inset-top,0px)}
 .screen.active{opacity:1;pointer-events:all;transform:translateX(0)}
 .screen.exit{opacity:0;transform:translateX(-26px);pointer-events:none}
-.si{min-height:100%;padding-bottom:88px}
+.si{min-height:100%;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{from{opacity:0;transform:scale(.2) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes confFall{to{transform:translateY(120vh) rotate(720deg);opacity:0}}
@@ -364,7 +374,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .bo-btn-s{padding:11px 14px;border-radius:11px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.6);font-family:var(--fb);font-size:12px;cursor:pointer}
 .bo-btn-row{display:flex;gap:8px;margin-top:14px}
 /* BOTTOM NAV */
-.bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(247,246,242,.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-top:1px solid var(--bg3);padding:8px 6px 8px;display:none;z-index:100}
+.bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(247,246,242,.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-top:1px solid var(--bg3);padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));display:none;z-index:100}
 .bnav.show{display:flex}
 .nav-it{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 2px;border-radius:13px;transition:all .13s;position:relative}
 .nav-it:active{transform:scale(.85)}
