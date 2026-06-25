@@ -116,8 +116,8 @@ p{color:var(--ink2)}
 /* header inline form */
 .header-waitlist{display:none;flex:1;max-width:360px}
 @media(min-width:900px){.header-waitlist{display:block}}
-.header-waitlist .waitlist-form{max-width:none;margin:0;gap:8px}
-.header-waitlist .waitlist-form input{padding:10px 14px;font-size:13.5px;background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.18);color:#fff}
+.header-waitlist .waitlist-form{max-width:none;margin:0;gap:8px;flex-direction:row;align-items:center}
+.header-waitlist .waitlist-form input{padding:10px 14px;font-size:13.5px;background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.18);color:#fff;flex:1;min-width:0}
 .header-waitlist .waitlist-form input::placeholder{color:rgba(255,255,255,.48)}
 .header-waitlist .waitlist-form input:focus{border-color:var(--amber);background:rgba(255,255,255,.15);box-shadow:0 0 0 3px rgba(249,167,22,.22)}
 .header-waitlist .waitlist-form .btn{font-size:13px;padding:10px 16px;flex:none}
@@ -327,9 +327,25 @@ html{scroll-padding-top:76px}
   .topbar .wrap{padding:16px 16px}
   .nav-cta{font-size:11px;padding:8px 13px}
 }
+
+/* ---------- INTRO OVERLAY ---------- */
+#intro-overlay{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(130% 120% at 55% -5%,#241F2B 0%,#0F0D12 60%);transition:opacity .7s ease}
+#intro-overlay.out{opacity:0;pointer-events:none}
+#intro-logo{height:118px;width:auto;animation:introPop .65s cubic-bezier(.34,1.56,.64,1) .2s both}
+@keyframes introPop{from{opacity:0;transform:scale(.12) rotate(-8deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+#intro-sep{width:36px;height:1.5px;background:linear-gradient(90deg,#f9a716,#fce1a7);border-radius:99px;opacity:0;animation:introFadeIn .4s ease .95s both}
+#intro-tagline{font-family:'Archivo',sans-serif;font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:4px;color:rgba(255,255,255,.48);text-align:center;padding:0 24px;opacity:0;animation:introFadeIn .5s ease 1.05s both}
+@keyframes introFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+
+<!-- INTRO OVERLAY -->
+<div id="intro-overlay">
+  <img id="intro-logo" src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Noova">
+  <div id="intro-sep"></div>
+  <div id="intro-tagline">Là où tes avis ont de la valeur</div>
+</div>
 
 <!-- TOP BAR -->
 <header class="topbar">
@@ -2140,6 +2156,16 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
 (function(){
   var el = document.querySelector('.hc-num');
   if (el) setTimeout(function(){ animateNum(el, 0, parseInt(el.dataset.target||0), 1800); }, 600);
+})();
+
+/* Intro overlay — slide down after 2s */
+(function(){
+  var o = document.getElementById('intro-overlay');
+  if (!o) return;
+  setTimeout(function(){
+    o.classList.add('out');
+    setTimeout(function(){ if(o.parentNode) o.parentNode.removeChild(o); }, 750);
+  }, 2100);
 })();
 </script>
 </body>
