@@ -378,10 +378,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .bnav.show{display:flex}
 .nav-it{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 2px;border-radius:13px;transition:all .13s;position:relative}
 .nav-it:active{transform:scale(.85)}
-.nav-ico{font-size:21px;line-height:1}
+.nav-ico{line-height:1;color:var(--ink3);transition:color .13s;display:flex;align-items:center;justify-content:center}
 .nav-lbl{font-size:9px;font-weight:500;color:var(--ink3);transition:color .13s}
 .nav-it.on .nav-lbl{color:var(--coral);font-weight:700}
-.nav-it.on .nav-ico{filter:drop-shadow(0 0 4px rgba(224,125,10,.3))}
+.nav-it.on .nav-ico{color:var(--coral)}
 .nav-badge{position:absolute;top:1px;right:calc(50% - 16px);width:7px;height:7px;background:var(--coral);border-radius:50%;border:2px solid var(--bg)}
 /* BUTTONS */
 .btn-p{width:100%;padding:14px;border-radius:12px;background:var(--grad);border:none;color:var(--gi);font-family:var(--fd);font-size:14px;font-weight:700;cursor:pointer;transition:all .13s;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 6px 18px var(--cg);letter-spacing:-.2px}
@@ -930,16 +930,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 
 <!-- BOTTOM NAV -->
 <nav class="bnav" id="bnav">
-  <div class="nav-it" id="nav-home" onclick="goNav('home')"><div class="nav-ico">🏠</div><div class="nav-lbl">Accueil</div></div>
-  <div class="nav-it" id="nav-social" onclick="goNav('social')"><div class="nav-ico">👥</div><div class="nav-lbl">Communauté</div><div class="nav-badge"></div></div>
-  <div class="nav-it" id="nav-rewards-tab" onclick="goNav('rewards-tab')"><div class="nav-ico">🎁</div><div class="nav-lbl">Récompenses</div></div>
-  <div class="nav-it" id="nav-profile" onclick="goNav('profile')"><div class="nav-ico">👤</div><div class="nav-lbl">Profil</div></div>
+  <div class="nav-it" id="nav-home" onclick="goNav('home')"><div class="nav-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nav-lbl">Accueil</div></div>
+  <div class="nav-it" id="nav-social" onclick="goNav('social')"><div class="nav-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="nav-lbl">Communauté</div><div class="nav-badge"></div></div>
+  <div class="nav-it" id="nav-rewards-tab" onclick="goNav('rewards-tab')"><div class="nav-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M20 6h-2.18c.07-.43.18-.84.18-1.25 0-2.07-1.68-3.75-3.75-3.75-1.03 0-1.96.43-2.63 1.12L10 3.87 8.38 2.12C7.71 1.43 6.78 1 5.75 1 3.68 1 2 2.68 2 4.75c0 .41.11.82.18 1.25H2v2h2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8h2V6h-2zm-7.63-2.38c.35-.36.83-.62 1.63-.62 1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H12.5l-.13-2.38zm-5.12-.25c1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H4.8c-.43-.31-.8-.71-.8-1.25C4 5.07 4.72 4.12 5.75 4.12zM4 19V8h7v11H4zm9 0V8h7v11h-7z"/></svg></div><div class="nav-lbl">Récompenses</div></div>
+  <div class="nav-it" id="nav-profile" onclick="goNav('profile')"><div class="nav-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="nav-lbl">Profil</div></div>
 </nav>
 
 </div>
 </div>
 <script>
-const S={user:null,pts:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],friends:[{n:'Marie',pts:340,str:5,online:true},{n:'Lucas',pts:210,str:3,online:false},{n:'Yasmine',pts:520,str:9,online:true},{n:'Tom',pts:155,str:2,online:false}],chats:{}};
+const S={user:null,pts:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],done:{},friends:[{n:'Marie',pts:340,str:5,online:true},{n:'Lucas',pts:210,str:3,online:false},{n:'Yasmine',pts:520,str:9,online:true},{n:'Tom',pts:155,str:2,online:false}],chats:{}};
 const BD=[{id:'kebab',n:"Kebab O'Coin",ico:'🌯',theme:'Manger & boire',use:'Kebab · à 600 m'},{id:'tacos',n:'Tacos du Port',ico:'🌮',theme:'Manger & boire',use:'Tacos · à 1,1 km'},{id:'cafe',n:'Café de la Place',ico:'☕',theme:'Cafés & boulangeries',use:'Café · à 350 m'},{id:'fournil',n:'Le Fournil',ico:'🥖',theme:'Cafés & boulangeries',use:'Boulangerie · à 800 m'},{id:'bio',n:'Comptoir Bio',ico:'🥬',theme:'Courses & alimentation',use:'Épicerie bio · à 1,3 km'},{id:'forme',n:'Studio Forme',ico:'🏋️',theme:'Sport & bien-être',use:'Salle de sport · à 900 m'},{id:'cine',n:'Cinéville',ico:'🎬',theme:'Sorties & loisirs',use:'Cinéma · à 1,2 km'},{id:'coiffure',n:'Coiffure Léa',ico:'💇',theme:'Beauté',use:'Salon de coiffure · à 700 m'}];
 const QS=[{brand:"Kebab O'Coin",ico:'🌯',theme:'Manger & boire',pts:30,type:'mcq',q:"Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?",hint:'Choisis ta réponse.',opts:['👍 Oui, clairement','🌙 Surtout le vendredi/samedi','🤷 Ça ne changerait rien','👎 Non, pas vraiment'],usage:"Kebab O'Coin (à 600 m) réfléchit à ses horaires du week-end"},{brand:'Café de la Place',ico:'☕',theme:'Cafés & boulangeries',pts:25,type:'mcq',q:"On lance un nouveau latté. Quel nom te donne le plus envie ?",hint:'Choisis une réponse.',opts:['☀️ "Le Doré"','🍯 "Caramel du Port"','🌿 "Latté des Remparts"','✨ Aucun des trois'],usage:"Le Café de la Place (à 350 m) teste le nom de sa nouvelle boisson avant de l'imprimer sur l'ardoise"},{brand:'Studio Forme',ico:'🏋️',theme:'Sport & bien-être',pts:30,type:'scale',q:'Sur 10, à quel point des créneaux tôt le matin (avant 8h) t\'intéresseraient ?',hint:'Glisse le curseur',usage:'Studio Forme (à 900 m) étudie l\'ouverture de créneaux matinaux'},{brand:'Cinéville',ico:'🎬',theme:'Sorties & loisirs',pts:25,type:'rank',q:"Classe ce qui te ferait venir plus souvent au ciné :",hint:'Glisse pour réordonner',items:['🎟️ Tarifs réduits','🍿 Snacks moins chers','🕐 Séances tardives','🎬 Plus d\'avant-premières','🛋️ Confort des salles'],usage:"Cinéville (à 1,2 km) ajuste son offre pour les habitants du quartier"},{brand:'Le Fournil',ico:'🥖',theme:'Cafés & boulangeries',pts:20,type:'text',q:'Qu\'est-ce qui te ferait venir le matin plutôt qu\'à la grande surface ?',hint:'Sois précis — prix, proximité, qualité, accueil…',usage:'Le Fournil (à 800 m) veut comprendre ce qui compte pour le quartier le matin',aiTips:['Le prix','La proximité','La qualité du pain','Les horaires','L\'accueil']}];
 const BRANDMETA={"Kebab O'Coin":{ab:'K',c:'#D6442E'},'Tacos du Port':{ab:'T',c:'#C0392B'},'Café de la Place':{ab:'C',c:'#6B4226'},'Le Fournil':{ab:'F',c:'#C9821A'},'Comptoir Bio':{ab:'B',c:'#1E8449'},'Studio Forme':{ab:'S',c:'#0BAB84'},'Cinéville':{ab:'C',c:'#2D6CDF'},'Coiffure Léa':{ab:'L',c:'#A14E08'},'Cashback':{ab:'€',c:'#0BAB84'}};
@@ -962,7 +962,7 @@ function goTo(id){
   document.getElementById('bnav').classList[S.user&&isN?'add':'remove']('show');
   navS.forEach(s=>{const el=document.getElementById('nav-'+s);if(el)el.classList[s===id?'add':'remove']('on')});
 }
-function goNav(id){goTo(id);if(id==='rewards-tab')refreshWallet();if(id==='profile')refreshProfile();if(id==='home')refreshHome();if(id==='social')renderSocial()}
+function goNav(id){goTo(id);if(id==='rewards-tab')refreshWallet();if(id==='profile')refreshProfile();if(id==='home')refreshHome();if(id==='social'){renderSocial();const b=document.querySelector('#nav-social .nav-badge');if(b)b.style.display='none';}}
 
 function obNext(){
   if(obIdx<2){
@@ -1050,7 +1050,11 @@ function buildAns(q){
     el.appendChild(sv);el.appendChild(sl);el.appendChild(inp);document.getElementById('sub-btn').disabled=false;
   }else if(q.type==='rank'){
     let items=[...(q.items||[])];const rl=document.createElement('div');rl.className='rank-list';
-    const render=()=>{rl.innerHTML='';items.forEach((it,i)=>{const d=document.createElement('div');d.className='rank-item';d.draggable=true;d.dataset.i=i;d.innerHTML=`<span class="rank-grip">⠿</span><div class="rank-num">${i+1}</div><div class="rank-txt">${it}</div>`;d.ondragstart=e=>{e.dataTransfer.setData('text/plain',i);d.classList.add('dragging')};d.ondragend=()=>d.classList.remove('dragging');d.ondragover=e=>e.preventDefault();d.ondrop=e=>{e.preventDefault();const f=+e.dataTransfer.getData('text/plain');[items[f],items[i]]=[items[i],items[f]];render()};rl.appendChild(d)})};
+    let dragIdx=-1;
+    const render=()=>{rl.innerHTML='';items.forEach((it,i)=>{const d=document.createElement('div');d.className='rank-item';d.draggable=true;d.dataset.i=i;d.innerHTML=`<span class="rank-grip">⠿</span><div class="rank-num">${i+1}</div><div class="rank-txt">${it}</div>`;d.ondragstart=e=>{e.dataTransfer.setData('text/plain',i);d.classList.add('dragging');dragIdx=i};d.ondragend=()=>{d.classList.remove('dragging');dragIdx=-1};d.ondragover=e=>e.preventDefault();d.ondrop=e=>{e.preventDefault();const f=+e.dataTransfer.getData('text/plain');if(f!==i){[items[f],items[i]]=[items[i],items[f]];render()}};rl.appendChild(d)})};
+    rl.addEventListener('touchstart',e=>{const item=e.target.closest('.rank-item');if(!item)return;dragIdx=+item.dataset.i;item.classList.add('dragging');},{passive:true});
+    rl.addEventListener('touchmove',e=>{e.preventDefault();if(dragIdx<0)return;const touch=e.touches[0];const children=[...rl.querySelectorAll('.rank-item')];let overIdx=-1;children.forEach((el,j)=>{const r=el.getBoundingClientRect();if(touch.clientY>=r.top&&touch.clientY<=r.bottom)overIdx=j});if(overIdx>=0&&overIdx!==dragIdx){[items[dragIdx],items[overIdx]]=[items[overIdx],items[dragIdx]];dragIdx=overIdx;render();const nc=rl.querySelectorAll('.rank-item');if(nc[dragIdx])nc[dragIdx].classList.add('dragging');}},{passive:false});
+    rl.addEventListener('touchend',()=>{rl.querySelectorAll('.rank-item').forEach(el=>el.classList.remove('dragging'));dragIdx=-1;},{passive:true});
     render();el.appendChild(rl);document.getElementById('sub-btn').disabled=false;
   }
 }
@@ -1313,6 +1317,7 @@ function submitAns(){
   }
   /* mode hook : on retire la question de la file d'attente */
   S.qs=S.qs.filter(x=>!(x.brand===q.brand&&x.q===q.q));
+  S.done[q.brand]=true;
   if(q.survey&&q.survey.length){
     S.sv={brand:q.brand,base:q,hookPts:q.pts,earned:q.pts,idx:0,
       list:q.survey.map(x=>Object.assign({},x,{brand:q.brand,ico:q.ico,theme:q.theme,usage:q.usage}))};
@@ -1363,12 +1368,13 @@ function exitQuestion(){if(S.mode==='survey'&&S.sv)finishSurvey();else goNav('ho
 /* --- Pages entreprise --- */
 function brandSurveys(name){
   const out=[];const hook=(typeof QS!=='undefined')?QS.find(q=>q.brand===name):null;
-  if(hook){const n=1+(hook.survey?hook.survey.length:0);const tot=hook.pts+(hook.survey?hook.survey.reduce((a,b)=>a+b.pts,0):0);out.push({q:hook.q,n,tot,status:'active'});}
+  if(hook){const n=1+(hook.survey?hook.survey.length:0);const tot=hook.pts+(hook.survey?hook.survey.reduce((a,b)=>a+b.pts,0):0);const status=S.done&&S.done[name]?'done':'active';out.push({q:hook.q,n,tot,status});}
   const p=BRANDPROFILE[name];if(p&&p.extra)p.extra.forEach(e=>out.push({q:e.q,status:e.status}));
   return out;
 }
 function statusBadge(s){
   if(s==='active')return '<span class="bp-sv-badge" style="background:var(--cd);color:var(--coral)">● Actif</span>';
+  if(s==='done')return '<span class="bp-sv-badge" style="background:rgba(11,171,132,.12);color:#0BAB84">✓ Répondu</span>';
   if(s==='soon')return '<span class="bp-sv-badge" style="background:var(--bg2);color:var(--ink2)">🔜 Bientôt</span>';
   return '<span class="bp-sv-badge" style="background:var(--bg2);color:var(--ink3)">Clôturé</span>';
 }
@@ -1381,8 +1387,8 @@ function openBrand(name,back){
   const info=[['Secteur',p.sector||'—'],['Créée en',p.founded||'—'],['Effectif',p.size||'—'],['Siège',p.loc||'—']];
   let sv='';
   surveys.forEach(s=>{
-    const active=s.status==='active';
-    sv+=`<div class="bp-survey${active?' active':''}"><div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
+    const active=s.status==='active';const isdone=s.status==='done';
+    sv+=`<div class="bp-survey${active?' active':''}"><div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:#0BAB84;font-weight:600">✓ Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
   });
   if(!surveys.length)sv='<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>';
   document.getElementById('bp-wrap').innerHTML=`
@@ -1402,6 +1408,7 @@ function openBrand(name,back){
 }
 function openBrandFromQ(){const q=curQuestion();if(q&&q.brand)openBrand(q.brand,'question');}
 function answerBrand(name){
+  if(S.done&&S.done[name])return;
   const hook=(typeof QS!=='undefined')?QS.find(q=>q.brand===name):null;if(!hook)return;
   S.mode='hook';S.curQ=Object.assign({},hook);S.qIdx=-1;
   const pg=document.getElementById('q-prog');pg.innerHTML='';const d=document.createElement('div');d.className='q-seg cur';pg.appendChild(d);
