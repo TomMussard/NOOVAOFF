@@ -1752,7 +1752,7 @@ function wzStep(n){
 function selFmt(el,fmt){document.querySelectorAll('.fmt-opt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle 1–10',rank:'Classement'}[fmt]}
 function useTmpl(txt){document.getElementById('bo-q').value=txt}
 function launchCampaign(){alert('🚀 Ta question est en ligne ! Tes voisins vont y répondre, premiers avis sous quelques heures.');boTab('dashboard',document.querySelectorAll('.bo-tab')[0])}
-window.addEventListener('load',()=>{renderBrands();renderCampaigns();setTimeout(()=>goTo('onboard'),2200)});
+
 
 /* ============================================================
    NOOVA, Questionnaires opt-in + pages entreprise (ajout)
@@ -2022,7 +2022,7 @@ function gameReveal(mine){
 function shareGame(b){const t=b.textContent;b.textContent='✓ Partagé en story';setTimeout(()=>b.textContent=t,1600);}
 
 
-window.addEventListener('load',function(){S.user={name:'Alex',email:'alex@noova.app',age:'25-34'};S.pts=25;S.qs=[...QS];document.getElementById('bnav').classList.add('show');goNav('home');renderSocial();});
+window.addEventListener('load',function(){renderBrands();renderCampaigns();S.user={name:'Alex',email:'alex@noova.app',age:'25-34'};S.pts=25;S.qs=[...QS];document.getElementById('bnav').classList.add('show');goNav('home');renderSocial();});
 </script>
 </body>
 </html>
