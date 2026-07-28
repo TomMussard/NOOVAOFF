@@ -1,0 +1,43 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "*.md",
+      "node_modules",
+      "build_app.js",
+      "fix_demo.js"
+    ],
+    "rewrites": [
+      {
+        "source": "/app",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/dashboard",
+        "destination": "/noova_dashboard.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/app.html",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache" }
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache" }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css|png|jpg|svg|ico|json)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=31536000" }
+        ]
+      }
+    ]
+  }
+}

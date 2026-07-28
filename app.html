@@ -1494,9 +1494,30 @@ function shareGame(b){const t=b.textContent;b.textContent='✓ Partagé en story
     <input id="aw-pass" type="password" placeholder="Mot de passe" autocomplete="current-password" style="width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
     <div id="aw-err" style="color:#EF4444;font-size:12px;display:none;padding:9px 12px;background:rgba(239,68,68,.08);border-radius:8px;text-align:center"></div>
     <button id="aw-submit" onclick="awSubmit()" style="width:100%;padding:16px;border-radius:14px;background:var(--coral);border:none;color:#fff;font-size:16px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 6px 20px rgba(224,125,10,.35);margin-top:3px">Se connecter</button>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+      <div style="flex:1;height:1px;background:var(--bg3)"></div>
+      <span style="font-size:11px;color:var(--ink3)">ou</span>
+      <div style="flex:1;height:1px;background:var(--bg3)"></div>
+    </div>
+
+    <button onclick="signInWithGoogle()" style="width:100%;padding:14px 16px;border-radius:14px;background:white;border:1.5px solid var(--bg3);color:#17141A;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+      Continuer avec Google
+    </button>
   </div>
 
   <div style="margin-top:24px;font-size:11px;color:var(--ink3);text-align:center;line-height:1.8">En continuant tu acceptes nos <span style="color:var(--coral)">CGU</span> et notre <span style="color:var(--coral)">Politique de confidentialité</span></div>
+</div>
+
+<!-- Complétion profil Google (ville manquante) -->
+<div id="google-city-wall" style="position:fixed;inset:0;z-index:10000;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px">
+  <div style="font-family:var(--fd);font-weight:800;font-size:28px;color:var(--ink);letter-spacing:-.8px;margin-bottom:8px">Dernière étape 👋</div>
+  <div style="font-size:14px;color:var(--ink2);margin-bottom:28px;text-align:center">Pour te montrer les questions des commerces près de toi,<br>dis-nous où tu es.</div>
+  <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px">
+    <input id="gcw-city" type="text" placeholder="Ta ville (ex: Paris, Lyon…)" autocomplete="address-level2" style="width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+    <button onclick="saveGoogleCity()" style="width:100%;padding:16px;border-radius:14px;background:var(--coral);border:none;color:#fff;font-size:16px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 6px 20px rgba(224,125,10,.35)">C'est parti →</button>
+  </div>
 </div>
 
 <!-- ═══ FIREBASE ══════════════════════════════════════════════ -->
@@ -1680,10 +1701,52 @@ function logout() {
   });
 }
 
+// ─── Google Sign-In ───────────────────────────────────────────
+async function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try {
+    const cred = await auth.signInWithPopup(provider);
+    const uid  = cred.user.uid;
+    const snap = await db.collection('users').doc(uid).get();
+    if(!snap.exists) {
+      // Nouveau compte Google — créer profil de base
+      await db.collection('users').doc(uid).set({
+        name:  cred.user.displayName || 'Utilisateur',
+        email: cred.user.email,
+        city:  '',
+        points: 0,
+        answeredCampaigns: [],
+        interests: ['sport','gaming','culture'],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      // Demander la ville
+      document.getElementById('auth-wall').style.display = 'none';
+      const gcw = document.getElementById('google-city-wall');
+      gcw.style.display = 'flex'; gcw._uid = uid;
+    }
+    // Si existant, onAuthStateChanged s'en occupe
+  } catch(e) {
+    if(e.code !== 'auth/popup-closed-by-user') awShowErr(awFrErr(e.code));
+  }
+}
+
+async function saveGoogleCity() {
+  const city = document.getElementById('gcw-city').value.trim();
+  const uid  = document.getElementById('google-city-wall')._uid || auth.currentUser?.uid;
+  if(!uid) return;
+  if(city) await db.collection('users').doc(uid).update({ city });
+  document.getElementById('google-city-wall').style.display = 'none';
+  loadUserAndStart(uid);
+}
+
 // ─── Observer principal ───────────────────────────────────────
 auth.onAuthStateChanged(user => {
-  const aw = document.getElementById('auth-wall');
+  const aw  = document.getElementById('auth-wall');
+  const gcw = document.getElementById('google-city-wall');
   if(user) {
+    // Ne pas interférer si l'écran ville Google est ouvert
+    if(gcw && gcw.style.display === 'flex') return;
+    aw.style.display = 'none';
     loadUserAndStart(user.uid);
   } else {
     aw.style.display = 'flex'; aw.style.opacity = '1';
