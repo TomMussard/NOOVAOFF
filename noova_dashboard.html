@@ -162,10 +162,10 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .card-inner { padding: 20px; }
 /* Campaign table */
 .camp-table { width: 100%; }
-.camp-thead { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 100px; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.camp-thead { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 160px; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
 .camp-thead-cell { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ink4); }
 .camp-row {
-  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 100px;
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 160px;
   gap: 10px; padding: 13px 16px; border-bottom: 1px solid var(--border);
   align-items: center; cursor: pointer; transition: background .13s;
 }
@@ -704,12 +704,40 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   </div>
                   <div class="field">
                     <label class="field-lbl">Votre question <span style="color:var(--coral)">*</span></label>
-                    <textarea class="field-ta" id="q-text-inp" placeholder="Ex : Quel est votre critère n°1 lors de l'achat d'un vélo ?" rows="3" oninput="updatePreview()">Quel est votre critère principal lors de l'achat d'un équipement sportif ?</textarea>
+                    <textarea class="field-ta" id="q-text-inp" placeholder="Ex : Quel est votre critère n°1 lors de l'achat d'un vélo ?" rows="3" oninput="updatePreview()"></textarea>
                     <div style="display:flex;justify-content:space-between;margin-top:6px"><div style="font-size:11px;color:var(--ink3)">💡 Conseil : une question courte obtient 34% de réponses en plus.</div><div style="font-size:11px;color:var(--ink3)" id="q-char-ct">65 / 150</div></div>
                   </div>
                   <div class="field" style="margin-bottom:0">
                     <label class="field-lbl">Contexte interne (non visible des répondants)</label>
                     <textarea class="field-ta" placeholder="Objectif de la question, contexte produit, contraintes particulières…" rows="2" style="min-height:60px"></textarea>
+                  </div>
+                  <!-- Questions supplémentaires -->
+                  <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+                    <div id="wz-q-extra-2" style="display:none;background:var(--bg2);border-radius:var(--rs);padding:14px;margin-bottom:10px;border:1px solid var(--border)">
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)">Question 2</div>
+                        <button onclick="removeWizQ(2)" style="background:none;border:none;color:var(--ink3);font-size:12px;cursor:pointer;padding:2px 6px">× Retirer</button>
+                      </div>
+                      <textarea class="field-ta" id="q2-text-inp" placeholder="2e question pour les répondants…" rows="2" style="margin-bottom:8px"></textarea>
+                      <select class="field-inp" id="q2-fmt-sel" style="font-size:12px">
+                        <option value="mcq">Choix multiple</option>
+                        <option value="text">Texte libre</option>
+                        <option value="scale">Échelle 1–10</option>
+                      </select>
+                    </div>
+                    <div id="wz-q-extra-3" style="display:none;background:var(--bg2);border-radius:var(--rs);padding:14px;margin-bottom:10px;border:1px solid var(--border)">
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)">Question 3</div>
+                        <button onclick="removeWizQ(3)" style="background:none;border:none;color:var(--ink3);font-size:12px;cursor:pointer;padding:2px 6px">× Retirer</button>
+                      </div>
+                      <textarea class="field-ta" id="q3-text-inp" placeholder="3e question pour les répondants…" rows="2" style="margin-bottom:8px"></textarea>
+                      <select class="field-inp" id="q3-fmt-sel" style="font-size:12px">
+                        <option value="mcq">Choix multiple</option>
+                        <option value="text">Texte libre</option>
+                        <option value="scale">Échelle 1–10</option>
+                      </select>
+                    </div>
+                    <button id="wz-add-q-btn" onclick="addWizQ()" style="display:flex;align-items:center;gap:6px;background:none;border:1.5px dashed var(--border2);border-radius:var(--rx);padding:9px 14px;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;width:100%;justify-content:center">+ Ajouter une question <span style="font-size:10px;color:var(--ink4)">(max 3 au total)</span></button>
                   </div>
                 </div>
                 <div class="wizard-actions">
@@ -771,11 +799,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div class="step-card-title">Options de réponse</div>
                   <div class="step-card-sub">Ajoutez les choix proposés aux répondants (2 à 6 options).</div>
                   <div id="mcq-options">
-                    <div class="mcq-option-row"><input class="mcq-opt-inp" value="💰 Prix / rapport qualité-prix" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
-                    <div class="mcq-option-row"><input class="mcq-opt-inp" value="🏅 Qualité et durabilité" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
-                    <div class="mcq-option-row"><input class="mcq-opt-inp" value="🎨 Design et esthétique" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
-                    <div class="mcq-option-row"><input class="mcq-opt-inp" value="🌱 Impact environnemental" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
-                    <div class="mcq-option-row"><input class="mcq-opt-inp" value="💡 Innovations techniques" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
+                    <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
+                    <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
+                    <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option C…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
                   </div>
                   <button class="add-option-btn" onclick="addOpt()">+ Ajouter une option</button>
                   <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
@@ -1251,11 +1277,172 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   </div><!-- /main -->
 </div><!-- /app -->
 
+<!-- Campaign detail / edit modal -->
+<div id="camp-modal" onclick="if(event.target===this)closeCampModal()" style="display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.5);align-items:flex-start;justify-content:center;padding:60px 20px 30px;overflow-y:auto">
+  <div style="background:var(--bg);border-radius:var(--r);max-width:580px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.22)">
+    <div id="camp-modal-body" style="padding:28px"></div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"><span class="toast-ico" id="toast-ico">✅</span><span id="toast-msg">Action effectuée</span></div>
 
 <script>
 let curPage='dashboard', wzCur=1, curFmt='mcq';
+let _wzQCount = 1;
+
+// ═══ MULTI-QUESTION WIZARD ═══════════════════════════════════
+function addWizQ() {
+  if(_wzQCount >= 3) return;
+  _wzQCount++;
+  const block = document.getElementById('wz-q-extra-' + _wzQCount);
+  if(block) block.style.display = 'block';
+  const btn = document.getElementById('wz-add-q-btn');
+  if(btn) btn.style.display = _wzQCount >= 3 ? 'none' : 'flex';
+}
+function removeWizQ(n) {
+  for(let i = n; i <= 3; i++) {
+    const b = document.getElementById('wz-q-extra-' + i);
+    if(b) { b.style.display = 'none'; const ta = b.querySelector('textarea'); if(ta) ta.value = ''; }
+  }
+  _wzQCount = n - 1;
+  const btn = document.getElementById('wz-add-q-btn');
+  if(btn) btn.style.display = 'flex';
+}
+
+// ═══ CAMPAIGN MODAL ══════════════════════════════════════════
+function viewCampaign(campaignId) {
+  const modal = document.getElementById('camp-modal');
+  document.getElementById('camp-modal-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink3);font-size:13px">Chargement…</div>';
+  modal.style.display = 'flex';
+  Promise.all([
+    db.collection('campaigns').doc(campaignId).get(),
+    db.collection('answers').where('campaignId','==',campaignId).get()
+  ]).then(([campDoc, answersSnap]) => {
+    if(!campDoc.exists){ document.getElementById('camp-modal-body').innerHTML='<div style="padding:20px;color:var(--red)">Campagne introuvable.</div>'; return; }
+    const c = { id: campDoc.id, ...campDoc.data() };
+    const answers = [];
+    answersSnap.forEach(d => answers.push(d.data()));
+    renderCampModal(c, answers);
+  }).catch(e => {
+    document.getElementById('camp-modal-body').innerHTML = `<div style="padding:20px;color:var(--red)">Erreur : ${e.message}</div>`;
+  });
+}
+
+function renderCampModal(c, answers) {
+  const pct = c.volumeTarget ? Math.min(100, Math.round((c.answersCount||0)/c.volumeTarget*100)) : 0;
+  const stMap   = { active:'En cours', draft:'Brouillon', paused:'Suspendue', completed:'Terminée' };
+  const stColor = { active:'var(--coral)', draft:'var(--ink3)', paused:'var(--amber)', completed:'var(--mint)' };
+  const dateStr = c.createdAt?.toDate ? c.createdAt.toDate().toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : '';
+
+  let distHTML = '';
+  if(c.format === 'mcq' && c.options?.length) {
+    const counts = {};
+    c.options.forEach(o => counts[o] = 0);
+    answers.forEach(a => { if(counts[a.answer] !== undefined) counts[a.answer]++; });
+    const total = Object.values(counts).reduce((a,b) => a+b, 0);
+    distHTML = `<div style="margin-top:20px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Distribution des réponses</div>
+      ${!total ? '<div style="color:var(--ink3);font-size:12px;text-align:center;padding:12px">Aucune réponse pour l\'instant.</div>'
+        : c.options.map(opt => {
+          const n = counts[opt]||0; const p = total ? Math.round(n/total*100) : 0;
+          return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--ink2)">${opt}</span><span style="font-weight:700;color:var(--coral)">${p}% <span style="font-weight:400;color:var(--ink4)">(${n})</span></span></div><div style="background:var(--bg3);border-radius:4px;height:7px;overflow:hidden"><div style="background:linear-gradient(90deg,var(--coral),var(--violet));height:100%;width:${p}%;border-radius:4px"></div></div></div>`;
+        }).join('')
+      }</div>`;
+  } else if(answers.length) {
+    distHTML = `<div style="margin-top:20px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Dernières réponses (${answers.length} au total)</div>${answers.slice(0,5).map(a=>`<div style="background:var(--bg2);border-radius:var(--rx);padding:10px 12px;margin-bottom:8px;font-size:12px;color:var(--ink2)">"${a.answer||'—'}"</div>`).join('')}</div>`;
+  } else {
+    distHTML = '<div style="margin-top:20px;text-align:center;padding:24px;background:var(--bg2);border-radius:var(--rx);color:var(--ink3);font-size:13px">Aucune réponse pour l\'instant. La campagne est en attente de répondants.</div>';
+  }
+
+  const toggleBtn = c.status === 'active'
+    ? `<button onclick="toggleCampStatus('${c.id}','paused')" style="background:var(--ad);color:var(--amber);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">⏸ Suspendre</button>`
+    : c.status === 'paused'
+    ? `<button onclick="toggleCampStatus('${c.id}','active')" style="background:var(--md);color:var(--mint);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">▶ Relancer</button>`
+    : '';
+
+  const qList = (c.questions||[]).length > 1
+    ? `<div style="margin-top:20px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Questions de la campagne (${c.questions.length})</div>${c.questions.map((q,i)=>`<div style="background:var(--bg2);border-radius:var(--rx);padding:10px 12px;margin-bottom:8px"><div style="font-size:10px;color:var(--ink3);margin-bottom:3px">Q${i+1} · ${q.format||'text'}</div><div style="font-size:13px;color:var(--ink)">${q.q}</div></div>`).join('')}</div>` : '';
+
+  document.getElementById('camp-modal-body').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Campagne · ${dateStr}</div>
+        <div style="font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink);line-height:1.3;word-break:break-word">${c.name||c.question||'—'}</div>
+        ${c.name&&c.question&&c.name!==c.question?`<div style="font-size:12px;color:var(--ink3);margin-top:5px">${c.question}</div>`:''}
+        <span style="display:inline-block;margin-top:7px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:${stColor[c.status]||'var(--bg3)'}18;color:${stColor[c.status]||'var(--ink3)'}">${stMap[c.status]||'—'}</span>
+      </div>
+      <button onclick="closeCampModal()" style="background:var(--bg3);border:none;border-radius:99px;width:30px;height:30px;cursor:pointer;font-size:16px;color:var(--ink3);flex-shrink:0;margin-left:12px;display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+    <div style="background:var(--bg2);border-radius:var(--rx);padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+        <span style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">${c.answersCount||0} <span style="font-size:14px;font-weight:600;color:var(--ink3)">réponses</span></span>
+        <span style="font-size:12px;color:var(--ink3)">Objectif : ${c.volumeTarget||'—'}</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:8px;overflow:hidden"><div style="background:linear-gradient(90deg,var(--coral),var(--violet));height:100%;width:${pct}%;border-radius:4px;transition:width .4s"></div></div>
+      <div style="font-size:11px;color:var(--ink3);margin-top:6px">${pct}% · ${c.targetCity||'Toutes villes'}</div>
+    </div>
+    ${distHTML}
+    ${qList}
+    <div style="display:flex;gap:9px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);flex-wrap:wrap">
+      ${toggleBtn}
+      <button onclick="openEditCamp('${c.id}')" style="background:var(--vd);color:var(--violet);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">✏️ Modifier</button>
+      <button onclick="closeCampModal()" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto">Fermer</button>
+    </div>`;
+}
+
+function closeCampModal() {
+  const m = document.getElementById('camp-modal');
+  if(m) m.style.display = 'none';
+}
+
+async function toggleCampStatus(id, newStatus) {
+  try {
+    await db.collection('campaigns').doc(id).update({ status: newStatus });
+    showToast(newStatus==='paused' ? 'Campagne suspendue' : 'Campagne relancée', newStatus==='paused'?'⏸':'▶');
+    closeCampModal();
+  } catch(e) { showToast('Erreur : ' + e.message, '❌'); }
+}
+
+function openEditCamp(id) {
+  const c = _mCampaigns.find(x => x.id === id);
+  if(!c) return;
+  document.getElementById('camp-modal').style.display = 'flex';
+  document.getElementById('camp-modal-body').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink)">Modifier la campagne</div>
+      <button onclick="closeCampModal()" style="background:var(--bg3);border:none;border-radius:99px;width:30px;height:30px;cursor:pointer;font-size:16px;color:var(--ink3);display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+    <div class="field">
+      <label class="field-lbl">Nom de la campagne</label>
+      <input class="field-inp" id="edit-camp-name" value="${(c.name||c.question||'').substring(0,80).replace(/"/g,'&quot;')}" placeholder="Nom interne de la campagne">
+    </div>
+    <div class="field">
+      <label class="field-lbl">Statut</label>
+      <select class="field-inp" id="edit-camp-status">
+        <option value="active" ${c.status==='active'?'selected':''}>En cours</option>
+        <option value="paused" ${c.status==='paused'?'selected':''}>Suspendue</option>
+        <option value="completed" ${c.status==='completed'?'selected':''}>Terminée</option>
+      </select>
+    </div>
+    <div style="background:var(--bg2);border-radius:var(--rx);padding:12px;font-size:12px;color:var(--ink3);margin-bottom:18px;line-height:1.55">
+      <strong style="color:var(--ink2)">Question :</strong> ${c.question||'—'}
+    </div>
+    <div style="display:flex;gap:9px">
+      <button onclick="saveEditCamp('${id}')" style="flex:1;background:var(--coral);color:#fff;border:none;border-radius:var(--rx);padding:11px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px var(--cg)">Enregistrer</button>
+      <button onclick="viewCampaign('${id}')" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer">Annuler</button>
+    </div>`;
+}
+
+async function saveEditCamp(id) {
+  const name   = document.getElementById('edit-camp-name')?.value?.trim();
+  const status = document.getElementById('edit-camp-status')?.value;
+  if(!name) { showToast('Le nom ne peut pas être vide','⚠️'); return; }
+  try {
+    await db.collection('campaigns').doc(id).update({ name, status });
+    showToast('Campagne mise à jour', '✅');
+    closeCampModal();
+  } catch(e) { showToast('Erreur : ' + e.message, '❌'); }
+}
 
 // ═══ NAVIGATION ══════════════════════════════════════════════
 function navTo(page, btn){
@@ -1644,12 +1831,16 @@ function renderFirestoreCampaigns(camps) {
       const st  = stMap[c.status] || 'draft';
       const row = document.createElement('div');
       row.className = 'camp-row';
+      const label = (c.name||c.question||'—');
       row.innerHTML = `
-        <div class="camp-name-wrap"><div class="camp-ico">${c.brandEmoji||'🏪'}</div><div><div class="camp-name">${(c.question||'').substring(0,38)}…</div><div class="camp-date">${c.targetCity||'France'}</div></div></div>
+        <div class="camp-name-wrap"><div class="camp-ico">${c.brandEmoji||'🏪'}</div><div><div class="camp-name">${label.substring(0,38)}${label.length>38?'…':''}</div><div class="camp-date">${c.targetCity||'France'} · ${c.questions?.length>1?c.questions.length+' q.':'1 q.'}</div></div></div>
         <div><span class="status-pill ${st}">${stLbl[c.status]||'Brouillon'}</span></div>
         <div><div class="camp-metric">${c.answersCount||0}</div><div class="camp-metric-sub">/ ${c.volumeTarget||100} obj.</div></div>
         <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:${pct}%;background:var(--mint)"></div></div><div class="cprog-lbl">${pct}%</div></div>
-        <div class="camp-actions"><button class="camp-act-btn" style="background:var(--md);color:var(--mint)" onclick="viewCampaign('${c.id}')">Voir</button></div>`;
+        <div class="camp-actions" style="display:flex;gap:6px;justify-content:flex-end">
+          <button class="camp-act-btn" style="background:var(--md);color:var(--mint)" onclick="event.stopPropagation();viewCampaign('${c.id}')">Voir</button>
+          <button class="camp-act-btn" style="background:var(--vd);color:var(--violet)" onclick="event.stopPropagation();openEditCamp('${c.id}')">Modifier</button>
+        </div>`;
       card.appendChild(row);
     });
   });
@@ -1662,51 +1853,48 @@ function updateKPIFromCampaigns(camps) {
   if(kpis[3]) kpis[3].firstChild.textContent = camps.filter(c=>c.status==='active').length;
 }
 
-function viewCampaign(campaignId) {
-  navTo('results', document.querySelectorAll('.sb-item')[3]);
-  db.collection('answers').where('campaignId','==',campaignId)
-    .orderBy('createdAt','desc').get().then(snap => {
-      const el = document.getElementById('verbatim-list');
-      if(!el) return; el.innerHTML = '';
-      if(snap.empty) { el.innerHTML='<div style="padding:20px;color:var(--ink3);font-size:13px">Aucune réponse pour l\'instant.</div>'; return; }
-      snap.forEach(doc => {
-        const d = doc.data();
-        const div = document.createElement('div'); div.className = 'verbatim-card';
-        const ts = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-        div.innerHTML = `<div class="vc-header"><span class="vc-theme" style="background:var(--cd);color:var(--coral)">Réponse</span></div><div class="vc-text">${d.answer||'—'}</div><div class="vc-footer"><div class="vc-meta">${ts}</div></div>`;
-        el.appendChild(div);
-      });
-      resTab('verbatims', document.querySelectorAll('.res-tab')[1]);
-    }).catch(e => console.warn('viewCampaign:', e));
-}
-
 // ─── Patch launchCampaign → Firestore ────────────────────────
 const _origLaunchCampaign = launchCampaign;
 launchCampaign = async function() {
   const u = auth.currentUser;
   if(!u || !_mData) { showToast('Connecte-toi pour lancer','⚠️'); return; }
-  const question = document.getElementById('q-text-inp')?.value?.trim();
-  if(!question) { showToast('Saisis une question d\'abord','⚠️'); return; }
-  const options  = Array.from(document.querySelectorAll('.mcq-opt-inp')).map(i=>i.value).filter(Boolean);
+  const q1 = document.getElementById('q-text-inp')?.value?.trim();
+  if(!q1) { showToast('Saisis une question d\'abord','⚠️'); return; }
+  const options  = Array.from(document.querySelectorAll('.mcq-opt-inp')).map(i=>i.value.trim()).filter(Boolean);
   const volume   = parseInt(document.getElementById('vol-num')?.textContent)||100;
   const themes   = Array.from(document.querySelectorAll('.th-chip.sel')).map(el=>el.textContent.replace(/[^\w\s\-éèêàùç]/gi,'').trim());
   const city     = _mData.city || '';
+  const campName = document.getElementById('camp-name-inp')?.value?.trim() || q1.substring(0,60);
+
+  // Collecter les questions supplémentaires
+  const questions = [{ q: q1, format: curFmt, options }];
+  for(let i = 2; i <= 3; i++) {
+    const block = document.getElementById('wz-q-extra-' + i);
+    if(block && block.style.display !== 'none') {
+      const qText = document.getElementById('q' + i + '-text-inp')?.value?.trim();
+      const qFmt  = document.getElementById('q' + i + '-fmt-sel')?.value || 'text';
+      if(qText) questions.push({ q: qText, format: qFmt, options: [] });
+    }
+  }
+
   try {
     await db.collection('campaigns').add({
-      merchantId:     u.uid,
-      merchantName:   _mData.brandName || '',
-      brandEmoji:     '🏪',
-      sector:         _mData.sector || 'Commerce',
-      question,
-      format:         curFmt,
+      merchantId:      u.uid,
+      merchantName:    _mData.brandName || '',
+      brandEmoji:      '🏪',
+      name:            campName,
+      sector:          _mData.sector || 'Commerce',
+      question:        q1,
+      questions,
+      format:          curFmt,
       options,
-      targetCity:     city,
+      targetCity:      city,
       targetInterests: themes,
-      volumeTarget:   volume,
+      volumeTarget:    volume,
       pointsPerAnswer: 20,
-      answersCount:   0,
-      status:         'active',
-      createdAt:      firebase.firestore.FieldValue.serverTimestamp()
+      answersCount:    0,
+      status:          'active',
+      createdAt:       firebase.firestore.FieldValue.serverTimestamp()
     });
     _origLaunchCampaign();
   } catch(e) {
