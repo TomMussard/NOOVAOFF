@@ -1786,10 +1786,11 @@ async function loadMerchantAndStart(uid) {
 function loadMerchantCampaigns(uid) {
   db.collection('campaigns')
     .where('merchantId','==',uid)
-    .orderBy('createdAt','desc')
     .onSnapshot(snap => {
       _mCampaigns = [];
       snap.forEach(doc => _mCampaigns.push({ id:doc.id, ...doc.data() }));
+      // Tri côté client pour éviter l'index composite Firestore
+      _mCampaigns.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
       renderFirestoreCampaigns(_mCampaigns);
       updateKPIFromCampaigns(_mCampaigns);
     }, err => console.warn('campaigns listener:', err));
