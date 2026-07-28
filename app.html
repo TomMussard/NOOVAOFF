@@ -1197,7 +1197,8 @@ function wzStep(n){
 function selFmt(el,fmt){document.querySelectorAll('.fmt-opt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle 1–10',rank:'Classement'}[fmt]}
 function useTmpl(txt){document.getElementById('bo-q').value=txt}
 function launchCampaign(){alert('🚀 Ta question est en ligne ! Tes voisins vont y répondre, premiers avis sous quelques heures.');boTab('dashboard',document.querySelectorAll('.bo-tab')[0])}
-window.addEventListener('load',()=>{renderBrands();renderCampaigns();setTimeout(()=>goTo('onboard'),2200)});
+let _authDone=false;
+window.addEventListener('load',()=>{renderBrands();renderCampaigns();setTimeout(()=>{if(!_authDone)goTo('onboard')},2200)});
 
 /* ============================================================
    NOOVA, Questionnaires opt-in + pages entreprise (ajout)
@@ -1929,6 +1930,7 @@ async function saveGoogleCity() {
 
 // ─── Observer principal ───────────────────────────────────────
 auth.onAuthStateChanged(user => {
+  _authDone = true;
   if(_skipNextAuth) { _skipNextAuth = false; return; }
   const loading = document.getElementById('auth-loading');
   if(loading) loading.style.display = 'none';
