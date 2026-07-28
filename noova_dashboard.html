@@ -1552,6 +1552,13 @@ async function loadMerchantAndStart(uid) {
   aw.style.transition = 'opacity .3s'; aw.style.opacity = '0';
   setTimeout(()=>{ aw.style.display='none'; }, 320);
 
+  // Vider toutes les données statiques (faux KPIs + fausses campagnes)
+  document.querySelectorAll('.camp-row').forEach(r => r.remove());
+  document.querySelectorAll('.kpi-val').forEach(el => {
+    if(el.firstChild && el.firstChild.nodeType === 3) el.firstChild.textContent = '—';
+  });
+  document.querySelectorAll('.kpi-delta').forEach(el => el.textContent = '');
+
   loadMerchantCampaigns(uid);
 }
 

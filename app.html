@@ -1017,12 +1017,12 @@ function refreshHome(){
   document.getElementById('streak-num').textContent=S.streak;
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<7;i++){const d=document.createElement('div');d.className='sdk'+(i<S.streak?' done':'');sd.appendChild(d)}
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent='+'+q.pts+' pts';document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .tc-cta').style.display='flex'}
-  else{document.getElementById('tc-brand').textContent='Terminé';document.getElementById('tc-pts').textContent='🎉';document.getElementById('tc-q').textContent='Tu as répondu à toutes les questions du jour. Reviens demain pour en gagner plus !';document.getElementById('today-card').style.opacity='.85';document.querySelector('#today-card .tc-cta').style.display='none'}
+  else{document.getElementById('tc-brand').textContent='Pas encore de question';document.getElementById('tc-pts').textContent='📍';document.getElementById('tc-q').textContent='Aucun commerce de ta zone n\'a encore posté de question. Reviens bientôt !';document.getElementById('today-card').style.opacity='.75';document.querySelector('#today-card .tc-cta').style.display='none'}
   renderQueue();
 }
 function renderQueue(){
   const el=document.getElementById('queue-list');el.innerHTML='';
-  if(!S.qs||S.qs.length<=1){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--ink2);font-size:13px">🎉 Toutes les questions répondues !</div>';return}
+  if(!S.qs||S.qs.length<=1){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--ink2);font-size:13px">'+(S.qs&&S.qs.length===1?'🎉 Plus que cette question !':'📭 Pas d\'autres questions pour l\'instant.')+'</div>';return}
   S.qs.slice(1).forEach((q,i)=>{
     const d=document.createElement('div');d.className='q-card';d.onclick=()=>openQ(i+1);
     const tc={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle',rank:'Classement'}[q.type];
@@ -1644,10 +1644,10 @@ async function loadCampaignsFromFirestore(userData) {
         usage: (d.merchantName||'Ce commerce') + ' veut ton avis'
       });
     });
-    S.qs = campaigns.length ? campaigns : [...QS];
+    S.qs = campaigns;
     S.qIdx = 0;
   } catch(e) {
-    S.qs = [...QS];
+    S.qs = [];
   }
 }
 
