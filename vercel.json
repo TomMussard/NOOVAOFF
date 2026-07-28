@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    { "source": "/app",       "destination": "/app.html" },
+    { "source": "/dashboard", "destination": "/noova_dashboard.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)\\.html",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+    }
+  ]
+}

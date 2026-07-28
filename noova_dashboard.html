@@ -1575,7 +1575,26 @@ function loadMerchantCampaigns(uid) {
 }
 
 function renderFirestoreCampaigns(camps) {
-  if(!camps.length) return;
+  // Toujours vider d'abord les lignes existantes
+  ['page-dashboard','page-campaigns'].forEach(pageId => {
+    const page = document.getElementById(pageId);
+    if(page) page.querySelectorAll('.camp-row').forEach(r=>r.remove());
+  });
+  if(!camps.length) {
+    // Afficher un état vide dans la page campagnes
+    const page = document.getElementById('page-campaigns');
+    if(page) {
+      const card = page.querySelector('.card');
+      if(card) {
+        const empty = document.createElement('div');
+        empty.className = 'camp-row';
+        empty.style.cssText = 'justify-content:center;padding:40px 20px;color:var(--ink3);font-size:13px;grid-column:1/-1';
+        empty.textContent = 'Aucune campagne pour l\'instant. Lance ta première campagne →';
+        card.appendChild(empty);
+      }
+    }
+    return;
+  }
   const stMap = { active:'live', draft:'draft', paused:'paused', completed:'done' };
   const stLbl = { active:'En cours', draft:'Brouillon', paused:'Pausée', completed:'Terminée' };
   // Update the campaigns page table

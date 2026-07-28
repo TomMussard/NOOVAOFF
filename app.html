@@ -1609,7 +1609,7 @@ async function loadUserAndStart(uid) {
     await loadCampaignsFromFirestore(data);
   } catch(e) {
     S.user = { name: 'Toi', uid };
-    S.qs = [...QS];
+    S.qs = [];
   }
   const aw = document.getElementById('auth-wall');
   aw.style.transition = 'opacity .3s';
