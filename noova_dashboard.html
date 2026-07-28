@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noova — Espace Commerçant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Firebase compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root {
+  --bg: #F7F6F2;
+  --bg2: #EEECEA;
+  --bg3: #E5E2DD;
+  --bg4: #DBD7D0;
+  --card: #FFFFFF;
+  --border: rgba(23,20,26,.08);
+  --border2: rgba(23,20,26,.14);
+  --ink: #17141A;
+  --ink2: rgba(23,20,26,.62);
+  --ink3: rgba(23,20,26,.42);
+  --ink4: rgba(23,20,26,.26);
+  --coral: #E07D0A;
+  --cd: rgba(224,125,10,.12);
+  --cg: rgba(224,125,10,.28);
+  --violet: #A14E08;
+  --vd: rgba(161,78,8,.1);
+  --vg: rgba(161,78,8,.22);
+  --mint: #0BAB84;
+  --md: rgba(11,171,132,.12);
+  --amber: #F5A623;
+  --ad: rgba(245,166,35,.12);
+  --red: #EF4444;
+  --r: 16px; --rs: 12px; --rx: 8px;
+  --fd: 'Bricolage Grotesque', sans-serif;
+  --fb: 'Plus Jakarta Sans', sans-serif;
+  --sidebar: 240px;
+  --nav-h: 64px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; font-family: var(--fb); background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; overflow: hidden; }
+button, input, textarea, select { font-family: inherit; color: inherit; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+/* ═══ LAYOUT ═══════════════════════════════════════════════ */
+#app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ═══ SIDEBAR ═══════════════════════════════════════════════ */
+#sidebar {
+  width: var(--sidebar); flex-shrink: 0;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transition: transform .25s ease;
+}
+.sb-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.sb-logo-mark {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--coral); display: flex; align-items: center; justify-content: center;
+  font-family: var(--fd); font-weight: 800; font-size: 17px; color: #fff;
+  box-shadow: 0 6px 16px var(--cg); flex-shrink: 0;
+}
+.sb-logo-text { font-family: var(--fd); font-weight: 800; font-size: 17px; color: var(--ink); letter-spacing: -.5px; }
+.sb-logo-sub { font-size: 10px; color: var(--ink3); font-weight: 500; }
+.sb-brand {
+  margin: 16px 14px; padding: 11px 13px;
+  background: var(--vd); border: 1.5px solid rgba(161,78,8,.2);
+  border-radius: var(--rs); display: flex; align-items: center; gap: 9px;
+}
+.sb-brand-av {
+  width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center;
+  justify-content: center; font-size: 18px; background: rgba(255,255,255,.06); flex-shrink: 0;
+}
+.sb-brand-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+.sb-brand-plan { font-size: 10px; color: var(--coral); font-weight: 600; margin-top: 1px; }
+.sb-online { width: 7px; height: 7px; background: var(--mint); border-radius: 50%; margin-left: auto; flex-shrink: 0; }
+.sb-nav { flex: 1; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.sb-section { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink4); padding: 14px 10px 6px; }
+.sb-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 12px; border-radius: var(--rx);
+  font-size: 13px; font-weight: 500; color: var(--ink3);
+  cursor: pointer; transition: all .15s; text-decoration: none; border: none; background: none; width: 100%; text-align: left;
+}
+.sb-item:hover { background: var(--card); color: var(--ink2); }
+.sb-item.active { background: var(--cd); color: var(--coral); font-weight: 700; }
+.sb-item.active .sb-ico { filter: drop-shadow(0 0 4px rgba(224,125,10,.4)); }
+.sb-ico { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+.sb-badge { margin-left: auto; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 99px; }
+.sb-footer {
+  padding: 14px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 9px; cursor: pointer;
+}
+.sb-user-av {
+  width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--coral), var(--violet));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--fd); font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0;
+}
+.sb-user-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+.sb-user-role { font-size: 10px; color: var(--ink3); margin-top: 1px; }
+
+/* ═══ MAIN ══════════════════════════════════════════════════ */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+/* ═══ TOPBAR ════════════════════════════════════════════════ */
+.topbar {
+  height: var(--nav-h); flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px; display: flex; align-items: center; gap: 16px;
+  background: var(--bg2);
+}
+.topbar-title { font-family: var(--fd); font-weight: 700; font-size: 18px; color: var(--ink); letter-spacing: -.5px; flex: 1; }
+.topbar-sub { font-size: 12px; color: var(--ink3); margin-top: 2px; }
+.tb-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 16px; border-radius: var(--rs);
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  border: none; transition: all .15s; font-family: var(--fd);
+}
+.tb-btn-primary { background: var(--coral); color: #fff; box-shadow: 0 4px 16px var(--cg); }
+.tb-btn-primary:active { transform: scale(.97); }
+.tb-btn-ghost { background: var(--card); color: var(--ink2); border: 1.5px solid var(--border2); }
+.tb-btn-ghost:active { background: var(--bg3); }
+.tb-notif { width: 38px; height: 38px; border-radius: var(--rx); background: var(--card); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 17px; position: relative; flex-shrink: 0; }
+.notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--coral); border-radius: 50%; border: 2px solid var(--bg2); }
+
+/* ═══ CONTENT ═══════════════════════════════════════════════ */
+#content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 28px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ═══ DASHBOARD ════════════════════════════════════════════ */
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.kpi-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 18px 20px;
+  transition: border-color .2s;
+}
+.kpi-card:hover { border-color: var(--border2); }
+.kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.kpi-icon { font-size: 20px; }
+.kpi-delta { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 99px; }
+.kpi-delta.up { background: rgba(11,171,132,.15); color: var(--mint); }
+.kpi-delta.dn { background: rgba(239,68,68,.12); color: #F87171; }
+.kpi-delta.neu { background: var(--ad); color: var(--amber); }
+.kpi-val { font-family: var(--fd); font-weight: 800; font-size: 30px; color: var(--ink); line-height: 1; letter-spacing: -1px; margin-bottom: 4px; }
+.kpi-lbl { font-size: 12px; color: var(--ink3); }
+.section-title { font-family: var(--fd); font-weight: 700; font-size: 17px; color: var(--ink); letter-spacing: -.4px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+.st-action { font-size: 12px; font-weight: 700; color: var(--coral); cursor: pointer; background: none; border: none; font-family: var(--fb); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.grid-3 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.card-inner { padding: 20px; }
+/* Campaign table */
+.camp-table { width: 100%; }
+.camp-thead { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 100px; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.camp-thead-cell { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ink4); }
+.camp-row {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 100px;
+  gap: 10px; padding: 13px 16px; border-bottom: 1px solid var(--border);
+  align-items: center; cursor: pointer; transition: background .13s;
+}
+.camp-row:last-child { border-bottom: none; }
+.camp-row:hover { background: rgba(255,255,255,.03); }
+.camp-name-wrap { display: flex; align-items: center; gap: 10px; }
+.camp-ico { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.camp-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+.camp-date { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.status-pill { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 9px; border-radius: 99px; display: inline-flex; align-items: center; gap: 5px; }
+.status-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+.status-pill.live { background: rgba(11,171,132,.15); color: var(--mint); }
+.status-pill.live::before { background: var(--mint); }
+.status-pill.draft { background: rgba(245,166,35,.12); color: var(--amber); }
+.status-pill.draft::before { background: var(--amber); }
+.status-pill.done { background: rgba(255,255,255,.07); color: var(--ink3); }
+.status-pill.done::before { background: var(--ink3); }
+.status-pill.paused { background: rgba(239,68,68,.1); color: #F87171; }
+.status-pill.paused::before { background: #F87171; }
+.camp-prog { }
+.cprog-bar { height: 4px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; margin-bottom: 3px; }
+.cprog-fill { height: 100%; border-radius: 99px; }
+.cprog-lbl { font-size: 10px; color: var(--ink3); }
+.camp-metric { font-family: var(--fd); font-weight: 700; font-size: 15px; color: var(--ink); }
+.camp-metric-sub { font-size: 10px; color: var(--ink3); margin-top: 1px; }
+.camp-actions { display: flex; gap: 7px; justify-content: flex-end; }
+.camp-act-btn { padding: 5px 10px; border-radius: var(--rx); font-size: 11px; font-weight: 600; cursor: pointer; border: none; transition: all .13s; }
+/* Quality score */
+.quality-ring { position: relative; width: 80px; height: 80px; margin: 0 auto 12px; }
+.quality-ring svg { transform: rotate(-90deg); }
+.qr-val { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.qr-num { font-family: var(--fd); font-weight: 800; font-size: 20px; color: var(--ink); line-height: 1; }
+.qr-lbl { font-size: 9px; color: var(--ink3); font-weight: 600; }
+/* Audience preview */
+.aud-row { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+.aud-bar { flex: 1; height: 7px; background: rgba(23,20,26,.08); border-radius: 99px; overflow: hidden; }
+.aud-fill { height: 100%; border-radius: 99px; }
+.aud-lbl { font-size: 11px; color: var(--ink3); width: 68px; flex-shrink: 0; }
+.aud-val { font-size: 11px; font-weight: 700; color: var(--ink2); width: 30px; text-align: right; flex-shrink: 0; }
+
+/* ═══ CAMPAIGN CREATION WIZARD ══════════════════════════════ */
+.wizard-wrap { max-width: 760px; margin: 0 auto; }
+.wizard-steps { display: flex; gap: 0; margin-bottom: 32px; position: relative; }
+.wizard-steps::before { content: ''; position: absolute; top: 20px; left: 20px; right: 20px; height: 1px; background: var(--border); z-index: 0; }
+.wiz-step-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; position: relative; z-index: 1; cursor: pointer; }
+.wiz-circle {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--fd); font-weight: 700; font-size: 14px;
+  transition: all .25s; border: 2px solid var(--border);
+  background: var(--bg2); color: var(--ink3);
+}
+.wiz-step-btn.done .wiz-circle { background: var(--coral); border-color: var(--coral); color: #fff; box-shadow: 0 4px 14px var(--cg); }
+.wiz-step-btn.active .wiz-circle { background: var(--bg2); border-color: var(--coral); color: var(--coral); }
+.wiz-step-lbl { font-size: 11px; font-weight: 600; color: var(--ink4); transition: color .25s; white-space: nowrap; }
+.wiz-step-btn.done .wiz-step-lbl,
+.wiz-step-btn.active .wiz-step-lbl { color: var(--ink2); }
+/* Step panels */
+.step-panel { display: none; }
+.step-panel.active { display: block; animation: fadeUp .25s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.step-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; margin-bottom: 14px; }
+.step-card-title { font-family: var(--fd); font-weight: 700; font-size: 16px; color: var(--ink); margin-bottom: 4px; letter-spacing: -.3px; }
+.step-card-sub { font-size: 12px; color: var(--ink3); margin-bottom: 20px; line-height: 1.6; }
+/* Form elements */
+.field { margin-bottom: 16px; }
+.field-lbl { display: block; font-size: 10px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--ink3); margin-bottom: 7px; }
+.field-inp {
+  width: 100%; padding: 12px 14px;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: var(--rs); color: var(--ink); font-size: 14px;
+  outline: none; transition: border-color .17s, box-shadow .17s; font-family: var(--fb);
+}
+.field-inp:focus { border-color: var(--coral); box-shadow: 0 0 0 3px var(--cd); }
+.field-inp::placeholder { color: var(--ink4); }
+.field-ta {
+  width: 100%; padding: 12px 14px;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: var(--rs); color: var(--ink); font-size: 14px;
+  outline: none; resize: none; min-height: 100px; line-height: 1.65;
+  transition: border-color .17s, box-shadow .17s; font-family: var(--fb);
+}
+.field-ta:focus { border-color: var(--coral); box-shadow: 0 0 0 3px var(--cd); }
+.field-ta::placeholder { color: var(--ink4); }
+/* Template chips */
+.tmpl-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.tmpl-chip {
+  padding: 7px 13px; border-radius: 99px;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  font-size: 12px; font-weight: 600; color: var(--ink3); cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.tmpl-chip:hover { border-color: var(--border2); color: var(--ink2); }
+.tmpl-chip.sel { border-color: var(--coral); background: var(--cd); color: var(--coral); }
+/* Format selector */
+.fmt-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 9px; }
+.fmt-card {
+  padding: 16px 10px; border-radius: var(--rs);
+  background: var(--bg3); border: 2px solid var(--border);
+  cursor: pointer; text-align: center; transition: all .17s;
+}
+.fmt-card:hover { border-color: var(--border2); }
+.fmt-card.sel { border-color: var(--coral); background: var(--cd); }
+.fmt-ico { font-size: 24px; margin-bottom: 7px; }
+.fmt-name { font-size: 12px; font-weight: 700; color: var(--ink2); margin-bottom: 3px; }
+.fmt-desc { font-size: 10px; color: var(--ink3); line-height: 1.5; }
+.fmt-card.sel .fmt-name { color: var(--coral); }
+/* MCQ builder */
+.mcq-option-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.mcq-opt-inp { flex: 1; padding: 10px 12px; background: var(--bg3); border: 1.5px solid var(--border); border-radius: var(--rx); color: var(--ink); font-size: 13px; outline: none; font-family: var(--fb); }
+.mcq-opt-inp:focus { border-color: var(--coral); }
+.mcq-opt-inp::placeholder { color: var(--ink4); }
+.mcq-remove { width: 30px; height: 30px; border-radius: 7px; background: rgba(239,68,68,.1); border: none; cursor: pointer; color: #F87171; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .13s; }
+.mcq-remove:hover { background: rgba(239,68,68,.2); }
+.add-option-btn { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--violet); background: none; border: none; cursor: pointer; padding: 4px 0; transition: opacity .13s; font-family: var(--fb); }
+.add-option-btn:hover { opacity: .75; }
+/* Theme grid */
+.theme-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.th-chip {
+  padding: 8px 13px; border-radius: 99px;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  font-size: 12px; font-weight: 600; color: var(--ink3);
+  cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px;
+}
+.th-chip:hover { border-color: var(--border2); color: var(--ink2); }
+.th-chip.sel { border-color: var(--coral); background: var(--cd); color: var(--coral); }
+/* Age grid */
+.age-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.age-chip {
+  padding: 8px 14px; border-radius: 99px;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  font-size: 12px; font-weight: 600; color: var(--ink3);
+  cursor: pointer; transition: all .15s;
+}
+.age-chip.sel { border-color: var(--violet); background: var(--vd); color: var(--violet); }
+/* Volume slider */
+.vol-wrap { display: flex; align-items: center; gap: 14px; }
+.vol-num { font-family: var(--fd); font-weight: 800; font-size: 32px; color: var(--ink); min-width: 80px; }
+.vol-info { font-size: 12px; color: var(--ink3); line-height: 1.7; }
+.vol-slider {
+  flex: 1; -webkit-appearance: none; height: 5px; border-radius: 99px;
+  background: linear-gradient(to right, var(--coral) 10%, rgba(23,20,26,.1) 10%);
+  outline: none; cursor: pointer;
+}
+.vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--coral); box-shadow: 0 3px 10px var(--cg); cursor: pointer; }
+/* Budget */
+.budget-display {
+  background: linear-gradient(135deg, var(--bg3), var(--bg4));
+  border: 1px solid var(--border2); border-radius: var(--rs);
+  padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.budget-amount { font-family: var(--fd); font-weight: 800; font-size: 36px; color: var(--ink); letter-spacing: -1.5px; }
+.budget-breakdown { font-size: 11px; color: var(--ink3); line-height: 2; }
+.budget-inc { background: var(--md); border: 1px solid rgba(11,171,132,.2); border-radius: var(--rs); padding: 13px 16px; margin-top: 13px; }
+.budget-inc-title { font-size: 12px; font-weight: 700; color: var(--mint); margin-bottom: 8px; }
+.budget-inc-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink2); margin-bottom: 6px; }
+.budget-inc-item:last-child { margin-bottom: 0; }
+/* Recap */
+.recap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.recap-item { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--rs); padding: 14px; }
+.recap-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ink4); margin-bottom: 5px; }
+.recap-val { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.5; }
+.recap-val.big { font-family: var(--fd); font-weight: 800; font-size: 20px; color: var(--coral); }
+.risk-box {
+  background: rgba(245,166,35,.07); border: 1px solid rgba(245,166,35,.2);
+  border-radius: var(--rs); padding: 14px 16px; margin-bottom: 14px;
+}
+.risk-title { font-size: 12px; font-weight: 700; color: var(--amber); margin-bottom: 8px; }
+.risk-item { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--ink2); line-height: 1.6; margin-bottom: 6px; }
+.risk-item:last-child { margin-bottom: 0; }
+.risk-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); flex-shrink: 0; margin-top: 5px; }
+/* Wizard actions */
+.wizard-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+.wiz-btn-back { padding: 12px 20px; border-radius: var(--rs); background: var(--card); border: 1.5px solid var(--border2); color: var(--ink2); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .13s; font-family: var(--fb); }
+.wiz-btn-next { padding: 12px 24px; border-radius: var(--rs); background: var(--coral); border: none; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .13s; font-family: var(--fd); box-shadow: 0 5px 18px var(--cg); display: flex; align-items: center; gap: 7px; }
+.wiz-btn-next:hover { box-shadow: 0 7px 22px var(--cg); transform: translateY(-1px); }
+.wiz-btn-next:active { transform: scale(.97); }
+.wiz-btn-launch { padding: 13px 28px; border-radius: var(--rs); background: linear-gradient(135deg, var(--coral), #7A3C06); border: none; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .13s; font-family: var(--fd); box-shadow: 0 6px 24px var(--cg); display: flex; align-items: center; gap: 9px; }
+.wiz-btn-launch:active { transform: scale(.97); }
+/* Live preview */
+.preview-box {
+  background: linear-gradient(135deg, var(--bg2), var(--bg3));
+  border: 1px solid var(--border); border-radius: var(--r);
+  padding: 18px; position: sticky; top: 0;
+}
+.preview-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ink4); margin-bottom: 14px; }
+.preview-phone {
+  background: #F7F6F2; border-radius: 22px; overflow: hidden;
+  padding: 0; max-width: 220px; margin: 0 auto; box-shadow: 0 12px 40px rgba(0,0,0,.15);
+}
+.preview-phone-notch {
+  background: #17141A; height: 20px;
+  border-radius: 0 0 12px 12px; width: 80px; margin: 0 auto;
+}
+.preview-phone-inner { padding: 14px 13px; }
+.preview-brand-row { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
+.preview-brand-ico { width: 32px; height: 32px; border-radius: 9px; background: #EEECEA; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.preview-brand-name { font-family: var(--fd); font-weight: 700; font-size: 12px; color: #17141A; }
+.preview-brand-theme { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: rgba(224,125,10,.12); color: #E07D0A; margin-top: 1px; }
+.preview-q { font-family: var(--fd); font-weight: 800; font-size: 13px; color: #17141A; line-height: 1.25; margin-bottom: 10px; letter-spacing: -.3px; }
+.preview-ans-placeholder { background: #EEECEA; border: 1.5px solid #E0DDD8; border-radius: 9px; padding: 10px 11px; font-size: 11px; color: #B2ADB9; margin-bottom: 10px; min-height: 52px; }
+.preview-cta { background: #E07D0A; border-radius: 9px; padding: 9px; text-align: center; font-family: var(--fd); font-weight: 700; font-size: 12px; color: #fff; }
+/* estimation chips */
+.est-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.est-chip { display: flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: var(--rx); background: var(--bg3); border: 1px solid var(--border); font-size: 11px; color: var(--ink2); }
+.est-chip-ico { font-size: 14px; }
+.est-chip-val { font-weight: 700; color: var(--ink); }
+
+/* ═══ RESULTS PAGE ══════════════════════════════════════════ */
+.results-header {
+  background: linear-gradient(135deg, var(--bg3), var(--bg4));
+  border: 1px solid var(--border); border-radius: var(--r);
+  padding: 22px 24px; margin-bottom: 24px;
+  display: flex; align-items: center; gap: 18px;
+}
+.rh-camp-ico { width: 52px; height: 52px; border-radius: 14px; background: rgba(23,20,26,.06); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+.rh-info { flex: 1; }
+.rh-name { font-family: var(--fd); font-weight: 800; font-size: 20px; color: var(--ink); letter-spacing: -.5px; margin-bottom: 4px; }
+.rh-meta { font-size: 12px; color: var(--ink3); display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
+.rh-meta-item { display: flex; align-items: center; gap: 5px; }
+.rh-actions { display: flex; gap: 9px; flex-shrink: 0; }
+.rh-btn { padding: 9px 16px; border-radius: var(--rs); font-size: 12px; font-weight: 700; cursor: pointer; border: none; transition: all .13s; font-family: var(--fd); }
+.results-tabs { display: flex; gap: 2px; background: var(--bg3); border-radius: var(--rs); padding: 3px; margin-bottom: 22px; }
+.res-tab { flex: 1; padding: 9px; border-radius: 10px; font-size: 12px; font-weight: 600; text-align: center; cursor: pointer; color: var(--ink3); background: none; border: none; font-family: var(--fb); transition: all .15s; }
+.res-tab.active { background: var(--card); color: var(--ink); font-weight: 700; box-shadow: 0 1px 6px rgba(0,0,0,.2); }
+.res-panel { display: none; }
+.res-panel.active { display: block; }
+/* Synthesis */
+.synth-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+.synth-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; }
+.synth-card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ink4); margin-bottom: 14px; }
+/* Sentiment bars */
+.sent-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.sent-item:last-child { margin-bottom: 0; }
+.sent-lbl { font-size: 11px; color: var(--ink3); width: 60px; flex-shrink: 0; }
+.sent-bar { flex: 1; height: 8px; background: rgba(23,20,26,.07); border-radius: 99px; overflow: hidden; }
+.sent-fill { height: 100%; border-radius: 99px; }
+.sent-val { font-size: 11px; font-weight: 700; width: 28px; text-align: right; flex-shrink: 0; }
+/* NPS */
+.nps-display { text-align: center; }
+.nps-score { font-family: var(--fd); font-weight: 800; font-size: 52px; color: var(--mint); line-height: 1; letter-spacing: -2px; }
+.nps-max { font-size: 16px; color: var(--ink3); }
+.nps-lbl { font-size: 11px; color: var(--ink3); margin-top: 4px; }
+.nps-bar { display: flex; height: 8px; border-radius: 99px; overflow: hidden; gap: 1px; margin-top: 12px; }
+.nps-det { font-size: 11px; color: var(--red); flex: 1; }
+.nps-pas { font-size: 11px; color: var(--amber); flex: 1; text-align: center; }
+.nps-pro { font-size: 11px; color: var(--mint); flex: 1; text-align: right; }
+/* Bar chart */
+.bar-chart-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.bar-chart-item:last-child { margin-bottom: 0; }
+.bc-lbl { font-size: 11px; color: var(--ink3); width: 80px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bc-track { flex: 1; height: 24px; background: rgba(23,20,26,.06); border-radius: 7px; overflow: hidden; }
+.bc-fill { height: 100%; border-radius: 7px; display: flex; align-items: center; justify-content: flex-end; padding-right: 9px; transition: width 1s ease; }
+.bc-val { font-size: 11px; font-weight: 700; color: #fff; }
+/* Verbatims */
+.verbatim-filters { display: flex; gap: 7px; margin-bottom: 16px; flex-wrap: wrap; }
+.vf-chip { padding: 6px 12px; border-radius: 99px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: var(--bg3); color: var(--ink3); transition: all .13s; }
+.vf-chip.active { border-color: var(--coral); background: var(--cd); color: var(--coral); }
+.verbatim-grid { display: flex; flex-direction: column; gap: 10px; }
+.verbatim-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--rs); padding: 14px 16px; transition: border-color .15s; }
+.verbatim-card:hover { border-color: var(--border2); }
+.vc-header { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+.vc-theme { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+.vc-score { margin-left: auto; display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--ink3); }
+.vc-text { font-size: 13px; color: var(--ink2); line-height: 1.65; margin-bottom: 9px; }
+.vc-footer { display: flex; align-items: center; gap: 9px; }
+.vc-meta { font-size: 10px; color: var(--ink4); }
+.vc-actions { display: flex; gap: 6px; margin-left: auto; }
+.vc-btn { padding: 4px 9px; border-radius: 6px; font-size: 10px; font-weight: 600; cursor: pointer; border: none; transition: all .13s; }
+/* Cluster tags */
+.cluster-map { display: flex; flex-wrap: wrap; gap: 9px; }
+.cluster-bubble {
+  padding: 10px 16px; border-radius: 99px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 7px;
+}
+/* Recommendations */
+.reco-list { display: flex; flex-direction: column; gap: 12px; }
+.reco-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--rs); padding: 16px 18px; border-left: 3px solid; }
+.reco-priority { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.reco-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 5px; line-height: 1.3; }
+.reco-desc { font-size: 12px; color: var(--ink2); line-height: 1.65; }
+.reco-action { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.reco-action-btn { padding: 6px 13px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; border: none; transition: all .13s; font-family: var(--fd); }
+/* Export bar */
+.export-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg3); border: 1px solid var(--border); border-radius: var(--rs);
+  padding: 13px 16px; margin-bottom: 20px;
+}
+.export-info { font-size: 12px; color: var(--ink3); }
+.export-info strong { color: var(--ink); font-weight: 700; }
+.export-btns { display: flex; gap: 8px; }
+.export-btn { padding: 8px 14px; border-radius: var(--rs); font-size: 12px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border2); background: var(--card); color: var(--ink2); transition: all .13s; font-family: var(--fd); display: flex; align-items: center; gap: 6px; }
+.export-btn:hover { background: var(--bg4); color: var(--ink); }
+
+/* ═══ SETTINGS ══════════════════════════════════════════════ */
+.settings-section { margin-bottom: 28px; }
+.settings-section-title { font-family: var(--fd); font-weight: 700; font-size: 15px; color: var(--ink); letter-spacing: -.3px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.setting-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.setting-row:last-child { border-bottom: none; }
+.setting-ico { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+.setting-info { flex: 1; }
+.setting-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.setting-desc { font-size: 11px; color: var(--ink3); line-height: 1.5; }
+.setting-control { flex-shrink: 0; }
+/* Toggle */
+.tgl { position: relative; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer; display: block; }
+.tgl input { opacity: 0; width: 0; height: 0; position: absolute; }
+.tgl-t { position: absolute; inset: 0; border-radius: 99px; background: rgba(23,20,26,.14); transition: background .2s; }
+.tgl input:checked ~ .tgl-t { background: var(--coral); }
+.tgl-k { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.3); transition: transform .2s; }
+.tgl input:checked ~ .tgl-k { transform: translateX(20px); }
+
+/* ═══ AUDIENCE PAGE ════════════════════════════════════════ */
+.audience-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+.donut-wrap { position: relative; width: 120px; height: 120px; margin: 0 auto 14px; }
+.donut-wrap svg { transform: rotate(-90deg); }
+.donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.donut-val { font-family: var(--fd); font-weight: 800; font-size: 22px; color: var(--ink); line-height: 1; }
+.donut-lbl { font-size: 10px; color: var(--ink3); margin-top: 2px; }
+.legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.legend-lbl { font-size: 11px; color: var(--ink2); flex: 1; }
+.legend-val { font-size: 11px; font-weight: 700; color: var(--ink); }
+
+/* ═══ TOAST ════════════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: var(--rs); padding: 14px 18px;
+  display: flex; align-items: center; gap: 11px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.12);
+  font-size: 13px; color: var(--ink); font-weight: 500;
+  transform: translateY(20px); opacity: 0;
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none; z-index: 1000; max-width: 340px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-ico { font-size: 20px; flex-shrink: 0; }
+
+/* ═══ ANIMATIONS ════════════════════════════════════════════ */
+@keyframes pop { from { opacity: 0; transform: scale(.2) rotate(-20deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes confFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+.conf-p { position: fixed; top: -20px; border-radius: 2px; animation: confFall linear forwards; pointer-events: none; z-index: 1001; }
+
+/* Responsive tweaks */
+@media (max-width: 1100px) {
+  .kpi-row { grid-template-columns: repeat(2,1fr); }
+  .synth-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 840px) {
+  #sidebar { position: fixed; z-index: 200; height: 100vh; transform: translateX(-100%); }
+  #sidebar.open { transform: translateX(0); }
+  .grid-3 { grid-template-columns: 1fr; }
+  .fmt-grid { grid-template-columns: repeat(2,1fr); }
+  .recap-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">N</div>
+      <div>
+        <div class="sb-logo-text">Noova</div>
+        <div class="sb-logo-sub">Espace commerçant</div>
+      </div>
+    </div>
+    <div class="sb-brand">
+      <div class="sb-brand-av">⛺</div>
+      <div>
+        <div class="sb-brand-name">Decathlon</div>
+        <div class="sb-brand-plan">Pro · 847 profils actifs</div>
+      </div>
+      <div class="sb-online"></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <button class="sb-item active" onclick="navTo('dashboard',this)"><span class="sb-ico">📊</span>Dashboard</button>
+      <button class="sb-item" onclick="navTo('create',this)"><span class="sb-ico">✨</span>Créer une campagne</button>
+      <button class="sb-item" onclick="navTo('campaigns',this)"><span class="sb-ico">📋</span>Mes campagnes<span class="sb-badge" style="background:rgba(224,125,10,.15);color:var(--coral)">3</span></button>
+      <button class="sb-item" onclick="navTo('results',this)"><span class="sb-ico">📈</span>Résultats</button>
+      <div class="sb-section">Audience</div>
+      <button class="sb-item" onclick="navTo('audience',this)"><span class="sb-ico">👥</span>Profils consentants</button>
+      <button class="sb-item" onclick="navTo('consents',this)"><span class="sb-ico">🔐</span>Consentements</button>
+      <div class="sb-section">Compte</div>
+      <button class="sb-item" onclick="navTo('settings',this)"><span class="sb-ico">⚙️</span>Paramètres</button>
+      <button class="sb-item" onclick="navTo('billing',this)"><span class="sb-ico">💳</span>Facturation</button>
+      <button class="sb-item" onclick="logout()" style="margin-top:auto;color:var(--ink3)"><span class="sb-ico">🚪</span>Se déconnecter</button>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user-av" style="background:linear-gradient(135deg,var(--coral),var(--violet))">N</div>
+      <div>
+        <div class="sb-user-name">Mon commerce</div>
+        <div class="sb-user-role">Commerçant</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar" id="topbar">
+      <div style="flex:1">
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-sub" id="topbar-sub">Bienvenue Claire — dernière mise à jour il y a 4 min</div>
+      </div>
+      <button class="tb-btn tb-btn-ghost" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">+ Nouvelle campagne</button>
+      <button class="tb-btn tb-btn-primary">🚀 Lancer</button>
+      <div class="tb-notif"><div class="notif-dot"></div>🔔</div>
+    </header>
+
+    <!-- CONTENT -->
+    <div id="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div class="page active" id="page-dashboard">
+        <!-- KPIs -->
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-top"><span class="kpi-icon">📨</span><span class="kpi-delta up">+18% sem.</span></div>
+            <div class="kpi-val">1 284</div>
+            <div class="kpi-lbl">Réponses reçues (30j)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span class="kpi-icon">⭐</span><span class="kpi-delta up">+0.3</span></div>
+            <div class="kpi-val">4.7<span style="font-size:16px;color:var(--ink3)">/5</span></div>
+            <div class="kpi-lbl">Score qualité moyen</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span class="kpi-icon">⚡</span><span class="kpi-delta up">−4h</span></div>
+            <div class="kpi-val">38<span style="font-size:16px;color:var(--ink3)">h</span></div>
+            <div class="kpi-lbl">Délai moyen livraison</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span class="kpi-icon">👥</span><span class="kpi-delta dn">−3 révocat.</span></div>
+            <div class="kpi-val">847</div>
+            <div class="kpi-lbl">Profils actifs consentants</div>
+          </div>
+        </div>
+        <!-- Campaigns + Quality -->
+        <div class="grid-3">
+          <div>
+            <div class="section-title">Campagnes actives<button class="st-action" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">+ Nouvelle</button></div>
+            <div class="card">
+              <div class="camp-thead">
+                <div class="camp-thead-cell">Campagne</div>
+                <div class="camp-thead-cell">Statut</div>
+                <div class="camp-thead-cell">Réponses</div>
+                <div class="camp-thead-cell">Progression</div>
+                <div class="camp-thead-cell" style="text-align:right">Actions</div>
+              </div>
+              <div class="camp-row" onclick="navTo('results',document.querySelectorAll('.sb-item')[3])">
+                <div class="camp-name-wrap"><div class="camp-ico">⛺</div><div><div class="camp-name">Nom produit trail</div><div class="camp-date">Lancée il y a 3j</div></div></div>
+                <div><span class="status-pill live">En cours</span></div>
+                <div><div class="camp-metric">487</div><div class="camp-metric-sub">/ 500 obj.</div></div>
+                <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:97%;background:linear-gradient(90deg,var(--mint),#22C55E)"></div></div><div class="cprog-lbl">97% · livraison imminente</div></div>
+                <div class="camp-actions"><button class="camp-act-btn" style="background:var(--md);color:var(--mint)" onclick="event.stopPropagation();navTo('results',document.querySelectorAll('.sb-item')[3])">Voir</button></div>
+              </div>
+              <div class="camp-row">
+                <div class="camp-name-wrap"><div class="camp-ico">🏊</div><div><div class="camp-name">Satisfaction natation</div><div class="camp-date">Terminée le 2 mai</div></div></div>
+                <div><span class="status-pill done">Terminée</span></div>
+                <div><div class="camp-metric">312</div><div class="camp-metric-sub">/ 300 obj.</div></div>
+                <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:100%;background:var(--violet)"></div></div><div class="cprog-lbl">104% · rapport disponible</div></div>
+                <div class="camp-actions"><button class="camp-act-btn" style="background:var(--vd);color:var(--violet)" onclick="event.stopPropagation()">Rapport</button></div>
+              </div>
+              <div class="camp-row">
+                <div class="camp-name-wrap"><div class="camp-ico">🚴</div><div><div class="camp-name">Test vélo électrique 2025</div><div class="camp-date">Créée hier</div></div></div>
+                <div><span class="status-pill draft">Brouillon</span></div>
+                <div><div class="camp-metric">—</div><div class="camp-metric-sub">/ 400 obj.</div></div>
+                <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:0%"></div></div><div class="cprog-lbl">Non lancée</div></div>
+                <div class="camp-actions"><button class="camp-act-btn" style="background:var(--ad);color:var(--amber)" onclick="event.stopPropagation();navTo('create',document.querySelectorAll('.sb-item')[1])">Éditer</button></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="section-title">Score qualité</div>
+            <div class="card card-inner" style="margin-bottom:14px">
+              <div class="quality-ring">
+                <svg width="80" height="80" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(23,20,26,.08)" stroke-width="7"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="var(--mint)" stroke-width="7" stroke-dasharray="201" stroke-dashoffset="40" stroke-linecap="round"/>
+                </svg>
+                <div class="qr-val"><div class="qr-num">4.7</div><div class="qr-lbl">/ 5.0</div></div>
+              </div>
+              <div style="text-align:center;font-size:11px;color:var(--ink3);margin-bottom:14px">Basé sur 1 284 réponses analysées</div>
+              <div class="aud-row"><div class="aud-lbl">Complétude</div><div class="aud-bar"><div class="aud-fill" style="width:92%;background:var(--mint)"></div></div><div class="aud-val">92%</div></div>
+              <div class="aud-row"><div class="aud-lbl">Cohérence</div><div class="aud-bar"><div class="aud-fill" style="width:88%;background:var(--violet)"></div></div><div class="aud-val">88%</div></div>
+              <div class="aud-row"><div class="aud-lbl">Richesse</div><div class="aud-bar"><div class="aud-fill" style="width:79%;background:var(--coral)"></div></div><div class="aud-val">79%</div></div>
+            </div>
+            <div class="section-title">Audience active</div>
+            <div class="card card-inner">
+              <div class="aud-row"><div class="aud-lbl">🏃 Sport</div><div class="aud-bar"><div class="aud-fill" style="width:84%;background:var(--coral)"></div></div><div class="aud-val">84%</div></div>
+              <div class="aud-row"><div class="aud-lbl">🧘 Bien-être</div><div class="aud-bar"><div class="aud-fill" style="width:62%;background:var(--violet)"></div></div><div class="aud-val">62%</div></div>
+              <div class="aud-row"><div class="aud-lbl">✈️ Voyage</div><div class="aud-bar"><div class="aud-fill" style="width:45%;background:var(--mint)"></div></div><div class="aud-val">45%</div></div>
+              <div class="aud-row"><div class="aud-lbl">💻 Tech</div><div class="aud-bar"><div class="aud-fill" style="width:38%;background:var(--amber)"></div></div><div class="aud-val">38%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CREATE CAMPAIGN ═══ -->
+      <div class="page" id="page-create">
+        <div class="wizard-wrap">
+          <!-- Step indicator -->
+          <div class="wizard-steps" id="wiz-steps">
+            <div class="wiz-step-btn done" data-step="0"><div class="wiz-circle">1</div><div class="wiz-step-lbl">Question</div></div>
+            <div class="wiz-step-btn active" data-step="1"><div class="wiz-circle">2</div><div class="wiz-step-lbl">Format</div></div>
+            <div class="wiz-step-btn" data-step="2"><div class="wiz-circle">3</div><div class="wiz-step-lbl">Audience</div></div>
+            <div class="wiz-step-btn" data-step="3"><div class="wiz-circle">4</div><div class="wiz-step-lbl">Budget</div></div>
+            <div class="wiz-step-btn" data-step="4"><div class="wiz-circle">5</div><div class="wiz-step-lbl">Validation</div></div>
+          </div>
+
+          <!-- Step 0 : Question -->
+          <div class="step-panel" id="wz-panel-0">
+            <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
+              <div>
+                <div class="step-card">
+                  <div class="step-card-title">Rédigez votre question</div>
+                  <div class="step-card-sub">Soyez direct et précis. Une bonne question = une réponse exploitable. Visez moins de 20 mots.</div>
+                  <div class="field">
+                    <label class="field-lbl">Templates suggérés</label>
+                    <div class="tmpl-grid">
+                      <div class="tmpl-chip sel" onclick="useTmpl(this,&quot;Quel est votre critère principal lors de l'achat d'un équipement sportif ?&quot;)">🎯 Test produit</div>
+                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Comment amélioreriez-vous notre service client sur ce point précis ?&quot;)">😊 Satisfaction</div>
+                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Quel nom trouvez-vous le plus adapté pour ce nouveau produit ?&quot;)">💡 Naming</div>
+                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Sur 10, quelle importance accordez-vous à la durabilité de nos produits ?&quot;)">📏 Échelle</div>
+                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Classez ces attributs par ordre d'importance lors de votre achat.&quot;)">🔢 Classement</div>
+                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Qu'est-ce qui vous ferait recommander notre marque à un proche ?&quot;)">📣 NPS qualitatif</div>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label class="field-lbl">Votre question <span style="color:var(--coral)">*</span></label>
+                    <textarea class="field-ta" id="q-text-inp" placeholder="Ex : Quel est votre critère n°1 lors de l'achat d'un vélo ?" rows="3" oninput="updatePreview()">Quel est votre critère principal lors de l'achat d'un équipement sportif ?</textarea>
+                    <div style="display:flex;justify-content:space-between;margin-top:6px"><div style="font-size:11px;color:var(--ink3)">💡 Conseil : une question courte obtient 34% de réponses en plus.</div><div style="font-size:11px;color:var(--ink3)" id="q-char-ct">65 / 150</div></div>
+                  </div>
+                  <div class="field" style="margin-bottom:0">
+                    <label class="field-lbl">Contexte interne (non visible des répondants)</label>
+                    <textarea class="field-ta" placeholder="Objectif de la question, contexte produit, contraintes particulières…" rows="2" style="min-height:60px"></textarea>
+                  </div>
+                </div>
+                <div class="wizard-actions">
+                  <button class="wiz-btn-next" onclick="wzGo(1)">Format de réponse →</button>
+                </div>
+              </div>
+              <div>
+                <div class="preview-box">
+                  <div class="preview-title">Aperçu dans l'app</div>
+                  <div class="preview-phone">
+                    <div class="preview-phone-notch"></div>
+                    <div class="preview-phone-inner">
+                      <div class="preview-brand-row">
+                        <div class="preview-brand-ico">⛺</div>
+                        <div><div class="preview-brand-name">Decathlon</div><div class="preview-brand-theme">Sport</div></div>
+                      </div>
+                      <div class="preview-q" id="preview-q">Quel est votre critère principal lors de l'achat d'un équipement sportif ?</div>
+                      <div class="preview-ans-placeholder">Écris ta réponse ici…</div>
+                      <div class="preview-cta">Valider → +20 pts</div>
+                    </div>
+                  </div>
+                  <div class="est-chips">
+                    <div class="est-chip"><span class="est-chip-ico">⏱️</span>Réponse moy. <span class="est-chip-val">3 min</span></div>
+                    <div class="est-chip"><span class="est-chip-ico">📊</span>Complétion <span class="est-chip-val">~87%</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 1 : Format -->
+          <div class="step-panel active" id="wz-panel-1">
+            <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
+              <div>
+                <div class="step-card">
+                  <div class="step-card-title">Format de réponse</div>
+                  <div class="step-card-sub">Choisissez le format le plus adapté à votre objectif d'étude.</div>
+                  <div class="fmt-grid" id="fmt-grid">
+                    <div class="fmt-card" onclick="selFmt(this,'text')">
+                      <div class="fmt-ico">✍️</div><div class="fmt-name">Texte libre</div>
+                      <div class="fmt-desc">Verbatims riches, idéal pour découverte et insights qualitatifs</div>
+                    </div>
+                    <div class="fmt-card sel" onclick="selFmt(this,'mcq')">
+                      <div class="fmt-ico">☑️</div><div class="fmt-name">Choix multiple</div>
+                      <div class="fmt-desc">Réponses structurées, comparaison facile entre options</div>
+                    </div>
+                    <div class="fmt-card" onclick="selFmt(this,'scale')">
+                      <div class="fmt-ico">📏</div><div class="fmt-name">Échelle 1–10</div>
+                      <div class="fmt-desc">Mesure d'intensité, NPS, satisfaction — données quantifiables</div>
+                    </div>
+                    <div class="fmt-card" onclick="selFmt(this,'rank')">
+                      <div class="fmt-ico">🔢</div><div class="fmt-name">Classement</div>
+                      <div class="fmt-desc">Priorisation d'attributs, choix entre alternatives</div>
+                    </div>
+                  </div>
+                </div>
+                <!-- MCQ builder (visible when mcq selected) -->
+                <div class="step-card" id="mcq-builder">
+                  <div class="step-card-title">Options de réponse</div>
+                  <div class="step-card-sub">Ajoutez les choix proposés aux répondants (2 à 6 options).</div>
+                  <div id="mcq-options">
+                    <div class="mcq-option-row"><input class="mcq-opt-inp" value="💰 Prix / rapport qualité-prix" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
+                    <div class="mcq-option-row"><input class="mcq-opt-inp" value="🏅 Qualité et durabilité" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
+                    <div class="mcq-option-row"><input class="mcq-opt-inp" value="🎨 Design et esthétique" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
+                    <div class="mcq-option-row"><input class="mcq-opt-inp" value="🌱 Impact environnemental" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
+                    <div class="mcq-option-row"><input class="mcq-opt-inp" value="💡 Innovations techniques" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
+                  </div>
+                  <button class="add-option-btn" onclick="addOpt()">+ Ajouter une option</button>
+                  <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+                    <label style="display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink2);cursor:pointer"><input type="checkbox" checked style="accent-color:var(--coral)"> Choix unique (une seule réponse possible)</label>
+                    <label style="display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink2);cursor:pointer;margin-top:8px"><input type="checkbox" style="accent-color:var(--coral)"> Ajouter "Autre (précisez)" automatiquement</label>
+                  </div>
+                </div>
+                <div class="wizard-actions">
+                  <button class="wiz-btn-back" onclick="wzGo(0)">← Retour</button>
+                  <button class="wiz-btn-next" onclick="wzGo(2)">Audience →</button>
+                </div>
+              </div>
+              <div>
+                <div class="preview-box">
+                  <div class="preview-title">Aperçu dans l'app</div>
+                  <div class="preview-phone">
+                    <div class="preview-phone-notch"></div>
+                    <div class="preview-phone-inner">
+                      <div class="preview-brand-row"><div class="preview-brand-ico">⛺</div><div><div class="preview-brand-name">Decathlon</div><div class="preview-brand-theme">Sport</div></div></div>
+                      <div class="preview-q" style="font-size:11px">Quel est votre critère principal lors de l'achat ?</div>
+                      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
+                        <div style="background:#EEECEA;border:1.5px solid #E0DDD8;border-radius:8px;padding:7px 10px;font-size:10px;color:#17141A;display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:50%;border:1.5px solid #B2ADB9;flex-shrink:0"></div>💰 Prix / rapport qualité-prix</div>
+                        <div style="background:#FFF4E6;border:1.5px solid #E07D0A;border-radius:8px;padding:7px 10px;font-size:10px;color:#E07D0A;display:flex;align-items:center;gap:7px;font-weight:700"><div style="width:14px;height:14px;border-radius:50%;background:#E07D0A;border:1.5px solid #E07D0A;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff">✓</div>🏅 Qualité et durabilité</div>
+                        <div style="background:#EEECEA;border:1.5px solid #E0DDD8;border-radius:8px;padding:7px 10px;font-size:10px;color:#17141A;display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:50%;border:1.5px solid #B2ADB9;flex-shrink:0"></div>🎨 Design et esthétique</div>
+                      </div>
+                      <div class="preview-cta">Valider → +20 pts</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 : Audience -->
+          <div class="step-panel" id="wz-panel-2">
+            <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
+              <div>
+                <div class="step-card">
+                  <div class="step-card-title">Sélectionnez vos thèmes cibles</div>
+                  <div class="step-card-sub">Uniquement parmi vos 847 profils ayant consenti à Decathlon. Chaque sélection affine l'audience éligible.</div>
+                  <div class="field">
+                    <label class="field-lbl">Thèmes d'intérêt</label>
+                    <div class="theme-grid">
+                      <div class="th-chip sel" onclick="this.classList.toggle('sel');updAud()">🏃 Sport</div>
+                      <div class="th-chip sel" onclick="this.classList.toggle('sel');updAud()">🧘 Bien-être</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">💻 Tech</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">✈️ Voyage</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🎮 Gaming</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🍔 Alimentation</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🌱 Éco-responsable</div>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label class="field-lbl">Tranches d'âge</label>
+                    <div class="age-grid">
+                      <div class="age-chip" onclick="this.classList.toggle('sel');updAud()">16–17</div>
+                      <div class="age-chip sel" onclick="this.classList.toggle('sel');updAud()">18–24</div>
+                      <div class="age-chip sel" onclick="this.classList.toggle('sel');updAud()">25–34</div>
+                      <div class="age-chip sel" onclick="this.classList.toggle('sel');updAud()">35–49</div>
+                      <div class="age-chip" onclick="this.classList.toggle('sel');updAud()">50–64</div>
+                      <div class="age-chip" onclick="this.classList.toggle('sel');updAud()">65+</div>
+                    </div>
+                  </div>
+                  <div class="field" style="margin-bottom:0">
+                    <label class="field-lbl">Localisation (optionnel)</label>
+                    <select class="field-inp" style="cursor:pointer">
+                      <option value="">Toute la France</option>
+                      <option>Île-de-France</option>
+                      <option>Auvergne-Rhône-Alpes</option>
+                      <option>PACA</option>
+                      <option>Occitanie</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="step-card" style="background:var(--vd);border-color:rgba(161,78,8,.2)">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <div style="font-size:28px">👥</div>
+                    <div>
+                      <div style="font-family:var(--fd);font-weight:800;font-size:26px;color:var(--ink);letter-spacing:-1px"><span id="aud-count">631</span> <span style="font-size:14px;color:rgba(23,20,26,.55);font-weight:600">profils éligibles</span></div>
+                      <div style="font-size:12px;color:var(--coral);margin-top:3px">Sur 847 profils consentants Decathlon · conforme RGPD</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="wizard-actions">
+                  <button class="wiz-btn-back" onclick="wzGo(1)">← Retour</button>
+                  <button class="wiz-btn-next" onclick="wzGo(3)">Budget →</button>
+                </div>
+              </div>
+              <div>
+                <div class="preview-box">
+                  <div class="preview-title">Répartition audience</div>
+                  <div style="margin-bottom:12px">
+                    <div class="aud-row"><div class="aud-lbl">🏃 Sport</div><div class="aud-bar"><div class="aud-fill" style="width:84%;background:var(--coral)"></div></div><div class="aud-val">84%</div></div>
+                    <div class="aud-row"><div class="aud-lbl">🧘 Bien-être</div><div class="aud-bar"><div class="aud-fill" style="width:62%;background:var(--violet)"></div></div><div class="aud-val">62%</div></div>
+                    <div class="aud-row"><div class="aud-lbl">18–34 ans</div><div class="aud-bar"><div class="aud-fill" style="width:58%;background:var(--mint)"></div></div><div class="aud-val">58%</div></div>
+                    <div class="aud-row"><div class="aud-lbl">35–49 ans</div><div class="aud-bar"><div class="aud-fill" style="width:31%;background:var(--amber)"></div></div><div class="aud-val">31%</div></div>
+                  </div>
+                  <div style="background:var(--md);border-radius:var(--rx);padding:10px 12px;font-size:11px;color:var(--mint);line-height:1.6"><strong>🛡️ Conforme RGPD</strong><br>Chaque profil a consenti explicitement à Decathlon. Révocable en 1 tap.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 : Budget -->
+          <div class="step-panel" id="wz-panel-3">
+            <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
+              <div>
+                <div class="step-card">
+                  <div class="step-card-title">Volume et tarification</div>
+                  <div class="step-card-sub">Définissez le nombre de réponses souhaité. Le prix est calculé en temps réel.</div>
+                  <div class="field">
+                    <label class="field-lbl">Nombre de réponses souhaité</label>
+                    <div class="vol-wrap">
+                      <div style="flex:1">
+                        <input type="range" class="vol-slider" id="vol-sl" min="50" max="5000" step="50" value="500" oninput="updVol(this.value)">
+                        <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--ink4)"><span>50</span><span>1 000</span><span>2 500</span><span>5 000</span></div>
+                      </div>
+                      <div class="vol-num" id="vol-num">500</div>
+                    </div>
+                    <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap">
+                      <div class="est-chip"><span class="est-chip-ico">⏱️</span>Délai estimé <span class="est-chip-val" id="est-delay">15h</span></div>
+                      <div class="est-chip"><span class="est-chip-ico">👥</span>Profils dispo. <span class="est-chip-val">631</span></div>
+                      <div class="est-chip"><span class="est-chip-ico">📦</span>Livraison <span class="est-chip-val">48–72h</span></div>
+                    </div>
+                  </div>
+                  <div class="field" style="margin-bottom:0">
+                    <label class="field-lbl">Nom de la campagne</label>
+                    <input class="field-inp" id="camp-name-inp" value="Test équipement sportif — Été 2025" placeholder="Ex : Test vélo été 2025">
+                  </div>
+                </div>
+                <div class="step-card">
+                  <div class="step-card-title">Devis estimatif</div>
+                  <div class="budget-display">
+                    <div>
+                      <div style="font-size:11px;color:var(--ink3);margin-bottom:3px">Total estimé</div>
+                      <div class="budget-amount" id="budget-amt">625 €</div>
+                      <div style="font-size:11px;color:var(--ink3);margin-top:3px">HT, facturé à la livraison</div>
+                    </div>
+                    <div class="budget-breakdown" id="budget-break">
+                      500 réponses × 1,25 €<br>
+                      Clustering IA inclus<br>
+                      Rapport livré en 48–72h
+                    </div>
+                  </div>
+                  <div class="budget-inc">
+                    <div class="budget-inc-title">📦 Inclus dans le livrable</div>
+                    <div class="budget-inc-item">✅ Synthèse exécutive (2 pages, format PDF)</div>
+                    <div class="budget-inc-item">✅ Verbatims bruts classés par thèmes (clustering IA)</div>
+                    <div class="budget-inc-item">✅ Recommandations actionnables priorisées</div>
+                    <div class="budget-inc-item">✅ Export CSV données brutes</div>
+                    <div class="budget-inc-item">✅ Score qualité par réponse</div>
+                  </div>
+                </div>
+                <div class="wizard-actions">
+                  <button class="wiz-btn-back" onclick="wzGo(2)">← Retour</button>
+                  <button class="wiz-btn-next" onclick="wzGo(4)">Vérifier →</button>
+                </div>
+              </div>
+              <div>
+                <div class="preview-box">
+                  <div class="preview-title">Simulation délai</div>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <div style="background:var(--bg3);border-radius:var(--rx);padding:11px 12px">
+                      <div style="font-size:10px;color:var(--ink4);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Aujourd'hui</div>
+                      <div style="font-size:12px;color:var(--ink2);font-weight:600">🚀 Lancement campagne</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink4)" id="sim-delay">~15h</div></div>
+                    <div style="background:var(--md);border-radius:var(--rx);padding:11px 12px;border:1px solid rgba(11,171,132,.2)">
+                      <div style="font-size:10px;color:var(--mint);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Collecte</div>
+                      <div style="font-size:12px;color:var(--ink2);font-weight:600">✅ <span id="sim-vol">500</span> réponses atteintes</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink4)">+48–72h</div></div>
+                    <div style="background:var(--vd);border-radius:var(--rx);padding:11px 12px;border:1px solid rgba(161,78,8,.2)">
+                      <div style="font-size:10px;color:var(--violet);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Livraison</div>
+                      <div style="font-size:12px;color:var(--ink2);font-weight:600">📊 Rapport disponible</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 : Validation -->
+          <div class="step-panel" id="wz-panel-4">
+            <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
+              <div>
+                <div class="step-card">
+                  <div class="step-card-title">✅ Vérification finale</div>
+                  <div class="step-card-sub">Vérifiez tous les paramètres avant de lancer. Cette campagne sera diffusée auprès de vos profils consentants uniquement.</div>
+                  <div class="recap-grid">
+                    <div class="recap-item"><div class="recap-lbl">Question</div><div class="recap-val" id="recap-q">Quel est votre critère principal lors de l'achat d'un équipement sportif ?</div></div>
+                    <div class="recap-item"><div class="recap-lbl">Format</div><div class="recap-val" id="recap-fmt">Choix multiple · 5 options</div></div>
+                    <div class="recap-item"><div class="recap-lbl">Audience</div><div class="recap-val" id="recap-aud">Sport + Bien-être · 18–49 ans</div></div>
+                    <div class="recap-item"><div class="recap-lbl">Volume</div><div class="recap-val big" id="recap-vol">500</div></div>
+                    <div class="recap-item"><div class="recap-lbl">Nom campagne</div><div class="recap-val" id="recap-name">Test équipement sportif — Été 2025</div></div>
+                    <div class="recap-item"><div class="recap-lbl">Budget estimé</div><div class="recap-val" id="recap-budget">625 € HT</div></div>
+                    <div class="recap-item" style="grid-column:span 2"><div class="recap-lbl">Livraison</div><div class="recap-val">Rapport complet sous 48–72h après clôture de la collecte · Clustering IA · Export CSV inclus</div></div>
+                  </div>
+                  <div class="risk-box">
+                    <div class="risk-title">⚠️ Points d'attention documentés</div>
+                    <div class="risk-item"><div class="risk-dot"></div>Décrochage au palier : maintenir l'engagement avec des questions variées</div>
+                    <div class="risk-item"><div class="risk-dot"></div>Frustration si quota non atteint : Noova garantit un minimum de 80% du volume ou remboursement</div>
+                    <div class="risk-item"><div class="risk-dot"></div>Score qualité min. 70/100 par répondant appliqué automatiquement</div>
+                    <div class="risk-item"><div class="risk-dot"></div>Révocations RGPD possibles en cours de campagne — décomptées du quota</div>
+                  </div>
+                </div>
+                <div class="wizard-actions" style="justify-content:space-between">
+                  <button class="wiz-btn-back" onclick="wzGo(3)">← Modifier</button>
+                  <button class="wiz-btn-launch" onclick="launchCampaign()">🚀 Lancer la campagne</button>
+                </div>
+              </div>
+              <div>
+                <div class="preview-box">
+                  <div class="preview-title">Ce qui se passe après</div>
+                  <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:var(--ink2);line-height:1.65">
+                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">📲</span><span>Les répondants éligibles voient votre question apparaître dans leur feed Noova en temps réel.</span></div>
+                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">📊</span><span>Vous suivez la progression en direct depuis ce dashboard.</span></div>
+                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">🤖</span><span>Le clustering IA analyse automatiquement les verbatims et identifie les thèmes émergents.</span></div>
+                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">📧</span><span>Vous recevez une notification dès que le rapport est disponible (48–72h).</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══ RESULTS PAGE ═══ -->
+      <div class="page" id="page-results">
+        <!-- Campaign selector -->
+        <div style="display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap">
+          <div style="padding:8px 14px;border-radius:var(--rs);background:var(--cd);border:1.5px solid rgba(224,125,10,.3);font-size:12px;font-weight:700;color:var(--coral);cursor:pointer">⛺ Nom produit trail</div>
+          <div style="padding:8px 14px;border-radius:var(--rs);background:var(--card);border:1.5px solid var(--border);font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer" onclick="this.style.background='var(--card)'">🏊 Satisfaction natation</div>
+          <div style="padding:8px 14px;border-radius:var(--rs);background:var(--card);border:1.5px solid var(--border);font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer">+ Autres</div>
+        </div>
+        <!-- Header -->
+        <div class="results-header">
+          <div class="rh-camp-ico">⛺</div>
+          <div class="rh-info">
+            <div class="rh-name">Quel nom pour notre prochain produit trail ?</div>
+            <div class="rh-meta">
+              <div class="rh-meta-item"><span>📅</span> Clôturée le 6 mai 2025</div>
+              <div class="rh-meta-item"><span>👥</span> 1 284 réponses</div>
+              <div class="rh-meta-item"><span>⭐</span> Score qualité 4.7/5</div>
+              <div class="rh-meta-item"><span>⏱️</span> Livré en 38h</div>
+              <div><span class="status-pill done">Terminée</span></div>
+            </div>
+          </div>
+          <div class="rh-actions">
+            <button class="rh-btn" style="background:var(--vd);color:var(--violet)" onclick="showToast('📄 Export PDF en cours de génération…','📄')">📄 Rapport PDF</button>
+            <button class="rh-btn" style="background:var(--md);color:var(--mint)" onclick="showToast('📊 Fichier CSV téléchargé','📊')">📊 Export CSV</button>
+            <button class="rh-btn" style="background:var(--cd);color:var(--coral)" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">🔁 Phase 2</button>
+          </div>
+        </div>
+        <!-- Export bar -->
+        <div class="export-bar">
+          <div class="export-info"><strong>Rapport complet disponible.</strong> Généré par clustering IA sur les verbatims bruts · Dernière mise à jour il y a 2h</div>
+          <div class="export-btns">
+            <button class="export-btn" onclick="showToast('📄 Ouverture du rapport…','📄')">📄 Synthèse PDF</button>
+            <button class="export-btn" onclick="showToast('📊 Export CSV lancé','📊')">📊 CSV brut</button>
+            <button class="export-btn" onclick="showToast('📧 Rapport envoyé par email','📧')">📧 Partager</button>
+          </div>
+        </div>
+        <!-- Tabs -->
+        <div class="results-tabs">
+          <button class="res-tab active" onclick="resTab('synthesis',this)">📊 Synthèse</button>
+          <button class="res-tab" onclick="resTab('verbatims',this)">💬 Verbatims</button>
+          <button class="res-tab" onclick="resTab('clusters',this)">🗂️ Clustering</button>
+          <button class="res-tab" onclick="resTab('recos',this)">💡 Recommandations</button>
+        </div>
+        <!-- Synthesis panel -->
+        <div class="res-panel active" id="res-synthesis">
+          <div class="synth-grid">
+            <div class="synth-card">
+              <div class="synth-card-title">Analyse de sentiment</div>
+              <div class="sent-item"><div class="sent-lbl">Positif</div><div class="sent-bar"><div class="sent-fill" style="width:68%;background:linear-gradient(90deg,var(--mint),#22C55E)"></div></div><div class="sent-val" style="color:var(--mint)">68%</div></div>
+              <div class="sent-item"><div class="sent-lbl">Neutre</div><div class="sent-bar"><div class="sent-fill" style="width:22%;background:rgba(23,20,26,.2)"></div></div><div class="sent-val" style="color:var(--ink3)">22%</div></div>
+              <div class="sent-item"><div class="sent-lbl">Négatif</div><div class="sent-bar"><div class="sent-fill" style="width:10%;background:rgba(239,68,68,.7)"></div></div><div class="sent-val" style="color:#F87171">10%</div></div>
+              <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--ink3);line-height:1.65">Le sentiment global est <strong style="color:var(--mint)">très positif</strong>. Le frein principal identifié est la perception prix (10% des réponses négatives).</div>
+            </div>
+            <div class="synth-card">
+              <div class="synth-card-title">Thèmes les plus mentionnés</div>
+              <div class="bar-chart-item"><div class="bc-lbl">Performance</div><div class="bc-track"><div class="bc-fill" style="width:74%;background:linear-gradient(90deg,var(--violet),var(--coral))"><div class="bc-val">74%</div></div></div></div>
+              <div class="bar-chart-item"><div class="bc-lbl">Légèreté</div><div class="bc-track"><div class="bc-fill" style="width:58%;background:linear-gradient(90deg,var(--violet),var(--coral))"><div class="bc-val">58%</div></div></div></div>
+              <div class="bar-chart-item"><div class="bc-lbl">Confort</div><div class="bc-track"><div class="bc-fill" style="width:49%;background:linear-gradient(90deg,var(--violet),var(--coral))"><div class="bc-val">49%</div></div></div></div>
+              <div class="bar-chart-item"><div class="bc-lbl">Prix</div><div class="bc-track"><div class="bc-fill" style="width:41%;background:linear-gradient(90deg,var(--violet),var(--coral))"><div class="bc-val">41%</div></div></div></div>
+              <div class="bar-chart-item"><div class="bc-lbl">Design</div><div class="bc-track"><div class="bc-fill" style="width:28%;background:linear-gradient(90deg,var(--violet),var(--coral))"><div class="bc-val">28%</div></div></div></div>
+            </div>
+            <div class="synth-card">
+              <div class="synth-card-title">Score qualité des réponses</div>
+              <div class="nps-display">
+                <div class="nps-score">4.7<span class="nps-max">/5</span></div>
+                <div class="nps-lbl">Basé sur complétude, cohérence & richesse</div>
+                <div class="nps-bar" style="margin-top:12px">
+                  <div style="flex:10;background:rgba(239,68,68,.5)"></div>
+                  <div style="flex:22;background:rgba(245,166,35,.5)"></div>
+                  <div style="flex:68;background:var(--mint)"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:9px;margin-top:4px">
+                  <span style="color:#F87171">< 3 · 10%</span>
+                  <span style="color:var(--amber)">3–4 · 22%</span>
+                  <span style="color:var(--mint)">4–5 · 68%</span>
+                </div>
+              </div>
+              <div style="margin-top:14px;display:flex;flex-direction:column;gap:7px">
+                <div class="aud-row"><div class="aud-lbl" style="width:80px">Complétude</div><div class="aud-bar"><div class="aud-fill" style="width:92%;background:var(--mint)"></div></div><div class="aud-val">92%</div></div>
+                <div class="aud-row"><div class="aud-lbl" style="width:80px">Cohérence</div><div class="aud-bar"><div class="aud-fill" style="width:88%;background:var(--violet)"></div></div><div class="aud-val">88%</div></div>
+                <div class="aud-row"><div class="aud-lbl" style="width:80px">Richesse</div><div class="aud-bar"><div class="aud-fill" style="width:79%;background:var(--coral)"></div></div><div class="aud-val">79%</div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Profil répondants -->
+          <div class="section-title">Profil des répondants</div>
+          <div class="audience-grid">
+            <div class="card card-inner">
+              <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:14px">Tranches d'âge</div>
+              <div class="aud-row"><div class="aud-lbl">18–24 ans</div><div class="aud-bar"><div class="aud-fill" style="width:32%;background:var(--coral)"></div></div><div class="aud-val">32%</div></div>
+              <div class="aud-row"><div class="aud-lbl">25–34 ans</div><div class="aud-bar"><div class="aud-fill" style="width:41%;background:var(--violet)"></div></div><div class="aud-val">41%</div></div>
+              <div class="aud-row"><div class="aud-lbl">35–49 ans</div><div class="aud-bar"><div class="aud-fill" style="width:19%;background:var(--mint)"></div></div><div class="aud-val">19%</div></div>
+              <div class="aud-row"><div class="aud-lbl">50+ ans</div><div class="aud-bar"><div class="aud-fill" style="width:8%;background:var(--amber)"></div></div><div class="aud-val">8%</div></div>
+            </div>
+            <div class="card card-inner">
+              <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:14px">Thèmes d'intérêt</div>
+              <div class="aud-row"><div class="aud-lbl">🏃 Sport</div><div class="aud-bar"><div class="aud-fill" style="width:84%;background:var(--coral)"></div></div><div class="aud-val">84%</div></div>
+              <div class="aud-row"><div class="aud-lbl">🧘 Bien-être</div><div class="aud-bar"><div class="aud-fill" style="width:61%;background:var(--violet)"></div></div><div class="aud-val">61%</div></div>
+              <div class="aud-row"><div class="aud-lbl">✈️ Voyage</div><div class="aud-bar"><div class="aud-fill" style="width:44%;background:var(--mint)"></div></div><div class="aud-val">44%</div></div>
+              <div class="aud-row"><div class="aud-lbl">💻 Tech</div><div class="aud-bar"><div class="aud-fill" style="width:37%;background:var(--amber)"></div></div><div class="aud-val">37%</div></div>
+            </div>
+          </div>
+        </div>
+        <!-- Verbatims panel -->
+        <div class="res-panel" id="res-verbatims">
+          <div class="verbatim-filters">
+            <div class="vf-chip active" onclick="filterVerb(this,'all')">Tous (1 284)</div>
+            <div class="vf-chip" onclick="filterVerb(this,'perf')">🚀 Performance (74%)</div>
+            <div class="vf-chip" onclick="filterVerb(this,'light')">🪶 Légèreté (58%)</div>
+            <div class="vf-chip" onclick="filterVerb(this,'comfort')">🛋️ Confort (49%)</div>
+            <div class="vf-chip" onclick="filterVerb(this,'price')">💰 Prix (41%)</div>
+            <div class="vf-chip" onclick="filterVerb(this,'neg')">⚠️ Négatifs (10%)</div>
+          </div>
+          <div class="verbatim-grid" id="verbatim-list"></div>
+        </div>
+        <!-- Clusters panel -->
+        <div class="res-panel" id="res-clusters">
+          <div style="font-size:13px;color:var(--ink2);margin-bottom:18px;line-height:1.65">Le clustering IA a identifié <strong style="color:var(--ink)">7 thèmes distincts</strong> à partir de 1 284 réponses brutes. Chaque bulle représente la fréquence d'apparition dans les verbatims.</div>
+          <div class="cluster-map" style="margin-bottom:24px" id="cluster-map"></div>
+          <div class="section-title">Détail par cluster</div>
+          <div id="cluster-detail"></div>
+        </div>
+        <!-- Recommendations panel -->
+        <div class="res-panel" id="res-recos">
+          <div style="background:var(--cd);border:1px solid rgba(224,125,10,.25);border-radius:var(--rs);padding:14px 16px;margin-bottom:20px;font-size:13px;color:var(--ink2);line-height:1.65">📊 <strong style="color:var(--coral)">3 recommandations prioritaires</strong> générées par IA · Basées sur l'analyse de 1 284 réponses · Confiancce 89%</div>
+          <div class="reco-list" id="reco-list"></div>
+        </div>
+      </div>
+
+      <!-- ═══ CAMPAIGNS LIST ═══ -->
+      <div class="page" id="page-campaigns">
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <input class="field-inp" style="max-width:280px" placeholder="🔍 Rechercher une campagne…">
+          <select class="field-inp" style="max-width:180px;cursor:pointer"><option>Tous les statuts</option><option>En cours</option><option>Terminée</option><option>Brouillon</option></select>
+          <button class="tb-btn tb-btn-primary" style="margin-left:auto" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">+ Nouvelle campagne</button>
+        </div>
+        <div class="card">
+          <div class="camp-thead">
+            <div class="camp-thead-cell">Campagne</div><div class="camp-thead-cell">Statut</div>
+            <div class="camp-thead-cell">Réponses</div><div class="camp-thead-cell">Progression</div>
+            <div class="camp-thead-cell" style="text-align:right">Actions</div>
+          </div>
+          <div class="camp-row" onclick="navTo('results',document.querySelectorAll('.sb-item')[3])"><div class="camp-name-wrap"><div class="camp-ico">⛺</div><div><div class="camp-name">Nom prochain produit trail</div><div class="camp-date">Lancée il y a 3j · Sport</div></div></div><div><span class="status-pill live">En cours</span></div><div><div class="camp-metric">487</div><div class="camp-metric-sub">/ 500 obj.</div></div><div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:97%;background:var(--mint)"></div></div><div class="cprog-lbl">97%</div></div><div class="camp-actions"><button class="camp-act-btn" style="background:var(--md);color:var(--mint)">Voir</button></div></div>
+          <div class="camp-row"><div class="camp-name-wrap"><div class="camp-ico">🏊</div><div><div class="camp-name">Satisfaction natation</div><div class="camp-date">Terminée le 2 mai · Sport</div></div></div><div><span class="status-pill done">Terminée</span></div><div><div class="camp-metric">312</div><div class="camp-metric-sub">/ 300 obj.</div></div><div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:100%;background:var(--violet)"></div></div><div class="cprog-lbl">104%</div></div><div class="camp-actions"><button class="camp-act-btn" style="background:var(--vd);color:var(--violet)">Rapport</button></div></div>
+          <div class="camp-row" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])"><div class="camp-name-wrap"><div class="camp-ico">🚴</div><div><div class="camp-name">Test vélo électrique 2025</div><div class="camp-date">Créée hier · Mobilité</div></div></div><div><span class="status-pill draft">Brouillon</span></div><div><div class="camp-metric">—</div><div class="camp-metric-sub">/ 400 obj.</div></div><div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:0%"></div></div><div class="cprog-lbl">Non lancée</div></div><div class="camp-actions"><button class="camp-act-btn" style="background:var(--ad);color:var(--amber)">Éditer</button></div></div>
+          <div class="camp-row"><div class="camp-name-wrap"><div class="camp-ico">👟</div><div><div class="camp-name">Naming chaussures running</div><div class="camp-date">Terminée le 14 avr · Sport</div></div></div><div><span class="status-pill done">Terminée</span></div><div><div class="camp-metric">203</div><div class="camp-metric-sub">/ 200 obj.</div></div><div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:100%;background:var(--violet)"></div></div><div class="cprog-lbl">102%</div></div><div class="camp-actions"><button class="camp-act-btn" style="background:var(--vd);color:var(--violet)">Rapport</button></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ AUDIENCE ═══ -->
+      <div class="page" id="page-audience">
+        <div class="kpi-row">
+          <div class="kpi-card"><div class="kpi-top"><span class="kpi-icon">👥</span><span class="kpi-delta up">+12 ce mois</span></div><div class="kpi-val">847</div><div class="kpi-lbl">Profils consentants actifs</div></div>
+          <div class="kpi-card"><div class="kpi-top"><span class="kpi-icon">🔐</span><span class="kpi-delta dn">−3 révocat.</span></div><div class="kpi-val">99.6<span style="font-size:16px;color:var(--ink3)">%</span></div><div class="kpi-lbl">Taux de consentement maintenu</div></div>
+          <div class="kpi-card"><div class="kpi-top"><span class="kpi-icon">⚡</span><span class="kpi-delta up">+0.5</span></div><div class="kpi-val">78<span style="font-size:16px;color:var(--ink3)">%</span></div><div class="kpi-lbl">Taux de réponse moyen</div></div>
+          <div class="kpi-card"><div class="kpi-top"><span class="kpi-icon">🔁</span><span class="kpi-delta up">+8%</span></div><div class="kpi-val">4.2</div><div class="kpi-lbl">Campagnes / profil en moyenne</div></div>
+        </div>
+        <div class="audience-grid">
+          <div class="card card-inner">
+            <div class="synth-card-title" style="margin-bottom:14px">Répartition par âge</div>
+            <div class="aud-row"><div class="aud-lbl">18–24 ans</div><div class="aud-bar"><div class="aud-fill" style="width:28%;background:var(--coral)"></div></div><div class="aud-val">237</div></div>
+            <div class="aud-row"><div class="aud-lbl">25–34 ans</div><div class="aud-bar"><div class="aud-fill" style="width:35%;background:var(--violet)"></div></div><div class="aud-val">296</div></div>
+            <div class="aud-row"><div class="aud-lbl">35–49 ans</div><div class="aud-bar"><div class="aud-fill" style="width:24%;background:var(--mint)"></div></div><div class="aud-val">203</div></div>
+            <div class="aud-row"><div class="aud-lbl">50–64 ans</div><div class="aud-bar"><div class="aud-fill" style="width:9%;background:var(--amber)"></div></div><div class="aud-val">76</div></div>
+            <div class="aud-row"><div class="aud-lbl">65+ ans</div><div class="aud-bar"><div class="aud-fill" style="width:4%;background:var(--ink3)"></div></div><div class="aud-val">35</div></div>
+          </div>
+          <div class="card card-inner">
+            <div class="synth-card-title" style="margin-bottom:14px">Thèmes d'intérêt</div>
+            <div class="aud-row"><div class="aud-lbl">🏃 Sport</div><div class="aud-bar"><div class="aud-fill" style="width:84%;background:var(--coral)"></div></div><div class="aud-val">711</div></div>
+            <div class="aud-row"><div class="aud-lbl">🧘 Bien-être</div><div class="aud-bar"><div class="aud-fill" style="width:62%;background:var(--violet)"></div></div><div class="aud-val">525</div></div>
+            <div class="aud-row"><div class="aud-lbl">✈️ Voyage</div><div class="aud-bar"><div class="aud-fill" style="width:45%;background:var(--mint)"></div></div><div class="aud-val">381</div></div>
+            <div class="aud-row"><div class="aud-lbl">💻 Tech</div><div class="aud-bar"><div class="aud-fill" style="width:38%;background:var(--amber)"></div></div><div class="aud-val">322</div></div>
+            <div class="aud-row"><div class="aud-lbl">🍔 Aliment.</div><div class="aud-bar"><div class="aud-fill" style="width:29%;background:var(--ink3)"></div></div><div class="aud-val">245</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CONSENTS ═══ -->
+      <div class="page" id="page-consents">
+        <div style="background:var(--md);border:1px solid rgba(11,171,132,.2);border-radius:var(--rs);padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:22px">🛡️</span>
+          <div style="font-size:13px;color:var(--ink2);line-height:1.65;flex:1"><strong style="color:var(--mint)">Conformité RGPD totale.</strong> Chaque profil a consenti explicitement à Decathlon via l'application Noova. Les consentements sont horodatés, granulaires et révocables en 1 tap par l'utilisateur. Vous ne pouvez pas modifier ces paramètres — seul l'utilisateur en a le contrôle.</div>
+          <button class="tb-btn tb-btn-ghost" style="font-size:12px">📥 Export RGPD</button>
+        </div>
+        <div class="section-title">Journal des consentements (30 derniers jours)</div>
+        <div class="card">
+          <div style="display:grid;grid-template-columns:160px 1fr 1fr 120px 100px;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Date</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Profil (anonymisé)</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Action</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Segment</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Statut</div>
+          </div>
+          ${[{d:'08/05/2025 14:32',p:'U-7823',a:'Nouveau consentement',s:'Sport · 25–34',t:'granted'},{d:'07/05/2025 09:14',p:'U-4421',a:'Renouvellement',s:'Bien-être · 18–24',t:'granted'},{d:'06/05/2025 17:55',p:'U-9102',a:'Révocation',s:'Sport · 35–49',t:'revoked'},{d:'05/05/2025 11:23',p:'U-3344',a:'Nouveau consentement',s:'Voyage · 25–34',t:'granted'},{d:'04/05/2025 08:41',p:'U-6677',a:'Révocation',s:'Tech · 18–24',t:'revoked'},{d:'03/05/2025 15:09',p:'U-1156',a:'Nouveau consentement',s:'Sport · 50–64',t:'granted'}].map(r=>`<div style="display:grid;grid-template-columns:160px 1fr 1fr 120px 100px;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center"><div style="font-size:11px;color:var(--ink3)">${r.d}</div><div style="font-size:12px;font-weight:600;color:var(--ink);font-family:monospace">${r.p}</div><div style="font-size:12px;color:var(--ink2)">${r.a}</div><div style="font-size:11px;color:var(--ink3)">${r.s}</div><div><span class="status-pill ${r.t==='granted'?'live':'paused'}">${r.t==='granted'?'Accordé':'Révoqué'}</span></div></div>`).join('')}
+        </div>
+      </div>
+
+      <!-- ═══ SETTINGS ═══ -->
+      <div class="page" id="page-settings">
+        <div style="max-width:640px">
+          <div class="settings-section">
+            <div class="settings-section-title">Profil de la marque</div>
+            <div class="setting-row"><div class="setting-ico">⛺</div><div class="setting-info"><div class="setting-name">Nom de la marque</div><div class="setting-desc">Decathlon France · ID marque: DEC-FR-001</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico">👤</div><div class="setting-info"><div class="setting-name">Contact principal</div><div class="setting-desc">claire.martin@decathlon.com · Chef de produit</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico">🌍</div><div class="setting-info"><div class="setting-name">Zone de diffusion</div><div class="setting-desc">France métropolitaine · Toutes régions</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Notifications</div>
+            <div class="setting-row"><div class="setting-ico">📊</div><div class="setting-info"><div class="setting-name">Rapport disponible</div><div class="setting-desc">Notification email quand le rapport est livré</div></div><div class="setting-control"><label class="tgl"><input type="checkbox" checked><div class="tgl-t"></div><div class="tgl-k"></div></label></div></div>
+            <div class="setting-row"><div class="setting-ico">📈</div><div class="setting-info"><div class="setting-name">Résumé hebdomadaire</div><div class="setting-desc">Récap de vos campagnes chaque lundi matin</div></div><div class="setting-control"><label class="tgl"><input type="checkbox" checked><div class="tgl-t"></div><div class="tgl-k"></div></label></div></div>
+            <div class="setting-row"><div class="setting-ico">⚠️</div><div class="setting-info"><div class="setting-name">Révocations de consentement</div><div class="setting-desc">Alerte quand un profil révoque son consentement</div></div><div class="setting-control"><label class="tgl"><input type="checkbox"><div class="tgl-t"></div><div class="tgl-k"></div></label></div></div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">RGPD & données</div>
+            <div class="setting-row"><div class="setting-ico">🛡️</div><div class="setting-info"><div class="setting-name">DPO désigné</div><div class="setting-desc">dpo@decathlon.com · Conforme RGPD Art. 37</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Gérer</button></div>
+            <div class="setting-row"><div class="setting-ico">📋</div><div class="setting-info"><div class="setting-name">Registre de traitement</div><div class="setting-desc">Export automatique disponible · Dernière MAJ il y a 2j</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Exporter</button></div>
+            <div class="setting-row"><div class="setting-ico">🗑️</div><div class="setting-info"><div class="setting-name">Rétention des données</div><div class="setting-desc">Données réponses conservées 24 mois par défaut</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Configurer</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ BILLING ═══ -->
+      <div class="page" id="page-billing">
+        <div style="max-width:680px">
+          <div class="step-card" style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <div><div class="step-card-title">Plan actuel · Pro</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Renouvellement le 1er juin 2025</div></div>
+              <div style="background:var(--cd);border:1.5px solid rgba(224,125,10,.25);border-radius:var(--rs);padding:7px 14px;font-family:var(--fd);font-weight:700;font-size:13px;color:var(--coral)">Pro</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+              <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">∞</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Campagnes</div></div>
+              <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">5k</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Rép. / campagne</div></div>
+              <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--coral)">1.25€</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Par réponse</div></div>
+            </div>
+            <div style="display:flex;gap:9px"><button class="tb-btn tb-btn-ghost" style="font-size:12px">Changer de plan</button><button class="tb-btn tb-btn-primary" style="font-size:12px">Ajouter du crédit</button></div>
+          </div>
+          <div class="section-title">Historique de facturation</div>
+          <div class="card">
+            ${[{d:'05/05/2025',c:'Nom produit trail — 487 réponses',m:'608,75€','s':'Payée'},{d:'15/04/2025',c:'Naming chaussures — 203 réponses',m:'253,75€',s:'Payée'},{d:'01/04/2025',c:'Satisfaction natation — 312 réponses',m:'390,00€',s:'Payée'}].map(f=>`<div style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--border)"><div style="font-size:11px;color:var(--ink3);width:100px;flex-shrink:0">${f.d}</div><div style="flex:1;font-size:13px;color:var(--ink2)">${f.c}</div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap">${f.m}</div><span class="status-pill done">${f.s}</span><button style="padding:5px 10px;border-radius:7px;background:var(--card);border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--ink3);cursor:pointer">📥 PDF</button></div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span class="toast-ico" id="toast-ico">✅</span><span id="toast-msg">Action effectuée</span></div>
+
+<script>
+let curPage='dashboard', wzCur=1, curFmt='mcq';
+
+// ═══ NAVIGATION ══════════════════════════════════════════════
+function navTo(page, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  curPage=page;
+  const titles={dashboard:['Dashboard','Bienvenue Claire — dernière mise à jour il y a 4 min'],create:['Créer une campagne','Moins de 10 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet · Quel nom pour notre prochain produit trail ?'],audience:['Profils consentants','847 profils actifs ayant consenti à Decathlon'],consents:['Consentements RGPD','Journal complet · Conforme RGPD Art. 6 et 7'],settings:['Paramètres','Configuration de votre espace marque'],billing:['Facturation','Historique et gestion de votre plan']};
+  const t=titles[page]||[page,''];
+  document.getElementById('topbar-title').textContent=t[0];
+  document.getElementById('topbar-sub').textContent=t[1];
+  if(page==='results'){renderVerbatims('all');renderClusters();renderRecos()}
+  if(page==='create'){wzSync()}
+}
+
+// ═══ WIZARD ══════════════════════════════════════════════════
+function wzGo(n){
+  document.querySelectorAll('.step-panel').forEach((p,i)=>{p.classList[i===n?'add':'remove']('active')});
+  document.querySelectorAll('.wiz-step-btn').forEach((b,i)=>{b.classList.remove('active','done');if(i<n)b.classList.add('done');else if(i===n)b.classList.add('active')});
+  wzCur=n;
+  if(n===4){
+    document.getElementById('recap-q').textContent=document.getElementById('q-text-inp').value.substring(0,80)||'—';
+    document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple · '+document.querySelectorAll('.mcq-opt-inp').length+' options',scale:'Échelle 1–10',rank:'Classement'}[curFmt];
+    document.getElementById('recap-vol').textContent=document.getElementById('vol-num').textContent;
+    document.getElementById('recap-name').textContent=document.getElementById('camp-name-inp').value;
+    document.getElementById('recap-budget').textContent=document.getElementById('budget-amt').textContent+' HT';
+  }
+}
+function wzSync(){ wzGo(wzCur); }
+
+// ═══ FORMAT ══════════════════════════════════════════════════
+function selFmt(el, fmt){
+  document.querySelectorAll('.fmt-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); curFmt=fmt;
+  document.getElementById('mcq-builder').style.display=fmt==='mcq'?'block':'none';
+}
+
+// ═══ MCQ BUILDER ═════════════════════════════════════════════
+function addOpt(){
+  const div=document.createElement('div');div.className='mcq-option-row';
+  div.innerHTML='<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button>';
+  document.getElementById('mcq-options').appendChild(div);
+}
+function removeOpt(btn){ const opts=document.querySelectorAll('.mcq-option-row');if(opts.length>2)btn.closest('.mcq-option-row').remove() }
+
+// ═══ TEMPLATES ═══════════════════════════════════════════════
+function useTmpl(el, txt){
+  document.querySelectorAll('.tmpl-chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  const inp=document.getElementById('q-text-inp');if(inp){inp.value=txt;updatePreview()}
+}
+
+// ═══ PREVIEW ════════════════════════════════════════════════
+function updatePreview(){
+  const q=document.getElementById('q-text-inp');
+  const pq=document.getElementById('preview-q');
+  if(q&&pq){ pq.textContent=q.value||'Votre question…'; const l=q.value.length; const ct=document.getElementById('q-char-ct');if(ct)ct.textContent=l+' / 150';ct.style.color=l>120?'var(--amber)':'var(--ink3)' }
+}
+
+// ═══ AUDIENCE COUNT ══════════════════════════════════════════
+function updAud(){
+  const sel=document.querySelectorAll('.th-chip.sel').length+document.querySelectorAll('.age-chip.sel').length;
+  const base=847; const count=Math.max(200,Math.min(base,Math.floor(base*(0.4+sel*0.08))));
+  document.getElementById('aud-count').textContent=count;
+}
+
+// ═══ VOLUME ══════════════════════════════════════════════════
+function updVol(v){
+  document.getElementById('vol-num').textContent=v;
+  const delay=Math.ceil(v/1284*38);
+  const estEl=document.getElementById('est-delay');if(estEl)estEl.textContent=delay+'h';
+  const simEl=document.getElementById('sim-delay');if(simEl)simEl.textContent='~'+delay+'h';
+  const svEl=document.getElementById('sim-vol');if(svEl)svEl.textContent=v;
+  const price=(v*1.25).toFixed(0);
+  document.getElementById('budget-amt').textContent=Number(price).toLocaleString('fr-FR')+' €';
+  document.getElementById('budget-break').innerHTML=v+' réponses × 1,25 €<br>Clustering IA inclus<br>Rapport livré en 48–72h';
+  const sl=document.getElementById('vol-sl');if(sl){const pct=(v-50)/(5000-50)*100;sl.style.background=`linear-gradient(to right,var(--coral) ${pct}%,rgba(23,20,26,.1) ${pct}%)`}
+}
+
+// ═══ LAUNCH ══════════════════════════════════════════════════
+function launchCampaign(){
+  spawnConfetti();
+  setTimeout(()=>{showToast('🚀 Campagne lancée ! Rapport estimé dans 38h','🚀')},200);
+  setTimeout(()=>{navTo('campaigns',document.querySelectorAll('.sb-item')[2])},1500);
+}
+
+// ═══ RESULTS TABS ════════════════════════════════════════════
+function resTab(tab, btn){
+  document.querySelectorAll('.res-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.querySelectorAll('.res-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('res-'+tab).classList.add('active');
+}
+
+// ═══ VERBATIMS ═══════════════════════════════════════════════
+const VERBS=[{theme:'Performance',thc:'rgba(161,78,8,.12)',tc:'var(--violet)',score:4.8,txt:'"Je veux un nom qui évoque la vitesse et l\'endurance sans être trop technique. Quelque chose comme KinetoRun aurait du sens pour moi."',seg:'25–34 · Sport'},{theme:'Légèreté',thc:'rgba(11,171,132,.12)',tc:'var(--mint)',score:4.6,txt:'"Le nom doit suggérer la légèreté. FeatherStep ou AirTrek — quelque chose qui donne envie de courir sans effort."',seg:'18–24 · Bien-être'},{theme:'Accessibilité',thc:'rgba(245,166,35,.12)',tc:'var(--amber)',score:4.2,txt:'"TrailEase ou EasyPath — il faut que ça reste accessible et pas trop intimidant pour les débutants en trail."',seg:'35–49 · Sport'},{theme:'Performance',thc:'rgba(161,78,8,.12)',tc:'var(--violet)',score:4.9,txt:'"Un nom comme PowerTrail ou KineticPro me parlerait davantage. La performance doit être au cœur du naming."',seg:'25–34 · Sport'},{theme:'Émotion',thc:'rgba(224,125,10,.12)',tc:'var(--coral)',score:4.4,txt:'"Je préfère quelque chose qui évoque une émotion, la liberté — type FreeStep ou OpenRun. Pas trop sportif dans les codes."',seg:'18–24 · Culture'},{theme:'Prix',thc:'rgba(239,68,68,.1)',tc:'#EF4444',score:3.1,txt:'"Le nom ne change pas grand chose si le prix reste élevé. Je suis plus sensible au rapport qualité-prix qu\'au branding."',seg:'35–49 · Finance'}];
+function renderVerbatims(filter){
+  const el=document.getElementById('verbatim-list');if(!el)return;el.innerHTML='';
+  const filtered=filter==='all'?VERBS:VERBS.filter(v=>v.theme.toLowerCase().includes(filter)||filter==='neg'&&v.score<3.5);
+  filtered.forEach(v=>{
+    const d=document.createElement('div');d.className='verbatim-card';
+    const stars='⭐'.repeat(Math.round(v.score))+'☆'.repeat(5-Math.round(v.score));
+    d.innerHTML=`<div class="vc-header"><span class="vc-theme" style="background:${v.thc};color:${v.tc}">${v.theme}</span><div class="vc-score"><span style="font-size:12px">${stars}</span><span>${v.score}</span></div></div><div class="vc-text">${v.txt}</div><div class="vc-footer"><div class="vc-meta">${v.seg}</div><div class="vc-actions"><button class="vc-btn" style="background:var(--cd);color:var(--coral)" onclick="showToast('Verbatim ajouté aux favoris ⭐','⭐')">⭐ Sauvegarder</button><button class="vc-btn" style="background:var(--md);color:var(--mint)" onclick="showToast('Verbatim copié','📋')">📋 Copier</button></div></div>`;
+    el.appendChild(d);
+  });
+}
+function filterVerb(el, f){document.querySelectorAll('.vf-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderVerbatims(f)}
+
+// ═══ CLUSTERS ════════════════════════════════════════════════
+const CLUSTERS=[{n:'Performance & vitesse',pct:74,c:'#E07D0A',bg:'rgba(224,125,10,.12)',size:48,desc:'Les répondants associent le trail à la performance physique et la vitesse. Le naming doit refléter cet ADN.',exs:['KinetoRun','PowerTrail','VelocityStep']},{n:'Légèreté & fluidité',pct:58,c:'#A14E08',bg:'rgba(161,78,8,.12)',size:42,desc:'La légèreté est un critère différenciant fort. Les noms évoquant l\'air, le vol ou la fluidité sont plébiscités.',exs:['FeatherStep','AirTrek','FloatRun']},{n:'Confort & durabilité',pct:49,c:'#0BAB84',bg:'rgba(11,171,132,.15)',size:38,desc:'Un segment de répondants prioritise le confort sur la performance pure. Profil 35-49 ans, trail loisir.',exs:['EasyTrail','ComfortRun','SteadyStep']},{n:'Accessibilité & entrée',pct:41,c:'#F5A623',bg:'rgba(245,166,35,.15)',size:34,desc:'Les débutants cherchent un nom rassurant, non intimidant. Potentiel pour une déclinaison gamme junior.',exs:['TrailEase','OpenRun','FirstStep']},{n:'Nature & liberté',pct:31,c:'#22C55E',bg:'rgba(34,197,94,.12)',size:28,desc:'L\'ancrage nature/outdoor ressort dans un tiers des réponses. Lié au thème éco-responsable.',exs:['WildStep','NatureRun','FreeTrail']},{n:'Sensibilité prix',pct:22,c:'#F87171',bg:'rgba(239,68,68,.1)',size:24,desc:'Un segment minoritaire mais à surveiller — l\'attractivité prix reste un frein à l\'adoption.',exs:[]},{n:'Émotionnel & identitaire',pct:18,c:'#60A5FA',bg:'rgba(96,165,250,.1)',size:20,desc:'Des réponses très personnalisées évoquant l\'identité, l\'appartenance à une communauté de coureurs.',exs:['TribTrail','RunClan','PackRun']}];
+function renderClusters(){
+  const cm=document.getElementById('cluster-map');if(!cm)return;cm.innerHTML='';
+  CLUSTERS.forEach(c=>{const d=document.createElement('div');d.className='cluster-bubble';d.style.cssText=`background:${c.bg};border:2px solid ${c.c}33;color:${c.c};font-size:${Math.max(11,Math.min(15,c.pct/6))}px;cursor:pointer;transition:all .15s`;d.textContent=c.n+' · '+c.pct+'%';d.onclick=()=>{document.getElementById('cluster-detail').scrollIntoView({behavior:'smooth'})};cm.appendChild(d)});
+  const cd=document.getElementById('cluster-detail');if(!cd)return;cd.innerHTML='';
+  CLUSTERS.forEach(c=>{const d=document.createElement('div');d.style.cssText=`background:var(--card);border:1px solid ${c.c}33;border-left:3px solid ${c.c};border-radius:var(--rs);padding:16px 18px;margin-bottom:11px`;d.innerHTML=`<div style="display:flex;align-items:center;gap:11px;margin-bottom:9px"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:${c.c}">${c.n}</div><div style="margin-left:auto;font-family:var(--fd);font-weight:800;font-size:18px;color:${c.c}">${c.pct}%</div></div><div style="font-size:12px;color:var(--ink2);line-height:1.65;margin-bottom:${c.exs.length?'10px':'0'}">${c.desc}</div>${c.exs.length?`<div style="display:flex;gap:7px;flex-wrap:wrap">${c.exs.map(e=>`<span style="padding:4px 11px;border-radius:99px;background:${c.bg};color:${c.c};font-size:12px;font-weight:700">${e}</span>`).join('')}</div>`:''}`; cd.appendChild(d)});
+}
+
+// ═══ RECOMMENDATIONS ════════════════════════════════════════
+const RECOS=[{priority:'Priorité haute',prio_c:'var(--coral)',border:'var(--coral)',title:'Privilégier la sémantique "Performance" dans le naming final',desc:'74% des répondants associent le trail à la performance et la vitesse. Les noms testés evoquant la cinétique (KinetoRun, VelocityStep) obtiennent les meilleures notes. Évitez les termes trop génériques.',action:'Tester 3 noms phase 2',action_c:'var(--coral)'},{priority:'Priorité haute',prio_c:'var(--coral)',border:'var(--coral)',title:'Segmenter la communication Légèreté vs Performance par âge',desc:'Les 18-24 ans plébiscitent la légèreté (AirTrek, FeatherStep) tandis que les 25-34 ans sont davantage attirés par la performance pure. Envisager deux déclinaisons selon le canal.',action:'Créer étude phase 2',action_c:'var(--coral)'},{priority:'Priorité moyenne',prio_c:'var(--amber)',border:'var(--amber)',title:'Traiter le frein prix dans la stratégie de lancement',desc:'22% des réponses mentionnent le prix comme facteur bloquant indépendamment du nom. Une communication sur le positionnement valeur/qualité est recommandée dès le lancement.',action:'Partager aux équipes',action_c:'var(--amber)'},{priority:'Opportunité',prio_c:'var(--mint)',border:'var(--mint)',title:'Explorer une déclinaison gamme débutants "TrailEase"',desc:'Un segment de 49% prioritise le confort et l\'accessibilité. Le profil 35-49 ans trail loisir est sous-adressé. Un nom rassurant type TrailEase ou OpenRun pourrait conquérir ce segment.',action:'Planifier étude complémentaire',action_c:'var(--mint)'}];
+function renderRecos(){
+  const el=document.getElementById('reco-list');if(!el)return;el.innerHTML='';
+  RECOS.forEach((r,i)=>{const d=document.createElement('div');d.className='reco-card';d.style.borderLeftColor=r.border;d.innerHTML=`<div class="reco-priority" style="color:${r.prio_c}">${r.priority}</div><div class="reco-title">${r.title}</div><div class="reco-desc">${r.desc}</div><div class="reco-action"><button class="reco-action-btn" style="background:${r.prio_c}18;color:${r.prio_c};border:none" onclick="showToast('Action enregistrée ✅','✅')">${r.action}</button><button class="reco-action-btn" style="background:var(--card);color:var(--ink3);border:1px solid var(--border)" onclick="showToast('Copié dans le presse-papiers','📋')">📋 Copier</button></div>`;el.appendChild(d)});
+}
+
+// ═══ CONFETTI ════════════════════════════════════════════════
+function spawnConfetti(){
+  const clrs=['#E07D0A','#A14E08','#F5A623','#0BAB84','#3B82F6','#FF69B4'];
+  for(let i=0;i<48;i++){const p=document.createElement('div');p.className='conf-p';const c=clrs[Math.floor(Math.random()*clrs.length)];const w=Math.random()*10+4,h=Math.random()*10+4;p.style.cssText=`width:${w}px;height:${h}px;background:${c};left:${Math.random()*100}%;animation-duration:${Math.random()*1.8+1}s;animation-delay:${Math.random()*.6}s`;document.body.appendChild(p);setTimeout(()=>p.remove(),(2.4+.6)*1000)}
+}
+
+// ═══ TOAST ═══════════════════════════════════════════════════
+let toastTimer=null;
+function showToast(msg,ico='✅'){
+  const t=document.getElementById('toast');const m=document.getElementById('toast-msg');const i=document.getElementById('toast-ico');
+  if(m)m.textContent=msg;if(i)i.textContent=ico;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ═══ INIT ════════════════════════════════════════════════════
+window.addEventListener('load',()=>{
+  updVol(500);updAud();updatePreview();
+  renderVerbatims('all');renderClusters();renderRecos();
+  const inp=document.getElementById('q-text-inp');if(inp)inp.addEventListener('input',updatePreview);
+});
+</script>
+
+<!-- ═══ AUTH WALL ══════════════════════════════════════════════ -->
+<div id="auth-wall" style="position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:28px;overflow-y:auto">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.08)">
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
+      <div style="width:40px;height:40px;border-radius:11px;background:var(--coral);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:20px;color:#fff;box-shadow:0 4px 14px var(--cg);flex-shrink:0">N</div>
+      <div>
+        <div style="font-family:var(--fd);font-weight:800;font-size:18px;color:var(--ink);letter-spacing:-.5px">Noova</div>
+        <div style="font-size:11px;color:var(--ink3);font-weight:500">Espace commerçant</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:0;background:var(--bg2);border-radius:11px;padding:3px;margin-bottom:22px">
+      <button id="aw-tab-login" onclick="awTab('login')" style="flex:1;padding:10px;border-radius:9px;font-size:13px;font-weight:700;border:none;background:white;color:var(--ink);font-family:var(--fb);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.06)">Connexion</button>
+      <button id="aw-tab-register" onclick="awTab('register')" style="flex:1;padding:10px;border-radius:9px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--ink3);font-family:var(--fb);cursor:pointer">Créer un compte</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <input id="aw-brand"  type="text"     placeholder="Nom de ton commerce"           autocomplete="organization"    style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <input id="aw-sector" type="text"     placeholder="Secteur (ex: Restauration…)"                                  style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <input id="aw-city"   type="text"     placeholder="Ville (ex: Paris, Lyon…)"      autocomplete="address-level2"  style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <input id="aw-email"  type="email"    placeholder="Email professionnel"            autocomplete="email"           style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <input id="aw-pass"   type="password" placeholder="Mot de passe"                  autocomplete="current-password" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <div id="aw-err" style="color:#EF4444;font-size:12px;display:none;padding:9px 12px;background:rgba(239,68,68,.08);border-radius:8px"></div>
+      <button id="aw-submit" onclick="awSubmit()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg);margin-top:4px">Connexion</button>
+    </div>
+
+    <div style="margin-top:18px;font-size:11px;color:var(--ink3);text-align:center">En continuant tu acceptes nos <span style="color:var(--coral)">CGU</span></div>
+  </div>
+</div>
+
+<!-- ═══ FIREBASE ══════════════════════════════════════════════ -->
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCU52SgKoIS_P-SEiXFC4d8lQ1rz5mG4to",
+  authDomain: "noova-366d0.firebaseapp.com",
+  projectId: "noova-366d0",
+  storageBucket: "noova-366d0.firebasestorage.app",
+  messagingSenderId: "710589257687",
+  appId: "1:710589257687:web:946b5d1efffabff14d9d92"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+let _mData      = null;
+let _mCampaigns = [];
+
+// ─── Auth UI ─────────────────────────────────────────────────
+let _awMode = 'login';
+function awTab(mode) {
+  _awMode = mode;
+  const isReg = mode === 'register';
+  ['aw-brand','aw-sector','aw-city'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isReg ? 'block' : 'none';
+  });
+  const a = 'flex:1;padding:10px;border-radius:9px;font-size:13px;font-weight:700;border:none;background:white;color:var(--ink);font-family:var(--fb);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.06)';
+  const i = 'flex:1;padding:10px;border-radius:9px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--ink3);font-family:var(--fb);cursor:pointer';
+  document.getElementById('aw-tab-login').style.cssText    = !isReg ? a : i;
+  document.getElementById('aw-tab-register').style.cssText = isReg  ? a : i;
+  document.getElementById('aw-submit').textContent = isReg ? 'Créer mon compte' : 'Connexion';
+  document.getElementById('aw-err').style.display = 'none';
+}
+
+function awShowErr(msg) { const e=document.getElementById('aw-err'); e.textContent=msg; e.style.display='block'; }
+
+function awFrErr(code) {
+  return ({'auth/wrong-password':'Mot de passe incorrect.','auth/user-not-found':'Aucun compte avec cet email.','auth/invalid-credential':'Email ou mot de passe incorrect.','auth/email-already-in-use':'Cet email est déjà utilisé.','auth/weak-password':'Mot de passe trop court (6 car. min).','auth/invalid-email':'Email invalide.'})[code]||'Erreur. Réessaie.';
+}
+
+async function awSubmit() {
+  const email = document.getElementById('aw-email').value.trim();
+  const pass  = document.getElementById('aw-pass').value;
+  if(!email || !pass) { awShowErr('Remplis tous les champs.'); return; }
+  const btn = document.getElementById('aw-submit');
+  btn.textContent = '…'; btn.disabled = true;
+  document.getElementById('aw-err').style.display = 'none';
+  try {
+    if(_awMode === 'login') {
+      await auth.signInWithEmailAndPassword(email, pass);
+    } else {
+      const brand  = document.getElementById('aw-brand').value.trim();
+      const sector = document.getElementById('aw-sector').value.trim();
+      const city   = document.getElementById('aw-city').value.trim();
+      if(!brand || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      await db.collection('merchants').doc(cred.user.uid).set({
+        brandName: brand, email, sector: sector||'Commerce', city,
+        plan: 'starter', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  } catch(e) {
+    btn.textContent = _awMode==='login' ? 'Connexion' : 'Créer mon compte';
+    btn.disabled = false; awShowErr(awFrErr(e.code));
+  }
+}
+
+// ─── Load merchant + init dashboard ─────────────────────────
+async function loadMerchantAndStart(uid) {
+  const snap = await db.collection('merchants').doc(uid).get();
+  if(!snap.exists) {
+    awTab('register');
+    document.getElementById('auth-wall').style.display = 'flex';
+    awShowErr('Connecte-toi avec un compte commerçant.');
+    await auth.signOut(); return;
+  }
+  _mData = snap.data();
+
+  // Mettre à jour la sidebar avec les vraies données
+  const sbn = document.querySelector('.sb-brand-name');
+  const sbp = document.querySelector('.sb-brand-plan');
+  const sun = document.querySelector('.sb-user-name');
+  const sur = document.querySelector('.sb-user-role');
+  if(sbn) sbn.textContent = _mData.brandName || '';
+  if(sbp) sbp.textContent = (_mData.plan||'Starter') + ' · ' + (_mData.city||'');
+  if(sun) sun.textContent = _mData.brandName || '';
+  if(sur) sur.textContent = _mData.sector || 'Commerçant';
+  document.getElementById('topbar-sub').textContent = 'Bienvenue — ' + (_mData.brandName||'');
+
+  const aw = document.getElementById('auth-wall');
+  aw.style.transition = 'opacity .3s'; aw.style.opacity = '0';
+  setTimeout(()=>{ aw.style.display='none'; }, 320);
+
+  loadMerchantCampaigns(uid);
+}
+
+function loadMerchantCampaigns(uid) {
+  db.collection('campaigns')
+    .where('merchantId','==',uid)
+    .orderBy('createdAt','desc')
+    .onSnapshot(snap => {
+      _mCampaigns = [];
+      snap.forEach(doc => _mCampaigns.push({ id:doc.id, ...doc.data() }));
+      renderFirestoreCampaigns(_mCampaigns);
+      updateKPIFromCampaigns(_mCampaigns);
+    }, err => console.warn('campaigns listener:', err));
+}
+
+function renderFirestoreCampaigns(camps) {
+  if(!camps.length) return;
+  const stMap = { active:'live', draft:'draft', paused:'paused', completed:'done' };
+  const stLbl = { active:'En cours', draft:'Brouillon', paused:'Pausée', completed:'Terminée' };
+  // Update the campaigns page table
+  const pages = ['page-dashboard','page-campaigns'];
+  pages.forEach(pageId => {
+    const page = document.getElementById(pageId);
+    if(!page) return;
+    page.querySelectorAll('.camp-row').forEach(r=>r.remove());
+    const card = page.querySelector('.card');
+    if(!card) return;
+    camps.forEach(c => {
+      const pct = c.volumeTarget ? Math.min(100, Math.round((c.answersCount||0)/c.volumeTarget*100)) : 0;
+      const st  = stMap[c.status] || 'draft';
+      const row = document.createElement('div');
+      row.className = 'camp-row';
+      row.innerHTML = `
+        <div class="camp-name-wrap"><div class="camp-ico">${c.brandEmoji||'🏪'}</div><div><div class="camp-name">${(c.question||'').substring(0,38)}…</div><div class="camp-date">${c.targetCity||'France'}</div></div></div>
+        <div><span class="status-pill ${st}">${stLbl[c.status]||'Brouillon'}</span></div>
+        <div><div class="camp-metric">${c.answersCount||0}</div><div class="camp-metric-sub">/ ${c.volumeTarget||100} obj.</div></div>
+        <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:${pct}%;background:var(--mint)"></div></div><div class="cprog-lbl">${pct}%</div></div>
+        <div class="camp-actions"><button class="camp-act-btn" style="background:var(--md);color:var(--mint)" onclick="viewCampaign('${c.id}')">Voir</button></div>`;
+      card.appendChild(row);
+    });
+  });
+}
+
+function updateKPIFromCampaigns(camps) {
+  const total = camps.reduce((a,c)=>a+(c.answersCount||0), 0);
+  const kpis = document.querySelectorAll('.kpi-val');
+  if(kpis[0]) kpis[0].firstChild.textContent = total.toLocaleString('fr-FR');
+  if(kpis[3]) kpis[3].firstChild.textContent = camps.filter(c=>c.status==='active').length;
+}
+
+function viewCampaign(campaignId) {
+  navTo('results', document.querySelectorAll('.sb-item')[3]);
+  db.collection('answers').where('campaignId','==',campaignId)
+    .orderBy('createdAt','desc').get().then(snap => {
+      const el = document.getElementById('verbatim-list');
+      if(!el) return; el.innerHTML = '';
+      if(snap.empty) { el.innerHTML='<div style="padding:20px;color:var(--ink3);font-size:13px">Aucune réponse pour l\'instant.</div>'; return; }
+      snap.forEach(doc => {
+        const d = doc.data();
+        const div = document.createElement('div'); div.className = 'verbatim-card';
+        const ts = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+        div.innerHTML = `<div class="vc-header"><span class="vc-theme" style="background:var(--cd);color:var(--coral)">Réponse</span></div><div class="vc-text">${d.answer||'—'}</div><div class="vc-footer"><div class="vc-meta">${ts}</div></div>`;
+        el.appendChild(div);
+      });
+      resTab('verbatims', document.querySelectorAll('.res-tab')[1]);
+    }).catch(e => console.warn('viewCampaign:', e));
+}
+
+// ─── Patch launchCampaign → Firestore ────────────────────────
+const _origLaunchCampaign = launchCampaign;
+launchCampaign = async function() {
+  const u = auth.currentUser;
+  if(!u || !_mData) { showToast('Connecte-toi pour lancer','⚠️'); return; }
+  const question = document.getElementById('q-text-inp')?.value?.trim();
+  if(!question) { showToast('Saisis une question d\'abord','⚠️'); return; }
+  const options  = Array.from(document.querySelectorAll('.mcq-opt-inp')).map(i=>i.value).filter(Boolean);
+  const volume   = parseInt(document.getElementById('vol-num')?.textContent)||100;
+  const themes   = Array.from(document.querySelectorAll('.th-chip.sel')).map(el=>el.textContent.replace(/[^\w\s\-éèêàùç]/gi,'').trim());
+  const city     = _mData.city || '';
+  try {
+    await db.collection('campaigns').add({
+      merchantId:     u.uid,
+      merchantName:   _mData.brandName || '',
+      brandEmoji:     '🏪',
+      sector:         _mData.sector || 'Commerce',
+      question,
+      format:         curFmt,
+      options,
+      targetCity:     city,
+      targetInterests: themes,
+      volumeTarget:   volume,
+      pointsPerAnswer: 20,
+      answersCount:   0,
+      status:         'active',
+      createdAt:      firebase.firestore.FieldValue.serverTimestamp()
+    });
+    _origLaunchCampaign();
+  } catch(e) {
+    showToast('Erreur : ' + e.message, '❌');
+  }
+};
+
+// ─── Déconnexion ─────────────────────────────────────────────
+function logout() {
+  auth.signOut().then(()=>{
+    const aw = document.getElementById('auth-wall');
+    aw.style.display='flex'; aw.style.opacity='1';
+  });
+}
+
+// ─── Observer principal ───────────────────────────────────────
+auth.onAuthStateChanged(user => {
+  const aw = document.getElementById('auth-wall');
+  if(user) {
+    loadMerchantAndStart(user.uid);
+  } else {
+    aw.style.display='flex'; aw.style.opacity='1';
+  }
+});
+</script>
+</body>
+</html>

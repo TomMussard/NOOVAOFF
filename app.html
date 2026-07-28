@@ -18,6 +18,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Firebase compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
 :root{
   --bg:#F7F6F2;--bg2:#EEECEA;--bg3:#E0DDD8;--card:#FFFFFF;
@@ -1468,6 +1472,223 @@ function gameReveal(mine){
 }
 function shareGame(b){const t=b.textContent;b.textContent='✓ Partagé en story';setTimeout(()=>b.textContent=t,1600);}
 
+</script>
+
+<!-- ═══ AUTH WALL ══════════════════════════════════════════════ -->
+<div id="auth-wall" style="position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;overflow-y:auto;padding-top:calc(40px + env(safe-area-inset-top,0px));padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))">
+
+  <div style="text-align:center;margin-bottom:36px">
+    <div style="font-family:var(--fd);font-weight:800;font-size:56px;letter-spacing:-2px;color:var(--coral);line-height:1">noova</div>
+    <div style="font-size:14px;color:var(--ink2);margin-top:10px;line-height:1.7">Tes avis valent de l'argent.<br>Réponds aux commerces de ton quartier.</div>
+  </div>
+
+  <div style="display:flex;gap:0;background:var(--bg2);border-radius:13px;padding:4px;width:100%;max-width:340px;margin-bottom:20px">
+    <button id="aw-tab-login" onclick="awTab('login')" style="flex:1;padding:11px;border-radius:10px;font-size:13px;font-weight:700;border:none;background:white;color:var(--ink);font-family:var(--fb);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.08)">Se connecter</button>
+    <button id="aw-tab-register" onclick="awTab('register')" style="flex:1;padding:11px;border-radius:10px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--ink3);font-family:var(--fb);cursor:pointer">S'inscrire</button>
+  </div>
+
+  <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:11px">
+    <input id="aw-name" type="text" placeholder="Ton prénom" autocomplete="name" style="display:none;width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+    <input id="aw-city" type="text" placeholder="Ta ville (ex: Paris, Lyon…)" autocomplete="address-level2" style="display:none;width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+    <input id="aw-email" type="email" placeholder="Email" autocomplete="email" style="width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+    <input id="aw-pass" type="password" placeholder="Mot de passe" autocomplete="current-password" style="width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+    <div id="aw-err" style="color:#EF4444;font-size:12px;display:none;padding:9px 12px;background:rgba(239,68,68,.08);border-radius:8px;text-align:center"></div>
+    <button id="aw-submit" onclick="awSubmit()" style="width:100%;padding:16px;border-radius:14px;background:var(--coral);border:none;color:#fff;font-size:16px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 6px 20px rgba(224,125,10,.35);margin-top:3px">Se connecter</button>
+  </div>
+
+  <div style="margin-top:24px;font-size:11px;color:var(--ink3);text-align:center;line-height:1.8">En continuant tu acceptes nos <span style="color:var(--coral)">CGU</span> et notre <span style="color:var(--coral)">Politique de confidentialité</span></div>
+</div>
+
+<!-- ═══ FIREBASE ══════════════════════════════════════════════ -->
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCU52SgKoIS_P-SEiXFC4d8lQ1rz5mG4to",
+  authDomain: "noova-366d0.firebaseapp.com",
+  projectId: "noova-366d0",
+  storageBucket: "noova-366d0.firebasestorage.app",
+  messagingSenderId: "710589257687",
+  appId: "1:710589257687:web:946b5d1efffabff14d9d92"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ─── Auth UI ─────────────────────────────────────────────────
+let _awMode = 'login';
+
+function awTab(mode) {
+  _awMode = mode;
+  const isReg = mode === 'register';
+  document.getElementById('aw-name').style.display = isReg ? 'block' : 'none';
+  document.getElementById('aw-city').style.display = isReg ? 'block' : 'none';
+  const aStyle = 'flex:1;padding:11px;border-radius:10px;font-size:13px;font-weight:700;border:none;background:white;color:var(--ink);font-family:var(--fb);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.08)';
+  const iStyle = 'flex:1;padding:11px;border-radius:10px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--ink3);font-family:var(--fb);cursor:pointer';
+  document.getElementById('aw-tab-login').style.cssText = !isReg ? aStyle : iStyle;
+  document.getElementById('aw-tab-register').style.cssText = isReg ? aStyle : iStyle;
+  document.getElementById('aw-submit').textContent = isReg ? 'Créer mon compte' : 'Se connecter';
+  document.getElementById('aw-err').style.display = 'none';
+}
+
+function awShowErr(msg) {
+  const e = document.getElementById('aw-err');
+  e.textContent = msg; e.style.display = 'block';
+}
+
+function awFrErr(code) {
+  return ({
+    'auth/wrong-password':'Mot de passe incorrect.',
+    'auth/user-not-found':'Aucun compte avec cet email.',
+    'auth/invalid-credential':'Email ou mot de passe incorrect.',
+    'auth/email-already-in-use':'Cet email est déjà utilisé.',
+    'auth/weak-password':'Mot de passe trop court (6 car. min).',
+    'auth/invalid-email':'Email invalide.'
+  })[code] || 'Erreur. Réessaie.';
+}
+
+async function awSubmit() {
+  const email = document.getElementById('aw-email').value.trim();
+  const pass  = document.getElementById('aw-pass').value;
+  if(!email || !pass) { awShowErr('Remplis tous les champs.'); return; }
+  const btn = document.getElementById('aw-submit');
+  btn.textContent = '…'; btn.disabled = true;
+  document.getElementById('aw-err').style.display = 'none';
+  try {
+    if(_awMode === 'login') {
+      await auth.signInWithEmailAndPassword(email, pass);
+    } else {
+      const name = document.getElementById('aw-name').value.trim();
+      const city = document.getElementById('aw-city').value.trim();
+      if(!name || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      await db.collection('users').doc(cred.user.uid).set({
+        name, email, city,
+        points: 0,
+        answeredCampaigns: [],
+        interests: ['sport','gaming','culture'],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  } catch(e) {
+    btn.textContent = _awMode === 'login' ? 'Se connecter' : 'Créer mon compte';
+    btn.disabled = false;
+    awShowErr(awFrErr(e.code));
+  }
+}
+
+// ─── Load user + démarrer l'app ──────────────────────────────
+async function loadUserAndStart(uid) {
+  try {
+    const snap = await db.collection('users').doc(uid).get();
+    const data = snap.exists ? snap.data() : {};
+    S.user = { name: data.name || 'Toi', uid };
+    S.pts   = data.points || 0;
+    S._city      = data.city || '';
+    S._interests = data.interests || ['sport','gaming','culture'];
+    S._answered  = data.answeredCampaigns || [];
+    await loadCampaignsFromFirestore(data);
+  } catch(e) {
+    S.user = { name: 'Toi', uid };
+    S.qs = [...QS];
+  }
+  const aw = document.getElementById('auth-wall');
+  aw.style.transition = 'opacity .3s';
+  aw.style.opacity = '0';
+  setTimeout(() => { aw.style.display = 'none'; }, 320);
+  document.getElementById('bnav').classList.add('show');
+  refreshHome(); renderSocial(); goTo('home');
+}
+
+async function loadCampaignsFromFirestore(userData) {
+  try {
+    const snap = await db.collection('campaigns').where('status','==','active').limit(25).get();
+    const answered = userData.answeredCampaigns || [];
+    const campaigns = [];
+    snap.forEach(doc => {
+      if(answered.includes(doc.id)) return;
+      const d = doc.data();
+      if(d.targetCity && userData.city &&
+         d.targetCity.toLowerCase().trim() !== userData.city.toLowerCase().trim()) return;
+      campaigns.push({
+        _firestoreId: doc.id,
+        _merchantId:  d.merchantId || null,
+        brand: d.merchantName || 'Commerce',
+        ico:   d.brandEmoji   || '🏪',
+        theme: d.sector       || 'Commerce local',
+        pts:   d.pointsPerAnswer || 20,
+        type:  d.format       || 'text',
+        q:     d.question,
+        hint:  'Donne ton avis',
+        opts:  d.options || [],
+        items: d.options || [],
+        usage: (d.merchantName||'Ce commerce') + ' veut ton avis'
+      });
+    });
+    S.qs = campaigns.length ? campaigns : [...QS];
+    S.qIdx = 0;
+  } catch(e) {
+    S.qs = [...QS];
+  }
+}
+
+// ─── Lecture de la réponse depuis le DOM ─────────────────────
+function getAnswerValue() {
+  const ta  = document.querySelector('#ans-area .ans-ta');  if(ta)  return ta.value;
+  const sel = document.querySelector('#ans-area .mcq-opt.sel span'); if(sel) return sel.textContent;
+  const sv  = document.getElementById('sv');               if(sv)  return sv.textContent;
+  const rks = document.querySelectorAll('#ans-area .rank-item span');
+  if(rks.length) return Array.from(rks).map(r=>r.textContent).join(' > ');
+  return '';
+}
+
+// ─── Patch submitAns → sauvegarde Firestore ──────────────────
+const _origSubmitAns = submitAns;
+submitAns = function() {
+  const q = curQuestion();
+  const answerValue = getAnswerValue();
+  _origSubmitAns();
+  const u = auth.currentUser;
+  if(!u || !q) return;
+  const uid = u.uid;
+  const batch = db.batch();
+  batch.set(db.collection('answers').doc(), {
+    campaignId:   q._firestoreId || null,
+    userId:       uid,
+    merchantId:   q._merchantId  || null,
+    brand:        q.brand,
+    answer:       answerValue,
+    pointsAwarded: q.pts,
+    createdAt:    firebase.firestore.FieldValue.serverTimestamp()
+  });
+  const userRef = db.collection('users').doc(uid);
+  const upd = { points: firebase.firestore.FieldValue.increment(q.pts) };
+  if(q._firestoreId) upd.answeredCampaigns = firebase.firestore.FieldValue.arrayUnion(q._firestoreId);
+  batch.update(userRef, upd);
+  if(q._firestoreId) {
+    batch.update(db.collection('campaigns').doc(q._firestoreId), {
+      answersCount: firebase.firestore.FieldValue.increment(1)
+    });
+  }
+  batch.commit().catch(e => console.warn('Firestore answer save:', e));
+};
+
+// ─── Déconnexion ─────────────────────────────────────────────
+function logout() {
+  auth.signOut().then(() => {
+    const aw = document.getElementById('auth-wall');
+    aw.style.display = 'flex'; aw.style.opacity = '1';
+    S.user = null; S.pts = 0; S.qs = [];
+  });
+}
+
+// ─── Observer principal ───────────────────────────────────────
+auth.onAuthStateChanged(user => {
+  const aw = document.getElementById('auth-wall');
+  if(user) {
+    loadUserAndStart(user.uid);
+  } else {
+    aw.style.display = 'flex'; aw.style.opacity = '1';
+  }
+});
 </script>
 </body>
 </html>
