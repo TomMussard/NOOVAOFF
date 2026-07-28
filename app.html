@@ -29,8 +29,9 @@
   --r:20px;--rs:13px;--fd:'Bricolage Grotesque',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb);-webkit-font-smoothing:antialiased}
+html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-webkit-font-smoothing:antialiased}
 #shell{position:fixed;inset:0;background:var(--bg);overflow:hidden}
+
 .bg-label{display:none}
 #app{position:absolute;inset:0;overflow:hidden;background:var(--bg)}
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;transform:translateX(26px);-webkit-overflow-scrolling:touch;background:var(--bg);padding-top:env(safe-area-inset-top,0px)}
@@ -193,20 +194,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .scale-inp::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--coral);box-shadow:0 4px 12px var(--cg);cursor:pointer;transition:transform .12s}
 .scale-inp::-webkit-slider-thumb:active{transform:scale(1.2)}
 .rank-list{display:flex;flex-direction:column;gap:7px}
-.rank-item{padding:11px 13px;border-radius:12px;background:var(--card);border:1.5px solid var(--bg3);display:flex;align-items:center;gap:10px;cursor:grab;user-select:none}
+.rank-item{padding:11px 13px;border-radius:12px;background:var(--card);border:1.5px solid var(--bg3);display:flex;align-items:center;gap:10px;cursor:default;user-select:none}
 .rank-item.dragging{opacity:.4;transform:scale(.96)}
 .rank-grip{font-size:14px;color:var(--ink3)}
 .rank-num{width:24px;height:24px;border-radius:7px;background:var(--vd);color:var(--violet);font-family:var(--fd);font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .rank-txt{flex:1;font-size:13px;font-weight:500;color:var(--ink)}
-.ai-panel{background:var(--grad-soft);border:1.5px solid rgba(161,78,8,.12);border-radius:13px;padding:11px 13px;margin-top:9px}
-.ai-tog{display:flex;align-items:center;gap:8px;cursor:pointer;background:none;border:none;width:100%;text-align:left;font-family:var(--fb);padding:0}
-.ai-lbl{flex:1;font-size:12px;font-weight:600;color:var(--violet)}
-.ai-badge{font-size:9px;font-weight:700;background:rgba(161,78,8,.14);color:var(--violet);padding:2px 6px;border-radius:99px}
-.ai-chev{font-size:11px;color:var(--violet);transition:transform .2s;display:inline-block}
-.ai-chev.open{transform:rotate(180deg)}
-.ai-body{margin-top:9px;display:none;flex-direction:column;gap:5px}
-.ai-body.show{display:flex}
-.ai-tip{font-size:11px;color:var(--ink2);line-height:1.6;padding:7px 9px;background:rgba(255,255,255,.7);border-radius:8px}
+.rank-arrows{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.rank-arr{width:32px;height:20px;border-radius:7px;background:var(--vd);border:1.5px solid var(--vg);color:var(--violet);font-size:10px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--fb);padding:0;transition:transform .1s}
+.rank-arr:active{transform:scale(.85)}
+.rank-arr:disabled{opacity:.28;cursor:default}
 .q-actions{display:flex;gap:9px;margin-top:10px;flex-shrink:0}
 .skip-btn{padding:12px 16px;border-radius:12px;background:var(--card);border:1.5px solid var(--bg3);color:var(--ink2);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--fb);transition:all .13s}
 /* REWARD */
@@ -453,7 +449,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 </style>
 </head>
 <body>
-<div class="bg-label">Noova — Prototype interactif complet</div>
+<div class="bg-label">Noova</div>
 <div id="shell">
 <div id="app">
 
@@ -478,7 +474,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
             <div style="font-size:28px;background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center">🌯</div>
             <div style="font-size:28px;background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center">🏋️</div>
             <div style="font-size:28px;background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center">💇</div>
-            <div style="font-size:28px;background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center">🎬</div>
+            <div style="font-size:28px;background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center">🍕</div>
             <div style="font-size:28px;background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center">🛒</div>
           </div>
         </div>
@@ -487,7 +483,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
           <div class="ob-step"><div class="ob-step-n">1</div><span style="font-size:13px;font-weight:500">Choisis ta ville & tes intérêts</span></div>
           <div class="ob-step"><div class="ob-step-n">2</div><span style="font-size:13px;font-weight:500">Autorise les commerces près de toi</span></div>
           <div class="ob-step"><div class="ob-step-n">3</div><span style="font-size:13px;font-weight:500">Réponds à leurs questions (30 s)</span></div>
-          <div class="ob-step"><div class="ob-step-n">4</div><span style="font-size:13px;font-weight:500">Gagne café, kebab, ciné offerts 🌯</span></div>
+          <div class="ob-step"><div class="ob-step-n">4</div><span style="font-size:13px;font-weight:500">Gagne café, kebab, pizza offerts 🌯</span></div>
         </div>
       </div>
       <div class="ob-slide" id="ob1">
@@ -496,12 +492,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
             <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:#D6442E;color:#fff;font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">K</span>Kebab O'Coin</div>
             <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:#6B4226;color:#fff;font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">C</span>Café de la Place</div>
             <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:#C9821A;color:#fff;font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">F</span>Le Fournil</div>
-            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:#2D6CDF;color:#fff;font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">C</span>Cinéville</div>
+            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:#D35400;color:#fff;font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">P</span>Pizzeria Bella</div>
+            <div style="font-size:13px;font-weight:800;letter-spacing:1.5px;color:var(--ink3);background:#fff;border-radius:11px;padding:8px 14px;display:flex;align-items:center">•••</div>
           </div>
           <div style="font-size:11px;color:rgba(161,78,8,.65);font-weight:600;text-align:center">Consentement révocable en 1 tap</div>
         </div>
         <h1 class="ob-title">Tu choisis<br>qui te<br><em>contacte.</em></h1>
-        <p class="ob-desc">Tu décides, commerce par commerce, qui peut te poser des questions. Seuls ceux que tu acceptes te contactent — et tu peux en retirer un quand tu veux.</p>
+        <p class="ob-desc">Tu décides, commerce par commerce, qui peut te poser des questions. Seuls ceux que tu acceptes te contactent, et tu peux en retirer un quand tu veux.</p>
       </div>
       <div class="ob-slide" id="ob2">
         <div class="ob-illo" style="background:linear-gradient(135deg,#E5F7F3,#CCF0E7);flex-direction:column;align-items:center;justify-content:center;gap:12px">
@@ -513,7 +510,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
           </div>
         </div>
         <h1 class="ob-title">Réponds.<br><em>Gagne.</em><br>Régale-toi.</h1>
-        <p class="ob-desc">Chaque réponse rapporte des points. Échange-les contre un café, un kebab, une place de ciné — chez les commerces de ton quartier, par paliers comme une carte de fidélité.</p>
+        <p class="ob-desc">Chaque réponse rapporte des points. Échange-les contre un café, un kebab, une pizza, chez les commerces de ton quartier, par paliers comme une carte de fidélité.</p>
       </div>
     </div>
     <div class="ob-dots"><div class="ob-dot on" id="d0"></div><div class="ob-dot" id="d1"></div><div class="ob-dot" id="d2"></div></div>
@@ -533,7 +530,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
     <p class="auth-sub">Aucune carte bancaire. Aucun engagement.</p>
     <div class="sso-wrap">
       <button class="sso-btn" onclick="doSSO()"><svg width="19" height="19" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Continuer avec Google</button>
-      <button class="sso-btn" onclick="doSSO()">🍎 Continuer avec Apple</button>
+      <button class="sso-btn" onclick="doSSO()"><svg width="15" height="19" viewBox="0 0 384 512" aria-hidden="true"><path fill="#17141A" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>Continuer avec Apple</button>
     </div>
     <div class="sso-div"><div class="sso-line"></div><div class="sso-or">ou par e-mail</div><div class="sso-line"></div></div>
     <div class="field"><label class="field-lbl">Prénom</label><input type="text" class="field-inp" id="inp-name" placeholder="Ex : Alex" autocomplete="given-name"></div>
@@ -559,6 +556,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
     <div class="auth-badge" style="background:var(--vd);color:var(--violet)">Étape 2 · Thèmes</div>
     <h2 class="auth-title">Tes centres<br>d'intérêt</h2>
     <p class="auth-sub" style="margin-bottom:0">On te proposera les commerces de ces catégories, près de chez toi.</p>
+    <div style="display:flex;justify-content:flex-end;margin:12px 0 -4px"><button id="theme-all-btn" onclick="toggleAllThemes()" style="background:var(--vd);border:1.5px solid var(--vg);color:var(--violet);font-family:var(--fb);font-size:12px;font-weight:700;padding:8px 14px;border-radius:99px;cursor:pointer">Tout sélectionner</button></div>
     <div class="theme-grid" id="theme-grid">
       <div class="theme-tile sel" data-t="resto" onclick="toggleTheme(this)"><span class="te">🍔</span><span class="tn">Restos & fast-food</span></div>
       <div class="theme-tile sel" data-t="cafe" onclick="toggleTheme(this)"><span class="te">🥐</span><span class="tn">Cafés & boulangeries</span></div>
@@ -566,7 +564,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
       <div class="theme-tile" data-t="bio" onclick="toggleTheme(this)"><span class="te">🌿</span><span class="tn">Bio & local</span></div>
       <div class="theme-tile sel" data-t="sport" onclick="toggleTheme(this)"><span class="te">🏋️</span><span class="tn">Sport & forme</span></div>
       <div class="theme-tile" data-t="beaute" onclick="toggleTheme(this)"><span class="te">💇</span><span class="tn">Beauté & coiffure</span></div>
-      <div class="theme-tile" data-t="sorties" onclick="toggleTheme(this)"><span class="te">🎬</span><span class="tn">Sorties & ciné</span></div>
+      <div class="theme-tile" data-t="sorties" onclick="toggleTheme(this)"><span class="te">🎉</span><span class="tn">Sorties & loisirs</span></div>
       <div class="theme-tile" data-t="bars" onclick="toggleTheme(this)"><span class="te">🍻</span><span class="tn">Bars & soirées</span></div>
       <div class="theme-tile" data-t="mode" onclick="toggleTheme(this)"><span class="te">👗</span><span class="tn">Mode & boutiques</span></div>
       <div class="theme-tile" data-t="maison" onclick="toggleTheme(this)"><span class="te">🏠</span><span class="tn">Maison & déco</span></div>
@@ -586,6 +584,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
       <div class="auth-badge" style="background:var(--md);color:var(--mint)">Étape 3 · Tu gardes le contrôle</div>
       <h2 class="auth-title" style="margin-top:8px">Autorise tes<br>commerces</h2>
       <p class="auth-sub" style="margin-bottom:4px">Tu acceptes commerce par commerce. Tu peux revenir en arrière en un tap.</p>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px"><button id="brands-all-btn" onclick="toggleAllBrands()" style="background:var(--md);border:1.5px solid var(--mg);color:var(--mint);font-family:var(--fb);font-size:12px;font-weight:700;padding:8px 14px;border-radius:99px;cursor:pointer">Tout autoriser</button></div>
     </div>
     <div id="brands-list"></div>
     <div class="consent-note" style="margin-bottom:14px"><strong style="color:var(--violet)">Tu gardes le contrôle.</strong> Un commerce ne voit que les réponses que tu lui donnes, rien d'autre. Aucune revente à des tiers. Tu peux n'en activer aucun et jouer quand même.</div>
@@ -646,14 +645,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
     <div class="q-text" id="q-text">Question…</div>
     <div class="q-hint" id="q-hint">Réponds librement.</div>
     <div class="ans-area" id="ans-area"></div>
-    <div class="ai-panel">
-      <button class="ai-tog" onclick="toggleAI()">
-        <span style="font-size:16px">💡</span>
-        <span class="ai-lbl">Pas d'idée ? Un coup de pouce pour répondre</span>
-        <span class="ai-chev" id="ai-chev">▼</span>
-      </button>
-      <div class="ai-body" id="ai-body"></div>
-    </div>
     <div class="q-actions">
       <button class="skip-btn" id="skip-btn" onclick="goNav('home')">Passer</button>
       <button class="btn-sub" id="sub-btn" onclick="submitAns()" disabled>Valider →</button>
@@ -714,12 +705,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
       <div class="wc-lbl">Mon solde</div>
       <div class="wc-pts" id="wc-pts">0 <small>pts</small></div>
       <div class="wc-bar"><div class="wc-fill" id="wc-fill" style="width:4%"></div></div>
-      <div class="wc-level"><span id="wc-level">Niveau 1 — Curieux</span><span id="wc-next">1000 pts</span></div>
+      <div class="wc-level"><span id="wc-level">Niveau 1 · Curieux</span><span id="wc-next">1000 pts</span></div>
     </div>
     <div class="cashout-c">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><span style="font-size:22px">📍</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">Des récompenses concrètes</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">Produits offerts et réductions chez les commerces de ton quartier. C'est là que tes points valent le plus — un peu de cashback reste possible si tu préfères.</div></div></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><span style="font-size:22px">📍</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">Des récompenses concrètes</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">Produits offerts et réductions chez les commerces de ton quartier. C'est là que tes points valent le plus, un peu de cashback reste possible si tu préfères.</div></div></div>
       <div class="co-req"><div class="req-dot" style="background:var(--mint)"></div><span>Bons à présenter au comptoir, chez les commerces de ta ville</span></div>
-      <div class="co-req"><div class="req-dot" style="background:var(--mint)"></div><span>Tes points n'expirent jamais — tu choisis quand les utiliser</span></div>
+      <div class="co-req"><div class="req-dot" style="background:var(--mint)"></div><span>Tes points n'expirent jamais, tu choisis quand les utiliser</span></div>
     </div>
     <div style="font-family:var(--fd);font-weight:700;font-size:16px;letter-spacing:-.4px;color:var(--ink);margin-bottom:10px">🎁 Récompenses près de toi</div>
     <div class="gift-grid" id="gift-grid"></div>
@@ -736,7 +727,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
       <div style="font-family:var(--fd);font-weight:700;font-size:21px;letter-spacing:-.8px;color:var(--ink)" id="prof-name">Alex</div>
       <div style="font-size:12px;color:var(--ink2);margin-top:2px" id="prof-email">alex@noova.app</div>
       <div style="margin-top:12px;background:var(--bg2);border-radius:11px;padding:10px 12px">
-        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span style="font-weight:700;color:var(--ink)" id="pl-name">Niveau 1 — Curieux</span><span style="color:var(--ink2)" id="pl-xp">0 / 1000 pts</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span style="font-weight:700;color:var(--ink)" id="pl-name">Niveau 1 · Curieux</span><span style="color:var(--ink2)" id="pl-xp">0 / 1000 pts</span></div>
         <div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden"><div style="height:100%;background:var(--grad);border-radius:99px;transition:width 1s" id="pl-fill"></div></div>
       </div>
     </div>
@@ -852,7 +843,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
           <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:rgba(255,255,255,.7)">
             <div>📝 <strong style="color:#fff">Question :</strong> <span id="recap-q">—</span></div>
             <div>☑️ <strong style="color:#fff">Format :</strong> <span id="recap-fmt">Texte libre</span></div>
-            <div>📍 <strong style="color:#fff">Cible :</strong> voisins à 3 km · Vannes</div>
+            <div>📍 <strong style="color:#fff">Cible :</strong> voisins à 3 km · Le Mans</div>
             <div>👥 <strong style="color:#fff">Volume :</strong> <span id="recap-vol">500</span> réponses</div>
             <div>⏱️ <strong style="color:#fff">Livraison :</strong> 48–72h après clôture</div>
           </div>
@@ -881,13 +872,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
       </div>
       <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:13px;margin-bottom:10px">
         <div style="font-family:var(--fd);font-weight:700;font-size:13px;color:#fff;margin-bottom:10px">Verbatims sélectionnés</div>
-        <div class="vb-it"><div class="vb-tag" style="background:rgba(11,171,132,.2);color:#0BAB84">Sorties tardives</div><div class="vb-txt">"Je sors du ciné à 22h30 et tout est fermé. Si vous ouvrez jusqu'à 23h, je viens à chaque fois."</div></div>
+        <div class="vb-it"><div class="vb-tag" style="background:rgba(11,171,132,.2);color:#0BAB84">Sorties tardives</div><div class="vb-txt">"Je finis le travail vers 22h30 et tout est fermé. Si vous ouvrez jusqu'à 23h, je viens à chaque fois."</div></div>
         <div class="vb-it"><div class="vb-tag" style="background:rgba(161,78,8,.2);color:#A14E08">Sauce maison</div><div class="vb-txt">"Gardez surtout la sauce blanche maison, c'est vraiment pour ça que je traverse le quartier."</div></div>
         <div class="vb-it"><div class="vb-tag" style="background:rgba(245,166,35,.2);color:#F5A623">Menu étudiant</div><div class="vb-txt">"Un menu étudiant un peu moins cher le soir et je deviens un client régulier."</div></div>
       </div>
       <div style="background:rgba(224,125,10,.07);border:1px solid rgba(224,125,10,.18);border-radius:14px;padding:13px">
         <div style="font-family:var(--fd);font-weight:700;font-size:13px;color:#fff;margin-bottom:9px">💡 Recommandations actionnables</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.8">→ <strong style="color:#fff">Teste l'ouverture jusqu'à 23h le vendredi/samedi</strong> (71% des voisins demandeurs).<br>→ <strong style="color:#fff">Mets en avant la sauce maison</strong> dans ta com — c'est ton vrai atout.<br>→ <strong style="color:#fff">Lance un menu étudiant le soir</strong> pour fidéliser les proches.</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.8">→ <strong style="color:#fff">Teste l'ouverture jusqu'à 23h le vendredi/samedi</strong> (71% des voisins demandeurs).<br>→ <strong style="color:#fff">Mets en avant la sauce maison</strong> dans ta com, c'est ton vrai atout.<br>→ <strong style="color:#fff">Lance un menu étudiant le soir</strong> pour fidéliser les proches.</div>
       </div>
     </div>
   </div>
@@ -940,16 +931,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 </div>
 <script>
 const S={user:null,pts:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],done:{},friends:[{n:'Marie',pts:340,str:5,online:true},{n:'Lucas',pts:210,str:3,online:false},{n:'Yasmine',pts:520,str:9,online:true},{n:'Tom',pts:155,str:2,online:false}],chats:{}};
-const BD=[{id:'kebab',n:"Kebab O'Coin",ico:'🌯',theme:'Manger & boire',use:'Kebab · à 600 m'},{id:'tacos',n:'Tacos du Port',ico:'🌮',theme:'Manger & boire',use:'Tacos · à 1,1 km'},{id:'cafe',n:'Café de la Place',ico:'☕',theme:'Cafés & boulangeries',use:'Café · à 350 m'},{id:'fournil',n:'Le Fournil',ico:'🥖',theme:'Cafés & boulangeries',use:'Boulangerie · à 800 m'},{id:'bio',n:'Comptoir Bio',ico:'🥬',theme:'Courses & alimentation',use:'Épicerie bio · à 1,3 km'},{id:'forme',n:'Studio Forme',ico:'🏋️',theme:'Sport & bien-être',use:'Salle de sport · à 900 m'},{id:'cine',n:'Cinéville',ico:'🎬',theme:'Sorties & loisirs',use:'Cinéma · à 1,2 km'},{id:'coiffure',n:'Coiffure Léa',ico:'💇',theme:'Beauté',use:'Salon de coiffure · à 700 m'}];
-const QS=[{brand:"Kebab O'Coin",ico:'🌯',theme:'Manger & boire',pts:30,type:'mcq',q:"Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?",hint:'Choisis ta réponse.',opts:['👍 Oui, clairement','🌙 Surtout le vendredi/samedi','🤷 Ça ne changerait rien','👎 Non, pas vraiment'],usage:"Kebab O'Coin (à 600 m) réfléchit à ses horaires du week-end"},{brand:'Café de la Place',ico:'☕',theme:'Cafés & boulangeries',pts:25,type:'mcq',q:"On lance un nouveau latté. Quel nom te donne le plus envie ?",hint:'Choisis une réponse.',opts:['☀️ "Le Doré"','🍯 "Caramel du Port"','🌿 "Latté des Remparts"','✨ Aucun des trois'],usage:"Le Café de la Place (à 350 m) teste le nom de sa nouvelle boisson avant de l'imprimer sur l'ardoise"},{brand:'Studio Forme',ico:'🏋️',theme:'Sport & bien-être',pts:30,type:'scale',q:'Sur 10, à quel point des créneaux tôt le matin (avant 8h) t\'intéresseraient ?',hint:'Glisse le curseur',usage:'Studio Forme (à 900 m) étudie l\'ouverture de créneaux matinaux'},{brand:'Cinéville',ico:'🎬',theme:'Sorties & loisirs',pts:25,type:'rank',q:"Classe ce qui te ferait venir plus souvent au ciné :",hint:'Glisse pour réordonner',items:['🎟️ Tarifs réduits','🍿 Snacks moins chers','🕐 Séances tardives','🎬 Plus d\'avant-premières','🛋️ Confort des salles'],usage:"Cinéville (à 1,2 km) ajuste son offre pour les habitants du quartier"},{brand:'Le Fournil',ico:'🥖',theme:'Cafés & boulangeries',pts:20,type:'text',q:'Qu\'est-ce qui te ferait venir le matin plutôt qu\'à la grande surface ?',hint:'Sois précis — prix, proximité, qualité, accueil…',usage:'Le Fournil (à 800 m) veut comprendre ce qui compte pour le quartier le matin',aiTips:['Le prix','La proximité','La qualité du pain','Les horaires','L\'accueil']}];
-const BRANDMETA={"Kebab O'Coin":{ab:'K',c:'#D6442E'},'Tacos du Port':{ab:'T',c:'#C0392B'},'Café de la Place':{ab:'C',c:'#6B4226'},'Le Fournil':{ab:'F',c:'#C9821A'},'Comptoir Bio':{ab:'B',c:'#1E8449'},'Studio Forme':{ab:'S',c:'#0BAB84'},'Cinéville':{ab:'C',c:'#2D6CDF'},'Coiffure Léa':{ab:'L',c:'#A14E08'},'Cashback':{ab:'€',c:'#0BAB84'}};
+const BD=[{id:'kebab',n:"Kebab O'Coin",ico:'🌯',theme:'Manger & boire',use:'Kebab · à 600 m'},{id:'tacos',n:'Tacos du Port',ico:'🌮',theme:'Manger & boire',use:'Tacos · à 1,1 km'},{id:'cafe',n:'Café de la Place',ico:'☕',theme:'Cafés & boulangeries',use:'Café · à 350 m'},{id:'fournil',n:'Le Fournil',ico:'🥖',theme:'Cafés & boulangeries',use:'Boulangerie · à 800 m'},{id:'bio',n:'Comptoir Bio',ico:'🥬',theme:'Courses & alimentation',use:'Épicerie bio · à 1,3 km'},{id:'forme',n:'Studio Forme',ico:'🏋️',theme:'Sport & bien-être',use:'Salle de sport · à 900 m'},{id:'pizza',n:'Pizzeria Bella',ico:'🍕',theme:'Manger & boire',use:'Pizzeria · à 500 m'},{id:'fleurs',n:'Pétales',ico:'💐',theme:'Fleuriste & cadeaux',use:'Fleuriste · à 450 m'},{id:'bar',n:'Le Comptoir',ico:'🍺',theme:'Bars & soirées',use:'Bar · à 650 m'},{id:'coiffure',n:'Coiffure Léa',ico:'💇',theme:'Beauté',use:'Salon de coiffure · à 700 m'}];
+const QS=[{brand:"Kebab O'Coin",ico:'🌯',theme:'Manger & boire',pts:30,type:'mcq',q:"Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?",hint:'Choisis ta réponse.',opts:['👍 Oui, clairement','🌙 Surtout le vendredi/samedi','🤷 Ça ne changerait rien','👎 Non, pas vraiment'],usage:"Kebab O'Coin (à 600 m) réfléchit à ses horaires du week-end"},{brand:'Café de la Place',ico:'☕',theme:'Cafés & boulangeries',pts:25,type:'mcq',q:"On lance un nouveau latté. Quel nom te donne le plus envie ?",hint:'Choisis une réponse.',opts:['☀️ "Le Doré"','🍯 "Caramel du Port"','🌿 "Latté des Remparts"','✨ Aucun des trois'],usage:"Le Café de la Place (à 350 m) teste le nom de sa nouvelle boisson avant de l'imprimer sur l'ardoise"},{brand:'Studio Forme',ico:'🏋️',theme:'Sport & bien-être',pts:30,type:'scale',q:'Sur 10, à quel point des créneaux tôt le matin (avant 8h) t\'intéresseraient ?',hint:'Glisse le curseur',usage:'Studio Forme (à 900 m) étudie l\'ouverture de créneaux matinaux'},{brand:'Pizzeria Bella',ico:'🍕',theme:'Manger & boire',pts:25,type:'rank',q:"Classe ce qui te ferait commander plus souvent chez nous :",hint:'Classe avec les flèches ↑↓',items:['🍕 La pizza du mois','💶 Une formule midi','🚴 La livraison offerte','🌱 Plus de choix végé','🕐 Ouvert plus tard le soir'],usage:"Pizzeria Bella (à 500 m) prépare sa nouvelle carte"},{brand:'Le Fournil',ico:'🥖',theme:'Cafés & boulangeries',pts:20,type:'mcq',q:'Qu\'est-ce qui te ferait venir le matin plutôt qu\'à la grande surface ?',hint:'Choisis ta réponse.',opts:['🥖 La qualité du pain','💰 Le prix','📍 La proximité','⏰ Les horaires'],usage:'Le Fournil (à 800 m) veut comprendre ce qui compte pour le quartier le matin'}];
+const BRANDMETA={"Kebab O'Coin":{ab:'K',c:'#D6442E'},'Tacos du Port':{ab:'T',c:'#C0392B'},'Café de la Place':{ab:'C',c:'#6B4226'},'Le Fournil':{ab:'F',c:'#C9821A'},'Comptoir Bio':{ab:'B',c:'#1E8449'},'Studio Forme':{ab:'S',c:'#0BAB84'},'Pizzeria Bella':{ab:'P',c:'#D35400'},'Pétales':{ab:'P',c:'#C2185B'},'Le Comptoir':{ab:'C',c:'#B9770E'},'Coiffure Léa':{ab:'L',c:'#A14E08'},'Cashback':{ab:'€',c:'#0BAB84'}};
 function logoHTML(name,size){const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#6A6470'};const s=size||44;const r=Math.round(s*0.27),fs=Math.round(s*0.44);return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;}
 const GROUPS=[{ico:'💻',n:'Groupe Tech',meta:'1 243 membres · Actif'},{ico:'👨‍👩‍👧',n:'Groupe Parents',meta:'842 membres · Actif'},{ico:'🏃',n:'Runners Community',meta:'2 105 membres · Très actif'},{ico:'🌱',n:'Éco-conscients',meta:'673 membres · Actif'}];
 const AVC=['#E07D0A','#A14E08','#0BAB84','#F5A623','#E8A33C'];
 const BDGS=[{id:'first',e:'🌟',n:'Première réponse'},{id:'trio',e:'🎯',n:'3 réponses'},{id:'streak3',e:'🔥',n:'Streak 3 jours'},{id:'social',e:'👥',n:'Premier ami'},{id:'qual',e:'✨',n:'Qualité A+'}];
-const GIFTS=[{e:'☕',br:'Café de la Place',val:'1 café offert',cost:200,req:200,c:'#6B4226'},{e:'🥐',br:'Le Fournil',val:'1 viennoiserie',cost:300,req:300,c:'#C9821A'},{e:'🥤',br:"Kebab O'Coin",val:'Boisson + frites',cost:450,req:450,c:'#D6442E'},{e:'💇',br:'Coiffure Léa',val:'−5€ sur ta coupe',cost:600,req:600,c:'#A14E08'},{e:'🌯',br:"Kebab O'Coin",val:'1 kebab complet',cost:800,req:800,c:'#D6442E'},{e:'🎬',br:'Cinéville',val:'1 place de ciné',cost:1200,req:1200,c:'#2D6CDF'},{e:'💶',br:'Cashback',val:'5 € sur ton compte',cost:1000,req:1000,c:'#0BAB84'}];
+const GIFTS=[{e:'☕',br:'Café de la Place',val:'1 café offert',cost:200,req:200,c:'#6B4226'},{e:'🥐',br:'Le Fournil',val:'1 viennoiserie',cost:300,req:300,c:'#C9821A'},{e:'🥤',br:"Kebab O'Coin",val:'Boisson + frites',cost:450,req:450,c:'#D6442E'},{e:'💇',br:'Coiffure Léa',val:'−5€ sur ta coupe',cost:600,req:600,c:'#A14E08'},{e:'🌯',br:"Kebab O'Coin",val:'1 kebab complet',cost:800,req:800,c:'#D6442E'},{e:'🍕',br:'Pizzeria Bella',val:'1 pizza offerte',cost:1200,req:1200,c:'#D35400'},{e:'💶',br:'Cashback',val:'5 € sur ton compte',cost:1000,req:1000,c:'#0BAB84'}];
 const TIERS=[{n:'Curieux',min:0,max:1000,ico:'🌱',c:'#6A6470'},{n:'Actif',min:1000,max:3000,ico:'⚡',c:'#A14E08'},{n:'Expert',min:3000,max:6000,ico:'🎯',c:'#E07D0A'},{n:'Ambassadeur',min:6000,max:10000,ico:'🏆',c:'#F5A623'},{n:'Légende',min:10000,max:99999,ico:'👑',c:'#0BAB84'}];
-const FEED=[{av:'M',avc:'#A14E08',n:'Marie',t:'12 min',theme:'Café de la Place',tc:'#E07D0A',tbg:'rgba(224,125,10,.09)',action:'a répondu à une question du Café de la Place',quote:'Ouvrez un peu plus tard le week-end, je sors du ciné et tout est fermé !',type:'answer'},{av:'L',avc:'#0BAB84',n:'Lucas',t:'34 min',theme:'Récompense',tc:'#A14E08',tbg:'rgba(161,78,8,.09)',action:'a gagné un café offert ☕',badge:'☕ Café de la Place',type:'badge'},{av:'Y',avc:'#F5A623',n:'Yasmine',t:'1h',theme:'Le Fournil',tc:'#E8A33C',tbg:'rgba(232,163,60,.09)',action:'a répondu à une question du Fournil',quote:"Le pain frais à 7h et un sourire, c'est tout ce qui me ferait venir tous les jours.",type:'answer'},{av:'T',avc:'#E07D0A',n:'Tom',t:'2h',theme:'Vannes',tc:'#0BAB84',tbg:'rgba(11,171,132,.09)',action:'a pris la 2e place du classement de Vannes 🎉',type:'level'}];
+const FEED=[{av:'M',avc:'#A14E08',n:'Marie',t:'12 min',theme:'Café de la Place',tc:'#E07D0A',tbg:'rgba(224,125,10,.09)',action:'a répondu à une question du Café de la Place',quote:'Ouvrez un peu plus tard le week-end, je rentre tard et tout est fermé !',type:'answer'},{av:'L',avc:'#0BAB84',n:'Lucas',t:'34 min',theme:'Récompense',tc:'#A14E08',tbg:'rgba(161,78,8,.09)',action:'a gagné un café offert ☕',badge:'☕ Café de la Place',type:'badge'},{av:'Y',avc:'#F5A623',n:'Yasmine',t:'1h',theme:'Le Fournil',tc:'#E8A33C',tbg:'rgba(232,163,60,.09)',action:'a répondu à une question du Fournil',quote:"Le pain frais à 7h et un sourire, c'est tout ce qui me ferait venir tous les jours.",type:'answer'},{av:'T',avc:'#E07D0A',n:'Tom',t:'2h',theme:'Le Mans',tc:'#0BAB84',tbg:'rgba(11,171,132,.09)',action:'a pris la 2e place du classement du Mans 🎉',type:'level'}];
 const MOCK={Marie:[{f:'them',t:"Salut ! T'as répondu à la question du Café de la Place ? ☕",ts:'14:32'},{f:'me',t:"Oui ! J'ai gagné 25 pts. Et toi ?",ts:'14:33'},{f:'them',t:"Pareil ! J'en suis à 340 pts 🎉",ts:'14:34'},{f:'me',t:"Top ! On se bat pour le classement 😄",ts:'14:34'},{f:'them',t:"T'as vu la question du Fournil ? 🥖",ts:'14:35'}]};
 let cur='splash',obIdx=0,boFmt='text',chUser='Marie',navS=['home','social','rewards-tab','profile'];
 
@@ -977,6 +968,23 @@ function selAge(el,v){document.querySelectorAll('.age-opt').forEach(e=>e.classLi
 function doSSO(){document.getElementById('inp-name').value='Alex';document.getElementById('inp-email').value='alex@noova.app';selAgeVal='25-34';document.querySelectorAll('.age-opt').forEach(e=>{if(e.textContent.includes('25'))e.classList.add('sel')});setTimeout(doSignup,300)}
 function doSignup(){const n=document.getElementById('inp-name').value.trim()||'Alex';const e=document.getElementById('inp-email').value.trim()||'alex@noova.app';S.user={name:n,email:e,age:selAgeVal||'25-34'};goTo('themes')}
 function toggleTheme(el){el.classList.toggle('sel');const a=[...document.querySelectorAll('.theme-tile.sel')];S.themes=a.map(e=>e.dataset.t);document.getElementById('theme-cnt').textContent=a.length}
+function toggleAllThemes(){
+  const tiles=[...document.querySelectorAll('#theme-grid .theme-tile')];
+  const allSel=tiles.length>0&&tiles.every(t=>t.classList.contains('sel'));
+  tiles.forEach(t=>t.classList.toggle('sel',!allSel));
+  const a=[...document.querySelectorAll('.theme-tile.sel')];
+  S.themes=a.map(e=>e.dataset.t);
+  document.getElementById('theme-cnt').textContent=a.length;
+  document.getElementById('theme-all-btn').textContent=allSel?'Tout sélectionner':'Tout désélectionner';
+}
+function toggleAllBrands(){
+  const inputs=[...document.querySelectorAll('#brands-list input[type=checkbox]')];
+  const allOn=inputs.length>0&&inputs.every(i=>i.checked);
+  const val=!allOn;
+  BD.forEach(b=>{S.brands[b.id]=val});
+  inputs.forEach(i=>{i.checked=val;const item=i.closest('.brand-item');if(item)item.classList[val?'add':'remove']('on')});
+  document.getElementById('brands-all-btn').textContent=val?'Tout retirer':'Tout autoriser';
+}
 function renderBrands(){
   const el=document.getElementById('brands-list');el.innerHTML='';
   const byT={};BD.forEach(b=>{if(!byT[b.theme])byT[b.theme]=[];byT[b.theme].push(b)});
@@ -989,6 +997,9 @@ function renderBrands(){
       el.appendChild(d);
     });
   });
+  const more=document.createElement('div');more.style.cssText='text-align:center;padding:10px 18px 2px';
+  more.innerHTML='<div style="font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:3px;color:var(--ink3);line-height:1">•••</div><div style="font-size:11px;color:var(--ink2);margin-top:4px">Et d\'autres commerces arrivent près de chez toi</div>';
+  el.appendChild(more);
 }
 function doBrands(){S.qs=[...QS];goTo('home');document.getElementById('bnav').classList.add('show');refreshHome();renderSocial()}
 function refreshHome(){
@@ -1023,9 +1034,7 @@ function openQ(idx){
   {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50);}document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||'Ta réponse aidera '+q.brand+'.';
   document.getElementById('bh-tag').textContent=q.theme;document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint;
-  document.getElementById('ai-body').classList.remove('show');document.getElementById('ai-chev').classList.remove('open');
-  document.getElementById('ai-body').innerHTML=(q.aiTips||['Soyez précis et concis','Donnez des exemples concrets','Partagez votre expérience']).map(t=>`<div class="ai-tip">${t}</div>`).join('');
-  buildAns(q);document.getElementById('sub-btn').disabled=true;goTo('question');
+  document.getElementById('sub-btn').disabled=true;buildAns(q);goTo('question');
 }
 function buildAns(q){
   const el=document.getElementById('ans-area');el.innerHTML='';
@@ -1050,20 +1059,16 @@ function buildAns(q){
     el.appendChild(sv);el.appendChild(sl);el.appendChild(inp);document.getElementById('sub-btn').disabled=false;
   }else if(q.type==='rank'){
     let items=[...(q.items||[])];const rl=document.createElement('div');rl.className='rank-list';
-    let dragIdx=-1;
-    const render=()=>{rl.innerHTML='';items.forEach((it,i)=>{const d=document.createElement('div');d.className='rank-item';d.draggable=true;d.dataset.i=i;d.innerHTML=`<span class="rank-grip">⠿</span><div class="rank-num">${i+1}</div><div class="rank-txt">${it}</div>`;d.ondragstart=e=>{e.dataTransfer.setData('text/plain',i);d.classList.add('dragging');dragIdx=i};d.ondragend=()=>{d.classList.remove('dragging');dragIdx=-1};d.ondragover=e=>e.preventDefault();d.ondrop=e=>{e.preventDefault();const f=+e.dataTransfer.getData('text/plain');if(f!==i){[items[f],items[i]]=[items[i],items[f]];render()}};rl.appendChild(d)})};
-    rl.addEventListener('touchstart',e=>{const item=e.target.closest('.rank-item');if(!item)return;dragIdx=+item.dataset.i;item.classList.add('dragging');},{passive:true});
-    rl.addEventListener('touchmove',e=>{e.preventDefault();if(dragIdx<0)return;const touch=e.touches[0];const children=[...rl.querySelectorAll('.rank-item')];let overIdx=-1;children.forEach((el,j)=>{const r=el.getBoundingClientRect();if(touch.clientY>=r.top&&touch.clientY<=r.bottom)overIdx=j});if(overIdx>=0&&overIdx!==dragIdx){[items[dragIdx],items[overIdx]]=[items[overIdx],items[dragIdx]];dragIdx=overIdx;render();const nc=rl.querySelectorAll('.rank-item');if(nc[dragIdx])nc[dragIdx].classList.add('dragging');}},{passive:false});
-    rl.addEventListener('touchend',()=>{rl.querySelectorAll('.rank-item').forEach(el=>el.classList.remove('dragging'));dragIdx=-1;},{passive:true});
+    const move=(from,to)=>{if(to<0||to>=items.length)return;[items[from],items[to]]=[items[to],items[from]];render();};
+    const render=()=>{rl.innerHTML='';items.forEach((it,i)=>{const d=document.createElement('div');d.className='rank-item';d.innerHTML=`<div class="rank-num">${i+1}</div><div class="rank-txt">${it}</div><div class="rank-arrows"><button type="button" class="rank-arr"${i===0?' disabled':''} aria-label="Monter">▲</button><button type="button" class="rank-arr"${i===items.length-1?' disabled':''} aria-label="Descendre">▼</button></div>`;const a=d.querySelectorAll('.rank-arr');a[0].onclick=()=>move(i,i-1);a[1].onclick=()=>move(i,i+1);rl.appendChild(d)})};
     render();el.appendChild(rl);document.getElementById('sub-btn').disabled=false;
   }
 }
-function toggleAI(){document.getElementById('ai-body').classList.toggle('show');document.getElementById('ai-chev').classList.toggle('open')}
 function submitAns(){
   const q=S.curQ;S.pts+=q.pts;S.ans++;if(!S.hist)S.hist=[];S.hist.unshift({brand:q.brand,ico:q.ico,q:q.q.substring(0,40),pts:q.pts});
   S.qs=S.qs.filter((_,i)=>i!==S.qIdx);
   document.getElementById('rw-pts').textContent=q.pts;document.getElementById('rw-total').textContent=S.pts+' pts';
-  document.getElementById('rw-usage').innerHTML='Ta réponse aidera <strong>'+q.brand+'</strong> — '+q.usage;
+  document.getElementById('rw-usage').innerHTML='Ta réponse aidera <strong>'+q.brand+'</strong>, '+q.usage;
   spawnConfetti();goTo('reward');refreshHome();refreshWallet();
 }
 function nextQ(){if(S.qs&&S.qs.length>0)openQ(0);else{refreshHome();goNav('home')}}
@@ -1127,7 +1132,7 @@ function socTab(tab,btn){
   if(tab==='friends')renderFriends();if(tab==='ranking')renderRanking();if(tab==='groups')renderGroups();
 }
 function renderGroups(){
-  const el=document.getElementById('panel-groups');el.innerHTML='<div style="padding:0 18px 10px;font-size:13px;color:var(--ink2);line-height:1.6">Communautés thématiques — compare tes réponses et progresse avec des inconnus. Inspiré de Strava.</div>';
+  const el=document.getElementById('panel-groups');el.innerHTML='<div style="padding:0 18px 10px;font-size:13px;color:var(--ink2);line-height:1.6">Communautés thématiques, compare tes réponses et progresse avec des inconnus. Inspiré de Strava.</div>';
   GROUPS.forEach(g=>{const d=document.createElement('div');d.className='group-c';d.innerHTML=`<div class="gc-ico" style="background:var(--vd)">${g.ico}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink)">${g.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${g.meta}</div></div><div style="font-size:11px;font-weight:700;color:var(--violet);background:var(--vd);padding:5px 11px;border-radius:99px;white-space:nowrap;cursor:pointer">Rejoindre</div>`;el.appendChild(d)});
 }
 function addFriend(){const inp=document.getElementById('fi-inp');const code=inp.value.trim();if(!code)return;S.friends.push({n:'Ami '+code.slice(-4),pts:Math.floor(Math.random()*200)+50,str:Math.floor(Math.random()*7)+1,online:true});inp.value='';renderFriends();renderRanking()}
@@ -1149,11 +1154,11 @@ function refreshWallet(){
   document.getElementById('wc-pts').innerHTML=S.pts+' <small>pts</small>';
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(4,((S.pts-l.min)/(l.max-l.min))*100));
   document.getElementById('wc-fill').style.width=pct+'%';
-  document.getElementById('wc-level').textContent='Niveau '+(li+1)+' — '+l.n;
+  document.getElementById('wc-level').textContent='Niveau '+(li+1)+' · '+l.n;
   document.getElementById('wc-next').textContent=l.max===9999?'Max !':l.max+' pts';
   const rpv=document.getElementById('req-pts-v');if(rpv)rpv.textContent=S.pts+' / 10000';
   const gg=document.getElementById('gift-grid');gg.innerHTML='';
-  GIFTS.forEach(g=>{const locked=S.pts<g.req;const d=document.createElement('div');d.className='gift-c'+(locked?' locked':'');d.innerHTML=`<div style="margin-bottom:7px">${logoHTML(g.br,38)}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${g.br}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${g.val}</div><div style="margin-top:7px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${g.c}15;color:${g.c};display:inline-block">${g.cost} pts</div>`;if(!locked)d.onclick=()=>{const code=(Math.random().toString(36).substring(2,5)+'-'+Math.random().toString(36).substring(2,5)).toUpperCase();alert('🎟️ Bon débloqué !\n\n'+g.val+' — '+g.br+'\n\nCode à usage unique : '+code+'\nÀ présenter au comptoir. Valable 15 min, non partageable.');};gg.appendChild(d)});
+  GIFTS.forEach(g=>{const locked=S.pts<g.req;const d=document.createElement('div');d.className='gift-c'+(locked?' locked':'');d.innerHTML=`<div style="margin-bottom:7px">${logoHTML(g.br,38)}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${g.br}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${g.val}</div><div style="margin-top:7px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${g.c}15;color:${g.c};display:inline-block">${g.cost} pts</div>`;if(!locked)d.onclick=()=>{const code=(Math.random().toString(36).substring(2,5)+'-'+Math.random().toString(36).substring(2,5)).toUpperCase();alert('🎟️ Bon débloqué !\n\n'+g.val+' · '+g.br+'\n\nCode à usage unique : '+code+'\nÀ présenter au comptoir. Valable 15 min, non partageable.');};gg.appendChild(d)});
   const tl=document.getElementById('tiers-list');tl.innerHTML='';
   TIERS.forEach((t,i)=>{const reached=S.pts>=t.min;const d=document.createElement('div');d.style.cssText=`background:var(--card);border:1.5px solid ${reached?t.c+'33':'var(--bg3)'};border-radius:var(--r);padding:12px 13px;margin-bottom:8px`;d.innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:11px;background:${t.c}14;display:flex;align-items:center;justify-content:center;font-size:20px">${t.ico}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:${reached?t.c:'var(--ink)'}">${t.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${t.min===0?'Dès le départ':t.min+' pts requis'}</div></div><div style="font-size:12px;font-weight:700;color:${reached?t.c:'var(--ink3)'}">${reached?'✅ Atteint':'🔒'}</div></div>`;tl.appendChild(d)});
 }
@@ -1163,7 +1168,7 @@ function refreshProfile(){
   document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.email;
   document.getElementById('s-pts').textContent=S.pts;document.getElementById('s-ans').textContent=S.ans;document.getElementById('s-str').textContent=S.streak;
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(2,((S.pts-l.min)/(l.max-l.min))*100));
-  document.getElementById('pl-name').textContent='Niveau '+(li+1)+' — '+l.n;document.getElementById('pl-xp').textContent=S.pts+' / '+(l.max===9999?'∞':l.max)+' pts';document.getElementById('pl-fill').style.width=pct+'%';
+  document.getElementById('pl-name').textContent='Niveau '+(li+1)+' · '+l.n;document.getElementById('pl-xp').textContent=S.pts+' / '+(l.max===9999?'∞':l.max)+' pts';document.getElementById('pl-fill').style.width=pct+'%';
   const cm=document.getElementById('consent-mgmt');cm.innerHTML='';
   BD.slice(0,4).forEach(b=>{const on=S.brands[b.id];const d=document.createElement('div');d.className='consent-it';d.innerHTML=`${logoHTML(b.n,32)}<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">${b.n}</div><div style="font-size:10px;color:var(--ink3);margin-top:1px">${b.use}</div></div><label class="tgl"><input type="checkbox" ${on?'checked':''} onchange="S.brands['${b.id}']=this.checked"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;cm.appendChild(d)});
   const bl=document.getElementById('badges-list');bl.innerHTML='';
@@ -1189,11 +1194,11 @@ function wzStep(n){
 }
 function selFmt(el,fmt){document.querySelectorAll('.fmt-opt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle 1–10',rank:'Classement'}[fmt]}
 function useTmpl(txt){document.getElementById('bo-q').value=txt}
-function launchCampaign(){alert('🚀 Ta question est en ligne ! Tes voisins vont y répondre — premiers avis sous quelques heures.');boTab('dashboard',document.querySelectorAll('.bo-tab')[0])}
+function launchCampaign(){alert('🚀 Ta question est en ligne ! Tes voisins vont y répondre, premiers avis sous quelques heures.');boTab('dashboard',document.querySelectorAll('.bo-tab')[0])}
 window.addEventListener('load',()=>{renderBrands();renderCampaigns();setTimeout(()=>goTo('onboard'),2200)});
 
 /* ============================================================
-   NOOVA — Questionnaires opt-in + pages entreprise (ajout)
+   NOOVA, Questionnaires opt-in + pages entreprise (ajout)
    ============================================================ */
 
 /* --- Questions de suivi (le "reste du questionnaire") par marque --- */
@@ -1201,24 +1206,19 @@ window.addEventListener('load',()=>{renderBrands();renderCampaigns();setTimeout(
   const SV={
     "Kebab O'Coin":[
       {type:'mcq',pts:15,q:"À quelle heure aimerais-tu pouvoir commander le week-end ?",hint:'Choisis une réponse.',opts:['Avant 22h ça me suffit','Jusqu\'à 23h','Jusqu\'à minuit','Encore plus tard']},
-      {type:'scale',pts:20,q:"À quel point un menu étudiant moins cher te ferait revenir ?",hint:'Glisse le curseur'},
-      {type:'text',pts:25,q:"Qu'est-ce qu'on pourrait améliorer pour que tu viennes plus souvent ?",hint:'Sois honnête — on lit tout.',aiTips:['Les horaires','Le rapport qualité-prix','Le choix au menu','L\'accueil ou la rapidité']}
+      {type:'scale',pts:20,q:"À quel point un menu étudiant moins cher te ferait revenir ?",hint:'Glisse le curseur'}
     ],
     'Café de la Place':[
-      {type:'mcq',pts:15,q:"Tu viens plutôt au café à quel moment ?",hint:'Choisis une réponse.',opts:['☀️ Le matin','🥪 Le midi','☕ L\'après-midi','🌙 En soirée']},
-      {type:'text',pts:25,q:"Qu'est-ce qui te ferait choisir notre café plutôt qu'une chaîne ?",hint:'Sois précis.'}
+      {type:'mcq',pts:15,q:"Tu viens plutôt au café à quel moment ?",hint:'Choisis une réponse.',opts:['☀️ Le matin','🥪 Le midi','☕ L\'après-midi','🌙 En soirée']}
     ],
     'Studio Forme':[
-      {type:'mcq',pts:15,q:"Quel créneau te conviendrait le mieux ?",hint:'Choisis une réponse.',opts:['🌅 Tôt le matin','🕛 Le midi','🌆 Après le travail','🌙 En soirée']},
-      {type:'text',pts:25,q:"Quel cours ou équipement te manque le plus ?",hint:'Une idée concrète.'}
+      {type:'mcq',pts:15,q:"Quel créneau te conviendrait le mieux ?",hint:'Choisis une réponse.',opts:['🌅 Tôt le matin','🕛 Le midi','🌆 Après le travail','🌙 En soirée']}
     ],
     'Le Fournil':[
-      {type:'rank',pts:20,q:"Classe ce qui te ferait venir le matin :",hint:'Glisse pour réordonner',items:['💰 Le prix','📍 La proximité','🥖 La qualité du pain','⏰ Les horaires','😊 L\'accueil']},
-      {type:'text',pts:25,q:"Un produit que tu aimerais trouver chez nous ?",hint:'Sois précis.'}
+      {type:'rank',pts:20,q:"Classe ce qui te ferait venir le matin :",hint:'Classe avec les flèches ↑↓',items:['💰 Le prix','📍 La proximité','🥖 La qualité du pain','⏰ Les horaires','😊 L\'accueil']}
     ],
-    'Cinéville':[
-      {type:'mcq',pts:15,q:"Tu viens au ciné le plus souvent…",hint:'Choisis une réponse.',opts:['Seul·e','En couple','Entre amis','En famille']},
-      {type:'text',pts:25,q:"Qu'est-ce qui te ferait venir une fois de plus par mois ?",hint:'Tarif, horaires, films…'}
+    'Pizzeria Bella':[
+      {type:'mcq',pts:15,q:"Tu commandes plutôt…",hint:'Choisis une réponse.',opts:['🍽️ Sur place','🥡 À emporter','🚴 En livraison','🤷 Ça dépend']}
     ]
   };
   if(typeof QS!=='undefined')QS.forEach(q=>{q.survey=SV[q.brand]||[]});
@@ -1226,32 +1226,36 @@ window.addEventListener('load',()=>{renderBrands();renderCampaigns();setTimeout(
 
 /* --- Profils entreprise (style Welcome to the Jungle) --- */
 const BRANDPROFILE={
-  "Kebab O'Coin":{sector:'Restauration · Kebab',tagline:'Le goût du quartier.',loc:'Rue Thiers, Vannes',founded:'2019',size:'Commerce local',avgpts:'30',resp:'~20s',rate:'—',
+  "Kebab O'Coin":{sector:'Restauration · Kebab',tagline:'Le goût du quartier.',loc:'Rue Gambetta, Le Mans',founded:'2019',size:'Commerce local',avgpts:'30',resp:'~20s',rate:'—',
     about:"Kebab O'Coin est un commerce de quartier à 600 m de chez toi. Sur Noova, il demande l'avis de ses voisins pour ajuster ses horaires, son menu et son offre.",
-    why:"Tes réponses l'aident à mieux servir le quartier — et tu gagnes des points échangeables chez lui. Rien n'est revendu : seuls les avis des habitants proches lui parviennent.",
+    why:"Tes réponses l'aident à mieux servir le quartier, et tu gagnes des points échangeables chez lui. Rien n'est revendu : seuls les avis des habitants proches lui parviennent.",
     extra:[{q:'Quel accompagnement te manque le plus ?',status:'soon'}]},
-  'Café de la Place':{sector:'Café · Salon de thé',tagline:'Ton café de tous les jours.',loc:'Place des Lices, Vannes',founded:'2016',size:'Commerce local',avgpts:'25',resp:'~20s',rate:'—',
+  'Café de la Place':{sector:'Café · Salon de thé',tagline:'Ton café de tous les jours.',loc:'Place du Ralliement, Angers',founded:'2016',size:'Commerce local',avgpts:'25',resp:'~20s',rate:'—',
     about:"Le Café de la Place est à 350 m de chez toi. Il utilise Noova pour tester ses nouveautés (boissons, formules) auprès des gens du coin.",
     why:"Tes avis orientent ses choix, et tu gagnes un café offert dès 200 pts. Seuls les voisins proches reçoivent ses questions.",
     extra:[{q:'Une formule petit-déj te plairait ?',status:'soon'}]},
-  'Studio Forme':{sector:'Sport · Salle de remise en forme',tagline:'Bouge près de chez toi.',loc:'Av. Roosevelt, Vannes',founded:'2021',size:'Commerce local',avgpts:'30',resp:'~25s',rate:'—',
+  'Studio Forme':{sector:'Sport · Salle de remise en forme',tagline:'Bouge près de chez toi.',loc:'Avenue Bollée, Le Mans',founded:'2021',size:'Commerce local',avgpts:'30',resp:'~25s',rate:'—',
     about:"Studio Forme est une salle de sport à 900 m. Elle interroge les habitants pour caler ses horaires et ses cours.",
     why:"Tes réponses façonnent les créneaux et les cours, et tu peux gagner une séance d'essai. Données du quartier uniquement.",
     extra:[{q:'Quel cours collectif aimerais-tu ?',status:'soon'}]},
-  'Le Fournil':{sector:'Boulangerie · Pâtisserie',tagline:'Le bon pain du matin.',loc:'Rue Saint-Vincent, Vannes',founded:'2012',size:'Commerce local',avgpts:'20',resp:'~20s',rate:'—',
+  'Le Fournil':{sector:'Boulangerie · Pâtisserie',tagline:'Le bon pain du matin.',loc:'Place de la République, Le Mans',founded:'2012',size:'Commerce local',avgpts:'20',resp:'~20s',rate:'—',
     about:"Le Fournil est ta boulangerie de quartier à 800 m. Sur Noova, elle écoute les habitants pour s'améliorer.",
     why:"Tes idées comptent, et tu gagnes une viennoiserie dès 300 pts. Seuls les voisins proches répondent.",
     extra:[{q:'Quel produit aimerais-tu trouver ?',status:'soon'}]},
-  'Cinéville':{sector:'Cinéma · Loisirs',tagline:'Le grand écran à côté.',loc:'Centre-ville, Vannes',founded:'2005',size:'Commerce local',avgpts:'25',resp:'~25s',rate:'—',
-    about:"Cinéville est le cinéma du quartier à 1,2 km. Il sonde les habitants pour ajuster séances, tarifs et offres.",
-    why:"Tes préférences orientent la programmation, et tu peux gagner une place. Avis des habitants proches uniquement.",
-    extra:[{q:'Des séances tardives t\'intéressent ?',status:'soon'}]},
-  'Tacos du Port':{sector:'Restauration · Tacos',tagline:'Généreux, comme le quartier.',loc:'Quai Éric Tabarly, Vannes',founded:'2020',size:'Commerce local',avgpts:'—',resp:'~20s',rate:'—',
-    about:"Tacos du Port, à 1,1 km, prépare ses prochaines questions pour les habitants du coin.",why:"Avis du quartier uniquement — jamais revendus.",extra:[]},
-  'Comptoir Bio':{sector:'Épicerie bio',tagline:'Local et de saison.',loc:'Rue du Mené, Vannes',founded:'2018',size:'Commerce local',avgpts:'—',resp:'~25s',rate:'—',
-    about:"Le Comptoir Bio, à 1,3 km, prépare ses sondages pour ses clients du quartier.",why:"Avis du quartier uniquement — jamais revendus.",extra:[]},
-  'Coiffure Léa':{sector:'Beauté · Coiffure',tagline:'Le salon du coin.',loc:'Rue Hoche, Vannes',founded:'2017',size:'Commerce local',avgpts:'—',resp:'~25s',rate:'—',
-    about:"Coiffure Léa, à 700 m, prépare ses questions pour sa clientèle de proximité.",why:"Avis du quartier uniquement — jamais revendus.",extra:[]}
+  'Pizzeria Bella':{sector:'Restauration · Pizzeria',tagline:'La pizza du quartier.',loc:'Rue Nationale, Le Mans',founded:'2019',size:'Commerce local',avgpts:'25',resp:'~25s',rate:'—',
+    about:"Pizzeria Bella est à 500 m de chez toi. Sur Noova, elle demande l'avis du quartier pour composer sa carte et ses formules.",
+    why:"Tes réponses orientent ses recettes, et tu peux gagner une pizza offerte. Seuls les voisins proches reçoivent ses questions.",
+    extra:[{q:'Quelle nouvelle pizza aimerais-tu ?',status:'soon'}]},
+  'Pétales':{sector:'Fleuriste · Cadeaux',tagline:'Des fleurs pour chaque occasion.',loc:'Rue du Port, Le Mans',founded:'2020',size:'Commerce local',avgpts:'—',resp:'~25s',rate:'—',
+    about:"Pétales, à 450 m, prépare ses questions pour les habitants du quartier.",why:"Avis du quartier uniquement, jamais revendus.",extra:[]},
+  'Le Comptoir':{sector:'Bar · Brasserie',tagline:'Le rendez-vous du quartier.',loc:'Place de la République, Le Mans',founded:'2017',size:'Commerce local',avgpts:'—',resp:'~25s',rate:'—',
+    about:"Le Comptoir, à 650 m, prépare ses sondages pour ses habitués du coin.",why:"Avis du quartier uniquement, jamais revendus.",extra:[]},
+  'Tacos du Port':{sector:'Restauration · Tacos',tagline:'Généreux, comme le quartier.',loc:'Rue Oberkampf, Paris',founded:'2020',size:'Commerce local',avgpts:'—',resp:'~20s',rate:'—',
+    about:"Tacos du Port, à 1,1 km, prépare ses prochaines questions pour les habitants du coin.",why:"Avis du quartier uniquement, jamais revendus.",extra:[]},
+  'Comptoir Bio':{sector:'Épicerie bio',tagline:'Local et de saison.',loc:'Rue Bressigny, Angers',founded:'2018',size:'Commerce local',avgpts:'—',resp:'~25s',rate:'—',
+    about:"Le Comptoir Bio, à 1,3 km, prépare ses sondages pour ses clients du quartier.",why:"Avis du quartier uniquement, jamais revendus.",extra:[]},
+  'Coiffure Léa':{sector:'Beauté · Coiffure',tagline:'Le salon du coin.',loc:'Rue Saint-Laud, Angers',founded:'2017',size:'Commerce local',avgpts:'—',resp:'~25s',rate:'—',
+    about:"Coiffure Léa, à 700 m, prépare ses questions pour sa clientèle de proximité.",why:"Avis du quartier uniquement, jamais revendus.",extra:[]}
 };
 
 S.mode=S.mode||'hook';S.sv=S.sv||null;S.brandBack=S.brandBack||'home';
@@ -1264,10 +1268,8 @@ function fillQuestion(q,opts){
   document.getElementById('bh-usage').textContent=q.usage||('Ta réponse aide '+q.brand+'.');
   document.getElementById('bh-tag').textContent=q.theme||'';
   document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||'';
-  document.getElementById('ai-body').classList.remove('show');document.getElementById('ai-chev').classList.remove('open');
-  document.getElementById('ai-body').innerHTML=(q.aiTips||['Sois précis et concis','Donne des exemples concrets','Partage ton expérience']).map(t=>`<div class="ai-tip">${t}</div>`).join('');
   const sk=document.getElementById('skip-btn');if(sk){sk.textContent=opts.skipLabel;sk.setAttribute('onclick',opts.skipFn);}
-  buildAns(q);document.getElementById('sub-btn').disabled=true;
+  document.getElementById('sub-btn').disabled=true;buildAns(q);
 }
 function curQuestion(){return S.mode==='survey'&&S.sv?S.sv.list[S.sv.idx]:S.curQ;}
 
@@ -1291,7 +1293,7 @@ function openSurveyQ(){
 function startSurvey(){if(!S.sv)return;S.sv.idx=0;openSurveyQ();}
 function endSurveyEarly(){
   refreshHome();refreshWallet();
-  openReward({pts:S.sv.hookPts,total:S.pts,brand:S.sv.brand,usage:S.sv.base.usage,title:'Merci !',sub:'Tu gardes tes points — reviens quand tu veux pour le reste.',brandName:S.sv.brand});
+  openReward({pts:S.sv.hookPts,total:S.pts,brand:S.sv.brand,usage:S.sv.base.usage,title:'Merci !',sub:'Tu gardes tes points, reviens quand tu veux pour le reste.',brandName:S.sv.brand});
   S.mode='hook';
 }
 function finishSurvey(){
@@ -1299,7 +1301,7 @@ function finishSurvey(){
   const done=sv.idx;
   openReward({pts:sv.earned,total:S.pts,brand:sv.brand,usage:sv.base.usage,
     title:done>=sv.list.length?'Questionnaire terminé 🎉':'Bien joué !',
-    sub:done>=sv.list.length?('Tu as répondu à tout le questionnaire '+sv.brand):'Tu gardes tes points — à bientôt !',
+    sub:done>=sv.list.length?('Tu as répondu à tout le questionnaire '+sv.brand):'Tu gardes tes points, à bientôt !',
     brandName:sv.brand});
   S.mode='hook';
 }
@@ -1352,7 +1354,7 @@ function openReward(o){
   const s=document.querySelector('#reward .rw-sub');if(s)s.textContent=o.sub||'Ta réponse a été envoyée';
   document.getElementById('rw-pts').textContent=o.pts;
   document.getElementById('rw-total').textContent=o.total+' pts';
-  document.getElementById('rw-usage').innerHTML='Ta réponse aide <strong>'+o.brand+'</strong> — '+(o.usage||'à mieux servir le quartier.');
+  document.getElementById('rw-usage').innerHTML='Ta réponse aide <strong>'+o.brand+'</strong>, '+(o.usage||'à mieux servir le quartier.');
   const act=document.getElementById('rw-actions');act.innerHTML='';
   const mk=(cls,txt,fn)=>{const b=document.createElement('button');b.className=cls;b.textContent=txt;b.onclick=fn;act.appendChild(b);};
   if(S.qs&&S.qs.length>0)mk('btn-p','Question suivante →',nextQ);
@@ -1387,7 +1389,8 @@ function openBrand(name,back){
   const info=[['Secteur',p.sector||'—'],['Créée en',p.founded||'—'],['Effectif',p.size||'—'],['Siège',p.loc||'—']];
   let sv='';
   surveys.forEach(s=>{
-    const active=s.status==='active';const isdone=s.status==='done';
+    const active=s.status==='active';
+    const isdone=s.status==='done';
     sv+=`<div class="bp-survey${active?' active':''}"><div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:#0BAB84;font-weight:600">✓ Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
   });
   if(!surveys.length)sv='<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>';
@@ -1395,7 +1398,7 @@ function openBrand(name,back){
     <div class="bp-cover" style="background:${cover}">
       <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
       <div class="bp-logo-wrap">${logoHTML(name,60)}<div><div class="bp-name">${name}</div><div class="bp-tag">${p.tagline||''}</div></div></div>
-      <div class="bp-chips"><span class="bp-chip">✓ Commerce du quartier</span><span class="bp-chip">${p.sector||''}</span></div>
+      <div class="bp-chips"><span class="bp-chip">✓ Commerce du quartier</span><span class="bp-chip">📍 ${(p.loc||'').split(',').pop().trim()}</span><span class="bp-chip">${p.sector||''}</span></div>
     </div>
     <div class="bp-stats">${stats.map(s=>`<div class="bp-stat"><div class="bp-stat-n">${s[0]} ${s[1]}</div><div class="bp-stat-l">${s[2]}</div></div>`).join('')}</div>
     <div class="bp-body">
@@ -1422,9 +1425,12 @@ function renderBrandRail(){
   Object.keys(BRANDPROFILE).forEach(name=>{
     const p=BRANDPROFILE[name];const act=brandSurveys(name).filter(s=>s.status==='active').length;
     const d=document.createElement('div');d.className='br-card';d.onclick=()=>openBrand(name,'home');
-    d.innerHTML=`<div class="brc-top">${logoHTML(name,40)}</div><div class="brc-name">${name}</div><div class="brc-sec">${p.sector}</div><div class="brc-chip${act?'':' soon'}">${act?('📋 '+act+' sondage'+(act>1?'s':'')):'🔜 Bientôt'}</div>`;
+    d.innerHTML=`<div class="brc-top">${logoHTML(name,40)}</div><div class="brc-name">${name}</div><div class="brc-sec" style="color:var(--coral);font-weight:600">📍 ${(p.loc||'').split(',').pop().trim()}</div><div class="brc-sec">${p.sector}</div><div class="brc-chip${act?'':' soon'}">${act?('📋 '+act+' sondage'+(act>1?'s':'')):'🔜 Bientôt'}</div>`;
     el.appendChild(d);
   });
+  const more=document.createElement('div');more.className='br-card';more.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px';
+  more.innerHTML=`<div style="font-family:var(--fd);font-weight:800;font-size:28px;letter-spacing:2px;color:var(--ink3);line-height:1">•••</div><div style="font-size:11px;font-weight:600;color:var(--ink2)">D'autres commerces<br>près de toi</div>`;
+  el.appendChild(more);
 }
 
 /* --- Brancher le rail sur refreshHome sans la réécrire --- */
