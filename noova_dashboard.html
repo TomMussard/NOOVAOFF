@@ -1402,8 +1402,17 @@ window.addEventListener('load',()=>{
 });
 </script>
 
+<!-- Écran de chargement Firebase -->
+<div id="auth-loading" style="position:fixed;inset:0;z-index:10001;background:var(--bg);display:flex;align-items:center;justify-content:center">
+  <div style="text-align:center">
+    <div style="font-family:var(--fd);font-weight:800;font-size:52px;letter-spacing:-2px;color:var(--coral);line-height:1">noova</div>
+    <div style="width:32px;height:3px;background:var(--coral);border-radius:99px;margin:14px auto 0;opacity:.4;animation:ld-dash 1.1s ease-in-out infinite alternate"></div>
+  </div>
+</div>
+<style>@keyframes ld-dash{from{transform:scaleX(.35)}to{transform:scaleX(1.3)}}</style>
+
 <!-- ═══ AUTH WALL ══════════════════════════════════════════════ -->
-<div id="auth-wall" style="position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:28px;overflow-y:auto">
+<div id="auth-wall" style="position:fixed;inset:0;z-index:9999;background:var(--bg);display:none;align-items:center;justify-content:center;padding:28px;overflow-y:auto">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.08)">
 
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
@@ -1728,6 +1737,8 @@ async function saveGoogleMerchant() {
 
 // ─── Observer principal ───────────────────────────────────────
 auth.onAuthStateChanged(user => {
+  const loading = document.getElementById('auth-loading');
+  if(loading) loading.style.display = 'none';
   const aw  = document.getElementById('auth-wall');
   const gmw = document.getElementById('google-merchant-wall');
   if(user) {
