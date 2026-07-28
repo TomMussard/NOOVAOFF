@@ -1402,6 +1402,21 @@ window.addEventListener('load',()=>{
 });
 </script>
 
+<!-- Écran d'attente vérification commerçant -->
+<div id="pending-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);align-items:center;justify-content:center;padding:32px;flex-direction:column;text-align:center">
+  <div style="max-width:380px">
+    <div style="font-size:52px;margin-bottom:16px">⏳</div>
+    <div style="font-family:var(--fd);font-weight:800;font-size:26px;letter-spacing:-.8px;color:var(--ink);margin-bottom:8px">Vérification en cours</div>
+    <div style="font-size:14px;color:var(--ink2);margin-bottom:6px;line-height:1.7">Ton espace commerçant pour <strong id="pending-brand"></strong> est en cours de validation.</div>
+    <div id="pending-eta" style="font-size:13px;color:var(--coral);font-weight:600;margin-bottom:28px"></div>
+    <div style="background:var(--vd);border:1.5px solid rgba(161,78,8,.15);border-radius:14px;padding:16px 18px;text-align:left;margin-bottom:24px">
+      <div style="font-size:12px;color:var(--ink2);line-height:2">✅ Inscription enregistrée<br>⏳ Vérification manuelle en cours (≤ 24h)<br>🚀 Accès au dashboard après validation</div>
+    </div>
+    <button onclick="auth.signOut()" style="padding:12px 24px;border-radius:11px;background:var(--bg2);border:1.5px solid var(--bg3);color:var(--ink2);font-size:13px;font-weight:600;font-family:var(--fb);cursor:pointer">Se déconnecter</button>
+    <div style="margin-top:12px;font-size:11px;color:var(--ink3)">Reviens dans quelques heures — tu recevras un email de confirmation.</div>
+  </div>
+</div>
+
 <!-- Écran de chargement Firebase -->
 <div id="auth-loading" style="position:fixed;inset:0;z-index:10001;background:var(--bg);display:flex;align-items:center;justify-content:center">
   <div style="text-align:center">
@@ -1526,7 +1541,11 @@ async function awSubmit() {
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       await db.collection('merchants').doc(cred.user.uid).set({
         brandName: brand, email, sector: sector||'Commerce', city,
-        plan: 'starter', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        ownerUid: cred.user.uid,
+        status: 'pending',
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        plan: 'starter',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     }
   } catch(e) {
@@ -1545,6 +1564,12 @@ async function loadMerchantAndStart(uid) {
     await auth.signOut(); return;
   }
   _mData = snap.data();
+
+  // Vérification statut : si pending, afficher l'écran d'attente
+  if(_mData.status === 'pending') {
+    showPendingScreen(_mData);
+    return;
+  }
 
   // Mettre à jour la sidebar avec les vraies données
   const sbn = document.querySelector('.sb-brand-name');
@@ -1689,11 +1714,41 @@ launchCampaign = async function() {
   }
 };
 
+// ─── Écran d'attente vérification commerçant ─────────────────
+function showPendingScreen(data) {
+  const aw = document.getElementById('auth-wall');
+  aw.style.transition = 'opacity .3s'; aw.style.opacity = '0';
+  setTimeout(() => { aw.style.display = 'none'; }, 320);
+
+  const pending = document.getElementById('pending-screen');
+  if(!pending) return;
+
+  // Calcul du délai restant (24h depuis submittedAt)
+  let remaining = '';
+  if(data.submittedAt && data.submittedAt.toDate) {
+    const sub  = data.submittedAt.toDate();
+    const due  = new Date(sub.getTime() + 24*60*60*1000);
+    const diff = due - Date.now();
+    if(diff > 0) {
+      const h = Math.floor(diff/3600000);
+      const m = Math.floor((diff%3600000)/60000);
+      remaining = `Vérification estimée dans ${h}h${m > 0 ? m + 'min' : ''}.`;
+    } else {
+      remaining = 'La vérification est en cours, merci de ta patience.';
+    }
+  }
+  document.getElementById('pending-eta').textContent = remaining;
+  document.getElementById('pending-brand').textContent = data.brandName || '';
+  pending.style.display = 'flex';
+}
+
 // ─── Déconnexion ─────────────────────────────────────────────
 function logout() {
   auth.signOut().then(()=>{
     const aw = document.getElementById('auth-wall');
     aw.style.display='flex'; aw.style.opacity='1';
+    const pending = document.getElementById('pending-screen');
+    if(pending) pending.style.display = 'none';
   });
 }
 
@@ -1729,7 +1784,11 @@ async function saveGoogleMerchant() {
   if(!uid) return;
   await db.collection('merchants').doc(uid).set({
     brandName: brand, email, sector: sector||'Commerce', city,
-    plan: 'starter', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    ownerUid: uid,
+    status: 'pending',
+    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    plan: 'starter',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   gmw.style.display = 'none';
   loadMerchantAndStart(uid);

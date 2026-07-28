@@ -985,27 +985,25 @@ function toggleAllBrands(){
   const inputs=[...document.querySelectorAll('#brands-list input[type=checkbox]')];
   const allOn=inputs.length>0&&inputs.every(i=>i.checked);
   const val=!allOn;
-  BD.forEach(b=>{S.brands[b.id]=val});
+  (S._merchantsForOnboarding||[]).forEach(m=>{S.brands[m.id]=val});
   inputs.forEach(i=>{i.checked=val;const item=i.closest('.brand-item');if(item)item.classList[val?'add':'remove']('on')});
   document.getElementById('brands-all-btn').textContent=val?'Tout retirer':'Tout autoriser';
 }
 function renderBrands(){
-  const el=document.getElementById('brands-list');el.innerHTML='';
-  const byT={};BD.forEach(b=>{if(!byT[b.theme])byT[b.theme]=[];byT[b.theme].push(b)});
-  Object.entries(byT).forEach(([th,items])=>{
-    const h=document.createElement('div');h.className='brand-cat-hdr';h.textContent=th;el.appendChild(h);
-    items.forEach(b=>{
-      if(S.brands[b.id]===undefined)S.brands[b.id]=b.id==='kebab'||b.id==='cafe'||b.id==='fournil';
-      const d=document.createElement('div');d.className='brand-item'+(S.brands[b.id]?' on':'');
-      d.innerHTML=`${logoHTML(b.n,44)}<div style="flex:1;min-width:0"><div class="bi-name">${b.n}</div><div class="bi-use">${b.use}</div></div><label class="tgl"><input type="checkbox" ${S.brands[b.id]?'checked':''} onchange="S.brands['${b.id}']=this.checked;this.closest('.brand-item').classList[this.checked?'add':'remove']('on')"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
-      el.appendChild(d);
-    });
-  });
-  const more=document.createElement('div');more.style.cssText='text-align:center;padding:10px 18px 2px';
-  more.innerHTML='<div style="font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:3px;color:var(--ink3);line-height:1">•••</div><div style="font-size:11px;color:var(--ink2);margin-top:4px">Et d\'autres commerces arrivent près de chez toi</div>';
-  el.appendChild(more);
+  document.getElementById('brands-list').innerHTML='';
 }
-function doBrands(){S.qs=[...QS];goTo('home');document.getElementById('bnav').classList.add('show');refreshHome();renderSocial()}
+async function doBrands(){
+  const uid=auth.currentUser?.uid;
+  if(!uid){goTo('home');return;}
+  const authorized=(S._merchantsForOnboarding||[]).filter(m=>S.brands[m.id]!==false).map(m=>m.id);
+  try{
+    await db.collection('users').doc(uid).update({authorizedMerchants:authorized,onboardingStep:'done'});
+    S._authorizedMerchants=authorized;
+    await loadCampaignsFromFirestore({city:S._city,interests:S._interests,answeredCampaigns:S._answered||[],authorizedMerchants:authorized});
+  }catch(e){console.warn('doBrands:',e);S.qs=[];}
+  document.getElementById('bnav').classList.add('show');
+  refreshHome();renderSocial();goTo('home');
+}
 function refreshHome(){
   if(!S.user)return;
   const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour 👋':hr<18?'Bon après-midi ☀️':'Bonsoir 🌙';
@@ -1611,6 +1609,7 @@ const db = firebase.firestore();
 
 // ─── Auth UI ─────────────────────────────────────────────────
 let _awMode = 'login';
+let _skipNextAuth = false;
 let _awAge = '';
 let _awInterests = [];
 
@@ -1678,6 +1677,7 @@ async function awSubmit() {
       if(!name || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       if(!_awAge) { awShowErr("Sélectionne ta tranche d'âge."); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       if(!_awInterests.length) { awShowErr('Sélectionne au moins un centre d\'intérêt.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      _skipNextAuth = true;
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       await db.collection('users').doc(cred.user.uid).set({
         name, email, city,
@@ -1685,10 +1685,19 @@ async function awSubmit() {
         interests: _awInterests,
         points: 0,
         answeredCampaigns: [],
+        authorizedMerchants: [],
+        onboardingStep: 'merchants',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+      // Gérer manuellement la suite (évite race avec onAuthStateChanged)
+      S.user = { name, uid: cred.user.uid };
+      S.pts = 0; S._city = city; S._interests = _awInterests; S._answered = []; S._authorizedMerchants = [];
+      document.getElementById('auth-wall').style.display = 'none';
+      await loadMerchantsForOnboarding({ city, interests: _awInterests, authorizedMerchants: [] });
+      return;
     }
   } catch(e) {
+    _skipNextAuth = false;
     btn.textContent = _awMode === 'login' ? 'Se connecter' : 'Créer mon compte';
     btn.disabled = false;
     awShowErr(awFrErr(e.code));
@@ -1702,9 +1711,17 @@ async function loadUserAndStart(uid) {
     const data = snap.exists ? snap.data() : {};
     S.user = { name: data.name || 'Toi', uid };
     S.pts   = data.points || 0;
-    S._city      = data.city || '';
-    S._interests = data.interests || ['sport','gaming','culture'];
-    S._answered  = data.answeredCampaigns || [];
+    S._city            = data.city || '';
+    S._interests       = data.interests || [];
+    S._answered        = data.answeredCampaigns || [];
+    S._authorizedMerchants = data.authorizedMerchants || [];
+
+    if(data.onboardingStep === 'merchants') {
+      document.getElementById('auth-wall').style.display = 'none';
+      await loadMerchantsForOnboarding(data);
+      return;
+    }
+
     await loadCampaignsFromFirestore(data);
   } catch(e) {
     S.user = { name: 'Toi', uid };
@@ -1718,16 +1735,67 @@ async function loadUserAndStart(uid) {
   refreshHome(); renderSocial(); goTo('home');
 }
 
+async function loadMerchantsForOnboarding(userData) {
+  const el = document.getElementById('brands-list');
+  el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink3);font-size:13px">Chargement des commerces…</div>';
+  goTo('brands');
+  document.getElementById('bnav').classList.remove('show');
+  try {
+    const city = (userData.city || S._city || '').toLowerCase().trim();
+    let q = db.collection('merchants').where('status','==','verified');
+    if(city) q = q.where('city','==',city);
+    const snap = await q.get();
+    S._merchantsForOnboarding = [];
+    snap.forEach(doc => S._merchantsForOnboarding.push({ id: doc.id, ...doc.data() }));
+    renderBrandsFromFirestore(S._merchantsForOnboarding);
+  } catch(e) {
+    console.warn('loadMerchantsForOnboarding:', e);
+    el.innerHTML = '<div style="text-align:center;padding:24px 20px;color:var(--ink2);font-size:13px;line-height:1.7">Impossible de charger les commerces.<br>Tu pourras les gérer depuis ton profil.</div>';
+  }
+}
+
+function renderBrandsFromFirestore(merchants) {
+  const el = document.getElementById('brands-list');
+  el.innerHTML = '';
+  if(!merchants.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px 20px;color:var(--ink2);font-size:13px;line-height:1.7">Aucun commerce vérifié dans ta ville pour l\'instant.<br>Tu seras notifié·e à leur arrivée.</div>';
+    return;
+  }
+  const byT = {};
+  merchants.forEach(m => {
+    const theme = m.sector || m.theme || 'Commerce';
+    if(!byT[theme]) byT[theme] = [];
+    byT[theme].push(m);
+  });
+  Object.entries(byT).forEach(([th, items]) => {
+    const h = document.createElement('div');
+    h.className = 'brand-cat-hdr'; h.textContent = th; el.appendChild(h);
+    items.forEach(m => {
+      if(S.brands[m.id] === undefined) S.brands[m.id] = true;
+      const checked = S.brands[m.id];
+      const label = m.brandName || m.name || 'Commerce';
+      const sub   = m.address ? (m.address + (m.city ? ', ' + m.city : '')) : (m.city || '');
+      const d = document.createElement('div');
+      d.className = 'brand-item' + (checked ? ' on' : '');
+      d.innerHTML = `${logoHTML(label,44)}<div style="flex:1;min-width:0"><div class="bi-name">${label}</div><div class="bi-use">${sub}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} onchange="S.brands['${m.id}']=this.checked;this.closest('.brand-item').classList[this.checked?'add':'remove']('on')"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
+      el.appendChild(d);
+    });
+  });
+}
+
 async function loadCampaignsFromFirestore(userData) {
   try {
     const snap = await db.collection('campaigns').where('status','==','active').limit(25).get();
-    const answered = userData.answeredCampaigns || [];
+    const answered   = userData.answeredCampaigns   || [];
+    const authorized = userData.authorizedMerchants || [];
     const campaigns = [];
     snap.forEach(doc => {
       if(answered.includes(doc.id)) return;
       const d = doc.data();
       if(d.targetCity && userData.city &&
          d.targetCity.toLowerCase().trim() !== userData.city.toLowerCase().trim()) return;
+      // Filtre authorizedMerchants (Q4 spec)
+      if(authorized.length && d.merchantId && !authorized.includes(d.merchantId)) return;
       campaigns.push({
         _firestoreId: doc.id,
         _merchantId:  d.merchantId || null,
@@ -1815,7 +1883,9 @@ async function signInWithGoogle() {
         city:  '',
         points: 0,
         answeredCampaigns: [],
-        interests: ['sport','gaming','culture'],
+        authorizedMerchants: [],
+        onboardingStep: 'merchants',
+        interests: [],
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       // Demander la ville
@@ -1859,6 +1929,7 @@ async function saveGoogleCity() {
 
 // ─── Observer principal ───────────────────────────────────────
 auth.onAuthStateChanged(user => {
+  if(_skipNextAuth) { _skipNextAuth = false; return; }
   const loading = document.getElementById('auth-loading');
   if(loading) loading.style.display = 'none';
   const aw  = document.getElementById('auth-wall');
