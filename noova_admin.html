@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Noova Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#17141A;--ink2:rgba(23,20,26,.65);--ink3:rgba(23,20,26,.38);--bg:#F5F3EF;--card:#fff;--border:rgba(23,20,26,.09);--mint:#0BAB84;--coral:#E07D0A;--red:#EF4444;--violet:#5C3BF5;--md:rgba(11,171,132,.07);--cd:rgba(224,125,10,.07);--fd:'DM Sans',sans-serif;--fb:system-ui,sans-serif}
+body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100vh}
+#auth-wall{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:16px}
+#auth-wall h2{font-family:var(--fd);font-weight:800;font-size:22px}
+#auth-wall p{font-size:13px;color:var(--ink3)}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.topbar-logo{font-family:var(--fd);font-weight:900;font-size:20px;letter-spacing:-1px}
+.topbar-logo span{color:var(--mint)}
+.topbar-sub{font-size:12px;color:var(--ink3);margin-left:4px}
+.tb-logout{margin-left:auto;padding:7px 14px;background:transparent;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--ink2)}
+.main{max-width:960px;margin:0 auto;padding:28px 24px}
+h1{font-family:var(--fd);font-weight:800;font-size:24px;margin-bottom:4px}
+.sub{font-size:13px;color:var(--ink3);margin-bottom:24px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.stat-n{font-family:var(--fd);font-weight:800;font-size:28px;color:var(--ink)}
+.stat-l{font-size:11px;color:var(--ink3);margin-top:2px;text-transform:uppercase;letter-spacing:.8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.card-title{font-family:var(--fd);font-weight:700;font-size:14px;padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.badge{display:inline-block;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.badge-pending{background:rgba(224,125,10,.12);color:var(--coral)}
+.badge-verified{background:rgba(11,171,132,.12);color:var(--mint)}
+.badge-rejected{background:rgba(239,68,68,.1);color:var(--red)}
+.merchant-row{display:grid;grid-template-columns:1fr 140px 120px 160px;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.merchant-row:last-child{border-bottom:none}
+.merchant-row:hover{background:rgba(0,0,0,.02)}
+.m-name{font-weight:700;font-size:14px;color:var(--ink)}
+.m-meta{font-size:11px;color:var(--ink3);margin-top:2px}
+.m-email{font-size:12px;color:var(--ink2)}
+.row-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn-approve{padding:6px 12px;background:rgba(11,171,132,.12);color:var(--mint);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd)}
+.btn-approve:hover{background:rgba(11,171,132,.22)}
+.btn-reject{padding:6px 12px;background:rgba(239,68,68,.1);color:var(--red);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd)}
+.btn-reject:hover{background:rgba(239,68,68,.18)}
+.empty{text-align:center;padding:48px 20px;color:var(--ink3);font-size:13px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#17141A;color:#fff;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1}
+#section-verified{margin-top:28px}
+.thead{display:grid;grid-template-columns:1fr 140px 120px 160px;gap:12px;padding:10px 18px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);border-bottom:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<div id="auth-wall">
+  <div style="font-size:36px">🔐</div>
+  <h2>Noova Admin</h2>
+  <p>Accès réservé à l'équipe Noova</p>
+  <div id="auth-err" style="font-size:12px;color:var(--red);min-height:16px"></div>
+</div>
+
+<div class="topbar" id="topbar" style="display:none">
+  <div class="topbar-logo">Noova<span>.</span></div>
+  <div class="topbar-sub">Panel Administration</div>
+  <button class="tb-logout" onclick="doLogout()">Déconnexion</button>
+</div>
+
+<div class="main" id="main" style="display:none">
+  <h1>Commerçants en attente</h1>
+  <div class="sub">Valide ou rejette les demandes d'inscription des commerçants.</div>
+
+  <div class="stats">
+    <div class="stat-card"><div class="stat-n" id="cnt-pending">—</div><div class="stat-l">En attente</div></div>
+    <div class="stat-card"><div class="stat-n" id="cnt-verified">—</div><div class="stat-l">Vérifiés</div></div>
+    <div class="stat-card"><div class="stat-n" id="cnt-rejected">—</div><div class="stat-l">Rejetés</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⏳ En attente de validation <span class="badge badge-pending" id="badge-pending">0</span></div>
+    <div class="thead"><div>Commerce</div><div>Secteur</div><div>Ville</div><div style="text-align:right">Actions</div></div>
+    <div id="list-pending"><div class="empty">Chargement…</div></div>
+  </div>
+
+  <div class="card" id="section-verified">
+    <div class="card-title">✅ Commerçants vérifiés <span class="badge badge-verified" id="badge-verified">0</span></div>
+    <div class="thead"><div>Commerce</div><div>Secteur</div><div>Ville</div><div style="text-align:right">Statut</div></div>
+    <div id="list-verified"><div class="empty">Chargement…</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const ADMIN_EMAILS = ['tomussproduction@gmail.com'];
+
+const app = firebase.initializeApp({
+  apiKey: "AIzaSyCU52SgKoIS_P-SEiXFC4d8lQ1rz5mG4to",
+  authDomain: "noova-366d0.firebaseapp.com",
+  projectId: "noova-366d0",
+  storageBucket: "noova-366d0.firebasestorage.app",
+  messagingSenderId: "710589257687",
+  appId: "1:710589257687:web:946b5d1efffabff14d9d92"
+});
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let allMerchants = [];
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    showGoogleLogin();
+    return;
+  }
+  if (!ADMIN_EMAILS.includes(user.email)) {
+    document.getElementById('auth-wall').innerHTML = '<div style="font-size:36px">🚫</div><h2 style="font-family:var(--fd)">Accès refusé</h2><p style="font-size:13px;color:var(--ink3)">Ce compte n\'est pas autorisé.</p><button onclick="auth.signOut()" style="margin-top:12px;padding:9px 18px;background:var(--coral);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700">Changer de compte</button>';
+    return;
+  }
+  document.getElementById('auth-wall').style.display = 'none';
+  document.getElementById('topbar').style.display = 'flex';
+  document.getElementById('main').style.display = 'block';
+  loadMerchants();
+});
+
+function showGoogleLogin() {
+  const aw = document.getElementById('auth-wall');
+  const btn = document.createElement('button');
+  btn.textContent = 'Se connecter avec Google';
+  btn.style.cssText = 'padding:11px 20px;background:#fff;border:1.5px solid rgba(0,0,0,.15);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px';
+  btn.onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => {
+    document.getElementById('auth-err').textContent = e.message;
+  });
+  aw.appendChild(btn);
+}
+
+function doLogout() {
+  auth.signOut().then(() => location.reload());
+}
+
+async function loadMerchants() {
+  document.getElementById('list-pending').innerHTML = '<div class="empty">Chargement…</div>';
+  document.getElementById('list-verified').innerHTML = '<div class="empty">Chargement…</div>';
+  try {
+    const snap = await db.collection('merchants').get();
+    allMerchants = [];
+    snap.forEach(doc => allMerchants.push({ id: doc.id, ...doc.data() }));
+    renderMerchants();
+  } catch(e) {
+    document.getElementById('list-pending').innerHTML = `<div class="empty">Erreur : ${e.message}</div>`;
+  }
+}
+
+function renderMerchants() {
+  const pending = allMerchants.filter(m => m.status === 'pending');
+  const verified = allMerchants.filter(m => m.status === 'verified');
+  const rejected = allMerchants.filter(m => m.status === 'rejected');
+
+  document.getElementById('cnt-pending').textContent = pending.length;
+  document.getElementById('cnt-verified').textContent = verified.length;
+  document.getElementById('cnt-rejected').textContent = rejected.length;
+  document.getElementById('badge-pending').textContent = pending.length;
+  document.getElementById('badge-verified').textContent = verified.length;
+
+  const listPending = document.getElementById('list-pending');
+  if (!pending.length) {
+    listPending.innerHTML = '<div class="empty">✅ Aucun commerçant en attente — tout est à jour !</div>';
+  } else {
+    listPending.innerHTML = pending.map(m => `
+      <div class="merchant-row" id="row-${m.id}">
+        <div>
+          <div class="m-name">${esc(m.brandName||'—')}</div>
+          <div class="m-meta">${esc(m.email||'—')}</div>
+        </div>
+        <div class="m-email">${esc(m.sector||'—')}</div>
+        <div class="m-email">${esc(m.city||'—')}</div>
+        <div class="row-actions">
+          <button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')">✓ Valider</button>
+          <button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')">✗ Rejeter</button>
+        </div>
+      </div>`).join('');
+  }
+
+  const listVerified = document.getElementById('list-verified');
+  const combined = [...verified, ...rejected];
+  if (!combined.length) {
+    listVerified.innerHTML = '<div class="empty">Aucun commerçant vérifié pour l\'instant.</div>';
+  } else {
+    listVerified.innerHTML = combined.map(m => `
+      <div class="merchant-row">
+        <div>
+          <div class="m-name">${esc(m.brandName||'—')}</div>
+          <div class="m-meta">${esc(m.email||'—')}</div>
+        </div>
+        <div class="m-email">${esc(m.sector||'—')}</div>
+        <div class="m-email">${esc(m.city||'—')}</div>
+        <div style="text-align:right"><span class="badge ${m.status==='verified'?'badge-verified':'badge-rejected'}">${m.status==='verified'?'Vérifié':'Rejeté'}</span></div>
+      </div>`).join('');
+  }
+}
+
+async function approveMerchant(id, name) {
+  if (!confirm(`Valider le commerçant "${name}" ?`)) return;
+  try {
+    await db.collection('merchants').doc(id).update({ status: 'verified' });
+    const idx = allMerchants.findIndex(m => m.id === id);
+    if (idx !== -1) allMerchants[idx].status = 'verified';
+    renderMerchants();
+    showToast(`✅ ${name} validé`);
+  } catch(e) { showToast('Erreur : ' + e.message); }
+}
+
+async function rejectMerchant(id, name) {
+  if (!confirm(`Rejeter le commerçant "${name}" ? Il ne pourra pas accéder au dashboard.`)) return;
+  try {
+    await db.collection('merchants').doc(id).update({ status: 'rejected' });
+    const idx = allMerchants.findIndex(m => m.id === id);
+    if (idx !== -1) allMerchants[idx].status = 'rejected';
+    renderMerchants();
+    showToast(`🚫 ${name} rejeté`);
+  } catch(e) { showToast('Erreur : ' + e.message); }
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

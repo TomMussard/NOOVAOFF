@@ -723,7 +723,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div class="preview-phone-inner">
                       <div class="preview-brand-row">
                         <div class="preview-brand-ico">⛺</div>
-                        <div><div class="preview-brand-name">Decathlon</div><div class="preview-brand-theme">Sport</div></div>
+                        <div><div class="preview-brand-name" id="preview-brand-nm">Votre commerce</div><div class="preview-brand-theme" id="preview-brand-sec">Commerce</div></div>
                       </div>
                       <div class="preview-q" id="preview-q">Quel est votre critère principal lors de l'achat d'un équipement sportif ?</div>
                       <div class="preview-ans-placeholder">Écris ta réponse ici…</div>
@@ -812,7 +812,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               <div>
                 <div class="step-card">
                   <div class="step-card-title">Sélectionnez vos thèmes cibles</div>
-                  <div class="step-card-sub">Uniquement parmi vos 847 profils ayant consenti à Decathlon. Chaque sélection affine l'audience éligible.</div>
+                  <div class="step-card-sub" id="aud-subtitle">Chaque sélection affine l'audience éligible parmi les profils ayant consenti à votre commerce.</div>
                   <div class="field">
                     <label class="field-lbl">Thèmes d'intérêt</label>
                     <div class="theme-grid">
@@ -852,7 +852,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div style="font-size:28px">👥</div>
                     <div>
                       <div style="font-family:var(--fd);font-weight:800;font-size:26px;color:var(--ink);letter-spacing:-1px"><span id="aud-count">631</span> <span style="font-size:14px;color:rgba(23,20,26,.55);font-weight:600">profils éligibles</span></div>
-                      <div style="font-size:12px;color:var(--coral);margin-top:3px">Sur 847 profils consentants Decathlon · conforme RGPD</div>
+                      <div style="font-size:12px;color:var(--coral);margin-top:3px" id="aud-footer">Profils consentants · conforme RGPD</div>
                     </div>
                   </div>
                 </div>
@@ -1003,131 +1003,33 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 
       <!-- ═══ RESULTS PAGE ═══ -->
       <div class="page" id="page-results">
-        <!-- Campaign selector -->
-        <div style="display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap">
-          <div style="padding:8px 14px;border-radius:var(--rs);background:var(--cd);border:1.5px solid rgba(224,125,10,.3);font-size:12px;font-weight:700;color:var(--coral);cursor:pointer">⛺ Nom produit trail</div>
-          <div style="padding:8px 14px;border-radius:var(--rs);background:var(--card);border:1.5px solid var(--border);font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer" onclick="this.style.background='var(--card)'">🏊 Satisfaction natation</div>
-          <div style="padding:8px 14px;border-radius:var(--rs);background:var(--card);border:1.5px solid var(--border);font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer">+ Autres</div>
+        <!-- Dynamic campaign selector -->
+        <div id="results-camp-selector" style="display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap">
+          <div style="font-size:13px;color:var(--ink3)">Sélectionne une campagne pour voir ses résultats détaillés.</div>
         </div>
-        <!-- Header -->
-        <div class="results-header">
-          <div class="rh-camp-ico">⛺</div>
-          <div class="rh-info">
-            <div class="rh-name">Quel nom pour notre prochain produit trail ?</div>
-            <div class="rh-meta">
-              <div class="rh-meta-item"><span>📅</span> Clôturée le 6 mai 2025</div>
-              <div class="rh-meta-item"><span>👥</span> 1 284 réponses</div>
-              <div class="rh-meta-item"><span>⭐</span> Score qualité 4.7/5</div>
-              <div class="rh-meta-item"><span>⏱️</span> Livré en 38h</div>
-              <div><span class="status-pill done">Terminée</span></div>
-            </div>
-          </div>
-          <div class="rh-actions">
-            <button class="rh-btn" style="background:var(--vd);color:var(--violet)" onclick="showToast('📄 Export PDF en cours de génération…','📄')">📄 Rapport PDF</button>
-            <button class="rh-btn" style="background:var(--md);color:var(--mint)" onclick="showToast('📊 Fichier CSV téléchargé','📊')">📊 Export CSV</button>
-            <button class="rh-btn" style="background:var(--cd);color:var(--coral)" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">🔁 Phase 2</button>
+        <!-- Dynamic content area -->
+        <div id="results-content">
+          <div style="text-align:center;padding:60px 20px">
+            <div style="font-size:40px;margin-bottom:16px">📊</div>
+            <div style="font-family:var(--fd);font-weight:700;font-size:18px;color:var(--ink);margin-bottom:8px">Aucune campagne sélectionnée</div>
+            <div style="font-size:13px;color:var(--ink3);line-height:1.65;max-width:320px;margin:0 auto 24px">Va dans <strong>Mes campagnes</strong> et clique sur <strong>Voir</strong> pour consulter les résultats en détail.</div>
+            <button class="tb-btn tb-btn-primary" onclick="navTo('campaigns',[...document.querySelectorAll('.sb-item')].find(b=>b.textContent.includes('campagnes')))">Voir mes campagnes →</button>
           </div>
         </div>
-        <!-- Export bar -->
-        <div class="export-bar">
-          <div class="export-info"><strong>Rapport complet disponible.</strong> Généré par clustering IA sur les verbatims bruts · Dernière mise à jour il y a 2h</div>
-          <div class="export-btns">
-            <button class="export-btn" onclick="showToast('📄 Ouverture du rapport…','📄')">📄 Synthèse PDF</button>
-            <button class="export-btn" onclick="showToast('📊 Export CSV lancé','📊')">📊 CSV brut</button>
-            <button class="export-btn" onclick="showToast('📧 Rapport envoyé par email','📧')">📧 Partager</button>
-          </div>
-        </div>
-        <!-- Tabs -->
-        <div class="results-tabs">
-          <button class="res-tab active" onclick="resTab('synthesis',this)">📊 Synthèse</button>
-          <button class="res-tab" onclick="resTab('verbatims',this)">💬 Verbatims</button>
-          <button class="res-tab" onclick="resTab('clusters',this)">🗂️ Clustering</button>
-          <button class="res-tab" onclick="resTab('recos',this)">💡 Recommandations</button>
-        </div>
-        <!-- Synthesis panel -->
-        <div class="res-panel active" id="res-synthesis">
-          <div class="synth-grid">
-            <div class="synth-card">
-              <div class="synth-card-title">Analyse de sentiment</div>
-              <div class="sent-item"><div class="sent-lbl">Positif</div><div class="sent-bar"><div class="sent-fill" style="width:68%;background:linear-gradient(90deg,var(--mint),#22C55E)"></div></div><div class="sent-val" style="color:var(--mint)">68%</div></div>
-              <div class="sent-item"><div class="sent-lbl">Neutre</div><div class="sent-bar"><div class="sent-fill" style="width:22%;background:rgba(23,20,26,.2)"></div></div><div class="sent-val" style="color:var(--ink3)">22%</div></div>
-              <div class="sent-item"><div class="sent-lbl">Négatif</div><div class="sent-bar"><div class="sent-fill" style="width:10%;background:rgba(239,68,68,.7)"></div></div><div class="sent-val" style="color:#F87171">10%</div></div>
-              <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--ink3);line-height:1.65">Le sentiment global est <strong style="color:var(--mint)">très positif</strong>. Le frein principal identifié est la perception prix (10% des réponses négatives).</div>
-            </div>
-            <div class="synth-card">
-              <div class="synth-card-title">Thèmes les plus mentionnés</div>
-              <div class="bar-chart-item"><div class="bc-lbl">Performance</div><div class="bc-track"><div class="bc-fill" style="width:74%;background:linear-gradient(90deg,var(--violet),var(--coral))"><div class="bc-val">74%</div></div></div></div>
-              <div class="bar-chart-item"><div class="bc-lbl">Légèreté</div><div class="bc-track"><div class="bc-fill" style="width:58%;background:linear-gradient(90deg,var(--violet),var(--coral))"><div class="bc-val">58%</div></div></div></div>
-              <div class="bar-chart-item"><div class="bc-lbl">Confort</div><div class="bc-track"><div class="bc-fill" style="width:49%;background:linear-gradient(90deg,var(--violet),var(--coral))"><div class="bc-val">49%</div></div></div></div>
-              <div class="bar-chart-item"><div class="bc-lbl">Prix</div><div class="bc-track"><div class="bc-fill" style="width:41%;background:linear-gradient(90deg,var(--violet),var(--coral))"><div class="bc-val">41%</div></div></div></div>
-              <div class="bar-chart-item"><div class="bc-lbl">Design</div><div class="bc-track"><div class="bc-fill" style="width:28%;background:linear-gradient(90deg,var(--violet),var(--coral))"><div class="bc-val">28%</div></div></div></div>
-            </div>
-            <div class="synth-card">
-              <div class="synth-card-title">Score qualité des réponses</div>
-              <div class="nps-display">
-                <div class="nps-score">4.7<span class="nps-max">/5</span></div>
-                <div class="nps-lbl">Basé sur complétude, cohérence & richesse</div>
-                <div class="nps-bar" style="margin-top:12px">
-                  <div style="flex:10;background:rgba(239,68,68,.5)"></div>
-                  <div style="flex:22;background:rgba(245,166,35,.5)"></div>
-                  <div style="flex:68;background:var(--mint)"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;font-size:9px;margin-top:4px">
-                  <span style="color:#F87171">< 3 · 10%</span>
-                  <span style="color:var(--amber)">3–4 · 22%</span>
-                  <span style="color:var(--mint)">4–5 · 68%</span>
-                </div>
-              </div>
-              <div style="margin-top:14px;display:flex;flex-direction:column;gap:7px">
-                <div class="aud-row"><div class="aud-lbl" style="width:80px">Complétude</div><div class="aud-bar"><div class="aud-fill" style="width:92%;background:var(--mint)"></div></div><div class="aud-val">92%</div></div>
-                <div class="aud-row"><div class="aud-lbl" style="width:80px">Cohérence</div><div class="aud-bar"><div class="aud-fill" style="width:88%;background:var(--violet)"></div></div><div class="aud-val">88%</div></div>
-                <div class="aud-row"><div class="aud-lbl" style="width:80px">Richesse</div><div class="aud-bar"><div class="aud-fill" style="width:79%;background:var(--coral)"></div></div><div class="aud-val">79%</div></div>
-              </div>
-            </div>
-          </div>
-          <!-- Profil répondants -->
-          <div class="section-title">Profil des répondants</div>
-          <div class="audience-grid">
-            <div class="card card-inner">
-              <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:14px">Tranches d'âge</div>
-              <div class="aud-row"><div class="aud-lbl">18–24 ans</div><div class="aud-bar"><div class="aud-fill" style="width:32%;background:var(--coral)"></div></div><div class="aud-val">32%</div></div>
-              <div class="aud-row"><div class="aud-lbl">25–34 ans</div><div class="aud-bar"><div class="aud-fill" style="width:41%;background:var(--violet)"></div></div><div class="aud-val">41%</div></div>
-              <div class="aud-row"><div class="aud-lbl">35–49 ans</div><div class="aud-bar"><div class="aud-fill" style="width:19%;background:var(--mint)"></div></div><div class="aud-val">19%</div></div>
-              <div class="aud-row"><div class="aud-lbl">50+ ans</div><div class="aud-bar"><div class="aud-fill" style="width:8%;background:var(--amber)"></div></div><div class="aud-val">8%</div></div>
-            </div>
-            <div class="card card-inner">
-              <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:14px">Thèmes d'intérêt</div>
-              <div class="aud-row"><div class="aud-lbl">🏃 Sport</div><div class="aud-bar"><div class="aud-fill" style="width:84%;background:var(--coral)"></div></div><div class="aud-val">84%</div></div>
-              <div class="aud-row"><div class="aud-lbl">🧘 Bien-être</div><div class="aud-bar"><div class="aud-fill" style="width:61%;background:var(--violet)"></div></div><div class="aud-val">61%</div></div>
-              <div class="aud-row"><div class="aud-lbl">✈️ Voyage</div><div class="aud-bar"><div class="aud-fill" style="width:44%;background:var(--mint)"></div></div><div class="aud-val">44%</div></div>
-              <div class="aud-row"><div class="aud-lbl">💻 Tech</div><div class="aud-bar"><div class="aud-fill" style="width:37%;background:var(--amber)"></div></div><div class="aud-val">37%</div></div>
-            </div>
-          </div>
-        </div>
-        <!-- Verbatims panel -->
-        <div class="res-panel" id="res-verbatims">
-          <div class="verbatim-filters">
-            <div class="vf-chip active" onclick="filterVerb(this,'all')">Tous (1 284)</div>
-            <div class="vf-chip" onclick="filterVerb(this,'perf')">🚀 Performance (74%)</div>
-            <div class="vf-chip" onclick="filterVerb(this,'light')">🪶 Légèreté (58%)</div>
-            <div class="vf-chip" onclick="filterVerb(this,'comfort')">🛋️ Confort (49%)</div>
-            <div class="vf-chip" onclick="filterVerb(this,'price')">💰 Prix (41%)</div>
-            <div class="vf-chip" onclick="filterVerb(this,'neg')">⚠️ Négatifs (10%)</div>
-          </div>
+        <!-- Legacy panels (hidden, kept for resTab() compatibility) -->
+        <div class="res-panel" id="res-synthesis" style="display:none"></div>
+        <div class="res-panel" id="res-verbatims" style="display:none">
+          <div class="verbatim-filters"></div>
           <div class="verbatim-grid" id="verbatim-list"></div>
         </div>
-        <!-- Clusters panel -->
-        <div class="res-panel" id="res-clusters">
-          <div style="font-size:13px;color:var(--ink2);margin-bottom:18px;line-height:1.65">Le clustering IA a identifié <strong style="color:var(--ink)">7 thèmes distincts</strong> à partir de 1 284 réponses brutes. Chaque bulle représente la fréquence d'apparition dans les verbatims.</div>
-          <div class="cluster-map" style="margin-bottom:24px" id="cluster-map"></div>
-          <div class="section-title">Détail par cluster</div>
+        <div class="res-panel" id="res-clusters" style="display:none">
+          <div class="cluster-map" id="cluster-map"></div>
           <div id="cluster-detail"></div>
         </div>
-        <!-- Recommendations panel -->
-        <div class="res-panel" id="res-recos">
-          <div style="background:var(--cd);border:1px solid rgba(224,125,10,.25);border-radius:var(--rs);padding:14px 16px;margin-bottom:20px;font-size:13px;color:var(--ink2);line-height:1.65">📊 <strong style="color:var(--coral)">3 recommandations prioritaires</strong> générées par IA · Basées sur l'analyse de 1 284 réponses · Confiancce 89%</div>
+        <div class="res-panel" id="res-recos" style="display:none">
           <div class="reco-list" id="reco-list"></div>
         </div>
+        <!-- REMOVED static fake data (Decathlon trail shoe content) -->
       </div>
 
       <!-- ═══ CAMPAIGNS LIST ═══ -->
@@ -1172,8 +1074,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div style="max-width:640px">
           <div class="settings-section">
             <div class="settings-section-title">Profil de la marque</div>
-            <div class="setting-row"><div class="setting-ico">⛺</div><div class="setting-info"><div class="setting-name">Nom de la marque</div><div class="setting-desc">Decathlon France · ID marque: DEC-FR-001</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
-            <div class="setting-row"><div class="setting-ico">👤</div><div class="setting-info"><div class="setting-name">Contact principal</div><div class="setting-desc">claire.martin@decathlon.com · Chef de produit</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico">⛺</div><div class="setting-info"><div class="setting-name">Nom de la marque</div><div class="setting-desc" id="set-brand-name">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico">👤</div><div class="setting-info"><div class="setting-name">Contact principal</div><div class="setting-desc" id="set-contact">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
             <div class="setting-row"><div class="setting-ico">🌍</div><div class="setting-info"><div class="setting-name">Zone de diffusion</div><div class="setting-desc">France métropolitaine · Toutes régions</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
           </div>
           <div class="settings-section">
@@ -1184,7 +1086,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
           </div>
           <div class="settings-section">
             <div class="settings-section-title">RGPD & données</div>
-            <div class="setting-row"><div class="setting-ico">🛡️</div><div class="setting-info"><div class="setting-name">DPO désigné</div><div class="setting-desc">dpo@decathlon.com · Conforme RGPD Art. 37</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Gérer</button></div>
+            <div class="setting-row"><div class="setting-ico">🛡️</div><div class="setting-info"><div class="setting-name">DPO désigné</div><div class="setting-desc" id="set-dpo">— · Conforme RGPD Art. 37</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Gérer</button></div>
             <div class="setting-row"><div class="setting-ico">📋</div><div class="setting-info"><div class="setting-name">Registre de traitement</div><div class="setting-desc">Export automatique disponible · Dernière MAJ il y a 2j</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Exporter</button></div>
             <div class="setting-row"><div class="setting-ico">🗑️</div><div class="setting-info"><div class="setting-name">Rétention des données</div><div class="setting-desc">Données réponses conservées 24 mois par défaut</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Configurer</button></div>
           </div>
@@ -1506,8 +1408,11 @@ function updatePreview(){
 // ═══ AUDIENCE COUNT ══════════════════════════════════════════
 function updAud(){
   const sel=document.querySelectorAll('.th-chip.sel').length+document.querySelectorAll('.age-chip.sel').length;
-  const base=847; const count=Math.max(200,Math.min(base,Math.floor(base*(0.4+sel*0.08))));
+  const base=_totalConsentedUsers||0;
+  const count=base?Math.max(1,Math.floor(base*(0.4+sel*0.08))):'-';
   document.getElementById('aud-count').textContent=count;
+  const footer=document.getElementById('aud-footer');
+  if(footer&&base) footer.textContent=base+' profils consentants · conforme RGPD';
 }
 
 // ═══ VOLUME ══════════════════════════════════════════════════
@@ -1686,6 +1591,7 @@ const db   = firebase.firestore();
 
 let _mData      = null;
 let _mCampaigns = [];
+let _totalConsentedUsers = 0;
 
 // ─── Auth UI ─────────────────────────────────────────────────
 let _awMode = 'login';
@@ -1767,6 +1673,16 @@ async function loadMerchantAndStart(uid) {
   if(sun) sun.textContent = _mData.brandName || '';
   if(sur) sur.textContent = _mData.sector || 'Commerçant';
   document.getElementById('topbar-sub').textContent = 'Bienvenue — ' + (_mData.brandName||'');
+  // Settings page dynamic data
+  const setBrand = document.getElementById('set-brand-name');
+  const setContact = document.getElementById('set-contact');
+  const setDpo = document.getElementById('set-dpo');
+  if(setBrand) setBrand.textContent = (_mData.brandName||'—') + (_mData.city?' · '+_mData.city:'');
+  if(setContact) setContact.textContent = (_mData.email||'—') + (_mData.sector?' · '+_mData.sector:'');
+  if(setDpo) setDpo.textContent = (_mData.email||'—') + ' · Conforme RGPD Art. 37';
+  // Update wizard preview brand names
+  document.querySelectorAll('#preview-brand-nm').forEach(el => el.textContent = _mData.brandName||'Votre commerce');
+  document.querySelectorAll('#preview-brand-sec').forEach(el => el.textContent = _mData.sector||'Commerce');
 
   const aw = document.getElementById('auth-wall');
   aw.style.transition = 'opacity .3s'; aw.style.opacity = '0';
@@ -1777,6 +1693,10 @@ async function loadMerchantAndStart(uid) {
   ['kpi-delta-0','kpi-delta-1','kpi-delta-2','kpi-delta-3'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=''; });
 
   loadMerchantCampaigns(uid);
+  // Count users who consented to this merchant
+  db.collection('users').where('authorizedMerchants','array-contains',uid).get()
+    .then(snap => { _totalConsentedUsers = snap.size; updAud(); })
+    .catch(()=>{});
 }
 
 function loadMerchantCampaigns(uid) {

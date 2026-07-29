@@ -936,6 +936,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 const S={user:null,pts:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],done:{},friends:[],chats:{}};
 const BRANDMETA={};
 function logoHTML(name,size){const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#6A6470'};const s=size||44;const r=Math.round(s*0.27),fs=Math.round(s*0.44);return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;}
+function normalizeCity(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');}
 const GROUPS=[];
 const AVC=['#E07D0A','#A14E08','#0BAB84','#F5A623','#E8A33C'];
 const BDGS=[{id:'first',e:'🌟',n:'Première réponse'},{id:'trio',e:'🎯',n:'3 réponses'},{id:'streak3',e:'🔥',n:'Streak 3 jours'},{id:'social',e:'👥',n:'Premier ami'},{id:'qual',e:'✨',n:'Qualité A+'}];
@@ -1100,8 +1101,10 @@ function renderSocial(){
 }
 function initFriendsPanel(){
   const fp=document.getElementById('panel-friends');fp.innerHTML='';
-  fp.innerHTML=`<div class="inv-c"><div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink);margin-bottom:4px">🎁 Invite un ami, gagne 50 pts</div><div style="font-size:12px;color:var(--ink2);margin-bottom:11px;line-height:1.5">Partage ton code. Quand ton ami répond à sa 1re question, vous gagnez tous les deux 50 pts.</div><div style="display:flex;align-items:center;gap:8px"><div class="inv-code" id="inv-code">NOVA-ALEX42</div><button class="copy-btn" onclick="this.textContent='Copié !';setTimeout(()=>this.textContent='Copier',2000)">Copier</button></div></div>
-  <div style="display:flex;gap:8px;margin:0 18px 12px"><input style="flex:1;padding:10px 12px;background:var(--card);border:1.5px solid var(--bg3);border-radius:11px;font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOVA-AB12)" id="fi-inp"><button style="padding:10px 14px;background:var(--coral);color:#fff;font-size:12px;font-weight:700;border:none;border-radius:11px;cursor:pointer;font-family:var(--fd);box-shadow:0 4px 10px var(--cg)" onclick="addFriend()">Ajouter</button></div>
+  const myCode=S._friendCode||'—';
+  fp.innerHTML=`<div class="inv-c"><div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink);margin-bottom:4px">🎁 Invite un ami, gagne 50 pts</div><div style="font-size:12px;color:var(--ink2);margin-bottom:11px;line-height:1.5">Partage ton code. Quand ton ami répond à sa 1re question, vous gagnez tous les deux 50 pts.</div><div style="display:flex;align-items:center;gap:8px"><div class="inv-code" id="inv-code">${myCode}</div><button class="copy-btn" onclick="navigator.clipboard&&navigator.clipboard.writeText('${myCode}');this.textContent='Copié !';setTimeout(()=>this.textContent='Copier',2000)">Copier</button></div></div>
+  <div style="display:flex;gap:8px;margin:0 18px 8px"><input style="flex:1;padding:10px 12px;background:var(--card);border:1.5px solid var(--bg3);border-radius:11px;font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOVA-AB12)" id="fi-inp"><button style="padding:10px 14px;background:var(--coral);color:#fff;font-size:12px;font-weight:700;border:none;border-radius:11px;cursor:pointer;font-family:var(--fd);box-shadow:0 4px 10px var(--cg)" onclick="addFriend()">Ajouter</button></div>
+  <div style="padding:0 18px 8px"><div id="fi-err" style="font-size:12px;color:var(--coral);min-height:16px"></div></div>
   <div style="padding:0 18px"><div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">MES AMIS</div><div id="friends-list"></div></div>`;
   renderFriends();
 }
@@ -1134,7 +1137,25 @@ function renderGroups(){
   if(!GROUPS.length){el.insertAdjacentHTML('beforeend','<div style="text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px;line-height:1.6">Les groupes communautaires arrivent bientôt !</div>');return}
   GROUPS.forEach(g=>{const d=document.createElement('div');d.className='group-c';d.innerHTML=`<div class="gc-ico" style="background:var(--vd)">${g.ico}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink)">${g.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${g.meta}</div></div><div style="font-size:11px;font-weight:700;color:var(--violet);background:var(--vd);padding:5px 11px;border-radius:99px;white-space:nowrap;cursor:pointer">Rejoindre</div>`;el.appendChild(d)});
 }
-function addFriend(){const inp=document.getElementById('fi-inp');const code=inp.value.trim();if(!code)return;S.friends.push({n:'Ami '+code.slice(-4),pts:Math.floor(Math.random()*200)+50,str:Math.floor(Math.random()*7)+1,online:true});inp.value='';renderFriends();renderRanking()}
+async function addFriend(){
+  const inp=document.getElementById('fi-inp');
+  const code=inp.value.trim().toUpperCase();
+  const errEl=document.getElementById('fi-err');
+  if(!code){return;}
+  const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
+  if(errEl)errEl.textContent='Recherche…';
+  try{
+    const snap=await db.collection('users').where('friendCode','==',code).limit(1).get();
+    if(snap.empty){if(errEl)errEl.textContent='Code introuvable — vérifie le code.';return;}
+    const friendDoc=snap.docs[0];
+    if(friendDoc.id===uid){if(errEl)errEl.textContent='Tu ne peux pas t\'ajouter toi-même !';return;}
+    if((S._friendUids||[]).includes(friendDoc.id)){if(errEl)errEl.textContent='Déjà ami !';return;}
+    await db.collection('users').doc(uid).update({friendUids:firebase.firestore.FieldValue.arrayUnion(friendDoc.id)});
+    S._friendUids=[...(S._friendUids||[]),friendDoc.id];
+    inp.value='';if(errEl)errEl.textContent='';
+    await loadFriendsFromFirestore(S._friendUids);
+  }catch(e){if(errEl)errEl.textContent='Erreur : '+e.message;}
+}
 function openChatFor(u){
   chUser=u;const idx=S.friends.findIndex(f=>f.n===u);const c=idx>=0?AVC[idx%AVC.length]:'#A14E08';
   const av=document.getElementById('ch-av');av.textContent=u[0];av.style.background=c+'18';av.style.color=c;
@@ -1364,7 +1385,77 @@ function openBrand(name,back){
     </div>`;
   goTo('brand-page');
 }
-function openBrandFromQ(){const q=curQuestion();if(q&&q.brand)openBrand(q.brand,'question');}
+async function openBrandById(mid, fallbackName) {
+  S.brandBack='home';
+  document.getElementById('bp-wrap').innerHTML='<div style="text-align:center;padding:80px 20px;color:var(--ink3);font-size:14px">Chargement…</div>';
+  goTo('brand-page');
+  try {
+    const [merchantSnap,campsSnap]=await Promise.all([
+      db.collection('merchants').doc(mid).get(),
+      db.collection('campaigns').where('merchantId','==',mid).where('status','==','active').get()
+    ]);
+    const m=merchantSnap.exists?merchantSnap.data():{};
+    const brandName=m.brandName||fallbackName||'Commerce';
+    const camps=[];
+    campsSnap.forEach(doc=>camps.push({id:doc.id,...doc.data()}));
+    const answered=S._answered||[];
+    const sv=!camps.length
+      ?'<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>'
+      :camps.map(c=>{
+          const done=answered.includes(c.id);
+          return done
+            ?`<div class="bp-survey"><div class="bp-sv-q">${c.question}</div><div class="bp-sv-meta" style="margin-bottom:0;color:#0BAB84;font-weight:600">✓ Tu as déjà répondu — merci !</div></div>`
+            :`<div class="bp-survey active">
+                <div class="bp-sv-top"><span class="bp-sv-badge" style="background:rgba(11,171,132,.12);color:#0BAB84">✓ Actif</span><span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${(c.questions&&c.questions.length||1)*(c.pointsPerAnswer||20)} pts</span></div>
+                <div class="bp-sv-q">${c.question}</div>
+                <div class="bp-sv-meta"><span>📝 ${c.questions&&c.questions.length||1} question(s)</span><span>⏱️ ~${(c.questions&&c.questions.length||1)*15}s</span></div>
+                <button class="btn-p" onclick="startCampaignById('${c.id}')">Répondre au questionnaire →</button>
+              </div>`;
+        }).join('');
+    document.getElementById('bp-wrap').innerHTML=`
+      <div class="bp-cover" style="background:linear-gradient(150deg,#1A1208 0%,#2B1D0B 38%,rgba(0,0,0,.5) 165%)">
+        <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
+        <div class="bp-logo-wrap">${logoHTML(brandName,60)}<div><div class="bp-name">${brandName}</div><div class="bp-tag">${m.sector||'Commerce local'}${m.city?' · '+m.city:''}</div></div></div>
+        <div class="bp-chips"><span class="bp-chip">✓ Commerce vérifié</span>${m.city?`<span class="bp-chip">📍 ${m.city}</span>`:''}${m.sector?`<span class="bp-chip">${m.sector}</span>`:''}</div>
+      </div>
+      <div class="bp-stats">
+        <div class="bp-stat"><div class="bp-stat-n">📋 ${camps.length}</div><div class="bp-stat-l">Sondage${camps.length>1?'s':''}</div></div>
+        <div class="bp-stat"><div class="bp-stat-n">💎 ${camps[0]&&camps[0].pointsPerAnswer||20}</div><div class="bp-stat-l">Pts / quest.</div></div>
+        <div class="bp-stat"><div class="bp-stat-n">⏱️ ~30s</div><div class="bp-stat-l">Par question</div></div>
+        <div class="bp-stat"><div class="bp-stat-n">🔐</div><div class="bp-stat-l">Données protégées</div></div>
+      </div>
+      <div class="bp-body">
+        <div class="bp-block"><div class="bp-sec">À propos</div><div class="bp-text">${m.description||m.about||'Commerce local vérifié sur Noova. Réponds à leurs questions pour gagner des points !'}</div></div>
+        <div class="bp-block"><div class="bp-sec">Leurs sondages</div>${sv}</div>
+        <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di">🔒</span><div class="bp-text" style="font-size:12.5px">Tes réponses sont agrégées et anonymes. Ce commerçant ne voit jamais ton identité.</div></div></div>
+      </div>`;
+  } catch(e) {
+    document.getElementById('bp-wrap').innerHTML=`<div style="text-align:center;padding:40px;color:var(--coral)">Impossible de charger ce commerce.<br><button class="btn-p" style="margin-top:16px" onclick="goTo('home')">Retour</button></div>`;
+  }
+}
+
+function startCampaignById(campId) {
+  const existing=(S.qs||[]).find(q=>q._firestoreId===campId);
+  if(existing){openQ(S.qs.indexOf(existing));return;}
+  db.collection('campaigns').doc(campId).get().then(doc=>{
+    if(!doc.exists)return;
+    const d=doc.data();
+    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:d.pointsPerAnswer||20,type:d.format||'text',q:d.question,hint:'Donne ton avis',opts:d.options||[],items:d.options||[],usage:(d.merchantName||'Ce commerce')+' veut ton avis'};
+    S.mode='hook';S.curQ=q;
+    const pg=document.getElementById('q-prog');pg.innerHTML='';
+    const seg=document.createElement('div');seg.className='q-seg cur';pg.appendChild(seg);
+    fillQuestion(q,{skipLabel:'Passer',skipFn:"goTo('brand-page')"});
+    goTo('question');
+  }).catch(e=>console.warn('startCampaignById:',e));
+}
+
+function openBrandFromQ(){
+  const q=curQuestion();
+  if(!q)return;
+  S.brandBack='question';
+  if(q._merchantId) openBrandById(q._merchantId,q.brand);
+  else if(q.brand) openBrand(q.brand,'question');
+}
 function answerBrand(name){
   if(S.done&&S.done[name])return;
   const hook=(typeof QS!=='undefined')?QS.find(q=>q.brand===name):null;if(!hook)return;
@@ -1380,10 +1471,10 @@ function renderBrandRail(){
   const seen=new Set();const cards=[];
   (S.qs||[]).forEach(q=>{
     const key=q._merchantId||q.brand;
-    if(!seen.has(key)){seen.add(key);cards.push({name:q.brand,ico:q.ico||'🏪',sector:q.theme||'Commerce local',hasQ:true});}
+    if(!seen.has(key)){seen.add(key);cards.push({name:q.brand,ico:q.ico||'🏪',sector:q.theme||'Commerce local',hasQ:true,_merchantId:q._merchantId||null});}
   });
   (S._merchantsForOnboarding||[]).forEach(m=>{
-    if(!seen.has(m.id)){seen.add(m.id);cards.push({name:m.name,ico:'🏪',sector:m.sector||'Commerce local',hasQ:false});}
+    if(!seen.has(m.id)){seen.add(m.id);cards.push({name:m.name,ico:'🏪',sector:m.sector||'Commerce local',hasQ:false,_merchantId:m.id||null});}
   });
   if(!cards.length){
     el.innerHTML='<div style="padding:4px;color:var(--ink3);font-size:12px">Aucun commerce vérifié dans ta ville pour l\'instant.</div>';
@@ -1392,6 +1483,7 @@ function renderBrandRail(){
   cards.forEach(c=>{
     const d=document.createElement('div');d.className='br-card';
     d.innerHTML=`<div class="brc-top">${logoHTML(c.name,40)}</div><div class="brc-name">${c.name}</div><div class="brc-sec">${c.sector}</div><div class="brc-chip${c.hasQ?'':' soon'}">${c.hasQ?'📋 Question active':'🔜 Bientôt'}</div>`;
+    if(c._merchantId) d.onclick=()=>openBrandById(c._merchantId,c.name);
     el.appendChild(d);
   });
   const more=document.createElement('div');more.className='br-card';more.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px';
@@ -1693,6 +1785,15 @@ async function loadUserAndStart(uid) {
     S._interests       = data.interests || [];
     S._answered        = data.answeredCampaigns || [];
     S._authorizedMerchants = data.authorizedMerchants || [];
+    S._friendUids      = data.friendUids || [];
+    if(data.friendCode) {
+      S._friendCode = data.friendCode;
+    } else {
+      const code = 'NOVA-' + Math.random().toString(36).slice(2,6).toUpperCase();
+      S._friendCode = code;
+      db.collection('users').doc(uid).update({ friendCode: code, friendUids: [] }).catch(()=>{});
+    }
+    if(S._friendUids.length) loadFriendsFromFirestore(S._friendUids);
 
     if(data.onboardingStep === 'merchants') {
       document.getElementById('auth-wall').style.display = 'none';
@@ -1712,6 +1813,19 @@ async function loadUserAndStart(uid) {
   setTimeout(() => { aw.style.display = 'none'; }, 320);
   document.getElementById('bnav').classList.add('show');
   refreshHome(); renderSocial(); goTo('home');
+}
+
+async function loadFriendsFromFirestore(uids) {
+  if(!uids || !uids.length) { S.friends=[]; renderFriends(); return; }
+  try {
+    const promises = uids.slice(0,10).map(uid => db.collection('users').doc(uid).get());
+    const snaps = await Promise.all(promises);
+    S.friends = snaps.filter(s=>s.exists).map(s => {
+      const d=s.data();
+      return { n: d.name||'Ami', pts: d.points||0, str: d.streak||0, uid: s.id, online: false };
+    });
+    renderFriends(); renderRanking();
+  } catch(e) { console.warn('loadFriends:', e); }
 }
 
 async function loadMerchantsForOnboarding(userData) {
@@ -1772,7 +1886,7 @@ async function loadCampaignsFromFirestore(userData) {
       if(answered.includes(doc.id)) return;
       const d = doc.data();
       if(d.targetCity && userData.city &&
-         d.targetCity.toLowerCase().trim() !== userData.city.toLowerCase().trim()) return;
+         normalizeCity(d.targetCity) !== normalizeCity(userData.city)) return;
       // Filtre authorizedMerchants (Q4 spec)
       if(authorized.length && d.merchantId && !authorized.includes(d.merchantId)) return;
       campaigns.push({
