@@ -586,7 +586,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <!-- ═══ DASHBOARD ═══ -->
       <div class="page active" id="page-dashboard">
         <!-- Bannière pending (masquée par défaut) -->
-        <div id="pending-banner" style="display:none;background:var(--ad);border:1.5px solid rgba(245,166,35,.35);border-radius:var(--rs);padding:12px 16px;margin-bottom:18px;display:none;align-items:center;gap:12px">
+        <div id="pending-banner" style="display:none;background:var(--ad);border:1.5px solid rgba(245,166,35,.35);border-radius:var(--rs);padding:12px 16px;margin-bottom:18px;align-items:center;gap:12px">
           <span style="font-size:20px">⏳</span>
           <div style="flex:1;font-size:13px;color:var(--ink2);line-height:1.5">
             <strong style="color:var(--ink)">Vérification en cours</strong> — Ton espace est en cours de validation par l'équipe Noova (≤ 24h). Tu peux explorer le dashboard mais le lancement de campagnes sera disponible après validation.
@@ -1468,9 +1468,10 @@ function resetWizard(){
   // Reset MCQ options to 3 blank
   const opts=document.getElementById('mcq-options');
   if(opts){opts.innerHTML='';for(let i=0;i<3;i++){const d=document.createElement('div');d.className='mcq-option-row';d.innerHTML='<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button>';opts.appendChild(d);}}
-  // Reset format to MCQ
-  selFmt(document.querySelector('.fmt-card'),curFmt='mcq');
-  document.getElementById('mcq-builder').style.display='block';
+  // Reset format to MCQ (index 1 = carte MCQ dans le fmt-grid)
+  const mcqCard = document.querySelectorAll('.fmt-card')[1];
+  if(mcqCard) selFmt(mcqCard,'mcq');
+  const mb = document.getElementById('mcq-builder'); if(mb) mb.style.display='block';
 }
 
 // ═══ FORMAT ══════════════════════════════════════════════════
