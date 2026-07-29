@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Fonctions utilitaires ────────────────────────────────────────────────
+    function isAuth() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+    function getMerchant(merchantId) {
+      return get(/databases/$(database)/documents/merchants/$(merchantId)).data;
+    }
+
+    // ─── Users ────────────────────────────────────────────────────────────────
+    // Lecture et écriture uniquement par le propriétaire du profil
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ─── Merchants ────────────────────────────────────────────────────────────
+    // Lecture : commerçant vérifié (pour l'onboarding users) OU propriétaire
+    // Écriture : uniquement le propriétaire (ownerUid)
+    match /merchants/{merchantId} {
+      allow read: if isAuth() && (
+        resource.data.status == 'verified' ||
+        resource.data.ownerUid == request.auth.uid
+      );
+      allow create: if isAuth() && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if isAuth() && resource.data.ownerUid == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // ─── Campaigns ────────────────────────────────────────────────────────────
+    // Lecture : campagnes actives pour tous les users connectés (filtre ville côté client)
+    // Écriture : uniquement le commerçant propriétaire, avec validation des champs
+    match /campaigns/{campaignId} {
+      allow read: if isAuth() && (
+        resource.data.status == 'active' ||
+        resource.data.merchantId == request.auth.uid
+      );
+      allow create: if isAuth() &&
+        request.resource.data.merchantId == request.auth.uid &&
+        request.resource.data.questions.size() <= 3 &&
+        request.resource.data.status in ['active', 'draft', 'paused'];
+      allow update: if isAuth() && (
+        // Le commerçant peut modifier sa campagne
+        resource.data.merchantId == request.auth.uid
+        ||
+        // Un user peut incrémenter answersCount uniquement
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answersCount']) &&
+         request.resource.data.answersCount == resource.data.answersCount + 1)
+      );
+      allow delete: if isAuth() && resource.data.merchantId == request.auth.uid;
+    }
+
+    // ─── Answers ─────────────────────────────────────────────────────────────
+    // Création : uniquement par l'auteur (userId doit matcher)
+    // Lecture : par l'auteur OU par le commerçant de la campagne
+    match /answers/{answerId} {
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAuth() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.merchantId == request.auth.uid
+      );
+      allow update, delete: if false;
+    }
+
+    // ─── Rewards ─────────────────────────────────────────────────────────────
+    // Lecture : récompenses actives pour tous les users connectés
+    // Écriture : uniquement le commerçant propriétaire
+    match /rewards/{rewardId} {
+      allow read: if isAuth() && resource.data.active == true;
+      allow create: if isAuth() && request.resource.data.merchantId == request.auth.uid;
+      allow update, delete: if isAuth() && resource.data.merchantId == request.auth.uid;
+    }
+
+    // ─── Redemptions ─────────────────────────────────────────────────────────
+    // Création : par l'utilisateur concerné
+    // Lecture : par l'utilisateur OU le commerçant concerné
+    match /redemptions/{redemptionId} {
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAuth() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.merchantId == request.auth.uid
+      );
+      allow update, delete: if false;
+    }
+
+    // ─── CommunityEvents ─────────────────────────────────────────────────────
+    // Lecture : tout utilisateur connecté (filtre ville côté client)
+    // Création : uniquement pour soi-même
+    match /communityEvents/{eventId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // ─── Cities ──────────────────────────────────────────────────────────────
+    // Référentiel en lecture seule pour les users
+    match /cities/{cityId} {
+      allow read: if isAuth();
+      allow write: if false;
+    }
+  }
+}

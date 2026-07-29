@@ -1078,7 +1078,9 @@ function spawnConfetti(){
   for(let i=0;i<36;i++){const p=document.createElement('div');p.className='conf-p';const c=clrs[Math.floor(Math.random()*clrs.length)];const w=Math.random()*10+4,h=Math.random()*10+4;p.style.cssText=`width:${w}px;height:${h}px;background:${c};left:${Math.random()*100}%;animation-duration:${Math.random()*1.5+1}s;animation-delay:${Math.random()*.5}s`;el.appendChild(p)}
 }
 function renderSocial(){
-  const fe=document.getElementById('panel-feed');fe.innerHTML='';
+  const fe=document.getElementById('panel-feed');
+  fe.innerHTML='';
+  // Bloc jeu du jour (statique, en construction)
   fe.insertAdjacentHTML('beforeend',`<div style="margin:0 18px 14px;background:linear-gradient(135deg,#0E2A24,#114A3C);border-radius:var(--r);padding:16px 17px;color:#fff;cursor:default;position:relative;overflow:hidden;opacity:.72">
     <div style="font-family:var(--fd);font-weight:700;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:#5FE3BC">🎮 Jeu du jour · question commune</div>
     <div style="font-family:var(--fd);font-weight:800;font-size:19px;line-height:1.18;letter-spacing:-.5px;margin:9px 0 13px">Bientôt disponible dans ta ville</div>
@@ -1086,18 +1088,58 @@ function renderSocial(){
       <span style="font-family:var(--fd);font-weight:700;font-size:13px;background:rgba(255,255,255,.14);padding:7px 13px;border-radius:99px">En préparation…</span>
     </div>
   </div>`);
-  if(FEED.length===0){
-    fe.insertAdjacentHTML('beforeend','<div style="text-align:center;padding:32px 24px;color:var(--ink2);font-size:13px;line-height:1.6">Aucune activité dans ta communauté pour l\'instant.<br>Réponds à des questions pour apparaître ici !</div>');
-  }else{
-    FEED.forEach(p=>{
-      const d=document.createElement('div');d.className='feed-post';
-      if(p.type==='answer')d.innerHTML=`<div class="fp-hdr"><div class="fp-av" style="background:${p.avc}18;color:${p.avc}">${p.av}</div><div style="flex:1"><div class="fp-name">${p.n}</div><div class="fp-time">il y a ${p.t}</div></div><div class="fp-theme" style="background:${p.tbg};color:${p.tc}">${p.theme}</div></div><div class="fp-body"><div class="fp-action">${p.action}</div><div class="fp-quote">"${p.quote}"</div></div><div class="fp-foot"><button class="fp-btn" onclick="this.classList.toggle('liked')">🤍 J'aime</button><button class="fp-btn" onclick="openChatFor('${p.n}')">💬 Commenter</button><button class="fp-btn">📣 Partager</button></div>`;
-      else if(p.type==='badge')d.innerHTML=`<div class="fp-hdr"><div class="fp-av" style="background:${p.avc}18;color:${p.avc}">${p.av}</div><div style="flex:1"><div class="fp-name">${p.n}</div><div class="fp-time">il y a ${p.t}</div></div></div><div class="fp-body"><div class="fp-action">${p.action}</div><div class="fp-ach"><span style="font-size:22px">${p.badge.split(' ')[0]}</span><span>${p.badge.split(' ').slice(1).join(' ')}</span></div></div><div class="fp-foot"><button class="fp-btn">🎊 Féliciter</button></div>`;
-      else d.innerHTML=`<div class="fp-hdr"><div class="fp-av" style="background:${p.avc}18;color:${p.avc}">${p.av}</div><div style="flex:1"><div class="fp-name">${p.n}</div><div class="fp-time">il y a ${p.t}</div></div></div><div class="fp-body"><div class="fp-action" style="font-size:13px;color:var(--ink);font-weight:600">${p.action}</div></div><div class="fp-foot"><button class="fp-btn">🎊 Féliciter</button></div>`;
-      fe.appendChild(d);
-    });
-  }
+  // Chargement du feed depuis Firestore
+  fe.insertAdjacentHTML('beforeend','<div id="feed-content" style="min-height:80px"><div style="text-align:center;padding:24px;color:var(--ink3);font-size:12px">Chargement…</div></div>');
+  loadCommunityFeed();
   initFriendsPanel();initRankingPanel();
+}
+
+async function loadCommunityFeed() {
+  const el = document.getElementById('feed-content');
+  if(!el) return;
+  const city = normalizeCity(S._city || '');
+  if(!city) {
+    el.innerHTML='<div style="text-align:center;padding:32px 24px;color:var(--ink2);font-size:13px;line-height:1.6">Renseigne ta ville pour voir l\'activité de ta communauté !</div>';
+    return;
+  }
+  try {
+    const snap = await db.collection('communityEvents')
+      .where('city','==',city)
+      .orderBy('createdAt','desc')
+      .limit(20)
+      .get();
+    el.innerHTML = '';
+    if(snap.empty) {
+      el.innerHTML='<div style="text-align:center;padding:32px 24px;color:var(--ink2);font-size:13px;line-height:1.6">Aucune activité dans ta communauté pour l\'instant.<br>Réponds à des questions pour être le premier ici !</div>';
+      return;
+    }
+    const colors=['#E07D0A','#A14E08','#0BAB84','#F5A623','#5C3BF5'];
+    snap.forEach((doc,i) => {
+      const ev = doc.data();
+      const name = ev.displayName || 'Quelqu\'un';
+      const c = colors[name.charCodeAt(0) % colors.length];
+      const av = name[0].toUpperCase();
+      const ts = ev.createdAt ? timeAgo(ev.createdAt.toDate()) : '';
+      const d = document.createElement('div');
+      d.className = 'feed-post';
+      d.innerHTML=`<div class="fp-hdr"><div class="fp-av" style="background:${c}18;color:${c}">${av}</div><div style="flex:1"><div class="fp-name">${esc(name)}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body"><div class="fp-action">${esc(ev.text||'a répondu à une question')}${ev.brand?` <strong>${esc(ev.brand)}</strong>`:''}</div></div><div class="fp-foot"><button class="fp-btn" onclick="this.textContent=this.textContent.includes('❤️')?'🤍 J\\'aime':'❤️ J\\'aime'">🤍 J'aime</button></div>`;
+      el.appendChild(d);
+    });
+  } catch(e) {
+    el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:12px">Impossible de charger le feed.</div>';
+  }
+}
+
+function timeAgo(date) {
+  const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+  if(diff < 60) return 'à l\'instant';
+  if(diff < 3600) return `il y a ${Math.floor(diff/60)} min`;
+  if(diff < 86400) return `il y a ${Math.floor(diff/3600)} h`;
+  return `il y a ${Math.floor(diff/86400)} j`;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function initFriendsPanel(){
   const fp=document.getElementById('panel-friends');fp.innerHTML='';
@@ -1119,13 +1161,44 @@ function renderFriends(){
   S.friends.forEach((f,i)=>{const c=AVC[i%AVC.length];const d=document.createElement('div');d.className='fi';d.onclick=()=>openChatFor(f.n);d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${f.n}</div><div class="fi-pts">${f.pts} pts · <span style="color:var(--amber);font-weight:600">🔥 ${f.str}</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;el.appendChild(d)});
 }
 function renderRanking(){
-  const all=[...S.friends,{n:S.user?S.user.name:'Moi',pts:S.pts,str:S.streak,isMe:true}];
-  all.sort((a,b)=>b.pts-a.pts);const mr=all.findIndex(x=>x.isMe)+1;
-  const mre=document.getElementById('my-rank');if(mre)mre.textContent=mr;
-  const tpe=document.getElementById('total-p');if(tpe)tpe.textContent=all.length;
-  const el=document.getElementById('ranking-list');if(!el)return;el.innerHTML='';
-  const medals=['🥇','🥈','🥉'];
-  all.forEach((f,i)=>{const c=f.isMe?'#E07D0A':AVC[i%AVC.length];const d=document.createElement('div');d.className='fi';d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}</div><div style="flex:1"><div class="fi-name" style="${f.isMe?'color:var(--coral);font-weight:700':''}">${f.n}${f.isMe?' (moi)':''}</div><div class="fi-pts">${f.pts} pts · <span style="color:var(--amber);font-weight:600">🔥 ${f.str}</span></div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;el.appendChild(d)});
+  const el=document.getElementById('ranking-list');
+  if(!el)return;
+  el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Chargement…</div>';
+  loadCityRanking();
+}
+
+async function loadCityRanking() {
+  const el=document.getElementById('ranking-list');if(!el)return;
+  const city=normalizeCity(S._city||'');
+  if(!city){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Renseigne ta ville pour voir le classement.</div>';return;}
+  try{
+    const snap=await db.collection('users')
+      .where('city','==',city)
+      .orderBy('points','desc')
+      .limit(20)
+      .get();
+    const myUid=auth.currentUser&&auth.currentUser.uid;
+    const all=[];
+    snap.forEach(doc=>all.push({uid:doc.id,...doc.data()}));
+    const mre=document.getElementById('my-rank');
+    const tpe=document.getElementById('total-p');
+    const myPos=all.findIndex(u=>u.uid===myUid)+1;
+    if(mre)mre.textContent=myPos||'—';
+    if(tpe)tpe.textContent=all.length;
+    el.innerHTML='';
+    const medals=['🥇','🥈','🥉'];
+    all.forEach((u,i)=>{
+      const isMe=u.uid===myUid;
+      const name=u.name||u.displayName||'Anonyme';
+      const c=isMe?'#E07D0A':AVC[i%AVC.length];
+      const d=document.createElement('div');d.className='fi';
+      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--coral);font-weight:700':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.points||0} pts</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;
+      el.appendChild(d);
+    });
+    if(!all.length)el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:13px">Sois le premier à répondre dans ta ville !</div>';
+  }catch(e){
+    el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Impossible de charger le classement.</div>';
+  }
 }
 function socTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
@@ -1177,9 +1250,8 @@ function refreshWallet(){
   document.getElementById('wc-level').textContent='Niveau '+(li+1)+' · '+l.n;
   document.getElementById('wc-next').textContent=l.max===9999?'Max !':l.max+' pts';
   const rpv=document.getElementById('req-pts-v');if(rpv)rpv.textContent=S.pts+' / 10000';
-  const gg=document.getElementById('gift-grid');gg.innerHTML='';
-  if(!GIFTS.length){gg.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px;line-height:1.6">Les récompenses arrivent bientôt.<br>Continue de répondre pour accumuler des points !</div>';}
-  else{GIFTS.forEach(g=>{const locked=S.pts<g.req;const d=document.createElement('div');d.className='gift-c'+(locked?' locked':'');d.innerHTML=`<div style="margin-bottom:7px">${logoHTML(g.br,38)}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${g.br}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${g.val}</div><div style="margin-top:7px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${g.c}15;color:${g.c};display:inline-block">${g.cost} pts</div>`;if(!locked)d.onclick=()=>{const code=(Math.random().toString(36).substring(2,5)+'-'+Math.random().toString(36).substring(2,5)).toUpperCase();alert('🎟️ Bon débloqué !\n\n'+g.val+' · '+g.br+'\n\nCode à usage unique : '+code+'\nÀ présenter au comptoir. Valable 15 min, non partageable.');};gg.appendChild(d)});}
+  const gg=document.getElementById('gift-grid');gg.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--ink3);font-size:12px">Chargement…</div>';
+  loadRewardsFromFirestore();
   const tl=document.getElementById('tiers-list');tl.innerHTML='';
   TIERS.forEach((t,i)=>{const reached=S.pts>=t.min;const d=document.createElement('div');d.style.cssText=`background:var(--card);border:1.5px solid ${reached?t.c+'33':'var(--bg3)'};border-radius:var(--r);padding:12px 13px;margin-bottom:8px`;d.innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:11px;background:${t.c}14;display:flex;align-items:center;justify-content:center;font-size:20px">${t.ico}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:${reached?t.c:'var(--ink)'}">${t.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${t.min===0?'Dès le départ':t.min+' pts requis'}</div></div><div style="font-size:12px;font-weight:700;color:${reached?t.c:'var(--ink3)'}">${reached?'✅ Atteint':'🔒'}</div></div>`;tl.appendChild(d)});
 }
@@ -1743,8 +1815,9 @@ async function awSubmit() {
       if(!_awInterests.length) { awShowErr('Sélectionne au moins un centre d\'intérêt.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       _skipNextAuth = true;
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      const cityNorm = normalizeCity(city);
       await db.collection('users').doc(cred.user.uid).set({
-        name, email, city,
+        name, email, city: cityNorm, cityLabel: city,
         age: _awAge,
         interests: _awInterests,
         points: 0,
@@ -1755,7 +1828,7 @@ async function awSubmit() {
       });
       // Gérer manuellement la suite (évite race avec onAuthStateChanged)
       S.user = { name, uid: cred.user.uid };
-      S.pts = 0; S._city = city; S._interests = _awInterests; S._answered = []; S._authorizedMerchants = [];
+      S.pts = 0; S._city = cityNorm; S._interests = _awInterests; S._answered = []; S._authorizedMerchants = [];
       document.getElementById('auth-wall').style.display = 'none';
       await loadMerchantsForOnboarding({ city, interests: _awInterests, authorizedMerchants: [] });
       return;
@@ -1765,6 +1838,71 @@ async function awSubmit() {
     btn.textContent = _awMode === 'login' ? 'Se connecter' : 'Créer mon compte';
     btn.disabled = false;
     awShowErr(awFrErr(e.code));
+  }
+}
+
+// ─── Récompenses Firestore ────────────────────────────────────
+async function loadRewardsFromFirestore() {
+  const gg = document.getElementById('gift-grid');
+  if(!gg) return;
+  const city = normalizeCity(S._city || '');
+  if(!city) {
+    gg.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px;line-height:1.6">Aucune récompense disponible dans ta ville pour l\'instant.</div>';
+    return;
+  }
+  try {
+    const snap = await db.collection('rewards')
+      .where('active','==',true)
+      .get();
+    const rewards = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      if(normalizeCity(d.city||'') === city) rewards.push({ id: doc.id, ...d });
+    });
+    gg.innerHTML = '';
+    if(!rewards.length) {
+      gg.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px;line-height:1.6">Les récompenses arrivent bientôt dans ta ville !<br>Continue de répondre pour accumuler des points 💪</div>';
+      return;
+    }
+    rewards.forEach(r => {
+      const locked = S.pts < (r.cost || 0);
+      const d = document.createElement('div');
+      d.className = 'gift-c' + (locked ? ' locked' : '');
+      d.innerHTML = `<div style="margin-bottom:7px">${logoHTML(r.merchantName||r.label,38)}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${r.merchantName||'Commerce'}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${r.label||'Récompense'}</div><div style="margin-top:7px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(92,59,245,.12);color:var(--violet);display:inline-block">${r.cost||0} pts</div>`;
+      if(!locked) d.onclick = () => redeemReward(r);
+      gg.appendChild(d);
+    });
+  } catch(e) {
+    gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--ink3);font-size:12px">Erreur de chargement.</div>';
+  }
+}
+
+async function redeemReward(reward) {
+  const u = auth.currentUser;
+  if(!u) return;
+  if(S.pts < (reward.cost||0)) return;
+  if(!confirm(`Échanger ${reward.cost} pts contre "${reward.label}" chez ${reward.merchantName||'ce commerce'} ?`)) return;
+  const code = (Math.random().toString(36).substring(2,5)+'-'+Math.random().toString(36).substring(2,5)).toUpperCase();
+  try {
+    const batch = db.batch();
+    batch.set(db.collection('redemptions').doc(), {
+      userId:     u.uid,
+      rewardId:   reward.id,
+      merchantId: reward.merchantId||null,
+      cost:       reward.cost||0,
+      code:       code,
+      status:     'pending',
+      redeemedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    batch.update(db.collection('users').doc(u.uid), {
+      points: firebase.firestore.FieldValue.increment(-(reward.cost||0))
+    });
+    await batch.commit();
+    S.pts = Math.max(0, S.pts - (reward.cost||0));
+    refreshWallet();
+    alert(`🎟️ Bon débloqué !\n\n${reward.label} · ${reward.merchantName||''}\n\nCode : ${code}\nÀ présenter au comptoir. Valable 15 min.`);
+  } catch(e) {
+    alert('Erreur lors de l\'échange : ' + e.message);
   }
 }
 
@@ -1887,7 +2025,11 @@ async function loadCampaignsFromFirestore(userData) {
       const d = doc.data();
       if(d.targetCity && userData.city &&
          normalizeCity(d.targetCity) !== normalizeCity(userData.city)) return;
-      // Filtre authorizedMerchants (Q4 spec)
+      // Filtre volume cible : campagne pleine
+      if(d.targetVolume && (d.answersCount || 0) >= d.targetVolume) return;
+      // Filtre âge : si la campagne cible des tranches précises
+      if(d.ageRanges && d.ageRanges.length && userData.age && !d.ageRanges.includes(userData.age)) return;
+      // Filtre authorizedMerchants
       if(authorized.length && d.merchantId && !authorized.includes(d.merchantId)) return;
       campaigns.push({
         _firestoreId: doc.id,
@@ -1931,18 +2073,23 @@ submitAns = function() {
   if(!u || !q) return;
   const uid = u.uid;
   const batch = db.batch();
-  batch.set(db.collection('answers').doc(), {
-    campaignId:   q._firestoreId || null,
-    userId:       uid,
-    merchantId:   q._merchantId  || null,
-    brand:        q.brand,
-    answer:       answerValue,
-    pointsAwarded: q.pts,
-    respondentAge:       S._age       || '',
-    respondentCity:      S._city      || '',
-    respondentInterests: S._interests || [],
-    createdAt:    firebase.firestore.FieldValue.serverTimestamp()
-  });
+  // ID déterministe pour éviter les doublons de réponse
+  const respId = q._firestoreId ? `${uid}_${q._firestoreId}` : null;
+  const respRef = respId
+    ? db.collection('answers').doc(respId)
+    : db.collection('answers').doc();
+  batch.set(respRef, {
+    campaignId:          q._firestoreId || null,
+    userId:              uid,
+    merchantId:          q._merchantId  || null,
+    brand:               q.brand,
+    answer:              answerValue,
+    pointsAwarded:       q.pts,
+    respondentAge:       S._age         || '',
+    respondentCity:      S._city        || '',
+    respondentInterests: S._interests   || [],
+    createdAt:           firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: false });
   const userRef = db.collection('users').doc(uid);
   const upd = { points: firebase.firestore.FieldValue.increment(q.pts) };
   if(q._firestoreId) upd.answeredCampaigns = firebase.firestore.FieldValue.arrayUnion(q._firestoreId);
@@ -1950,6 +2097,19 @@ submitAns = function() {
   if(q._firestoreId) {
     batch.update(db.collection('campaigns').doc(q._firestoreId), {
       answersCount: firebase.firestore.FieldValue.increment(1)
+    });
+  }
+  // Événement communautaire pour le feed ville
+  if(S._city) {
+    batch.set(db.collection('communityEvents').doc(), {
+      type:        'answer',
+      userId:      uid,
+      displayName: (S.user && S.user.name) || '—',
+      city:        normalizeCity(S._city),
+      merchantId:  q._merchantId || null,
+      brand:       q.brand,
+      text:        `a répondu à une question de ${q.brand}`,
+      createdAt:   firebase.firestore.FieldValue.serverTimestamp()
     });
   }
   batch.commit().catch(e => console.warn('Firestore answer save:', e));
@@ -2018,7 +2178,7 @@ async function saveGoogleCity() {
   if(!city) { errEl.textContent = 'Indique ta ville.'; errEl.style.display='block'; return; }
   if(!_gcwAge) { errEl.textContent = "Sélectionne ta tranche d'âge."; errEl.style.display='block'; return; }
   if(!_gcwInterests.length) { errEl.textContent = 'Sélectionne au moins un centre d\'intérêt.'; errEl.style.display='block'; return; }
-  await db.collection('users').doc(uid).update({ city, age: _gcwAge, interests: _gcwInterests });
+  await db.collection('users').doc(uid).update({ city: normalizeCity(city), cityLabel: city, age: _gcwAge, interests: _gcwInterests });
   document.getElementById('google-city-wall').style.display = 'none';
   loadUserAndStart(uid);
 }
