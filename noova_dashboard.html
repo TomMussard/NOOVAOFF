@@ -1706,10 +1706,9 @@ async function loadMerchantAndStart(uid) {
   ['kpi-delta-0','kpi-delta-1','kpi-delta-2','kpi-delta-3'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=''; });
 
   loadMerchantCampaigns(uid);
-  // Count users who consented to this merchant
-  db.collection('users').where('authorizedMerchants','array-contains',uid).get()
-    .then(snap => { _totalConsentedUsers = snap.size; updAud(); })
-    .catch(()=>{});
+  // Nb utilisateurs : stocké dans le doc merchant (consentCount) pour éviter les restrictions RGPD
+  _totalConsentedUsers = _mData.consentCount || 0;
+  updAud();
 }
 
 function loadMerchantCampaigns(uid) {

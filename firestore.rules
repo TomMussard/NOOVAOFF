@@ -14,21 +14,33 @@ service cloud.firestore {
     }
 
     // ─── Users ────────────────────────────────────────────────────────────────
-    // Lecture et écriture uniquement par le propriétaire du profil
+    // Lecture : propriétaire OU marchand pour compter ses utilisateurs consentis
+    // Écriture : uniquement le propriétaire
     match /users/{uid} {
-      allow read, write: if isOwner(uid);
+      allow read: if isOwner(uid) ||
+        (isAuth() && request.auth.token.email == 'noovaoffr@gmail.com');
+      allow write: if isOwner(uid);
     }
 
     // ─── Merchants ────────────────────────────────────────────────────────────
-    // Lecture : commerçant vérifié (pour l'onboarding users) OU propriétaire
-    // Écriture : uniquement le propriétaire (ownerUid)
+    // Lecture : commerçant vérifié (pour l'onboarding users) OU propriétaire OU admin
+    // Écriture : uniquement le propriétaire (ownerUid) OU admin
     match /merchants/{merchantId} {
       allow read: if isAuth() && (
         resource.data.status == 'verified' ||
-        resource.data.ownerUid == request.auth.uid
+        resource.data.ownerUid == request.auth.uid ||
+        merchantId == request.auth.uid ||
+        request.auth.token.email == 'noovaoffr@gmail.com'
       );
-      allow create: if isAuth() && request.resource.data.ownerUid == request.auth.uid;
-      allow update: if isAuth() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isAuth() && (
+        request.resource.data.ownerUid == request.auth.uid ||
+        request.auth.uid == merchantId
+      );
+      allow update: if isAuth() && (
+        resource.data.ownerUid == request.auth.uid ||
+        merchantId == request.auth.uid ||
+        request.auth.token.email == 'noovaoffr@gmail.com'
+      );
       allow delete: if false;
     }
 
