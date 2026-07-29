@@ -550,11 +550,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <div class="sb-section">Principal</div>
       <button class="sb-item active" onclick="navTo('dashboard',this)"><span class="sb-ico">📊</span>Dashboard</button>
       <button class="sb-item" onclick="navTo('create',this)"><span class="sb-ico">✨</span>Créer une campagne</button>
-      <button class="sb-item" onclick="navTo('campaigns',this)"><span class="sb-ico">📋</span>Mes campagnes<span class="sb-badge" style="background:rgba(224,125,10,.15);color:var(--coral)">3</span></button>
+      <button class="sb-item" onclick="navTo('campaigns',this)"><span class="sb-ico">📋</span>Mes campagnes<span class="sb-badge" id="camp-badge" style="background:rgba(224,125,10,.15);color:var(--coral);display:none"></span></button>
       <button class="sb-item" onclick="navTo('results',this)"><span class="sb-ico">📈</span>Résultats</button>
-      <div class="sb-section">Audience</div>
-      <button class="sb-item" onclick="navTo('audience',this)"><span class="sb-ico">👥</span>Profils consentants</button>
-      <button class="sb-item" onclick="navTo('consents',this)"><span class="sb-ico">🔐</span>Consentements</button>
+      <button class="sb-item" onclick="navTo('consents',this)"><span class="sb-ico">🔐</span>Consentements RGPD</button>
       <div class="sb-section">Compte</div>
       <button class="sb-item" onclick="navTo('settings',this)"><span class="sb-ico">⚙️</span>Paramètres</button>
       <button class="sb-item" onclick="navTo('billing',this)"><span class="sb-ico">💳</span>Facturation</button>
@@ -578,8 +576,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div class="topbar-title" id="topbar-title">Dashboard</div>
         <div class="topbar-sub" id="topbar-sub">Bienvenue Claire — dernière mise à jour il y a 4 min</div>
       </div>
-      <button class="tb-btn tb-btn-ghost" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">+ Nouvelle campagne</button>
-      <button class="tb-btn tb-btn-primary">🚀 Lancer</button>
+      <button class="tb-btn tb-btn-primary" id="topbar-new-camp-btn" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">✨ Nouvelle campagne</button>
       <div class="tb-notif"><div class="notif-dot"></div>🔔</div>
     </header>
 
@@ -588,27 +585,34 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 
       <!-- ═══ DASHBOARD ═══ -->
       <div class="page active" id="page-dashboard">
+        <!-- Bannière pending (masquée par défaut) -->
+        <div id="pending-banner" style="display:none;background:var(--ad);border:1.5px solid rgba(245,166,35,.35);border-radius:var(--rs);padding:12px 16px;margin-bottom:18px;display:none;align-items:center;gap:12px">
+          <span style="font-size:20px">⏳</span>
+          <div style="flex:1;font-size:13px;color:var(--ink2);line-height:1.5">
+            <strong style="color:var(--ink)">Vérification en cours</strong> — Ton espace est en cours de validation par l'équipe Noova (≤ 24h). Tu peux explorer le dashboard mais le lancement de campagnes sera disponible après validation.
+          </div>
+        </div>
         <!-- KPIs -->
         <div class="kpi-row">
           <div class="kpi-card">
-            <div class="kpi-top"><span class="kpi-icon">📨</span><span class="kpi-delta up">+18% sem.</span></div>
-            <div class="kpi-val">1 284</div>
-            <div class="kpi-lbl">Réponses reçues (30j)</div>
+            <div class="kpi-top"><span class="kpi-icon">📨</span><span class="kpi-delta" id="kpi-delta-0"></span></div>
+            <div class="kpi-val" id="kpi-val-0">0</div>
+            <div class="kpi-lbl">Réponses reçues (total)</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-top"><span class="kpi-icon">⭐</span><span class="kpi-delta up">+0.3</span></div>
-            <div class="kpi-val">4.7<span style="font-size:16px;color:var(--ink3)">/5</span></div>
-            <div class="kpi-lbl">Score qualité moyen</div>
+            <div class="kpi-top"><span class="kpi-icon">📊</span><span class="kpi-delta" id="kpi-delta-1"></span></div>
+            <div class="kpi-val" id="kpi-val-1">0</div>
+            <div class="kpi-lbl">Campagnes actives</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-top"><span class="kpi-icon">⚡</span><span class="kpi-delta up">−4h</span></div>
-            <div class="kpi-val">38<span style="font-size:16px;color:var(--ink3)">h</span></div>
-            <div class="kpi-lbl">Délai moyen livraison</div>
+            <div class="kpi-top"><span class="kpi-icon">📝</span><span class="kpi-delta" id="kpi-delta-2"></span></div>
+            <div class="kpi-val" id="kpi-val-2">0</div>
+            <div class="kpi-lbl">Campagnes créées</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-top"><span class="kpi-icon">👥</span><span class="kpi-delta dn">−3 révocat.</span></div>
-            <div class="kpi-val">847</div>
-            <div class="kpi-lbl">Profils actifs consentants</div>
+            <div class="kpi-top"><span class="kpi-icon">✅</span><span class="kpi-delta" id="kpi-delta-3"></span></div>
+            <div class="kpi-val" id="kpi-val-3">0</div>
+            <div class="kpi-lbl">Campagnes terminées</div>
           </div>
         </div>
         <!-- Campaigns + Quality -->
@@ -623,50 +627,17 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                 <div class="camp-thead-cell">Progression</div>
                 <div class="camp-thead-cell" style="text-align:right">Actions</div>
               </div>
-              <div class="camp-row" onclick="navTo('results',document.querySelectorAll('.sb-item')[3])">
-                <div class="camp-name-wrap"><div class="camp-ico">⛺</div><div><div class="camp-name">Nom produit trail</div><div class="camp-date">Lancée il y a 3j</div></div></div>
-                <div><span class="status-pill live">En cours</span></div>
-                <div><div class="camp-metric">487</div><div class="camp-metric-sub">/ 500 obj.</div></div>
-                <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:97%;background:linear-gradient(90deg,var(--mint),#22C55E)"></div></div><div class="cprog-lbl">97% · livraison imminente</div></div>
-                <div class="camp-actions"><button class="camp-act-btn" style="background:var(--md);color:var(--mint)" onclick="event.stopPropagation();navTo('results',document.querySelectorAll('.sb-item')[3])">Voir</button></div>
-              </div>
-              <div class="camp-row">
-                <div class="camp-name-wrap"><div class="camp-ico">🏊</div><div><div class="camp-name">Satisfaction natation</div><div class="camp-date">Terminée le 2 mai</div></div></div>
-                <div><span class="status-pill done">Terminée</span></div>
-                <div><div class="camp-metric">312</div><div class="camp-metric-sub">/ 300 obj.</div></div>
-                <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:100%;background:var(--violet)"></div></div><div class="cprog-lbl">104% · rapport disponible</div></div>
-                <div class="camp-actions"><button class="camp-act-btn" style="background:var(--vd);color:var(--violet)" onclick="event.stopPropagation()">Rapport</button></div>
-              </div>
-              <div class="camp-row">
-                <div class="camp-name-wrap"><div class="camp-ico">🚴</div><div><div class="camp-name">Test vélo électrique 2025</div><div class="camp-date">Créée hier</div></div></div>
-                <div><span class="status-pill draft">Brouillon</span></div>
-                <div><div class="camp-metric">—</div><div class="camp-metric-sub">/ 400 obj.</div></div>
-                <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:0%"></div></div><div class="cprog-lbl">Non lancée</div></div>
-                <div class="camp-actions"><button class="camp-act-btn" style="background:var(--ad);color:var(--amber)" onclick="event.stopPropagation();navTo('create',document.querySelectorAll('.sb-item')[1])">Éditer</button></div>
-              </div>
+              <div class="camp-row" style="justify-content:center;padding:32px 20px;color:var(--ink3);font-size:13px;grid-column:1/-1" id="dash-empty-camps">Chargement des campagnes…</div>
             </div>
           </div>
           <div>
-            <div class="section-title">Score qualité</div>
-            <div class="card card-inner" style="margin-bottom:14px">
-              <div class="quality-ring">
-                <svg width="80" height="80" viewBox="0 0 80 80">
-                  <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(23,20,26,.08)" stroke-width="7"/>
-                  <circle cx="40" cy="40" r="32" fill="none" stroke="var(--mint)" stroke-width="7" stroke-dasharray="201" stroke-dashoffset="40" stroke-linecap="round"/>
-                </svg>
-                <div class="qr-val"><div class="qr-num">4.7</div><div class="qr-lbl">/ 5.0</div></div>
-              </div>
-              <div style="text-align:center;font-size:11px;color:var(--ink3);margin-bottom:14px">Basé sur 1 284 réponses analysées</div>
-              <div class="aud-row"><div class="aud-lbl">Complétude</div><div class="aud-bar"><div class="aud-fill" style="width:92%;background:var(--mint)"></div></div><div class="aud-val">92%</div></div>
-              <div class="aud-row"><div class="aud-lbl">Cohérence</div><div class="aud-bar"><div class="aud-fill" style="width:88%;background:var(--violet)"></div></div><div class="aud-val">88%</div></div>
-              <div class="aud-row"><div class="aud-lbl">Richesse</div><div class="aud-bar"><div class="aud-fill" style="width:79%;background:var(--coral)"></div></div><div class="aud-val">79%</div></div>
+            <div class="section-title">Statut des campagnes</div>
+            <div class="card card-inner" id="dash-status-card" style="margin-bottom:14px">
+              <div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Aucune campagne pour l'instant.</div>
             </div>
-            <div class="section-title">Audience active</div>
-            <div class="card card-inner">
-              <div class="aud-row"><div class="aud-lbl">🏃 Sport</div><div class="aud-bar"><div class="aud-fill" style="width:84%;background:var(--coral)"></div></div><div class="aud-val">84%</div></div>
-              <div class="aud-row"><div class="aud-lbl">🧘 Bien-être</div><div class="aud-bar"><div class="aud-fill" style="width:62%;background:var(--violet)"></div></div><div class="aud-val">62%</div></div>
-              <div class="aud-row"><div class="aud-lbl">✈️ Voyage</div><div class="aud-bar"><div class="aud-fill" style="width:45%;background:var(--mint)"></div></div><div class="aud-val">45%</div></div>
-              <div class="aud-row"><div class="aud-lbl">💻 Tech</div><div class="aud-bar"><div class="aud-fill" style="width:38%;background:var(--amber)"></div></div><div class="aud-val">38%</div></div>
+            <div class="section-title">Thèmes ciblés</div>
+            <div class="card card-inner" id="dash-themes-card">
+              <div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Lance une campagne pour voir les thèmes.</div>
             </div>
           </div>
         </div>
@@ -1172,38 +1143,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div class="camp-thead-cell">Réponses</div><div class="camp-thead-cell">Progression</div>
             <div class="camp-thead-cell" style="text-align:right">Actions</div>
           </div>
-          <div class="camp-row" onclick="navTo('results',document.querySelectorAll('.sb-item')[3])"><div class="camp-name-wrap"><div class="camp-ico">⛺</div><div><div class="camp-name">Nom prochain produit trail</div><div class="camp-date">Lancée il y a 3j · Sport</div></div></div><div><span class="status-pill live">En cours</span></div><div><div class="camp-metric">487</div><div class="camp-metric-sub">/ 500 obj.</div></div><div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:97%;background:var(--mint)"></div></div><div class="cprog-lbl">97%</div></div><div class="camp-actions"><button class="camp-act-btn" style="background:var(--md);color:var(--mint)">Voir</button></div></div>
-          <div class="camp-row"><div class="camp-name-wrap"><div class="camp-ico">🏊</div><div><div class="camp-name">Satisfaction natation</div><div class="camp-date">Terminée le 2 mai · Sport</div></div></div><div><span class="status-pill done">Terminée</span></div><div><div class="camp-metric">312</div><div class="camp-metric-sub">/ 300 obj.</div></div><div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:100%;background:var(--violet)"></div></div><div class="cprog-lbl">104%</div></div><div class="camp-actions"><button class="camp-act-btn" style="background:var(--vd);color:var(--violet)">Rapport</button></div></div>
-          <div class="camp-row" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])"><div class="camp-name-wrap"><div class="camp-ico">🚴</div><div><div class="camp-name">Test vélo électrique 2025</div><div class="camp-date">Créée hier · Mobilité</div></div></div><div><span class="status-pill draft">Brouillon</span></div><div><div class="camp-metric">—</div><div class="camp-metric-sub">/ 400 obj.</div></div><div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:0%"></div></div><div class="cprog-lbl">Non lancée</div></div><div class="camp-actions"><button class="camp-act-btn" style="background:var(--ad);color:var(--amber)">Éditer</button></div></div>
-          <div class="camp-row"><div class="camp-name-wrap"><div class="camp-ico">👟</div><div><div class="camp-name">Naming chaussures running</div><div class="camp-date">Terminée le 14 avr · Sport</div></div></div><div><span class="status-pill done">Terminée</span></div><div><div class="camp-metric">203</div><div class="camp-metric-sub">/ 200 obj.</div></div><div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:100%;background:var(--violet)"></div></div><div class="cprog-lbl">102%</div></div><div class="camp-actions"><button class="camp-act-btn" style="background:var(--vd);color:var(--violet)">Rapport</button></div></div>
-        </div>
-      </div>
-
-      <!-- ═══ AUDIENCE ═══ -->
-      <div class="page" id="page-audience">
-        <div class="kpi-row">
-          <div class="kpi-card"><div class="kpi-top"><span class="kpi-icon">👥</span><span class="kpi-delta up">+12 ce mois</span></div><div class="kpi-val">847</div><div class="kpi-lbl">Profils consentants actifs</div></div>
-          <div class="kpi-card"><div class="kpi-top"><span class="kpi-icon">🔐</span><span class="kpi-delta dn">−3 révocat.</span></div><div class="kpi-val">99.6<span style="font-size:16px;color:var(--ink3)">%</span></div><div class="kpi-lbl">Taux de consentement maintenu</div></div>
-          <div class="kpi-card"><div class="kpi-top"><span class="kpi-icon">⚡</span><span class="kpi-delta up">+0.5</span></div><div class="kpi-val">78<span style="font-size:16px;color:var(--ink3)">%</span></div><div class="kpi-lbl">Taux de réponse moyen</div></div>
-          <div class="kpi-card"><div class="kpi-top"><span class="kpi-icon">🔁</span><span class="kpi-delta up">+8%</span></div><div class="kpi-val">4.2</div><div class="kpi-lbl">Campagnes / profil en moyenne</div></div>
-        </div>
-        <div class="audience-grid">
-          <div class="card card-inner">
-            <div class="synth-card-title" style="margin-bottom:14px">Répartition par âge</div>
-            <div class="aud-row"><div class="aud-lbl">18–24 ans</div><div class="aud-bar"><div class="aud-fill" style="width:28%;background:var(--coral)"></div></div><div class="aud-val">237</div></div>
-            <div class="aud-row"><div class="aud-lbl">25–34 ans</div><div class="aud-bar"><div class="aud-fill" style="width:35%;background:var(--violet)"></div></div><div class="aud-val">296</div></div>
-            <div class="aud-row"><div class="aud-lbl">35–49 ans</div><div class="aud-bar"><div class="aud-fill" style="width:24%;background:var(--mint)"></div></div><div class="aud-val">203</div></div>
-            <div class="aud-row"><div class="aud-lbl">50–64 ans</div><div class="aud-bar"><div class="aud-fill" style="width:9%;background:var(--amber)"></div></div><div class="aud-val">76</div></div>
-            <div class="aud-row"><div class="aud-lbl">65+ ans</div><div class="aud-bar"><div class="aud-fill" style="width:4%;background:var(--ink3)"></div></div><div class="aud-val">35</div></div>
-          </div>
-          <div class="card card-inner">
-            <div class="synth-card-title" style="margin-bottom:14px">Thèmes d'intérêt</div>
-            <div class="aud-row"><div class="aud-lbl">🏃 Sport</div><div class="aud-bar"><div class="aud-fill" style="width:84%;background:var(--coral)"></div></div><div class="aud-val">711</div></div>
-            <div class="aud-row"><div class="aud-lbl">🧘 Bien-être</div><div class="aud-bar"><div class="aud-fill" style="width:62%;background:var(--violet)"></div></div><div class="aud-val">525</div></div>
-            <div class="aud-row"><div class="aud-lbl">✈️ Voyage</div><div class="aud-bar"><div class="aud-fill" style="width:45%;background:var(--mint)"></div></div><div class="aud-val">381</div></div>
-            <div class="aud-row"><div class="aud-lbl">💻 Tech</div><div class="aud-bar"><div class="aud-fill" style="width:38%;background:var(--amber)"></div></div><div class="aud-val">322</div></div>
-            <div class="aud-row"><div class="aud-lbl">🍔 Aliment.</div><div class="aud-bar"><div class="aud-fill" style="width:29%;background:var(--ink3)"></div></div><div class="aud-val">245</div></div>
-          </div>
+          <div class="camp-row" style="justify-content:center;padding:32px 20px;color:var(--ink3);font-size:13px;grid-column:1/-1" id="camps-empty-row">Chargement des campagnes…</div>
         </div>
       </div>
 
@@ -1211,7 +1151,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <div class="page" id="page-consents">
         <div style="background:var(--md);border:1px solid rgba(11,171,132,.2);border-radius:var(--rs);padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:12px">
           <span style="font-size:22px">🛡️</span>
-          <div style="font-size:13px;color:var(--ink2);line-height:1.65;flex:1"><strong style="color:var(--mint)">Conformité RGPD totale.</strong> Chaque profil a consenti explicitement à Decathlon via l'application Noova. Les consentements sont horodatés, granulaires et révocables en 1 tap par l'utilisateur. Vous ne pouvez pas modifier ces paramètres — seul l'utilisateur en a le contrôle.</div>
+          <div style="font-size:13px;color:var(--ink2);line-height:1.65;flex:1"><strong style="color:var(--mint)">Conformité RGPD totale.</strong> Chaque profil a consenti explicitement à votre commerce via l'application Noova. Les consentements sont horodatés, granulaires et révocables en 1 tap par l'utilisateur. Vous ne pouvez pas modifier ces paramètres — seul l'utilisateur en a le contrôle.</div>
           <button class="tb-btn tb-btn-ghost" style="font-size:12px">📥 Export RGPD</button>
         </div>
         <div class="section-title">Journal des consentements (30 derniers jours)</div>
@@ -1354,6 +1294,33 @@ function renderCampModal(c, answers) {
     distHTML = '<div style="margin-top:20px;text-align:center;padding:24px;background:var(--bg2);border-radius:var(--rx);color:var(--ink3);font-size:13px">Aucune réponse pour l\'instant. La campagne est en attente de répondants.</div>';
   }
 
+  // Profil des répondants (depuis les champs enrichis)
+  let profileHTML = '';
+  const respondentsWithAge = answers.filter(a => a.respondentAge);
+  if(respondentsWithAge.length) {
+    const ageCounts = {};
+    respondentsWithAge.forEach(a => { ageCounts[a.respondentAge] = (ageCounts[a.respondentAge]||0) + 1; });
+    const ageOrder = ['13-17','18-24','25-34','35-49','50-64','65+'];
+    const sortedAge = Object.entries(ageCounts).sort((x,y) => ageOrder.indexOf(x[0]) - ageOrder.indexOf(y[0]));
+    const maxAge = Math.max(...sortedAge.map(e=>e[1]));
+    const intCounts = {};
+    answers.forEach(a => (a.respondentInterests||[]).forEach(t => { intCounts[t] = (intCounts[t]||0)+1; }));
+    const sortedInt = Object.entries(intCounts).sort((a,b)=>b[1]-a[1]).slice(0,4);
+    const maxInt = sortedInt.length ? sortedInt[0][1] : 1;
+    profileHTML = `<div style="margin-top:20px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Profil des répondants (${respondentsWithAge.length})</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:var(--bg2);border-radius:var(--rx);padding:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:8px">Âge</div>
+          ${sortedAge.map(([age,n])=>`<div class="aud-row"><div class="aud-lbl">${age}</div><div class="aud-bar"><div class="aud-fill" style="width:${Math.round(n/maxAge*100)}%;background:var(--coral)"></div></div><div class="aud-val">${n}</div></div>`).join('')}
+        </div>
+        <div style="background:var(--bg2);border-radius:var(--rx);padding:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:8px">Intérêts</div>
+          ${sortedInt.length ? sortedInt.map(([t,n])=>`<div class="aud-row"><div class="aud-lbl">${t}</div><div class="aud-bar"><div class="aud-fill" style="width:${Math.round(n/maxInt*100)}%;background:var(--violet)"></div></div><div class="aud-val">${n}</div></div>`).join('') : '<div style="font-size:11px;color:var(--ink3)">Données insuffisantes</div>'}
+        </div>
+      </div>
+    </div>`;
+  }
+
   const toggleBtn = c.status === 'active'
     ? `<button onclick="toggleCampStatus('${c.id}','paused')" style="background:var(--ad);color:var(--amber);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">⏸ Suspendre</button>`
     : c.status === 'paused'
@@ -1382,10 +1349,12 @@ function renderCampModal(c, answers) {
       <div style="font-size:11px;color:var(--ink3);margin-top:6px">${pct}% · ${c.targetCity||'Toutes villes'}</div>
     </div>
     ${distHTML}
+    ${profileHTML}
     ${qList}
     <div style="display:flex;gap:9px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);flex-wrap:wrap">
       ${toggleBtn}
       <button onclick="openEditCamp('${c.id}')" style="background:var(--vd);color:var(--violet);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">✏️ Modifier</button>
+      <button onclick="deleteCampaign('${c.id}','${(c.name||c.question||'').replace(/'/g,'').substring(0,40)}')" style="background:rgba(239,68,68,.1);color:var(--red);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">🗑️ Supprimer</button>
       <button onclick="closeCampModal()" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto">Fermer</button>
     </div>`;
 }
@@ -1433,6 +1402,15 @@ function openEditCamp(id) {
     </div>`;
 }
 
+async function deleteCampaign(id, name) {
+  if(!confirm(`Supprimer la campagne "${name}" ? Cette action est irréversible.`)) return;
+  try {
+    await db.collection('campaigns').doc(id).delete();
+    showToast('Campagne supprimée', '🗑️');
+    closeCampModal();
+  } catch(e) { showToast('Erreur : ' + e.message, '❌'); }
+}
+
 async function saveEditCamp(id) {
   const name   = document.getElementById('edit-camp-name')?.value?.trim();
   const status = document.getElementById('edit-camp-status')?.value;
@@ -1451,12 +1429,13 @@ function navTo(page, btn){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   curPage=page;
-  const titles={dashboard:['Dashboard','Bienvenue Claire — dernière mise à jour il y a 4 min'],create:['Créer une campagne','Moins de 10 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet · Quel nom pour notre prochain produit trail ?'],audience:['Profils consentants','847 profils actifs ayant consenti à Decathlon'],consents:['Consentements RGPD','Journal complet · Conforme RGPD Art. 6 et 7'],settings:['Paramètres','Configuration de votre espace marque'],billing:['Facturation','Historique et gestion de votre plan']};
+  const brandName = (_mData && _mData.brandName) || 'votre espace';
+  const titles={dashboard:['Dashboard','Bienvenue — '+brandName],create:['Créer une campagne','Moins de 5 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet de vos campagnes'],consents:['Consentements RGPD','Journal complet · Conforme RGPD Art. 6 et 7'],settings:['Paramètres','Configuration de votre espace marque'],billing:['Facturation','Historique et gestion de votre plan']};
   const t=titles[page]||[page,''];
   document.getElementById('topbar-title').textContent=t[0];
   document.getElementById('topbar-sub').textContent=t[1];
   if(page==='results'){renderVerbatims('all');renderClusters();renderRecos()}
-  if(page==='create'){wzSync()}
+  if(page==='create'){wzCur=0;resetWizard();wzSync()}
 }
 
 // ═══ WIZARD ══════════════════════════════════════════════════
@@ -1473,6 +1452,26 @@ function wzGo(n){
   }
 }
 function wzSync(){ wzGo(wzCur); }
+
+function resetWizard(){
+  const ta=document.getElementById('q-text-inp');if(ta)ta.value='';
+  const ni=document.getElementById('camp-name-inp');if(ni)ni.value='';
+  const pq=document.getElementById('preview-q');if(pq)pq.textContent='Votre question…';
+  const ct=document.getElementById('q-char-ct');if(ct)ct.textContent='0 / 150';
+  document.querySelectorAll('.tmpl-chip').forEach(c=>c.classList.remove('sel'));
+  // Reset extra questions
+  _wzQCount=1;
+  ['wz-q-extra-2','wz-q-extra-3'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  const q2=document.getElementById('q2-text-inp');if(q2)q2.value='';
+  const q3=document.getElementById('q3-text-inp');if(q3)q3.value='';
+  const addBtn=document.getElementById('wz-add-q-btn');if(addBtn)addBtn.style.display='';
+  // Reset MCQ options to 3 blank
+  const opts=document.getElementById('mcq-options');
+  if(opts){opts.innerHTML='';for(let i=0;i<3;i++){const d=document.createElement('div');d.className='mcq-option-row';d.innerHTML='<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button>';opts.appendChild(d);}}
+  // Reset format to MCQ
+  selFmt(document.querySelector('.fmt-card'),curFmt='mcq');
+  document.getElementById('mcq-builder').style.display='block';
+}
 
 // ═══ FORMAT ══════════════════════════════════════════════════
 function selFmt(el, fmt){
@@ -1752,10 +1751,9 @@ async function loadMerchantAndStart(uid) {
   }
   _mData = snap.data();
 
-  // Vérification statut : si pending, afficher l'écran d'attente
+  // Vérification statut : si pending, accès au dashboard mais création désactivée
   if(_mData.status === 'pending') {
-    showPendingScreen(_mData);
-    return;
+    showPendingBanner(_mData);
   }
 
   // Mettre à jour la sidebar avec les vraies données
@@ -1773,12 +1771,9 @@ async function loadMerchantAndStart(uid) {
   aw.style.transition = 'opacity .3s'; aw.style.opacity = '0';
   setTimeout(()=>{ aw.style.display='none'; }, 320);
 
-  // Vider toutes les données statiques (faux KPIs + fausses campagnes)
-  document.querySelectorAll('.camp-row').forEach(r => r.remove());
-  document.querySelectorAll('.kpi-val').forEach(el => {
-    if(el.firstChild && el.firstChild.nodeType === 3) el.firstChild.textContent = '—';
-  });
-  document.querySelectorAll('.kpi-delta').forEach(el => el.textContent = '');
+  // Init KPIs à 0 (plus de tirets)
+  ['kpi-val-0','kpi-val-1','kpi-val-2','kpi-val-3'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent='0'; });
+  ['kpi-delta-0','kpi-delta-1','kpi-delta-2','kpi-delta-3'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=''; });
 
   loadMerchantCampaigns(uid);
 }
@@ -1797,24 +1792,31 @@ function loadMerchantCampaigns(uid) {
 }
 
 function renderFirestoreCampaigns(camps) {
-  // Toujours vider d'abord les lignes existantes
+  // Vider les lignes existantes (garder les headers)
   ['page-dashboard','page-campaigns'].forEach(pageId => {
     const page = document.getElementById(pageId);
     if(page) page.querySelectorAll('.camp-row').forEach(r=>r.remove());
   });
+  const emptyMsg = camps.length ? '' : 'Aucune campagne pour l\'instant — crée ta première campagne ✨';
+  // État vide dashboard
+  const dashEmpty = document.getElementById('dash-empty-camps');
+  if(dashEmpty) dashEmpty.remove();
+  const campsEmpty = document.getElementById('camps-empty-row');
+  if(campsEmpty) campsEmpty.remove();
   if(!camps.length) {
-    // Afficher un état vide dans la page campagnes
-    const page = document.getElementById('page-campaigns');
-    if(page) {
-      const card = page.querySelector('.card');
-      if(card) {
-        const empty = document.createElement('div');
-        empty.className = 'camp-row';
-        empty.style.cssText = 'justify-content:center;padding:40px 20px;color:var(--ink3);font-size:13px;grid-column:1/-1';
-        empty.textContent = 'Aucune campagne pour l\'instant. Lance ta première campagne →';
-        card.appendChild(empty);
+    ['page-dashboard','page-campaigns'].forEach(pageId => {
+      const page = document.getElementById(pageId);
+      if(page) {
+        const card = page.querySelector('.card');
+        if(card) {
+          const empty = document.createElement('div');
+          empty.className = 'camp-row';
+          empty.style.cssText = 'justify-content:center;padding:40px 20px;color:var(--ink3);font-size:13px;grid-column:1/-1;cursor:default';
+          empty.textContent = emptyMsg;
+          card.appendChild(empty);
+        }
       }
-    }
+    });
     return;
   }
   const stMap = { active:'live', draft:'draft', paused:'paused', completed:'done' };
@@ -1841,6 +1843,7 @@ function renderFirestoreCampaigns(camps) {
         <div class="camp-actions" style="display:flex;gap:6px;justify-content:flex-end">
           <button class="camp-act-btn" style="background:var(--md);color:var(--mint)" onclick="event.stopPropagation();viewCampaign('${c.id}')">Voir</button>
           <button class="camp-act-btn" style="background:var(--vd);color:var(--violet)" onclick="event.stopPropagation();openEditCamp('${c.id}')">Modifier</button>
+          <button class="camp-act-btn" style="background:rgba(239,68,68,.1);color:var(--red)" onclick="event.stopPropagation();deleteCampaign('${c.id}','${(c.name||c.question||'').replace(/'/g,'')}')">Supprimer</button>
         </div>`;
       card.appendChild(row);
     });
@@ -1848,10 +1851,55 @@ function renderFirestoreCampaigns(camps) {
 }
 
 function updateKPIFromCampaigns(camps) {
-  const total = camps.reduce((a,c)=>a+(c.answersCount||0), 0);
-  const kpis = document.querySelectorAll('.kpi-val');
-  if(kpis[0]) kpis[0].firstChild.textContent = total.toLocaleString('fr-FR');
-  if(kpis[3]) kpis[3].firstChild.textContent = camps.filter(c=>c.status==='active').length;
+  const total    = camps.reduce((a,c) => a + (c.answersCount||0), 0);
+  const active   = camps.filter(c => c.status === 'active').length;
+  const completed = camps.filter(c => c.status === 'completed').length;
+
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  set('kpi-val-0', total.toLocaleString('fr-FR'));
+  set('kpi-val-1', active);
+  set('kpi-val-2', camps.length);
+  set('kpi-val-3', completed);
+
+  // Badge sidebar
+  const badge = document.getElementById('camp-badge');
+  if(badge) { badge.textContent = active; badge.style.display = active ? '' : 'none'; }
+
+  // Carte statut campagnes
+  const stCard = document.getElementById('dash-status-card');
+  if(stCard) {
+    if(!camps.length) {
+      stCard.innerHTML = '<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Aucune campagne pour l\'instant.</div>';
+    } else {
+      const paused = camps.filter(c=>c.status==='paused').length;
+      const draft  = camps.filter(c=>c.status==='draft').length;
+      const bars = [
+        { lbl: 'En cours', n: active, c: 'var(--mint)' },
+        { lbl: 'Terminées', n: completed, c: 'var(--violet)' },
+        { lbl: 'Suspendues', n: paused, c: 'var(--amber)' },
+        { lbl: 'Brouillons', n: draft, c: 'var(--ink4)' }
+      ].filter(b => b.n > 0);
+      stCard.innerHTML = bars.map(b =>
+        `<div class="aud-row"><div class="aud-lbl">${b.lbl}</div><div class="aud-bar"><div class="aud-fill" style="width:${Math.round(b.n/camps.length*100)}%;background:${b.c}"></div></div><div class="aud-val">${b.n}</div></div>`
+      ).join('');
+    }
+  }
+
+  // Carte thèmes ciblés
+  const thCard = document.getElementById('dash-themes-card');
+  if(thCard) {
+    const themeCounts = {};
+    camps.forEach(c => (c.targetInterests||[]).forEach(t => { themeCounts[t] = (themeCounts[t]||0) + 1; }));
+    const sorted = Object.entries(themeCounts).sort((a,b) => b[1]-a[1]).slice(0, 5);
+    if(!sorted.length) {
+      thCard.innerHTML = '<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Lance une campagne pour voir les thèmes.</div>';
+    } else {
+      const max = sorted[0][1];
+      thCard.innerHTML = sorted.map(([t, n]) =>
+        `<div class="aud-row"><div class="aud-lbl">${t}</div><div class="aud-bar"><div class="aud-fill" style="width:${Math.round(n/max*100)}%;background:var(--coral)"></div></div><div class="aud-val">${n}</div></div>`
+      ).join('');
+    }
+  }
 }
 
 // ─── Patch launchCampaign → Firestore ────────────────────────
@@ -1859,6 +1907,7 @@ const _origLaunchCampaign = launchCampaign;
 launchCampaign = async function() {
   const u = auth.currentUser;
   if(!u || !_mData) { showToast('Connecte-toi pour lancer','⚠️'); return; }
+  if(_mData.status === 'pending') { showToast('Espace en cours de vérification — lancement disponible après validation','⏳'); return; }
   const q1 = document.getElementById('q-text-inp')?.value?.trim();
   if(!q1) { showToast('Saisis une question d\'abord','⚠️'); return; }
   const options  = Array.from(document.querySelectorAll('.mcq-opt-inp')).map(i=>i.value.trim()).filter(Boolean);
@@ -1903,33 +1952,31 @@ launchCampaign = async function() {
   }
 };
 
-// ─── Écran d'attente vérification commerçant ─────────────────
-function showPendingScreen(data) {
-  const aw = document.getElementById('auth-wall');
-  aw.style.transition = 'opacity .3s'; aw.style.opacity = '0';
-  setTimeout(() => { aw.style.display = 'none'; }, 320);
+// ─── Bannière pending (accès dashboard, création désactivée) ──
+function showPendingBanner(data) {
+  const banner = document.getElementById('pending-banner');
+  if(banner) banner.style.display = 'flex';
 
-  const pending = document.getElementById('pending-screen');
-  if(!pending) return;
-
-  // Calcul du délai restant (24h depuis submittedAt)
-  let remaining = '';
-  if(data.submittedAt && data.submittedAt.toDate) {
-    const sub  = data.submittedAt.toDate();
-    const due  = new Date(sub.getTime() + 24*60*60*1000);
-    const diff = due - Date.now();
-    if(diff > 0) {
-      const h = Math.floor(diff/3600000);
-      const m = Math.floor((diff%3600000)/60000);
-      remaining = `Vérification estimée dans ${h}h${m > 0 ? m + 'min' : ''}.`;
-    } else {
-      remaining = 'La vérification est en cours, merci de ta patience.';
-    }
+  // Désactiver le bouton de création
+  const createBtn = document.getElementById('topbar-new-camp-btn');
+  if(createBtn) {
+    createBtn.disabled = true;
+    createBtn.style.opacity = '.4';
+    createBtn.style.cursor = 'not-allowed';
+    createBtn.title = 'Disponible après validation de ton espace';
   }
-  document.getElementById('pending-eta').textContent = remaining;
-  document.getElementById('pending-brand').textContent = data.brandName || '';
-  pending.style.display = 'flex';
+  // Désactiver le lien sidebar "Créer une campagne"
+  document.querySelectorAll('.sb-item').forEach(btn => {
+    if(btn.textContent.includes('Créer')) {
+      btn.style.opacity = '.4';
+      btn.style.pointerEvents = 'none';
+      btn.title = 'Disponible après validation';
+    }
+  });
 }
+
+// ─── Écran d'attente (gardé pour compatibilité mais plus utilisé) ─
+function showPendingScreen(data) { showPendingBanner(data); }
 
 // ─── Déconnexion ─────────────────────────────────────────────
 function logout() {

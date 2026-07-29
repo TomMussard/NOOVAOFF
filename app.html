@@ -1689,6 +1689,7 @@ async function loadUserAndStart(uid) {
     S.user = { name: resolvedName, uid };
     S.pts   = data.points || 0;
     S._city            = data.city || '';
+    S._age             = data.age  || '';
     S._interests       = data.interests || [];
     S._answered        = data.answeredCampaigns || [];
     S._authorizedMerchants = data.authorizedMerchants || [];
@@ -1823,6 +1824,9 @@ submitAns = function() {
     brand:        q.brand,
     answer:       answerValue,
     pointsAwarded: q.pts,
+    respondentAge:       S._age       || '',
+    respondentCity:      S._city      || '',
+    respondentInterests: S._interests || [],
     createdAt:    firebase.firestore.FieldValue.serverTimestamp()
   });
   const userRef = db.collection('users').doc(uid);
