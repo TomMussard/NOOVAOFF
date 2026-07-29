@@ -1078,11 +1078,11 @@ function spawnConfetti(){
 }
 function renderSocial(){
   const fe=document.getElementById('panel-feed');fe.innerHTML='';
-  fe.insertAdjacentHTML('beforeend',`<div onclick="openGame()" style="margin:0 18px 14px;background:linear-gradient(135deg,#0E2A24,#114A3C);border-radius:var(--r);padding:16px 17px;color:#fff;cursor:pointer;position:relative;overflow:hidden">
+  fe.insertAdjacentHTML('beforeend',`<div style="margin:0 18px 14px;background:linear-gradient(135deg,#0E2A24,#114A3C);border-radius:var(--r);padding:16px 17px;color:#fff;cursor:default;position:relative;overflow:hidden;opacity:.72">
     <div style="font-family:var(--fd);font-weight:700;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:#5FE3BC">🎮 Jeu du jour · question commune</div>
     <div style="font-family:var(--fd);font-weight:800;font-size:19px;line-height:1.18;letter-spacing:-.5px;margin:9px 0 13px">Bientôt disponible dans ta ville</div>
     <div style="display:flex;align-items:center">
-      <span style="font-family:var(--fd);font-weight:700;font-size:13px;background:rgba(255,255,255,.14);padding:7px 13px;border-radius:99px">Jouer →</span>
+      <span style="font-family:var(--fd);font-weight:700;font-size:13px;background:rgba(255,255,255,.14);padding:7px 13px;border-radius:99px">En préparation…</span>
     </div>
   </div>`);
   if(FEED.length===0){
@@ -1130,7 +1130,7 @@ function socTab(tab,btn){
   if(tab==='friends')renderFriends();if(tab==='ranking')renderRanking();if(tab==='groups')renderGroups();
 }
 function renderGroups(){
-  const el=document.getElementById('panel-groups');el.innerHTML='<div style="padding:0 18px 10px;font-size:13px;color:var(--ink2);line-height:1.6">Communautés thématiques, compare tes réponses et progresse avec des inconnus. Inspiré de Strava.</div>';
+  const el=document.getElementById('panel-groups');el.innerHTML='<div style="padding:0 18px 10px;font-size:13px;color:var(--ink2);line-height:1.6">Communautés thématiques — compare tes réponses et progresse avec des inconnus partageant tes intérêts.</div>';
   if(!GROUPS.length){el.insertAdjacentHTML('beforeend','<div style="text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px;line-height:1.6">Les groupes communautaires arrivent bientôt !</div>');return}
   GROUPS.forEach(g=>{const d=document.createElement('div');d.className='group-c';d.innerHTML=`<div class="gc-ico" style="background:var(--vd)">${g.ico}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink)">${g.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${g.meta}</div></div><div style="font-size:11px;font-weight:700;color:var(--violet);background:var(--vd);padding:5px 11px;border-radius:99px;white-space:nowrap;cursor:pointer">Rejoindre</div>`;el.appendChild(d)});
 }
@@ -1419,15 +1419,23 @@ function gameReveal(mine){
   const compat=answers.length?Math.round(matches/answers.length*100):0;
   S.pts+=15;if(typeof refreshHome==='function')refreshHome();if(typeof refreshWallet==='function')refreshWallet();
   const rows=answers.map((x,i)=>{const c=AVC[i%AVC.length];const m=x.a===mine;return `<div style="display:flex;align-items:center;gap:12px;background:${m?'var(--md)':'var(--card)'};border:1.5px solid ${m?'var(--mg)':'var(--bg3)'};border-radius:14px;padding:13px;margin-bottom:10px"><div style="width:38px;height:38px;border-radius:50%;background:${c}22;color:${c};display:flex;align-items:center;justify-content:center;font-weight:700">${x.n[0]}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">${x.n}</div><div style="font-size:13px;color:var(--ink2);margin-top:2px">a répondu : ${x.a}</div></div>${m?'<span style="color:var(--mint);font-weight:700;font-size:13px">✓ pareil</span>':''}</div>`;}).join('');
+  const compatBlock = answers.length
+    ? `<div style="background:linear-gradient(135deg,#0E2A24,#114A3C);border-radius:18px;padding:20px;text-align:center;color:#fff;margin-top:6px">
+      <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#5FE3BC">Compatibilité du groupe</div>
+      <div style="font-family:var(--fd);font-weight:800;font-size:48px;color:#5FE3BC;line-height:1.1">${compat}%</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.82);margin-top:2px">+15 pts pour avoir joué 🎯</div>
+    </div>`
+    : `<div style="background:linear-gradient(135deg,#0E2A24,#114A3C);border-radius:18px;padding:22px;text-align:center;color:#fff;margin-top:6px">
+      <div style="font-size:28px;margin-bottom:8px">👥</div>
+      <div style="font-family:var(--fd);font-weight:800;font-size:17px;line-height:1.25;margin-bottom:8px">Ajoute des amis pour comparer tes réponses !</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.5;margin-bottom:14px">La compatibilité s'affiche quand tu as des amis sur Noova.</div>
+      <button onclick="goNav('social')" style="background:#5FE3BC;color:#0E2A24;font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:99px;padding:10px 20px;cursor:pointer">Inviter des amis →</button>
+    </div>`;
   document.getElementById('game-stage').innerHTML=`
     <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mint)">Ta réponse : ${mine}</div>
     <div style="font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:-.6px;color:var(--ink);margin:9px 0 16px">Et tes amis…</div>
     ${rows}
-    <div style="background:linear-gradient(135deg,#0E2A24,#114A3C);border-radius:18px;padding:20px;text-align:center;color:#fff;margin-top:6px">
-      <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#5FE3BC">Compatibilité du groupe</div>
-      <div style="font-family:var(--fd);font-weight:800;font-size:48px;color:#5FE3BC;line-height:1.1">${compat}%</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.82);margin-top:2px">+15 pts pour avoir joué 🎯</div>
-    </div>
+    ${compatBlock}
     <button class="btn-p" style="margin-top:16px" onclick="shareGame(this)">📣 Partager le résultat</button>
     <button class="btn-s" style="margin-top:9px" onclick="renderGameStart()">Rejouer</button>
     <button class="btn-s" onclick="goNav('social')">Retour à la communauté</button>`;
@@ -1673,7 +1681,12 @@ async function loadUserAndStart(uid) {
   try {
     const snap = await db.collection('users').doc(uid).get();
     const data = snap.exists ? snap.data() : {};
-    S.user = { name: data.name || 'Toi', uid };
+    const fbDisplayName = auth.currentUser && auth.currentUser.displayName;
+    const resolvedName = data.name || fbDisplayName || 'Toi';
+    if (!data.name && fbDisplayName) {
+      db.collection('users').doc(uid).update({ name: fbDisplayName }).catch(() => {});
+    }
+    S.user = { name: resolvedName, uid };
     S.pts   = data.points || 0;
     S._city            = data.city || '';
     S._interests       = data.interests || [];
@@ -1688,7 +1701,8 @@ async function loadUserAndStart(uid) {
 
     await loadCampaignsFromFirestore(data);
   } catch(e) {
-    S.user = { name: 'Toi', uid };
+    const fbName = auth.currentUser && auth.currentUser.displayName;
+    S.user = { name: fbName || 'Toi', uid };
     S.qs = [];
   }
   const aw = document.getElementById('auth-wall');
