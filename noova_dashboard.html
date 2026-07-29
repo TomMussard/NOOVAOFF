@@ -1171,7 +1171,7 @@ function viewCampaign(campaignId) {
   modal.style.display = 'flex';
   Promise.all([
     db.collection('campaigns').doc(campaignId).get(),
-    db.collection('answers').where('campaignId','==',campaignId).get()
+    db.collection('answers').where('campaignId','==',campaignId).where('merchantId','==',auth.currentUser.uid).get()
   ]).then(([campDoc, answersSnap]) => {
     if(!campDoc.exists){ document.getElementById('camp-modal-body').innerHTML='<div style="padding:20px;color:var(--red)">Campagne introuvable.</div>'; return; }
     const c = { id: campDoc.id, ...campDoc.data() };
