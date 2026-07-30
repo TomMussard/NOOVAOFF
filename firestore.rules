@@ -14,12 +14,19 @@ service cloud.firestore {
     }
 
     // ─── Users ────────────────────────────────────────────────────────────────
-    // Lecture : propriétaire OU marchand pour compter ses utilisateurs consentis
-    // Écriture : uniquement le propriétaire
     match /users/{uid} {
       allow read: if isOwner(uid) ||
         (isAuth() && request.auth.token.email == 'noovaoffr@gmail.com');
       allow write: if isOwner(uid);
+
+      // Notifications subcollection
+      // Lecture & update (marquer lu) : propriétaire uniquement
+      // Création : tout user connecté peut envoyer une notif à n'importe qui
+      match /notifications/{notifId} {
+        allow read, update: if isOwner(uid);
+        allow create: if isAuth();
+        allow delete: if false;
+      }
     }
 
     // ─── Merchants ────────────────────────────────────────────────────────────

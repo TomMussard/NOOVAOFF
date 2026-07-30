@@ -232,7 +232,20 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .soc-hdr{padding:0 20px 11px;display:flex;align-items:center;justify-content:space-between}
 .soc-title{font-family:var(--fd);font-weight:800;font-size:25px;letter-spacing:-.8px;color:var(--ink)}
 .soc-bell{width:38px;height:38px;border-radius:11px;background:var(--card);border:1.5px solid var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative}
-.bell-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--coral);border:2px solid var(--card)}
+.bell-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--coral);border:2px solid var(--card);display:none}
+.notif-panel{position:fixed;top:60px;right:16px;width:min(320px,calc(100vw - 32px));max-height:420px;background:var(--card);border:1.5px solid var(--bg3);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.22);overflow-y:auto;z-index:9000;display:none}
+.notif-panel.open{display:block}
+.notif-hdr{padding:14px 16px 10px;font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink);border-bottom:1.5px solid var(--bg3);display:flex;align-items:center;justify-content:space-between}
+.notif-close{font-size:18px;color:var(--ink3);cursor:pointer;line-height:1}
+.notif-item{padding:12px 16px;border-bottom:1px solid var(--bg2);display:flex;flex-direction:column;gap:5px}
+.notif-item.unread{background:color-mix(in srgb,var(--amber) 8%,var(--card))}
+.notif-txt{font-size:13px;color:var(--ink);line-height:1.4}
+.notif-meta{font-size:11px;color:var(--ink3)}
+.notif-done{font-size:11px;color:var(--ink3);font-style:italic}
+.notif-actions{display:flex;gap:7px;margin-top:4px}
+.notif-btn{padding:7px 16px;border-radius:9px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:var(--fb)}
+.notif-btn.accept{background:var(--grad);color:var(--gi)}
+.notif-btn.decline{background:var(--bg2);color:var(--ink2)}
 .tab-bar{display:flex;margin:0 18px 12px;background:var(--bg2);border-radius:11px;padding:3px;gap:2px}
 .tab-btn{flex:1;padding:8px 4px;border-radius:9px;font-size:11px;font-weight:600;text-align:center;cursor:pointer;color:var(--ink2);transition:all .16s;background:none;border:none;font-family:var(--fb)}
 .tab-btn.on{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 1px 5px rgba(0,0,0,.07)}
@@ -681,7 +694,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="social-wrap">
     <div class="soc-hdr">
       <div class="soc-title">Communauté</div>
-      <div class="soc-bell"><div class="bell-dot"></div>🔔</div>
+      <div class="soc-bell" id="soc-bell" onclick="toggleNotifPanel(event)"><div class="bell-dot" id="bell-dot"></div>🔔</div>
+    </div>
+    <div class="notif-panel" id="notif-panel">
+      <div class="notif-hdr"><span>Notifications</span><span class="notif-close" onclick="closeNotifPanel()">✕</span></div>
+      <div id="notif-list"><div style="text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px">Aucune notification</div></div>
     </div>
     <div class="tab-bar">
       <button class="tab-btn on" onclick="socTab('feed',this)">Feed</button>
@@ -1105,37 +1122,51 @@ function renderSocial(){
 
 async function loadCommunityFeed() {
   const el = document.getElementById('feed-content');
-  if(!el) return;
-  const city = normalizeCity(S._city || '');
-  if(!city) {
-    el.innerHTML='<div style="text-align:center;padding:32px 24px;color:var(--ink2);font-size:13px;line-height:1.6">Renseigne ta ville pour voir l\'activité de ta communauté !</div>';
+  if (!el) return;
+
+  // Feed vide si aucun ami
+  if (!S._friendUids || S._friendUids.length === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:48px 24px">
+      <div style="font-size:44px;margin-bottom:14px">👥</div>
+      <div style="font-family:var(--fd);font-weight:900;font-size:21px;color:var(--ink);letter-spacing:-.5px;margin-bottom:8px">Ton feed est vide</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.65;margin-bottom:22px">Ajoute des amis pour voir leur activité ici.<br>Partage ton code depuis l'onglet <strong>Amis</strong>.</div>
+      <button style="padding:13px 26px;background:var(--grad);border:none;border-radius:99px;font-family:var(--fd);font-weight:700;font-size:14px;color:var(--gi);cursor:pointer;box-shadow:0 4px 14px var(--cg)" onclick="document.querySelector('.tab-btn:nth-child(2)').click()">Ajouter des amis →</button>
+    </div>`;
     return;
   }
+
   try {
+    // whereIn supporte max 30 valeurs
+    const uids = S._friendUids.slice(0, 30);
     const snap = await db.collection('communityEvents')
-      .where('city','==',city)
-      .orderBy('createdAt','desc')
-      .limit(20)
+      .where('userId', 'in', uids)
+      .orderBy('createdAt', 'desc')
+      .limit(25)
       .get();
+
     el.innerHTML = '';
-    if(snap.empty) {
-      el.innerHTML='<div style="text-align:center;padding:32px 24px;color:var(--ink2);font-size:13px;line-height:1.6">Aucune activité dans ta communauté pour l\'instant.<br>Réponds à des questions pour être le premier ici !</div>';
+    if (snap.empty) {
+      el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
+        Tes amis n'ont pas encore répondu à des questions.<br>
+        <span style="color:var(--coral);font-weight:600">Encourage-les ! 👋</span>
+      </div>`;
       return;
     }
-    const colors=['#E07D0A','#A14E08','#0BAB84','#F5A623','#5C3BF5'];
-    snap.forEach((doc,i) => {
+
+    const colors = ['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
+    snap.forEach(doc => {
       const ev = doc.data();
       const name = ev.displayName || 'Quelqu\'un';
       const c = colors[name.charCodeAt(0) % colors.length];
-      const av = name[0].toUpperCase();
       const ts = ev.createdAt ? timeAgo(ev.createdAt.toDate()) : '';
       const d = document.createElement('div');
       d.className = 'feed-post';
-      d.innerHTML=`<div class="fp-hdr"><div class="fp-av" style="background:${c}18;color:${c}">${av}</div><div style="flex:1"><div class="fp-name">${esc(name)}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body"><div class="fp-action">${esc(ev.text||'a répondu à une question')}${ev.brand?` <strong>${esc(ev.brand)}</strong>`:''}</div></div><div class="fp-foot"><button class="fp-btn" onclick="this.textContent=this.textContent.includes('❤️')?'🤍 J\\'aime':'❤️ J\\'aime'">🤍 J'aime</button></div>`;
+      d.innerHTML = `<div class="fp-hdr"><div class="fp-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fp-name">${esc(name)}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body"><div class="fp-action">${esc(ev.text||'a répondu à une question')}${ev.brand?` <strong>${esc(ev.brand)}</strong>`:''}</div></div><div class="fp-foot"><button class="fp-btn" onclick="this.classList.toggle('liked');this.textContent=this.classList.contains('liked')?'❤️ J\'aime':'🤍 J\'aime'">🤍 J'aime</button></div>`;
       el.appendChild(d);
     });
-  } catch(e) {
-    el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:12px">Impossible de charger le feed.</div>';
+  } catch (e) {
+    console.warn('Feed error:', e);
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink3);font-size:12px">Impossible de charger le feed.</div>';
   }
 }
 
@@ -1151,13 +1182,42 @@ function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function initFriendsPanel(){
-  const fp=document.getElementById('panel-friends');fp.innerHTML='';
+  const fp=document.getElementById('panel-friends');
+  fp.innerHTML='';
   const myCode=S._friendCode||'—';
-  fp.innerHTML=`<div class="inv-c"><div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink);margin-bottom:4px">🎁 Invite un ami, gagne 50 pts</div><div style="font-size:12px;color:var(--ink2);margin-bottom:11px;line-height:1.5">Partage ton code. Quand ton ami répond à sa 1re question, vous gagnez tous les deux 50 pts.</div><div style="display:flex;align-items:center;gap:8px"><div class="inv-code" id="inv-code">${myCode}</div><button class="copy-btn" onclick="navigator.clipboard&&navigator.clipboard.writeText('${myCode}');this.textContent='Copié !';setTimeout(()=>this.textContent='Copier',2000)">Copier</button></div></div>
-  <div style="display:flex;gap:8px;margin:0 18px 8px"><input style="flex:1;padding:10px 12px;background:var(--card);border:1.5px solid var(--bg3);border-radius:11px;font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOVA-AB12)" id="fi-inp"><button style="padding:10px 14px;background:var(--coral);color:#fff;font-size:12px;font-weight:700;border:none;border-radius:11px;cursor:pointer;font-family:var(--fd);box-shadow:0 4px 10px var(--cg)" onclick="addFriend()">Ajouter</button></div>
-  <div style="padding:0 18px 8px"><div id="fi-err" style="font-size:12px;color:var(--coral);min-height:16px"></div></div>
-  <div style="padding:0 18px"><div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">MES AMIS</div><div id="friends-list"></div></div>`;
+  fp.innerHTML=`
+    <div class="inv-c">
+      <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink);margin-bottom:5px">Mon code ami</div>
+      <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;line-height:1.55">Envoie ce code à un ami. Quand il répond à sa 1re question, vous gagnez chacun <strong>50 pts</strong> 🎁</div>
+      <div style="display:flex;align-items:center;gap:9px">
+        <div class="inv-code" id="inv-code" style="letter-spacing:2.5px;font-size:19px;font-weight:800">${myCode}</div>
+        <button class="copy-btn" id="share-btn" onclick="shareCode('${myCode}')">Partager</button>
+      </div>
+    </div>
+    <div style="padding:0 18px 6px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Ajouter un ami</div>
+      <div style="display:flex;gap:8px">
+        <input style="flex:1;padding:11px 13px;background:var(--card);border:1.5px solid var(--bg3);border-radius:12px;font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOVA-AB12)" id="fi-inp" oninput="this.value=this.value.toUpperCase()">
+        <button style="padding:11px 16px;background:var(--grad);color:var(--gi);font-size:12px;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-family:var(--fd);box-shadow:0 4px 10px var(--cg);white-space:nowrap" onclick="addFriend()">+ Ajouter</button>
+      </div>
+      <div id="fi-err" style="font-size:12px;color:var(--coral);min-height:18px;margin-top:6px"></div>
+    </div>
+    <div style="padding:0 18px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Mes amis <span id="friends-count" style="color:var(--coral)"></span></div>
+      <div id="friends-list"></div>
+    </div>`;
   renderFriends();
+}
+
+function shareCode(code){
+  const msg='Rejoins-moi sur Noova ! Réponds à des questions et gagne des récompenses près de chez toi. Mon code : '+code;
+  if(navigator.share){
+    navigator.share({title:'Noova — Rejoins-moi !',text:msg}).catch(()=>{});
+  } else {
+    navigator.clipboard&&navigator.clipboard.writeText(code);
+    const btn=document.getElementById('share-btn');
+    if(btn){btn.textContent='Copié !';setTimeout(()=>btn.textContent='Partager',2000);}
+  }
 }
 function initRankingPanel(){
   const rp=document.getElementById('panel-ranking');rp.innerHTML='';
@@ -1165,9 +1225,23 @@ function initRankingPanel(){
   renderRanking();
 }
 function renderFriends(){
-  const el=document.getElementById('friends-list');if(!el)return;el.innerHTML='';
-  if(!S.friends.length){el.innerHTML='<div style="text-align:center;padding:24px 16px;color:var(--ink2);font-size:13px;line-height:1.6">Aucun ami pour l\'instant.<br>Partage ton code pour commencer !</div>';return}
-  S.friends.forEach((f,i)=>{const c=AVC[i%AVC.length];const d=document.createElement('div');d.className='fi';d.onclick=()=>openChatFor(f.n);d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${f.n}</div><div class="fi-pts">${f.pts} pts · <span style="color:var(--amber);font-weight:600">🔥 ${f.str}</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;el.appendChild(d)});
+  const el=document.getElementById('friends-list');
+  if(!el)return;
+  const countEl=document.getElementById('friends-count');
+  if(countEl)countEl.textContent=S.friends.length?'('+S.friends.length+')':'';
+  el.innerHTML='';
+  if(!S.friends.length){
+    el.innerHTML='<div style="text-align:center;padding:28px 16px 8px"><div style="font-size:32px;margin-bottom:10px">🤝</div><div style="color:var(--ink2);font-size:13px;line-height:1.6">Aucun ami pour l\'instant.<br>Partage ton code pour commencer !</div></div>';
+    return;
+  }
+  S.friends.forEach((f,i)=>{
+    const c=AVC[i%AVC.length];
+    const d=document.createElement('div');
+    d.className='fi';
+    d.onclick=()=>openChatFor(f.n);
+    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.pts} pts · <span style="color:var(--amber);font-weight:600">🔥 ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
+    el.appendChild(d);
+  });
 }
 function renderRanking(){
   const el=document.getElementById('ranking-list');
@@ -1232,11 +1306,137 @@ async function addFriend(){
     const friendDoc=snap.docs[0];
     if(friendDoc.id===uid){if(errEl)errEl.textContent='Tu ne peux pas t\'ajouter toi-même !';return;}
     if((S._friendUids||[]).includes(friendDoc.id)){if(errEl)errEl.textContent='Déjà ami !';return;}
-    await db.collection('users').doc(uid).update({friendUids:firebase.firestore.FieldValue.arrayUnion(friendDoc.id)});
-    S._friendUids=[...(S._friendUids||[]),friendDoc.id];
-    inp.value='';if(errEl)errEl.textContent='';
-    await loadFriendsFromFirestore(S._friendUids);
+    // Vérifie si une demande est déjà en attente
+    const existing=await db.collection('users').doc(friendDoc.id).collection('notifications')
+      .where('type','==','friend_request').where('fromUid','==',uid).where('read','==',false).limit(1).get();
+    if(!existing.empty){if(errEl)errEl.textContent='Demande déjà envoyée !';return;}
+    // Envoie une notification de demande d\'ami
+    await db.collection('users').doc(friendDoc.id).collection('notifications').add({
+      type:'friend_request',
+      fromUid:uid,
+      fromName:(S.user&&S.user.name)||'Un utilisateur',
+      fromCode:S._friendCode||'',
+      read:false,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    inp.value='';
+    if(errEl){errEl.style.color='var(--ink)';errEl.textContent='✅ Demande envoyée !';}
+    setTimeout(()=>{if(errEl){errEl.style.color='var(--coral)';errEl.textContent=''}},3000);
   }catch(e){if(errEl)errEl.textContent='Erreur : '+e.message;}
+}
+
+// ─── Système de notifications ────────────────────────────────────────────────
+let _notifUnsub=null;
+let _notifs=[];
+
+function initNotifications(uid){
+  if(_notifUnsub)_notifUnsub();
+  _notifUnsub=db.collection('users').doc(uid).collection('notifications')
+    .orderBy('createdAt','desc').limit(30)
+    .onSnapshot(snap=>{
+      _notifs=snap.docs.map(d=>({id:d.id,...d.data()}));
+      const unread=_notifs.filter(n=>!n.read).length;
+      const dot=document.getElementById('bell-dot');
+      if(dot)dot.style.display=unread>0?'block':'none';
+      const panel=document.getElementById('notif-panel');
+      if(panel&&panel.classList.contains('open'))renderNotifications();
+    },err=>console.warn('notifs:',err));
+}
+
+function toggleNotifPanel(e){
+  if(e)e.stopPropagation();
+  const panel=document.getElementById('notif-panel');
+  if(!panel)return;
+  if(panel.classList.contains('open')){panel.classList.remove('open');return;}
+  panel.classList.add('open');
+  renderNotifications();
+}
+
+function closeNotifPanel(){
+  const panel=document.getElementById('notif-panel');
+  if(panel)panel.classList.remove('open');
+}
+
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('notif-panel');
+  const bell=document.getElementById('soc-bell');
+  if(panel&&panel.classList.contains('open')&&!panel.contains(e.target)&&!bell.contains(e.target)){
+    panel.classList.remove('open');
+  }
+});
+
+function fmtNotifTime(ts){
+  if(!ts)return'';
+  const d=ts.seconds?new Date(ts.seconds*1000):new Date(ts);
+  const now=new Date();
+  const diff=Math.floor((now-d)/60000);
+  if(diff<1)return'À l\'instant';
+  if(diff<60)return diff+'min';
+  if(diff<1440)return Math.floor(diff/60)+'h';
+  return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+}
+
+function renderNotifications(){
+  const el=document.getElementById('notif-list');
+  if(!el)return;
+  if(!_notifs.length){
+    el.innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px">Aucune notification</div>';
+    return;
+  }
+  el.innerHTML='';
+  _notifs.forEach(n=>{
+    const d=document.createElement('div');
+    d.className='notif-item'+(n.read?'':' unread');
+    const ts=fmtNotifTime(n.createdAt);
+    let inner='';
+    if(n.type==='friend_request'){
+      inner=`<div class="notif-txt">👥 <strong>${esc(n.fromName)}</strong> veut être ton ami !</div>
+        <div class="notif-meta">${ts}</div>
+        ${!n.read?`<div class="notif-actions">
+          <button class="notif-btn accept" onclick="acceptFriendRequest('${n.id}','${n.fromUid}','${esc(n.fromName)}')">Accepter</button>
+          <button class="notif-btn decline" onclick="declineFriendRequest('${n.id}')">Refuser</button>
+        </div>`:'<div class="notif-done">Traitée</div>'}`;
+    }else if(n.type==='friend_accepted'){
+      inner=`<div class="notif-txt">🎉 <strong>${esc(n.fromName)}</strong> a accepté ta demande d'ami !</div>
+        <div class="notif-meta">${ts}</div>`;
+    }else if(n.type==='noova_message'){
+      inner=`<div class="notif-txt">📢 <strong>Noova</strong> · ${esc(n.message||'')}</div>
+        <div class="notif-meta">${ts}</div>`;
+    }else{
+      inner=`<div class="notif-txt">${esc(n.message||'Notification')}</div><div class="notif-meta">${ts}</div>`;
+    }
+    d.innerHTML=inner;
+    el.appendChild(d);
+  });
+}
+
+async function acceptFriendRequest(notifId,fromUid,fromName){
+  const uid=auth.currentUser&&auth.currentUser.uid;
+  if(!uid)return;
+  try{
+    await Promise.all([
+      db.collection('users').doc(uid).update({friendUids:firebase.firestore.FieldValue.arrayUnion(fromUid)}),
+      db.collection('users').doc(fromUid).update({friendUids:firebase.firestore.FieldValue.arrayUnion(uid)})
+    ]);
+    await db.collection('users').doc(uid).collection('notifications').doc(notifId).update({read:true});
+    await db.collection('users').doc(fromUid).collection('notifications').add({
+      type:'friend_accepted',
+      fromUid:uid,
+      fromName:(S.user&&S.user.name)||'Quelqu\'un',
+      read:false,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    S._friendUids=[...(S._friendUids||[]),fromUid];
+    await loadFriendsFromFirestore(S._friendUids);
+  }catch(e){console.warn('acceptFriend:',e);}
+}
+
+async function declineFriendRequest(notifId){
+  const uid=auth.currentUser&&auth.currentUser.uid;
+  if(!uid)return;
+  try{
+    await db.collection('users').doc(uid).collection('notifications').doc(notifId).update({read:true});
+  }catch(e){console.warn('declineFriend:',e);}
 }
 function openChatFor(u){
   chUser=u;const idx=S.friends.findIndex(f=>f.n===u);const c=idx>=0?AVC[idx%AVC.length]:'#A14E08';
@@ -1941,6 +2141,7 @@ async function loadUserAndStart(uid) {
       db.collection('users').doc(uid).update({ friendCode: code, friendUids: [] }).catch(()=>{});
     }
     if(S._friendUids.length) loadFriendsFromFirestore(S._friendUids);
+    initNotifications(uid);
 
     if(data.onboardingStep === 'merchants') {
       document.getElementById('auth-wall').style.display = 'none';
@@ -1963,16 +2164,25 @@ async function loadUserAndStart(uid) {
 }
 
 async function loadFriendsFromFirestore(uids) {
-  if(!uids || !uids.length) { S.friends=[]; renderFriends(); return; }
+  if (!uids || !uids.length) { S.friends = []; renderFriends(); return; }
   try {
-    const promises = uids.slice(0,10).map(uid => db.collection('users').doc(uid).get());
-    const snaps = await Promise.all(promises);
-    S.friends = snaps.filter(s=>s.exists).map(s => {
-      const d=s.data();
-      return { n: d.name||'Ami', pts: d.points||0, str: d.streak||0, uid: s.id, online: false };
+    // Batch en groupes de 10 (get individuel par doc)
+    const capped = uids.slice(0, 30);
+    const batches = [];
+    for (let i = 0; i < capped.length; i += 10) {
+      batches.push(Promise.all(capped.slice(i, i + 10).map(uid => db.collection('users').doc(uid).get())));
+    }
+    const results = await Promise.all(batches);
+    const allSnaps = results.flat();
+    S.friends = allSnaps.filter(s => s.exists).map(s => {
+      const d = s.data();
+      return { n: d.name || 'Ami', pts: d.points || 0, str: d.streak || 0, uid: s.id, online: false };
     });
-    renderFriends(); renderRanking();
-  } catch(e) { console.warn('loadFriends:', e); }
+    renderFriends();
+    // Recharge le feed avec la nouvelle liste d'amis
+    const feedEl = document.getElementById('feed-content');
+    if (feedEl) loadCommunityFeed();
+  } catch (e) { console.warn('loadFriends:', e); }
 }
 
 async function loadMerchantsForOnboarding(userData) {
