@@ -567,6 +567,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <button class="sb-item" onclick="navTo('consents',this)"><span class="sb-ico">🔐</span>Consentements RGPD</button>
       <div class="sb-section">Compte</div>
       <button class="sb-item" onclick="navTo('settings',this)"><span class="sb-ico">⚙️</span>Paramètres</button>
+      <button class="sb-item" onclick="navTo('plans',this)"><span class="sb-ico">⭐</span>Abonnements</button>
       <button class="sb-item" onclick="navTo('billing',this)"><span class="sb-ico">💳</span>Facturation</button>
       <button class="sb-item" onclick="logout()" style="margin-top:auto;color:var(--ink3)"><span class="sb-ico">🚪</span>Se déconnecter</button>
     </nav>
@@ -660,15 +661,15 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div class="wizard-wrap">
           <!-- Step indicator -->
           <div class="wizard-steps" id="wiz-steps">
-            <div class="wiz-step-btn done" data-step="0"><div class="wiz-circle">1</div><div class="wiz-step-lbl">Question</div></div>
-            <div class="wiz-step-btn active" data-step="1"><div class="wiz-circle">2</div><div class="wiz-step-lbl">Format</div></div>
+            <div class="wiz-step-btn active" data-step="0"><div class="wiz-circle">1</div><div class="wiz-step-lbl">Question</div></div>
+            <div class="wiz-step-btn" data-step="1"><div class="wiz-circle">2</div><div class="wiz-step-lbl">Format</div></div>
             <div class="wiz-step-btn" data-step="2"><div class="wiz-circle">3</div><div class="wiz-step-lbl">Audience</div></div>
             <div class="wiz-step-btn" data-step="3"><div class="wiz-circle">4</div><div class="wiz-step-lbl">Budget</div></div>
             <div class="wiz-step-btn" data-step="4"><div class="wiz-circle">5</div><div class="wiz-step-lbl">Validation</div></div>
           </div>
 
           <!-- Step 0 : Question -->
-          <div class="step-panel" id="wz-panel-0">
+          <div class="step-panel active" id="wz-panel-0">
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
                 <div class="step-card">
@@ -752,7 +753,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
           </div>
 
           <!-- Step 1 : Format -->
-          <div class="step-panel active" id="wz-panel-1">
+          <div class="step-panel" id="wz-panel-1">
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
                 <div class="step-card">
@@ -803,7 +804,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div class="preview-phone">
                     <div class="preview-phone-notch"></div>
                     <div class="preview-phone-inner">
-                      <div class="preview-brand-row"><div class="preview-brand-ico">⛺</div><div><div class="preview-brand-name">Decathlon</div><div class="preview-brand-theme">Sport</div></div></div>
+                      <div class="preview-brand-row"><div class="preview-brand-ico">⛺</div><div><div class="preview-brand-name" id="preview-brand-nm-p1">Votre commerce</div><div class="preview-brand-theme" id="preview-brand-sec-p1">Commerce</div></div></div>
                       <div class="preview-q" style="font-size:11px">Quel est votre critère principal lors de l'achat ?</div>
                       <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
                         <div style="background:#EEECEA;border:1.5px solid #E0DDD8;border-radius:8px;padding:7px 10px;font-size:10px;color:#17141A;display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:50%;border:1.5px solid #B2ADB9;flex-shrink:0"></div>💰 Prix / rapport qualité-prix</div>
@@ -823,47 +824,87 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
                 <div class="step-card">
-                  <div class="step-card-title">Sélectionnez vos thèmes cibles</div>
-                  <div class="step-card-sub" id="aud-subtitle">Chaque sélection affine l'audience éligible parmi les profils ayant consenti à votre commerce.</div>
+                  <div class="step-card-title">Ciblez votre audience</div>
+                  <div class="step-card-sub" id="aud-subtitle">Chaque filtre affine les profils éligibles. C'est la <strong>localisation de la question</strong> (pas de l'entreprise) qui détermine le bassin de répondants.</div>
                   <div class="field">
-                    <label class="field-lbl">Thèmes d'intérêt</label>
+                    <label class="field-lbl">Thèmes d'intérêt <span style="color:var(--ink3);font-weight:400">(laisser vide = tous)</span></label>
                     <div class="theme-grid">
-                      <div class="th-chip sel" onclick="this.classList.toggle('sel');updAud()">🏃 Sport</div>
-                      <div class="th-chip sel" onclick="this.classList.toggle('sel');updAud()">🧘 Bien-être</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🏃 Sport</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🧘 Bien-être</div>
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">💻 Tech</div>
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">✈️ Voyage</div>
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🎮 Gaming</div>
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🍔 Alimentation</div>
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🌱 Éco-responsable</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">👗 Mode & Beauté</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🎵 Musique</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🏠 Maison & Déco</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🚗 Auto & Moto</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">📚 Lecture</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🎬 Cinéma & Séries</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">💰 Finance & Épargne</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🐾 Animaux</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">📸 Photo & Vidéo</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🍷 Gastronomie</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🏡 Immobilier</div>
                     </div>
                   </div>
                   <div class="field">
-                    <label class="field-lbl">Tranches d'âge</label>
+                    <label class="field-lbl">Tranches d'âge <span style="color:var(--ink3);font-weight:400">(laisser vide = toutes)</span></label>
                     <div class="age-grid">
-                      <div class="age-chip" onclick="this.classList.toggle('sel');updAud()">16–17</div>
-                      <div class="age-chip sel" onclick="this.classList.toggle('sel');updAud()">18–24</div>
-                      <div class="age-chip sel" onclick="this.classList.toggle('sel');updAud()">25–34</div>
-                      <div class="age-chip sel" onclick="this.classList.toggle('sel');updAud()">35–49</div>
+                      <div class="age-chip" onclick="this.classList.toggle('sel');updAud()">13–17</div>
+                      <div class="age-chip" onclick="this.classList.toggle('sel');updAud()">18–24</div>
+                      <div class="age-chip" onclick="this.classList.toggle('sel');updAud()">25–34</div>
+                      <div class="age-chip" onclick="this.classList.toggle('sel');updAud()">35–49</div>
                       <div class="age-chip" onclick="this.classList.toggle('sel');updAud()">50–64</div>
                       <div class="age-chip" onclick="this.classList.toggle('sel');updAud()">65+</div>
                     </div>
                   </div>
                   <div class="field" style="margin-bottom:0">
-                    <label class="field-lbl">Localisation (optionnel)</label>
-                    <select class="field-inp" style="cursor:pointer">
-                      <option value="">Toute la France</option>
-                      <option>Île-de-France</option>
-                      <option>Auvergne-Rhône-Alpes</option>
-                      <option>PACA</option>
-                      <option>Occitanie</option>
+                    <label class="field-lbl">📍 Localisation des répondants <span style="color:var(--coral);font-weight:600">· affecte le prix</span></label>
+                    <select class="field-inp" id="aud-loc-sel" style="cursor:pointer" onchange="updAud();updVol(document.getElementById('vol-sl').value)">
+                      <option value="national">🇫🇷 Toute la France (moins cher)</option>
+                      <optgroup label="── Grandes régions ──">
+                        <option value="idf">Île-de-France</option>
+                        <option value="aura">Auvergne-Rhône-Alpes</option>
+                        <option value="paca">PACA</option>
+                        <option value="occ">Occitanie</option>
+                        <option value="na">Nouvelle-Aquitaine</option>
+                        <option value="bre">Bretagne</option>
+                        <option value="pdl">Pays de la Loire</option>
+                        <option value="nor">Normandie</option>
+                        <option value="ge">Grand Est</option>
+                        <option value="hdf">Hauts-de-France</option>
+                        <option value="bfc">Bourgogne-Franche-Comté</option>
+                        <option value="cvl">Centre-Val de Loire</option>
+                        <option value="cor">Corse</option>
+                      </optgroup>
+                      <optgroup label="── Grandes villes ──">
+                        <option value="paris">Paris</option>
+                        <option value="lyon">Lyon</option>
+                        <option value="marseille">Marseille</option>
+                        <option value="toulouse">Toulouse</option>
+                        <option value="nice">Nice</option>
+                        <option value="nantes">Nantes</option>
+                        <option value="montpellier">Montpellier</option>
+                        <option value="strasbourg">Strasbourg</option>
+                        <option value="bordeaux">Bordeaux</option>
+                        <option value="lille">Lille</option>
+                        <option value="rennes">Rennes</option>
+                        <option value="reims">Reims</option>
+                        <option value="toulon">Toulon</option>
+                        <option value="grenoble">Grenoble</option>
+                        <option value="dijon">Dijon</option>
+                      </optgroup>
                     </select>
+                    <div style="font-size:11px;color:var(--ink3);margin-top:5px">💡 Cibler une ville ou région augmente le coût au répondant mais garantit une audience locale précise.</div>
                   </div>
                 </div>
                 <div class="step-card" style="background:var(--vd);border-color:rgba(161,78,8,.2)">
                   <div style="display:flex;align-items:center;gap:12px">
                     <div style="font-size:28px">👥</div>
                     <div>
-                      <div style="font-family:var(--fd);font-weight:800;font-size:26px;color:var(--ink);letter-spacing:-1px"><span id="aud-count">631</span> <span style="font-size:14px;color:rgba(23,20,26,.55);font-weight:600">profils éligibles</span></div>
+                      <div style="font-family:var(--fd);font-weight:800;font-size:26px;color:var(--ink);letter-spacing:-1px"><span id="aud-count">—</span> <span style="font-size:14px;color:rgba(23,20,26,.55);font-weight:600">profils éligibles</span></div>
                       <div style="font-size:12px;color:var(--coral);margin-top:3px" id="aud-footer">Profils consentants · conforme RGPD</div>
                     </div>
                   </div>
@@ -875,14 +916,13 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               </div>
               <div>
                 <div class="preview-box">
-                  <div class="preview-title">Répartition audience</div>
-                  <div style="margin-bottom:12px">
-                    <div class="aud-row"><div class="aud-lbl">🏃 Sport</div><div class="aud-bar"><div class="aud-fill" style="width:84%;background:var(--coral)"></div></div><div class="aud-val">84%</div></div>
-                    <div class="aud-row"><div class="aud-lbl">🧘 Bien-être</div><div class="aud-bar"><div class="aud-fill" style="width:62%;background:var(--violet)"></div></div><div class="aud-val">62%</div></div>
-                    <div class="aud-row"><div class="aud-lbl">18–34 ans</div><div class="aud-bar"><div class="aud-fill" style="width:58%;background:var(--mint)"></div></div><div class="aud-val">58%</div></div>
-                    <div class="aud-row"><div class="aud-lbl">35–49 ans</div><div class="aud-bar"><div class="aud-fill" style="width:31%;background:var(--amber)"></div></div><div class="aud-val">31%</div></div>
+                  <div class="preview-title">Répartition audience estimée</div>
+                  <div id="aud-preview-bars" style="margin-bottom:12px">
+                    <div class="aud-row"><div class="aud-lbl">18–34 ans</div><div class="aud-bar"><div class="aud-fill" style="width:58%;background:var(--coral)"></div></div><div class="aud-val">58%</div></div>
+                    <div class="aud-row"><div class="aud-lbl">35–49 ans</div><div class="aud-bar"><div class="aud-fill" style="width:31%;background:var(--violet)"></div></div><div class="aud-val">31%</div></div>
+                    <div class="aud-row"><div class="aud-lbl">50+ ans</div><div class="aud-bar"><div class="aud-fill" style="width:11%;background:var(--ink3)"></div></div><div class="aud-val">11%</div></div>
                   </div>
-                  <div style="background:var(--md);border-radius:var(--rx);padding:10px 12px;font-size:11px;color:var(--mint);line-height:1.6"><strong>🛡️ Conforme RGPD</strong><br>Chaque profil a consenti explicitement à Decathlon. Révocable en 1 tap.</div>
+                  <div style="background:var(--md);border-radius:var(--rx);padding:10px 12px;font-size:11px;color:var(--mint);line-height:1.6"><strong>🛡️ Conforme RGPD</strong><br>Chaque profil a consenti explicitement à votre commerce. Révocable à tout moment depuis l'app.</div>
                 </div>
               </div>
             </div>
@@ -893,26 +933,26 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
                 <div class="step-card">
-                  <div class="step-card-title">Volume et tarification</div>
-                  <div class="step-card-sub">Définissez le nombre de réponses souhaité. Le prix est calculé en temps réel.</div>
+                  <div class="step-card-title">Volume de réponses</div>
+                  <div class="step-card-sub">Plus vous ciblez localement, plus le coût par réponse augmente — mais l'audience est plus précise.</div>
                   <div class="field">
                     <label class="field-lbl">Nombre de réponses souhaité</label>
                     <div class="vol-wrap">
                       <div style="flex:1">
-                        <input type="range" class="vol-slider" id="vol-sl" min="50" max="5000" step="50" value="500" oninput="updVol(this.value)">
-                        <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--ink4)"><span>50</span><span>1 000</span><span>2 500</span><span>5 000</span></div>
+                        <input type="range" class="vol-slider" id="vol-sl" min="50" max="5000" step="50" value="200" oninput="updVol(this.value)">
+                        <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--ink3)"><span>50</span><span>1 000</span><span>2 500</span><span>5 000</span></div>
                       </div>
-                      <div class="vol-num" id="vol-num">500</div>
+                      <div class="vol-num" id="vol-num">200</div>
                     </div>
-                    <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap">
-                      <div class="est-chip"><span class="est-chip-ico">⏱️</span>Délai estimé <span class="est-chip-val" id="est-delay">15h</span></div>
-                      <div class="est-chip"><span class="est-chip-ico">👥</span>Profils dispo. <span class="est-chip-val">631</span></div>
-                      <div class="est-chip"><span class="est-chip-ico">📦</span>Livraison <span class="est-chip-val">48–72h</span></div>
+                    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+                      <div class="est-chip"><span class="est-chip-ico">⏱️</span>Délai estimé <span class="est-chip-val" id="est-delay">6h</span></div>
+                      <div class="est-chip"><span class="est-chip-ico">📍</span>Localisation <span class="est-chip-val" id="est-loc-label">France entière</span></div>
+                      <div class="est-chip"><span class="est-chip-ico">💶</span>Coût/réponse <span class="est-chip-val" id="est-cpr">0,80 €</span></div>
                     </div>
                   </div>
                   <div class="field" style="margin-bottom:0">
                     <label class="field-lbl">Nom de la campagne</label>
-                    <input class="field-inp" id="camp-name-inp" value="Test équipement sportif — Été 2025" placeholder="Ex : Test vélo été 2025">
+                    <input class="field-inp" id="camp-name-inp" placeholder="Ex : Test nouveau produit — Été 2025">
                   </div>
                 </div>
                 <div class="step-card">
@@ -920,22 +960,31 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div class="budget-display">
                     <div>
                       <div style="font-size:11px;color:var(--ink3);margin-bottom:3px">Total estimé</div>
-                      <div class="budget-amount" id="budget-amt">625 €</div>
-                      <div style="font-size:11px;color:var(--ink3);margin-top:3px">HT, facturé à la livraison</div>
+                      <div class="budget-amount" id="budget-amt">259 €</div>
+                      <div style="font-size:11px;color:var(--ink3);margin-top:3px">HT · facturé à la livraison</div>
                     </div>
                     <div class="budget-breakdown" id="budget-break">
-                      500 réponses × 1,25 €<br>
-                      Clustering IA inclus<br>
-                      Rapport livré en 48–72h
+                      Forfait de base : 99 €<br>
+                      200 réponses × 0,80 €<br>
+                      <span style="color:var(--mint)">Localisation : France entière</span>
                     </div>
                   </div>
                   <div class="budget-inc">
-                    <div class="budget-inc-title">📦 Inclus dans le livrable</div>
-                    <div class="budget-inc-item">✅ Synthèse exécutive (2 pages, format PDF)</div>
-                    <div class="budget-inc-item">✅ Verbatims bruts classés par thèmes (clustering IA)</div>
-                    <div class="budget-inc-item">✅ Recommandations actionnables priorisées</div>
-                    <div class="budget-inc-item">✅ Export CSV données brutes</div>
+                    <div class="budget-inc-title">📦 Toujours inclus</div>
+                    <div class="budget-inc-item">✅ Analyse IA des réponses (clustering thématique)</div>
+                    <div class="budget-inc-item">✅ Rapport synthèse exécutive (PDF)</div>
+                    <div class="budget-inc-item">✅ Export données brutes (CSV)</div>
                     <div class="budget-inc-item">✅ Score qualité par réponse</div>
+                    <div class="budget-inc-item">✅ Dashboard résultats en temps réel</div>
+                  </div>
+                  <div style="margin-top:12px;padding:10px 12px;background:rgba(242,151,21,.08);border-radius:10px;border:1px solid rgba(242,151,21,.2)">
+                    <div style="font-size:11px;font-weight:700;color:var(--coral);margin-bottom:6px">📍 Grille tarifaire selon localisation</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px">
+                      <div style="text-align:center;padding:6px;background:#fff;border-radius:8px;border:1px solid var(--border)"><div style="font-weight:700;color:var(--ink)">0,80 €</div><div style="color:var(--ink3)">France entière</div></div>
+                      <div style="text-align:center;padding:6px;background:#fff;border-radius:8px;border:1px solid var(--border)"><div style="font-weight:700;color:var(--coral)">1,20 €</div><div style="color:var(--ink3)">Région</div></div>
+                      <div style="text-align:center;padding:6px;background:#fff;border-radius:8px;border:1px solid var(--border)"><div style="font-weight:700;color:var(--violet)">1,80 €</div><div style="color:var(--ink3)">Ville précise</div></div>
+                    </div>
+                    <div style="font-size:10px;color:var(--ink3);margin-top:6px">+ Forfait de base 99 € dans tous les cas (analyse IA, PDF, CSV inclus)</div>
                   </div>
                 </div>
                 <div class="wizard-actions">
@@ -945,29 +994,32 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               </div>
               <div>
                 <div class="preview-box">
-                  <div class="preview-title">Simulation délai</div>
+                  <div class="preview-title">Simulation livraison</div>
                   <div style="display:flex;flex-direction:column;gap:10px">
                     <div style="background:var(--bg3);border-radius:var(--rx);padding:11px 12px">
-                      <div style="font-size:10px;color:var(--ink4);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Aujourd'hui</div>
+                      <div style="font-size:10px;color:var(--ink3);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Aujourd'hui</div>
                       <div style="font-size:12px;color:var(--ink2);font-weight:600">🚀 Lancement campagne</div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink4)" id="sim-delay">~15h</div></div>
+                    <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink3)" id="sim-delay">~6h</div></div>
                     <div style="background:var(--md);border-radius:var(--rx);padding:11px 12px;border:1px solid rgba(11,171,132,.2)">
                       <div style="font-size:10px;color:var(--mint);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Collecte</div>
-                      <div style="font-size:12px;color:var(--ink2);font-weight:600">✅ <span id="sim-vol">500</span> réponses atteintes</div>
+                      <div style="font-size:12px;color:var(--ink2);font-weight:600">✅ <span id="sim-vol">200</span> réponses atteintes</div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink4)">+48–72h</div></div>
+                    <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink3)">+48–72h</div></div>
                     <div style="background:var(--vd);border-radius:var(--rx);padding:11px 12px;border:1px solid rgba(161,78,8,.2)">
                       <div style="font-size:10px;color:var(--violet);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Livraison</div>
                       <div style="font-size:12px;color:var(--ink2);font-weight:600">📊 Rapport disponible</div>
+                    </div>
+                    <div style="background:var(--bg3);border-radius:var(--rx);padding:10px 12px;text-align:center">
+                      <div style="font-size:18px;font-weight:800;color:var(--ink)" id="sim-total">259 €</div>
+                      <div style="font-size:10px;color:var(--ink3)">Total estimé HT</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Step 4 : Validation -->
+<!-- Step 4 : Validation -->
           <div class="step-panel" id="wz-panel-4">
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
@@ -1127,7 +1179,95 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         </div>
       </div>
 
-    </div><!-- /content -->
+      <!-- ═══ PLANS PAGE ═══ -->
+      <div class="page" id="page-plans">
+        <div style="max-width:800px">
+          <div style="text-align:center;margin-bottom:28px">
+            <div style="font-family:var(--fd);font-weight:900;font-style:italic;font-size:26px;color:var(--ink);letter-spacing:-1px;margin-bottom:6px">Choisissez votre formule</div>
+            <div style="font-size:13px;color:var(--ink3)">Le prix par réponse reste le même quelle que soit la formule. L'abonnement déverrouille des fonctionnalités supplémentaires.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px">
+
+            <!-- FREE -->
+            <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3)">Free</div>
+              <div><span style="font-family:var(--fd);font-weight:900;font-size:28px;color:var(--ink)">0 €</span><span style="font-size:12px;color:var(--ink3)">/mois</span></div>
+              <div style="font-size:11px;color:var(--ink3);line-height:1.5">Pour tester Noova sans engagement.</div>
+              <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink2)">
+                <div>✅ 1 campagne active</div>
+                <div>✅ 50 réponses max</div>
+                <div>✅ Analyse IA incluse</div>
+                <div>✅ Export CSV</div>
+                <div style="color:var(--ink3)">❌ Ciblage avancé</div>
+                <div style="color:var(--ink3)">❌ Questions ouvertes</div>
+              </div>
+              <button style="margin-top:auto;padding:9px;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)">Formule actuelle</button>
+            </div>
+
+            <!-- STARTER -->
+            <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--coral)">Starter</div>
+              <div><span style="font-family:var(--fd);font-weight:900;font-size:28px;color:var(--ink)">29 €</span><span style="font-size:12px;color:var(--ink3)">/mois</span></div>
+              <div style="font-size:11px;color:var(--ink3);line-height:1.5">Idéal pour les indépendants et petits commerces.</div>
+              <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink2)">
+                <div>✅ 3 campagnes actives</div>
+                <div>✅ 500 réponses / campagne</div>
+                <div>✅ Analyse IA incluse</div>
+                <div>✅ Export CSV + PDF</div>
+                <div>✅ Score qualité</div>
+                <div style="color:var(--ink3)">❌ Ciblage géographique fin</div>
+              </div>
+              <button style="margin-top:auto;padding:9px;background:rgba(242,151,21,.1);border:1.5px solid rgba(242,151,21,.4);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--coral)">Choisir Starter</button>
+            </div>
+
+            <!-- PRO -->
+            <div style="background:linear-gradient(145deg,#1c0e02,#3a1e06);border:1.5px solid rgba(242,151,21,.5);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;gap:10px;position:relative;box-shadow:0 8px 24px rgba(242,151,21,.2)">
+              <div style="position:absolute;top:-1px;right:16px;background:linear-gradient(135deg,#f29715,#ffda09);color:#1c0e02;font-size:10px;font-weight:900;padding:3px 10px;border-radius:0 0 8px 8px;letter-spacing:.5px">POPULAIRE</div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#fcc61a">Pro</div>
+              <div><span style="font-family:var(--fd);font-weight:900;font-size:28px;color:#fff">99 €</span><span style="font-size:12px;color:rgba(255,255,255,.55)">/mois</span></div>
+              <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.5">Pour les enseignes et marques en croissance.</div>
+              <div style="border-top:1px solid rgba(255,255,255,.12);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:rgba(255,255,255,.85)">
+                <div>✅ Campagnes illimitées</div>
+                <div>✅ 5 000 réponses / campagne</div>
+                <div>✅ Analyse IA avancée</div>
+                <div>✅ Export CSV + PDF + slides</div>
+                <div>✅ Score qualité + verbatims</div>
+                <div>✅ Ciblage région &amp; ville</div>
+                <div>✅ Questions ouvertes + échelle</div>
+              </div>
+              <button style="margin-top:auto;padding:9px;background:linear-gradient(135deg,#f29715,#ffda09);border:none;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;color:#1c0e02">Choisir Pro</button>
+            </div>
+
+            <!-- ENTERPRISE -->
+            <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--violet)">Enterprise</div>
+              <div><span style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--ink)">Sur devis</span></div>
+              <div style="font-size:11px;color:var(--ink3);line-height:1.5">Grandes enseignes, études multi-sites, accès API.</div>
+              <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink2)">
+                <div>✅ Tout ce qui est dans Pro</div>
+                <div>✅ Accès API Noova</div>
+                <div>✅ Multi-utilisateurs</div>
+                <div>✅ Intégration CRM/ERP</div>
+                <div>✅ SLA &amp; support dédié</div>
+                <div>✅ White-label disponible</div>
+              </div>
+              <button style="margin-top:auto;padding:9px;background:rgba(92,59,245,.1);border:1.5px solid rgba(92,59,245,.3);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--violet)">Nous contacter</button>
+            </div>
+
+          </div><!-- /grid -->
+
+          <!-- Pricing reminder -->
+          <div class="step-card" style="background:rgba(242,151,21,.06);border-color:rgba(242,151,21,.2)">
+            <div class="step-card-title" style="margin-bottom:10px">💡 Rappel : tarification à la réponse</div>
+            <div style="font-size:12px;color:var(--ink2);line-height:1.8">
+              Quel que soit votre abonnement, chaque campagne est facturée <strong>99 € de forfait de base</strong> (analyse IA, PDF, CSV inclus) + un coût par réponse selon la localisation ciblée :<br>
+              &nbsp;&nbsp;🇫🇷 <strong>France entière</strong> → 0,80 € / réponse &nbsp;·&nbsp;
+              📍 <strong>Région</strong> → 1,20 € / réponse &nbsp;·&nbsp;
+              🏙️ <strong>Ville</strong> → 1,80 € / réponse
+            </div>
+          </div>
+        </div>
+      </div>    </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /app -->
 
@@ -1142,7 +1282,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 <div class="toast" id="toast"><span class="toast-ico" id="toast-ico">✅</span><span id="toast-msg">Action effectuée</span></div>
 
 <script>
-let curPage='dashboard', wzCur=1, curFmt='mcq';
+let curPage='dashboard', wzCur=0, curFmt='mcq';
 let _wzQCount = 1;
 
 // ═══ MULTI-QUESTION WIZARD ═══════════════════════════════════
@@ -1429,14 +1569,38 @@ function updAud(){
 
 // ═══ VOLUME ══════════════════════════════════════════════════
 function updVol(v){
+  v=parseInt(v)||200;
   document.getElementById('vol-num').textContent=v;
-  const delay=Math.ceil(v/1284*38);
-  const estEl=document.getElementById('est-delay');if(estEl)estEl.textContent=delay+'h';
-  const simEl=document.getElementById('sim-delay');if(simEl)simEl.textContent='~'+delay+'h';
-  const svEl=document.getElementById('sim-vol');if(svEl)svEl.textContent=v;
-  const price=(v*1.25).toFixed(0);
-  document.getElementById('budget-amt').textContent=Number(price).toLocaleString('fr-FR')+' €';
-  document.getElementById('budget-break').innerHTML=v+' réponses × 1,25 €<br>Clustering IA inclus<br>Rapport livré en 48–72h';
+  // Pricing: base 99€ + per-response cost depending on location scope
+  const locSel=document.getElementById('aud-loc-sel');
+  const locVal=locSel?locSel.value:'national';
+  const LOC_LABELS={'national':'France entière','idf':'Île-de-France','aura':'Auvergne-Rhône-Alpes','paca':'PACA','occ':'Occitanie','na':'Nouvelle-Aquitaine','bre':'Bretagne','pdl':'Pays de la Loire','nor':'Normandie','ge':'Grand Est','hdf':'Hauts-de-France','bfc':'Bourgogne-Franche-Comté','cvl':'Centre-Val de Loire','cor':'Corse','paris':'Paris','lyon':'Lyon','marseille':'Marseille','toulouse':'Toulouse','nice':'Nice','nantes':'Nantes','montpellier':'Montpellier','strasbourg':'Strasbourg','bordeaux':'Bordeaux','lille':'Lille','rennes':'Rennes','reims':'Reims','toulon':'Toulon','grenoble':'Grenoble','dijon':'Dijon'};
+  const CITIES=['paris','lyon','marseille','toulouse','nice','nantes','montpellier','strasbourg','bordeaux','lille','rennes','reims','toulon','grenoble','dijon'];
+  const REGIONS=['idf','aura','paca','occ','na','bre','pdl','nor','ge','hdf','bfc','cvl','cor'];
+  let cpr,locType;
+  if(locVal==='national'){cpr=0.80;locType='national';}
+  else if(REGIONS.includes(locVal)){cpr=1.20;locType='region';}
+  else{cpr=1.80;locType='city';}
+  const base=99;
+  const total=Math.round(base+v*cpr);
+  const locLabel=LOC_LABELS[locVal]||'France entière';
+  // Delay: national responds fastest, city slowest (base: 1200 responses/day avg pool)
+  const poolFactor=locType==='national'?1:locType==='region'?0.3:0.1;
+  const delay=Math.ceil(v/(1200*poolFactor)*24);
+  const delayStr=delay<=24?delay+'h':Math.ceil(delay/24)+'j';
+  // Update UI
+  const elNum=document.getElementById('vol-num');if(elNum)elNum.textContent=v;
+  const elDelay=document.getElementById('est-delay');if(elDelay)elDelay.textContent=delayStr;
+  const elCpr=document.getElementById('est-cpr');if(elCpr)elCpr.textContent=cpr.toFixed(2).replace('.',',')+' €';
+  const elLocLbl=document.getElementById('est-loc-label');if(elLocLbl)elLocLbl.textContent=locLabel;
+  const elSimDelay=document.getElementById('sim-delay');if(elSimDelay)elSimDelay.textContent='~'+delayStr;
+  const elSimVol=document.getElementById('sim-vol');if(elSimVol)elSimVol.textContent=v;
+  const totalFmt=total.toLocaleString('fr-FR')+' €';
+  const elAmt=document.getElementById('budget-amt');if(elAmt)elAmt.textContent=totalFmt;
+  const elSimTotal=document.getElementById('sim-total');if(elSimTotal)elSimTotal.textContent=totalFmt;
+  const cprColor=locType==='national'?'var(--mint)':locType==='region'?'var(--coral)':'var(--violet)';
+  const elBreak=document.getElementById('budget-break');
+  if(elBreak)elBreak.innerHTML='Forfait de base : 99 €<br>'+v+' réponses × '+cpr.toFixed(2).replace('.',',')+' €<br><span style="color:'+cprColor+'">📍 '+locLabel+'</span>';
   const sl=document.getElementById('vol-sl');if(sl){const pct=(v-50)/(5000-50)*100;sl.style.background=`linear-gradient(to right,var(--coral) ${pct}%,rgba(23,20,26,.1) ${pct}%)`}
 }
 
@@ -1694,8 +1858,8 @@ async function loadMerchantAndStart(uid) {
   if(setContact) setContact.textContent = (_mData.email||'—') + (_mData.sector?' · '+_mData.sector:'');
   if(setDpo) setDpo.textContent = (_mData.email||'—') + ' · Conforme RGPD Art. 37';
   // Update wizard preview brand names
-  document.querySelectorAll('#preview-brand-nm').forEach(el => el.textContent = _mData.brandName||'Votre commerce');
-  document.querySelectorAll('#preview-brand-sec').forEach(el => el.textContent = _mData.sector||'Commerce');
+  document.querySelectorAll('#preview-brand-nm,#preview-brand-nm-p1').forEach(el => el.textContent = _mData.brandName||'Votre commerce');
+  document.querySelectorAll('#preview-brand-sec,#preview-brand-sec-p1').forEach(el => el.textContent = _mData.sector||'Commerce');
 
   const aw = document.getElementById('auth-wall');
   aw.style.transition = 'opacity .3s'; aw.style.opacity = '0';
