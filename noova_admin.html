@@ -1,64 +1,173 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffda09">
 <title>Noova Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--ink:#17141A;--ink2:rgba(23,20,26,.65);--ink3:rgba(23,20,26,.38);--bg:#F5F3EF;--card:#fff;--border:rgba(23,20,26,.09);--mint:#0BAB84;--coral:#E07D0A;--red:#EF4444;--violet:#5C3BF5;--md:rgba(11,171,132,.07);--cd:rgba(224,125,10,.07);--fd:'DM Sans',sans-serif;--fb:system-ui,sans-serif}
+:root{
+  --ink:#17141A;--ink2:rgba(23,20,26,.65);--ink3:rgba(23,20,26,.38);
+  --bg:#F5F3EF;--bg2:#EEECEA;--card:#fff;--border:rgba(23,20,26,.09);
+  --coral:#f29715;--cd:rgba(242,151,21,.1);--cg:rgba(242,151,21,.25);
+  --amber:#ffda09;--brown:#1c0e02;--cream:#fffbd7;
+  --mint:#0BAB84;--red:#EF4444;
+  --grad:linear-gradient(135deg,#f29715 0%,#ffda09 79%);
+  --fd:'Archivo',sans-serif;--fb:'Archivo',sans-serif
+}
 body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100vh}
-#auth-wall{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:16px}
-#auth-wall h2{font-family:var(--fd);font-weight:800;font-size:22px}
-#auth-wall p{font-size:13px;color:var(--ink3)}
-.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
-.topbar-logo{font-family:var(--fd);font-weight:900;font-size:20px;letter-spacing:-1px}
-.topbar-logo span{color:var(--mint)}
-.topbar-sub{font-size:12px;color:var(--ink3);margin-left:4px}
-.tb-logout{margin-left:auto;padding:7px 14px;background:transparent;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--ink2)}
+
+/* === AUTH WALL === */
+#auth-wall{
+  position:fixed;inset:0;z-index:100;
+  background:var(--grad);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:0
+}
+.aw-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.aw-card{
+  position:relative;z-index:1;
+  background:var(--card);border-radius:20px;
+  padding:36px 32px;width:100%;max-width:380px;
+  box-shadow:0 32px 80px rgba(28,14,2,.25)
+}
+.aw-brand{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  margin-bottom:28px;padding-bottom:24px;
+  border-bottom:1px solid var(--border);
+  text-align:center
+}
+.aw-logo{width:64px;height:64px;border-radius:16px;overflow:hidden;box-shadow:0 8px 20px rgba(242,151,21,.35)}
+.aw-name{font-family:var(--fd);font-weight:900;font-size:26px;color:var(--ink);letter-spacing:-1px;line-height:1}
+.aw-sub{font-size:12px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:1.2px}
+.aw-form{display:flex;flex-direction:column;gap:16px}
+#auth-err{font-size:12px;color:var(--red);min-height:16px;text-align:center}
+
+/* === TOPBAR === */
+.topbar{
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;height:58px;
+  display:flex;align-items:center;gap:14px;
+  position:sticky;top:0;z-index:10
+}
+.topbar::after{
+  content:"";position:absolute;bottom:-1px;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#f29715 0%,#ffda09 60%,transparent 100%);
+  opacity:.6
+}
+.tb-logo{display:flex;align-items:center;gap:10px}
+.tb-logo-mark{width:32px;height:32px;border-radius:8px;overflow:hidden;flex-shrink:0}
+.tb-brand{font-family:var(--fd);font-weight:900;font-size:18px;color:var(--ink);letter-spacing:-1px}
+.tb-badge{
+  background:var(--grad);color:var(--brown);
+  font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;
+  padding:3px 9px;border-radius:99px
+}
+.tb-logout{
+  margin-left:auto;padding:7px 14px;
+  background:transparent;border:1.5px solid var(--border);border-radius:8px;
+  font-size:12px;font-weight:600;cursor:pointer;color:var(--ink2);
+  font-family:var(--fb)
+}
+
+/* === MAIN === */
 .main{max-width:960px;margin:0 auto;padding:28px 24px}
-h1{font-family:var(--fd);font-weight:800;font-size:24px;margin-bottom:4px}
+h1{font-family:var(--fd);font-weight:900;font-size:24px;margin-bottom:4px;letter-spacing:-.5px}
 .sub{font-size:13px;color:var(--ink3);margin-bottom:24px}
+
+/* === STATS === */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
-.stat-n{font-family:var(--fd);font-weight:800;font-size:28px;color:var(--ink)}
-.stat-l{font-size:11px;color:var(--ink3);margin-top:2px;text-transform:uppercase;letter-spacing:.8px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
+.stat-card:first-child{border-color:rgba(242,151,21,.3);background:linear-gradient(145deg,rgba(242,151,21,.06),rgba(255,218,9,.04))}
+.stat-card:first-child::before{content:"";position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(242,151,21,.2),transparent 70%);pointer-events:none}
+.stat-n{font-family:var(--fd);font-weight:900;font-size:28px;color:var(--ink);letter-spacing:-1px}
+.stat-l{font-size:11px;color:var(--ink3);margin-top:2px;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
+
+/* === CARDS === */
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
-.card-title{font-family:var(--fd);font-weight:700;font-size:14px;padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.badge{display:inline-block;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700}
-.badge-pending{background:rgba(224,125,10,.12);color:var(--coral)}
+.card-title{
+  font-family:var(--fd);font-weight:700;font-size:14px;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px
+}
+.badge{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.badge-pending{background:rgba(242,151,21,.15);color:var(--coral)}
 .badge-verified{background:rgba(11,171,132,.12);color:var(--mint)}
 .badge-rejected{background:rgba(239,68,68,.1);color:var(--red)}
-.merchant-row{display:grid;grid-template-columns:1fr 140px 120px 160px;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.merchant-row{
+  display:grid;grid-template-columns:1fr 140px 120px 160px;
+  align-items:center;gap:12px;padding:14px 18px;
+  border-bottom:1px solid var(--border)
+}
 .merchant-row:last-child{border-bottom:none}
-.merchant-row:hover{background:rgba(0,0,0,.02)}
+.merchant-row:hover{background:rgba(242,151,21,.03)}
 .m-name{font-weight:700;font-size:14px;color:var(--ink)}
 .m-meta{font-size:11px;color:var(--ink3);margin-top:2px}
 .m-email{font-size:12px;color:var(--ink2)}
 .row-actions{display:flex;gap:8px;justify-content:flex-end}
-.btn-approve{padding:6px 12px;background:rgba(11,171,132,.12);color:var(--mint);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd)}
-.btn-approve:hover{background:rgba(11,171,132,.22)}
-.btn-reject{padding:6px 12px;background:rgba(239,68,68,.1);color:var(--red);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd)}
+.btn-approve{
+  padding:6px 14px;border:none;border-radius:8px;
+  font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);
+  background:var(--grad);color:var(--brown);
+  box-shadow:0 2px 8px rgba(242,151,21,.3);transition:opacity .15s
+}
+.btn-approve:hover{opacity:.88}
+.btn-reject{
+  padding:6px 12px;background:rgba(239,68,68,.1);color:var(--red);
+  border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);
+  transition:background .15s
+}
 .btn-reject:hover{background:rgba(239,68,68,.18)}
 .empty{text-align:center;padding:48px 20px;color:var(--ink3);font-size:13px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#17141A;color:#fff;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--brown);color:var(--amber);
+  padding:10px 20px;border-radius:99px;font-size:13px;font-weight:700;
+  opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;white-space:nowrap
+}
 .toast.show{opacity:1}
 #section-verified{margin-top:28px}
-.thead{display:grid;grid-template-columns:1fr 140px 120px 160px;gap:12px;padding:10px 18px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);border-bottom:1px solid var(--border)}
+.thead{
+  display:grid;grid-template-columns:1fr 140px 120px 160px;
+  gap:12px;padding:10px 18px;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1px;color:var(--ink3);
+  border-bottom:1px solid var(--border)
+}
 </style>
 </head>
 <body>
 
 <div id="auth-wall">
-  <div style="font-size:36px">🔐</div>
-  <h2>Noova Admin</h2>
-  <p>Accès réservé à l'équipe Noova</p>
-  <div id="auth-err" style="font-size:12px;color:var(--red);min-height:16px"></div>
+  <div class="aw-deco">
+    <svg viewBox="0 0 800 600" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="650" cy="80" rx="300" ry="220" fill="rgba(255,255,255,.12)"/>
+      <ellipse cx="100" cy="520" rx="260" ry="180" fill="rgba(28,14,2,.08)"/>
+      <ellipse cx="400" cy="300" rx="400" ry="250" fill="rgba(255,255,255,.04)"/>
+    </svg>
+  </div>
+  <div class="aw-card">
+    <div class="aw-brand">
+      <div class="aw-logo"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2000 2000" width="64" height="64"><defs><linearGradient id="nlgB" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f29715"/><stop offset="79%" stop-color="#ffda09"/></linearGradient></defs><rect fill="url(#nlgB)" x="141.86" y="141.86" width="1716.28" height="1716.28" rx="355.68" ry="355.68"/><g fill="#fff"><path d="M1403.19,463.98c40.46,25.06,86.67,54.28,125.6,79.06,47.74,30.38,61.67,93.78,31.09,141.39l-283.67,441.67c-30.7,47.8-94.51,61.38-142.01,30.21l-60.97-40c-42.22-27.7-57.87-82.1-36.82-128l220.11-480.05c25.62-55.88,94.41-76.64,146.67-44.27Z"/><path d="M691.38,979.15c-1.25-27.37-.28-53.33,4.32-79.73l12.86-73.82,16.16-91.52c3.82-21.63,1.11-35.23-12.61-53.54-8.84-11.79-22.17-18.69-37.09-17.65-23.45,1.64-46.24,12.64-60.97,31.16-11.46,14.41-14.08,32.27-12.76,50.44l24.53,103.87c3.7,15.66,2.05,32.28-3.95,46.82-6.05,14.67-18.4,24.69-32.81,31.16-35.77,16.06-75.18,17.5-111.29,2.57-25.45-10.52-44.22-32.16-49.31-59.81-5.23-28.45-5.47-56.68-3.19-85.51,5.27-66.6,32.39-127.89,78.25-176.54,47.27-50.16,105.57-83.54,169.14-110.12,91.74-38.35,231.67-86.48,323.88-37.91,22.23,11.71,40.34,27.64,54.24,49.26,29.69,46.17,41.37,102.99,31.81,157.19-5.82,33.02-19.81,62.47-38.65,89.66l-45.42,65.58c-13.64,19.7-24.55,40.2-31.71,62.88-6.49,20.57-6,40.71-.59,61.64l11.33,43.85c8.58,33.21-14.94,62.53-41.99,81.76-25.06,17.81-52.2,31.84-81.49,41.29-42.07,13.58-81.19,4.61-112.3-26.71-15.6-15.71-26.47-34.27-36.61-53.88-8.45-16.34-12.89-33.04-13.78-52.39Z"/><path d="M1186.29,1434.2c-23.99,62.59-88.82,105.24-152.01,122.04-58.25,15.48-117.63-3.98-155.06-51.03-41.21-51.82-52.84-115.75-46.29-180.89,5.29-52.64,25.07-112.72,70.6-142.42,29.62-19.32,64.67-24.84,99.06-17.95,40.28,8.08,80.89,32.55,111.76,59.9,37.63,33.34,64.41,76.17,76.23,125.1,6.95,28.76,6.28,57.68-4.29,85.24Z"/></g></svg></div>
+      <div class="aw-name">Noova</div>
+      <div class="aw-sub">Panel Administration</div>
+    </div>
+    <div class="aw-form">
+      <div id="auth-err"></div>
+    </div>
+  </div>
 </div>
 
-<div class="topbar" id="topbar" style="display:none">
-  <div class="topbar-logo">Noova<span>.</span></div>
-  <div class="topbar-sub">Panel Administration</div>
+<div class="topbar" id="topbar" style="display:none;position:relative">
+  <div class="tb-logo">
+    <div class="tb-logo-mark"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2000 2000" width="32" height="32"><defs><linearGradient id="nlgC" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f29715"/><stop offset="79%" stop-color="#ffda09"/></linearGradient></defs><rect fill="url(#nlgC)" x="141.86" y="141.86" width="1716.28" height="1716.28" rx="355.68" ry="355.68"/><g fill="#fff"><path d="M1403.19,463.98c40.46,25.06,86.67,54.28,125.6,79.06,47.74,30.38,61.67,93.78,31.09,141.39l-283.67,441.67c-30.7,47.8-94.51,61.38-142.01,30.21l-60.97-40c-42.22-27.7-57.87-82.1-36.82-128l220.11-480.05c25.62-55.88,94.41-76.64,146.67-44.27Z"/><path d="M691.38,979.15c-1.25-27.37-.28-53.33,4.32-79.73l12.86-73.82,16.16-91.52c3.82-21.63,1.11-35.23-12.61-53.54-8.84-11.79-22.17-18.69-37.09-17.65-23.45,1.64-46.24,12.64-60.97,31.16-11.46,14.41-14.08,32.27-12.76,50.44l24.53,103.87c3.7,15.66,2.05,32.28-3.95,46.82-6.05,14.67-18.4,24.69-32.81,31.16-35.77,16.06-75.18,17.5-111.29,2.57-25.45-10.52-44.22-32.16-49.31-59.81-5.23-28.45-5.47-56.68-3.19-85.51,5.27-66.6,32.39-127.89,78.25-176.54,47.27-50.16,105.57-83.54,169.14-110.12,91.74-38.35,231.67-86.48,323.88-37.91,22.23,11.71,40.34,27.64,54.24,49.26,29.69,46.17,41.37,102.99,31.81,157.19-5.82,33.02-19.81,62.47-38.65,89.66l-45.42,65.58c-13.64,19.7-24.55,40.2-31.71,62.88-6.49,20.57-6,40.71-.59,61.64l11.33,43.85c8.58,33.21-14.94,62.53-41.99,81.76-25.06,17.81-52.2,31.84-81.49,41.29-42.07,13.58-81.19,4.61-112.3-26.71-15.6-15.71-26.47-34.27-36.61-53.88-8.45-16.34-12.89-33.04-13.78-52.39Z"/><path d="M1186.29,1434.2c-23.99,62.59-88.82,105.24-152.01,122.04-58.25,15.48-117.63-3.98-155.06-51.03-41.21-51.82-52.84-115.75-46.29-180.89,5.29-52.64,25.07-112.72,70.6-142.42,29.62-19.32,64.67-24.84,99.06-17.95,40.28,8.08,80.89,32.55,111.76,59.9,37.63,33.34,64.41,76.17,76.23,125.1,6.95,28.76,6.28,57.68-4.29,85.24Z"/></g></svg></div>
+    <div class="tb-brand">Noova</div>
+    <div class="tb-badge">Admin</div>
+  </div>
   <button class="tb-logout" onclick="doLogout()">Déconnexion</button>
 </div>
 
@@ -119,7 +228,7 @@ auth.onAuthStateChanged(async user => {
     return;
   }
   if (!ADMIN_EMAILS.includes(user.email)) {
-    document.getElementById('auth-wall').innerHTML = '<div style="font-size:36px">🚫</div><h2 style="font-family:var(--fd)">Accès refusé</h2><p style="font-size:13px;color:var(--ink3)">Ce compte n\'est pas autorisé.</p><button onclick="auth.signOut()" style="margin-top:12px;padding:9px 18px;background:var(--coral);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700">Changer de compte</button>';
+    document.getElementById('auth-wall').innerHTML = '<div class="aw-deco"><svg viewBox="0 0 800 600" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><ellipse cx="650" cy="80" rx="300" ry="220" fill="rgba(255,255,255,.12)"/></svg></div><div class="aw-card" style="text-align:center"><div style="font-size:40px;margin-bottom:12px">🚫</div><div style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--ink);margin-bottom:8px;letter-spacing:-.5px">Accès refusé</div><p style="font-size:13px;color:var(--ink3);margin-bottom:20px">Ce compte n\'est pas autorisé.</p><button onclick="auth.signOut()" style="padding:10px 20px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;cursor:pointer;font-weight:800;font-family:var(--fb);font-size:14px">Changer de compte</button></div>';
     return;
   }
   document.getElementById('auth-wall').style.display = 'none';
@@ -129,10 +238,10 @@ auth.onAuthStateChanged(async user => {
 });
 
 function showGoogleLogin() {
-  const aw = document.getElementById('auth-wall');
+  const aw = document.querySelector('#auth-wall .aw-form') || document.getElementById('auth-wall');
   const btn = document.createElement('button');
   btn.textContent = 'Se connecter avec Google';
-  btn.style.cssText = 'padding:11px 20px;background:#fff;border:1.5px solid rgba(0,0,0,.15);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px';
+  btn.style.cssText = 'padding:11px 20px;background:#fff;border:1.5px solid rgba(0,0,0,.12);border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:var(--fb);width:100%;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.06)';
   btn.onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => {
     document.getElementById('auth-err').textContent = e.message;
   });
