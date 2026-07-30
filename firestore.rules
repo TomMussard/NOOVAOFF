@@ -116,8 +116,17 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ─── FriendCodes ─────────────────────────────────────────────────────────
+    // Annuaire public des codes amis — lecture ouverte à tous les users connectés
+    // Seul le propriétaire du code peut le créer (uid == auth.uid)
+    match /friendCodes/{code} {
+      allow read: if isAuth();
+      allow create: if isAuth() && request.resource.data.uid == request.auth.uid;
+      allow update: if isAuth() && resource.data.uid == request.auth.uid;
+      allow delete: if false;
+    }
+
     // ─── Cities ──────────────────────────────────────────────────────────────
-    // Référentiel en lecture seule pour les users
     match /cities/{cityId} {
       allow read: if isAuth();
       allow write: if false;

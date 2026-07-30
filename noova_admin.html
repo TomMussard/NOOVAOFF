@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -15,32 +15,17 @@
   --bg:#F5F3EF;--bg2:#EEECEA;--card:#fff;--border:rgba(23,20,26,.09);
   --coral:#f29715;--cd:rgba(242,151,21,.1);--cg:rgba(242,151,21,.25);
   --amber:#ffda09;--brown:#1c0e02;--cream:#fffbd7;
-  --mint:#0BAB84;--red:#EF4444;
+  --mint:#0BAB84;--red:#EF4444;--violet:#7C3AED;
   --grad:linear-gradient(135deg,#f29715 0%,#ffda09 79%);
   --fd:'Archivo',sans-serif;--fb:'Archivo',sans-serif
 }
 body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100vh}
 
 /* === AUTH WALL === */
-#auth-wall{
-  position:fixed;inset:0;z-index:100;
-  background:var(--grad);
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:0
-}
+#auth-wall{position:fixed;inset:0;z-index:100;background:var(--grad);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0}
 .aw-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.aw-card{
-  position:relative;z-index:1;
-  background:var(--card);border-radius:20px;
-  padding:36px 32px;width:100%;max-width:380px;
-  box-shadow:0 32px 80px rgba(28,14,2,.25)
-}
-.aw-brand{
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-  margin-bottom:28px;padding-bottom:24px;
-  border-bottom:1px solid var(--border);
-  text-align:center
-}
+.aw-card{position:relative;z-index:1;background:var(--card);border-radius:20px;padding:36px 32px;width:100%;max-width:380px;box-shadow:0 32px 80px rgba(28,14,2,.25)}
+.aw-brand{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);text-align:center}
 .aw-logo{width:64px;height:64px;border-radius:16px;overflow:hidden;box-shadow:0 8px 20px rgba(242,151,21,.35)}
 .aw-name{font-family:var(--fd);font-weight:900;font-size:26px;color:var(--ink);letter-spacing:-1px;line-height:1}
 .aw-sub{font-size:12px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:1.2px}
@@ -48,100 +33,156 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 #auth-err{font-size:12px;color:var(--red);min-height:16px;text-align:center}
 
 /* === TOPBAR === */
-.topbar{
-  background:var(--card);
-  border-bottom:1px solid var(--border);
-  padding:0 24px;height:58px;
-  display:flex;align-items:center;gap:14px;
-  position:sticky;top:0;z-index:10
-}
-.topbar::after{
-  content:"";position:absolute;bottom:-1px;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,#f29715 0%,#ffda09 60%,transparent 100%);
-  opacity:.6
-}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
+.topbar::after{content:"";position:absolute;bottom:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,#f29715 0%,#ffda09 60%,transparent 100%);opacity:.6}
 .tb-logo{display:flex;align-items:center;gap:10px}
 .tb-logo-mark{width:32px;height:32px;border-radius:8px;overflow:hidden;flex-shrink:0}
 .tb-brand{font-family:var(--fd);font-weight:900;font-size:18px;color:var(--ink);letter-spacing:-1px}
-.tb-badge{
-  background:var(--grad);color:var(--brown);
-  font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;
-  padding:3px 9px;border-radius:99px
-}
-.tb-logout{
-  margin-left:auto;padding:7px 14px;
-  background:transparent;border:1.5px solid var(--border);border-radius:8px;
-  font-size:12px;font-weight:600;cursor:pointer;color:var(--ink2);
-  font-family:var(--fb)
-}
+.tb-badge{background:var(--grad);color:var(--brown);font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px}
+.tb-logout{margin-left:auto;padding:7px 14px;background:transparent;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--ink2);font-family:var(--fb)}
 
-/* === MAIN === */
-.main{max-width:960px;margin:0 auto;padding:28px 24px}
-h1{font-family:var(--fd);font-weight:900;font-size:24px;margin-bottom:4px;letter-spacing:-.5px}
-.sub{font-size:13px;color:var(--ink3);margin-bottom:24px}
+/* === MAIN LAYOUT === */
+.main{max-width:1080px;margin:0 auto;padding:28px 24px}
 
-/* === STATS === */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
+/* === TABS === */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:28px}
+.tab-btn-main{padding:10px 22px;font-family:var(--fd);font-weight:700;font-size:14px;cursor:pointer;border:none;background:none;color:var(--ink3);position:relative;transition:color .15s}
+.tab-btn-main.active{color:var(--coral)}
+.tab-btn-main.active::after{content:"";position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--grad);border-radius:2px 2px 0 0}
+.tab-badge{display:inline-block;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:800;margin-left:6px;background:rgba(242,151,21,.15);color:var(--coral);vertical-align:middle}
+
+/* === SECTION HEADER === */
+.sec-hdr{margin-bottom:6px}
+.sec-hdr h2{font-family:var(--fd);font-weight:900;font-size:20px;letter-spacing:-.4px}
+.sec-hdr p{font-size:12px;color:var(--ink3);margin-top:3px}
+
+/* === STATS GRID === */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
-.stat-card:first-child{border-color:rgba(242,151,21,.3);background:linear-gradient(145deg,rgba(242,151,21,.06),rgba(255,218,9,.04))}
-.stat-card:first-child::before{content:"";position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(242,151,21,.2),transparent 70%);pointer-events:none}
+.stat-card.hl{border-color:rgba(242,151,21,.3);background:linear-gradient(145deg,rgba(242,151,21,.07),rgba(255,218,9,.04))}
+.stat-card.hl::before{content:"";position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(242,151,21,.2),transparent 70%);pointer-events:none}
+.stat-card.green{border-color:rgba(11,171,132,.25);background:linear-gradient(145deg,rgba(11,171,132,.07),rgba(11,171,132,.02))}
+.stat-card.red{border-color:rgba(239,68,68,.2);background:linear-gradient(145deg,rgba(239,68,68,.06),transparent)}
+.stat-card.violet{border-color:rgba(124,58,237,.2);background:linear-gradient(145deg,rgba(124,58,237,.06),transparent)}
+.stat-icon{font-size:18px;margin-bottom:6px}
 .stat-n{font-family:var(--fd);font-weight:900;font-size:28px;color:var(--ink);letter-spacing:-1px}
 .stat-l{font-size:11px;color:var(--ink3);margin-top:2px;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
+.stat-sub{font-size:11px;color:var(--ink3);margin-top:4px}
 
-/* === CARDS === */
+/* === CARD === */
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
-.card-title{
-  font-family:var(--fd);font-weight:700;font-size:14px;
-  padding:14px 18px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:8px
-}
+.card-title{font-family:var(--fd);font-weight:700;font-size:14px;padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.card-title .ct-right{margin-left:auto;font-size:12px;font-weight:600;color:var(--ink3)}
+
+/* === BADGES === */
 .badge{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
 .badge-pending{background:rgba(242,151,21,.15);color:var(--coral)}
 .badge-verified{background:rgba(11,171,132,.12);color:var(--mint)}
 .badge-rejected{background:rgba(239,68,68,.1);color:var(--red)}
-.merchant-row{
-  display:grid;grid-template-columns:1fr 140px 120px 160px;
-  align-items:center;gap:12px;padding:14px 18px;
-  border-bottom:1px solid var(--border)
-}
+
+/* === MERCHANT ROWS === */
+.merchant-row{display:grid;grid-template-columns:1fr 130px 110px auto;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);transition:background .12s}
 .merchant-row:last-child{border-bottom:none}
 .merchant-row:hover{background:rgba(242,151,21,.03)}
 .m-name{font-weight:700;font-size:14px;color:var(--ink)}
 .m-meta{font-size:11px;color:var(--ink3);margin-top:2px}
-.m-email{font-size:12px;color:var(--ink2)}
-.row-actions{display:flex;gap:8px;justify-content:flex-end}
-.btn-approve{
-  padding:6px 14px;border:none;border-radius:8px;
-  font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);
-  background:var(--grad);color:var(--brown);
-  box-shadow:0 2px 8px rgba(242,151,21,.3);transition:opacity .15s
-}
+.m-cell{font-size:12px;color:var(--ink2)}
+.row-actions{display:flex;gap:6px;justify-content:flex-end;align-items:center}
+.thead{display:grid;grid-template-columns:1fr 130px 110px auto;gap:12px;padding:9px 18px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);border-bottom:1px solid var(--border)}
+
+/* === BUTTONS === */
+.btn-approve{padding:6px 13px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);background:var(--grad);color:var(--brown);box-shadow:0 2px 8px rgba(242,151,21,.3);transition:opacity .15s;white-space:nowrap}
 .btn-approve:hover{opacity:.88}
-.btn-reject{
-  padding:6px 12px;background:rgba(239,68,68,.1);color:var(--red);
-  border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);
-  transition:background .15s
-}
+.btn-reject{padding:6px 11px;background:rgba(239,68,68,.1);color:var(--red);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:background .15s;white-space:nowrap}
 .btn-reject:hover{background:rgba(239,68,68,.18)}
-.empty{text-align:center;padding:48px 20px;color:var(--ink3);font-size:13px}
-.toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-  background:var(--brown);color:var(--amber);
-  padding:10px 20px;border-radius:99px;font-size:13px;font-weight:700;
-  opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;white-space:nowrap
-}
+.btn-detail{padding:6px 11px;background:var(--bg2);color:var(--ink2);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:background .15s;white-space:nowrap}
+.btn-detail:hover{background:var(--border);color:var(--ink)}
+.empty{text-align:center;padding:40px 20px;color:var(--ink3);font-size:13px;line-height:1.6}
+
+/* === GEOGRAPHIC CHART === */
+.geo-chart{padding:18px}
+.geo-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.geo-row:last-child{margin-bottom:0}
+.geo-label{width:100px;font-size:12px;font-weight:600;color:var(--ink);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.geo-track{flex:1;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.geo-fill{height:100%;border-radius:99px;background:var(--grad);transition:width .6s ease}
+.geo-count{font-size:12px;font-weight:700;color:var(--ink);width:40px;text-align:right;flex-shrink:0}
+.geo-pct{font-size:10px;color:var(--ink3);font-weight:400;margin-left:2px}
+
+/* === AGE TABLE === */
+.age-table{width:100%;border-collapse:collapse}
+.age-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);padding:9px 18px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg)}
+.age-table td{padding:11px 18px;font-size:13px;border-bottom:1px solid var(--border)}
+.age-table tr:last-child td{border-bottom:none}
+.age-table tr:hover td{background:rgba(242,151,21,.03)}
+.age-mini-track{width:80px;height:6px;background:var(--bg2);border-radius:99px;overflow:hidden;display:inline-block}
+.age-mini-fill{height:100%;border-radius:99px;background:var(--grad)}
+.age-num{font-weight:700;color:var(--ink)}
+.age-pct{font-size:11px;color:var(--ink3);margin-left:4px}
+
+/* === DONUT / METRICS === */
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0}
+.metric-cell{padding:16px 18px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.metric-cell:nth-child(even){border-right:none}
+.metric-cell:nth-last-child(-n+2){border-bottom:none}
+.metric-val{font-family:var(--fd);font-weight:900;font-size:22px;color:var(--ink);letter-spacing:-.5px}
+.metric-lbl{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-top:3px}
+.metric-bar-track{height:4px;background:var(--bg2);border-radius:99px;margin-top:8px;overflow:hidden}
+.metric-bar-fill{height:100%;border-radius:99px}
+
+/* === TIERS CHART === */
+.tier-row{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--border)}
+.tier-row:last-child{border-bottom:none}
+.tier-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.tier-name{font-size:13px;font-weight:600;color:var(--ink);flex:1}
+.tier-track{width:120px;height:6px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.tier-fill{height:100%;border-radius:99px}
+.tier-count{font-size:12px;font-weight:700;color:var(--ink);width:32px;text-align:right}
+
+/* === RECENT ACTIVITY === */
+.act-row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--border)}
+.act-row:last-child{border-bottom:none}
+.act-av{width:34px;height:34px;border-radius:50%;background:var(--cd);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:13px;color:var(--coral);flex-shrink:0}
+.act-info{flex:1;min-width:0}
+.act-name{font-size:13px;font-weight:700;color:var(--ink)}
+.act-meta{font-size:11px;color:var(--ink3);margin-top:1px}
+.act-time{font-size:11px;color:var(--ink3);white-space:nowrap}
+
+/* === TWO-COL LAYOUT === */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:720px){.two-col{grid-template-columns:1fr}.merchant-row,.thead{grid-template-columns:1fr auto}}
+
+/* === MODAL === */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;display:none}
+.modal-ov.open{display:flex}
+.modal-box{background:var(--card);border-radius:16px;padding:0;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-head{padding:20px 22px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px}
+.modal-ico{width:48px;height:48px;border-radius:12px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.modal-ttl{font-family:var(--fd);font-weight:800;font-size:18px;color:var(--ink);letter-spacing:-.4px}
+.modal-sub{font-size:12px;color:var(--ink3);margin-top:3px}
+.modal-close{margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink3);line-height:1;padding:4px}
+.modal-body{padding:20px 22px}
+.modal-field{margin-bottom:14px}
+.modal-field:last-child{margin-bottom:0}
+.mf-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:4px}
+.mf-val{font-size:14px;font-weight:600;color:var(--ink)}
+.mf-val.muted{font-weight:400;color:var(--ink2)}
+.modal-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.modal-foot{padding:16px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+/* === TOAST === */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--brown);color:var(--amber);padding:10px 20px;border-radius:99px;font-size:13px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;white-space:nowrap}
 .toast.show{opacity:1}
-#section-verified{margin-top:28px}
-.thead{
-  display:grid;grid-template-columns:1fr 140px 120px 160px;
-  gap:12px;padding:10px 18px;font-size:10px;font-weight:700;
-  text-transform:uppercase;letter-spacing:1px;color:var(--ink3);
-  border-bottom:1px solid var(--border)
-}
+
+/* === LOADING === */
+.loading{text-align:center;padding:48px 20px;color:var(--ink3);font-size:13px}
+.loading::after{content:"";display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--coral);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
+<!-- AUTH WALL -->
 <div id="auth-wall">
   <div class="aw-deco">
     <svg viewBox="0 0 800 600" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -156,12 +197,11 @@ h1{font-family:var(--fd);font-weight:900;font-size:24px;margin-bottom:4px;letter
       <div class="aw-name">Noova</div>
       <div class="aw-sub">Panel Administration</div>
     </div>
-    <div class="aw-form">
-      <div id="auth-err"></div>
-    </div>
+    <div class="aw-form"><div id="auth-err"></div></div>
   </div>
 </div>
 
+<!-- TOPBAR -->
 <div class="topbar" id="topbar" style="display:none;position:relative">
   <div class="tb-logo">
     <div class="tb-logo-mark"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2000 2000" width="32" height="32"><defs><linearGradient id="nlgC" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f29715"/><stop offset="79%" stop-color="#ffda09"/></linearGradient></defs><rect fill="url(#nlgC)" x="141.86" y="141.86" width="1716.28" height="1716.28" rx="355.68" ry="355.68"/><g fill="#fff"><path d="M1403.19,463.98c40.46,25.06,86.67,54.28,125.6,79.06,47.74,30.38,61.67,93.78,31.09,141.39l-283.67,441.67c-30.7,47.8-94.51,61.38-142.01,30.21l-60.97-40c-42.22-27.7-57.87-82.1-36.82-128l220.11-480.05c25.62-55.88,94.41-76.64,146.67-44.27Z"/><path d="M691.38,979.15c-1.25-27.37-.28-53.33,4.32-79.73l12.86-73.82,16.16-91.52c3.82-21.63,1.11-35.23-12.61-53.54-8.84-11.79-22.17-18.69-37.09-17.65-23.45,1.64-46.24,12.64-60.97,31.16-11.46,14.41-14.08,32.27-12.76,50.44l24.53,103.87c3.7,15.66,2.05,32.28-3.95,46.82-6.05,14.67-18.4,24.69-32.81,31.16-35.77,16.06-75.18,17.5-111.29,2.57-25.45-10.52-44.22-32.16-49.31-59.81-5.23-28.45-5.47-56.68-3.19-85.51,5.27-66.6,32.39-127.89,78.25-176.54,47.27-50.16,105.57-83.54,169.14-110.12,91.74-38.35,231.67-86.48,323.88-37.91,22.23,11.71,40.34,27.64,54.24,49.26,29.69,46.17,41.37,102.99,31.81,157.19-5.82,33.02-19.81,62.47-38.65,89.66l-45.42,65.58c-13.64,19.7-24.55,40.2-31.71,62.88-6.49,20.57-6,40.71-.59,61.64l11.33,43.85c8.58,33.21-14.94,62.53-41.99,81.76-25.06,17.81-52.2,31.84-81.49,41.29-42.07,13.58-81.19,4.61-112.3-26.71-15.6-15.71-26.47-34.27-36.61-53.88-8.45-16.34-12.89-33.04-13.78-52.39Z"/><path d="M1186.29,1434.2c-23.99,62.59-88.82,105.24-152.01,122.04-58.25,15.48-117.63-3.98-155.06-51.03-41.21-51.82-52.84-115.75-46.29-180.89,5.29-52.64,25.07-112.72,70.6-142.42,29.62-19.32,64.67-24.84,99.06-17.95,40.28,8.08,80.89,32.55,111.76,59.9,37.63,33.34,64.41,76.17,76.23,125.1,6.95,28.76,6.28,57.68-4.29,85.24Z"/></g></svg></div>
@@ -171,26 +211,127 @@ h1{font-family:var(--fd);font-weight:900;font-size:24px;margin-bottom:4px;letter
   <button class="tb-logout" onclick="doLogout()">Déconnexion</button>
 </div>
 
+<!-- MAIN -->
 <div class="main" id="main" style="display:none">
-  <h1>Commerçants en attente</h1>
-  <div class="sub">Valide ou rejette les demandes d'inscription des commerçants.</div>
 
-  <div class="stats">
-    <div class="stat-card"><div class="stat-n" id="cnt-pending">—</div><div class="stat-l">En attente</div></div>
-    <div class="stat-card"><div class="stat-n" id="cnt-verified">—</div><div class="stat-l">Vérifiés</div></div>
-    <div class="stat-card"><div class="stat-n" id="cnt-rejected">—</div><div class="stat-l">Rejetés</div></div>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn-main active" onclick="switchTab('entreprises',this)">🏪 Entreprises<span class="tab-badge" id="tb-ent">—</span></button>
+    <button class="tab-btn-main" onclick="switchTab('utilisateurs',this)">👥 Utilisateurs<span class="tab-badge" id="tb-usr">—</span></button>
   </div>
 
-  <div class="card">
-    <div class="card-title">⏳ En attente de validation <span class="badge badge-pending" id="badge-pending">0</span></div>
-    <div class="thead"><div>Commerce</div><div>Secteur</div><div>Ville</div><div style="text-align:right">Actions</div></div>
-    <div id="list-pending"><div class="empty">Chargement…</div></div>
+  <!-- ══════════════ TAB ENTREPRISES ══════════════ -->
+  <div id="tab-entreprises">
+    <div class="sec-hdr"><h2>Entreprises</h2><p>Gestion et validation des commerçants inscrits sur Noova.</p></div>
+
+    <div class="stats">
+      <div class="stat-card hl"><div class="stat-icon">🏪</div><div class="stat-n" id="cnt-total">—</div><div class="stat-l">Total</div></div>
+      <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-n" id="cnt-pending">—</div><div class="stat-l">En attente</div></div>
+      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-n" id="cnt-verified">—</div><div class="stat-l">Vérifiés</div></div>
+      <div class="stat-card red"><div class="stat-icon">🚫</div><div class="stat-n" id="cnt-rejected">—</div><div class="stat-l">Rejetés</div></div>
+    </div>
+
+    <!-- En attente -->
+    <div class="card">
+      <div class="card-title">⏳ En attente de validation <span class="badge badge-pending" id="badge-pending">0</span></div>
+      <div class="thead"><div>Commerce</div><div>Secteur</div><div>Ville</div><div style="text-align:right">Actions</div></div>
+      <div id="list-pending"><div class="loading">Chargement</div></div>
+    </div>
+
+    <!-- Tous les commerçants -->
+    <div class="card">
+      <div class="card-title">
+        📋 Toutes les entreprises
+        <div class="ct-right" style="display:flex;gap:6px">
+          <button onclick="filterMerchants('all')" id="f-all" style="padding:4px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:var(--ink);color:#fff;font-family:var(--fb)">Tous</button>
+          <button onclick="filterMerchants('verified')" id="f-verified" style="padding:4px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:var(--ink3);font-family:var(--fb)">Vérifiés</button>
+          <button onclick="filterMerchants('rejected')" id="f-rejected" style="padding:4px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:var(--ink3);font-family:var(--fb)">Rejetés</button>
+        </div>
+      </div>
+      <div class="thead"><div>Commerce</div><div>Secteur</div><div>Ville</div><div style="text-align:right">Statut</div></div>
+      <div id="list-all"><div class="loading">Chargement</div></div>
+    </div>
   </div>
 
-  <div class="card" id="section-verified">
-    <div class="card-title">✅ Commerçants vérifiés <span class="badge badge-verified" id="badge-verified">0</span></div>
-    <div class="thead"><div>Commerce</div><div>Secteur</div><div>Ville</div><div style="text-align:right">Statut</div></div>
-    <div id="list-verified"><div class="empty">Chargement…</div></div>
+  <!-- ══════════════ TAB UTILISATEURS ══════════════ -->
+  <div id="tab-utilisateurs" style="display:none">
+    <div class="sec-hdr"><h2>Utilisateurs</h2><p>Aperçu de la communauté Noova — données agrégées en temps réel.</p></div>
+
+    <div class="stats">
+      <div class="stat-card hl"><div class="stat-icon">👥</div><div class="stat-n" id="u-total">—</div><div class="stat-l">Utilisateurs</div></div>
+      <div class="stat-card green"><div class="stat-icon">📍</div><div class="stat-n" id="u-cities">—</div><div class="stat-l">Villes</div></div>
+      <div class="stat-card violet"><div class="stat-icon">⭐</div><div class="stat-n" id="u-avgpts">—</div><div class="stat-l">Pts moyen</div></div>
+      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-n" id="u-avgstreak">—</div><div class="stat-l">Streak moyen</div></div>
+    </div>
+
+    <div class="two-col">
+      <!-- Répartition géographique -->
+      <div class="card">
+        <div class="card-title">📍 Répartition géographique <span class="badge badge-verified" id="u-cities-count">—</span></div>
+        <div id="geo-chart-wrap"><div class="loading">Chargement</div></div>
+      </div>
+
+      <!-- Répartition par âge -->
+      <div class="card">
+        <div class="card-title">🎂 Répartition par âge</div>
+        <div style="overflow-x:auto">
+          <table class="age-table" id="age-table-wrap">
+            <thead><tr><th>Tranche d'âge</th><th>Utilisateurs</th><th>%</th><th>Distribution</th></tr></thead>
+            <tbody id="age-tbody"><tr><td colspan="4"><div class="loading">Chargement</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- Engagement par niveau -->
+      <div class="card">
+        <div class="card-title">🏆 Niveaux de la communauté</div>
+        <div id="tiers-wrap"><div class="loading">Chargement</div></div>
+      </div>
+
+      <!-- Métriques clés -->
+      <div class="card">
+        <div class="card-title">📊 Métriques clés</div>
+        <div class="metrics-grid" id="metrics-wrap">
+          <div class="metric-cell"><div class="metric-val" id="m-withloc">—</div><div class="metric-lbl">Avec localisation</div></div>
+          <div class="metric-cell"><div class="metric-val" id="m-withage">—</div><div class="metric-lbl">Avec âge renseigné</div></div>
+          <div class="metric-cell"><div class="metric-val" id="m-hasfriends">—</div><div class="metric-lbl">Ont des amis</div></div>
+          <div class="metric-cell"><div class="metric-val" id="m-streak5">—</div><div class="metric-lbl">Streak ≥ 5 jours</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inscriptions récentes -->
+    <div class="card">
+      <div class="card-title">🕐 Inscrits récemment <span class="badge badge-pending" id="u-recent-count">—</span></div>
+      <div id="recent-users-wrap"><div class="loading">Chargement</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MERCHANT DETAIL MODAL -->
+<div class="modal-ov" id="modal-ov" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-ico" id="modal-ico">🏪</div>
+      <div><div class="modal-ttl" id="modal-ttl">—</div><div class="modal-sub" id="modal-sub">—</div></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-fields">
+        <div class="modal-field"><div class="mf-lbl">Email</div><div class="mf-val" id="md-email">—</div></div>
+        <div class="modal-field"><div class="mf-lbl">Statut</div><div class="mf-val" id="md-status">—</div></div>
+        <div class="modal-field"><div class="mf-lbl">Secteur</div><div class="mf-val" id="md-sector">—</div></div>
+        <div class="modal-field"><div class="mf-lbl">Ville</div><div class="mf-val" id="md-city">—</div></div>
+        <div class="modal-field"><div class="mf-lbl">Adresse</div><div class="mf-val" id="md-address">—</div></div>
+        <div class="modal-field"><div class="mf-lbl">Téléphone</div><div class="mf-val" id="md-phone">—</div></div>
+      </div>
+      <div class="modal-field" style="margin-top:14px"><div class="mf-lbl">Description</div><div class="mf-val muted" id="md-desc" style="font-size:13px;line-height:1.5">—</div></div>
+      <div class="modal-field" style="margin-top:14px"><div class="mf-lbl">ID Firestore</div><div class="mf-val muted" id="md-id" style="font-size:11px;font-family:monospace">—</div></div>
+    </div>
+    <div class="modal-foot" id="modal-foot"></div>
   </div>
 </div>
 
@@ -214,21 +355,30 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let allMerchants = [];
+let currentFilter = 'all';
+let modalMerchant = null;
 
+// ── Utils ──────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
+function fmtDate(ts) {
+  if (!ts) return '—';
+  const d = ts.seconds ? new Date(ts.seconds*1000) : new Date(ts);
+  return d.toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric'});
+}
 
+// ── Auth ───────────────────────────────────────────────────────────────────
 auth.onAuthStateChanged(async user => {
-  if (!user) {
-    showGoogleLogin();
-    return;
-  }
+  if (!user) { showGoogleLogin(); return; }
   if (!ADMIN_EMAILS.includes(user.email)) {
-    document.getElementById('auth-wall').innerHTML = '<div class="aw-deco"><svg viewBox="0 0 800 600" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><ellipse cx="650" cy="80" rx="300" ry="220" fill="rgba(255,255,255,.12)"/></svg></div><div class="aw-card" style="text-align:center"><div style="font-size:40px;margin-bottom:12px">🚫</div><div style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--ink);margin-bottom:8px;letter-spacing:-.5px">Accès refusé</div><p style="font-size:13px;color:var(--ink3);margin-bottom:20px">Ce compte n\'est pas autorisé.</p><button onclick="auth.signOut()" style="padding:10px 20px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;cursor:pointer;font-weight:800;font-family:var(--fb);font-size:14px">Changer de compte</button></div>';
+    document.getElementById('auth-wall').innerHTML = `<div class="aw-deco"><svg viewBox="0 0 800 600" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><ellipse cx="650" cy="80" rx="300" ry="220" fill="rgba(255,255,255,.12)"/></svg></div><div class="aw-card" style="text-align:center"><div style="font-size:40px;margin-bottom:12px">🚫</div><div style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--ink);margin-bottom:8px;letter-spacing:-.5px">Accès refusé</div><p style="font-size:13px;color:var(--ink3);margin-bottom:20px">Ce compte n'est pas autorisé.</p><button onclick="auth.signOut()" style="padding:10px 20px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;cursor:pointer;font-weight:800;font-family:var(--fb);font-size:14px">Changer de compte</button></div>`;
     return;
   }
   document.getElementById('auth-wall').style.display = 'none';
@@ -247,96 +397,289 @@ function showGoogleLogin() {
   });
   aw.appendChild(btn);
 }
+function doLogout() { auth.signOut().then(() => location.reload()); }
 
-function doLogout() {
-  auth.signOut().then(() => location.reload());
+// ── Tabs ───────────────────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn-main').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-entreprises').style.display = tab === 'entreprises' ? 'block' : 'none';
+  document.getElementById('tab-utilisateurs').style.display = tab === 'utilisateurs' ? 'block' : 'none';
+  if (tab === 'utilisateurs') loadUsers();
 }
 
+// ── Merchants ──────────────────────────────────────────────────────────────
 async function loadMerchants() {
-  document.getElementById('list-pending').innerHTML = '<div class="empty">Chargement…</div>';
-  document.getElementById('list-verified').innerHTML = '<div class="empty">Chargement…</div>';
   try {
     const snap = await db.collection('merchants').get();
     allMerchants = [];
     snap.forEach(doc => allMerchants.push({ id: doc.id, ...doc.data() }));
     renderMerchants();
+    document.getElementById('tb-ent').textContent = allMerchants.length;
   } catch(e) {
-    document.getElementById('list-pending').innerHTML = `<div class="empty">Erreur : ${e.message}</div>`;
+    document.getElementById('list-pending').innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
   }
 }
 
 function renderMerchants() {
-  const pending = allMerchants.filter(m => m.status === 'pending');
+  const pending  = allMerchants.filter(m => m.status === 'pending');
   const verified = allMerchants.filter(m => m.status === 'verified');
   const rejected = allMerchants.filter(m => m.status === 'rejected');
 
-  document.getElementById('cnt-pending').textContent = pending.length;
+  document.getElementById('cnt-total').textContent    = allMerchants.length;
+  document.getElementById('cnt-pending').textContent  = pending.length;
   document.getElementById('cnt-verified').textContent = verified.length;
   document.getElementById('cnt-rejected').textContent = rejected.length;
   document.getElementById('badge-pending').textContent = pending.length;
-  document.getElementById('badge-verified').textContent = verified.length;
 
-  const listPending = document.getElementById('list-pending');
+  // Pending list
+  const lp = document.getElementById('list-pending');
   if (!pending.length) {
-    listPending.innerHTML = '<div class="empty">✅ Aucun commerçant en attente — tout est à jour !</div>';
+    lp.innerHTML = '<div class="empty">✅ Aucun commerçant en attente</div>';
   } else {
-    listPending.innerHTML = pending.map(m => `
+    lp.innerHTML = pending.map(m => `
       <div class="merchant-row" id="row-${m.id}">
-        <div>
-          <div class="m-name">${esc(m.brandName||'—')}</div>
-          <div class="m-meta">${esc(m.email||'—')}</div>
-        </div>
-        <div class="m-email">${esc(m.sector||'—')}</div>
-        <div class="m-email">${esc(m.city||'—')}</div>
+        <div><div class="m-name">${esc(m.brandName||'—')}</div><div class="m-meta">${esc(m.email||'—')}</div></div>
+        <div class="m-cell">${esc(m.sector||'—')}</div>
+        <div class="m-cell">${esc(m.city||'—')}</div>
         <div class="row-actions">
           <button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')">✓ Valider</button>
           <button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')">✗ Rejeter</button>
+          <button class="btn-detail" onclick="openModal('${m.id}')">Détails ▸</button>
         </div>
       </div>`).join('');
   }
 
-  const listVerified = document.getElementById('list-verified');
-  const combined = [...verified, ...rejected];
-  if (!combined.length) {
-    listVerified.innerHTML = '<div class="empty">Aucun commerçant vérifié pour l\'instant.</div>';
-  } else {
-    listVerified.innerHTML = combined.map(m => `
-      <div class="merchant-row">
-        <div>
-          <div class="m-name">${esc(m.brandName||'—')}</div>
-          <div class="m-meta">${esc(m.email||'—')}</div>
-        </div>
-        <div class="m-email">${esc(m.sector||'—')}</div>
-        <div class="m-email">${esc(m.city||'—')}</div>
-        <div style="text-align:right"><span class="badge ${m.status==='verified'?'badge-verified':'badge-rejected'}">${m.status==='verified'?'Vérifié':'Rejeté'}</span></div>
-      </div>`).join('');
+  renderAllMerchants();
+}
+
+function filterMerchants(f) {
+  currentFilter = f;
+  ['all','verified','rejected'].forEach(k => {
+    const btn = document.getElementById('f-'+k);
+    btn.style.background = k === f ? 'var(--ink)' : 'none';
+    btn.style.color = k === f ? '#fff' : 'var(--ink3)';
+  });
+  renderAllMerchants();
+}
+
+function renderAllMerchants() {
+  const filtered = currentFilter === 'all'
+    ? allMerchants.filter(m => m.status !== 'pending')
+    : allMerchants.filter(m => m.status === currentFilter);
+  const la = document.getElementById('list-all');
+  if (!filtered.length) {
+    la.innerHTML = '<div class="empty">Aucun commerçant dans cette catégorie.</div>';
+    return;
   }
+  la.innerHTML = filtered.map(m => `
+    <div class="merchant-row">
+      <div><div class="m-name">${esc(m.brandName||'—')}</div><div class="m-meta">${esc(m.email||'—')}</div></div>
+      <div class="m-cell">${esc(m.sector||'—')}</div>
+      <div class="m-cell">${esc(m.city||'—')}</div>
+      <div class="row-actions">
+        <span class="badge ${m.status==='verified'?'badge-verified':'badge-rejected'}">${m.status==='verified'?'Vérifié':'Rejeté'}</span>
+        <button class="btn-detail" onclick="openModal('${m.id}')">Détails ▸</button>
+      </div>
+    </div>`).join('');
 }
 
 async function approveMerchant(id, name) {
-  if (!confirm(`Valider le commerçant "${name}" ?`)) return;
+  if (!confirm(`Valider "${name}" ?`)) return;
   try {
     await db.collection('merchants').doc(id).update({ status: 'verified' });
     const idx = allMerchants.findIndex(m => m.id === id);
     if (idx !== -1) allMerchants[idx].status = 'verified';
     renderMerchants();
     showToast(`✅ ${name} validé`);
+    if (modalMerchant && modalMerchant.id === id) openModal(id);
   } catch(e) { showToast('Erreur : ' + e.message); }
 }
-
 async function rejectMerchant(id, name) {
-  if (!confirm(`Rejeter le commerçant "${name}" ? Il ne pourra pas accéder au dashboard.`)) return;
+  if (!confirm(`Rejeter "${name}" ?`)) return;
   try {
     await db.collection('merchants').doc(id).update({ status: 'rejected' });
     const idx = allMerchants.findIndex(m => m.id === id);
     if (idx !== -1) allMerchants[idx].status = 'rejected';
     renderMerchants();
     showToast(`🚫 ${name} rejeté`);
+    if (modalMerchant && modalMerchant.id === id) openModal(id);
   } catch(e) { showToast('Erreur : ' + e.message); }
 }
 
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ── Merchant Modal ─────────────────────────────────────────────────────────
+function openModal(id) {
+  const m = allMerchants.find(x => x.id === id);
+  if (!m) return;
+  modalMerchant = m;
+  document.getElementById('modal-ico').textContent = m.emoji || '🏪';
+  document.getElementById('modal-ttl').textContent = m.brandName || '—';
+  document.getElementById('modal-sub').textContent = m.sector || 'Commerce';
+  document.getElementById('md-email').textContent   = m.email   || '—';
+  document.getElementById('md-sector').textContent  = m.sector  || '—';
+  document.getElementById('md-city').textContent    = m.city    || '—';
+  document.getElementById('md-address').textContent = m.address || '—';
+  document.getElementById('md-phone').textContent   = m.phone   || '—';
+  document.getElementById('md-desc').textContent    = m.description || '—';
+  document.getElementById('md-id').textContent      = m.id;
+  const statusMap = { verified:'✅ Vérifié', pending:'⏳ En attente', rejected:'🚫 Rejeté' };
+  document.getElementById('md-status').innerHTML = `<span class="badge ${m.status==='verified'?'badge-verified':m.status==='pending'?'badge-pending':'badge-rejected'}">${statusMap[m.status]||m.status}</span>`;
+  const foot = document.getElementById('modal-foot');
+  if (m.status === 'pending') {
+    foot.innerHTML = `<button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')">✗ Rejeter</button><button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')">✓ Valider</button>`;
+  } else if (m.status === 'verified') {
+    foot.innerHTML = `<button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')">Révoquer l'accès</button>`;
+  } else {
+    foot.innerHTML = `<button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')">Ré-approuver</button>`;
+  }
+  document.getElementById('modal-ov').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-ov').classList.remove('open'); }
+
+// ── Users Analytics ────────────────────────────────────────────────────────
+let _usersLoaded = false;
+
+async function loadUsers() {
+  if (_usersLoaded) return;
+  try {
+    const snap = await db.collection('users').limit(500).get();
+    const users = [];
+    snap.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+    _usersLoaded = true;
+    renderUsers(users);
+    document.getElementById('tb-usr').textContent = users.length;
+  } catch(e) {
+    document.getElementById('geo-chart-wrap').innerHTML = `<div class="empty">Erreur chargement : ${esc(e.message)}</div>`;
+  }
+}
+
+function renderUsers(users) {
+  const total = users.length;
+
+  // ── Stat cards
+  const citySet = new Set(users.map(u => (u.city||'').toLowerCase().trim()).filter(Boolean));
+  const avgPts  = total ? Math.round(users.reduce((s,u) => s+(u.points||0), 0) / total) : 0;
+  const avgStrk = total ? Math.round(users.reduce((s,u) => s+(u.streak||0), 0) / total) : 0;
+
+  document.getElementById('u-total').textContent     = total;
+  document.getElementById('u-cities').textContent    = citySet.size;
+  document.getElementById('u-avgpts').textContent    = avgPts;
+  document.getElementById('u-avgstreak').textContent = avgStrk;
+
+  // ── Geographic chart
+  const cityCounts = {};
+  users.forEach(u => {
+    const c = (u.city||'').trim();
+    if (!c) return;
+    const k = c.charAt(0).toUpperCase() + c.slice(1).toLowerCase();
+    cityCounts[k] = (cityCounts[k]||0) + 1;
+  });
+  const sortedCities = Object.entries(cityCounts).sort((a,b) => b[1]-a[1]).slice(0,12);
+  const maxCity = sortedCities.length ? sortedCities[0][1] : 1;
+
+  document.getElementById('u-cities-count').textContent = citySet.size + ' villes';
+
+  const geoWrap = document.getElementById('geo-chart-wrap');
+  if (!sortedCities.length) {
+    geoWrap.innerHTML = '<div class="empty">Aucune donnée de localisation</div>';
+  } else {
+    geoWrap.innerHTML = '<div class="geo-chart">' + sortedCities.map(([city, count]) => {
+      const pct = Math.round((count/total)*100);
+      const barW = Math.round((count/maxCity)*100);
+      return `<div class="geo-row">
+        <div class="geo-label" title="${esc(city)}">${esc(city)}</div>
+        <div class="geo-track"><div class="geo-fill" style="width:${barW}%"></div></div>
+        <div class="geo-count">${count}<span class="geo-pct">${pct}%</span></div>
+      </div>`;
+    }).join('') + '</div>';
+  }
+
+  // ── Age table
+  const AGE_ORDER = ['13-17','18-24','25-34','35-44','45-54','55-64','65+'];
+  const ageCounts = {};
+  AGE_ORDER.forEach(a => ageCounts[a] = 0);
+  let withAge = 0;
+  users.forEach(u => {
+    if (u.age && ageCounts[u.age] !== undefined) {
+      ageCounts[u.age]++;
+      withAge++;
+    }
+  });
+  const maxAge = Math.max(...Object.values(ageCounts), 1);
+  const tbody = document.getElementById('age-tbody');
+  tbody.innerHTML = AGE_ORDER.map(range => {
+    const cnt = ageCounts[range] || 0;
+    const pct = total ? Math.round((cnt/total)*100) : 0;
+    const barW = Math.round((cnt/maxAge)*100);
+    return `<tr>
+      <td style="font-weight:600">${range} ans</td>
+      <td class="age-num">${cnt}</td>
+      <td><span class="age-num">${pct}</span><span class="age-pct">%</span></td>
+      <td><div class="age-mini-track"><div class="age-mini-fill" style="width:${barW}%"></div></div></td>
+    </tr>`;
+  }).join('');
+
+  // ── Tiers (points distribution)
+  const TIERS = [
+    { n:'Curieux',   min:0,    max:99,   c:'#94a3b8' },
+    { n:'Actif',     min:100,  max:499,  c:'#0BAB84' },
+    { n:'Engagé',    min:500,  max:1999, c:'#7C3AED' },
+    { n:'Expert',    min:2000, max:4999, c:'#f29715' },
+    { n:'Légende',   min:5000, max:9999, c:'#ffda09' }
+  ];
+  const tierCounts = TIERS.map(t => ({
+    ...t,
+    count: users.filter(u => (u.points||0) >= t.min && (u.points||0) < t.max).length
+  }));
+  const maxTier = Math.max(...tierCounts.map(t => t.count), 1);
+  const tiersWrap = document.getElementById('tiers-wrap');
+  tiersWrap.innerHTML = tierCounts.map(t => {
+    const barW = Math.round((t.count/maxTier)*100);
+    return `<div class="tier-row">
+      <div class="tier-dot" style="background:${t.c}"></div>
+      <div class="tier-name">${t.n} <span style="font-size:10px;color:var(--ink3)">(${t.min}–${t.max=== 9999?'∞':t.max} pts)</span></div>
+      <div class="tier-track"><div class="tier-fill" style="width:${barW}%;background:${t.c}"></div></div>
+      <div class="tier-count">${t.count}</div>
+    </div>`;
+  }).join('');
+
+  // ── Métriques clés
+  const withLoc     = users.filter(u => u.city && u.city.trim()).length;
+  const hasFriends  = users.filter(u => u.friendUids && u.friendUids.length > 0).length;
+  const streak5     = users.filter(u => (u.streak||0) >= 5).length;
+
+  document.getElementById('m-withloc').textContent   = total ? Math.round((withLoc/total)*100)+'%' : '—';
+  document.getElementById('m-withage').textContent   = total ? Math.round((withAge/total)*100)+'%' : '—';
+  document.getElementById('m-hasfriends').textContent = total ? Math.round((hasFriends/total)*100)+'%' : '—';
+  document.getElementById('m-streak5').textContent   = total ? Math.round((streak5/total)*100)+'%' : '—';
+
+  // ── Inscriptions récentes
+  const recent = [...users]
+    .filter(u => u.createdAt)
+    .sort((a,b) => (b.createdAt.seconds||0) - (a.createdAt.seconds||0))
+    .slice(0, 10);
+
+  const COLORS = ['#f29715','#7C3AED','#0BAB84','#EF4444','#3B82F6','#EC4899'];
+  const rWrap = document.getElementById('recent-users-wrap');
+  document.getElementById('u-recent-count').textContent = recent.length + ' affichés';
+
+  if (!recent.length) {
+    rWrap.innerHTML = '<div class="empty">Aucun utilisateur avec date d\'inscription enregistrée.</div>';
+  } else {
+    rWrap.innerHTML = recent.map((u, i) => {
+      const name = u.name || 'Utilisateur';
+      const col  = COLORS[i % COLORS.length];
+      const meta = [u.city, u.age ? u.age+' ans' : null].filter(Boolean).join(' · ') || 'Profil incomplet';
+      return `<div class="act-row">
+        <div class="act-av" style="background:${col}18;color:${col}">${name[0].toUpperCase()}</div>
+        <div class="act-info">
+          <div class="act-name">${esc(name)}</div>
+          <div class="act-meta">${esc(meta)} · <span style="font-family:monospace;font-size:10px;color:var(--ink3)">${esc(u.id.slice(0,8))}…</span></div>
+        </div>
+        <div class="act-time">${fmtDate(u.createdAt)}</div>
+      </div>`;
+    }).join('');
+  }
 }
 </script>
 </body>

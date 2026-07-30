@@ -1197,7 +1197,7 @@ function initFriendsPanel(){
     <div style="padding:0 18px 6px">
       <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Ajouter un ami</div>
       <div style="display:flex;gap:8px">
-        <input style="flex:1;padding:11px 13px;background:var(--card);border:1.5px solid var(--bg3);border-radius:12px;font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOVA-AB12)" id="fi-inp" oninput="this.value=this.value.toUpperCase()">
+        <input style="flex:1;padding:11px 13px;background:var(--card);border:1.5px solid var(--bg3);border-radius:12px;font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOOVA-AB1234)" id="fi-inp" oninput="this.value=this.value.toUpperCase()">
         <button style="padding:11px 16px;background:var(--grad);color:var(--gi);font-size:12px;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-family:var(--fd);box-shadow:0 4px 10px var(--cg);white-space:nowrap" onclick="addFriend()">+ Ajouter</button>
       </div>
       <div id="fi-err" style="font-size:12px;color:var(--coral);min-height:18px;margin-top:6px"></div>
@@ -1297,21 +1297,22 @@ async function addFriend(){
   const inp=document.getElementById('fi-inp');
   const code=inp.value.trim().toUpperCase();
   const errEl=document.getElementById('fi-err');
-  if(!code){return;}
+  if(!code)return;
+  if(!code.startsWith('NOOVA-')){
+    if(errEl)errEl.textContent='Format invalide — ex: NOOVA-AB1234';
+    return;
+  }
   const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
   if(errEl)errEl.textContent='Recherche…';
   try{
-    const snap=await db.collection('users').where('friendCode','==',code).limit(1).get();
-    if(snap.empty){if(errEl)errEl.textContent='Code introuvable — vérifie le code.';return;}
-    const friendDoc=snap.docs[0];
-    if(friendDoc.id===uid){if(errEl)errEl.textContent='Tu ne peux pas t\'ajouter toi-même !';return;}
-    if((S._friendUids||[]).includes(friendDoc.id)){if(errEl)errEl.textContent='Déjà ami !';return;}
-    // Vérifie si une demande est déjà en attente
-    const existing=await db.collection('users').doc(friendDoc.id).collection('notifications')
-      .where('type','==','friend_request').where('fromUid','==',uid).where('read','==',false).limit(1).get();
-    if(!existing.empty){if(errEl)errEl.textContent='Demande déjà envoyée !';return;}
-    // Envoie une notification de demande d\'ami
-    await db.collection('users').doc(friendDoc.id).collection('notifications').add({
+    // Lecture directe dans friendCodes (collection publique) — pas de query sur users
+    const codeDoc=await db.collection('friendCodes').doc(code).get();
+    if(!codeDoc.exists){if(errEl)errEl.textContent='Code introuvable — vérifie le code.';return;}
+    const friendUid=codeDoc.data().uid;
+    if(friendUid===uid){if(errEl)errEl.textContent='Tu ne peux pas t\'ajouter toi-même !';return;}
+    if((S._friendUids||[]).includes(friendUid)){if(errEl)errEl.textContent='Déjà ami !';return;}
+    // Envoie la demande d\'ami via notification (le seul write autorisé sur les notifs d\'autrui)
+    await db.collection('users').doc(friendUid).collection('notifications').add({
       type:'friend_request',
       fromUid:uid,
       fromName:(S.user&&S.user.name)||'Un utilisateur',
@@ -1335,6 +1336,8 @@ function initNotifications(uid){
     .orderBy('createdAt','desc').limit(30)
     .onSnapshot(snap=>{
       _notifs=snap.docs.map(d=>({id:d.id,...d.data()}));
+      // Auto-traitement des friend_accepted (l'ami s'ajoute sans avoir à ouvrir le panel)
+      _notifs.filter(n=>n.type==='friend_accepted'&&!n.read).forEach(n=>autoAddFriend(n,uid));
       const unread=_notifs.filter(n=>!n.read).length;
       const dot=document.getElementById('bell-dot');
       if(dot)dot.style.display=unread>0?'block':'none';
@@ -1350,6 +1353,9 @@ function toggleNotifPanel(e){
   if(panel.classList.contains('open')){panel.classList.remove('open');return;}
   panel.classList.add('open');
   renderNotifications();
+  // À l'ouverture du panel, on traite automatiquement les friend_accepted
+  const myUid=auth.currentUser&&auth.currentUser.uid;
+  if(myUid) _notifs.filter(n=>n.type==='friend_accepted'&&!n.read).forEach(n=>autoAddFriend(n,myUid));
 }
 
 function closeNotifPanel(){
@@ -1414,11 +1420,11 @@ async function acceptFriendRequest(notifId,fromUid,fromName){
   const uid=auth.currentUser&&auth.currentUser.uid;
   if(!uid)return;
   try{
-    await Promise.all([
-      db.collection('users').doc(uid).update({friendUids:firebase.firestore.FieldValue.arrayUnion(fromUid)}),
-      db.collection('users').doc(fromUid).update({friendUids:firebase.firestore.FieldValue.arrayUnion(uid)})
-    ]);
+    // On s'ajoute l'ami dans notre propre doc (seul write autorisé sur notre doc)
+    await db.collection('users').doc(uid).update({friendUids:firebase.firestore.FieldValue.arrayUnion(fromUid)});
+    // On marque la notif comme lue
     await db.collection('users').doc(uid).collection('notifications').doc(notifId).update({read:true});
+    // On envoie une notif friend_accepted au demandeur — il s'auto-ajoutera nous à la prochaine ouverture
     await db.collection('users').doc(fromUid).collection('notifications').add({
       type:'friend_accepted',
       fromUid:uid,
@@ -1426,8 +1432,11 @@ async function acceptFriendRequest(notifId,fromUid,fromName){
       read:false,
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
-    S._friendUids=[...(S._friendUids||[]),fromUid];
-    await loadFriendsFromFirestore(S._friendUids);
+    // Mise à jour locale
+    if(!(S._friendUids||[]).includes(fromUid)){
+      S._friendUids=[...(S._friendUids||[]),fromUid];
+      await loadFriendsFromFirestore(S._friendUids);
+    }
   }catch(e){console.warn('acceptFriend:',e);}
 }
 
@@ -1437,6 +1446,17 @@ async function declineFriendRequest(notifId){
   try{
     await db.collection('users').doc(uid).collection('notifications').doc(notifId).update({read:true});
   }catch(e){console.warn('declineFriend:',e);}
+}
+
+// Appelé quand on reçoit une notif friend_accepted : on s'ajoute l'ami dans notre doc
+async function autoAddFriend(notif,uid){
+  if(!notif.fromUid||(S._friendUids||[]).includes(notif.fromUid))return;
+  try{
+    await db.collection('users').doc(uid).update({friendUids:firebase.firestore.FieldValue.arrayUnion(notif.fromUid)});
+    await db.collection('users').doc(uid).collection('notifications').doc(notif.id).update({read:true});
+    S._friendUids=[...(S._friendUids||[]),notif.fromUid];
+    await loadFriendsFromFirestore(S._friendUids);
+  }catch(e){console.warn('autoAddFriend:',e);}
 }
 function openChatFor(u){
   chUser=u;const idx=S.friends.findIndex(f=>f.n===u);const c=idx>=0?AVC[idx%AVC.length]:'#A14E08';
@@ -2133,12 +2153,19 @@ async function loadUserAndStart(uid) {
     S._answered        = data.answeredCampaigns || [];
     S._authorizedMerchants = data.authorizedMerchants || [];
     S._friendUids      = data.friendUids || [];
-    if(data.friendCode) {
+    if(data.friendCode && data.friendCode.startsWith('NOOVA-')) {
       S._friendCode = data.friendCode;
+      // S'assure que le code existe dans friendCodes
+      db.collection('friendCodes').doc(data.friendCode)
+        .set({ uid, name: resolvedName }, { merge: true }).catch(()=>{});
     } else {
-      const code = 'NOVA-' + Math.random().toString(36).slice(2,6).toUpperCase();
+      // Génère un nouveau code NOOVA- (6 chars alphanumériques)
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = 'NOOVA-';
+      for(let i=0;i<6;i++) code += chars[Math.floor(Math.random()*chars.length)];
       S._friendCode = code;
-      db.collection('users').doc(uid).update({ friendCode: code, friendUids: [] }).catch(()=>{});
+      db.collection('users').doc(uid).update({ friendCode: code, friendUids: data.friendUids||[] }).catch(()=>{});
+      db.collection('friendCodes').doc(code).set({ uid, name: resolvedName }).catch(()=>{});
     }
     if(S._friendUids.length) loadFriendsFromFirestore(S._friendUids);
     initNotifications(uid);
