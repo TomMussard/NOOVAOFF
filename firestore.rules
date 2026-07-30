@@ -14,14 +14,13 @@ service cloud.firestore {
     }
 
     // ─── Users ────────────────────────────────────────────────────────────────
+    // Lecture : tout user connecté (profils semi-publics pour amis/classement)
+    // Écriture : propriétaire uniquement
     match /users/{uid} {
-      allow read: if isOwner(uid) ||
-        (isAuth() && request.auth.token.email == 'noovaoffr@gmail.com');
+      allow read: if isAuth();
       allow write: if isOwner(uid);
 
       // Notifications subcollection
-      // Lecture & update (marquer lu) : propriétaire uniquement
-      // Création : tout user connecté peut envoyer une notif à n'importe qui
       match /notifications/{notifId} {
         allow read, update: if isOwner(uid);
         allow create: if isAuth();
@@ -124,6 +123,13 @@ service cloud.firestore {
       allow create: if isAuth() && request.resource.data.uid == request.auth.uid;
       allow update: if isAuth() && resource.data.uid == request.auth.uid;
       allow delete: if false;
+    }
+
+    // ─── Broadcasts ──────────────────────────────────────────────────────────
+    // Historique des notifications diffusées par l'admin
+    match /broadcasts/{id} {
+      allow read, create: if isAuth() && request.auth.token.email == 'noovaoffr@gmail.com';
+      allow update, delete: if false;
     }
 
     // ─── Cities ──────────────────────────────────────────────────────────────

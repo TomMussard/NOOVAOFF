@@ -218,6 +218,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <div class="tabs">
     <button class="tab-btn-main active" onclick="switchTab('entreprises',this)">🏪 Entreprises<span class="tab-badge" id="tb-ent">—</span></button>
     <button class="tab-btn-main" onclick="switchTab('utilisateurs',this)">👥 Utilisateurs<span class="tab-badge" id="tb-usr">—</span></button>
+    <button class="tab-btn-main" onclick="switchTab('diffusion',this)">📢 Diffusion</button>
   </div>
 
   <!-- ══════════════ TAB ENTREPRISES ══════════════ -->
@@ -306,6 +307,69 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <div class="card">
       <div class="card-title">🕐 Inscrits récemment <span class="badge badge-pending" id="u-recent-count">—</span></div>
       <div id="recent-users-wrap"><div class="loading">Chargement</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ TAB DIFFUSION ══════════════ -->
+  <div id="tab-diffusion" style="display:none">
+    <div class="sec-hdr"><h2>Diffusion</h2><p>Envoie une notification à tous les utilisateurs de l'app. Elle apparaîtra dans leur cloche 🔔.</p></div>
+
+    <div class="two-col" style="align-items:start">
+      <!-- Formulaire d'envoi -->
+      <div class="card">
+        <div class="card-title">✍️ Nouvelle annonce</div>
+        <div style="padding:20px">
+          <div style="margin-bottom:14px">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Message</label>
+            <textarea id="broadcast-msg" maxlength="240" placeholder="Ex : Nouvelle fonctionnalité disponible ! Découvrez les récompenses exclusives ce week-end…" style="width:100%;height:110px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:14px;color:var(--ink);resize:none;outline:none;line-height:1.5" oninput="updateCharCount()"></textarea>
+            <div style="display:flex;justify-content:space-between;margin-top:6px">
+              <span id="char-count" style="font-size:11px;color:var(--ink3)">0 / 240 caractères</span>
+              <span id="audience-count" style="font-size:11px;color:var(--ink3)">— utilisateurs ciblés</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:18px">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Audience</label>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;font-weight:600;color:var(--ink)">
+                <input type="radio" name="bc-audience" value="all" checked onchange="updateAudience(this)" style="accent-color:var(--coral)"> Tous les utilisateurs
+              </label>
+              <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;font-weight:600;color:var(--ink)">
+                <input type="radio" name="bc-audience" value="city" onchange="updateAudience(this)" style="accent-color:var(--coral)"> Par ville
+                <input type="text" id="bc-city" placeholder="ex: Paris" disabled style="flex:1;max-width:160px;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--fb);color:var(--ink);background:var(--bg);outline:none">
+              </label>
+            </div>
+          </div>
+
+          <button onclick="sendBroadcast()" style="width:100%;padding:12px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--cg);letter-spacing:-.2px">
+            📢 Envoyer l'annonce
+          </button>
+          <div id="broadcast-status" style="margin-top:12px;font-size:13px;font-weight:600;text-align:center;min-height:20px;color:var(--ink2)"></div>
+        </div>
+      </div>
+
+      <!-- Aperçu + historique -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <!-- Aperçu de la notif -->
+        <div class="card">
+          <div class="card-title">👁️ Aperçu</div>
+          <div style="padding:16px">
+            <div style="background:var(--bg);border-radius:12px;padding:12px 14px;border:1.5px solid var(--border)">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:8px">Tel qu'il apparaîtra dans l'app :</div>
+              <div style="display:flex;flex-direction:column;gap:4px;background:var(--card);border-radius:10px;padding:12px 14px;border:1px solid var(--border)">
+                <div style="font-size:13px;color:var(--ink);line-height:1.45">📢 <strong>Noova</strong> · <span id="preview-msg" style="color:var(--ink2)">Votre message ici…</span></div>
+                <div style="font-size:11px;color:var(--ink3)">À l'instant</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historique récent -->
+        <div class="card">
+          <div class="card-title">🕐 Envois récents <span class="badge badge-pending" id="hist-count">0</span></div>
+          <div id="broadcast-history"><div class="empty" style="padding:24px 16px">Aucun envoi pour l'instant.</div></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -403,9 +467,11 @@ function doLogout() { auth.signOut().then(() => location.reload()); }
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn-main').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('tab-entreprises').style.display = tab === 'entreprises' ? 'block' : 'none';
-  document.getElementById('tab-utilisateurs').style.display = tab === 'utilisateurs' ? 'block' : 'none';
+  ['entreprises','utilisateurs','diffusion'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
+  });
   if (tab === 'utilisateurs') loadUsers();
+  if (tab === 'diffusion') initDiffusion();
 }
 
 // ── Merchants ──────────────────────────────────────────────────────────────
@@ -680,6 +746,134 @@ function renderUsers(users) {
       </div>`;
     }).join('');
   }
+}
+
+// ── Diffusion ──────────────────────────────────────────────────────────────
+let _broadcastHistory = [];
+let _allUserIds = [];
+let _diffusionReady = false;
+
+async function initDiffusion() {
+  if (_diffusionReady) { renderBroadcastHistory(); return; }
+  const statusEl = document.getElementById('broadcast-status');
+  statusEl.textContent = 'Chargement de la liste des utilisateurs…';
+  try {
+    const snap = await db.collection('users').limit(500).get();
+    _allUserIds = [];
+    snap.forEach(doc => _allUserIds.push(doc.id));
+    _diffusionReady = true;
+    statusEl.textContent = '';
+    document.getElementById('audience-count').textContent = _allUserIds.length + ' utilisateurs ciblés';
+    // Charge l'historique des broadcasts
+    const hSnap = await db.collection('broadcasts').orderBy('sentAt','desc').limit(20).get();
+    _broadcastHistory = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderBroadcastHistory();
+  } catch(e) {
+    statusEl.textContent = 'Erreur : ' + e.message;
+  }
+}
+
+function updateCharCount() {
+  const msg = document.getElementById('broadcast-msg').value;
+  document.getElementById('char-count').textContent = msg.length + ' / 240 caractères';
+  document.getElementById('preview-msg').textContent = msg || 'Votre message ici…';
+}
+
+function updateAudience(radio) {
+  const cityInput = document.getElementById('bc-city');
+  cityInput.disabled = radio.value !== 'city';
+  if (radio.value === 'city') { cityInput.focus(); }
+  updateAudienceCount();
+}
+
+function updateAudienceCount() {
+  const audience = document.querySelector('input[name="bc-audience"]:checked')?.value || 'all';
+  if (audience === 'all') {
+    document.getElementById('audience-count').textContent = _allUserIds.length + ' utilisateurs ciblés';
+  } else {
+    document.getElementById('audience-count').textContent = '— (par ville, comptage en direct)';
+  }
+}
+
+async function sendBroadcast() {
+  const msg = document.getElementById('broadcast-msg').value.trim();
+  if (!msg) { showToast('⚠️ Écris un message avant d\'envoyer'); return; }
+  const audience = document.querySelector('input[name="bc-audience"]:checked')?.value || 'all';
+  const cityFilter = (document.getElementById('bc-city').value || '').trim().toLowerCase();
+  const statusEl = document.getElementById('broadcast-status');
+
+  if (!confirm(`Envoyer cette notification à ${audience === 'all' ? 'TOUS les utilisateurs' : 'les utilisateurs de "'+cityFilter+'"'} ?`)) return;
+
+  statusEl.textContent = 'Récupération des destinataires…';
+  try {
+    let targetUids = [..._allUserIds];
+
+    // Filtre par ville si demandé
+    if (audience === 'city' && cityFilter) {
+      const citySnap = await db.collection('users').where('city','==',cityFilter).get();
+      targetUids = [];
+      citySnap.forEach(doc => targetUids.push(doc.id));
+    }
+
+    if (!targetUids.length) { statusEl.textContent = '⚠️ Aucun utilisateur trouvé.'; return; }
+    statusEl.textContent = `Envoi à ${targetUids.length} utilisateurs…`;
+
+    // Batch writes (max 499 ops par batch Firestore)
+    const BATCH_SIZE = 499;
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    for (let i = 0; i < targetUids.length; i += BATCH_SIZE) {
+      const batch = db.batch();
+      targetUids.slice(i, i + BATCH_SIZE).forEach(uid => {
+        const ref = db.collection('users').doc(uid).collection('notifications').doc();
+        batch.set(ref, { type: 'noova_message', message: msg, read: false, createdAt: ts });
+      });
+      await batch.commit();
+    }
+
+    // Sauvegarde dans l'historique broadcasts
+    await db.collection('broadcasts').add({
+      message: msg,
+      audience: audience === 'city' ? cityFilter : 'all',
+      recipientCount: targetUids.length,
+      sentBy: auth.currentUser.email,
+      sentAt: ts
+    });
+
+    document.getElementById('broadcast-msg').value = '';
+    updateCharCount();
+    statusEl.style.color = 'var(--mint)';
+    statusEl.textContent = `✅ Envoyé à ${targetUids.length} utilisateurs !`;
+    setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 5000);
+
+    // Rafraîchit l'historique
+    const hSnap = await db.collection('broadcasts').orderBy('sentAt','desc').limit(20).get();
+    _broadcastHistory = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderBroadcastHistory();
+    showToast(`📢 Notification envoyée à ${targetUids.length} users`);
+  } catch(e) {
+    statusEl.textContent = 'Erreur : ' + e.message;
+  }
+}
+
+function renderBroadcastHistory() {
+  const el = document.getElementById('broadcast-history');
+  document.getElementById('hist-count').textContent = _broadcastHistory.length;
+  if (!_broadcastHistory.length) {
+    el.innerHTML = '<div class="empty" style="padding:24px 16px">Aucun envoi pour l\'instant.</div>';
+    return;
+  }
+  el.innerHTML = _broadcastHistory.map(b => {
+    const ts = b.sentAt ? fmtDate(b.sentAt) : '—';
+    const aud = b.audience === 'all' ? 'Tous les users' : '📍 ' + b.audience;
+    return `<div class="act-row">
+      <div class="act-av" style="background:var(--cd);color:var(--coral);font-size:16px">📢</div>
+      <div class="act-info">
+        <div class="act-name" style="font-weight:600">${esc(b.message)}</div>
+        <div class="act-meta">${aud} · ${b.recipientCount||'?'} destinataires</div>
+      </div>
+      <div class="act-time">${ts}</div>
+    </div>`;
+  }).join('');
 }
 </script>
 </body>
