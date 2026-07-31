@@ -1219,10 +1219,24 @@ function initFriendsPanel(){
   const fp=document.getElementById('panel-friends');
   fp.innerHTML='';
   const myCode=S._friendCode||'—';
+  // Demandes reçues en attente
+  const pending=(_notifs||[]).filter(n=>n.type==='friend_request'&&!n.read);
+  const pendingHTML=pending.length?`
+    <div style="margin:0 18px 14px;background:var(--cd);border:1.5px solid rgba(242,151,21,.25);border-radius:14px;padding:14px 15px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--coral);margin-bottom:10px">🔔 Demandes reçues (${pending.length})</div>
+      <div id="pending-requests-list">${pending.map(n=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--coral);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:15px;flex-shrink:0">${(n.fromName||'?')[0].toUpperCase()}</div>
+          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--ink)">${esc(n.fromName||'Utilisateur')}</div><div style="font-size:11px;color:var(--ink3)">veut être ton ami</div></div>
+          <button onclick="acceptFriendRequest('${n.id}','${n.fromUid}','${esc(n.fromName||'')}');this.closest('div[style]').remove()" style="padding:7px 13px;background:var(--coral);color:#fff;border:none;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd)">Accepter</button>
+          <button onclick="declineFriendRequest('${n.id}');this.closest('div[style]').remove()" style="padding:7px 11px;background:var(--bg3);color:var(--ink2);border:none;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer">✕</button>
+        </div>`).join('')}</div>
+    </div>`:'' ;
   fp.innerHTML=`
+    ${pendingHTML}
     <div class="inv-c">
       <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink);margin-bottom:5px">Mon code ami</div>
-      <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;line-height:1.55">Envoie ce code à un ami. Quand il répond à sa 1re question, vous gagnez chacun <strong>50 pts</strong> 🎁</div>
+      <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;line-height:1.55">Envoie ce code à un ami pour qu'il puisse t'ajouter. Réciprocité obligatoire — tu dois aussi l'ajouter de ton côté.</div>
       <div style="display:flex;align-items:center;gap:9px">
         <div class="inv-code" id="inv-code" style="letter-spacing:2.5px;font-size:19px;font-weight:800">${myCode}</div>
         <button class="copy-btn" id="share-btn" onclick="shareCode('${myCode}')">Partager</button>
@@ -1230,9 +1244,10 @@ function initFriendsPanel(){
     </div>
     <div style="padding:0 18px 6px">
       <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Ajouter un ami</div>
+      <div style="font-size:12px;color:var(--ink2);margin-bottom:9px;line-height:1.5">Saisis le code de ton ami. Une fois qu'il accepte ta demande, vous serez connectés et verrez vos activités dans le feed.</div>
       <div style="display:flex;gap:8px">
         <input style="flex:1;padding:11px 13px;background:var(--card);border:1.5px solid var(--bg3);border-radius:12px;font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOOVA-AB1234)" id="fi-inp" oninput="this.value=this.value.toUpperCase()">
-        <button style="padding:11px 16px;background:var(--grad);color:var(--gi);font-size:12px;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-family:var(--fd);box-shadow:0 4px 10px var(--cg);white-space:nowrap" onclick="addFriend()">+ Ajouter</button>
+        <button style="padding:11px 16px;background:var(--grad);color:var(--gi);font-size:12px;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-family:var(--fd);box-shadow:0 4px 10px var(--cg);white-space:nowrap" onclick="addFriend()">Envoyer →</button>
       </div>
       <div id="fi-err" style="font-size:12px;color:var(--coral);min-height:18px;margin-top:6px"></div>
     </div>
@@ -1377,6 +1392,9 @@ function initNotifications(uid){
       if(dot)dot.style.display=unread>0?'block':'none';
       const panel=document.getElementById('notif-panel');
       if(panel&&panel.classList.contains('open'))renderNotifications();
+      // Rafraîchit le panel Amis si ouvert (demandes en attente)
+      const pf=document.getElementById('panel-friends');
+      if(pf&&pf.style.display!=='none')initFriendsPanel();
     },err=>console.warn('notifs:',err));
 }
 
@@ -2455,11 +2473,12 @@ async function openManageMerchants() {
 
   try {
     const city = normalizeCity(S._city || '');
-    let q = db.collection('merchants').where('status','==','verified');
-    if(city) q = q.where('city','==',city);
-    const snap = await q.get();
+    const snap = await db.collection('merchants').where('status','==','verified').get();
     const allMerchants = [];
-    snap.forEach(doc => allMerchants.push({ id: doc.id, ...doc.data() }));
+    snap.forEach(doc => {
+      const d = doc.data();
+      if(!city || normalizeCity(d.city||'') === city) allMerchants.push({ id: doc.id, ...d });
+    });
 
     // also include authorized merchants not in Firestore result (local cache)
     (S._nearbyMerchants || []).forEach(m => {
@@ -2529,12 +2548,16 @@ async function loadMerchantsForOnboarding(userData) {
   goTo('brands');
   document.getElementById('bnav').classList.remove('show');
   try {
-    const city = (userData.city || S._city || '').toLowerCase().trim();
-    let q = db.collection('merchants').where('status','==','verified');
-    if(city) q = q.where('city','==',city);
-    const snap = await q.get();
+    const userCity = normalizeCity(userData.city || S._city || '');
+    const snap = await db.collection('merchants').where('status','==','verified').get();
     S._merchantsForOnboarding = [];
-    snap.forEach(doc => S._merchantsForOnboarding.push({ id: doc.id, ...doc.data() }));
+    snap.forEach(doc => {
+      const d = doc.data();
+      // Filtre côté client pour éviter les problèmes de casse/accents entre dashboard et app
+      if(!userCity || normalizeCity(d.city||'') === userCity) {
+        S._merchantsForOnboarding.push({ id: doc.id, ...d });
+      }
+    });
     renderBrandsFromFirestore(S._merchantsForOnboarding);
   } catch(e) {
     console.warn('loadMerchantsForOnboarding:', e);
