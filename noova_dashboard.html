@@ -576,6 +576,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <button class="sb-item" onclick="navTo('campaigns',this)"><span class="sb-ico">📋</span>Mes campagnes<span class="sb-badge" id="camp-badge" style="background:rgba(224,125,10,.15);color:var(--coral);display:none"></span></button>
       <button class="sb-item" onclick="navTo('results',this)"><span class="sb-ico">📈</span>Résultats</button>
       <button class="sb-item" onclick="navTo('consents',this)"><span class="sb-ico">🔐</span>Consentements RGPD</button>
+      <button class="sb-item" onclick="navTo('rewards',this)"><span class="sb-ico">🎁</span>Mes récompenses</button>
+      <button class="sb-item" onclick="navTo('validate',this)"><span class="sb-ico">✅</span>Valider un bon</button>
       <div class="sb-section">Compte</div>
       <button class="sb-item" onclick="navTo('settings',this)"><span class="sb-ico">⚙️</span>Paramètres</button>
       <button class="sb-item" onclick="navTo('plans',this)"><span class="sb-ico">⭐</span>Abonnements</button>
@@ -1110,8 +1112,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <!-- ═══ CAMPAIGNS LIST ═══ -->
       <div class="page" id="page-campaigns">
         <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
-          <input class="field-inp" style="max-width:280px" placeholder="🔍 Rechercher une campagne…">
-          <select class="field-inp" style="max-width:180px;cursor:pointer"><option>Tous les statuts</option><option>En cours</option><option>Terminée</option><option>Brouillon</option></select>
+          <input class="field-inp" id="camp-search-inp" style="max-width:280px" placeholder="🔍 Rechercher une campagne…" oninput="filterCampaigns()">
+          <select class="field-inp" id="camp-status-sel" style="max-width:180px;cursor:pointer" onchange="filterCampaigns()"><option value="">Tous les statuts</option><option value="active">En cours</option><option value="ended">Terminée</option><option value="draft">Brouillon</option></select>
           <button class="tb-btn tb-btn-primary" style="margin-left:auto" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">+ Nouvelle campagne</button>
         </div>
         <div class="card">
@@ -1278,7 +1280,46 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             </div>
           </div>
         </div>
-      </div>    </div><!-- /content -->
+      </div>
+
+      <!-- ═══ REWARDS MANAGEMENT ═══ -->
+      <div class="page" id="page-rewards">
+        <div style="max-width:700px">
+          <div style="margin-bottom:24px">
+            <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink)">🎁 Mes récompenses</div>
+            <div style="font-size:13px;color:var(--ink2);margin-top:4px">Proposez jusqu'à 5 récompenses à vos clients. 1 pt ≈ 1 centime de valeur perçue.</div>
+          </div>
+          <div id="rewards-suggestion" style="display:none;background:var(--ad);border:1.5px solid rgba(242,151,21,.25);border-radius:var(--rs);padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--ink2)">
+            💡 <strong>Suggestions selon votre activité :</strong> <span id="rewards-suggestion-text"></span>
+          </div>
+          <div id="reward-slots"></div>
+          <button class="tb-btn tb-btn-primary" style="margin-top:8px" id="add-reward-btn" onclick="addRewardSlot()">+ Ajouter une récompense</button>
+        </div>
+      </div>
+
+      <!-- ═══ VALIDATE VOUCHER ═══ -->
+      <div class="page" id="page-validate">
+        <div style="max-width:520px">
+          <div style="margin-bottom:28px">
+            <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink)">✅ Valider un bon</div>
+            <div style="font-size:13px;color:var(--ink2);margin-top:4px">Scannez ou saisissez le code que le client vous présente.</div>
+          </div>
+          <div class="card" style="padding:28px">
+            <div style="margin-bottom:20px">
+              <label style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:8px">Code du bon</label>
+              <input class="field-inp" id="voucher-code-inp" placeholder="NVA-ABC-1234" style="font-family:monospace;font-size:18px;letter-spacing:3px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')validateVoucher()">
+            </div>
+            <button class="tb-btn tb-btn-primary" style="width:100%;padding:13px;font-size:15px" onclick="validateVoucher()">Valider le bon</button>
+          </div>
+          <div id="voucher-result" style="margin-top:20px"></div>
+          <div style="margin-top:28px">
+            <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink);margin-bottom:12px">Bons récents</div>
+            <div id="recent-redemptions" style="color:var(--ink3);font-size:13px">Chargement…</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /app -->
 
@@ -1667,6 +1708,7 @@ function spawnConfetti(){
 
 // ═══ TOAST ═══════════════════════════════════════════════════
 function normalizeCity(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 let toastTimer=null;
 function showToast(msg,ico='✅'){
   const t=document.getElementById('toast');const m=document.getElementById('toast-msg');const i=document.getElementById('toast-ico');
@@ -1904,6 +1946,41 @@ function loadMerchantCampaigns(uid) {
     }, err => console.warn('campaigns listener:', err));
 }
 
+function filterCampaigns() {
+  const q = (document.getElementById('camp-search-inp')?.value || '').trim().toLowerCase();
+  const s = document.getElementById('camp-status-sel')?.value || '';
+  const filtered = _mCampaigns.filter(c => {
+    const matchName = !q || (c.title||'').toLowerCase().includes(q);
+    const matchStatus = !s || c.status === s;
+    return matchName && matchStatus;
+  });
+  renderFilteredCampaigns(filtered);
+}
+
+function renderFilteredCampaigns(camps) {
+  const page = document.getElementById('page-campaigns');
+  if(!page) return;
+  page.querySelectorAll('.camp-row').forEach(r=>r.remove());
+  const table = page.querySelector('.camp-thead')?.closest('.card') || page.querySelector('.card');
+  if(!table) return;
+  if(!camps.length) {
+    const empty = document.createElement('div');
+    empty.className = 'camp-row';
+    empty.style.cssText = 'text-align:center;padding:24px;color:var(--muted);font-size:13px;grid-column:1/-1';
+    empty.textContent = 'Aucune campagne trouvée.';
+    table.appendChild(empty);
+    return;
+  }
+  camps.forEach(c => {
+    const stMap = { active:'En cours', ended:'Terminée', draft:'Brouillon', paused:'En pause' };
+    const stCl  = { active:'st-active', ended:'st-ended', draft:'st-draft', paused:'st-draft' };
+    const row = document.createElement('div');
+    row.className = 'camp-row';
+    row.innerHTML = `<div>${c.title||'—'}</div><div><span class="camp-status ${stCl[c.status]||''}">${stMap[c.status]||c.status||'—'}</span></div><div>${c.answersCount||0} rép.</div><div><button class="tb-btn" style="padding:4px 10px;font-size:11px" onclick="openEditCamp('${c.id}')">Voir</button></div>`;
+    table.appendChild(row);
+  });
+}
+
 function renderFirestoreCampaigns(camps) {
   // Vider les lignes existantes (garder les headers)
   ['page-dashboard','page-campaigns'].forEach(pageId => {
@@ -2090,6 +2167,275 @@ function showPendingBanner(data) {
 
 // ─── Écran d'attente (gardé pour compatibilité mais plus utilisé) ─
 function showPendingScreen(data) { showPendingBanner(data); }
+
+// ═══ RÉCOMPENSES — gestion des 5 slots ═══════════════════════
+
+const REWARD_SUGGESTIONS = {
+  'Restauration': ['Café offert (200 pts)', 'Dessert offert (350 pts)', '-20% sur l\'addition (500 pts)', 'Menu offert (1000 pts)'],
+  'Café': ['Expresso offert (200 pts)', 'Boisson chaude offerte (250 pts)', 'Viennoiserie offerte (200 pts)'],
+  'Commerce': ['10% de réduction (200 pts)', 'Produit surprise (350 pts)', '-15% sur commande (400 pts)'],
+  'Beauté': ['Soin découverte (350 pts)', 'Remise 15% (300 pts)', 'Produit offert (250 pts)'],
+  'Sport': ['Cours découverte (300 pts)', '-20% abonnement (500 pts)'],
+};
+const PRICE_GUIDES = [
+  { label: 'Petit geste (café, -10%)', pts: 200 },
+  { label: 'Moyen (dessert, -15%)', pts: 350 },
+  { label: 'Belle offre (-20%)', pts: 500 },
+  { label: 'Grosse offre (-30%, avec condition)', pts: 900 },
+];
+
+let _rewardSlots = []; // [{id, data}] loaded from Firestore
+let _slotCount = 0;
+
+function navToRewards() {
+  loadMerchantRewards();
+}
+
+function loadMerchantRewards() {
+  const u = auth.currentUser;
+  if(!u) return;
+  const el = document.getElementById('reward-slots');
+  if(!el) return;
+  el.innerHTML = '<div style="color:var(--ink3);font-size:13px;padding:12px 0">Chargement…</div>';
+
+  // Suggestions selon secteur
+  const sector = _mData?.sector || '';
+  const suggestions = REWARD_SUGGESTIONS[sector] || REWARD_SUGGESTIONS['Commerce'];
+  const sugEl = document.getElementById('rewards-suggestion');
+  const sugTxt = document.getElementById('rewards-suggestion-text');
+  if(sugEl && sugTxt && _rewardSlots.length === 0) {
+    sugTxt.textContent = suggestions.slice(0,3).join(' · ');
+    sugEl.style.display = 'block';
+  }
+
+  db.collection('rewards').where('merchantId','==',u.uid).orderBy('slot','asc').get().then(snap => {
+    _rewardSlots = [];
+    snap.forEach(doc => _rewardSlots.push({ id: doc.id, data: doc.data() }));
+    renderRewardSlots();
+  }).catch(() => renderRewardSlots());
+}
+
+function renderRewardSlots() {
+  const el = document.getElementById('reward-slots');
+  if(!el) return;
+  el.innerHTML = '';
+  if(!_rewardSlots.length) {
+    el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--ink3);font-size:13px;border:2px dashed var(--border);border-radius:var(--rs)">Aucune récompense encore. Crée ta première récompense ci-dessous.</div>';
+  }
+  _rewardSlots.forEach((r, i) => renderRewardCard(r, i));
+  const addBtn = document.getElementById('add-reward-btn');
+  if(addBtn) addBtn.style.display = _rewardSlots.length >= 5 ? 'none' : '';
+}
+
+function renderRewardCard(r, i) {
+  const el = document.getElementById('reward-slots');
+  const d = r.data;
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.style.marginBottom = '14px';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <div style="font-size:28px">${d.icon||'🎁'}</div>
+      <div style="flex:1">
+        <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink)">${esc(d.label||'Récompense')}</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:2px">${d.cost||0} pts · Stock : ${d.stock===null||d.stock===undefined?'Illimité':d.stock} · Échangés : ${d.redeemedCount||0}</div>
+      </div>
+      <span style="padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${d.active?'rgba(11,171,132,.12)':'var(--bg3)'};color:${d.active?'#0BAB84':'var(--ink3)'}">${d.active?'Actif':'Inactif'}</span>
+      <button class="tb-btn" style="font-size:11px;padding:4px 10px" onclick="toggleRewardActive('${r.id}',${!d.active})">${d.active?'Désactiver':'Activer'}</button>
+      <button class="tb-btn" style="font-size:11px;padding:4px 10px;color:var(--coral)" onclick="deleteReward('${r.id}')">Supprimer</button>
+    </div>
+    ${d.purchaseCondition ? `<div style="font-size:11px;color:var(--ink2);margin-top:-6px;margin-bottom:8px">📋 Condition : ${esc(d.purchaseCondition)}</div>` : ''}
+  `;
+  el.appendChild(card);
+}
+
+function addRewardSlot() {
+  if(_rewardSlots.length >= 5) { showToast('Maximum 5 récompenses','⚠️'); return; }
+  const el = document.getElementById('reward-slots');
+  const slot = _rewardSlots.length + 1;
+  const form = document.createElement('div');
+  form.className = 'card';
+  form.style.marginBottom = '14px';
+  form.style.border = '2px dashed var(--coral)';
+  const pGuide = PRICE_GUIDES.map(p => `<option value="${p.pts}">${p.label} → ${p.pts} pts</option>`).join('');
+  form.innerHTML = `
+    <div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--coral);margin-bottom:14px">Nouvelle récompense (slot ${slot}/5)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Emoji icône</label>
+        <input class="field-inp" id="new-r-icon" placeholder="🎁" style="font-size:22px;text-align:center" maxlength="2" value="🎁"></div>
+      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Intitulé *</label>
+        <input class="field-inp" id="new-r-label" placeholder="ex. Café offert"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Prix suggéré</label>
+        <select class="field-inp" id="new-r-guide" onchange="document.getElementById('new-r-cost').value=this.value"><option value="">—</option>${pGuide}</select></div>
+      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Coût en pts *</label>
+        <input class="field-inp" id="new-r-cost" type="number" placeholder="200" min="1"></div>
+      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Stock (vide=illimité)</label>
+        <input class="field-inp" id="new-r-stock" type="number" placeholder="50" min="1"></div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Condition d'achat (optionnel)</label>
+      <input class="field-inp" id="new-r-condition" placeholder="ex. pour tout plat commandé">
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <div style="flex:1"><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Expire le (optionnel)</label>
+        <input class="field-inp" id="new-r-expires" type="date"></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="tb-btn" onclick="this.closest('.card').remove();const ab=document.getElementById('add-reward-btn');if(ab)ab.style.display=''">Annuler</button>
+      <button class="tb-btn tb-btn-primary" onclick="saveReward(${slot},this)">Publier cette récompense</button>
+    </div>
+  `;
+  el.appendChild(form);
+  document.getElementById('add-reward-btn').style.display = 'none';
+}
+
+async function saveReward(slot, btn) {
+  const u = auth.currentUser;
+  if(!u || !_mData) return;
+  const label = document.getElementById('new-r-label')?.value.trim();
+  const cost = parseInt(document.getElementById('new-r-cost')?.value);
+  if(!label || !cost || cost < 1) { showToast('Remplis l\'intitulé et le coût','⚠️'); return; }
+  const icon = document.getElementById('new-r-icon')?.value || '🎁';
+  const stockVal = document.getElementById('new-r-stock')?.value;
+  const stock = stockVal ? parseInt(stockVal) : null;
+  const condition = document.getElementById('new-r-condition')?.value.trim() || null;
+  const expiresVal = document.getElementById('new-r-expires')?.value;
+  const expiresAt = expiresVal ? firebase.firestore.Timestamp.fromDate(new Date(expiresVal)) : null;
+  btn.disabled = true; btn.textContent = 'Publication…';
+  try {
+    await db.collection('rewards').add({
+      merchantId:   u.uid,
+      merchantName: _mData.brandName || '',
+      city:         _mData.city || '',
+      slot,
+      label, icon, cost,
+      stock, perUserLimit: 1,
+      purchaseCondition: condition,
+      expiresAt,
+      active: true,
+      redeemedCount: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Récompense publiée !','🎁');
+    loadMerchantRewards();
+  } catch(e) { showToast('Erreur : ' + e.message,'❌'); btn.disabled = false; btn.textContent = 'Publier cette récompense'; }
+}
+
+async function toggleRewardActive(rewardId, active) {
+  try {
+    await db.collection('rewards').doc(rewardId).update({ active, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast(active ? 'Récompense activée' : 'Récompense désactivée', active ? '✅' : '⏸️');
+    loadMerchantRewards();
+  } catch(e) { showToast('Erreur','❌'); }
+}
+
+async function deleteReward(rewardId) {
+  if(!confirm('Supprimer cette récompense ?')) return;
+  try {
+    await db.collection('rewards').doc(rewardId).delete();
+    showToast('Récompense supprimée','🗑️');
+    loadMerchantRewards();
+  } catch(e) { showToast('Erreur','❌'); }
+}
+
+// ═══ VALIDATION DE BON ══════════════════════════════════════
+
+async function validateVoucher() {
+  const u = auth.currentUser;
+  if(!u) return;
+  const code = (document.getElementById('voucher-code-inp')?.value || '').trim().toUpperCase();
+  if(!code) { showToast('Saisis un code','⚠️'); return; }
+  const el = document.getElementById('voucher-result');
+  el.innerHTML = '<div style="color:var(--ink3);font-size:13px;padding:12px 0">Recherche…</div>';
+  try {
+    const snap = await db.collection('redemptions')
+      .where('code','==',code)
+      .where('merchantId','==',u.uid)
+      .limit(1).get();
+    if(snap.empty) {
+      el.innerHTML = `<div style="background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--rs);padding:16px 18px">
+        <div style="font-weight:700;color:#EF4444;margin-bottom:4px">❌ Code introuvable</div>
+        <div style="font-size:12px;color:var(--ink2)">Ce code n'appartient pas à votre commerce ou n'existe pas.</div></div>`;
+      return;
+    }
+    const doc = snap.docs[0];
+    const d = doc.data();
+    const now = Date.now() / 1000;
+    if(d.status === 'used') {
+      el.innerHTML = `<div style="background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--rs);padding:16px 18px">
+        <div style="font-weight:700;color:#EF4444;margin-bottom:4px">❌ Bon déjà utilisé</div>
+        <div style="font-size:12px;color:var(--ink2)">Ce bon a été validé le ${d.usedAt?.toDate ? d.usedAt.toDate().toLocaleDateString('fr-FR') : '—'}.</div></div>`;
+      return;
+    }
+    if(d.expiresAt && d.expiresAt.seconds < now) {
+      el.innerHTML = `<div style="background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--rs);padding:16px 18px">
+        <div style="font-weight:700;color:#EF4444;margin-bottom:4px">❌ Bon expiré</div>
+        <div style="font-size:12px;color:var(--ink2)">Ce bon n'est plus valable.</div></div>`;
+      return;
+    }
+    // Bon valide — afficher et proposer de valider
+    el.innerHTML = `<div style="background:rgba(11,171,132,.08);border:1.5px solid rgba(11,171,132,.25);border-radius:var(--rs);padding:20px 22px">
+      <div style="font-weight:800;font-size:16px;font-family:var(--fd);color:#0BAB84;margin-bottom:12px">✅ Bon valide</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--ink2);margin-bottom:16px">
+        <div>🎁 <strong style="color:var(--ink)">${esc(d.label||'Récompense')}</strong></div>
+        <div>💳 <strong style="color:var(--ink)">${d.cost||0} pts déduits</strong></div>
+        <div>🔑 Code : <code style="font-size:13px;font-weight:700;color:var(--coral)">${esc(d.code)}</code></div>
+        ${d.purchaseCondition ? `<div>📋 Condition : ${esc(d.purchaseCondition)}</div>` : '<div></div>'}
+      </div>
+      <button class="tb-btn tb-btn-primary" style="width:100%;padding:12px" onclick="confirmValidateVoucher('${doc.id}',this)">Confirmer l'utilisation</button>
+    </div>`;
+    loadRecentRedemptions();
+  } catch(e) { el.innerHTML = `<div style="color:var(--ink3);font-size:13px">Erreur : ${e.message}</div>`; }
+}
+
+async function confirmValidateVoucher(redemId, btn) {
+  btn.disabled = true; btn.textContent = 'Validation…';
+  try {
+    await db.collection('redemptions').doc(redemId).update({
+      status: 'used',
+      usedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('voucher-code-inp').value = '';
+    document.getElementById('voucher-result').innerHTML = `<div style="background:rgba(11,171,132,.1);border-radius:var(--rs);padding:16px;text-align:center;color:#0BAB84;font-weight:700;font-family:var(--fd);font-size:16px">🎉 Bon validé avec succès !</div>`;
+    showToast('Bon validé !','✅');
+    loadRecentRedemptions();
+  } catch(e) { showToast('Erreur : ' + e.message,'❌'); btn.disabled = false; btn.textContent = 'Confirmer l\'utilisation'; }
+}
+
+async function loadRecentRedemptions() {
+  const u = auth.currentUser;
+  if(!u) return;
+  const el = document.getElementById('recent-redemptions');
+  if(!el) return;
+  try {
+    const snap = await db.collection('redemptions')
+      .where('merchantId','==',u.uid)
+      .orderBy('createdAt','desc').limit(10).get();
+    if(snap.empty) { el.innerHTML = '<div style="color:var(--ink3);font-size:13px">Aucun bon échangé pour le moment.</div>'; return; }
+    el.innerHTML = '';
+    snap.forEach(doc => {
+      const d = doc.data();
+      const st = d.status==='used' ? {c:'#0BAB84',t:'Validé'} : d.status==='expired' ? {c:'#EF4444',t:'Expiré'} : {c:'#F5A623',t:'En attente'};
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)';
+      row.innerHTML = `<code style="font-size:12px;font-weight:700;color:var(--coral);flex-shrink:0">${esc(d.code)}</code>
+        <div style="flex:1;font-size:12px;color:var(--ink2)">${esc(d.label||'Récompense')} · ${d.cost||0} pts</div>
+        <span style="padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;background:${st.c}18;color:${st.c}">${st.t}</span>`;
+      el.appendChild(row);
+    });
+  } catch(e) { el.innerHTML = '<div style="color:var(--ink3);font-size:12px">Erreur de chargement.</div>'; }
+}
+
+// Intercepter navTo pour charger les données au besoin
+const _origNavTo = navTo;
+navTo = function(page, btn) {
+  _origNavTo(page, btn);
+  if(page === 'rewards') { loadMerchantRewards(); }
+  if(page === 'validate') { loadRecentRedemptions(); }
+};
 
 // ─── Déconnexion ─────────────────────────────────────────────
 function logout() {

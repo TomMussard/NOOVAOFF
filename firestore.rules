@@ -89,9 +89,20 @@ service cloud.firestore {
     // Lecture : récompenses actives pour tous les users connectés
     // Écriture : uniquement le commerçant propriétaire
     match /rewards/{rewardId} {
-      allow read: if isAuth() && resource.data.active == true;
+      allow read: if isAuth() && (
+        resource.data.active == true ||
+        resource.data.merchantId == request.auth.uid
+      );
       allow create: if isAuth() && request.resource.data.merchantId == request.auth.uid;
-      allow update, delete: if isAuth() && resource.data.merchantId == request.auth.uid;
+      allow update: if isAuth() && (
+        // Commerçant : modification complète
+        resource.data.merchantId == request.auth.uid
+        ||
+        // Utilisateur : uniquement incrémenter redeemedCount de 1
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['redeemedCount']) &&
+         request.resource.data.redeemedCount == resource.data.redeemedCount + 1)
+      );
+      allow delete: if isAuth() && resource.data.merchantId == request.auth.uid;
     }
 
     // ─── Redemptions ─────────────────────────────────────────────────────────
@@ -103,7 +114,12 @@ service cloud.firestore {
         resource.data.userId == request.auth.uid ||
         resource.data.merchantId == request.auth.uid
       );
-      allow update, delete: if false;
+      // Le commerçant peut passer le bon à "used" (validation au comptoir)
+      allow update: if isAuth() &&
+        resource.data.merchantId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','usedAt']) &&
+        request.resource.data.status == 'used';
+      allow delete: if false;
     }
 
     // ─── CommunityEvents ─────────────────────────────────────────────────────
@@ -130,6 +146,22 @@ service cloud.firestore {
     match /broadcasts/{id} {
       allow read, create: if isAuth() && request.auth.token.email == 'noovaoffr@gmail.com';
       allow update, delete: if false;
+    }
+
+    // ─── Chats ───────────────────────────────────────────────────────────────
+    // Accès uniquement aux participants (stockés dans participants map du doc chat)
+    match /chats/{chatId} {
+      allow read: if isAuth() && (resource == null || request.auth.uid in resource.data.participants);
+      allow create: if isAuth() && request.auth.uid in request.resource.data.participants;
+      allow update, delete: if false;
+      match /messages/{msgId} {
+        allow read: if isAuth() &&
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+        allow create: if isAuth() &&
+          request.resource.data.fromUid == request.auth.uid &&
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+        allow update, delete: if false;
+      }
     }
 
     // ─── Cities ──────────────────────────────────────────────────────────────

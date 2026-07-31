@@ -716,7 +716,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- CHAT -->
 <div id="chat" class="screen">
   <div class="chat-hdr">
-    <div class="back-btn" style="margin-bottom:0;margin-right:4px" onclick="goTo('social')">←</div>
+    <div class="back-btn" style="margin-bottom:0;margin-right:4px" onclick="leaveChat()">←</div>
     <div class="fi-av" id="ch-av" style="width:38px;height:38px;font-size:15px;background:rgba(161,78,8,.12);color:var(--violet)">M</div>
     <div><div style="font-family:var(--fd);font-weight:700;font-size:16px;color:var(--ink)" id="ch-name">Marie</div><div style="font-size:11px;color:#22C55E;font-weight:500">En ligne</div></div>
   </div>
@@ -959,7 +959,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 </div>
 </div>
 <script>
-const S={user:null,pts:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],done:{},friends:[],chats:{}};
+const S={user:null,pts:0,xp:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],done:{},friends:[],chats:{}};
+const DAILY_CAP=300;
 const BRANDMETA={};
 function logoHTML(name,size){const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#6A6470'};const s=size||44;const r=Math.round(s*0.27),fs=Math.round(s*0.44);return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;}
 function normalizeCity(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');}
@@ -969,8 +970,8 @@ const BDGS=[{id:'first',e:'🌟',n:'Première réponse'},{id:'trio',e:'🎯',n:'
 const GIFTS=[];
 const TIERS=[{n:'Curieux',min:0,max:1000,ico:'🌱',c:'#6A6470'},{n:'Actif',min:1000,max:3000,ico:'⚡',c:'#A14E08'},{n:'Expert',min:3000,max:6000,ico:'🎯',c:'#E07D0A'},{n:'Ambassadeur',min:6000,max:10000,ico:'🏆',c:'#F5A623'},{n:'Légende',min:10000,max:99999,ico:'👑',c:'#0BAB84'}];
 const FEED=[];
-const MOCK={};
-let cur='splash',obIdx=0,boFmt='text',chUser='Marie',navS=['home','social','rewards-tab','profile'];
+let cur='splash',obIdx=0,boFmt='text',navS=['home','social','rewards-tab','profile'];
+let _chatUnsub=null,_chatFriendUid=null,_chatFriendName='',_chatMessages=[];
 
 function goTo(id){
   const p=document.getElementById(cur);
@@ -1032,10 +1033,10 @@ function refreshHome(){
   if(!S.user)return;
   const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour 👋':hr<18?'Bon après-midi ☀️':'Bonsoir 🌙';
   document.getElementById('home-name').textContent=S.user.name;document.getElementById('home-pts').textContent=S.pts;
-  const targets=[1000,3000,5000,6000,10000];const tgt=targets.find(t=>t>S.pts)||10000;const prev=targets.filter(t=>t<=S.pts).pop()||0;
-  const pct=Math.min(95,Math.max(4,((S.pts-prev)/(tgt-prev))*100));
-  document.getElementById('nm-fill').style.width=pct+'%';document.getElementById('nm-target').textContent=tgt+' pts';
-  document.getElementById('nm-txt').innerHTML='Il te reste <strong>'+(tgt-S.pts)+' pts</strong> avant '+tgt;
+  const targets=[1000,3000,5000,6000,10000];const tgt=targets.find(t=>t>S.xp)||10000;const prev=targets.filter(t=>t<=S.xp).pop()||0;
+  const pct=Math.min(95,Math.max(4,((S.xp-prev)/(tgt-prev))*100));
+  document.getElementById('nm-fill').style.width=pct+'%';document.getElementById('nm-target').textContent=tgt+' xp';
+  document.getElementById('nm-txt').innerHTML='Il te reste <strong>'+(tgt-S.xp)+' xp</strong> avant le palier suivant';
   document.getElementById('streak-num').textContent=S.streak;
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<7;i++){const d=document.createElement('div');d.className='sdk'+(i<S.streak?' done':'');sd.appendChild(d)}
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent='+'+q.pts+' pts';document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .tc-cta').style.display='flex'}
@@ -1238,7 +1239,7 @@ function renderFriends(){
     const c=AVC[i%AVC.length];
     const d=document.createElement('div');
     d.className='fi';
-    d.onclick=()=>openChatFor(f.n);
+    d.onclick=()=>openChatFor(f);
     d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.pts} pts · <span style="color:var(--amber);font-weight:600">🔥 ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
     el.appendChild(d);
   });
@@ -1458,39 +1459,67 @@ async function autoAddFriend(notif,uid){
     await loadFriendsFromFirestore(S._friendUids);
   }catch(e){console.warn('autoAddFriend:',e);}
 }
-function openChatFor(u){
-  chUser=u;const idx=S.friends.findIndex(f=>f.n===u);const c=idx>=0?AVC[idx%AVC.length]:'#A14E08';
-  const av=document.getElementById('ch-av');av.textContent=u[0];av.style.background=c+'18';av.style.color=c;
-  document.getElementById('ch-name').textContent=u;
-  if(!S.chats[u])S.chats[u]=MOCK[u]||[{f:'them',t:`Salut ! On est tous les deux sur Noova 👋`,ts:'maintenant'}];
-  renderChat();goTo('chat');
+function openChatFor(friend){
+  const friendUid=friend.uid,friendName=friend.n;
+  _chatFriendUid=friendUid;_chatFriendName=friendName;
+  const idx=S.friends.findIndex(f=>f.uid===friendUid);const c=idx>=0?AVC[idx%AVC.length]:'#A14E08';
+  const av=document.getElementById('ch-av');av.textContent=(friendName[0]||'?').toUpperCase();av.style.background=c+'18';av.style.color=c;
+  document.getElementById('ch-name').textContent=friendName;
+  if(_chatUnsub){_chatUnsub();_chatUnsub=null;}
+  _chatMessages=[];renderChat();
+  const myUid=auth.currentUser&&auth.currentUser.uid;if(!myUid){goTo('chat');return;}
+  const chatId=[myUid,friendUid].sort().join('_');
+  db.collection('chats').doc(chatId).set({participants:{[myUid]:true,[friendUid]:true}},{merge:true}).catch(()=>{});
+  _chatUnsub=db.collection('chats').doc(chatId).collection('messages').orderBy('createdAt','asc').limit(100).onSnapshot(snap=>{
+    _chatMessages=snap.docs.map(d=>({id:d.id,...d.data()}));renderChat();
+  },err=>console.warn('chat:',err));
+  goTo('chat');
 }
 function renderChat(){
-  const msgs=S.chats[chUser]||[];const el=document.getElementById('chat-msgs');el.innerHTML='';
-  msgs.forEach(m=>{const isMe=m.f==='me';const w=document.createElement('div');w.style.cssText=`display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}`;const b=document.createElement('div');b.className='msg '+(isMe?'me':'them');b.textContent=m.t;w.appendChild(b);const t=document.createElement('div');t.className='msg-t'+(isMe?' r':'');t.textContent=m.ts;w.appendChild(t);el.appendChild(w)});
+  const myUid=auth.currentUser&&auth.currentUser.uid;
+  const el=document.getElementById('chat-msgs');el.innerHTML='';
+  if(!_chatMessages.length){
+    el.innerHTML=`<div style="text-align:center;padding:32px 16px;color:var(--ink3);font-size:13px">Dis bonjour à ${esc(_chatFriendName||'ton ami')} 👋</div>`;
+    return;
+  }
+  _chatMessages.forEach(m=>{
+    const isMe=m.fromUid===myUid;
+    const ts=m.createdAt?new Date(m.createdAt.seconds*1000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+    const w=document.createElement('div');w.style.cssText=`display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}`;
+    const b=document.createElement('div');b.className='msg '+(isMe?'me':'them');b.textContent=m.text;w.appendChild(b);
+    const t=document.createElement('div');t.className='msg-t'+(isMe?' r':'');t.textContent=ts;w.appendChild(t);el.appendChild(w);
+  });
   el.scrollTop=el.scrollHeight;
 }
-function sendMsg(){const inp=document.getElementById('chat-inp');const txt=inp.value.trim();if(!txt)return;if(!S.chats[chUser])S.chats[chUser]=[];const ts=new Date().getHours()+':'+(String(new Date().getMinutes()).padStart(2,'0'));S.chats[chUser].push({f:'me',t:txt,ts});inp.value='';renderChat();setTimeout(()=>{const reps=["Haha trop bon 😂","Je suis d'accord !","T'as vu la question du jour ?","💯 exactement","Moi aussi j'ai répondu !"];S.chats[chUser].push({f:'them',t:reps[Math.floor(Math.random()*reps.length)],ts});renderChat()},1200+Math.random()*800)}
-function getLvl(){return TIERS.find(t=>S.pts>=t.min&&S.pts<t.max)||TIERS[TIERS.length-1]}
+async function sendMsg(){
+  const inp=document.getElementById('chat-inp');const txt=inp.value.trim();if(!txt)return;
+  const myUid=auth.currentUser&&auth.currentUser.uid;if(!myUid||!_chatFriendUid)return;
+  inp.value='';
+  const chatId=[myUid,_chatFriendUid].sort().join('_');
+  try{await db.collection('chats').doc(chatId).collection('messages').add({fromUid:myUid,text:txt,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}
+  catch(e){console.warn('sendMsg:',e);inp.value=txt;}
+}
+function leaveChat(){if(_chatUnsub){_chatUnsub();_chatUnsub=null;}_chatMessages=[];goTo('social');}
+function getLvl(){return TIERS.find(t=>S.xp>=t.min&&S.xp<t.max)||TIERS[TIERS.length-1]}
 function refreshWallet(){
   document.getElementById('wc-pts').innerHTML=S.pts+' <small>pts</small>';
-  const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(4,((S.pts-l.min)/(l.max-l.min))*100));
+  const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(4,((S.xp-l.min)/(l.max-l.min))*100));
   document.getElementById('wc-fill').style.width=pct+'%';
   document.getElementById('wc-level').textContent='Niveau '+(li+1)+' · '+l.n;
-  document.getElementById('wc-next').textContent=l.max===9999?'Max !':l.max+' pts';
-  const rpv=document.getElementById('req-pts-v');if(rpv)rpv.textContent=S.pts+' / 10000';
+  document.getElementById('wc-next').textContent=l.max===99999?'Max !':l.max+' xp';
+  const rpv=document.getElementById('req-pts-v');if(rpv)rpv.textContent=S.xp+' / 10000';
   const gg=document.getElementById('gift-grid');gg.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--ink3);font-size:12px">Chargement…</div>';
   loadRewardsFromFirestore();
   const tl=document.getElementById('tiers-list');tl.innerHTML='';
-  TIERS.forEach((t,i)=>{const reached=S.pts>=t.min;const d=document.createElement('div');d.style.cssText=`background:var(--card);border:1.5px solid ${reached?t.c+'33':'var(--bg3)'};border-radius:var(--r);padding:12px 13px;margin-bottom:8px`;d.innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:11px;background:${t.c}14;display:flex;align-items:center;justify-content:center;font-size:20px">${t.ico}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:${reached?t.c:'var(--ink)'}">${t.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${t.min===0?'Dès le départ':t.min+' pts requis'}</div></div><div style="font-size:12px;font-weight:700;color:${reached?t.c:'var(--ink3)'}">${reached?'✅ Atteint':'🔒'}</div></div>`;tl.appendChild(d)});
+  TIERS.forEach((t,i)=>{const reached=S.xp>=t.min;const d=document.createElement('div');d.style.cssText=`background:var(--card);border:1.5px solid ${reached?t.c+'33':'var(--bg3)'};border-radius:var(--r);padding:12px 13px;margin-bottom:8px`;d.innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:11px;background:${t.c}14;display:flex;align-items:center;justify-content:center;font-size:20px">${t.ico}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:${reached?t.c:'var(--ink)'}">${t.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${t.min===0?'Dès le départ':t.min+' xp requis'}</div></div><div style="font-size:12px;font-weight:700;color:${reached?t.c:'var(--ink3)'}">${reached?'✅ Atteint':'🔒'}</div></div>`;tl.appendChild(d)});
 }
 function refreshProfile(){
   if(!S.user)return;
   document.getElementById('prof-av').textContent=S.user.name[0].toUpperCase();
   document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.email;
   document.getElementById('s-pts').textContent=S.pts;document.getElementById('s-ans').textContent=S.ans;document.getElementById('s-str').textContent=S.streak;
-  const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(2,((S.pts-l.min)/(l.max-l.min))*100));
-  document.getElementById('pl-name').textContent='Niveau '+(li+1)+' · '+l.n;document.getElementById('pl-xp').textContent=S.pts+' / '+(l.max===9999?'∞':l.max)+' pts';document.getElementById('pl-fill').style.width=pct+'%';
+  const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(2,((S.xp-l.min)/(l.max-l.min))*100));
+  document.getElementById('pl-name').textContent='Niveau '+(li+1)+' · '+l.n;document.getElementById('pl-xp').textContent=S.xp+' / '+(l.max===99999?'∞':l.max)+' xp';document.getElementById('pl-fill').style.width=pct+'%';
   const cm=document.getElementById('consent-mgmt');cm.innerHTML='';
   const _cm=S._merchantsForOnboarding||[];
   if(!_cm.length){cm.innerHTML='<div style="font-size:12px;color:var(--ink2);text-align:center;padding:8px 0">Aucun commerçant autorisé pour l\'instant.</div>';}
@@ -2049,7 +2078,8 @@ async function awSubmit() {
         name, email, city: cityNorm, cityLabel: city,
         age: _awAge,
         interests: _awInterests,
-        points: 0,
+        points: 0, xp: 0, streak: 0,
+        lastAnswerDate: null, dailyEarned: 0, dailyEarnedDate: null,
         answeredCampaigns: [],
         authorizedMerchants: [],
         onboardingStep: 'merchants',
@@ -2057,7 +2087,7 @@ async function awSubmit() {
       });
       // Gérer manuellement la suite (évite race avec onAuthStateChanged)
       S.user = { name, uid: cred.user.uid };
-      S.pts = 0; S._city = cityNorm; S._interests = _awInterests; S._answered = []; S._authorizedMerchants = [];
+      S.pts = 0; S.xp = 0; S._city = cityNorm; S._interests = _awInterests; S._answered = []; S._authorizedMerchants = [];
       document.getElementById('auth-wall').style.display = 'none';
       await loadMerchantsForOnboarding({ city, interests: _awInterests, authorizedMerchants: [] });
       return;
@@ -2109,30 +2139,100 @@ async function loadRewardsFromFirestore() {
 async function redeemReward(reward) {
   const u = auth.currentUser;
   if(!u) return;
-  if(S.pts < (reward.cost||0)) return;
+  if(S.pts < (reward.cost||0)) { showVoucherError('Solde insuffisant.'); return; }
+
+  // Vérification expiration
+  if(reward.expiresAt && reward.expiresAt.seconds && reward.expiresAt.seconds < Date.now()/1000) {
+    showVoucherError('Cette récompense a expiré.'); return;
+  }
+  // Vérification stock
+  if(reward.stock !== null && reward.stock !== undefined && (reward.redeemedCount||0) >= reward.stock) {
+    showVoucherError('Stock épuisé.'); return;
+  }
+
+  try {
+    // Vérification perUserLimit (1 fois par personne par défaut)
+    const limit = reward.perUserLimit !== undefined ? reward.perUserLimit : 1;
+    if(limit > 0) {
+      const existing = await db.collection('redemptions')
+        .where('userId','==',u.uid).where('rewardId','==',reward.id).limit(1).get();
+      if(!existing.empty) { showVoucherError('Tu as déjà échangé cette récompense.'); return; }
+    }
+  } catch(e) { console.warn('perUserLimit check:', e); }
+
   if(!confirm(`Échanger ${reward.cost} pts contre "${reward.label}" chez ${reward.merchantName||'ce commerce'} ?`)) return;
-  const code = (Math.random().toString(36).substring(2,5)+'-'+Math.random().toString(36).substring(2,5)).toUpperCase();
+
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'NVA-';
+  for(let i=0;i<3;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  code += '-';
+  for(let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
+
+  const expiresAt = new Date(Date.now() + 24*60*60*1000); // 24h
+
   try {
     const batch = db.batch();
-    batch.set(db.collection('redemptions').doc(), {
+    const redemRef = db.collection('redemptions').doc();
+    batch.set(redemRef, {
       userId:     u.uid,
       rewardId:   reward.id,
       merchantId: reward.merchantId||null,
       cost:       reward.cost||0,
-      code:       code,
+      label:      reward.label||'Récompense',
+      merchantName: reward.merchantName||'',
+      purchaseCondition: reward.purchaseCondition||null,
+      code,
       status:     'pending',
-      redeemedAt: firebase.firestore.FieldValue.serverTimestamp()
+      createdAt:  firebase.firestore.FieldValue.serverTimestamp(),
+      expiresAt:  firebase.firestore.Timestamp.fromDate(expiresAt),
+      usedAt:     null
     });
     batch.update(db.collection('users').doc(u.uid), {
       points: firebase.firestore.FieldValue.increment(-(reward.cost||0))
     });
+    batch.update(db.collection('rewards').doc(reward.id), {
+      redeemedCount: firebase.firestore.FieldValue.increment(1)
+    });
     await batch.commit();
     S.pts = Math.max(0, S.pts - (reward.cost||0));
     refreshWallet();
-    alert(`🎟️ Bon débloqué !\n\n${reward.label} · ${reward.merchantName||''}\n\nCode : ${code}\nÀ présenter au comptoir. Valable 15 min.`);
+    showVoucherModal({ code, label: reward.label, merchantName: reward.merchantName, cost: reward.cost, purchaseCondition: reward.purchaseCondition, expiresAt });
   } catch(e) {
-    alert('Erreur lors de l\'échange : ' + e.message);
+    showVoucherError('Erreur : ' + e.message);
   }
+}
+
+function showVoucherModal({ code, label, merchantName, cost, purchaseCondition, expiresAt }) {
+  const exp = expiresAt ? expiresAt.toLocaleDateString('fr-FR',{day:'numeric',month:'long'}) : 'demain';
+  let ov = document.getElementById('voucher-overlay');
+  if(!ov) {
+    ov = document.createElement('div');
+    ov.id = 'voucher-overlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
+    ov.onclick = e => { if(e.target === ov) ov.remove(); };
+    document.body.appendChild(ov);
+  }
+  ov.innerHTML = `<div style="background:var(--card);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:430px;box-shadow:0 -8px 40px rgba(0,0,0,.25)">
+    <div style="width:40px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 24px"></div>
+    <div style="text-align:center;font-size:40px;margin-bottom:12px">🎟️</div>
+    <div style="font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:-.5px;text-align:center;color:var(--ink);margin-bottom:4px">${esc(label||'Récompense')}</div>
+    <div style="text-align:center;font-size:13px;color:var(--ink2);margin-bottom:20px">${esc(merchantName||'')}</div>
+    <div style="background:var(--bg2);border:2px dashed var(--coral);border-radius:14px;padding:18px;text-align:center;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Ton code</div>
+      <div style="font-family:monospace;font-size:26px;font-weight:900;letter-spacing:4px;color:var(--coral)">${esc(code)}</div>
+    </div>
+    ${purchaseCondition ? `<div style="background:var(--ad);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--ink2);margin-bottom:12px">📋 Condition : ${esc(purchaseCondition)}</div>` : ''}
+    <div style="font-size:11px;color:var(--ink3);text-align:center;margin-bottom:20px">Valable jusqu'au ${exp} · -${cost} pts de ton solde</div>
+    <button onclick="document.getElementById('voucher-overlay').remove()" style="width:100%;padding:14px;border-radius:12px;background:var(--coral);border:none;color:#fff;font-family:var(--fd);font-weight:700;font-size:15px;cursor:pointer">Fermer</button>
+  </div>`;
+}
+
+function showVoucherError(msg) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1c0e02;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+  ov.textContent = '⚠️ ' + msg;
+  document.body.appendChild(ov);
+  setTimeout(() => ov.remove(), 3000);
 }
 
 // ─── Load user + démarrer l'app ──────────────────────────────
@@ -2146,7 +2246,12 @@ async function loadUserAndStart(uid) {
       db.collection('users').doc(uid).update({ name: fbDisplayName }).catch(() => {});
     }
     S.user = { name: resolvedName, uid };
-    S.pts   = data.points || 0;
+    S.pts              = data.points || 0;
+    S.xp               = data.xp !== undefined ? data.xp : (data.points || 0);
+    S.streak           = data.streak || 0;
+    S._lastAnswerDate  = data.lastAnswerDate || null;
+    S._dailyEarned     = data.dailyEarned || 0;
+    S._dailyEarnedDate = data.dailyEarnedDate || null;
     S._city            = data.city || '';
     S._age             = data.age  || '';
     S._interests       = data.interests || [];
@@ -2277,19 +2382,28 @@ async function loadCampaignsFromFirestore(userData) {
       if(d.ageRanges && d.ageRanges.length && userData.age && !d.ageRanges.includes(userData.age)) return;
       // Filtre authorizedMerchants
       if(authorized.length && d.merchantId && !authorized.includes(d.merchantId)) return;
+      // Barème NOOVA : Q1=10, Q2=15, Q3=20, bonus série=+10
+      const allQs = d.questions && d.questions.length ? d.questions
+        : [{ q: d.question, format: d.format || 'text', options: d.options || [] }];
+      const SCALE = [10, 15, 20];
+      const surveyList = allQs.slice(1).map((sq, idx) => ({
+        _firestoreId: doc.id, _merchantId: d.merchantId || null, _questionIdx: idx + 1,
+        brand: d.merchantName || 'Commerce', ico: d.brandEmoji || '🏪',
+        theme: d.sector || 'Commerce local', pts: SCALE[idx + 1] || 20,
+        type: sq.format || 'text', q: sq.q, hint: '',
+        opts: sq.options || [], items: sq.options || [],
+        usage: (d.merchantName || 'Ce commerce') + ' veut ton avis'
+      }));
       campaigns.push({
-        _firestoreId: doc.id,
-        _merchantId:  d.merchantId || null,
-        brand: d.merchantName || 'Commerce',
-        ico:   d.brandEmoji   || '🏪',
-        theme: d.sector       || 'Commerce local',
-        pts:   d.pointsPerAnswer || 20,
-        type:  d.format       || 'text',
-        q:     d.question,
-        hint:  'Donne ton avis',
-        opts:  d.options || [],
-        items: d.options || [],
-        usage: (d.merchantName||'Ce commerce') + ' veut ton avis'
+        _firestoreId: doc.id, _merchantId: d.merchantId || null, _questionIdx: 0,
+        _surveyCount: allQs.length,
+        brand: d.merchantName || 'Commerce', ico: d.brandEmoji || '🏪',
+        theme: d.sector || 'Commerce local', pts: 10,
+        type: allQs[0].format || d.format || 'text',
+        q: allQs[0].q || d.question, hint: 'Donne ton avis',
+        opts: allQs[0].options || d.options || [], items: allQs[0].options || d.options || [],
+        usage: (d.merchantName || 'Ce commerce') + ' veut ton avis',
+        survey: surveyList
       });
     });
     S.qs = campaigns;
@@ -2309,7 +2423,7 @@ function getAnswerValue() {
   return '';
 }
 
-// ─── Patch submitAns → sauvegarde Firestore ──────────────────
+// ─── Patch submitAns → sauvegarde Firestore (barème NOOVA) ───
 const _origSubmitAns = submitAns;
 submitAns = function() {
   const q = curQuestion();
@@ -2318,34 +2432,77 @@ submitAns = function() {
   const u = auth.currentUser;
   if(!u || !q) return;
   const uid = u.uid;
+
+  // ── Calcul des points réellement attribués ─────────────────
+  const today = new Date().toISOString().slice(0,10);
+
+  // Réinitialiser le compteur quotidien si on change de jour
+  if(S._dailyEarnedDate !== today) { S._dailyEarned = 0; S._dailyEarnedDate = today; }
+
+  let earnedPts = q.pts; // barème déjà fixé (10/15/20)
+  if(S._dailyEarned + earnedPts > DAILY_CAP) earnedPts = Math.max(0, DAILY_CAP - S._dailyEarned);
+
+  // Bonus streak (+5 pts au premier point du jour)
+  let streakBonus = 0;
+  if(earnedPts > 0 && S._lastAnswerDate !== today) {
+    streakBonus = 5;
+    const prevAnswerDate = S._lastAnswerDate;
+    S._lastAnswerDate = today;
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+    S.streak = (prevAnswerDate === yesterday) ? S.streak + 1 : 1;
+  }
+
+  // Bonus série complète (+10 si c'est la 3e question d'une même campagne)
+  let serieBonus = 0;
+  if(q._questionIdx === 2 && earnedPts > 0) serieBonus = 10; // Q3 = index 2
+
+  const totalEarned = earnedPts + streakBonus + serieBonus;
+  S._dailyEarned += totalEarned;
+
+  // Mettre à jour localement (correction du _origSubmitAns qui a déjà ajouté q.pts)
+  const correction = totalEarned - q.pts;
+  S.pts += correction;
+  S.xp  += totalEarned;
+
+  // ── Écriture Firestore ─────────────────────────────────────
   const batch = db.batch();
-  // ID déterministe pour éviter les doublons de réponse
-  const respId = q._firestoreId ? `${uid}_${q._firestoreId}` : null;
-  const respRef = respId
-    ? db.collection('answers').doc(respId)
-    : db.collection('answers').doc();
+  const qIdx = q._questionIdx || 0;
+  const respId = q._firestoreId ? `${uid}_${q._firestoreId}_q${qIdx}` : null;
+  const respRef = respId ? db.collection('answers').doc(respId) : db.collection('answers').doc();
   batch.set(respRef, {
     campaignId:          q._firestoreId || null,
     userId:              uid,
     merchantId:          q._merchantId  || null,
+    questionIdx:         qIdx,
     brand:               q.brand,
     answer:              answerValue,
-    pointsAwarded:       q.pts,
+    pointsAwarded:       totalEarned,
+    qualityScore:        1,
+    flagged:             false,
     respondentAge:       S._age         || '',
     respondentCity:      S._city        || '',
     respondentInterests: S._interests   || [],
     createdAt:           firebase.firestore.FieldValue.serverTimestamp()
   }, { merge: false });
+
   const userRef = db.collection('users').doc(uid);
-  const upd = { points: firebase.firestore.FieldValue.increment(q.pts) };
-  if(q._firestoreId) upd.answeredCampaigns = firebase.firestore.FieldValue.arrayUnion(q._firestoreId);
+  const upd = {
+    points: firebase.firestore.FieldValue.increment(totalEarned),
+    xp:     firebase.firestore.FieldValue.increment(totalEarned),
+    ans:    firebase.firestore.FieldValue.increment(1),
+    dailyEarned:     S._dailyEarned,
+    dailyEarnedDate: today,
+    lastAnswerDate:  today,
+    streak:          S.streak
+  };
+  if(q._firestoreId && qIdx === 0) upd.answeredCampaigns = firebase.firestore.FieldValue.arrayUnion(q._firestoreId);
   batch.update(userRef, upd);
+
   if(q._firestoreId) {
     batch.update(db.collection('campaigns').doc(q._firestoreId), {
       answersCount: firebase.firestore.FieldValue.increment(1)
     });
   }
-  // Événement communautaire pour le feed ville
   if(S._city) {
     batch.set(db.collection('communityEvents').doc(), {
       type:        'answer',
@@ -2366,7 +2523,7 @@ function logout() {
   auth.signOut().then(() => {
     const aw = document.getElementById('auth-wall');
     aw.style.display = 'flex'; aw.style.opacity = '1';
-    S.user = null; S.pts = 0; S.qs = [];
+    S.user = null; S.pts = 0; S.xp = 0; S.qs = [];
   });
 }
 
