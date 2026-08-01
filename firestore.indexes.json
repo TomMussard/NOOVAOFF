@@ -28,6 +28,14 @@
       "collectionGroup": "answers",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "answers",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "campaignId", "order": "ASCENDING" },
         { "fieldPath": "merchantId", "order": "ASCENDING" }
       ]
@@ -62,6 +70,14 @@
       "fields": [
         { "fieldPath": "city", "order": "ASCENDING" },
         { "fieldPath": "points", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "city", "order": "ASCENDING" },
+        { "fieldPath": "xp", "order": "DESCENDING" }
       ]
     },
     {
@@ -102,6 +118,14 @@
       "fields": [
         { "fieldPath": "code", "order": "ASCENDING" },
         { "fieldPath": "merchantId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "invoices",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "merchantId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     }
   ],

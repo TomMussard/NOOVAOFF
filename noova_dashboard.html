@@ -3,7 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noova — Espace Commerçant</title>
+<title>Noova Pro — Espace Commerçant</title>
+<meta name="description" content="Collectez des avis qualifiés de vos clients locaux, lancez des campagnes ciblées et fidélisez votre clientèle avec Noova Pro.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="author" content="Noova">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Noova Pro — Espace Commerçant">
+<meta property="og:description" content="Collectez des avis qualifiés de vos clients locaux et fidélisez votre clientèle avec Noova Pro.">
+<meta property="og:image" content="https://noova.fr/og-pro.jpg">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Noova">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="Plan%20de%20travail%208LOGO_NOOVAV2.png">
+<link rel="apple-touch-icon" href="Plan%20de%20travail%208LOGO_NOOVAV2.png">
+
+<!-- Données structurées JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Noova Pro",
+  "url": "https://noova.fr",
+  "description": "Espace commerçant Noova — collectez des avis qualifiés de vos clients locaux et fidélisez votre clientèle.",
+  "applicationCategory": "BusinessApplication",
+  "inLanguage": "fr-FR",
+  "publisher": {"@type": "Organization","name": "Noova","url": "https://noova.fr"}
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,600;0,700;0,800;1,900&display=swap" rel="stylesheet">
@@ -564,8 +595,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
     <div class="sb-brand">
       <div class="sb-brand-av">⛺</div>
       <div>
-        <div class="sb-brand-name">Decathlon</div>
-        <div class="sb-brand-plan">Pro · 847 profils actifs</div>
+        <div class="sb-brand-name">—</div>
+        <div class="sb-brand-plan">—</div>
       </div>
       <div class="sb-online"></div>
     </div>
@@ -1151,9 +1182,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div style="max-width:640px">
           <div class="settings-section">
             <div class="settings-section-title">Profil de la marque</div>
-            <div class="setting-row"><div class="setting-ico">⛺</div><div class="setting-info"><div class="setting-name">Nom de la marque</div><div class="setting-desc" id="set-brand-name">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
-            <div class="setting-row"><div class="setting-ico">👤</div><div class="setting-info"><div class="setting-name">Contact principal</div><div class="setting-desc" id="set-contact">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
-            <div class="setting-row"><div class="setting-ico">🌍</div><div class="setting-info"><div class="setting-name">Zone de diffusion</div><div class="setting-desc">France métropolitaine · Toutes régions</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico">⛺</div><div class="setting-info"><div class="setting-name">Nom de la marque</div><div class="setting-desc" id="set-brand-name">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('brandName','Nom de la marque',document.getElementById('set-brand-name').textContent)">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico">👤</div><div class="setting-info"><div class="setting-name">Contact principal</div><div class="setting-desc" id="set-contact">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('email','Contact / Email',document.getElementById('set-contact').textContent)">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico">🌍</div><div class="setting-info"><div class="setting-name">Zone de diffusion</div><div class="setting-desc" id="set-zone">France métropolitaine · Toutes régions</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('zone','Zone de diffusion',document.getElementById('set-zone').textContent)">Modifier</button></div>
           </div>
           <div class="settings-section">
             <div class="settings-section-title">Notifications</div>
@@ -1163,9 +1194,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
           </div>
           <div class="settings-section">
             <div class="settings-section-title">RGPD & données</div>
-            <div class="setting-row"><div class="setting-ico">🛡️</div><div class="setting-info"><div class="setting-name">DPO désigné</div><div class="setting-desc" id="set-dpo">— · Conforme RGPD Art. 37</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Gérer</button></div>
-            <div class="setting-row"><div class="setting-ico">📋</div><div class="setting-info"><div class="setting-name">Registre de traitement</div><div class="setting-desc">Export automatique disponible · Dernière MAJ il y a 2j</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Exporter</button></div>
-            <div class="setting-row"><div class="setting-ico">🗑️</div><div class="setting-info"><div class="setting-name">Rétention des données</div><div class="setting-desc">Données réponses conservées 24 mois par défaut</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px">Configurer</button></div>
+            <div class="setting-row"><div class="setting-ico">🛡️</div><div class="setting-info"><div class="setting-name">DPO désigné</div><div class="setting-desc" id="set-dpo">— · Conforme RGPD Art. 37</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('dpo','DPO désigné (email)',document.getElementById('set-dpo').textContent.split(' · ')[0])">Gérer</button></div>
+            <div class="setting-row"><div class="setting-ico">📋</div><div class="setting-info"><div class="setting-name">Registre de traitement</div><div class="setting-desc" id="set-registry-date">Export automatique disponible</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="exportRegistry()">Exporter</button></div>
+            <div class="setting-row"><div class="setting-ico">🗑️</div><div class="setting-info"><div class="setting-name">Rétention des données</div><div class="setting-desc" id="set-retention">Données réponses conservées 24 mois</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('retentionMonths','Rétention (mois)',24)">Configurer</button></div>
           </div>
         </div>
       </div>
@@ -1175,20 +1206,18 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div style="max-width:680px">
           <div class="step-card" style="margin-bottom:16px">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-              <div><div class="step-card-title">Plan actuel · Pro</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Renouvellement le 1er juin 2025</div></div>
-              <div style="background:var(--cd);border:1.5px solid rgba(224,125,10,.25);border-radius:var(--rs);padding:7px 14px;font-family:var(--fd);font-weight:700;font-size:13px;color:var(--coral)">Pro</div>
+              <div><div class="step-card-title" id="bill-plan-title">Plan actuel · —</div><div style="font-size:12px;color:var(--ink3);margin-top:2px" id="bill-renewal">Chargement…</div></div>
+              <div style="background:var(--cd);border:1.5px solid rgba(224,125,10,.25);border-radius:var(--rs);padding:7px 14px;font-family:var(--fd);font-weight:700;font-size:13px;color:var(--coral)" id="bill-plan-badge">—</div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
               <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">∞</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Campagnes</div></div>
               <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">5k</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Rép. / campagne</div></div>
               <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--coral)">1.25€</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Par réponse</div></div>
             </div>
-            <div style="display:flex;gap:9px"><button class="tb-btn tb-btn-ghost" style="font-size:12px">Changer de plan</button><button class="tb-btn tb-btn-primary" style="font-size:12px">Ajouter du crédit</button></div>
+            <div style="display:flex;gap:9px"><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="navPage('plans')">Changer de plan</button><button class="tb-btn tb-btn-primary" style="font-size:12px" onclick="showToast('Contacte-nous à contact@noova.fr pour ajouter du crédit.','💳')">Ajouter du crédit</button></div>
           </div>
           <div class="section-title">Historique de facturation</div>
-          <div class="card">
-            ${[{d:'05/05/2025',c:'Nom produit trail — 487 réponses',m:'608,75€','s':'Payée'},{d:'15/04/2025',c:'Naming chaussures — 203 réponses',m:'253,75€',s:'Payée'},{d:'01/04/2025',c:'Satisfaction natation — 312 réponses',m:'390,00€',s:'Payée'}].map(f=>`<div style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--border)"><div style="font-size:11px;color:var(--ink3);width:100px;flex-shrink:0">${f.d}</div><div style="flex:1;font-size:13px;color:var(--ink2)">${f.c}</div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap">${f.m}</div><span class="status-pill done">${f.s}</span><button style="padding:5px 10px;border-radius:7px;background:var(--card);border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--ink3);cursor:pointer">📥 PDF</button></div>`).join('')}
-          </div>
+          <div class="card" id="billing-history"><div style="padding:20px;text-align:center;color:var(--ink3);font-size:13px">Chargement…</div></div>
         </div>
       </div>
 
@@ -1230,7 +1259,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                 <div>✅ Score qualité</div>
                 <div style="color:var(--ink3)">❌ Ciblage géographique fin</div>
               </div>
-              <button style="margin-top:auto;padding:9px;background:rgba(242,151,21,.1);border:1.5px solid rgba(242,151,21,.4);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--coral)">Choisir Starter</button>
+              <button style="margin-top:auto;padding:9px;background:rgba(242,151,21,.1);border:1.5px solid rgba(242,151,21,.4);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--coral)" onclick="choosePlan('Starter',29)">Choisir Starter</button>
             </div>
 
             <!-- PRO -->
@@ -1248,7 +1277,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                 <div>✅ Ciblage région &amp; ville</div>
                 <div>✅ Questions ouvertes + échelle</div>
               </div>
-              <button style="margin-top:auto;padding:9px;background:linear-gradient(135deg,#f29715,#ffda09);border:none;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;color:#1c0e02">Choisir Pro</button>
+              <button style="margin-top:auto;padding:9px;background:linear-gradient(135deg,#f29715,#ffda09);border:none;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;color:#1c0e02" onclick="choosePlan('Pro',99)">Choisir Pro</button>
             </div>
 
             <!-- ENTERPRISE -->
@@ -1264,7 +1293,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                 <div>✅ SLA &amp; support dédié</div>
                 <div>✅ White-label disponible</div>
               </div>
-              <button style="margin-top:auto;padding:9px;background:rgba(92,59,245,.1);border:1.5px solid rgba(92,59,245,.3);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--violet)">Nous contacter</button>
+              <button style="margin-top:auto;padding:9px;background:rgba(92,59,245,.1);border:1.5px solid rgba(92,59,245,.3);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--violet)" onclick="window.location.href='mailto:contact@noova.fr?subject=Offre Enterprise'">Nous contacter</button>
             </div>
 
           </div><!-- /grid -->
@@ -1406,7 +1435,7 @@ function renderCampModal(c, answers) {
   if(respondentsWithAge.length) {
     const ageCounts = {};
     respondentsWithAge.forEach(a => { ageCounts[a.respondentAge] = (ageCounts[a.respondentAge]||0) + 1; });
-    const ageOrder = ['13-17','18-24','25-34','35-49','50-64','65+'];
+    const ageOrder = ['16-17','18-24','25-34','35-49','50-64','65+'];
     const sortedAge = Object.entries(ageCounts).sort((x,y) => ageOrder.indexOf(x[0]) - ageOrder.indexOf(y[0]));
     const maxAge = Math.max(...sortedAge.map(e=>e[1]));
     const intCounts = {};
@@ -1716,6 +1745,93 @@ function showToast(msg,ico='✅'){
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
 }
 
+// ═══ SETTINGS ════════════════════════════════════════════════
+async function editSetting(field, label, current) {
+  const val = prompt(`${label} :`, current || '');
+  if(val === null || val.trim() === '') return;
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if(!uid) return;
+  const upd = {};
+  if(field === 'zone') {
+    const el = document.getElementById('set-zone');
+    if(el) el.textContent = val.trim();
+    showToast('Zone de diffusion mise à jour.', '🌍');
+    return;
+  }
+  if(field === 'retentionMonths') {
+    const months = parseInt(val) || 24;
+    upd.retentionMonths = months;
+    const el = document.getElementById('set-retention');
+    if(el) el.textContent = `Données réponses conservées ${months} mois`;
+  } else if(field === 'dpo') {
+    upd.dpoEmail = val.trim();
+    const el = document.getElementById('set-dpo');
+    if(el) el.textContent = val.trim() + ' · Conforme RGPD Art. 37';
+  } else {
+    upd[field] = val.trim();
+    if(field === 'brandName') {
+      const el = document.getElementById('set-brand-name');
+      if(el) el.textContent = val.trim();
+      document.querySelectorAll('.sb-brand-name').forEach(e => e.textContent = val.trim());
+    } else if(field === 'email') {
+      const el = document.getElementById('set-contact');
+      if(el) el.textContent = val.trim();
+    }
+  }
+  await db.collection('merchants').doc(uid).update(upd).catch(() => {});
+  showToast('Paramètre mis à jour.', '✅');
+}
+
+function exportRegistry() {
+  showToast('Export du registre en cours de préparation…', '📋');
+  setTimeout(() => showToast('Export disponible dans 2 minutes par email.', '📧'), 2000);
+}
+
+async function choosePlan(planName, price) {
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if(!uid) return;
+  const current = _mData && _mData.plan;
+  if(current === planName) { showToast(`Tu es déjà sur le plan ${planName}.`, 'ℹ️'); return; }
+  if(!confirm(`Passer au plan ${planName} (${price}€/mois) ? Tu seras contacté sous 24h pour finaliser.`)) return;
+  await db.collection('planRequests').doc().set({
+    merchantId: uid,
+    brandName: (_mData && _mData.brandName) || '',
+    requestedPlan: planName,
+    price,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(() => {});
+  showToast(`Demande ${planName} enregistrée. On te contacte sous 24h !`, '🚀');
+}
+
+async function loadBillingData(uid) {
+  const planName = (_mData && _mData.plan) || 'Free';
+  const planEl = document.getElementById('bill-plan-title');
+  const badgeEl = document.getElementById('bill-plan-badge');
+  const renewEl = document.getElementById('bill-renewal');
+  if(planEl) planEl.textContent = `Plan actuel · ${planName}`;
+  if(badgeEl) badgeEl.textContent = planName;
+  if(renewEl) {
+    const rd = _mData && _mData.planRenewalDate;
+    renewEl.textContent = rd ? `Renouvellement le ${rd}` : 'Abonnement mensuel';
+  }
+  const histEl = document.getElementById('billing-history');
+  if(!histEl) return;
+  try {
+    const snap = await db.collection('invoices').where('merchantId','==',uid).orderBy('createdAt','desc').limit(10).get();
+    if(snap.empty) {
+      histEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink3);font-size:13px">Aucune facture pour le moment.</div>';
+      return;
+    }
+    histEl.innerHTML = snap.docs.map(d => {
+      const f = d.data();
+      const date = f.createdAt ? new Date(f.createdAt.seconds*1000).toLocaleDateString('fr-FR') : '—';
+      return `<div style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--border)"><div style="font-size:11px;color:var(--ink3);width:100px;flex-shrink:0">${date}</div><div style="flex:1;font-size:13px;color:var(--ink2)">${esc(f.label||'Facture')}</div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap">${f.amount||'—'}</div><span class="status-pill done">${f.status||'Payée'}</span></div>`;
+    }).join('');
+  } catch(e) {
+    histEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink3);font-size:13px">Historique non disponible.</div>';
+  }
+}
+
 // ═══ INIT ════════════════════════════════════════════════════
 window.addEventListener('load',()=>{
   updVol(500);updAud();updatePreview();
@@ -1739,14 +1855,12 @@ window.addEventListener('load',()=>{
   </div>
 </div>
 
-<!-- Écran de chargement Firebase -->
-<div id="auth-loading" style="position:fixed;inset:0;z-index:10001;background:var(--bg);display:flex;align-items:center;justify-content:center">
-  <div style="text-align:center">
-    <div style="font-family:var(--fd);font-weight:800;font-size:52px;letter-spacing:-2px;color:var(--coral);line-height:1">noova</div>
-    <div style="width:32px;height:3px;background:var(--coral);border-radius:99px;margin:14px auto 0;opacity:.4;animation:ld-dash 1.1s ease-in-out infinite alternate"></div>
-  </div>
+<!-- Écran de chargement -->
+<div id="auth-loading" style="position:fixed;inset:0;z-index:10001;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(130% 120% at 55% -5%,#241F2B 0%,#0F0D12 60%);transition:opacity .7s ease">
+  <img src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Noova" style="height:118px;width:auto;animation:pop .65s cubic-bezier(.34,1.56,.64,1) .2s both">
+  <div style="width:36px;height:1.5px;background:linear-gradient(90deg,#f9a716,#fce1a7);border-radius:99px;animation:fadeUp .4s ease .95s both"></div>
+  <div style="font-family:'Archivo',sans-serif;font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:4px;color:rgba(255,255,255,.48);text-align:center;padding:0 24px;animation:fadeUp .5s ease 1.05s both">Là où vos avis ont de la valeur</div>
 </div>
-<style>@keyframes ld-dash{from{transform:scaleX(.35)}to{transform:scaleX(1.3)}}</style>
 
 <!-- ═══ AUTH WALL ══════════════════════════════════════════════ -->
 <div id="auth-wall" style="position:fixed;inset:0;z-index:9999;background:var(--bg);display:none;align-items:center;justify-content:center;padding:28px;overflow-y:auto">
@@ -1928,6 +2042,7 @@ async function loadMerchantAndStart(uid) {
   ['kpi-delta-0','kpi-delta-1','kpi-delta-2','kpi-delta-3'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=''; });
 
   loadMerchantCampaigns(uid);
+  loadBillingData(uid);
   // Nb utilisateurs : stocké dans le doc merchant (consentCount) pour éviter les restrictions RGPD
   _totalConsentedUsers = _mData.consentCount || 0;
   updAud();

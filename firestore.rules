@@ -169,5 +169,29 @@ service cloud.firestore {
       allow read: if isAuth();
       allow write: if false;
     }
+
+    // ─── Friend notifications ─────────────────────────────────────────────────
+    match /friendNotifications/{notifId} {
+      allow read: if isAuth() && resource.data.toUid == request.auth.uid;
+      allow create: if isAuth() && request.resource.data.fromUid == request.auth.uid;
+      allow update: if isAuth() && resource.data.toUid == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // ─── Plan requests ────────────────────────────────────────────────────────
+    match /planRequests/{reqId} {
+      allow create: if isAuth() && request.resource.data.merchantId == request.auth.uid;
+      allow read: if isAuth() && (
+        resource.data.merchantId == request.auth.uid ||
+        request.auth.token.email == 'noovaoffr@gmail.com'
+      );
+      allow update, delete: if false;
+    }
+
+    // ─── Invoices ─────────────────────────────────────────────────────────────
+    match /invoices/{invId} {
+      allow read: if isAuth() && resource.data.merchantId == request.auth.uid;
+      allow write: if false;
+    }
   }
 }

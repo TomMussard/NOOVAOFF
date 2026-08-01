@@ -256,7 +256,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
   <!-- ══════════════ TAB UTILISATEURS ══════════════ -->
   <div id="tab-utilisateurs" style="display:none">
-    <div class="sec-hdr"><h2>Utilisateurs</h2><p>Aperçu de la communauté Noova — données agrégées en temps réel.</p></div>
+    <div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between"><div><h2>Utilisateurs</h2><p>Aperçu de la communauté Noova — données agrégées en temps réel.</p></div><button onclick="_usersLoaded=false;loadUsers(true)" style="padding:8px 16px;background:var(--grad);color:var(--brown);border:none;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--fb);white-space:nowrap">↻ Actualiser</button></div>
 
     <div class="stats">
       <div class="stat-card hl"><div class="stat-icon">👥</div><div class="stat-n" id="u-total">—</div><div class="stat-l">Utilisateurs</div></div>
@@ -457,7 +457,7 @@ function switchTab(tab, btn) {
   ['entreprises','utilisateurs','diffusion'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
   });
-  if (tab === 'utilisateurs') loadUsers();
+  if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
   if (tab === 'diffusion') initDiffusion();
 }
 
@@ -592,8 +592,11 @@ function closeModal() { document.getElementById('modal-ov').classList.remove('op
 // ── Users Analytics ────────────────────────────────────────────────────────
 let _usersLoaded = false;
 
-async function loadUsers() {
-  if (_usersLoaded) return;
+async function loadUsers(force) {
+  if (_usersLoaded && !force) return;
+  const statIds = ['u-total','u-cities','u-avgpts','u-avgstreak'];
+  statIds.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '…'; });
+  document.getElementById('geo-chart-wrap').innerHTML = '<div class="loading">Chargement</div>';
   try {
     const snap = await db.collection('users').limit(500).get();
     const users = [];
@@ -602,7 +605,9 @@ async function loadUsers() {
     renderUsers(users);
     document.getElementById('tb-usr').textContent = users.length;
   } catch(e) {
-    document.getElementById('geo-chart-wrap').innerHTML = `<div class="empty">Erreur chargement : ${esc(e.message)}</div>`;
+    _usersLoaded = false;
+    statIds.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '—'; });
+    document.getElementById('geo-chart-wrap').innerHTML = `<div class="empty">Erreur Firestore : ${esc(e.message)}<br><button onclick="loadUsers(true)" style="margin-top:10px;padding:8px 16px;background:var(--grad);color:var(--brown);border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:var(--fb)">Réessayer</button></div>`;
   }
 }
 
@@ -647,8 +652,8 @@ function renderUsers(users) {
     }).join('') + '</div>';
   }
 
-  // ── Age table
-  const AGE_ORDER = ['13-17','18-24','25-34','35-44','45-54','55-64','65+'];
+  // ── Age table — tranches identiques à celles de l'app
+  const AGE_ORDER = ['16-17','18-24','25-34','35-49','50-64','65+'];
   const ageCounts = {};
   AGE_ORDER.forEach(a => ageCounts[a] = 0);
   let withAge = 0;
@@ -672,17 +677,19 @@ function renderUsers(users) {
     </tr>`;
   }).join('');
 
-  // ── Tiers (points distribution)
+  // ── Tiers basés sur XP (lifetime, jamais diminue) — mêmes paliers que l'app
   const TIERS = [
-    { n:'Curieux',   min:0,    max:99,   c:'#94a3b8' },
-    { n:'Actif',     min:100,  max:499,  c:'#0BAB84' },
-    { n:'Engagé',    min:500,  max:1999, c:'#7C3AED' },
-    { n:'Expert',    min:2000, max:4999, c:'#f29715' },
-    { n:'Légende',   min:5000, max:9999, c:'#ffda09' }
+    { n:'Curieux',      min:0,     max:1000,  c:'#94a3b8' },
+    { n:'Actif',        min:1000,  max:3000,  c:'#0BAB84' },
+    { n:'Expert',       min:3000,  max:6000,  c:'#f29715' },
+    { n:'Ambassadeur',  min:6000,  max:10000, c:'#7C3AED' },
+    { n:'Légende',      min:10000, max:Infinity, c:'#ffda09' }
   ];
   const tierCounts = TIERS.map(t => ({
     ...t,
-    count: users.filter(u => (u.points||0) >= t.min && (u.points||0) < t.max).length
+    // XP = expérience à vie (ne descend jamais), points = solde dépensable
+    count: users.filter(u => (u.xp !== undefined ? u.xp : u.points||0) >= t.min &&
+                             (u.xp !== undefined ? u.xp : u.points||0) < t.max).length
   }));
   const maxTier = Math.max(...tierCounts.map(t => t.count), 1);
   const tiersWrap = document.getElementById('tiers-wrap');
@@ -690,7 +697,7 @@ function renderUsers(users) {
     const barW = Math.round((t.count/maxTier)*100);
     return `<div class="tier-row">
       <div class="tier-dot" style="background:${t.c}"></div>
-      <div class="tier-name">${t.n} <span style="font-size:10px;color:var(--ink3)">(${t.min}–${t.max=== 9999?'∞':t.max} pts)</span></div>
+      <div class="tier-name">${t.n} <span style="font-size:10px;color:var(--ink3)">(${t.min>=1000?(t.min/1000)+'k':t.min}–${t.max===Infinity?'∞':t.max>=1000?(t.max/1000)+'k':t.max} xp)</span></div>
       <div class="tier-track"><div class="tier-fill" style="width:${barW}%;background:${t.c}"></div></div>
       <div class="tier-count">${t.count}</div>
     </div>`;
