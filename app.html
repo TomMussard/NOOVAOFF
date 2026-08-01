@@ -1,6 +1,9 @@
 ﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6M20ZMJBX8"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-6M20ZMJBX8');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Noova — Là où vos avis ont de la valeur</title>
@@ -38,7 +41,7 @@
 
 <!-- PWA — Android / Chrome -->
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#ffda09">
+<meta name="theme-color" content="#0F0D12">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,18 +90,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{from{opacity:0;transform:scale(.2) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes confFall{to{transform:translateY(120vh) rotate(720deg);opacity:0}}
-/* SPLASH */
-#splash{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;position:relative;overflow:hidden;background:linear-gradient(145deg,#f29715 0%,#ffda09 85%)}
-#splash-deco{position:absolute;inset:0;pointer-events:none;opacity:.12}
-.logo-mark{width:96px;height:96px;background:var(--grad);border-radius:28px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:52px;color:var(--gi);box-shadow:0 20px 60px var(--cg);animation:pop .8s cubic-bezier(.34,1.56,.64,1) forwards}
-.logo-mark-img{width:104px;height:104px;border-radius:26px;box-shadow:0 22px 60px var(--cg);animation:pop .8s cubic-bezier(.34,1.56,.64,1) forwards;display:block;object-fit:contain}
-.splash-name{font-family:var(--fd);font-weight:900;font-size:30px;letter-spacing:-1.5px;color:var(--ink);animation:fadeUp .5s .25s both}
-.splash-tag{font-size:14px;color:rgba(28,14,2,.7);font-weight:500;animation:fadeUp .5s .4s both}
-.splash-dots{position:absolute;bottom:72px;display:flex;gap:8px}
-.sp-dot{width:8px;height:8px;border-radius:50%;background:rgba(28,14,2,.35);animation:sda 1.4s ease-in-out infinite}
-.sp-dot:nth-child(2){animation-delay:.22s}.sp-dot:nth-child(3){animation-delay:.44s}
-@keyframes sda{0%,80%,100%{background:var(--bg3);transform:scale(1)}40%{background:var(--coral);transform:scale(1.5)}}
-.splash-bo{position:absolute;bottom:22px;right:22px;font-size:11px;font-weight:700;color:rgba(28,14,2,.6);background:none;border:none;cursor:pointer;font-family:var(--fb);padding:8px}
+/* SPLASH — empty screen covered by #app-loader */
+#splash{position:relative;overflow:hidden;background:var(--bg)}
 /* ONBOARDING */
 .ob-wrap{height:100%;display:flex;flex-direction:column}
 .ob-topbar{padding:56px 22px 0;display:flex;justify-content:flex-end}
@@ -460,7 +453,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 </style>
 </head>
 <body>
-<div class="bg-label">Noova</div>
 <div id="shell">
 <div id="app">
 
@@ -470,7 +462,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- ONBOARDING -->
 <div id="onboard" class="screen">
   <div class="ob-wrap">
-    <div class="ob-topbar"><button class="ob-skip" onclick="showAuthWall('login')">Passer</button></div>
+    <div class="ob-topbar"><button class="ob-skip" onclick="showAuthWall('register')">Passer</button></div>
     <div class="ob-slides">
       <div class="ob-slide active" id="ob0">
         <div class="ob-illo" style="background:linear-gradient(135deg,#FFF0EC,#FFE0D6)">
@@ -684,6 +676,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="wc-pts" id="wc-pts">0 <small>pts</small></div>
       <div class="wc-bar"><div class="wc-fill" id="wc-fill" style="width:4%"></div></div>
       <div class="wc-level"><span id="wc-level">Niveau 1 · Curieux</span><span id="wc-next">1000 pts</span></div>
+      <div style="font-size:10px;color:rgba(255,255,255,.42);margin-top:8px;text-align:center;line-height:1.6"><strong style="color:rgba(255,255,255,.65)">pts</strong> = solde dépensable · <strong style="color:rgba(255,255,255,.65)">xp</strong> = progression palier (ne se dépense pas)</div>
     </div>
     <div class="cashout-c">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><span style="font-size:22px">📍</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">Des récompenses concrètes</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">Produits offerts et réductions chez les commerces de ton quartier. C'est là que tes points valent le plus, un peu de cashback reste possible si tu préfères.</div></div></div>
@@ -1801,22 +1794,17 @@ function shareGame(b){const t=b.textContent;b.textContent='✓ Partagé en story
 </script>
 
 <!-- ═══ AUTH WALL ══════════════════════════════════════════════ -->
-<!-- Écran de chargement Firebase (masqué après le 1er check auth) -->
-<div id="auth-loading" style="position:fixed;inset:0;z-index:10001;background:var(--bg);display:flex;align-items:center;justify-content:center">
-  <div style="text-align:center">
-    <div style="font-family:var(--fd);font-weight:800;font-size:52px;letter-spacing:-2px;color:var(--coral);line-height:1">noova</div>
-    <div style="width:32px;height:3px;background:var(--coral);border-radius:99px;margin:14px auto 0;opacity:.4;animation:ld 1.1s ease-in-out infinite alternate"></div>
-  </div>
-</div>
-<style>@keyframes ld{from{transform:scaleX(.35)}to{transform:scaleX(1.3)}}
+<style>
 .int-chip{padding:8px 13px;border-radius:99px;background:var(--bg2);border:1.5px solid var(--bg3);color:var(--ink2);font-size:12px;font-weight:500;cursor:pointer;transition:all .13s;font-family:var(--fb)}
-.int-chip.sel{border-color:var(--coral);background:var(--cd);color:var(--coral);font-weight:700}</style>
+.int-chip.sel{border-color:var(--coral);background:var(--cd);color:var(--coral);font-weight:700}
+</style>
 
 <div id="auth-wall" style="position:fixed;inset:0;z-index:9999;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;overflow-y:auto;padding-top:calc(40px + env(safe-area-inset-top,0px));padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))">
 
   <div style="text-align:center;margin-bottom:36px">
-    <div style="font-family:var(--fd);font-weight:800;font-size:56px;letter-spacing:-2px;color:var(--coral);line-height:1">noova</div>
-    <div style="font-size:14px;color:var(--ink2);margin-top:10px;line-height:1.7">Tes avis valent de l'argent.<br>Réponds aux commerces de ton quartier.</div>
+    <img src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Noova" style="height:64px;width:auto;border-radius:16px;box-shadow:0 8px 24px rgba(242,151,21,.3);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
+    <div style="font-family:var(--fd);font-weight:900;font-size:26px;letter-spacing:-1px;color:var(--ink);line-height:1">Noova</div>
+    <div style="font-size:14px;color:var(--ink2);margin-top:8px;line-height:1.7">Tes avis valent de l'argent.<br>Réponds aux commerces de ton quartier.</div>
   </div>
 
   <div style="display:flex;gap:0;background:var(--bg2);border-radius:13px;padding:4px;width:100%;max-width:340px;margin-bottom:20px">
@@ -2797,6 +2785,8 @@ function hideAppLoader() {
   el._hiding = true;
   el.style.opacity = '0';
   el.style.pointerEvents = 'none';
+  const tc = document.querySelector('meta[name="theme-color"]');
+  if(tc) tc.content = '#ffda09';
   setTimeout(() => { try { el.remove(); } catch(e){} }, 650);
 }
 
