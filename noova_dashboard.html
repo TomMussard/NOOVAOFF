@@ -1,12 +1,9 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6M20ZMJBX8"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-6M20ZMJBX8');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#f29715">
 <title>Noova Pro — Espace Commerçant</title>
 <meta name="description" content="Collectez des avis qualifiés de vos clients locaux, lancez des campagnes ciblées et fidélisez votre clientèle avec Noova Pro.">
 <meta name="robots" content="noindex, nofollow">
@@ -41,7 +38,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,600;0,700;0,800;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -74,8 +71,8 @@
   --ad: rgba(245,166,35,.12);
   --red: #EF4444;
   --r: 16px; --rs: 12px; --rx: 8px;
-  --fd: 'Archivo', sans-serif;
-  --fb: 'Archivo', sans-serif;
+  --fd: 'Bricolage Grotesque', sans-serif;
+  --fb: 'Plus Jakarta Sans', sans-serif;
   --sidebar: 240px;
   --nav-h: 64px;
 }
@@ -144,7 +141,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .sb-item:hover { background: var(--card); color: var(--ink2); }
 .sb-item.active { background: var(--cd); color: var(--coral); font-weight: 700; }
 .sb-item.active .sb-ico { filter: drop-shadow(0 0 4px rgba(224,125,10,.4)); }
-.sb-ico { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sb-ico { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
 .sb-badge { margin-left: auto; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 99px; }
 .sb-footer {
   padding: 14px; border-top: 1px solid var(--border);
@@ -567,23 +564,78 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 @keyframes confFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 .conf-p { position: fixed; top: -20px; border-radius: 2px; animation: confFall linear forwards; pointer-events: none; z-index: 1001; }
 
-/* Responsive tweaks */
+/* ═══ RESPONSIVE ═══════════════════════════════════════════ */
 @media (max-width: 1100px) {
   .kpi-row { grid-template-columns: repeat(2,1fr); }
   .synth-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 840px) {
-  #sidebar { position: fixed; z-index: 200; height: 100vh; transform: translateX(-100%); }
+  :root { --sidebar: 0px; }
+  #sidebar {
+    position: fixed; z-index: 300; height: 100vh; top: 0; left: 0;
+    width: 280px;
+    transform: translateX(-100%);
+    box-shadow: 4px 0 24px rgba(0,0,0,.15);
+  }
   #sidebar.open { transform: translateX(0); }
+  /* Overlay behind sidebar */
+  #sidebar-overlay { display:none; position:fixed; inset:0; z-index:299; background:rgba(0,0,0,.35); backdrop-filter:blur(2px); }
+  #sidebar-overlay.show { display:block; }
+  /* Hamburger in topbar */
+  .topbar { padding: 0 16px; gap: 10px; }
+  #mob-menu-btn { display:flex !important; }
+  .topbar-title { font-size: 15px; }
+  .topbar-sub { font-size: 11px; display:none; }
+  #topbar-new-camp-btn { font-size: 12px; padding: 8px 12px; }
+  /* Content */
+  #content { padding: 16px; }
+  .kpi-row { grid-template-columns: repeat(2,1fr); gap: 10px; }
   .grid-3 { grid-template-columns: 1fr; }
   .fmt-grid { grid-template-columns: repeat(2,1fr); }
   .recap-grid { grid-template-columns: 1fr; }
+  .wizard-wrap { padding: 12px; }
+  /* Two-col wizard panels → single col */
+  #wz-panel-0 > div,
+  #wz-panel-1 > div,
+  #wz-panel-2 > div,
+  #wz-panel-3 > div,
+  #wz-panel-4 > div { grid-template-columns: 1fr !important; }
+  /* Hide preview on mobile */
+  #wz-panel-0 > div > div:last-child,
+  #wz-panel-1 > div > div:last-child,
+  #wz-panel-2 > div > div:last-child,
+  #wz-panel-3 > div > div:last-child { display: none; }
+  /* Cards */
+  .card { padding: 14px; }
+  .step-card { padding: 14px; }
+  /* Camp table → compact */
+  .camp-header, .camp-row { grid-template-columns: 1fr auto auto !important; }
+  .camp-header div:nth-child(3),
+  .camp-row div:nth-child(3) { display: none; }
+  /* Voucher layout */
+  .voucher-layout { flex-direction: column; }
+  /* Section headings */
+  .section-title { font-size: 16px; }
+  /* Step cards full width */
+  .step-panel.active { padding: 0; }
+}
+@media (max-width: 480px) {
+  .kpi-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi-card { padding: 12px; }
+  #topbar-new-camp-btn { display: none; }
+  #mob-camp-fab { display: flex !important; }
 }
 </style>
 </head>
 <body>
 
 <div id="app">
+
+<!-- Mobile sidebar overlay -->
+<div id="sidebar-overlay" onclick="toggleMobMenu()"></div>
+
+<!-- Mobile FAB for new campaign -->
+<button id="mob-camp-fab" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])" style="display:none;position:fixed;bottom:24px;right:20px;z-index:200;width:56px;height:56px;border-radius:50%;background:var(--grad);border:none;box-shadow:0 8px 24px rgba(242,151,21,.45);cursor:pointer;align-items:center;justify-content:center;font-size:24px">✨</button>
 
   <!-- SIDEBAR -->
   <aside id="sidebar">
@@ -606,18 +658,18 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
     </div>
     <nav class="sb-nav">
       <div class="sb-section">Principal</div>
-      <button class="sb-item active" onclick="navTo('dashboard',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></span>Dashboard</button>
-      <button class="sb-item" onclick="navTo('create',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></span>Créer une campagne</button>
-      <button class="sb-item" onclick="navTo('campaigns',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></span>Mes campagnes<span class="sb-badge" id="camp-badge" style="background:rgba(224,125,10,.15);color:var(--coral);display:none"></span></button>
-      <button class="sb-item" onclick="navTo('results',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></span>Résultats</button>
-      <button class="sb-item" onclick="navTo('consents',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg></span>Consentements RGPD</button>
-      <button class="sb-item" onclick="navTo('rewards',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M20 6h-2.18c.07-.43.18-.84.18-1.25C18 3.12 16.88 2 15.25 2c-1.07 0-1.98.6-2.34 1.53L12 5.09l-.91-1.56C10.73 2.6 9.82 2 8.75 2 7.12 2 6 3.12 6 4.75c0 .41.11.82.18 1.25H4c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2v5c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-5c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5-2c.41 0 .75.34.75.75s-.34.75-.75.75h-2.09l.96-1.63c.12-.24.36-.37.63-.37zm-6.5 0c.27 0 .51.13.63.37l.97 1.63H8.25c-.41 0-.75-.34-.75-.75S8.34 4 8.75 4zM4 8h7v2H4V8zm2 9v-5h5v5H6zm8 0v-5h5v5h-5zm2-7h-7V8h7v2z"/></svg></span>Mes récompenses</button>
-      <button class="sb-item" onclick="navTo('validate',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span>Valider un bon</button>
+      <button class="sb-item active" onclick="navTo('dashboard',this)"><span class="sb-ico">📊</span>Dashboard</button>
+      <button class="sb-item" onclick="navTo('create',this)"><span class="sb-ico">✨</span>Créer une campagne</button>
+      <button class="sb-item" onclick="navTo('campaigns',this)"><span class="sb-ico">📋</span>Mes campagnes<span class="sb-badge" id="camp-badge" style="background:rgba(224,125,10,.15);color:var(--coral);display:none"></span></button>
+      <button class="sb-item" onclick="navTo('results',this)"><span class="sb-ico">📈</span>Résultats</button>
+      <button class="sb-item" onclick="navTo('consents',this)"><span class="sb-ico">🔐</span>Consentements RGPD</button>
+      <button class="sb-item" onclick="navTo('rewards',this)"><span class="sb-ico">🎁</span>Mes récompenses</button>
+      <button class="sb-item" onclick="navTo('validate',this)"><span class="sb-ico">✅</span>Valider un bon</button>
       <div class="sb-section">Compte</div>
-      <button class="sb-item" onclick="navTo('settings',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.22-.07.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></span>Paramètres</button>
-      <button class="sb-item" onclick="navTo('plans',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/></svg></span>Abonnements</button>
-      <button class="sb-item" onclick="navTo('billing',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v4z"/></svg></span>Facturation</button>
-      <button class="sb-item" onclick="logout()" style="margin-top:auto;color:var(--ink3)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></span>Se déconnecter</button>
+      <button class="sb-item" onclick="navTo('settings',this)"><span class="sb-ico">⚙️</span>Paramètres</button>
+      <button class="sb-item" onclick="navTo('plans',this)"><span class="sb-ico">⭐</span>Abonnements</button>
+      <button class="sb-item" onclick="navTo('billing',this)"><span class="sb-ico">💳</span>Facturation</button>
+      <button class="sb-item" onclick="logout()" style="margin-top:auto;color:var(--ink3)"><span class="sb-ico">🚪</span>Se déconnecter</button>
     </nav>
     <div class="sb-footer">
       <div class="sb-user-av" style="background:linear-gradient(135deg,var(--coral),var(--violet))">N</div>
@@ -633,9 +685,12 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 
     <!-- TOPBAR -->
     <header class="topbar" id="topbar">
-      <div style="flex:1">
+      <button id="mob-menu-btn" onclick="toggleMobMenu()" style="display:none;width:38px;height:38px;border-radius:10px;background:var(--card);border:1.5px solid var(--border);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:var(--ink)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+      <div style="flex:1;min-width:0">
         <div class="topbar-title" id="topbar-title">Dashboard</div>
-        <div class="topbar-sub" id="topbar-sub">Bienvenue Claire — dernière mise à jour il y a 4 min</div>
+        <div class="topbar-sub" id="topbar-sub">Bienvenue — dernière mise à jour il y a 4 min</div>
       </div>
       <button class="tb-btn tb-btn-primary" id="topbar-new-camp-btn" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">✨ Nouvelle campagne</button>
       <div class="tb-notif"><div class="notif-dot"></div>🔔</div>
@@ -751,11 +806,19 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                         <button onclick="removeWizQ(2)" style="background:none;border:none;color:var(--ink3);font-size:12px;cursor:pointer;padding:2px 6px">× Retirer</button>
                       </div>
                       <textarea class="field-ta" id="q2-text-inp" placeholder="2e question pour les répondants…" rows="2" style="margin-bottom:8px"></textarea>
-                      <select class="field-inp" id="q2-fmt-sel" style="font-size:12px">
+                      <select class="field-inp" id="q2-fmt-sel" style="font-size:12px" onchange="showMcqForQ(2,this.value)">
                         <option value="mcq">Choix multiple</option>
                         <option value="text">Texte libre</option>
                         <option value="scale">Échelle 1–10</option>
                       </select>
+                      <div id="q2-mcq-builder" style="margin-top:8px">
+                        <div style="font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Options Q2</div>
+                        <div id="q2-mcq-opts">
+                          <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div>
+                          <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div>
+                        </div>
+                        <button onclick="addQOpt('q2-mcq-opts')" style="display:flex;align-items:center;gap:4px;background:none;border:none;color:var(--violet);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;margin-top:4px">+ Option</button>
+                      </div>
                     </div>
                     <div id="wz-q-extra-3" style="display:none;background:var(--bg2);border-radius:var(--rs);padding:14px;margin-bottom:10px;border:1px solid var(--border)">
                       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -763,11 +826,19 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                         <button onclick="removeWizQ(3)" style="background:none;border:none;color:var(--ink3);font-size:12px;cursor:pointer;padding:2px 6px">× Retirer</button>
                       </div>
                       <textarea class="field-ta" id="q3-text-inp" placeholder="3e question pour les répondants…" rows="2" style="margin-bottom:8px"></textarea>
-                      <select class="field-inp" id="q3-fmt-sel" style="font-size:12px">
+                      <select class="field-inp" id="q3-fmt-sel" style="font-size:12px" onchange="showMcqForQ(3,this.value)">
                         <option value="mcq">Choix multiple</option>
                         <option value="text">Texte libre</option>
                         <option value="scale">Échelle 1–10</option>
                       </select>
+                      <div id="q3-mcq-builder" style="margin-top:8px">
+                        <div style="font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Options Q3</div>
+                        <div id="q3-mcq-opts">
+                          <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div>
+                          <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div>
+                        </div>
+                        <button onclick="addQOpt('q3-mcq-opts')" style="display:flex;align-items:center;gap:4px;background:none;border:none;color:var(--violet);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;margin-top:4px">+ Option</button>
+                      </div>
                     </div>
                     <button id="wz-add-q-btn" onclick="addWizQ()" style="display:flex;align-items:center;gap:6px;background:none;border:1.5px dashed var(--border2);border-radius:var(--rx);padding:9px 14px;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;width:100%;justify-content:center">+ Ajouter une question <span style="font-size:10px;color:var(--ink4)">(max 3 au total)</span></button>
                   </div>
@@ -927,22 +998,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                         <option value="cvl">Centre-Val de Loire</option>
                         <option value="cor">Corse</option>
                       </optgroup>
-                      <optgroup label="── Grandes villes ──">
-                        <option value="paris">Paris</option>
-                        <option value="lyon">Lyon</option>
-                        <option value="marseille">Marseille</option>
-                        <option value="toulouse">Toulouse</option>
-                        <option value="nice">Nice</option>
-                        <option value="nantes">Nantes</option>
-                        <option value="montpellier">Montpellier</option>
-                        <option value="strasbourg">Strasbourg</option>
-                        <option value="bordeaux">Bordeaux</option>
-                        <option value="lille">Lille</option>
-                        <option value="rennes">Rennes</option>
-                        <option value="reims">Reims</option>
-                        <option value="toulon">Toulon</option>
-                        <option value="grenoble">Grenoble</option>
-                        <option value="dijon">Dijon</option>
+                      <optgroup label="── Villes actives ──" id="aud-loc-cities-optgroup">
+                        <option disabled value="">Chargement des villes…</option>
                       </optgroup>
                     </select>
                     <div style="font-size:11px;color:var(--ink3);margin-top:5px">💡 Cibler une ville ou région augmente le coût au répondant mais garantit une audience locale précise.</div>
@@ -1218,7 +1275,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">5k</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Rép. / campagne</div></div>
               <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--coral)">1.25€</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Par réponse</div></div>
             </div>
-            <div style="display:flex;gap:9px"><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="navPage('plans')">Changer de plan</button><button class="tb-btn tb-btn-primary" style="font-size:12px" onclick="showToast('Contacte-nous à contact@noova.fr pour ajouter du crédit.','💳')">Ajouter du crédit</button></div>
+            <div style="display:flex;gap:9px"><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="navTo('plans', document.querySelector('.sb-item[onclick*=plans]'))">Changer de plan</button><button class="tb-btn tb-btn-primary" style="font-size:12px" onclick="showToast('Contacte-nous à contact@noova.fr pour ajouter du crédit.','💳')">Ajouter du crédit</button></div>
           </div>
           <div class="section-title">Historique de facturation</div>
           <div class="card" id="billing-history"><div style="padding:20px;text-align:center;color:var(--ink3);font-size:13px">Chargement…</div></div>
@@ -1562,11 +1619,23 @@ async function saveEditCamp(id) {
 }
 
 // ═══ NAVIGATION ══════════════════════════════════════════════
+function toggleMobMenu() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('show');
+}
+function closeMobMenu() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
 function navTo(page, btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
+  closeMobMenu();
   curPage=page;
   const brandName = (_mData && _mData.brandName) || 'votre espace';
   const titles={dashboard:['Dashboard','Bienvenue — '+brandName],create:['Créer une campagne','Moins de 5 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet de vos campagnes'],consents:['Consentements RGPD','Journal complet · Conforme RGPD Art. 6 et 7'],settings:['Paramètres','Configuration de votre espace marque'],billing:['Facturation','Historique et gestion de votre plan']};
@@ -1582,6 +1651,7 @@ function wzGo(n){
   document.querySelectorAll('.step-panel').forEach((p,i)=>{p.classList[i===n?'add':'remove']('active')});
   document.querySelectorAll('.wiz-step-btn').forEach((b,i)=>{b.classList.remove('active','done');if(i<n)b.classList.add('done');else if(i===n)b.classList.add('active')});
   wzCur=n;
+  if(n===2) loadCitiesForAudience();
   if(n===4){
     document.getElementById('recap-q').textContent=document.getElementById('q-text-inp').value.substring(0,80)||'—';
     document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple · '+document.querySelectorAll('.mcq-opt-inp').length+' options',scale:'Échelle 1–10',rank:'Classement'}[curFmt];
@@ -1604,6 +1674,13 @@ function resetWizard(){
   const q2=document.getElementById('q2-text-inp');if(q2)q2.value='';
   const q3=document.getElementById('q3-text-inp');if(q3)q3.value='';
   const addBtn=document.getElementById('wz-add-q-btn');if(addBtn)addBtn.style.display='';
+  // Reset Q2/Q3 format selects and MCQ builders
+  [2,3].forEach(i=>{
+    const sel=document.getElementById('q'+i+'-fmt-sel');if(sel)sel.value='mcq';
+    showMcqForQ(i,'mcq');
+    const opts=document.getElementById('q'+i+'-mcq-opts');
+    if(opts)opts.innerHTML='<div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div>';
+  });
   // Reset MCQ options to 3 blank
   const opts=document.getElementById('mcq-options');
   if(opts){opts.innerHTML='';for(let i=0;i<3;i++){const d=document.createElement('div');d.className='mcq-option-row';d.innerHTML='<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button>';opts.appendChild(d);}}
@@ -1626,7 +1703,25 @@ function addOpt(){
   div.innerHTML='<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button>';
   document.getElementById('mcq-options').appendChild(div);
 }
-function removeOpt(btn){ const opts=document.querySelectorAll('.mcq-option-row');if(opts.length>2)btn.closest('.mcq-option-row').remove() }
+function removeOpt(btn){ const opts=document.querySelectorAll('#mcq-options .mcq-option-row');if(opts.length>2)btn.closest('.mcq-option-row').remove() }
+
+// ═══ MCQ BUILDERS Q2 / Q3 ═════════════════════════════════════
+function showMcqForQ(qNum, fmt) {
+  const b = document.getElementById('q' + qNum + '-mcq-builder');
+  if(b) b.style.display = fmt === 'mcq' ? 'block' : 'none';
+}
+function addQOpt(containerId) {
+  const c = document.getElementById(containerId);
+  if(!c) return;
+  const d = document.createElement('div'); d.className = 'mcq-option-row';
+  d.innerHTML = '<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button>';
+  c.appendChild(d);
+}
+function removeQOpt(btn) {
+  const container = btn.closest('.mcq-option-row')?.parentElement;
+  const rows = container?.querySelectorAll('.mcq-option-row');
+  if(rows && rows.length > 2) btn.closest('.mcq-option-row').remove();
+}
 
 // ═══ TEMPLATES ═══════════════════════════════════════════════
 function useTmpl(el, txt){
@@ -1652,6 +1747,37 @@ function updAud(){
   if(footer&&base) footer.textContent=base+' profils consentants · conforme RGPD';
 }
 
+// ═══ VILLES DYNAMIQUES ═══════════════════════════════════════
+let _citiesLoaded = false;
+async function loadCitiesForAudience() {
+  if(_citiesLoaded) return;
+  const og = document.getElementById('aud-loc-cities-optgroup');
+  if(!og) return;
+  try {
+    const snap = await db.collection('cities').orderBy('count','desc').limit(60).get();
+    og.innerHTML = '';
+    if(snap.empty) {
+      const opt = document.createElement('option');
+      opt.disabled = true; opt.value = '';
+      opt.textContent = 'Aucune ville enregistrée pour l\'instant';
+      og.appendChild(opt);
+    } else {
+      snap.forEach(doc => {
+        const d = doc.data();
+        const opt = document.createElement('option');
+        opt.value = doc.id;
+        const label = d.label || doc.id.charAt(0).toUpperCase() + doc.id.slice(1);
+        opt.textContent = label + ' (' + (d.count || 0) + ' utilisateur' + ((d.count||0)>1?'s':'') + ')';
+        og.appendChild(opt);
+      });
+      _citiesLoaded = true;
+    }
+  } catch(e) {
+    if(og) og.innerHTML = '<option disabled value="">Erreur de chargement</option>';
+    console.warn('loadCitiesForAudience:', e);
+  }
+}
+
 // ═══ VOLUME ══════════════════════════════════════════════════
 function updVol(v){
   v=parseInt(v)||200;
@@ -1659,8 +1785,7 @@ function updVol(v){
   // Pricing: base 99€ + per-response cost depending on location scope
   const locSel=document.getElementById('aud-loc-sel');
   const locVal=locSel?locSel.value:'national';
-  const LOC_LABELS={'national':'France entière','idf':'Île-de-France','aura':'Auvergne-Rhône-Alpes','paca':'PACA','occ':'Occitanie','na':'Nouvelle-Aquitaine','bre':'Bretagne','pdl':'Pays de la Loire','nor':'Normandie','ge':'Grand Est','hdf':'Hauts-de-France','bfc':'Bourgogne-Franche-Comté','cvl':'Centre-Val de Loire','cor':'Corse','paris':'Paris','lyon':'Lyon','marseille':'Marseille','toulouse':'Toulouse','nice':'Nice','nantes':'Nantes','montpellier':'Montpellier','strasbourg':'Strasbourg','bordeaux':'Bordeaux','lille':'Lille','rennes':'Rennes','reims':'Reims','toulon':'Toulon','grenoble':'Grenoble','dijon':'Dijon'};
-  const CITIES=['paris','lyon','marseille','toulouse','nice','nantes','montpellier','strasbourg','bordeaux','lille','rennes','reims','toulon','grenoble','dijon'];
+  const LOC_LABELS={'national':'France entière','idf':'Île-de-France','aura':'Auvergne-Rhône-Alpes','paca':'PACA','occ':'Occitanie','na':'Nouvelle-Aquitaine','bre':'Bretagne','pdl':'Pays de la Loire','nor':'Normandie','ge':'Grand Est','hdf':'Hauts-de-France','bfc':'Bourgogne-Franche-Comté','cvl':'Centre-Val de Loire','cor':'Corse'};
   const REGIONS=['idf','aura','paca','occ','na','bre','pdl','nor','ge','hdf','bfc','cvl','cor'];
   let cpr,locType;
   if(locVal==='national'){cpr=0.80;locType='national';}
@@ -1668,7 +1793,7 @@ function updVol(v){
   else{cpr=1.80;locType='city';}
   const base=99;
   const total=Math.round(base+v*cpr);
-  const locLabel=LOC_LABELS[locVal]||'France entière';
+  const locLabel=LOC_LABELS[locVal]||(locSel&&locSel.options[locSel.selectedIndex]?locSel.options[locSel.selectedIndex].text.replace(/\s*\(\d+.*?\)$/,'').trim():null)||'France entière';
   // Delay: national responds fastest, city slowest (base: 1200 responses/day avg pool)
   const poolFactor=locType==='national'?1:locType==='region'?0.3:0.1;
   const delay=Math.ceil(v/(1200*poolFactor)*24);
@@ -1863,7 +1988,7 @@ window.addEventListener('load',()=>{
 <div id="auth-loading" style="position:fixed;inset:0;z-index:10001;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(130% 120% at 55% -5%,#241F2B 0%,#0F0D12 60%);transition:opacity .7s ease">
   <img src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Noova" style="height:118px;width:auto;animation:pop .65s cubic-bezier(.34,1.56,.64,1) .2s both">
   <div style="width:36px;height:1.5px;background:linear-gradient(90deg,#f9a716,#fce1a7);border-radius:99px;animation:fadeUp .4s ease .95s both"></div>
-  <div style="font-family:'Archivo',sans-serif;font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:4px;color:rgba(255,255,255,.48);text-align:center;padding:0 24px;animation:fadeUp .5s ease 1.05s both">Là où vos avis ont de la valeur</div>
+  <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:4px;color:rgba(255,255,255,.48);text-align:center;padding:0 24px;animation:fadeUp .5s ease 1.05s both">Là où vos avis ont de la valeur</div>
 </div>
 
 <!-- ═══ AUTH WALL ══════════════════════════════════════════════ -->
@@ -1877,7 +2002,7 @@ window.addEventListener('load',()=>{
           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2000 2000" width="56" height="56"><defs><linearGradient id="nlgA" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f29715"/><stop offset="79%" stop-color="#ffda09"/></linearGradient></defs><rect fill="url(#nlgA)" x="141.86" y="141.86" width="1716.28" height="1716.28" rx="355.68" ry="355.68"/><g fill="#fff"><path d="M1403.19,463.98c40.46,25.06,86.67,54.28,125.6,79.06,47.74,30.38,61.67,93.78,31.09,141.39l-283.67,441.67c-30.7,47.8-94.51,61.38-142.01,30.21l-60.97-40c-42.22-27.7-57.87-82.1-36.82-128l220.11-480.05c25.62-55.88,94.41-76.64,146.67-44.27Z"/><path d="M691.38,979.15c-1.25-27.37-.28-53.33,4.32-79.73l12.86-73.82,16.16-91.52c3.82-21.63,1.11-35.23-12.61-53.54-8.84-11.79-22.17-18.69-37.09-17.65-23.45,1.64-46.24,12.64-60.97,31.16-11.46,14.41-14.08,32.27-12.76,50.44l24.53,103.87c3.7,15.66,2.05,32.28-3.95,46.82-6.05,14.67-18.4,24.69-32.81,31.16-35.77,16.06-75.18,17.5-111.29,2.57-25.45-10.52-44.22-32.16-49.31-59.81-5.23-28.45-5.47-56.68-3.19-85.51,5.27-66.6,32.39-127.89,78.25-176.54,47.27-50.16,105.57-83.54,169.14-110.12,91.74-38.35,231.67-86.48,323.88-37.91,22.23,11.71,40.34,27.64,54.24,49.26,29.69,46.17,41.37,102.99,31.81,157.19-5.82,33.02-19.81,62.47-38.65,89.66l-45.42,65.58c-13.64,19.7-24.55,40.2-31.71,62.88-6.49,20.57-6,40.71-.59,61.64l11.33,43.85c8.58,33.21-14.94,62.53-41.99,81.76-25.06,17.81-52.2,31.84-81.49,41.29-42.07,13.58-81.19,4.61-112.3-26.71-15.6-15.71-26.47-34.27-36.61-53.88-8.45-16.34-12.89-33.04-13.78-52.39Z"/><path d="M1186.29,1434.2c-23.99,62.59-88.82,105.24-152.01,122.04-58.25,15.48-117.63-3.98-155.06-51.03-41.21-51.82-52.84-115.75-46.29-180.89,5.29-52.64,25.07-112.72,70.6-142.42,29.62-19.32,64.67-24.84,99.06-17.95,40.28,8.08,80.89,32.55,111.76,59.9,37.63,33.34,64.41,76.17,76.23,125.1,6.95,28.76,6.28,57.68-4.29,85.24Z"/></g></svg>
         </div>
         <div>
-          <div style="font-family:'Archivo',sans-serif;font-weight:900;font-size:22px;color:#1c0e02;letter-spacing:-1px">Noova</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:22px;color:#1c0e02;letter-spacing:-1px">Noova</div>
           <div style="font-size:11px;color:rgba(28,14,2,.6);font-weight:600;margin-top:1px">Espace commerçant</div>
         </div>
       </div>
@@ -2007,13 +2132,17 @@ async function loadMerchantAndStart(uid) {
     awTab('register');
     document.getElementById('auth-wall').style.display = 'flex';
     awShowErr('Connecte-toi avec un compte commerçant.');
-    await auth.signOut(); return;
+    return;
   }
   _mData = snap.data();
 
   // Vérification statut : si pending, accès au dashboard mais création désactivée
   if(_mData.status === 'pending') {
     showPendingBanner(_mData);
+  }
+  if(_mData.status === 'rejected') {
+    showRejectedScreen(_mData);
+    return;
   }
 
   // Mettre à jour la sidebar avec les vraies données
@@ -2069,7 +2198,7 @@ function filterCampaigns() {
   const q = (document.getElementById('camp-search-inp')?.value || '').trim().toLowerCase();
   const s = document.getElementById('camp-status-sel')?.value || '';
   const filtered = _mCampaigns.filter(c => {
-    const matchName = !q || (c.title||'').toLowerCase().includes(q);
+    const matchName = !q || (c.name||c.question||'').toLowerCase().includes(q);
     const matchStatus = !s || c.status === s;
     return matchName && matchStatus;
   });
@@ -2095,7 +2224,7 @@ function renderFilteredCampaigns(camps) {
     const stCl  = { active:'st-active', ended:'st-ended', draft:'st-draft', paused:'st-draft' };
     const row = document.createElement('div');
     row.className = 'camp-row';
-    row.innerHTML = `<div>${c.title||'—'}</div><div><span class="camp-status ${stCl[c.status]||''}">${stMap[c.status]||c.status||'—'}</span></div><div>${c.answersCount||0} rép.</div><div><button class="tb-btn" style="padding:4px 10px;font-size:11px" onclick="openEditCamp('${c.id}')">Voir</button></div>`;
+    row.innerHTML = `<div>${c.name||c.question||'—'}</div><div><span class="camp-status ${stCl[c.status]||''}">${stMap[c.status]||c.status||'—'}</span></div><div>${c.answersCount||0} rép.</div><div><button class="tb-btn" style="padding:4px 10px;font-size:11px" onclick="openEditCamp('${c.id}')">Voir</button></div>`;
     table.appendChild(row);
   });
 }
@@ -2232,7 +2361,10 @@ launchCampaign = async function() {
     if(block && block.style.display !== 'none') {
       const qText = document.getElementById('q' + i + '-text-inp')?.value?.trim();
       const qFmt  = document.getElementById('q' + i + '-fmt-sel')?.value || 'text';
-      if(qText) questions.push({ q: qText, format: qFmt, options: [] });
+      const qOpts = qFmt === 'mcq'
+        ? Array.from(document.querySelectorAll('#q' + i + '-mcq-opts .mcq-opt-inp')).map(inp => inp.value.trim()).filter(Boolean)
+        : [];
+      if(qText) questions.push({ q: qText, format: qFmt, options: qOpts });
     }
   }
 
@@ -2286,6 +2418,32 @@ function showPendingBanner(data) {
 
 // ─── Écran d'attente (gardé pour compatibilité mais plus utilisé) ─
 function showPendingScreen(data) { showPendingBanner(data); }
+
+// ─── Écran compte refusé ─────────────────────────────────────
+function showRejectedScreen(data) {
+  let sc = document.getElementById('rejected-screen');
+  if(!sc) {
+    sc = document.createElement('div');
+    sc.id = 'rejected-screen';
+    sc.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#0F0D12;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center';
+    sc.innerHTML = `
+      <div style="max-width:420px">
+        <div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,.12);border:2px solid rgba(239,68,68,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="#EF4444"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </div>
+        <div style="font-family:var(--fd);font-weight:800;font-size:22px;color:#EF4444;margin-bottom:10px;letter-spacing:-.5px">Demande refusée</div>
+        <div style="font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:28px">
+          Votre demande d'accès commerçant n'a pas été approuvée.<br>
+          Cela peut être dû à des informations incomplètes ou non conformes.<br>
+          <strong style="color:var(--ink)">Contactez-nous</strong> pour en savoir plus ou soumettre une nouvelle demande.
+        </div>
+        <a href="mailto:noovaoffr@gmail.com?subject=Refus%20commerçant%20—%20${encodeURIComponent(data&&data.brandName||'')}" style="display:inline-block;background:var(--coral);color:white;padding:13px 28px;border-radius:var(--rx);font-weight:700;text-decoration:none;font-family:var(--fd);font-size:14px;margin-bottom:12px">Contacter le support</a>
+        <div><button onclick="auth.signOut()" style="background:none;border:none;color:var(--ink3);font-size:12px;cursor:pointer;padding:8px">Se déconnecter</button></div>
+      </div>`;
+    document.body.appendChild(sc);
+  }
+  sc.style.display = 'flex';
+}
 
 // ═══ RÉCOMPENSES — gestion des 5 slots ═══════════════════════
 
@@ -2464,7 +2622,11 @@ async function deleteReward(rewardId) {
 
 async function validateVoucher() {
   const u = auth.currentUser;
-  if(!u) return;
+  if(!u) {
+    const el2 = document.getElementById('voucher-result');
+    if(el2) el2.innerHTML = '<div style="background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--rs);padding:16px 18px"><div style="font-weight:700;color:#EF4444;margin-bottom:4px">⚠️ Non connecté</div><div style="font-size:12px;color:var(--ink2)">Connecte-toi à ton espace commerçant pour valider un bon.</div></div>';
+    return;
+  }
   const code = (document.getElementById('voucher-code-inp')?.value || '').trim().toUpperCase();
   if(!code) { showToast('Saisis un code','⚠️'); return; }
   const el = document.getElementById('voucher-result');

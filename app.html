@@ -45,7 +45,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,600;0,700;0,800;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Données structurées JSON-LD -->
 <script type="application/ld+json">
@@ -75,13 +75,17 @@
   --amber:#ffda09;--mint:#0BAB84;--md:rgba(11,171,132,.1);--mg:rgba(11,171,132,.2);
   --grad:linear-gradient(135deg,#f29715 0%,#ffda09 79%);--grad-soft:linear-gradient(135deg,#fffbd7,#fffef0);--gi:#1c0e02;
   --noova-brown:#1c0e02;--noova-cream:#fffbd7;--noova-gold:#ffda09;
-  --r:20px;--rs:13px;--fd:'Archivo',sans-serif;--fb:'Archivo',sans-serif;
+  --r:20px;--rs:13px;--fd:'Bricolage Grotesque',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-webkit-font-smoothing:antialiased}
 #shell{position:fixed;inset:0;background:var(--bg);overflow:hidden}
-
-.bg-label{display:none}
+@media(min-width:520px){
+  #shell{inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:390px;height:844px;border-radius:50px;box-shadow:0 60px 120px rgba(0,0,0,.55),0 0 0 12px #2A2535,0 0 0 13px #1A1820}
+  #shell::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:37px;background:#17141A;border-radius:0 0 22px 22px;z-index:999}
+  .bg-label{position:fixed;top:18px;left:50%;transform:translateX(-50%);font-family:var(--fd);font-weight:700;font-size:11px;color:rgba(255,255,255,.28);letter-spacing:1.5px;text-transform:uppercase;pointer-events:none}
+}
+@media(max-width:519px){.bg-label{display:none}}
 #app{position:absolute;inset:0;overflow:hidden;background:var(--bg)}
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;transform:translateX(26px);-webkit-overflow-scrolling:touch;background:var(--bg);padding-top:env(safe-area-inset-top,0px)}
 .screen.active{opacity:1;pointer-events:all;transform:translateX(0)}
@@ -2034,6 +2038,11 @@ async function awSubmit() {
         onboardingStep: 'merchants',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+      // Update city registry for merchant audience targeting
+      db.collection('cities').doc(cityNorm).set({
+        label: city.charAt(0).toUpperCase() + city.slice(1),
+        count: firebase.firestore.FieldValue.increment(1)
+      }, { merge: true }).catch(() => {});
       // Gérer manuellement la suite (évite race avec onAuthStateChanged)
       S.user = { name, uid: cred.user.uid };
       S.pts = 0; S.xp = 0; S._city = cityNorm; S._interests = _awInterests; S._answered = []; S._authorizedMerchants = [];
@@ -2426,8 +2435,14 @@ async function saveMerchantConsents() {
   if(btn) { btn.textContent = '…'; btn.disabled = true; }
   const newAuthorized = Object.keys(_mmConsents).filter(id => _mmConsents[id]);
   try {
+    const prevAuthorized = new Set(S._authorizedMerchants || []);
     await db.collection('users').doc(uid).update({ authorizedMerchants: newAuthorized });
     S._authorizedMerchants = newAuthorized;
+    // Update consentCount on merchant docs for audience estimation in dashboard
+    const batch = db.batch();
+    newAuthorized.forEach(mid => { if(!prevAuthorized.has(mid)) batch.update(db.collection('merchants').doc(mid), { consentCount: firebase.firestore.FieldValue.increment(1) }); });
+    prevAuthorized.forEach(mid => { if(!newAuthorized.includes(mid)) batch.update(db.collection('merchants').doc(mid), { consentCount: firebase.firestore.FieldValue.increment(-1) }); });
+    batch.commit().catch(() => {});
     if(newAuthorized.length) loadNearbyMerchants(newAuthorized);
     goTo('profile');
     document.getElementById('bnav').classList.add('show');
@@ -2493,7 +2508,7 @@ function renderBrandsFromFirestore(merchants) {
 
 async function loadCampaignsFromFirestore(userData) {
   try {
-    const snap = await db.collection('campaigns').where('status','==','active').limit(25).get();
+    const snap = await db.collection('campaigns').where('status','==','active').limit(200).get();
     const answered   = userData.answeredCampaigns   || [];
     const authorized = userData.authorizedMerchants || [];
     const campaigns = [];
@@ -2773,7 +2788,10 @@ async function saveGoogleCity() {
   if(!city) { errEl.textContent = 'Indique ta ville.'; errEl.style.display='block'; return; }
   if(!_gcwAge) { errEl.textContent = "Sélectionne ta tranche d'âge."; errEl.style.display='block'; return; }
   if(!_gcwInterests.length) { errEl.textContent = 'Sélectionne au moins un centre d\'intérêt.'; errEl.style.display='block'; return; }
-  await db.collection('users').doc(uid).update({ city: normalizeCity(city), cityLabel: city, age: _gcwAge, interests: _gcwInterests });
+  const cityNormG = normalizeCity(city);
+  await db.collection('users').doc(uid).update({ city: cityNormG, cityLabel: city, age: _gcwAge, interests: _gcwInterests });
+  // Update city registry for merchant audience targeting
+  db.collection('cities').doc(cityNormG).set({ label: city.charAt(0).toUpperCase()+city.slice(1), count: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(()=>{});
   document.getElementById('google-city-wall').style.display = 'none';
   loadUserAndStart(uid);
 }

@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="Plan%20de%20travail%208LOGO_NOOVAV2.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -21,7 +21,7 @@
   --amber:#ffda09;--brown:#1c0e02;--cream:#fffbd7;
   --mint:#0BAB84;--red:#EF4444;--violet:#7C3AED;
   --grad:linear-gradient(135deg,#f29715 0%,#ffda09 79%);
-  --fd:'Archivo',sans-serif;--fb:'Archivo',sans-serif
+  --fd:'Bricolage Grotesque',sans-serif;--fb:'Plus Jakarta Sans',sans-serif
 }
 body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100vh}
 
@@ -154,7 +154,31 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
 /* === TWO-COL LAYOUT === */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-@media(max-width:720px){.two-col{grid-template-columns:1fr}.merchant-row,.thead{grid-template-columns:1fr auto}}
+
+/* === RESPONSIVE === */
+@media(max-width:720px){
+  .two-col{grid-template-columns:1fr}
+  .merchant-row,.thead{grid-template-columns:1fr auto}
+  .merchant-row > *:nth-child(3){ display:none }
+  .thead > *:nth-child(3){ display:none }
+  .modal-fields{grid-template-columns:1fr}
+  .main{padding:16px 14px}
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;gap:0;padding-bottom:2px}
+  .tab-btn-main{padding:10px 14px;font-size:13px;white-space:nowrap}
+  .topbar{padding:0 14px;gap:10px}
+  .tb-brand{font-size:15px}
+  .tb-badge{display:none}
+  .sec-hdr h2{font-size:17px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .metrics-grid{grid-template-columns:1fr}
+  .modal-box{max-width:100%;border-radius:16px 16px 0 0}
+  .modal-ov{align-items:flex-end;padding:0}
+  .broadcast-area textarea{min-height:80px}
+}
+@media(max-width:480px){
+  .stats{grid-template-columns:repeat(2,1fr);gap:8px}
+  .merchant-row{padding:11px 12px}
+}
 
 /* === MODAL === */
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;display:none}
@@ -808,14 +832,14 @@ async function sendBroadcast() {
     document.getElementById('broadcast-msg').value = '';
     updateCharCount();
     statusEl.style.color = 'var(--mint)';
-    statusEl.textContent = `✅ Envoyé à ${targetUids.length} utilisateurs !`;
+    statusEl.textContent = `✅ Envoyé à ${_allUserIds.length} utilisateurs !`;
     setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 5000);
 
     // Rafraîchit l'historique
     const hSnap = await db.collection('broadcasts').orderBy('sentAt','desc').limit(20).get();
     _broadcastHistory = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderBroadcastHistory();
-    showToast(`📢 Notification envoyée à ${targetUids.length} users`);
+    showToast(`📢 Notification envoyée à ${_allUserIds.length} users`);
   } catch(e) {
     statusEl.textContent = 'Erreur : ' + e.message;
   }
