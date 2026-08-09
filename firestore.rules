@@ -37,7 +37,7 @@ service cloud.firestore {
       match /notifications/{notifId} {
         allow read, update: if isOwner(uid);
         allow create: if isAuth();
-        allow delete: if false;
+        allow delete: if isOwner(uid);
       }
     }
 
@@ -98,7 +98,9 @@ service cloud.firestore {
         resource.data.merchantId == request.auth.uid ||
         isFriendOf(resource.data.userId)
       );
-      allow update, delete: if false;
+      // delete : uniquement par l'auteur (suppression de compte / droit à l'effacement)
+      allow update: if false;
+      allow delete: if isAuth() && resource.data.userId == request.auth.uid;
     }
 
     // ─── Responses ───────────────────────────────────────────────────────────
@@ -108,7 +110,8 @@ service cloud.firestore {
         resource.data.userId == request.auth.uid ||
         resource.data.merchantId == request.auth.uid
       );
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if isAuth() && resource.data.userId == request.auth.uid;
     }
 
     // ─── Rewards ─────────────────────────────────────────────────────────────
@@ -147,7 +150,8 @@ service cloud.firestore {
         resource.data.merchantId == request.auth.uid &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','usedAt']) &&
         request.resource.data.status == 'used';
-      allow delete: if false;
+      // delete : uniquement par l'utilisateur concerné (suppression de compte / droit à l'effacement)
+      allow delete: if isAuth() && resource.data.userId == request.auth.uid;
     }
 
     // ─── CommunityEvents ─────────────────────────────────────────────────────
@@ -156,7 +160,8 @@ service cloud.firestore {
     match /communityEvents/{eventId} {
       allow read: if isAuth() && resource.data.get('city', null) == myCity();
       allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if isAuth() && resource.data.userId == request.auth.uid;
     }
 
     // ─── FriendCodes ─────────────────────────────────────────────────────────
@@ -166,7 +171,7 @@ service cloud.firestore {
       allow read: if isAuth();
       allow create: if isAuth() && request.resource.data.uid == request.auth.uid;
       allow update: if isAuth() && resource.data.uid == request.auth.uid;
-      allow delete: if false;
+      allow delete: if isAuth() && resource.data.uid == request.auth.uid;
     }
 
     // ─── Broadcasts ──────────────────────────────────────────────────────────

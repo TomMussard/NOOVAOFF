@@ -791,17 +791,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <div id="brand-page" class="screen"><div class="bp-wrap" id="bp-wrap"></div></div>
 
 
-<!-- JEU ENTRE AMIS -->
-<div id="game" class="screen">
-  <div class="si" style="padding:54px 18px 30px">
-    <div style="display:flex;align-items:center;gap:11px;margin-bottom:16px">
-      <div class="back-btn" style="margin-bottom:0" onclick="goNav('social')">←</div>
-      <div style="font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:-.6px;color:var(--ink)">🎮 Jeu du jour</div>
-    </div>
-    <div id="game-stage"></div>
-  </div>
-</div>
-
 <!-- BOTTOM NAV -->
 <nav class="bnav" id="bnav">
   <div class="nav-it" id="nav-home" onclick="goNav('home')"><div class="nav-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nav-lbl">Accueil</div></div>
@@ -892,7 +881,7 @@ function refreshHome(){
   if(!S.user)return;
   const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour 👋':hr<18?'Bon après-midi ☀️':'Bonsoir 🌙';
   document.getElementById('home-name').textContent=S.user.name;document.getElementById('home-pts').textContent=S.pts;
-  const targets=[1000,3000,5000,6000,10000];const tgt=targets.find(t=>t>S.xp)||10000;const prev=targets.filter(t=>t<=S.xp).pop()||0;
+  const targets=[1000,3000,6000,10000];const tgt=targets.find(t=>t>S.xp)||10000;const prev=targets.filter(t=>t<=S.xp).pop()||0;
   const pct=Math.min(95,Math.max(4,((S.xp-prev)/(tgt-prev))*100));
   document.getElementById('nm-fill').style.width=pct+'%';document.getElementById('nm-target').textContent=tgt+' xp';
   document.getElementById('nm-txt').innerHTML='Il te reste <strong>'+(tgt-S.xp)+' xp</strong> avant le palier suivant';
@@ -1064,7 +1053,7 @@ async function loadFriendAnswers() {
       if (!S._friendAnswers[d.campaignId]) S._friendAnswers[d.campaignId] = [];
       S._friendAnswers[d.campaignId].push({ uid: d.userId, answer: d.answer || '' });
     });
-  } catch(e) {}
+  } catch(e) { console.warn('loadFriendAnswers:', e); }
 }
 
 function getFriendName(uid) {
@@ -1290,7 +1279,7 @@ async function loadGroupMembers(g){
     const snap=await db.collection('users').where('city','==',city).orderBy('points','desc').limit(50).get();
     const myUid=auth.currentUser&&auth.currentUser.uid;
     const all=[];
-    snap.forEach(doc=>{const u={uid:doc.id,...doc.data()};if(u.interests&&u.interests.includes(g.interest))all.push(u);});
+    snap.forEach(doc=>{const u={uid:doc.id,...doc.data()};if(u.groups&&u.groups.includes(g.id))all.push(u);});
     const top=all.slice(0,15);
     el.innerHTML='';
     if(!top.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:13px">Sois le premier dans ce groupe dans ta ville !</div>';return;}
@@ -1482,7 +1471,11 @@ function openChatFor(friend){
   _chatMessages=[];renderChat();
   const myUid=auth.currentUser&&auth.currentUser.uid;if(!myUid){goTo('chat');return;}
   const chatId=[myUid,friendUid].sort().join('_');
-  db.collection('chats').doc(chatId).set({participants:{[myUid]:true,[friendUid]:true}},{merge:true}).catch(()=>{});
+  // .set() sur un doc existant est évalué comme "update" par les règles (bloqué) — on ne crée que si absent
+  const chatRef=db.collection('chats').doc(chatId);
+  chatRef.get().then(snap=>{
+    if(!snap.exists) chatRef.set({participants:{[myUid]:true,[friendUid]:true}}).catch(()=>{});
+  }).catch(()=>{});
   _chatUnsub=db.collection('chats').doc(chatId).collection('messages').orderBy('createdAt','asc').limit(100).onSnapshot(snap=>{
     _chatMessages=snap.docs.map(d=>({id:d.id,...d.data()}));renderChat();
   },err=>console.warn('chat:',err));
@@ -1626,7 +1619,7 @@ function openSurveyQ(){
 function startSurvey(){if(!S.sv)return;S.sv.idx=0;openSurveyQ();}
 function endSurveyEarly(){
   refreshHome();refreshWallet();
-  openReward({pts:S.sv.hookPts,total:S.pts,brand:S.sv.brand,usage:S.sv.base.usage,title:'Merci !',sub:'Tu gardes tes points, reviens quand tu veux pour le reste.',brandName:S.sv.brand});
+  openReward({pts:S.sv.hookPts,total:S.pts,brand:S.sv.brand,usage:S.sv.base.usage,title:'Merci !',sub:'Tu gardes tes points, reviens quand tu veux pour le reste.',brandName:S.sv.brand,merchantId:S.sv.base._merchantId});
   S.mode='hook';
 }
 function finishSurvey(){
@@ -1635,7 +1628,7 @@ function finishSurvey(){
   openReward({pts:sv.earned,total:S.pts,brand:sv.brand,usage:sv.base.usage,
     title:done>=sv.list.length?'Questionnaire terminé 🎉':'Bien joué !',
     sub:done>=sv.list.length?('Tu as répondu à tout le questionnaire '+sv.brand):'Tu gardes tes points, à bientôt !',
-    brandName:sv.brand});
+    brandName:sv.brand,merchantId:sv.base._merchantId});
   S.mode='hook';
 }
 
@@ -1659,7 +1652,7 @@ function submitAns(){
     showSurveyOffer();
   }else{
     refreshHome();refreshWallet();
-    openReward({pts:q.pts,total:S.pts,brand:q.brand,usage:q.usage,title:'Bien joué !',sub:'Ta réponse a été envoyée',brandName:q.brand});
+    openReward({pts:q.pts,total:S.pts,brand:q.brand,usage:q.usage,title:'Bien joué !',sub:'Ta réponse a été envoyée',brandName:q.brand,merchantId:q._merchantId});
   }
 }
 
@@ -1692,7 +1685,7 @@ function openReward(o){
   const mk=(cls,txt,fn)=>{const b=document.createElement('button');b.className=cls;b.textContent=txt;b.onclick=fn;act.appendChild(b);};
   if(S.qs&&S.qs.length>0)mk('btn-p','Question suivante →',nextQ);
   else mk('btn-p','Revenir à l’accueil',()=>goNav('home'));
-  if(o.brandName)mk('btn-s','Voir la page de '+o.brandName,()=>openBrand(o.brandName,'home'));
+  if(o.brandName)mk('btn-s','Voir la page de '+o.brandName, o.merchantId ? ()=>openBrandById(o.merchantId,o.brandName) : ()=>openBrand(o.brandName,'home'));
   if(S.qs&&S.qs.length>0)mk('btn-s','Revenir à l’accueil',()=>goNav('home'));
   spawnConfetti();goTo('reward');
 }
@@ -1747,11 +1740,14 @@ async function openBrandById(mid, fallbackName) {
   document.getElementById('bp-wrap').innerHTML='<div style="text-align:center;padding:80px 20px;color:var(--ink3);font-size:14px">Chargement…</div>';
   goTo('brand-page');
   try {
-    const [merchantSnap,campsSnap]=await Promise.all([
+    // Promise.allSettled : un des deux appels refusé par les règles ne doit pas vider toute la page
+    const [merchantRes,campsRes]=await Promise.allSettled([
       db.collection('merchants').doc(mid).get(),
       db.collection('campaigns').where('merchantId','==',mid).where('status','==','active').where('targetCity','==',normalizeCity(S._city||'')).get()
     ]);
-    const m=merchantSnap.exists?merchantSnap.data():{};
+    const merchantSnap = merchantRes.status==='fulfilled' ? merchantRes.value : null;
+    const campsSnap = campsRes.status==='fulfilled' ? campsRes.value : { forEach(){} };
+    const m=(merchantSnap&&merchantSnap.exists)?merchantSnap.data():{};
     const brandName=m.brandName||fallbackName||'Commerce';
     const camps=[];
     campsSnap.forEach(doc=>camps.push({id:doc.id,...doc.data()}));
@@ -1826,7 +1822,9 @@ function answerBrand(name){
 async function loadNearbyMerchants(merchantIds) {
   if(!merchantIds || !merchantIds.length) { S._nearbyMerchants = []; renderBrandRail(); return; }
   try {
-    const snaps = await Promise.all(merchantIds.slice(0,20).map(id => db.collection('merchants').doc(id).get()));
+    // Promise.allSettled : un commerce inaccessible (règle refusée, ex. pas encore vérifié) ne doit pas vider tout le rail
+    const results = await Promise.allSettled(merchantIds.slice(0,20).map(id => db.collection('merchants').doc(id).get()));
+    const snaps = results.filter(r => r.status === 'fulfilled').map(r => r.value);
     S._nearbyMerchants = snaps.filter(s => s.exists).map(s => ({ id: s.id, ...s.data() }));
     renderBrandRail();
     // Recharger les récompenses avec les nouveaux marchands
@@ -1865,51 +1863,8 @@ function renderBrandRail(){
 /* --- Brancher le rail sur refreshHome sans la réécrire --- */
 (function(){const _rh=refreshHome;refreshHome=function(){_rh.apply(this,arguments);renderBrandRail();};})();
 /* --- Jeu entre amis : question commune --- */
-const GAMEQ={q:'Pizza ananas : crime ou génie ?',a:'Crime 🔪',b:'Génie 🍍'};
-function openGame(){renderGameStart();goTo('game');}
-function renderGameStart(){
-  const opt=(txt)=>`<div onclick="gameReveal('${txt.replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:12px;padding:15px;background:var(--card);border:2px solid var(--bg3);border-radius:15px;margin-bottom:10px;cursor:pointer;font-size:15px;font-weight:600;color:var(--ink)"><div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--bg3);flex-shrink:0"></div><span>${txt}</span></div>`;
-  document.getElementById('game-stage').innerHTML=`
-    <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mint)">Question commune · entre amis</div>
-    <div style="font-family:var(--fd);font-weight:800;font-size:25px;line-height:1.15;letter-spacing:-.7px;color:var(--ink);margin:9px 0 8px">"${GAMEQ.q}"</div>
-    <div style="font-size:13px;color:var(--ink2);line-height:1.55;margin-bottom:18px">Réponds, puis découvre ce que tes amis ont dit. Pense comme la majorité = bonus 🎯</div>
-    ${opt(GAMEQ.a)}${opt(GAMEQ.b)}`;
-}
-function gameReveal(mine){
-  const fr=(S.friends||[]).slice(0,4);
-  const answers=fr.map((f,i)=>({n:f.n,a:(i%2===0?GAMEQ.b:GAMEQ.a)}));
-  const matches=answers.filter(x=>x.a===mine).length;
-  const compat=answers.length?Math.round(matches/answers.length*100):0;
-  const _today=new Date().toISOString().slice(0,10);
-  if(S._dailyEarnedDate!==_today){S._dailyEarned=0;S._dailyEarnedDate=_today;}
-  const _gamePts=Math.max(0,Math.min(15,DAILY_CAP-S._dailyEarned));
-  S.pts+=_gamePts;S.xp+=_gamePts;S._dailyEarned+=_gamePts;
-  if(typeof refreshHome==='function')refreshHome();if(typeof refreshWallet==='function')refreshWallet();
-  const _gUid=auth.currentUser&&auth.currentUser.uid;
-  if(_gUid&&_gamePts>0)db.collection('users').doc(_gUid).update({points:firebase.firestore.FieldValue.increment(_gamePts),xp:firebase.firestore.FieldValue.increment(_gamePts),dailyEarned:S._dailyEarned,dailyEarnedDate:_today}).catch(()=>{});
-  const rows=answers.map((x,i)=>{const c=AVC[i%AVC.length];const m=x.a===mine;return `<div style="display:flex;align-items:center;gap:12px;background:${m?'var(--md)':'var(--card)'};border:1.5px solid ${m?'var(--mg)':'var(--bg3)'};border-radius:14px;padding:13px;margin-bottom:10px"><div style="width:38px;height:38px;border-radius:50%;background:${c}22;color:${c};display:flex;align-items:center;justify-content:center;font-weight:700">${x.n[0]}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">${x.n}</div><div style="font-size:13px;color:var(--ink2);margin-top:2px">a répondu : ${x.a}</div></div>${m?'<span style="color:var(--mint);font-weight:700;font-size:13px">✓ pareil</span>':''}</div>`;}).join('');
-  const compatBlock = answers.length
-    ? `<div style="background:linear-gradient(135deg,#0E2A24,#114A3C);border-radius:18px;padding:20px;text-align:center;color:#fff;margin-top:6px">
-      <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#5FE3BC">Compatibilité du groupe</div>
-      <div style="font-family:var(--fd);font-weight:800;font-size:48px;color:#5FE3BC;line-height:1.1">${compat}%</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.82);margin-top:2px">+15 pts pour avoir joué 🎯</div>
-    </div>`
-    : `<div style="background:linear-gradient(135deg,#0E2A24,#114A3C);border-radius:18px;padding:22px;text-align:center;color:#fff;margin-top:6px">
-      <div style="font-size:28px;margin-bottom:8px">👥</div>
-      <div style="font-family:var(--fd);font-weight:800;font-size:17px;line-height:1.25;margin-bottom:8px">Ajoute des amis pour comparer tes réponses !</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.5;margin-bottom:14px">La compatibilité s'affiche quand tu as des amis sur Noova.</div>
-      <button onclick="goNav('social')" style="background:#5FE3BC;color:#0E2A24;font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:99px;padding:10px 20px;cursor:pointer">Inviter des amis →</button>
-    </div>`;
-  document.getElementById('game-stage').innerHTML=`
-    <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mint)">Ta réponse : ${mine}</div>
-    <div style="font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:-.6px;color:var(--ink);margin:9px 0 16px">Et tes amis…</div>
-    ${rows}
-    ${compatBlock}
-    <button class="btn-p" style="margin-top:16px" onclick="shareGame(this)">📣 Partager le résultat</button>
-    <button class="btn-s" style="margin-top:9px" onclick="renderGameStart()">Rejouer</button>
-    <button class="btn-s" onclick="goNav('social')">Retour à la communauté</button>`;
-}
-function shareGame(b){const t=b.textContent;b.textContent='✓ Partagé en story';setTimeout(()=>b.textContent=t,1600);}
+// Jeu entre amis retiré : fabriquait de fausses réponses (GAMEQ statique) et créditait quand même de vrais points.
+// Voir les cartes "Même avis ?" (buildSocialCard) pour l'équivalent alimenté par de vraies données Firestore.
 
 </script>
 
@@ -2299,15 +2254,19 @@ async function redeemReward(reward) {
     showVoucherError('Stock épuisé.'); return;
   }
 
-  try {
-    // Vérification perUserLimit (1 fois par personne par défaut)
-    const limit = reward.perUserLimit !== undefined ? reward.perUserLimit : 1;
-    if(limit > 0) {
+  // Vérification perUserLimit (1 fois par personne par défaut) — en échec, on bloque (fail closed)
+  const limit = reward.perUserLimit !== undefined ? reward.perUserLimit : 1;
+  if(limit > 0) {
+    try {
       const existing = await db.collection('redemptions')
         .where('userId','==',u.uid).where('rewardId','==',reward.id).limit(1).get();
       if(!existing.empty) { showVoucherError('Tu as déjà échangé cette récompense.'); return; }
+    } catch(e) {
+      console.warn('perUserLimit check:', e);
+      showVoucherError('Impossible de vérifier ton échange. Réessaie dans un instant.');
+      return;
     }
-  } catch(e) { console.warn('perUserLimit check:', e); }
+  }
 
   if(!confirm(`Échanger ${reward.cost} pts contre "${reward.label}" chez ${reward.merchantName||'ce commerce'} ?`)) return;
 
@@ -2398,6 +2357,7 @@ async function loadUserAndStart(uid) {
     S.pts              = data.points || 0;
     S.xp               = data.xp !== undefined ? data.xp : (data.points || 0);
     S.streak           = data.streak || 0;
+    S.ans              = data.ans || 0;
     S._lastAnswerDate  = data.lastAnswerDate || null;
     S._dailyEarned     = data.dailyEarned || 0;
     S._dailyEarnedDate = data.dailyEarnedDate || null;
@@ -2462,14 +2422,10 @@ async function loadUserAndStart(uid) {
 async function loadFriendsFromFirestore(uids) {
   if (!uids || !uids.length) { S.friends = []; renderFriends(); return; }
   try {
-    // Batch en groupes de 10 (get individuel par doc)
+    // Promise.allSettled : un ami inaccessible (règle refusée) ne doit pas faire échouer tous les autres
     const capped = uids.slice(0, 30);
-    const batches = [];
-    for (let i = 0; i < capped.length; i += 10) {
-      batches.push(Promise.all(capped.slice(i, i + 10).map(uid => db.collection('users').doc(uid).get())));
-    }
-    const results = await Promise.all(batches);
-    const allSnaps = results.flat();
+    const results = await Promise.allSettled(capped.map(uid => db.collection('users').doc(uid).get()));
+    const allSnaps = results.filter(r => r.status === 'fulfilled').map(r => r.value);
     const twoMinAgo = Date.now() - 2 * 60 * 1000;
     S.friends = allSnaps.filter(s => s.exists).map(s => {
       const d = s.data();
@@ -2693,7 +2649,7 @@ function getAnswerValue() {
   const ta  = document.querySelector('#ans-area .ans-ta');  if(ta)  return ta.value;
   const sel = document.querySelector('#ans-area .mcq-opt.sel span'); if(sel) return sel.textContent;
   const sv  = document.getElementById('sv');               if(sv)  return sv.textContent;
-  const rks = document.querySelectorAll('#ans-area .rank-item span');
+  const rks = document.querySelectorAll('#ans-area .rank-item .rank-txt');
   if(rks.length) return Array.from(rks).map(r=>r.textContent).join(' > ');
   return '';
 }
@@ -2703,6 +2659,9 @@ const _origSubmitAns = submitAns;
 submitAns = function() {
   const q = curQuestion();
   const answerValue = getAnswerValue();
+  // Capturé avant _origSubmitAns() : détermine si cette soumission alimente S.sv.earned
+  // (démarrage OU poursuite d'un questionnaire de suivi), pour pouvoir corriger l'affichage ensuite.
+  const touchesSurvey = (S.mode === 'survey') || !!(q && q.survey && q.survey.length);
   _origSubmitAns();
   const u = auth.currentUser;
   if(!u || !q) return;
@@ -2738,6 +2697,17 @@ submitAns = function() {
   const correction = totalEarned - q.pts;
   S.pts += correction;
   S.xp  += totalEarned;
+  if (touchesSurvey && S.sv) S.sv.earned += correction;
+
+  // Re-synchroniser l'écran récompense (déjà affiché par _origSubmitAns avec les points
+  // AVANT bonus série/streak/cap quotidien) — la correction ci-dessus le rend juste avant
+  // le prochain repaint, donc l'utilisateur ne voit jamais le mauvais total.
+  {
+    const rwPtsEl = document.getElementById('rw-pts');
+    if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
+    const rwTotalEl = document.getElementById('rw-total');
+    if (rwTotalEl) rwTotalEl.textContent = S.pts + ' pts';
+  }
 
   // ── Écriture Firestore ─────────────────────────────────────
   const batch = db.batch();
@@ -2842,6 +2812,22 @@ async function deleteMyAccount() {
   const uid = auth.currentUser && auth.currentUser.uid;
   if(!uid) return;
   try {
+    // Purge des données liées avant de supprimer le compte lui-même (droit à l'effacement)
+    for (const col of ['responses','answers','redemptions','communityEvents']) {
+      const snap = await db.collection(col).where('userId','==',uid).limit(450).get().catch(() => null);
+      if (snap && !snap.empty) {
+        const batch = db.batch();
+        snap.forEach(doc => batch.delete(doc.ref));
+        await batch.commit().catch(() => {});
+      }
+    }
+    const notifSnap = await db.collection('users').doc(uid).collection('notifications').limit(450).get().catch(() => null);
+    if (notifSnap && !notifSnap.empty) {
+      const batch = db.batch();
+      notifSnap.forEach(doc => batch.delete(doc.ref));
+      await batch.commit().catch(() => {});
+    }
+    if (S._friendCode) await db.collection('friendCodes').doc(S._friendCode).delete().catch(() => {});
     await db.collection('users').doc(uid).delete().catch(() => {});
     await auth.currentUser.delete();
   } catch(e) {
@@ -2856,15 +2842,15 @@ async function deleteMyAccount() {
 // ─── Historique depuis Firestore ──────────────────────────────
 async function loadHistFromFirestore(uid) {
   try {
-    const snap = await db.collection('responses')
+    const snap = await db.collection('answers')
       .where('userId', '==', uid)
-      .orderBy('answeredAt', 'desc')
+      .orderBy('createdAt', 'desc')
       .limit(20)
       .get();
     if(snap.empty) return;
     S.hist = snap.docs.map(d => {
       const dd = d.data();
-      return { brand: dd.brand || '—', ico: '📝', q: (dd.value || '').toString().substring(0, 40), pts: dd.points || 0 };
+      return { brand: dd.brand || '—', ico: dd.ico || '📝', q: (dd.question || '').toString().substring(0, 40), pts: dd.pointsAwarded || 0 };
     });
   } catch(e) { console.warn('loadHist:', e); }
 }
