@@ -2359,6 +2359,12 @@ async function loadUserAndStart(uid) {
     S.streak           = data.streak || 0;
     S.ans              = data.ans || 0;
     S._lastAnswerDate  = data.lastAnswerDate || null;
+    // Streak cassé si un jour a été manqué : ne pas attendre la prochaine réponse pour l'afficher à 0
+    {
+      const _today = new Date().toISOString().slice(0,10);
+      const _yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+      if (S._lastAnswerDate !== _today && S._lastAnswerDate !== _yesterday) S.streak = 0;
+    }
     S._dailyEarned     = data.dailyEarned || 0;
     S._dailyEarnedDate = data.dailyEarnedDate || null;
     S._city            = data.city || '';
