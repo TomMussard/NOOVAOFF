@@ -267,6 +267,36 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .share-row:active{background:var(--bg2)}
 /* SOCIAL */
 .social-wrap{padding:52px 0;padding-bottom:88px}
+/* STORIES BAR */
+#stories-bar::-webkit-scrollbar{display:none}
+.story-pill{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;flex-shrink:0;transition:opacity .13s}
+.story-pill:active{opacity:.65}
+.story-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:17px;border:2.5px solid var(--coral);box-sizing:border-box}
+.story-av.unseen{border-color:var(--bg3)}
+.story-name{font-size:10px;font-weight:600;color:var(--ink2);max-width:54px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;text-align:center}
+/* FRIEND BADGE */
+.friend-badge{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:4px 8px 4px 5px;background:rgba(242,151,21,.07);border:1px solid rgba(242,151,21,.18);border-radius:99px;font-size:10px;color:var(--ink2)}
+.fb-av{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;flex-shrink:0}
+/* SOCIAL CARD */
+.social-card{margin:0 0 10px;background:linear-gradient(135deg,rgba(242,151,21,.05),rgba(255,218,9,.03));border:1.5px solid rgba(242,151,21,.2);border-radius:var(--r);padding:14px;overflow:hidden}
+.sc-label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--coral);margin-bottom:9px}
+.sc-friend{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.sc-fav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:12px;flex-shrink:0}
+.sc-fname{font-size:13px;font-weight:700;color:var(--ink)}
+.sc-brand{font-size:11px;color:var(--ink3)}
+.sc-q{font-size:11px;color:var(--ink3);margin-bottom:7px}
+.sc-answer{font-size:13px;color:var(--ink);border-left:2.5px solid var(--coral);padding-left:9px;margin:0 0 12px;line-height:1.5;font-style:italic}
+.sc-actions{display:flex;gap:7px}
+.sc-btn{padding:9px 14px;border-radius:10px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:var(--fd);flex:1;text-align:center;transition:all .13s}
+.sc-btn:active{transform:scale(.96)}
+.sc-btn.p{background:var(--grad);color:var(--gi)}
+.sc-btn.g{background:var(--bg2);color:var(--ink2)}
+/* COMPARE SHEET */
+#compare-sheet{position:fixed;inset:0;z-index:8000;display:none;align-items:flex-end}
+#compare-sheet.open{display:flex}
+.cs-ov{position:absolute;inset:0;background:rgba(0,0,0,.38);backdrop-filter:blur(3px);cursor:pointer}
+.cs-box{position:relative;z-index:1;width:100%;background:var(--card);border-radius:24px 24px 0 0;padding:0 20px calc(32px + env(safe-area-inset-bottom,0px));max-height:82vh;overflow-y:auto}
+.cs-handle{width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:13px auto 20px}
 .soc-hdr{padding:0 20px 11px;display:flex;align-items:center;justify-content:space-between}
 .soc-title{font-family:var(--fd);font-weight:800;font-size:25px;letter-spacing:-.8px;color:var(--ink)}
 .soc-bell{width:38px;height:38px;border-radius:11px;background:var(--card);border:1.5px solid var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative}
@@ -578,6 +608,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div style="flex:1"><div class="s-num" id="streak-num">1</div><div class="s-lbl">jour(s) consécutif(s)</div></div>
       <div class="s-dots" id="streak-dots"></div>
     </div>
+    <div id="stories-bar" style="display:none;overflow-x:auto;margin:0 0 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch"><div id="stories-inner" style="display:flex;gap:10px;padding:2px 18px 10px"></div></div>
     <div class="sec-lbl">QUESTION DU JOUR</div>
     <div class="today-card" id="today-card" onclick="openQ(0)">
       <div class="tc-top"><div class="tc-brand" id="tc-brand">Commerce</div><div class="tc-pts" id="tc-pts">+pts</div></div>
@@ -786,7 +817,12 @@ const S={user:null,pts:0,xp:0,ans:0,streak:1,themes:['sport','gaming','culture']
 const DAILY_CAP=300;
 const BRANDMETA={};
 function logoHTML(name,size){const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#6A6470'};const s=size||44;const r=Math.round(s*0.27),fs=Math.round(s*0.44);return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;}
-function normalizeCity(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');}
+function normalizeCity(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
+function getCampaignCity(c){return normalizeCity(c?.city || c?.targetCity || c?.cityLabel || '');}
+function getCampaignTargetVolume(c){return Number(c?.targetVolume ?? c?.volumeTarget ?? 100) || 100;}
+function getCampaignAgeRanges(c){const raw = c?.ageRanges || (c?.ageRange ? [c.ageRange] : []); return (Array.isArray(raw) ? raw : [raw]).filter(Boolean);}
+function getCampaignQuestions(c){return Array.isArray(c?.questions) && c.questions.length ? c.questions : [{ q: c?.question || '', format: c?.format || 'text', options: c?.options || [] }];}
+function normalizeAgeRange(v){return (v||'').toString().trim().toLowerCase();}
 const GROUPS=[
   {id:'food',  ico:'🍔', n:'Restos & Gourmands',   interest:'restauration', meta:'Bons plans food dans ta ville',  color:'#E07D0A'},
   {id:'sport', ico:'🏋️', n:'Sport & Forme',        interest:'sport',        meta:'Défis et promos sportifs',       color:'#0BAB84'},
@@ -864,16 +900,30 @@ function refreshHome(){
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<7;i++){const d=document.createElement('div');d.className='sdk'+(i<S.streak?' done':'');sd.appendChild(d)}
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent='+'+q.pts+' pts';document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .tc-cta').style.display='flex'}
   else{document.getElementById('tc-brand').textContent='Pas encore de question';document.getElementById('tc-pts').textContent='📍';document.getElementById('tc-q').textContent='Aucun commerce de ta zone n\'a encore posté de question. Reviens bientôt !';document.getElementById('today-card').style.opacity='.75';document.querySelector('#today-card .tc-cta').style.display='none'}
+  renderStoriesBar();
   renderQueue();
 }
 function renderQueue(){
   const el=document.getElementById('queue-list');el.innerHTML='';
   if(!S.qs||S.qs.length<=1){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--ink2);font-size:13px">'+(S.qs&&S.qs.length===1?'🎉 Plus que cette question !':'📭 Pas d\'autres questions pour l\'instant.')+'</div>';return}
+  window._scPool = {};
+  const clrs=['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
+  let cnt=0;
   S.qs.slice(1).forEach((q,i)=>{
     const d=document.createElement('div');d.className='q-card';d.onclick=()=>openQ(i+1);
     const tc={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle',rank:'Classement'}[q.type];
-    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--coral)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta"><span class="q-pts-t">+${q.pts} pts</span><span class="q-type-t">${tc}</span></div></div>`;
-    el.appendChild(d);
+    const friendArr=(S._friendAnswers||{})[q._firestoreId]||[];
+    let badge='';
+    if(friendArr.length){
+      const fn=getFriendName(friendArr[0].uid);
+      const more=friendArr.length-1;
+      const c=clrs[(fn||'A').charCodeAt(0)%clrs.length];
+      const verb=friendArr.length>1?'ont répondu':'a répondu';
+      badge=`<div class="friend-badge"><div class="fb-av" style="background:${c}22;color:${c}">${(fn||'?')[0]}</div>${esc(fn)}${more>0?` + ${more} ami${more>1?'s':''}`:''} ${verb}</div>`;
+    }
+    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--coral)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta"><span class="q-pts-t">+${q.pts} pts</span><span class="q-type-t">${tc}</span></div>${badge}</div>`;
+    el.appendChild(d);cnt++;
+    if(cnt%3===0){const sc=buildSocialCard();if(sc)el.appendChild(sc);}
   });
 }
 function openQ(idx){
@@ -931,14 +981,7 @@ function shareReward(){
 function renderSocial(){
   const fe=document.getElementById('panel-feed');
   fe.innerHTML='';
-  // Bloc jeu du jour (statique, en construction)
-  fe.insertAdjacentHTML('beforeend',`<div onclick="openGame()" style="margin:0 18px 14px;background:linear-gradient(135deg,#0E2A24,#114A3C);border-radius:var(--r);padding:16px 17px;color:#fff;cursor:pointer;position:relative;overflow:hidden">
-    <div style="font-family:var(--fd);font-weight:700;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:#5FE3BC">🎮 Jeu du jour · question commune</div>
-    <div style="font-family:var(--fd);font-weight:800;font-size:19px;line-height:1.18;letter-spacing:-.5px;margin:9px 0 13px">${GAMEQ.q}</div>
-    <div style="display:flex;align-items:center">
-      <span style="font-family:var(--fd);font-weight:700;font-size:13px;background:rgba(255,255,255,.14);padding:7px 13px;border-radius:99px">Jouer maintenant →</span>
-    </div>
-  </div>`);
+  // Jeu du jour retiré du périmètre (GAMEQ est une donnée statique, pas encore de vraie source Firestore)
   // Chargement du feed depuis Firestore
   fe.insertAdjacentHTML('beforeend','<div id="feed-content" style="min-height:80px;padding:0 18px"><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div></div>');
   loadCommunityFeed();
@@ -949,22 +992,15 @@ async function loadCommunityFeed() {
   const el = document.getElementById('feed-content');
   if (!el) return;
 
-  // Feed vide si aucun ami
-  if (!S._friendUids || S._friendUids.length === 0) {
-    el.innerHTML = `<div style="text-align:center;padding:48px 24px">
-      <div style="font-size:44px;margin-bottom:14px">👥</div>
-      <div style="font-family:var(--fd);font-weight:900;font-size:21px;color:var(--ink);letter-spacing:-.5px;margin-bottom:8px">Ton feed est vide</div>
-      <div style="font-size:13px;color:var(--ink2);line-height:1.65;margin-bottom:22px">Ajoute des amis pour voir leur activité ici.<br>Partage ton code depuis l'onglet <strong>Amis</strong>.</div>
-      <button style="padding:13px 26px;background:var(--grad);border:none;border-radius:99px;font-family:var(--fd);font-weight:700;font-size:14px;color:var(--gi);cursor:pointer;box-shadow:0 4px 14px var(--cg)" onclick="document.querySelector('.tab-btn:nth-child(2)').click()">Ajouter des amis →</button>
-    </div>`;
+  const city = normalizeCity(S._city || '');
+  if (!city) {
+    el.innerHTML = '<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">Renseigne ta ville pour voir l’activité locale.</div>';
     return;
   }
 
   try {
-    // whereIn supporte max 30 valeurs
-    const uids = S._friendUids.slice(0, 30);
     const snap = await db.collection('communityEvents')
-      .where('userId', 'in', uids)
+      .where('city', '==', city)
       .orderBy('createdAt', 'desc')
       .limit(25)
       .get();
@@ -972,8 +1008,8 @@ async function loadCommunityFeed() {
     el.innerHTML = '';
     if (snap.empty) {
       el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
-        Tes amis n'ont pas encore répondu à des questions.<br>
-        <span style="color:var(--coral);font-weight:600">Encourage-les ! 👋</span>
+        Aucune activité dans ta ville pour l'instant.<br>
+        <span style="color:var(--coral);font-weight:600">Les réponses apparaissent ici dès qu'elles sont publiées.</span>
       </div>`;
       return;
     }
@@ -1005,6 +1041,92 @@ function timeAgo(date) {
 
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── Social feed helpers ──────────────────────────────────────
+window._scPool = {};
+
+async function loadFriendAnswers() {
+  S._friendAnswers = {};
+  if (!S._friendUids || !S._friendUids.length) return;
+  if (!S.qs || !S.qs.length) return;
+  const uids = S._friendUids.slice(0, 30);
+  const campSet = new Set(S.qs.map(q => q._firestoreId).filter(Boolean));
+  if (!campSet.size) return;
+  try {
+    const snap = await db.collection('answers')
+      .where('userId', 'in', uids)
+      .limit(200)
+      .get();
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (!campSet.has(d.campaignId)) return;
+      if (!S._friendAnswers[d.campaignId]) S._friendAnswers[d.campaignId] = [];
+      S._friendAnswers[d.campaignId].push({ uid: d.userId, answer: d.answer || '' });
+    });
+  } catch(e) {}
+}
+
+function getFriendName(uid) {
+  const f = (S.friends || []).find(x => x.uid === uid);
+  return f ? f.n : 'Un ami';
+}
+
+function renderStoriesBar() {
+  const bar = document.getElementById('stories-bar');
+  const inner = document.getElementById('stories-inner');
+  if (!bar || !inner) return;
+  const friends = S.friends && S.friends.length ? S.friends.slice(0, 10) : [];
+  if (!friends.length) { bar.style.display = 'none'; return; }
+  const colors = ['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623','#E07D0A'];
+  inner.innerHTML = friends.map(f => {
+    const c = colors[(f.n || 'A').charCodeAt(0) % colors.length];
+    const hasAct = Object.values(S._friendAnswers || {}).some(arr => arr.some(a => a.uid === f.uid));
+    return `<div class="story-pill" onclick="goNav('social')"><div class="story-av${hasAct ? '' : ' unseen'}" style="background:${c}20;color:${c}">${(f.n||'?')[0].toUpperCase()}</div><div class="story-name">${esc(f.n||'Ami')}</div></div>`;
+  }).join('');
+  bar.style.display = 'block';
+}
+
+function buildSocialCard() {
+  const answered = S._answered || [];
+  const entries = Object.entries(S._friendAnswers || {});
+  const eligible = entries.filter(([campId, arr]) => arr.length && !answered.includes(campId));
+  if (!eligible.length) return null;
+  const [campId, arr] = eligible[Math.floor(Math.random() * eligible.length)];
+  const friendData = arr[0];
+  const friendName = getFriendName(friendData.uid);
+  const q = (S.qs || []).find(x => x._firestoreId === campId);
+  if (!q) return null;
+  const colors = ['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
+  const c = colors[(friendName||'A').charCodeAt(0) % colors.length];
+  const shortAns = (friendData.answer || '').substring(0, 80);
+  const key = '_sc' + Math.random().toString(36).slice(2);
+  window._scPool[key] = { campId, friendName, friendAnswer: shortAns, qIdx: S.qs.indexOf(q) };
+  const d = document.createElement('div');
+  d.className = 'social-card';
+  d.innerHTML = `<div class="sc-label">👥 Même avis ?</div><div class="sc-friend"><div class="sc-fav" style="background:${c}20;color:${c}">${(friendName||'?')[0].toUpperCase()}</div><div><div class="sc-fname">${esc(friendName)}</div><div class="sc-brand">a répondu à ${esc(q.brand)}</div></div></div><div class="sc-q">${esc((q.q||'').substring(0,60))}…</div><div class="sc-answer">${shortAns ? '&ldquo;' + esc(shortAns) + '&rdquo;' : '…'}</div><div class="sc-actions"><button class="sc-btn p" onclick="openCompare('${key}')">Comparer →</button><button class="sc-btn g" onclick="this.closest('.social-card').remove()">Passer</button></div>`;
+  return d;
+}
+
+function openCompare(key) {
+  const data = window._scPool && window._scPool[key];
+  if (!data) return;
+  const { campId, friendName, friendAnswer, qIdx } = data;
+  const q = (S.qs || []).find(x => x._firestoreId === campId);
+  const sheet = document.getElementById('compare-sheet');
+  const content = document.getElementById('cs-content');
+  if (!sheet || !content) return;
+  const colors = ['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
+  const c = colors[(friendName||'A').charCodeAt(0) % colors.length];
+  const brand = q ? q.brand : '';
+  const qText = q ? q.q : '';
+  content.innerHTML = `<div style="font-family:var(--fd);font-weight:800;font-size:20px;color:var(--ink);letter-spacing:-.5px;margin-bottom:4px">Même avis que ${esc(friendName)} ?</div><div style="font-size:12px;color:var(--ink3);margin-bottom:18px">${esc(brand)}</div><div style="font-size:12px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">La question</div><div style="font-size:14px;color:var(--ink);line-height:1.55;margin-bottom:16px">${esc(qText)}</div><div style="font-size:12px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">La réponse de ${esc(friendName)}</div><div style="padding:12px 14px;background:${c}12;border:1.5px solid ${c}30;border-radius:12px;font-size:13px;color:var(--ink);line-height:1.55;font-style:italic;margin-bottom:22px">${friendAnswer ? '&ldquo;' + esc(friendAnswer) + '&rdquo;' : '…'}</div><button style="width:100%;padding:15px;background:var(--grad);border:none;border-radius:13px;font-family:var(--fd);font-weight:800;font-size:15px;color:var(--gi);cursor:pointer;box-shadow:0 6px 20px rgba(242,151,21,.3);margin-bottom:8px" onclick="closeCompare();openQ(${Math.max(0,qIdx)})">Je réponds aussi →</button><button style="width:100%;padding:11px;background:none;border:none;font-size:13px;color:var(--ink3);cursor:pointer;font-family:var(--fb)" onclick="closeCompare()">Fermer</button>`;
+  sheet.classList.add('open');
+}
+
+function closeCompare() {
+  const s = document.getElementById('compare-sheet');
+  if (s) s.classList.remove('open');
 }
 function initFriendsPanel(){
   const fp=document.getElementById('panel-friends');
@@ -1097,7 +1219,7 @@ async function loadCityRanking() {
   try{
     const snap=await db.collection('users')
       .where('city','==',city)
-      .orderBy('xp','desc')
+      .orderBy('points','desc')
       .limit(20)
       .get();
     const myUid=auth.currentUser&&auth.currentUser.uid;
@@ -1115,7 +1237,7 @@ async function loadCityRanking() {
       const name=u.name||u.displayName||'Anonyme';
       const c=isMe?'#E07D0A':AVC[i%AVC.length];
       const d=document.createElement('div');d.className='fi';
-      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--coral);font-weight:700':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.xp||0} xp</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;
+      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--coral);font-weight:700':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.points || u.xp || 0} pts</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;
       el.appendChild(d);
     });
     if(!all.length)el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:13px">Sois le premier à répondre dans ta ville !</div>';
@@ -1165,7 +1287,7 @@ async function loadGroupMembers(g){
   const city=normalizeCity(S._city||'');
   if(!city){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:13px">Renseigne ta ville pour voir les membres.</div>';return;}
   try{
-    const snap=await db.collection('users').where('city','==',city).orderBy('xp','desc').limit(50).get();
+    const snap=await db.collection('users').where('city','==',city).orderBy('points','desc').limit(50).get();
     const myUid=auth.currentUser&&auth.currentUser.uid;
     const all=[];
     snap.forEach(doc=>{const u={uid:doc.id,...doc.data()};if(u.interests&&u.interests.includes(g.interest))all.push(u);});
@@ -1176,7 +1298,7 @@ async function loadGroupMembers(g){
     top.forEach((u,i)=>{
       const isMe=u.uid===myUid;const name=u.name||'Anonyme';const c=isMe?'#E07D0A':AVC[i%AVC.length];
       const d=document.createElement('div');d.className='fi';
-      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--coral);font-weight:700':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.xp||0} xp</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;
+      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--coral);font-weight:700':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.points || u.xp || 0} pts</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;
       el.appendChild(d);
     });
   }catch(e){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Impossible de charger les membres.</div>';}
@@ -1466,12 +1588,6 @@ window.addEventListener('load',()=>{renderBrands();});
    NOOVA, Questionnaires opt-in + pages entreprise (ajout)
    ============================================================ */
 
-/* --- Questions de suivi (le "reste du questionnaire") par marque --- */
-(function attachSurveys(){
-  const SV={};
-  if(typeof QS!=='undefined')QS.forEach(q=>{q.survey=SV[q.brand]||[]});
-})();
-
 /* --- Profils entreprise (chargés depuis Firestore) --- */
 const BRANDPROFILE={};
 
@@ -1586,7 +1702,7 @@ function exitQuestion(){if(S.mode==='survey'&&S.sv)finishSurvey();else goNav('ho
 
 /* --- Pages entreprise --- */
 function brandSurveys(name){
-  const out=[];const hook=(typeof QS!=='undefined')?QS.find(q=>q.brand===name):null;
+  const out=[];const hook=null;
   if(hook){const n=1+(hook.survey?hook.survey.length:0);const tot=hook.pts+(hook.survey?hook.survey.reduce((a,b)=>a+b.pts,0):0);const status=S.done&&S.done[name]?'done':'active';out.push({q:hook.q,n,tot,status});}
   const p=BRANDPROFILE[name];if(p&&p.extra)p.extra.forEach(e=>out.push({q:e.q,status:e.status}));
   return out;
@@ -1633,7 +1749,7 @@ async function openBrandById(mid, fallbackName) {
   try {
     const [merchantSnap,campsSnap]=await Promise.all([
       db.collection('merchants').doc(mid).get(),
-      db.collection('campaigns').where('merchantId','==',mid).where('status','==','active').get()
+      db.collection('campaigns').where('merchantId','==',mid).where('status','==','active').where('targetCity','==',normalizeCity(S._city||'')).get()
     ]);
     const m=merchantSnap.exists?merchantSnap.data():{};
     const brandName=m.brandName||fallbackName||'Commerce';
@@ -1699,7 +1815,7 @@ function openBrandFromQ(){
 }
 function answerBrand(name){
   if(S.done&&S.done[name])return;
-  const hook=(typeof QS!=='undefined')?QS.find(q=>q.brand===name):null;if(!hook)return;
+  const hook=null;if(!hook)return;
   S.mode='hook';S.curQ=Object.assign({},hook);S.qIdx=-1;
   const pg=document.getElementById('q-prog');pg.innerHTML='';const d=document.createElement('div');d.className='q-seg cur';pg.appendChild(d);
   fillQuestion(S.curQ,{skipLabel:'Passer',skipFn:"goNav('home')"});
@@ -2028,15 +2144,18 @@ async function awSubmit() {
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       const cityNorm = normalizeCity(city);
       await db.collection('users').doc(cred.user.uid).set({
+        role: 'user',
         name, email, city: cityNorm, cityLabel: city,
+        ageRange: _awAge,
         age: _awAge,
         interests: _awInterests,
         points: 0, xp: 0, streak: 0,
-        lastAnswerDate: null, dailyEarned: 0, dailyEarnedDate: null,
+        lastDailyDate: null, lastAnswerDate: null, dailyEarned: 0, dailyEarnedDate: null,
         answeredCampaigns: [],
         authorizedMerchants: [],
         onboardingStep: 'merchants',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       // Update city registry for merchant audience targeting
       db.collection('cities').doc(cityNorm).set({
@@ -2045,7 +2164,7 @@ async function awSubmit() {
       }, { merge: true }).catch(() => {});
       // Gérer manuellement la suite (évite race avec onAuthStateChanged)
       S.user = { name, uid: cred.user.uid };
-      S.pts = 0; S.xp = 0; S._city = cityNorm; S._interests = _awInterests; S._answered = []; S._authorizedMerchants = [];
+      S.pts = 0; S.xp = 0; S._city = cityNorm; S._age = _awAge; S._interests = _awInterests; S._answered = []; S._authorizedMerchants = [];
       document.getElementById('auth-wall').style.display = 'none';
       await loadMerchantsForOnboarding({ city, interests: _awInterests, authorizedMerchants: [] });
       return;
@@ -2068,7 +2187,7 @@ async function loadRewardsFromFirestore() {
     return;
   }
   try {
-    const snap = await db.collection('rewards').where('active','==',true).get();
+    const snap = await db.collection('rewards').where('active','==',true).where('city','==',city).get();
     const rewards = [];
     snap.forEach(doc => {
       const d = doc.data();
@@ -2283,7 +2402,7 @@ async function loadUserAndStart(uid) {
     S._dailyEarned     = data.dailyEarned || 0;
     S._dailyEarnedDate = data.dailyEarnedDate || null;
     S._city            = data.city || '';
-    S._age             = data.age  || '';
+    S._age             = data.ageRange || data.age || '';
     S._interests       = data.interests || [];
     S._answered        = data.answeredCampaigns || [];
     S._authorizedMerchants = data.authorizedMerchants || [];
@@ -2318,6 +2437,7 @@ async function loadUserAndStart(uid) {
     }
 
     await loadCampaignsFromFirestore(data);
+    loadFriendAnswers().then(() => { renderStoriesBar(); renderQueue(); }).catch(() => {});
   } catch(e) {
     const fbName = auth.currentUser && auth.currentUser.displayName;
     S.user = { name: fbName || 'Toi', uid };
@@ -2360,6 +2480,7 @@ async function loadFriendsFromFirestore(uids) {
     // Recharge le feed avec la nouvelle liste d'amis
     const feedEl = document.getElementById('feed-content');
     if (feedEl) loadCommunityFeed();
+    loadFriendAnswers().then(() => { renderStoriesBar(); renderQueue(); }).catch(() => {});
   } catch (e) { console.warn('loadFriends:', e); }
 }
 
@@ -2379,7 +2500,7 @@ async function openManageMerchants() {
 
   try {
     const city = normalizeCity(S._city || '');
-    const snap = await db.collection('merchants').where('status','==','verified').get();
+    const snap = await db.collection('merchants').where('status','==','verified').where('city','==',city).get();
     const allMerchants = [];
     snap.forEach(doc => {
       const d = doc.data();
@@ -2461,7 +2582,7 @@ async function loadMerchantsForOnboarding(userData) {
   document.getElementById('bnav').classList.remove('show');
   try {
     const userCity = normalizeCity(userData.city || S._city || '');
-    const snap = await db.collection('merchants').where('status','==','verified').get();
+    const snap = await db.collection('merchants').where('status','==','verified').where('city','==',userCity).get();
     S._merchantsForOnboarding = [];
     snap.forEach(doc => {
       const d = doc.data();
@@ -2508,24 +2629,36 @@ function renderBrandsFromFirestore(merchants) {
 
 async function loadCampaignsFromFirestore(userData) {
   try {
-    const snap = await db.collection('campaigns').where('status','==','active').limit(200).get();
-    const answered   = userData.answeredCampaigns   || [];
+    const city = normalizeCity(userData.city || S._city || '');
+    const answered = userData.answeredCampaigns || [];
     const authorized = userData.authorizedMerchants || [];
+    const userAge = normalizeAgeRange(userData.ageRange || userData.age || '');
+
+    const verifiedSnap = await db.collection('merchants').where('status', '==', 'verified').where('city', '==', city).get();
+    const verifiedMerchants = {};
+    verifiedSnap.forEach(doc => {
+      const d = doc.data();
+      if (!d || !doc.id) return;
+      verifiedMerchants[doc.id] = d;
+    });
+
+    const snap = await db.collection('campaigns').where('status', '==', 'active').where('targetCity', '==', city).limit(200).get();
     const campaigns = [];
     snap.forEach(doc => {
-      if(answered.includes(doc.id)) return;
+      if (answered.includes(doc.id)) return;
       const d = doc.data();
-      if(d.targetCity && userData.city &&
-         normalizeCity(d.targetCity) !== normalizeCity(userData.city)) return;
-      // Filtre volume cible : campagne pleine
-      if(d.targetVolume && (d.answersCount || 0) >= d.targetVolume) return;
-      // Filtre âge : si la campagne cible des tranches précises
-      if(d.ageRanges && d.ageRanges.length && userData.age && !d.ageRanges.includes(userData.age)) return;
-      // Filtre authorizedMerchants
-      if(authorized.length && d.merchantId && !authorized.includes(d.merchantId)) return;
-      // Barème NOOVA : Q1=10, Q2=15, Q3=20, bonus série=+10
-      const allQs = d.questions && d.questions.length ? d.questions
-        : [{ q: d.question, format: d.format || 'text', options: d.options || [] }];
+      const campaignCity = getCampaignCity(d);
+      const merchantData = verifiedMerchants[d.merchantId] || null;
+      const merchantCity = normalizeCity(merchantData?.city || d.city || '');
+      if (city && campaignCity && campaignCity !== city) return;
+      if (city && merchantCity && merchantCity !== city) return;
+      if (!merchantData) return;
+      if (getCampaignTargetVolume(d) && (d.responsesCount || d.answersCount || 0) >= getCampaignTargetVolume(d)) return;
+      const ageRanges = getCampaignAgeRanges(d).map(normalizeAgeRange);
+      if (ageRanges.length && userAge && !ageRanges.includes(userAge)) return;
+      if (authorized.length && d.merchantId && !authorized.includes(d.merchantId)) return;
+
+      const allQs = getCampaignQuestions(d);
       const SCALE = [10, 15, 20];
       const surveyList = allQs.slice(1).map((sq, idx) => ({
         _firestoreId: doc.id, _merchantId: d.merchantId || null, _questionIdx: idx + 1,
@@ -2549,7 +2682,8 @@ async function loadCampaignsFromFirestore(userData) {
     });
     S.qs = campaigns;
     S.qIdx = 0;
-  } catch(e) {
+  } catch (e) {
+    console.warn('loadCampaignsFromFirestore:', e);
     S.qs = [];
   }
 }
@@ -2609,8 +2743,20 @@ submitAns = function() {
   const batch = db.batch();
   const qIdx = q._questionIdx || 0;
   const respId = q._firestoreId ? `${uid}_${q._firestoreId}_q${qIdx}` : null;
-  const respRef = respId ? db.collection('answers').doc(respId) : db.collection('answers').doc();
-  batch.set(respRef, {
+  const responseRef = respId ? db.collection('responses').doc(respId) : db.collection('responses').doc();
+  const answerRef = respId ? db.collection('answers').doc(respId) : db.collection('answers').doc();
+  batch.set(responseRef, {
+    userId: uid,
+    userCity: normalizeCity(S._city || ''),
+    campaignId: q._firestoreId || null,
+    merchantId: q._merchantId || null,
+    qid: `q${qIdx}`,
+    type: q.type || 'text',
+    value: answerValue,
+    points: totalEarned,
+    answeredAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: false });
+  batch.set(answerRef, {
     campaignId:          q._firestoreId || null,
     userId:              uid,
     merchantId:          q._merchantId  || null,
@@ -2635,8 +2781,10 @@ submitAns = function() {
     ans:    firebase.firestore.FieldValue.increment(1),
     dailyEarned:     S._dailyEarned,
     dailyEarnedDate: today,
+    lastDailyDate:   today,
     lastAnswerDate:  today,
-    streak:          S.streak
+    streak:          S.streak,
+    updatedAt:       firebase.firestore.FieldValue.serverTimestamp()
   };
   if(q._firestoreId && qIdx === 0) upd.answeredCampaigns = firebase.firestore.FieldValue.arrayUnion(q._firestoreId);
   batch.update(userRef, upd);
@@ -2708,15 +2856,15 @@ async function deleteMyAccount() {
 // ─── Historique depuis Firestore ──────────────────────────────
 async function loadHistFromFirestore(uid) {
   try {
-    const snap = await db.collection('answers')
+    const snap = await db.collection('responses')
       .where('userId', '==', uid)
-      .orderBy('createdAt', 'desc')
+      .orderBy('answeredAt', 'desc')
       .limit(20)
       .get();
     if(snap.empty) return;
     S.hist = snap.docs.map(d => {
       const dd = d.data();
-      return { brand: dd.brand || '—', ico: dd.ico || '❓', q: (dd.question || dd.answer || '').substring(0, 40), pts: dd.pointsAwarded || 0 };
+      return { brand: dd.brand || '—', ico: '📝', q: (dd.value || '').toString().substring(0, 40), pts: dd.points || 0 };
     });
   } catch(e) { console.warn('loadHist:', e); }
 }
@@ -2743,16 +2891,21 @@ async function signInWithGoogle() {
     if(!snap.exists) {
       // Nouveau compte Google — créer profil de base
       await db.collection('users').doc(uid).set({
+        role: 'user',
         name:  cred.user.displayName || 'Utilisateur',
         email: cred.user.email,
         city:  '',
+        cityLabel: '',
+        ageRange: '',
+        age: '',
         points: 0, xp: 0, streak: 0,
-        lastAnswerDate: null, dailyEarned: 0, dailyEarnedDate: null,
+        lastDailyDate: null, lastAnswerDate: null, dailyEarned: 0, dailyEarnedDate: null,
         answeredCampaigns: [],
         authorizedMerchants: [],
         onboardingStep: 'merchants',
         interests: [],
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       // Demander la ville
       document.getElementById('auth-wall').style.display = 'none';
@@ -2789,7 +2942,7 @@ async function saveGoogleCity() {
   if(!_gcwAge) { errEl.textContent = "Sélectionne ta tranche d'âge."; errEl.style.display='block'; return; }
   if(!_gcwInterests.length) { errEl.textContent = 'Sélectionne au moins un centre d\'intérêt.'; errEl.style.display='block'; return; }
   const cityNormG = normalizeCity(city);
-  await db.collection('users').doc(uid).update({ city: cityNormG, cityLabel: city, age: _gcwAge, interests: _gcwInterests });
+  await db.collection('users').doc(uid).update({ city: cityNormG, cityLabel: city, ageRange: _gcwAge, age: _gcwAge, interests: _gcwInterests, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
   // Update city registry for merchant audience targeting
   db.collection('cities').doc(cityNormG).set({ label: city.charAt(0).toUpperCase()+city.slice(1), count: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(()=>{});
   document.getElementById('google-city-wall').style.display = 'none';
@@ -2831,6 +2984,15 @@ auth.onAuthStateChanged(user => {
   }
 });
 </script>
+
+<!-- COMPARE SHEET -->
+<div id="compare-sheet">
+  <div class="cs-ov" onclick="closeCompare()"></div>
+  <div class="cs-box">
+    <div class="cs-handle"></div>
+    <div id="cs-content"></div>
+  </div>
+</div>
 
 <!-- Loader initial — seul écran visible au démarrage -->
 <div id="app-loader" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(130% 120% at 55% -5%,#241F2B 0%,#0F0D12 60%);transition:opacity .7s ease">

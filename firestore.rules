@@ -12,12 +12,25 @@ service cloud.firestore {
     function getMerchant(merchantId) {
       return get(/databases/$(database)/documents/merchants/$(merchantId)).data;
     }
+    function isFriendOf(otherUid) {
+      return isAuth() &&
+        otherUid in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('friendUids', []);
+    }
+    function isAdmin() {
+      return isAuth() && request.auth.token.email == 'noovaoffr@gmail.com';
+    }
+    function myCity() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('city', null);
+    }
 
     // ─── Users ────────────────────────────────────────────────────────────────
-    // Lecture : tout user connecté (profils semi-publics pour amis/classement)
+    // Lecture : soi-même, ses amis, les autres users de sa propre ville (classement/groupes), ou l'admin
     // Écriture : propriétaire uniquement
     match /users/{uid} {
-      allow read: if isAuth();
+      allow read: if isOwner(uid) ||
+        isFriendOf(uid) ||
+        isAdmin() ||
+        (isAuth() && myCity() != null && resource.data.get('city', null) == myCity());
       allow write: if isOwner(uid);
 
       // Notifications subcollection
@@ -29,14 +42,14 @@ service cloud.firestore {
     }
 
     // ─── Merchants ────────────────────────────────────────────────────────────
-    // Lecture : commerçant vérifié (pour l'onboarding users) OU propriétaire OU admin
+    // Lecture : commerçant vérifié de MA ville (onboarding/découverte) OU propriétaire OU admin
     // Écriture : uniquement le propriétaire (ownerUid) OU admin
     match /merchants/{merchantId} {
       allow read: if isAuth() && (
-        resource.data.status == 'verified' ||
+        (resource.data.status == 'verified' && resource.data.get('city', null) == myCity()) ||
         resource.data.ownerUid == request.auth.uid ||
         merchantId == request.auth.uid ||
-        request.auth.token.email == 'noovaoffr@gmail.com'
+        isAdmin()
       );
       allow create: if isAuth() && (
         request.resource.data.ownerUid == request.auth.uid ||
@@ -45,23 +58,25 @@ service cloud.firestore {
       allow update: if isAuth() && (
         resource.data.ownerUid == request.auth.uid ||
         merchantId == request.auth.uid ||
-        request.auth.token.email == 'noovaoffr@gmail.com'
+        isAdmin()
       );
       allow delete: if false;
     }
 
     // ─── Campaigns ────────────────────────────────────────────────────────────
-    // Lecture : campagnes actives pour tous les users connectés (filtre ville côté client)
-    // Écriture : uniquement le commerçant propriétaire, avec validation des champs
+    // Lecture : campagnes actives de MA ville pour tous les users connectés, ou par le commerçant propriétaire
+    // Écriture : uniquement le commerçant propriétaire, vérifié, avec validation des champs
     match /campaigns/{campaignId} {
       allow read: if isAuth() && (
-        resource.data.status == 'active' ||
+        (resource.data.status == 'active' && resource.data.get('targetCity', null) == myCity()) ||
         resource.data.merchantId == request.auth.uid
       );
       allow create: if isAuth() &&
         request.resource.data.merchantId == request.auth.uid &&
         request.resource.data.questions.size() <= 3 &&
-        request.resource.data.status in ['active', 'draft', 'paused'];
+        request.resource.data.status in ['active', 'draft', 'paused'] &&
+        getMerchant(request.auth.uid).status == 'verified' &&
+        request.resource.data.targetCity == getMerchant(request.auth.uid).city;
       allow update: if isAuth() && (
         // Le commerçant peut modifier sa campagne
         resource.data.merchantId == request.auth.uid
@@ -80,20 +95,33 @@ service cloud.firestore {
       allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
       allow read: if isAuth() && (
         resource.data.userId == request.auth.uid ||
+        resource.data.merchantId == request.auth.uid ||
+        isFriendOf(resource.data.userId)
+      );
+      allow update, delete: if false;
+    }
+
+    // ─── Responses ───────────────────────────────────────────────────────────
+    match /responses/{responseId} {
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAuth() && (
+        resource.data.userId == request.auth.uid ||
         resource.data.merchantId == request.auth.uid
       );
       allow update, delete: if false;
     }
 
     // ─── Rewards ─────────────────────────────────────────────────────────────
-    // Lecture : récompenses actives pour tous les users connectés
-    // Écriture : uniquement le commerçant propriétaire
+    // Lecture : récompenses actives de MA ville pour tous les users connectés
+    // Écriture : uniquement le commerçant propriétaire, vérifié
     match /rewards/{rewardId} {
       allow read: if isAuth() && (
-        resource.data.active == true ||
+        (resource.data.active == true && resource.data.get('city', null) == myCity()) ||
         resource.data.merchantId == request.auth.uid
       );
-      allow create: if isAuth() && request.resource.data.merchantId == request.auth.uid;
+      allow create: if isAuth() &&
+        request.resource.data.merchantId == request.auth.uid &&
+        getMerchant(request.auth.uid).status == 'verified';
       allow update: if isAuth() && (
         // Commerçant : modification complète
         resource.data.merchantId == request.auth.uid
@@ -123,10 +151,10 @@ service cloud.firestore {
     }
 
     // ─── CommunityEvents ─────────────────────────────────────────────────────
-    // Lecture : tout utilisateur connecté (filtre ville côté client)
+    // Lecture : événements de MA ville uniquement
     // Création : uniquement pour soi-même
     match /communityEvents/{eventId} {
-      allow read: if isAuth();
+      allow read: if isAuth() && resource.data.get('city', null) == myCity();
       allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
       allow update, delete: if false;
     }
@@ -144,7 +172,7 @@ service cloud.firestore {
     // ─── Broadcasts ──────────────────────────────────────────────────────────
     // Historique des notifications diffusées par l'admin
     match /broadcasts/{id} {
-      allow read, create: if isAuth() && request.auth.token.email == 'noovaoffr@gmail.com';
+      allow read, create: if isAdmin();
       allow update, delete: if false;
     }
 
@@ -167,7 +195,8 @@ service cloud.firestore {
     // ─── Cities ──────────────────────────────────────────────────────────────
     match /cities/{cityId} {
       allow read: if isAuth();
-      allow write: if false;
+      allow create, update: if isAuth();
+      allow delete: if false;
     }
 
     // ─── Friend notifications ─────────────────────────────────────────────────
@@ -183,7 +212,7 @@ service cloud.firestore {
       allow create: if isAuth() && request.resource.data.merchantId == request.auth.uid;
       allow read: if isAuth() && (
         resource.data.merchantId == request.auth.uid ||
-        request.auth.token.email == 'noovaoffr@gmail.com'
+        isAdmin()
       );
       allow update, delete: if false;
     }

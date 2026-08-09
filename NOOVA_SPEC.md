@@ -26,7 +26,7 @@ NOOVA est une app **hyperlocale** de feedback commerçant. Deux interfaces :
 
 - **Front** : HTML/CSS existant + JavaScript en **modules ES natifs** (`<script type="module">`). **Pas de framework, pas de bundler** au départ (les fichiers doivent pouvoir être servis en statique). Si tu juges Vite nécessaire plus tard, propose-le d'abord, ne l'impose pas.
 - **Backend / base de données** : **Firebase** — Authentication (Email/Password + Google), **Cloud Firestore**, Storage (pour les logos, optionnel).
-- **Firebase SDK v10 modular**, importé depuis le CDN gstatic (`https://www.gstatic.com/firebasejs/...`).
+- **Firebase SDK v10, build « compat »** (namespace global `firebase.*`, `firebase-app-compat.js` / `firebase-auth-compat.js` / `firebase-firestore-compat.js` depuis le CDN gstatic). *Mise à jour post-audit (2026-08-09) : `app.html`, `noova_dashboard.html` et `noova_admin.html` utilisent déjà tous les trois ce SDK de façon cohérente ; on le documente comme le standard réel du projet plutôt que de migrer vers le modulaire v10 sans bénéfice utilisateur avant le lancement beta.*
 - **Hébergement** : **Vercel** (statique). **Domaine** : **OVH** (DNS pointant vers Vercel).
 - Les **clés Firebase Web** (`apiKey`, etc.) sont **publiques par nature** : les mettre dans `src/firebase/config.js` est acceptable. La sécurité réelle est assurée par les **règles Firestore**, pas par le secret des clés. **Aucune clé admin / service account ne doit jamais être committée.**
 
@@ -330,8 +330,11 @@ Formulaire (réutilise l'UI existante) qui renseigne :
 
 ---
 
-## 13. Points à me confirmer en Phase 0
-1. Noms réels des fichiers (`app.html` / `dashboard.html` ?) et où est le proto actuel.
-2. « 3 questions max » = **par campagne** (mon hypothèse) ou par commerçant au total ?
-3. Vérification 24h : automatique (Cloud Function, plan Blaze) ou manuelle pour le MVP ?
-4. Un utilisateur ne voit que les campagnes des commerçants qu'il a **explicitement autorisés** (mon hypothèse), ou aussi celles qui matchent ses **intérêts** même sans autorisation ?
+## 13. Points à me confirmer en Phase 0 — tranchés lors de l'audit du 2026-08-09
+
+1. ✅ Noms réels des fichiers : `app.html` (résident) et `noova_dashboard.html` (commerçant), déjà en place et actifs. Un troisième fichier non prévu au départ, `noova_admin.html`, sert d'outil interne (vérification commerçant, gestion users, broadcasts) — gardé tel quel pour la beta.
+2. ✅ « 3 questions max » = **par campagne**, pas de plafond global par commerçant (comportement déjà implémenté dans le wizard de `noova_dashboard.html`, confirmé comme définitif).
+3. ✅ Vérification commerçant : **manuelle**, via `noova_admin.html` (compte admin unique `noovaoffr@gmail.com`), pas de Cloud Function/plan Blaze pour la beta. Renforcé côté `firestore.rules` : un commerçant `status:'pending'` ne peut plus créer de `campaigns`/`rewards` visibles, même en appelant le SDK directement (auparavant seul le dashboard bloquait ça côté UI).
+4. ✅ Filtrage des campagnes côté résident : uniquement les commerces **explicitement autorisés** (`users.authorizedMerchants`) — confirmé, comportement déjà implémenté dans `loadCampaignsFromFirestore()`.
+
+Voir l'audit complet (plan de session du 2026-08-09) pour le détail des écarts trouvés entre ce document et l'état réel du dépôt, notamment : le cloisonnement par ville (Règle d'or 3) qui n'était pas appliqué au niveau des règles Firestore avant cette date, et un bug bloquant la boucle points/réponses (`campaigns.answersCount`/`responsesCount` en conflit avec la règle Firestore), tous deux corrigés.
