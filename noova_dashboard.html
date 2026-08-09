@@ -1865,7 +1865,7 @@ function spawnConfetti(){
 }
 
 // ═══ TOAST ═══════════════════════════════════════════════════
-function normalizeCity(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');}
+function normalizeCity(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 let toastTimer=null;
 function showToast(msg,ico='✅'){
@@ -2111,12 +2111,15 @@ async function awSubmit() {
       if(!brand || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       await db.collection('merchants').doc(cred.user.uid).set({
-        brandName: brand, email, sector: sector||'Commerce', city: normalizeCity(city), cityLabel: city,
+        role: 'merchant',
+        name: brand,
+        brandName: brand, email, sector: sector||'Commerce', theme: (sector||'Commerce').toLowerCase(), city: normalizeCity(city), cityLabel: city,
         ownerUid: cred.user.uid,
         status: 'pending',
         submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
         plan: 'starter',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     }
   } catch(e) {
@@ -2351,7 +2354,9 @@ launchCampaign = async function() {
   const options  = Array.from(document.querySelectorAll('.mcq-opt-inp')).map(i=>i.value.trim()).filter(Boolean);
   const volume   = parseInt(document.getElementById('vol-num')?.textContent)||100;
   const themes   = Array.from(document.querySelectorAll('.th-chip.sel')).map(el=>el.textContent.replace(/[^\w\s\-éèêàùç]/gi,'').trim());
-  const city     = _mData.city || '';
+  const city     = normalizeCity(_mData.city || _mData.cityLabel || '');
+  const cityLabel = _mData.cityLabel || _mData.city || '';
+  const ageRanges = Array.from(document.querySelectorAll('.age-chip.sel')).map(el => el.textContent.trim()).filter(Boolean);
   const campName = document.getElementById('camp-name-inp')?.value?.trim() || q1.substring(0,60);
 
   // Collecter les questions supplémentaires
@@ -2372,6 +2377,7 @@ launchCampaign = async function() {
     await db.collection('campaigns').add({
       merchantId:      u.uid,
       merchantName:    _mData.brandName || '',
+      merchantTheme:   _mData.sector || 'Commerce',
       brandEmoji:      '🏪',
       name:            campName,
       sector:          _mData.sector || 'Commerce',
@@ -2379,13 +2385,19 @@ launchCampaign = async function() {
       questions,
       format:          curFmt,
       options,
+      city:            city,
+      cityLabel,
       targetCity:      city,
+      ageRanges,
       targetInterests: themes,
+      targetVolume:    volume,
       volumeTarget:    volume,
       pointsPerAnswer: 20,
       answersCount:    0,
+      responsesCount:  0,
       status:          'active',
-      createdAt:       firebase.firestore.FieldValue.serverTimestamp()
+      createdAt:       firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:       firebase.firestore.FieldValue.serverTimestamp()
     });
     _origLaunchCampaign();
   } catch(e) {
@@ -2759,12 +2771,15 @@ async function saveGoogleMerchant() {
   const email = gmw._email || auth.currentUser?.email || '';
   if(!uid) return;
   await db.collection('merchants').doc(uid).set({
-    brandName: brand, email, sector: sector||'Commerce', city,
+    role: 'merchant',
+    name: brand,
+    brandName: brand, email, sector: sector||'Commerce', theme: (sector||'Commerce').toLowerCase(), city: normalizeCity(city), cityLabel: city,
     ownerUid: uid,
     status: 'pending',
     submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
     plan: 'starter',
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   gmw.style.display = 'none';
   loadMerchantAndStart(uid);
