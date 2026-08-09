@@ -75,8 +75,9 @@ service cloud.firestore {
         request.resource.data.merchantId == request.auth.uid &&
         request.resource.data.questions.size() <= 3 &&
         request.resource.data.status in ['active', 'draft', 'paused'] &&
-        getMerchant(request.auth.uid).status == 'verified' &&
-        request.resource.data.targetCity == getMerchant(request.auth.uid).city;
+        getMerchant(request.auth.uid).get('status', null) == 'verified' &&
+        (getMerchant(request.auth.uid).get('city', null) == null ||
+         request.resource.data.get('targetCity', null) == getMerchant(request.auth.uid).get('city', null));
       allow update: if isAuth() && (
         // Le commerçant peut modifier sa campagne
         resource.data.merchantId == request.auth.uid
@@ -124,7 +125,7 @@ service cloud.firestore {
       );
       allow create: if isAuth() &&
         request.resource.data.merchantId == request.auth.uid &&
-        getMerchant(request.auth.uid).status == 'verified';
+        getMerchant(request.auth.uid).get('status', null) == 'verified';
       allow update: if isAuth() && (
         // Commerçant : modification complète
         resource.data.merchantId == request.auth.uid
