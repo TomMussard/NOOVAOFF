@@ -811,7 +811,7 @@ function getCampaignCity(c){return normalizeCity(c?.city || c?.targetCity || c?.
 function getCampaignTargetVolume(c){return Number(c?.targetVolume ?? c?.volumeTarget ?? 100) || 100;}
 function getCampaignAgeRanges(c){const raw = c?.ageRanges || (c?.ageRange ? [c.ageRange] : []); return (Array.isArray(raw) ? raw : [raw]).filter(Boolean);}
 function getCampaignQuestions(c){return Array.isArray(c?.questions) && c.questions.length ? c.questions : [{ q: c?.question || '', format: c?.format || 'text', options: c?.options || [] }];}
-function normalizeAgeRange(v){return (v||'').toString().trim().toLowerCase();}
+function normalizeAgeRange(v){return (v||'').toString().trim().toLowerCase().replace(/–|—/g,'-');}
 const GROUPS=[
   {id:'food',  ico:'🍔', n:'Restos & Gourmands',   interest:'restauration', meta:'Bons plans food dans ta ville',  color:'#E07D0A'},
   {id:'sport', ico:'🏋️', n:'Sport & Forme',        interest:'sport',        meta:'Défis et promos sportifs',       color:'#0BAB84'},
