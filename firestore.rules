@@ -69,7 +69,8 @@ service cloud.firestore {
     match /campaigns/{campaignId} {
       allow read: if isAuth() && (
         (resource.data.status == 'active' && resource.data.get('targetCity', null) == myCity()) ||
-        resource.data.merchantId == request.auth.uid
+        resource.data.merchantId == request.auth.uid ||
+        isAdmin()
       );
       allow create: if isAuth() &&
         request.resource.data.merchantId == request.auth.uid &&
@@ -110,7 +111,8 @@ service cloud.firestore {
     match /rewards/{rewardId} {
       allow read: if isAuth() && (
         (resource.data.active == true && resource.data.get('city', null) == myCity()) ||
-        resource.data.merchantId == request.auth.uid
+        resource.data.merchantId == request.auth.uid ||
+        isAdmin()
       );
       allow create: if isAuth() &&
         request.resource.data.merchantId == request.auth.uid &&
@@ -216,6 +218,20 @@ service cloud.firestore {
     match /invoices/{invId} {
       allow read: if isAuth() && resource.data.merchantId == request.auth.uid;
       allow write: if false;
+    }
+
+    // ─── Consent events ──────────────────────────────────────────────────────
+    // Journal horodaté des octrois/révocations de consentement (preuve RGPD Art. 7).
+    // Création : uniquement par l'utilisateur concerné. Lecture : l'utilisateur,
+    // le commerçant concerné, ou l'admin. Jamais modifiable ni supprimable (journal).
+    match /consentEvents/{eventId} {
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAuth() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.merchantId == request.auth.uid ||
+        isAdmin()
+      );
+      allow update, delete: if false;
     }
   }
 }

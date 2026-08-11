@@ -834,7 +834,7 @@ const GIFTS=[];
 const TIERS=[{n:'Curieux',min:0,max:1000,ico:'🌱',c:'#6A6470'},{n:'Actif',min:1000,max:3000,ico:'⚡',c:'#A14E08'},{n:'Expert',min:3000,max:6000,ico:'🎯',c:'#E07D0A'},{n:'Ambassadeur',min:6000,max:10000,ico:'🏆',c:'#F5A623'},{n:'Légende',min:10000,max:99999,ico:'👑',c:'#0BAB84'}];
 const FEED=[];
 let cur='splash',obIdx=0,boFmt='text',navS=['home','social','rewards-tab','profile'];
-let _chatUnsub=null,_chatFriendUid=null,_chatFriendName='',_chatMessages=[];
+let _chatUnsub=null,_chatFriendUid=null,_chatFriendName='',_chatMessages=[],_chatOpenToken=0;
 
 function goTo(id){
   const p=document.getElementById(cur);
@@ -871,12 +871,33 @@ function toggleAllBrands(){
 function renderBrands(){
   document.getElementById('brands-list').innerHTML='';
 }
+// Journal RGPD (preuve de consentement, Art. 7) : ajoute au batch fourni un événement
+// 'granted' ou 'revoked' pour chaque commerce dont l'autorisation a changé.
+function logConsentEvents(batch, uid, prevIds, newIds){
+  const prevSet=new Set(prevIds||[]);
+  const newSet=new Set(newIds||[]);
+  const segment={city:S._city||'',ageRange:S._age||'',interests:S._interests||[]};
+  newSet.forEach(mid=>{
+    if(!prevSet.has(mid)){
+      batch.set(db.collection('consentEvents').doc(),{userId:uid,merchantId:mid,action:'granted',segment,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    }
+  });
+  prevSet.forEach(mid=>{
+    if(!newSet.has(mid)){
+      batch.set(db.collection('consentEvents').doc(),{userId:uid,merchantId:mid,action:'revoked',segment,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    }
+  });
+}
+
 async function doBrands(){
   const uid=auth.currentUser?.uid;
   if(!uid){goTo('home');return;}
   const authorized=(S._merchantsForOnboarding||[]).filter(m=>S.brands[m.id]!==false).map(m=>m.id);
   try{
-    await db.collection('users').doc(uid).update({authorizedMerchants:authorized,onboardingStep:'done'});
+    const batch=db.batch();
+    batch.update(db.collection('users').doc(uid),{authorizedMerchants:authorized,onboardingStep:'done'});
+    logConsentEvents(batch,uid,S._authorizedMerchants||[],authorized);
+    await batch.commit();
     S._authorizedMerchants=authorized;
     // Peupler _nearbyMerchants depuis les objets déjà en mémoire (onboarding)
     S._nearbyMerchants=(S._merchantsForOnboarding||[]).filter(m=>authorized.includes(m.id));
@@ -1479,14 +1500,20 @@ function openChatFor(friend){
   _chatMessages=[];renderChat();
   const myUid=auth.currentUser&&auth.currentUser.uid;if(!myUid){goTo('chat');return;}
   const chatId=[myUid,friendUid].sort().join('_');
-  // .set() sur un doc existant est évalué comme "update" par les règles (bloqué) — on ne crée que si absent
+  const myToken=++_chatOpenToken;
+  // .set() sur un doc existant est évalué comme "update" par les règles (bloqué) — on ne crée que si absent.
+  // Le listener de messages exige que 'chats/{chatId}' existe déjà (règles de sécurité) : on attend la
+  // création avant de s'abonner, sinon le tout premier abonnement échoue en permission-denied et ne se
+  // rétablit jamais tout seul (le SDK Firestore ne retente pas après une erreur de permission).
   const chatRef=db.collection('chats').doc(chatId);
   chatRef.get().then(snap=>{
-    if(!snap.exists) chatRef.set({participants:{[myUid]:true,[friendUid]:true}}).catch(()=>{});
-  }).catch(()=>{});
-  _chatUnsub=db.collection('chats').doc(chatId).collection('messages').orderBy('createdAt','asc').limit(100).onSnapshot(snap=>{
-    _chatMessages=snap.docs.map(d=>({id:d.id,...d.data()}));renderChat();
-  },err=>console.warn('chat:',err));
+    if(!snap.exists) return chatRef.set({participants:{[myUid]:true,[friendUid]:true}});
+  }).catch(()=>{}).then(()=>{
+    if(myToken!==_chatOpenToken) return; // un autre chat a été ouvert entre-temps
+    _chatUnsub=db.collection('chats').doc(chatId).collection('messages').orderBy('createdAt','asc').limit(100).onSnapshot(snap=>{
+      _chatMessages=snap.docs.map(d=>({id:d.id,...d.data()}));renderChat();
+    },err=>console.warn('chat:',err));
+  });
   goTo('chat');
 }
 function renderChat(){
@@ -1954,13 +1981,16 @@ function renderBrandRail(){
       Continuer avec Google
     </button>
 
-    <button onclick="signInWithApple()" style="width:100%;padding:14px 16px;border-radius:14px;background:#000;border:none;color:#fff;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:9px">
+    <!-- Apple Sign-In en pause : bouton masqué tant que le Services ID + la clé côté
+         Apple Developer et le provider Firebase ne sont pas configurés (signInWithApple()
+         reste dans le code, prêt à réactiver — il suffit de retirer ce display:none). -->
+    <button onclick="signInWithApple()" style="display:none;width:100%;padding:14px 16px;border-radius:14px;background:#000;border:none;color:#fff;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer;align-items:center;justify-content:center;gap:10px;margin-top:9px">
       <svg width="16" height="18" viewBox="0 0 16 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path fill="#fff" d="M13.05 9.53c-.02-2.06 1.68-3.05 1.76-3.1-.96-1.4-2.45-1.6-2.98-1.62-1.27-.13-2.48.75-3.12.75-.65 0-1.63-.73-2.69-.71-1.38.02-2.66.8-3.37 2.03-1.44 2.5-.37 6.2 1.03 8.23.69.99 1.5 2.1 2.58 2.06 1.03-.04 1.42-.67 2.67-.67 1.24 0 1.6.67 2.69.65 1.11-.02 1.82-1 2.49-2 .79-1.14 1.11-2.25 1.13-2.31-.02-.01-2.17-.83-2.19-3.31zM11 3.34c.56-.68.94-1.62.83-2.56-.81.03-1.79.54-2.37 1.22-.52.6-.97 1.57-.85 2.49.91.07 1.83-.46 2.39-1.15z"/></svg>
       Continuer avec Apple
     </button>
   </div>
 
-  <div style="margin-top:24px;font-size:11px;color:var(--ink3);text-align:center;line-height:1.8">En continuant tu acceptes nos <span style="color:var(--coral)">CGU</span> et notre <span style="color:var(--coral)">Politique de confidentialité</span></div>
+  <div style="margin-top:24px;font-size:11px;color:var(--ink3);text-align:center;line-height:1.8">En continuant tu acceptes nos <a href="cgu.html" target="_blank" rel="noopener" style="color:var(--coral)">CGU</a> et notre <a href="confidentialite.html" target="_blank" rel="noopener" style="color:var(--coral)">Politique de confidentialité</a></div>
 </div>
 
 <!-- Complétion profil Google (profil manquant) -->
@@ -2114,6 +2144,7 @@ async function awSubmit() {
       if(!_awInterests.length) { awShowErr('Sélectionne au moins un centre d\'intérêt.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       _skipNextAuth = true;
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      cred.user.sendEmailVerification().catch(() => {}); // non bloquant : l'email arrive en tâche de fond
       const cityNorm = normalizeCity(city);
       await db.collection('users').doc(cred.user.uid).set({
         role: 'user',
@@ -2565,13 +2596,14 @@ async function saveMerchantConsents() {
   const newAuthorized = Object.keys(_mmConsents).filter(id => _mmConsents[id]);
   try {
     const prevAuthorized = new Set(S._authorizedMerchants || []);
-    await db.collection('users').doc(uid).update({ authorizedMerchants: newAuthorized });
-    S._authorizedMerchants = newAuthorized;
-    // Update consentCount on merchant docs for audience estimation in dashboard
     const batch = db.batch();
+    batch.update(db.collection('users').doc(uid), { authorizedMerchants: newAuthorized });
+    // Update consentCount on merchant docs for audience estimation in dashboard
     newAuthorized.forEach(mid => { if(!prevAuthorized.has(mid)) batch.update(db.collection('merchants').doc(mid), { consentCount: firebase.firestore.FieldValue.increment(1) }); });
     prevAuthorized.forEach(mid => { if(!newAuthorized.includes(mid)) batch.update(db.collection('merchants').doc(mid), { consentCount: firebase.firestore.FieldValue.increment(-1) }); });
-    batch.commit().catch(() => {});
+    logConsentEvents(batch, uid, prevAuthorized, newAuthorized);
+    await batch.commit();
+    S._authorizedMerchants = newAuthorized;
     if(newAuthorized.length) loadNearbyMerchants(newAuthorized);
     goTo('profile');
     document.getElementById('bnav').classList.add('show');
@@ -2848,7 +2880,10 @@ async function revokeAllConsents() {
   if(!confirm('Révoquer tous les consentements ? Les commerçants ne pourront plus te cibler. Action irréversible.')) return;
   const uid = auth.currentUser && auth.currentUser.uid;
   if(!uid) return;
-  await db.collection('users').doc(uid).update({ authorizedMerchants: [], onboardingStep: 'merchants' }).catch(() => {});
+  const batch = db.batch();
+  batch.update(db.collection('users').doc(uid), { authorizedMerchants: [], onboardingStep: 'merchants' });
+  logConsentEvents(batch, uid, S._authorizedMerchants || [], []);
+  await batch.commit().catch(() => {});
   S._authorizedMerchants = [];
   S._nearbyMerchants = [];
   showVoucherError('✓ Tous les consentements ont été révoqués.');

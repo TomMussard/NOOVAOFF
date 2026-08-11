@@ -247,6 +247,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <button class="tab-btn-main active" onclick="switchTab('entreprises',this)">🏪 Entreprises<span class="tab-badge" id="tb-ent">—</span></button>
     <button class="tab-btn-main" onclick="switchTab('utilisateurs',this)">👥 Utilisateurs<span class="tab-badge" id="tb-usr">—</span></button>
     <button class="tab-btn-main" onclick="switchTab('diffusion',this)">📢 Diffusion</button>
+    <button class="tab-btn-main" onclick="switchTab('lancement',this)">🚦 Lancement</button>
   </div>
 
   <!-- ══════════════ TAB ENTREPRISES ══════════════ -->
@@ -388,6 +389,12 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     </div>
   </div>
 
+  <!-- ══════════════ TAB LANCEMENT ══════════════ -->
+  <div id="tab-lancement" style="display:none">
+    <div class="sec-hdr"><h2>Lancement</h2><p>Combien de commerçants sont réellement opérationnels par ville — vérifié, avec au moins une campagne active et une récompense active. C'est ce qu'un nouvel utilisateur voit en arrivant sur l'app.</p></div>
+    <div id="readiness-cities"><div class="loading">Chargement</div></div>
+  </div>
+
 </div>
 
 <!-- MERCHANT DETAIL MODAL -->
@@ -482,11 +489,12 @@ function doLogout() { auth.signOut().then(() => location.reload()); }
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn-main').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  ['entreprises','utilisateurs','diffusion'].forEach(t => {
+  ['entreprises','utilisateurs','diffusion','lancement'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
   if (tab === 'diffusion') initDiffusion();
+  if (tab === 'lancement') loadReadiness();
 }
 
 // ── Merchants ──────────────────────────────────────────────────────────────
@@ -499,6 +507,69 @@ async function loadMerchants() {
     document.getElementById('tb-ent').textContent = allMerchants.length;
   } catch(e) {
     document.getElementById('list-pending').innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
+  }
+}
+
+// ── Lancement (readiness par ville) ─────────────────────────────────────────
+// Un commerçant "opérationnel" = vérifié + au moins une campagne active + au
+// moins une récompense active. C'est ce qui fait qu'un nouvel utilisateur voit
+// vraiment quelque chose en arrivant sur l'app, pas un écran vide.
+async function loadReadiness() {
+  const el = document.getElementById('readiness-cities');
+  if (!el) return;
+  el.innerHTML = '<div class="loading">Chargement</div>';
+  try {
+    if (!allMerchants.length) await loadMerchants();
+
+    const [campSnap, rewSnap] = await Promise.all([
+      db.collection('campaigns').where('status', '==', 'active').get(),
+      db.collection('rewards').where('active', '==', true).get()
+    ]);
+    const merchantsWithCampaign = new Set();
+    campSnap.forEach(d => { const c = d.data(); if (c.merchantId) merchantsWithCampaign.add(c.merchantId); });
+    const merchantsWithReward = new Set();
+    rewSnap.forEach(d => { const r = d.data(); if (r.merchantId) merchantsWithReward.add(r.merchantId); });
+
+    const byCity = {};
+    allMerchants.forEach(m => {
+      if (m.status !== 'verified') return;
+      const key = m.city || '—';
+      if (!byCity[key]) byCity[key] = { label: m.cityLabel || m.city || 'Ville inconnue', verified: 0, withCampaign: 0, withReward: 0, operational: 0 };
+      const c = byCity[key];
+      c.verified++;
+      const hasCamp = merchantsWithCampaign.has(m.id);
+      const hasRew = merchantsWithReward.has(m.id);
+      if (hasCamp) c.withCampaign++;
+      if (hasRew) c.withReward++;
+      if (hasCamp && hasRew) c.operational++;
+    });
+
+    const cities = Object.values(byCity).sort((a, b) => b.verified - a.verified);
+    if (!cities.length) {
+      el.innerHTML = '<div class="empty">Aucun commerçant vérifié pour l\'instant — rien à afficher tant que le premier n\'est pas validé dans l\'onglet Entreprises.</div>';
+      return;
+    }
+    el.innerHTML = cities.map(c => `
+      <div class="card">
+        <div class="card-title">📍 ${esc(c.label)}<span class="badge" style="background:var(--ad);color:var(--brown)">${c.operational} / ${c.verified} opérationnels</span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:18px 20px">
+          <div style="text-align:center">
+            <div style="font-family:var(--fd);font-weight:800;font-size:26px;color:var(--ink)">${c.verified}</div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:2px">Commerçants vérifiés</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:var(--fd);font-weight:800;font-size:26px;color:var(--ink)">${c.withCampaign}</div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:2px">Avec campagne active</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:var(--fd);font-weight:800;font-size:26px;color:var(--ink)">${c.withReward}</div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:2px">Avec récompense active</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
   }
 }
 

@@ -1228,9 +1228,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div style="background:var(--md);border:1px solid rgba(11,171,132,.2);border-radius:var(--rs);padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:12px">
           <span style="font-size:22px">🛡️</span>
           <div style="font-size:13px;color:var(--ink2);line-height:1.65;flex:1"><strong style="color:var(--mint)">Conformité RGPD totale.</strong> Chaque profil a consenti explicitement à votre commerce via l'application Noova. Les consentements sont horodatés, granulaires et révocables en 1 tap par l'utilisateur. Vous ne pouvez pas modifier ces paramètres — seul l'utilisateur en a le contrôle.</div>
-          <button class="tb-btn tb-btn-ghost" style="font-size:12px">📥 Export RGPD</button>
+          <button class="tb-btn tb-btn-ghost" style="font-size:12px" id="export-rgpd-btn" onclick="exportConsentJournal()">📥 Export RGPD</button>
         </div>
-        <div class="section-title">Journal des consentements (30 derniers jours)</div>
+        <div class="section-title">Journal des consentements (50 derniers événements)</div>
         <div class="card">
           <div style="display:grid;grid-template-columns:160px 1fr 1fr 120px 100px;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Date</div>
@@ -1239,7 +1239,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Segment</div>
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Statut</div>
           </div>
-          ${[{d:'08/05/2025 14:32',p:'U-7823',a:'Nouveau consentement',s:'Sport · 25–34',t:'granted'},{d:'07/05/2025 09:14',p:'U-4421',a:'Renouvellement',s:'Bien-être · 18–24',t:'granted'},{d:'06/05/2025 17:55',p:'U-9102',a:'Révocation',s:'Sport · 35–49',t:'revoked'},{d:'05/05/2025 11:23',p:'U-3344',a:'Nouveau consentement',s:'Voyage · 25–34',t:'granted'},{d:'04/05/2025 08:41',p:'U-6677',a:'Révocation',s:'Tech · 18–24',t:'revoked'},{d:'03/05/2025 15:09',p:'U-1156',a:'Nouveau consentement',s:'Sport · 50–64',t:'granted'}].map(r=>`<div style="display:grid;grid-template-columns:160px 1fr 1fr 120px 100px;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center"><div style="font-size:11px;color:var(--ink3)">${r.d}</div><div style="font-size:12px;font-weight:600;color:var(--ink);font-family:monospace">${r.p}</div><div style="font-size:12px;color:var(--ink2)">${r.a}</div><div style="font-size:11px;color:var(--ink3)">${r.s}</div><div><span class="status-pill ${r.t==='granted'?'live':'paused'}">${r.t==='granted'?'Accordé':'Révoqué'}</span></div></div>`).join('')}
+          <div id="consent-journal-rows"><div style="padding:24px 16px;text-align:center;color:var(--ink3);font-size:13px">Chargement…</div></div>
         </div>
       </div>
 
@@ -1384,8 +1384,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink)">🎁 Mes récompenses</div>
             <div style="font-size:13px;color:var(--ink2);margin-top:4px">Proposez jusqu'à 5 récompenses à vos clients. 1 pt ≈ 1 centime de valeur perçue.</div>
           </div>
-          <div id="rewards-suggestion" style="display:none;background:var(--ad);border:1.5px solid rgba(242,151,21,.25);border-radius:var(--rs);padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--ink2)">
-            💡 <strong>Suggestions selon votre activité :</strong> <span id="rewards-suggestion-text"></span>
+          <div id="rewards-suggestion" style="display:none;background:var(--ad);border:1.5px solid rgba(242,151,21,.25);border-radius:var(--rs);padding:14px 18px;margin-bottom:20px">
+            <div style="font-size:13px;color:var(--ink2);margin-bottom:10px">💡 <strong>Suggestions selon votre activité</strong> — cliquez pour pré-remplir, vous gardez la main avant de publier.</div>
+            <div id="rewards-suggestion-chips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
           </div>
           <div id="reward-slots"></div>
           <button class="tb-btn tb-btn-primary" style="margin-top:8px" id="add-reward-btn" onclick="addRewardSlot()">+ Ajouter une récompense</button>
@@ -2048,7 +2049,7 @@ window.addEventListener('load',()=>{
       </button>
     </div>
 
-    <div style="margin-top:18px;font-size:11px;color:var(--ink3);text-align:center">En continuant tu acceptes nos <span style="color:var(--coral)">CGU</span></div>
+    <div style="margin-top:18px;font-size:11px;color:var(--ink3);text-align:center">En continuant tu acceptes nos <a href="cgu.html" target="_blank" rel="noopener" style="color:var(--coral)">CGU</a> et notre <a href="confidentialite.html" target="_blank" rel="noopener" style="color:var(--coral)">Politique de confidentialité</a></div>
   </div>
 </div>
 
@@ -2128,6 +2129,7 @@ async function awSubmit() {
       if(!brand || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       _skipNextAuth = true;
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      cred.user.sendEmailVerification().catch(() => {}); // non bloquant : l'email arrive en tâche de fond
       await db.collection('merchants').doc(cred.user.uid).set({
         role: 'merchant',
         name: brand,
@@ -2516,12 +2518,52 @@ function showRejectedScreen(data) {
 // ═══ RÉCOMPENSES — gestion des 5 slots ═══════════════════════
 
 const REWARD_SUGGESTIONS = {
-  'Restauration': ['Café offert (200 pts)', 'Dessert offert (350 pts)', '-20% sur l\'addition (500 pts)', 'Menu offert (1000 pts)'],
-  'Café': ['Expresso offert (200 pts)', 'Boisson chaude offerte (250 pts)', 'Viennoiserie offerte (200 pts)'],
-  'Commerce': ['10% de réduction (200 pts)', 'Produit surprise (350 pts)', '-15% sur commande (400 pts)'],
-  'Beauté': ['Soin découverte (350 pts)', 'Remise 15% (300 pts)', 'Produit offert (250 pts)'],
-  'Sport': ['Cours découverte (300 pts)', '-20% abonnement (500 pts)'],
+  'Restauration': [
+    { icon: '☕', label: 'Café offert', cost: 200 },
+    { icon: '🍰', label: 'Dessert offert', cost: 350 },
+    { icon: '💸', label: "-20% sur l'addition", cost: 500 },
+    { icon: '🍽️', label: 'Menu offert', cost: 1000, condition: "pour un plat acheté" },
+  ],
+  'Café': [
+    { icon: '☕', label: 'Expresso offert', cost: 200 },
+    { icon: '🥤', label: 'Boisson chaude offerte', cost: 250 },
+    { icon: '🥐', label: 'Viennoiserie offerte', cost: 200 },
+  ],
+  'Beauté': [
+    { icon: '💆', label: 'Soin découverte', cost: 350 },
+    { icon: '💸', label: 'Remise 15%', cost: 300 },
+    { icon: '🎁', label: 'Produit offert', cost: 250 },
+  ],
+  'Sport': [
+    { icon: '🏋️', label: 'Cours découverte', cost: 300 },
+    { icon: '💸', label: '-20% abonnement', cost: 500 },
+  ],
+  'Mode': [
+    { icon: '💸', label: '-15% sur un article', cost: 300 },
+    { icon: '🎁', label: 'Accessoire offert', cost: 400 },
+  ],
+  'Commerce': [
+    { icon: '💸', label: '10% de réduction', cost: 200 },
+    { icon: '🎁', label: 'Produit surprise', cost: 350 },
+    { icon: '💸', label: '-15% sur commande', cost: 400 },
+  ],
 };
+
+// Associe le secteur (texte libre saisi par le commerçant à l'inscription) à un jeu
+// de suggestions par mots-clés — plus robuste qu'une correspondance exacte, qui
+// échouait dès que le commerçant n'écrivait pas le libellé au mot près.
+const SECTOR_KEYWORDS = [
+  { key: 'Café',         words: ['café', 'coffee', 'salon de thé', 'brunch'] },
+  { key: 'Restauration', words: ['resto', 'restaurant', 'brasserie', 'pizzeria', 'boulangerie', 'traiteur', 'kebab', 'food'] },
+  { key: 'Beauté',       words: ['coiff', 'beaut', 'salon', 'esthét', 'barbier', 'spa', 'onglerie'] },
+  { key: 'Sport',        words: ['sport', 'fitness', 'gym', 'yoga', 'musculation', 'salle de sport'] },
+  { key: 'Mode',         words: ['mode', 'vêtement', 'boutique', 'prêt-à-porter', 'shopping'] },
+];
+function matchSectorKey(sectorText) {
+  const s = (sectorText || '').toLowerCase();
+  const found = SECTOR_KEYWORDS.find(entry => entry.words.some(w => s.includes(w)));
+  return found ? found.key : 'Commerce';
+}
 const PRICE_GUIDES = [
   { label: 'Petit geste (café, -10%)', pts: 200 },
   { label: 'Moyen (dessert, -15%)', pts: 350 },
@@ -2543,21 +2585,47 @@ function loadMerchantRewards() {
   if(!el) return;
   el.innerHTML = '<div style="color:var(--ink3);font-size:13px;padding:12px 0">Chargement…</div>';
 
-  // Suggestions selon secteur
-  const sector = _mData?.sector || '';
-  const suggestions = REWARD_SUGGESTIONS[sector] || REWARD_SUGGESTIONS['Commerce'];
-  const sugEl = document.getElementById('rewards-suggestion');
-  const sugTxt = document.getElementById('rewards-suggestion-text');
-  if(sugEl && sugTxt && _rewardSlots.length === 0) {
-    sugTxt.textContent = suggestions.slice(0,3).join(' · ');
-    sugEl.style.display = 'block';
-  }
-
   db.collection('rewards').where('merchantId','==',u.uid).orderBy('slot','asc').get().then(snap => {
     _rewardSlots = [];
     snap.forEach(doc => _rewardSlots.push({ id: doc.id, data: doc.data() }));
+    renderRewardSuggestions();
     renderRewardSlots();
-  }).catch(() => renderRewardSlots());
+  }).catch(() => { renderRewardSuggestions(); renderRewardSlots(); });
+}
+
+// Suggestions selon secteur — affichées seulement tant qu'aucune récompense n'existe,
+// cliquables pour pré-remplir le formulaire (rien n'est publié sans confirmation).
+function renderRewardSuggestions() {
+  const sugEl = document.getElementById('rewards-suggestion');
+  const chipsEl = document.getElementById('rewards-suggestion-chips');
+  if(!sugEl || !chipsEl) return;
+  if(_rewardSlots.length > 0) { sugEl.style.display = 'none'; return; }
+  const sectorKey = matchSectorKey(_mData?.sector || '');
+  const suggestions = REWARD_SUGGESTIONS[sectorKey] || REWARD_SUGGESTIONS['Commerce'];
+  chipsEl.innerHTML = '';
+  suggestions.forEach(s => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.style.cssText = 'padding:8px 14px;border-radius:99px;border:1.5px solid rgba(242,151,21,.35);background:var(--card);color:var(--ink);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--fb);white-space:nowrap';
+    chip.textContent = `${s.icon} ${s.label} — ${s.cost} pts`;
+    chip.onclick = () => useSuggestedReward(s);
+    chipsEl.appendChild(chip);
+  });
+  sugEl.style.display = 'block';
+}
+
+function useSuggestedReward(s) {
+  if (!document.getElementById('new-r-label')) addRewardSlot();
+  const iconEl  = document.getElementById('new-r-icon');
+  const labelEl = document.getElementById('new-r-label');
+  const costEl  = document.getElementById('new-r-cost');
+  const condEl  = document.getElementById('new-r-condition');
+  if (iconEl)  iconEl.value = s.icon;
+  if (labelEl) labelEl.value = s.label;
+  if (costEl)  costEl.value = s.cost;
+  if (condEl && s.condition) condEl.value = s.condition;
+  const formCard = labelEl && labelEl.closest('.card');
+  if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function renderRewardSlots() {
@@ -2639,6 +2707,7 @@ function addRewardSlot() {
 async function saveReward(slot, btn) {
   const u = auth.currentUser;
   if(!u || !_mData) return;
+  if(_mData.status === 'pending') { showToast('Espace en cours de vérification — publication disponible après validation','⏳'); return; }
   const label = document.getElementById('new-r-label')?.value.trim();
   const cost = parseInt(document.getElementById('new-r-cost')?.value);
   if(!label || !cost || cost < 1) { showToast('Remplis l\'intitulé et le coût','⚠️'); return; }
@@ -2784,7 +2853,64 @@ navTo = function(page, btn) {
   _origNavTo(page, btn);
   if(page === 'rewards') { loadMerchantRewards(); }
   if(page === 'validate') { loadRecentRedemptions(); }
+  if(page === 'consents') { loadConsentJournal(); }
 };
+
+// ─── Journal des consentements RGPD (réel, Firestore) ─────────
+let _consentEvents = [];
+async function loadConsentJournal() {
+  const u = auth.currentUser;
+  const el = document.getElementById('consent-journal-rows');
+  if(!u || !el) return;
+  el.innerHTML = '<div style="padding:24px 16px;text-align:center;color:var(--ink3);font-size:13px">Chargement…</div>';
+  try {
+    const snap = await db.collection('consentEvents').where('merchantId','==',u.uid).orderBy('createdAt','desc').limit(50).get();
+    _consentEvents = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if(!_consentEvents.length) {
+      el.innerHTML = '<div style="padding:28px 16px;text-align:center;color:var(--ink3);font-size:13px">Aucun événement de consentement pour l\'instant.</div>';
+      return;
+    }
+    el.innerHTML = _consentEvents.map(r => {
+      const dt = r.createdAt && r.createdAt.toDate ? r.createdAt.toDate() : null;
+      const dateStr = dt ? dt.toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+      const profil = 'U-' + (r.userId || '').slice(0,6).toUpperCase();
+      const action = r.action === 'granted' ? 'Nouveau consentement' : 'Révocation';
+      const seg = r.segment || {};
+      const segStr = [seg.city, seg.ageRange].filter(Boolean).join(' · ') || '—';
+      const granted = r.action === 'granted';
+      return `<div style="display:grid;grid-template-columns:160px 1fr 1fr 120px 100px;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center"><div style="font-size:11px;color:var(--ink3)">${esc(dateStr)}</div><div style="font-size:12px;font-weight:600;color:var(--ink);font-family:monospace">${esc(profil)}</div><div style="font-size:12px;color:var(--ink2)">${esc(action)}</div><div style="font-size:11px;color:var(--ink3)">${esc(segStr)}</div><div><span class="status-pill ${granted?'live':'paused'}">${granted?'Accordé':'Révoqué'}</span></div></div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div style="padding:24px 16px;text-align:center;color:var(--ink3);font-size:13px">Erreur de chargement : ${esc(e.message)}</div>`;
+  }
+}
+
+function exportConsentJournal() {
+  if(!_consentEvents.length) { showToast('Aucun événement à exporter','⚠️'); return; }
+  const header = ['Date', 'Profil (anonymisé)', 'Action', 'Ville', 'Tranche d\'âge', 'Statut'];
+  const rows = _consentEvents.map(r => {
+    const dt = r.createdAt && r.createdAt.toDate ? r.createdAt.toDate() : null;
+    const seg = r.segment || {};
+    return [
+      dt ? dt.toISOString() : '',
+      'U-' + (r.userId || '').slice(0,6).toUpperCase(),
+      r.action === 'granted' ? 'Nouveau consentement' : 'Révocation',
+      seg.city || '',
+      seg.ageRange || '',
+      r.action === 'granted' ? 'Accordé' : 'Révoqué'
+    ];
+  });
+  const csv = [header, ...rows].map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(';')).join('\r\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `noova-export-rgpd-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 // ─── Déconnexion ─────────────────────────────────────────────
 function logout() {
