@@ -2405,6 +2405,15 @@ async function loadUserAndStart(uid) {
     S._dailyEarned     = data.dailyEarned || 0;
     S._dailyEarnedDate = data.dailyEarnedDate || null;
     S._city            = data.city || '';
+    // Auto-canonicalisation : un compte créé avant le fix "ville fantôme" peut avoir
+    // un city stocké différent du slug canonique actuel — on le corrige silencieusement.
+    if (S._city) {
+      const canonCity = normalizeCity(S._city);
+      if (canonCity !== S._city) {
+        db.collection('users').doc(uid).update({ city: canonCity }).catch(() => {});
+        S._city = canonCity;
+      }
+    }
     S._age             = data.ageRange || data.age || '';
     S._interests       = data.interests || [];
     S._answered        = data.answeredCampaigns || [];

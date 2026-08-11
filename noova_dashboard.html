@@ -2182,6 +2182,19 @@ async function loadMerchantAndStart(uid) {
   }
   _mData = snap.data();
 
+  // Auto-canonicalisation de la ville : si le champ stocké (ancien compte, ancienne
+  // orthographe...) ne correspond plus au slug canonique actuel, on le corrige ici.
+  // Évite un décalage entre merchant.city (règles Firestore) et campaign.targetCity
+  // calculé à la volée dans launchCampaign(), qui provoquerait un "Missing or
+  // insufficient permissions" à la création de campagne.
+  if (_mData.city) {
+    const canonCity = normalizeCity(_mData.city);
+    if (canonCity !== _mData.city) {
+      db.collection('merchants').doc(uid).update({ city: canonCity }).catch(() => {});
+      _mData.city = canonCity;
+    }
+  }
+
   // Vérification statut : si pending, accès au dashboard mais création désactivée
   if(_mData.status === 'pending') {
     showPendingBanner(_mData);
