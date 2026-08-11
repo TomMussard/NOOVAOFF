@@ -714,7 +714,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div style="font-size:10px;color:rgba(255,255,255,.42);margin-top:8px;text-align:center;line-height:1.6"><strong style="color:rgba(255,255,255,.65)">pts</strong> = solde dépensable · <strong style="color:rgba(255,255,255,.65)">xp</strong> = progression palier (ne se dépense pas)</div>
     </div>
     <div class="cashout-c">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><span style="font-size:22px">📍</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">Des récompenses concrètes</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">Produits offerts et réductions chez les commerces de ton quartier. C'est là que tes points valent le plus, un peu de cashback reste possible si tu préfères.</div></div></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><span style="font-size:22px">📍</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">Des récompenses concrètes</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">Produits offerts et réductions chez les commerces de ton quartier. C'est là que tes points valent le plus.</div></div></div>
       <div class="co-req"><div class="req-dot" style="background:var(--mint)"></div><span>Bons à présenter au comptoir, chez les commerces de ta ville</span></div>
       <div class="co-req"><div class="req-dot" style="background:var(--mint)"></div><span>Tes points n'expirent jamais, tu choisis quand les utiliser</span></div>
     </div>
@@ -806,7 +806,15 @@ const S={user:null,pts:0,xp:0,ans:0,streak:1,themes:['sport','gaming','culture']
 const DAILY_CAP=300;
 const BRANDMETA={};
 function logoHTML(name,size){const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#6A6470'};const s=size||44;const r=Math.round(s*0.27),fs=Math.round(s*0.44);return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;}
-function normalizeCity(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
+// Villes beta connues : rattache les variantes d'\u00e9criture (espace manquant, tirets...)
+// au m\u00eame slug pour \u00e9viter qu'un utilisateur atterrisse dans une "ville fant\u00f4me".
+const NOOVA_KNOWN_CITIES=[{slug:'le-mans',label:'Le Mans'},{slug:'angers',label:'Angers'}];
+function normalizeCity(s){
+  const base=(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  const flat=base.replace(/-/g,'');
+  const known=NOOVA_KNOWN_CITIES.find(c=>c.slug.replace(/-/g,'')===flat);
+  return known?known.slug:base;
+}
 function getCampaignCity(c){return normalizeCity(c?.city || c?.targetCity || c?.cityLabel || '');}
 function getCampaignTargetVolume(c){return Number(c?.targetVolume ?? c?.volumeTarget ?? 100) || 100;}
 function getCampaignAgeRanges(c){const raw = c?.ageRanges || (c?.ageRange ? [c.ageRange] : []); return (Array.isArray(raw) ? raw : [raw]).filter(Boolean);}
@@ -1208,7 +1216,7 @@ async function loadCityRanking() {
   try{
     const snap=await db.collection('users')
       .where('city','==',city)
-      .orderBy('points','desc')
+      .orderBy('xp','desc')
       .limit(20)
       .get();
     const myUid=auth.currentUser&&auth.currentUser.uid;
@@ -1226,7 +1234,7 @@ async function loadCityRanking() {
       const name=u.name||u.displayName||'Anonyme';
       const c=isMe?'#E07D0A':AVC[i%AVC.length];
       const d=document.createElement('div');d.className='fi';
-      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--coral);font-weight:700':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.points || u.xp || 0} pts</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;
+      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--coral);font-weight:700':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.xp || u.points || 0} xp</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;
       el.appendChild(d);
     });
     if(!all.length)el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:13px">Sois le premier à répondre dans ta ville !</div>';
@@ -1276,7 +1284,7 @@ async function loadGroupMembers(g){
   const city=normalizeCity(S._city||'');
   if(!city){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:13px">Renseigne ta ville pour voir les membres.</div>';return;}
   try{
-    const snap=await db.collection('users').where('city','==',city).orderBy('points','desc').limit(50).get();
+    const snap=await db.collection('users').where('city','==',city).orderBy('xp','desc').limit(50).get();
     const myUid=auth.currentUser&&auth.currentUser.uid;
     const all=[];
     snap.forEach(doc=>{const u={uid:doc.id,...doc.data()};if(u.groups&&u.groups.includes(g.id))all.push(u);});
@@ -1287,7 +1295,7 @@ async function loadGroupMembers(g){
     top.forEach((u,i)=>{
       const isMe=u.uid===myUid;const name=u.name||'Anonyme';const c=isMe?'#E07D0A':AVC[i%AVC.length];
       const d=document.createElement('div');d.className='fi';
-      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--coral);font-weight:700':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.points || u.xp || 0} pts</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;
+      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--coral);font-weight:700':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.xp || u.points || 0} xp</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;
       el.appendChild(d);
     });
   }catch(e){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Impossible de charger les membres.</div>';}
@@ -1588,6 +1596,7 @@ S.mode=S.mode||'hook';S.sv=S.sv||null;S.brandBack=S.brandBack||'home';
 
 /* --- Rendu d'une question (commun hook + suivi) --- */
 function fillQuestion(q,opts){
+  S._qShownAt = Date.now(); // sert au score qualité (temps de réponse minimal)
   document.getElementById('q-pts-tag').textContent='+'+q.pts+' pts';
   {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50);}
   document.getElementById('bh-name').textContent=q.brand;
@@ -1930,6 +1939,7 @@ function renderBrandRail(){
         <div class="pw-str-lbl" id="pw-str-lbl"></div>
       </div>
     </div>
+    <div id="aw-forgot" style="text-align:right;margin-top:-3px"><button type="button" id="aw-forgot-link" onclick="awForgotPassword()" style="background:none;border:none;padding:0;font-size:12px;color:var(--ink3);cursor:pointer;font-family:var(--fb);text-decoration:underline">Mot de passe oublié ?</button></div>
     <div id="aw-err" style="color:#EF4444;font-size:12px;display:none;padding:9px 12px;background:rgba(239,68,68,.08);border-radius:8px;text-align:center"></div>
     <button id="aw-submit" onclick="awSubmit()" style="width:100%;padding:16px;border-radius:14px;background:var(--coral);border:none;color:#fff;font-size:16px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 6px 20px rgba(224,125,10,.35);margin-top:3px">Se connecter</button>
 
@@ -1942,6 +1952,11 @@ function renderBrandRail(){
     <button onclick="signInWithGoogle()" style="width:100%;padding:14px 16px;border-radius:14px;background:white;border:1.5px solid var(--bg3);color:#17141A;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
       <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
       Continuer avec Google
+    </button>
+
+    <button onclick="signInWithApple()" style="width:100%;padding:14px 16px;border-radius:14px;background:#000;border:none;color:#fff;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:9px">
+      <svg width="16" height="18" viewBox="0 0 16 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path fill="#fff" d="M13.05 9.53c-.02-2.06 1.68-3.05 1.76-3.1-.96-1.4-2.45-1.6-2.98-1.62-1.27-.13-2.48.75-3.12.75-.65 0-1.63-.73-2.69-.71-1.38.02-2.66.8-3.37 2.03-1.44 2.5-.37 6.2 1.03 8.23.69.99 1.5 2.1 2.58 2.06 1.03-.04 1.42-.67 2.67-.67 1.24 0 1.6.67 2.69.65 1.11-.02 1.82-1 2.49-2 .79-1.14 1.11-2.25 1.13-2.31-.02-.01-2.17-.83-2.19-3.31zM11 3.34c.56-.68.94-1.62.83-2.56-.81.03-1.79.54-2.37 1.22-.52.6-.97 1.57-.85 2.49.91.07 1.83-.46 2.39-1.15z"/></svg>
+      Continuer avec Apple
     </button>
   </div>
 
@@ -2061,6 +2076,8 @@ function awTab(mode) {
   document.getElementById('aw-tab-register').style.cssText = isReg ? aStyle : iStyle;
   document.getElementById('aw-submit').textContent = isReg ? 'Créer mon compte' : 'Se connecter';
   document.getElementById('aw-err').style.display = 'none';
+  const forgot = document.getElementById('aw-forgot');
+  if(forgot) forgot.style.display = isReg ? 'none' : 'block';
 }
 
 function awShowErr(msg) {
@@ -2130,6 +2147,26 @@ async function awSubmit() {
     btn.disabled = false;
     awShowErr(awFrErr(e.code));
   }
+}
+
+async function awForgotPassword() {
+  const email = document.getElementById('aw-email').value.trim();
+  if(!email) { awShowErr('Renseigne ton email ci-dessus, puis retente.'); return; }
+  const link = document.getElementById('aw-forgot-link');
+  if(link) { link.disabled = true; link.textContent = 'Envoi…'; }
+  try {
+    await auth.sendPasswordResetEmail(email);
+  } catch(e) {
+    if(e.code === 'auth/invalid-email') {
+      awShowErr('Email invalide.');
+      if(link) { link.disabled = false; link.textContent = 'Mot de passe oublié ?'; }
+      return;
+    }
+    // Autres erreurs (ex. compte inexistant) : message volontairement générique, ne pas révéler si le compte existe
+  }
+  document.getElementById('aw-err').style.display = 'none';
+  const wrap = document.getElementById('aw-forgot');
+  if(wrap) wrap.innerHTML = '<span style="font-size:12px;color:var(--ink2)">✅ Si ce compte existe, un email a été envoyé.</span>';
 }
 
 // ─── Récompenses Firestore — groupées par commerce ────────────
@@ -2673,18 +2710,26 @@ submitAns = function() {
   if(!u || !q) return;
   const uid = u.uid;
 
+  // ── Score qualité (anti-abus léger) ──────────────────────────
+  // Une réponse rendue en moins de MIN_ANSWER_MS depuis l'affichage de la question
+  // est jugée trop rapide pour être un vrai choix humain (mcq/scale/rank) → 0 pt, flagged.
+  const MIN_ANSWER_MS = 900;
+  const elapsedMs = S._qShownAt ? (Date.now() - S._qShownAt) : null;
+  const flagged = elapsedMs !== null && elapsedMs < MIN_ANSWER_MS;
+  const qualityScore = flagged ? 0 : 1;
+
   // ── Calcul des points réellement attribués ─────────────────
   const today = new Date().toISOString().slice(0,10);
 
   // Réinitialiser le compteur quotidien si on change de jour
   if(S._dailyEarnedDate !== today) { S._dailyEarned = 0; S._dailyEarnedDate = today; }
 
-  let earnedPts = q.pts; // barème déjà fixé (10/15/20)
+  let earnedPts = flagged ? 0 : q.pts; // barème déjà fixé (10/15/20), 0 si réponse flaggée
   if(S._dailyEarned + earnedPts > DAILY_CAP) earnedPts = Math.max(0, DAILY_CAP - S._dailyEarned);
 
   // Bonus streak (+5 pts au premier point du jour)
   let streakBonus = 0;
-  if(earnedPts > 0 && S._lastAnswerDate !== today) {
+  if(!flagged && earnedPts > 0 && S._lastAnswerDate !== today) {
     streakBonus = 5;
     const prevAnswerDate = S._lastAnswerDate;
     S._lastAnswerDate = today;
@@ -2694,7 +2739,7 @@ submitAns = function() {
 
   // Bonus série complète (+10 si c'est la 3e question d'une même campagne)
   let serieBonus = 0;
-  if(q._questionIdx === 2 && earnedPts > 0) serieBonus = 10; // Q3 = index 2
+  if(!flagged && q._questionIdx === 2 && earnedPts > 0) serieBonus = 10; // Q3 = index 2
 
   const totalEarned = earnedPts + streakBonus + serieBonus;
   S._dailyEarned += totalEarned;
@@ -2716,22 +2761,12 @@ submitAns = function() {
   }
 
   // ── Écriture Firestore ─────────────────────────────────────
+  // Note : seule 'answers' est lue par l'app (historique, "Même avis ?", analytics
+  // commerçant) — plus de double écriture dans une collection 'responses' jamais lue.
   const batch = db.batch();
   const qIdx = q._questionIdx || 0;
   const respId = q._firestoreId ? `${uid}_${q._firestoreId}_q${qIdx}` : null;
-  const responseRef = respId ? db.collection('responses').doc(respId) : db.collection('responses').doc();
   const answerRef = respId ? db.collection('answers').doc(respId) : db.collection('answers').doc();
-  batch.set(responseRef, {
-    userId: uid,
-    userCity: normalizeCity(S._city || ''),
-    campaignId: q._firestoreId || null,
-    merchantId: q._merchantId || null,
-    qid: `q${qIdx}`,
-    type: q.type || 'text',
-    value: answerValue,
-    points: totalEarned,
-    answeredAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: false });
   batch.set(answerRef, {
     campaignId:          q._firestoreId || null,
     userId:              uid,
@@ -2742,8 +2777,8 @@ submitAns = function() {
     ico:                 q.ico || '❓',
     answer:              answerValue,
     pointsAwarded:       totalEarned,
-    qualityScore:        1,
-    flagged:             false,
+    qualityScore:        qualityScore,
+    flagged:             flagged,
     respondentAge:       S._age         || '',
     respondentCity:      S._city        || '',
     respondentInterests: S._interests   || [],
@@ -2874,37 +2909,56 @@ function logout() {
 }
 
 // ─── Google Sign-In ───────────────────────────────────────────
+// Commun à Google et Apple : après popup OAuth réussi, crée le profil de base
+// si le compte est nouveau puis ouvre le mur "complète ta ville" (google-city-wall,
+// réutilisé tel quel — son contenu n'est pas spécifique à Google).
+async function _completeSocialSignIn(cred) {
+  const uid  = cred.user.uid;
+  const snap = await db.collection('users').doc(uid).get();
+  if(!snap.exists) {
+    await db.collection('users').doc(uid).set({
+      role: 'user',
+      name:  cred.user.displayName || 'Utilisateur',
+      email: cred.user.email || '',
+      city:  '',
+      cityLabel: '',
+      ageRange: '',
+      age: '',
+      points: 0, xp: 0, streak: 0,
+      lastDailyDate: null, lastAnswerDate: null, dailyEarned: 0, dailyEarnedDate: null,
+      answeredCampaigns: [],
+      authorizedMerchants: [],
+      onboardingStep: 'merchants',
+      interests: [],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('auth-wall').style.display = 'none';
+    const gcw = document.getElementById('google-city-wall');
+    gcw.style.display = 'flex'; gcw._uid = uid;
+  }
+  // Si existant, onAuthStateChanged s'en occupe
+}
+
 async function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
   try {
     const cred = await auth.signInWithPopup(provider);
-    const uid  = cred.user.uid;
-    const snap = await db.collection('users').doc(uid).get();
-    if(!snap.exists) {
-      // Nouveau compte Google — créer profil de base
-      await db.collection('users').doc(uid).set({
-        role: 'user',
-        name:  cred.user.displayName || 'Utilisateur',
-        email: cred.user.email,
-        city:  '',
-        cityLabel: '',
-        ageRange: '',
-        age: '',
-        points: 0, xp: 0, streak: 0,
-        lastDailyDate: null, lastAnswerDate: null, dailyEarned: 0, dailyEarnedDate: null,
-        answeredCampaigns: [],
-        authorizedMerchants: [],
-        onboardingStep: 'merchants',
-        interests: [],
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      // Demander la ville
-      document.getElementById('auth-wall').style.display = 'none';
-      const gcw = document.getElementById('google-city-wall');
-      gcw.style.display = 'flex'; gcw._uid = uid;
-    }
-    // Si existant, onAuthStateChanged s'en occupe
+    await _completeSocialSignIn(cred);
+  } catch(e) {
+    if(e.code !== 'auth/popup-closed-by-user') awShowErr(awFrErr(e.code));
+  }
+}
+
+async function signInWithApple() {
+  // Nécessite : provider Apple activé dans Firebase Auth (Services ID, clé Sign in with
+  // Apple et domaine vérifiés côté Apple Developer) — voir configuration à faire côté compte.
+  const provider = new firebase.auth.OAuthProvider('apple.com');
+  provider.addScope('email');
+  provider.addScope('name');
+  try {
+    const cred = await auth.signInWithPopup(provider);
+    await _completeSocialSignIn(cred);
   } catch(e) {
     if(e.code !== 'auth/popup-closed-by-user') awShowErr(awFrErr(e.code));
   }

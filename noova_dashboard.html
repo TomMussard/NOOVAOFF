@@ -1870,7 +1870,15 @@ function spawnConfetti(){
 }
 
 // ═══ TOAST ═══════════════════════════════════════════════════
-function normalizeCity(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
+// Villes beta connues : rattache les variantes d'\u00e9criture (espace manquant, tirets...)
+// au m\u00eame slug pour \u00e9viter qu'un commer\u00e7ant atterrisse dans une "ville fant\u00f4me".
+const NOOVA_KNOWN_CITIES=[{slug:'le-mans',label:'Le Mans'},{slug:'angers',label:'Angers'}];
+function normalizeCity(s){
+  const base=(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  const flat=base.replace(/-/g,'');
+  const known=NOOVA_KNOWN_CITIES.find(c=>c.slug.replace(/-/g,'')===flat);
+  return known?known.slug:base;
+}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 let toastTimer=null;
 function showToast(msg,ico='✅'){
@@ -2024,6 +2032,7 @@ window.addEventListener('load',()=>{
       <input id="aw-city"   type="text"     placeholder="Ville (ex: Paris, Lyon…)"      autocomplete="address-level2"  style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-email"  type="email"    placeholder="Email professionnel"            autocomplete="email"           style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-pass"   type="password" placeholder="Mot de passe"                  autocomplete="current-password" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <div id="aw-forgot" style="text-align:right;margin-top:-3px"><button type="button" id="aw-forgot-link" onclick="awForgotPassword()" style="background:none;border:none;padding:0;font-size:12px;color:var(--ink3);cursor:pointer;font-family:var(--fb);text-decoration:underline">Mot de passe oublié ?</button></div>
       <div id="aw-err" style="color:#EF4444;font-size:12px;display:none;padding:9px 12px;background:rgba(239,68,68,.08);border-radius:8px"></div>
       <button id="aw-submit" onclick="awSubmit()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg);margin-top:4px">Connexion</button>
 
@@ -2078,6 +2087,7 @@ let _totalConsentedUsers = 0;
 
 // ─── Auth UI ─────────────────────────────────────────────────
 let _awMode = 'login';
+let _skipNextAuth = false;
 function awTab(mode) {
   _awMode = mode;
   const isReg = mode === 'register';
@@ -2091,6 +2101,8 @@ function awTab(mode) {
   document.getElementById('aw-tab-register').style.cssText = isReg  ? a : i;
   document.getElementById('aw-submit').textContent = isReg ? 'Créer mon compte' : 'Connexion';
   document.getElementById('aw-err').style.display = 'none';
+  const forgot = document.getElementById('aw-forgot');
+  if(forgot) forgot.style.display = isReg ? 'none' : 'block';
 }
 
 function awShowErr(msg) { const e=document.getElementById('aw-err'); e.textContent=msg; e.style.display='block'; }
@@ -2114,6 +2126,7 @@ async function awSubmit() {
       const sector = document.getElementById('aw-sector').value.trim();
       const city   = document.getElementById('aw-city').value.trim();
       if(!brand || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      _skipNextAuth = true;
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       await db.collection('merchants').doc(cred.user.uid).set({
         role: 'merchant',
@@ -2126,11 +2139,36 @@ async function awSubmit() {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+      // Gérer manuellement la suite (évite la race avec onAuthStateChanged,
+      // qui peut se déclencher avant la fin de l'écriture Firestore ci-dessus)
+      loadMerchantAndStart(cred.user.uid);
+      return;
     }
   } catch(e) {
+    _skipNextAuth = false;
     btn.textContent = _awMode==='login' ? 'Connexion' : 'Créer mon compte';
     btn.disabled = false; awShowErr(awFrErr(e.code));
   }
+}
+
+async function awForgotPassword() {
+  const email = document.getElementById('aw-email').value.trim();
+  if(!email) { awShowErr('Renseigne ton email ci-dessus, puis retente.'); return; }
+  const link = document.getElementById('aw-forgot-link');
+  if(link) { link.disabled = true; link.textContent = 'Envoi…'; }
+  try {
+    await auth.sendPasswordResetEmail(email);
+  } catch(e) {
+    if(e.code === 'auth/invalid-email') {
+      awShowErr('Email invalide.');
+      if(link) { link.disabled = false; link.textContent = 'Mot de passe oublié ?'; }
+      return;
+    }
+    // Autres erreurs (ex. compte inexistant) : message volontairement générique, ne pas révéler si le compte existe
+  }
+  document.getElementById('aw-err').style.display = 'none';
+  const wrap = document.getElementById('aw-forgot');
+  if(wrap) wrap.innerHTML = '<span style="font-size:12px;color:var(--ink2)">✅ Si ce compte existe, un email a été envoyé.</span>';
 }
 
 // ─── Load merchant + init dashboard ─────────────────────────
@@ -2792,6 +2830,7 @@ async function saveGoogleMerchant() {
 
 // ─── Observer principal ───────────────────────────────────────
 auth.onAuthStateChanged(user => {
+  if(_skipNextAuth) { _skipNextAuth = false; return; }
   const loading = document.getElementById('auth-loading');
   if(loading) loading.style.display = 'none';
   const aw  = document.getElementById('auth-wall');

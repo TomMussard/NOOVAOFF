@@ -104,17 +104,6 @@ service cloud.firestore {
       allow delete: if isAuth() && resource.data.userId == request.auth.uid;
     }
 
-    // ─── Responses ───────────────────────────────────────────────────────────
-    match /responses/{responseId} {
-      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
-      allow read: if isAuth() && (
-        resource.data.userId == request.auth.uid ||
-        resource.data.merchantId == request.auth.uid
-      );
-      allow update: if false;
-      allow delete: if isAuth() && resource.data.userId == request.auth.uid;
-    }
-
     // ─── Rewards ─────────────────────────────────────────────────────────────
     // Lecture : récompenses actives de MA ville pour tous les users connectés
     // Écriture : uniquement le commerçant propriétaire, vérifié
