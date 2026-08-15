@@ -249,6 +249,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <button class="tab-btn-main" onclick="switchTab('diffusion',this)">📢 Diffusion</button>
     <button class="tab-btn-main" onclick="switchTab('lancement',this)">🚦 Lancement</button>
     <button class="tab-btn-main" onclick="switchTab('moderation',this)">🚩 Modération</button>
+    <button class="tab-btn-main" onclick="switchTab('danger',this)" style="color:#EF4444">⚠️ Zone de danger</button>
   </div>
 
   <!-- ══════════════ TAB ENTREPRISES ══════════════ -->
@@ -416,6 +417,28 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     </div>
   </div>
 
+  <!-- ══════════════ TAB ZONE DE DANGER ══════════════ -->
+  <div id="tab-danger" style="display:none">
+    <div class="sec-hdr"><h2>⚠️ Zone de danger</h2><p>Supprime des comptes de test avant un vrai lancement. Ça efface les données Firestore (commerçant/utilisateur + campagnes, récompenses, réponses, échanges liés) — <strong>ça ne supprime pas le compte de connexion (Auth)</strong>, à faire en plus dans Firebase Console → Authentication si besoin. Irréversible.</p>
+    <div class="card" style="margin-bottom:20px;border-color:rgba(239,68,68,.35)">
+      <div class="card-title" style="color:#EF4444">🗑️ Tout supprimer</div>
+      <div style="padding:16px 18px">
+        <button id="danger-delete-all-btn" onclick="dangerDeleteAll()" style="padding:11px 20px;background:#EF4444;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--fb)">Supprimer TOUS les commerçants et utilisateurs</button>
+        <div id="danger-progress" style="margin-top:12px;font-size:12.5px;color:var(--ink3)"></div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">🏪 Commerçants <span class="badge" id="danger-merchant-count">—</span></div>
+        <div id="danger-merchant-list"><div class="loading">Chargement</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">👥 Utilisateurs <span class="badge" id="danger-user-count">—</span></div>
+        <div id="danger-user-list"><div class="loading">Chargement</div></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- MERCHANT DETAIL MODAL -->
@@ -510,13 +533,14 @@ function doLogout() { auth.signOut().then(() => location.reload()); }
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn-main').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  ['entreprises','utilisateurs','diffusion','lancement','moderation'].forEach(t => {
+  ['entreprises','utilisateurs','diffusion','lancement','moderation','danger'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
   if (tab === 'diffusion') initDiffusion();
   if (tab === 'lancement') loadReadiness();
   if (tab === 'moderation') loadModeration();
+  if (tab === 'danger') loadDangerZone();
 }
 
 // ── Merchants ──────────────────────────────────────────────────────────────
@@ -683,6 +707,107 @@ async function unflagAnswer(answerId, btn) {
     showToast('Erreur : ' + e.message, '❌');
     if (btn) { btn.disabled = false; btn.textContent = '✓ Lever le signalement'; }
   }
+}
+
+// ── Zone de danger : nettoyage complet avant lancement ──────────────────────
+async function loadDangerZone() {
+  const mEl = document.getElementById('danger-merchant-list');
+  const uEl = document.getElementById('danger-user-list');
+  mEl.innerHTML = '<div class="loading">Chargement</div>';
+  uEl.innerHTML = '<div class="loading">Chargement</div>';
+  try {
+    const [mSnap, uSnap] = await Promise.all([
+      db.collection('merchants').get(),
+      db.collection('users').get()
+    ]);
+    const merchants = mSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const users = uSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('danger-merchant-count').textContent = merchants.length;
+    document.getElementById('danger-user-count').textContent = users.length;
+
+    mEl.innerHTML = merchants.length ? merchants.map(m => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border)">
+        <div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--ink)">${esc(m.brandName||m.name||'—')}</div><div style="font-size:11px;color:var(--ink3)">${esc(m.email||'')} · ${esc(m.city||'')} · ${esc(m.status||'')}</div></div>
+        <button onclick="dangerDeleteMerchant('${m.id}',this)" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:rgba(239,68,68,.1);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Supprimer</button>
+      </div>`).join('') : '<div class="empty">Aucun commerçant.</div>';
+
+    uEl.innerHTML = users.length ? users.map(u => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border)">
+        <div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--ink)">${esc(u.name||'—')}</div><div style="font-size:11px;color:var(--ink3)">${esc(u.email||'')} · ${esc(u.city||'')}</div></div>
+        <button onclick="dangerDeleteUser('${u.id}',this)" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:rgba(239,68,68,.1);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Supprimer</button>
+      </div>`).join('') : '<div class="empty">Aucun utilisateur.</div>';
+  } catch (e) {
+    mEl.innerHTML = uEl.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
+  }
+}
+
+async function _dangerDeleteQuery(col, field, value) {
+  const snap = await db.collection(col).where(field, '==', value).get();
+  if (snap.empty) return;
+  const batch = db.batch();
+  snap.forEach(d => batch.delete(d.ref));
+  await batch.commit();
+}
+
+async function dangerDeleteMerchant(merchantId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  try {
+    await _dangerDeleteQuery('campaigns', 'merchantId', merchantId);
+    await _dangerDeleteQuery('rewards', 'merchantId', merchantId);
+    await db.collection('merchants').doc(merchantId).delete();
+    loadDangerZone();
+  } catch (e) {
+    showToast('Erreur : ' + e.message, '❌');
+    if (btn) { btn.disabled = false; btn.textContent = 'Supprimer'; }
+  }
+}
+
+async function dangerDeleteUser(uid, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  try {
+    await _dangerDeleteQuery('answers', 'userId', uid);
+    await _dangerDeleteQuery('redemptions', 'userId', uid);
+    await _dangerDeleteQuery('communityEvents', 'userId', uid);
+    await _dangerDeleteQuery('friendCodes', 'uid', uid);
+    await db.collection('users').doc(uid).delete();
+    loadDangerZone();
+  } catch (e) {
+    showToast('Erreur : ' + e.message, '❌');
+    if (btn) { btn.disabled = false; btn.textContent = 'Supprimer'; }
+  }
+}
+
+async function dangerDeleteAll() {
+  if (!confirm("Supprimer TOUS les commerçants et utilisateurs (et leurs campagnes, récompenses, réponses, échanges) ? Action irréversible.")) return;
+  const btn = document.getElementById('danger-delete-all-btn');
+  const progress = document.getElementById('danger-progress');
+  btn.disabled = true;
+  try {
+    const [mSnap, uSnap] = await Promise.all([db.collection('merchants').get(), db.collection('users').get()]);
+    const merchants = mSnap.docs.map(d => d.id);
+    const users = uSnap.docs.map(d => d.id);
+    let done = 0;
+    const total = merchants.length + users.length;
+    for (const id of merchants) {
+      await _dangerDeleteQuery('campaigns', 'merchantId', id);
+      await _dangerDeleteQuery('rewards', 'merchantId', id);
+      await db.collection('merchants').doc(id).delete();
+      done++; progress.textContent = `${done} / ${total}…`;
+    }
+    for (const id of users) {
+      await _dangerDeleteQuery('answers', 'userId', id);
+      await _dangerDeleteQuery('redemptions', 'userId', id);
+      await _dangerDeleteQuery('communityEvents', 'userId', id);
+      await _dangerDeleteQuery('friendCodes', 'uid', id);
+      await db.collection('users').doc(id).delete();
+      done++; progress.textContent = `${done} / ${total}…`;
+    }
+    progress.textContent = `✅ Terminé — ${merchants.length} commerçant(s) et ${users.length} utilisateur(s) supprimés.`;
+    loadDangerZone();
+  } catch (e) {
+    progress.textContent = 'Erreur : ' + e.message;
+  }
+  btn.disabled = false;
 }
 
 function renderMerchants() {
