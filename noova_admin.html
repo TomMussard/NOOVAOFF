@@ -248,6 +248,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <button class="tab-btn-main" onclick="switchTab('utilisateurs',this)">👥 Utilisateurs<span class="tab-badge" id="tb-usr">—</span></button>
     <button class="tab-btn-main" onclick="switchTab('diffusion',this)">📢 Diffusion</button>
     <button class="tab-btn-main" onclick="switchTab('lancement',this)">🚦 Lancement</button>
+    <button class="tab-btn-main" onclick="switchTab('moderation',this)">🚩 Modération</button>
   </div>
 
   <!-- ══════════════ TAB ENTREPRISES ══════════════ -->
@@ -392,7 +393,27 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <!-- ══════════════ TAB LANCEMENT ══════════════ -->
   <div id="tab-lancement" style="display:none">
     <div class="sec-hdr"><h2>Lancement</h2><p>Combien de commerçants sont réellement opérationnels par ville — vérifié, avec au moins une campagne active et une récompense active. C'est ce qu'un nouvel utilisateur voit en arrivant sur l'app.</p></div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title">🌍 Villes — ouverture aux habitants</div>
+      <div style="padding:14px 18px;font-size:12.5px;color:var(--ink3);border-bottom:1px solid var(--border)">Une ville désactivée reste accessible aux commerçants (pour se préparer), mais bloque l'inscription des habitants avec cette ville — utile pour ne pas ouvrir une ville avant d'avoir assez de commerçants opérationnels.</div>
+      <div id="city-controls"><div class="loading">Chargement</div></div>
+    </div>
+    <div class="stats" id="global-stats">
+      <div class="stat-card hl"><div class="stat-icon">📋</div><div class="stat-n" id="g-camps-active">—</div><div class="stat-l">Campagnes actives</div></div>
+      <div class="stat-card green"><div class="stat-icon">💬</div><div class="stat-n" id="g-answers">—</div><div class="stat-l">Réponses totales</div></div>
+      <div class="stat-card violet"><div class="stat-icon">🎁</div><div class="stat-n" id="g-redemptions">—</div><div class="stat-l">Échanges totaux</div></div>
+      <div class="stat-card"><div class="stat-icon">🚩</div><div class="stat-n" id="g-flagged">—</div><div class="stat-l">Réponses signalées</div></div>
+    </div>
     <div id="readiness-cities"><div class="loading">Chargement</div></div>
+  </div>
+
+  <!-- ══════════════ TAB MODÉRATION ══════════════ -->
+  <div id="tab-moderation" style="display:none">
+    <div class="sec-hdr"><h2>Modération</h2><p>Réponses signalées par le score qualité (soumises trop vite pour être un vrai choix humain) — 0 point crédité automatiquement. Tu peux lever le signalement si c'est un faux positif.</p></div>
+    <div class="card">
+      <div class="card-title">🚩 Réponses signalées <span class="badge badge-pending" id="mod-count">0</span></div>
+      <div id="mod-list"><div class="loading">Chargement</div></div>
+    </div>
   </div>
 
 </div>
@@ -427,7 +448,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-const ADMIN_EMAILS = ['noovaoffr@gmail.com'];
+const ADMIN_EMAILS = ['noovaoffr@gmail.com', 'tomussproduction@gmail.com'];
 
 const app = firebase.initializeApp({
   apiKey: "AIzaSyCU52SgKoIS_P-SEiXFC4d8lQ1rz5mG4to",
@@ -489,12 +510,13 @@ function doLogout() { auth.signOut().then(() => location.reload()); }
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn-main').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  ['entreprises','utilisateurs','diffusion','lancement'].forEach(t => {
+  ['entreprises','utilisateurs','diffusion','lancement','moderation'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
   if (tab === 'diffusion') initDiffusion();
   if (tab === 'lancement') loadReadiness();
+  if (tab === 'moderation') loadModeration();
 }
 
 // ── Merchants ──────────────────────────────────────────────────────────────
@@ -510,11 +532,62 @@ async function loadMerchants() {
   }
 }
 
+// ── Gestion des villes (ouverture aux habitants) ────────────────────────────
+async function loadCityControls() {
+  const el = document.getElementById('city-controls');
+  if (!el) return;
+  el.innerHTML = '<div class="loading">Chargement</div>';
+  try {
+    const snap = await db.collection('cities').get();
+    const cities = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (a.label||a.id).localeCompare(b.label||b.id));
+    if (!cities.length) {
+      el.innerHTML = '<div class="empty">Aucune ville enregistrée pour l\'instant — une entrée est créée automatiquement à la première inscription dans cette ville.</div>';
+      return;
+    }
+    el.innerHTML = cities.map(c => {
+      const active = c.active !== false; // par défaut active tant que non désactivée explicitement
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border)">
+        <div><div style="font-weight:700;font-size:13.5px;color:var(--ink)">${esc(c.label||c.id)}</div><div style="font-size:11px;color:var(--ink3)">${c.count||0} habitant${(c.count||0)>1?'s':''} inscrit${(c.count||0)>1?'s':''}</div></div>
+        <button onclick="toggleCityActive('${c.id}',${!active})" style="padding:6px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid ${active?'rgba(11,171,132,.35)':'var(--border)'};background:${active?'rgba(11,171,132,.1)':'var(--bg)'};color:${active?'#0BAB84':'var(--ink3)'};cursor:pointer">${active?'✓ Ouverte aux habitants':'⏸ Fermée'}</button>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
+  }
+}
+async function toggleCityActive(cityId, newActive) {
+  try {
+    await db.collection('cities').doc(cityId).update({ active: newActive });
+    loadCityControls();
+  } catch(e) {
+    showToast('Erreur : ' + e.message, '❌');
+  }
+}
+
 // ── Lancement (readiness par ville) ─────────────────────────────────────────
 // Un commerçant "opérationnel" = vérifié + au moins une campagne active + au
 // moins une récompense active. C'est ce qui fait qu'un nouvel utilisateur voit
 // vraiment quelque chose en arrivant sur l'app, pas un écran vide.
+async function loadGlobalStats() {
+  try {
+    const [campActiveCount, answersCount, redemptionsCount, flaggedCount] = await Promise.all([
+      db.collection('campaigns').where('status', '==', 'active').count().get(),
+      db.collection('answers').count().get(),
+      db.collection('redemptions').count().get(),
+      db.collection('answers').where('flagged', '==', true).count().get()
+    ]);
+    document.getElementById('g-camps-active').textContent = campActiveCount.data().count;
+    document.getElementById('g-answers').textContent = answersCount.data().count;
+    document.getElementById('g-redemptions').textContent = redemptionsCount.data().count;
+    document.getElementById('g-flagged').textContent = flaggedCount.data().count;
+  } catch(e) {
+    ['g-camps-active','g-answers','g-redemptions','g-flagged'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '—'; });
+  }
+}
+
 async function loadReadiness() {
+  loadCityControls();
+  loadGlobalStats();
   const el = document.getElementById('readiness-cities');
   if (!el) return;
   el.innerHTML = '<div class="loading">Chargement</div>';
@@ -570,6 +643,45 @@ async function loadReadiness() {
     `).join('');
   } catch (e) {
     el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
+  }
+}
+
+// ── Modération : réponses signalées par le score qualité ────────────────────
+async function loadModeration() {
+  const el = document.getElementById('mod-list');
+  if (!el) return;
+  el.innerHTML = '<div class="loading">Chargement</div>';
+  try {
+    const snap = await db.collection('answers').where('flagged', '==', true).orderBy('createdAt', 'desc').limit(100).get();
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('mod-count').textContent = items.length;
+    if (!items.length) {
+      el.innerHTML = '<div class="empty">Aucune réponse signalée pour l\'instant. 🎉</div>';
+      return;
+    }
+    el.innerHTML = items.map(a => {
+      const dt = a.createdAt && a.createdAt.toDate ? a.createdAt.toDate().toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+      return `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border)">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">${esc(dt)} · ${esc(a.brand||'Commerce')} · user ${esc((a.userId||'').slice(0,8))}…</div>
+          <div style="font-size:12px;color:var(--ink2);margin-bottom:3px">${esc(a.question||'')}</div>
+          <div style="font-size:13px;color:var(--ink);font-weight:600">"${esc(String(a.answer ?? '—'))}"</div>
+        </div>
+        <button onclick="unflagAnswer('${a.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap">✓ Lever le signalement</button>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
+  }
+}
+async function unflagAnswer(answerId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  try {
+    await db.collection('answers').doc(answerId).update({ flagged: false });
+    loadModeration();
+  } catch (e) {
+    showToast('Erreur : ' + e.message, '❌');
+    if (btn) { btn.disabled = false; btn.textContent = '✓ Lever le signalement'; }
   }
 }
 

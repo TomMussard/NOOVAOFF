@@ -316,7 +316,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .tmpl-chip:hover { border-color: var(--border2); color: var(--ink2); }
 .tmpl-chip.sel { border-color: var(--coral); background: var(--cd); color: var(--coral); }
 /* Format selector */
-.fmt-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 9px; }
+.fmt-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; }
 .fmt-card {
   padding: 16px 10px; border-radius: var(--rs);
   background: var(--bg3); border: 2px solid var(--border);
@@ -813,7 +813,6 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <textarea class="field-ta" id="q2-text-inp" placeholder="2e question pour les répondants…" rows="2" style="margin-bottom:8px"></textarea>
                       <select class="field-inp" id="q2-fmt-sel" style="font-size:12px" onchange="showMcqForQ(2,this.value)">
                         <option value="mcq">Choix multiple</option>
-                        <option value="text">Texte libre</option>
                         <option value="scale">Échelle 1–10</option>
                       </select>
                       <div id="q2-mcq-builder" style="margin-top:8px">
@@ -833,7 +832,6 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <textarea class="field-ta" id="q3-text-inp" placeholder="3e question pour les répondants…" rows="2" style="margin-bottom:8px"></textarea>
                       <select class="field-inp" id="q3-fmt-sel" style="font-size:12px" onchange="showMcqForQ(3,this.value)">
                         <option value="mcq">Choix multiple</option>
-                        <option value="text">Texte libre</option>
                         <option value="scale">Échelle 1–10</option>
                       </select>
                       <div id="q3-mcq-builder" style="margin-top:8px">
@@ -884,10 +882,6 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div class="step-card-title">Format de réponse</div>
                   <div class="step-card-sub">Choisissez le format le plus adapté à votre objectif d'étude.</div>
                   <div class="fmt-grid" id="fmt-grid">
-                    <div class="fmt-card" onclick="selFmt(this,'text')">
-                      <div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></div><div class="fmt-name">Texte libre</div>
-                      <div class="fmt-desc">Verbatims riches, idéal pour découverte et insights qualitatifs</div>
-                    </div>
                     <div class="fmt-card sel" onclick="selFmt(this,'mcq')">
                       <div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12l3 3 5-6"/></svg></div><div class="fmt-name">Choix multiple</div>
                       <div class="fmt-desc">Réponses structurées, comparaison facile entre options</div>
@@ -1477,23 +1471,35 @@ function renderCampModal(c, answers) {
   const stColor = { active:'var(--coral)', draft:'var(--ink3)', paused:'var(--amber)', completed:'var(--mint)' };
   const dateStr = c.createdAt?.toDate ? c.createdAt.toDate().toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : '';
 
-  let distHTML = '';
-  if(c.format === 'mcq' && c.options?.length) {
-    const counts = {};
-    c.options.forEach(o => counts[o] = 0);
-    answers.forEach(a => { if(counts[a.answer] !== undefined) counts[a.answer]++; });
-    const total = Object.values(counts).reduce((a,b) => a+b, 0);
-    distHTML = `<div style="margin-top:20px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Distribution des réponses</div>
-      ${!total ? '<div style="color:var(--ink3);font-size:12px;text-align:center;padding:12px">Aucune réponse pour l\'instant.</div>'
-        : c.options.map(opt => {
-          const n = counts[opt]||0; const p = total ? Math.round(n/total*100) : 0;
-          return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--ink2)">${opt}</span><span style="font-weight:700;color:var(--coral)">${p}% <span style="font-weight:400;color:var(--ink4)">(${n})</span></span></div><div style="background:var(--bg3);border-radius:4px;height:7px;overflow:hidden"><div style="background:linear-gradient(90deg,var(--coral),var(--violet));height:100%;width:${p}%;border-radius:4px"></div></div></div>`;
-        }).join('')
-      }</div>`;
-  } else if(answers.length) {
-    distHTML = `<div style="margin-top:20px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Dernières réponses (${answers.length} au total)</div>${answers.slice(0,5).map(a=>`<div style="background:var(--bg2);border-radius:var(--rx);padding:10px 12px;margin-bottom:8px;font-size:12px;color:var(--ink2)">"${a.answer||'—'}"</div>`).join('')}</div>`;
-  } else {
+  // Une campagne a jusqu'à 3 questions distinctes (c.questions[]) — chaque réponse porte
+  // un questionIdx. On casse la distribution par question pour ne pas mélanger les
+  // réponses à des questions différentes dans un seul graphique (bug corrigé : avant,
+  // tout était compté avec les seules options de la question 1).
+  const distQuestions = (c.questions && c.questions.length) ? c.questions : [{ q: c.question, format: c.format, options: c.options }];
+  if(!answers.length) {
     distHTML = '<div style="margin-top:20px;text-align:center;padding:24px;background:var(--bg2);border-radius:var(--rx);color:var(--ink3);font-size:13px">Aucune réponse pour l\'instant. La campagne est en attente de répondants.</div>';
+  } else {
+    distHTML = distQuestions.map((q, idx) => {
+      const qAnswers = answers.filter(a => (a.questionIdx || 0) === idx);
+      const label = distQuestions.length > 1 ? `Q${idx+1} — ${esc(q.q || '')}` : 'Distribution des réponses';
+      let body;
+      if(q.format === 'mcq' && q.options?.length) {
+        const counts = {};
+        q.options.forEach(o => counts[o] = 0);
+        qAnswers.forEach(a => { if(counts[a.answer] !== undefined) counts[a.answer]++; });
+        const total = Object.values(counts).reduce((a,b) => a+b, 0);
+        body = !total ? '<div style="color:var(--ink3);font-size:12px;text-align:center;padding:12px">Aucune réponse pour l\'instant.</div>'
+          : q.options.map(opt => {
+              const n = counts[opt]||0; const p = total ? Math.round(n/total*100) : 0;
+              return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--ink2)">${esc(opt)}</span><span style="font-weight:700;color:var(--coral)">${p}% <span style="font-weight:400;color:var(--ink4)">(${n})</span></span></div><div style="background:var(--bg3);border-radius:4px;height:7px;overflow:hidden"><div style="background:linear-gradient(90deg,var(--coral),var(--violet));height:100%;width:${p}%;border-radius:4px"></div></div></div>`;
+            }).join('');
+      } else if(qAnswers.length) {
+        body = `<div style="font-size:11px;color:var(--ink3);margin-bottom:8px">${qAnswers.length} réponse${qAnswers.length>1?'s':''}</div>${qAnswers.slice(0,5).map(a=>`<div style="background:var(--bg2);border-radius:var(--rx);padding:10px 12px;margin-bottom:8px;font-size:12px;color:var(--ink2)">"${esc(String(a.answer ?? '—'))}"</div>`).join('')}`;
+      } else {
+        body = '<div style="color:var(--ink3);font-size:12px;text-align:center;padding:12px">Aucune réponse pour l\'instant.</div>';
+      }
+      return `<div style="margin-top:20px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">${label}</div>${body}</div>`;
+    }).join('');
   }
 
   // Profil des répondants (depuis les champs enrichis)
@@ -1690,8 +1696,8 @@ function resetWizard(){
   // Reset MCQ options to 3 blank
   const opts=document.getElementById('mcq-options');
   if(opts){opts.innerHTML='';for(let i=0;i<3;i++){const d=document.createElement('div');d.className='mcq-option-row';d.innerHTML='<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button>';opts.appendChild(d);}}
-  // Reset format to MCQ (index 1 = carte MCQ dans le fmt-grid)
-  const mcqCard = document.querySelectorAll('.fmt-card')[1];
+  // Reset format to MCQ (index 0 = carte MCQ dans le fmt-grid, "texte libre" retiré — interdit en beta)
+  const mcqCard = document.querySelectorAll('.fmt-card')[0];
   if(mcqCard) selFmt(mcqCard,'mcq');
   const mb = document.getElementById('mcq-builder'); if(mb) mb.style.display='block';
 }
@@ -2423,7 +2429,7 @@ launchCampaign = async function() {
     const block = document.getElementById('wz-q-extra-' + i);
     if(block && block.style.display !== 'none') {
       const qText = document.getElementById('q' + i + '-text-inp')?.value?.trim();
-      const qFmt  = document.getElementById('q' + i + '-fmt-sel')?.value || 'text';
+      const qFmt  = document.getElementById('q' + i + '-fmt-sel')?.value || 'mcq';
       const qOpts = qFmt === 'mcq'
         ? Array.from(document.querySelectorAll('#q' + i + '-mcq-opts .mcq-opt-inp')).map(inp => inp.value.trim()).filter(Boolean)
         : [];

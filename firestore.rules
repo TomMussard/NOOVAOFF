@@ -17,7 +17,7 @@ service cloud.firestore {
         otherUid in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('friendUids', []);
     }
     function isAdmin() {
-      return isAuth() && request.auth.token.email == 'noovaoffr@gmail.com';
+      return isAuth() && request.auth.token.email in ['noovaoffr@gmail.com', 'tomussproduction@gmail.com'];
     }
     function myCity() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('city', null);
@@ -55,10 +55,15 @@ service cloud.firestore {
         request.resource.data.ownerUid == request.auth.uid ||
         request.auth.uid == merchantId
       );
+      // Le commerçant peut modifier son profil (nom, secteur, ville, description...)
+      // mais jamais son propre statut de vérification ni son ownerUid/role — seul
+      // l'admin peut faire passer un compte pending -> verified/rejected.
       allow update: if isAuth() && (
-        resource.data.ownerUid == request.auth.uid ||
-        merchantId == request.auth.uid ||
-        isAdmin()
+        isAdmin() ||
+        (
+          (resource.data.ownerUid == request.auth.uid || merchantId == request.auth.uid) &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'verifiedAt', 'submittedAt', 'ownerUid', 'role'])
+        )
       );
       allow delete: if false;
     }
@@ -98,10 +103,13 @@ service cloud.firestore {
       allow read: if isAuth() && (
         resource.data.userId == request.auth.uid ||
         resource.data.merchantId == request.auth.uid ||
-        isFriendOf(resource.data.userId)
+        isFriendOf(resource.data.userId) ||
+        isAdmin()
       );
+      // Modération : l'admin peut uniquement lever/poser le flag anti-abus
+      allow update: if isAuth() && isAdmin() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['flagged']);
       // delete : uniquement par l'auteur (suppression de compte / droit à l'effacement)
-      allow update: if false;
       allow delete: if isAuth() && resource.data.userId == request.auth.uid;
     }
 
@@ -135,7 +143,8 @@ service cloud.firestore {
       allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
       allow read: if isAuth() && (
         resource.data.userId == request.auth.uid ||
-        resource.data.merchantId == request.auth.uid
+        resource.data.merchantId == request.auth.uid ||
+        isAdmin()
       );
       // Le commerçant peut passer le bon à "used" (validation au comptoir)
       allow update: if isAuth() &&
@@ -192,7 +201,13 @@ service cloud.firestore {
     // ─── Cities ──────────────────────────────────────────────────────────────
     match /cities/{cityId} {
       allow read: if isAuth();
-      allow create, update: if isAuth();
+      allow create: if isAuth();
+      // Un habitant peut toujours créer/mettre à jour label+count (inscription) ;
+      // seul l'admin peut changer 'active' (ouverture/fermeture de la ville).
+      allow update: if isAuth() && (
+        (resource == null || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['label','count'])) ||
+        isAdmin()
+      );
       allow delete: if false;
     }
 

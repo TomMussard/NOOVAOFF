@@ -815,6 +815,17 @@ function normalizeCity(s){
   const known=NOOVA_KNOWN_CITIES.find(c=>c.slug.replace(/-/g,'')===flat);
   return known?known.slug:base;
 }
+// Vérifie qu'une ville n'a pas été explicitement fermée par l'admin (onglet
+// Lancement). Fail-open : si le doc n'existe pas encore ou en cas d'erreur
+// réseau, on n'empêche jamais une inscription légitime.
+async function isCityOpen(slug){
+  if(!slug) return true;
+  try{
+    const doc=await db.collection('cities').doc(slug).get();
+    if(!doc.exists) return true;
+    return doc.data().active!==false;
+  }catch(e){ return true; }
+}
 function getCampaignCity(c){return normalizeCity(c?.city || c?.targetCity || c?.cityLabel || '');}
 function getCampaignTargetVolume(c){return Number(c?.targetVolume ?? c?.volumeTarget ?? 100) || 100;}
 function getCampaignAgeRanges(c){const raw = c?.ageRanges || (c?.ageRange ? [c.ageRange] : []); return (Array.isArray(raw) ? raw : [raw]).filter(Boolean);}
@@ -2142,10 +2153,11 @@ async function awSubmit() {
       if(!name || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       if(!_awAge) { awShowErr("Sélectionne ta tranche d'âge."); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       if(!_awInterests.length) { awShowErr('Sélectionne au moins un centre d\'intérêt.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      const cityNorm = normalizeCity(city);
+      if(!(await isCityOpen(cityNorm))) { awShowErr('Noova n\'est pas encore ouvert dans ta ville — reviens bientôt !'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       _skipNextAuth = true;
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       cred.user.sendEmailVerification().catch(() => {}); // non bloquant : l'email arrive en tâche de fond
-      const cityNorm = normalizeCity(city);
       await db.collection('users').doc(cred.user.uid).set({
         role: 'user',
         name, email, city: cityNorm, cityLabel: city,
@@ -3032,6 +3044,7 @@ async function saveGoogleCity() {
   if(!_gcwAge) { errEl.textContent = "Sélectionne ta tranche d'âge."; errEl.style.display='block'; return; }
   if(!_gcwInterests.length) { errEl.textContent = 'Sélectionne au moins un centre d\'intérêt.'; errEl.style.display='block'; return; }
   const cityNormG = normalizeCity(city);
+  if(!(await isCityOpen(cityNormG))) { errEl.textContent = 'Noova n\'est pas encore ouvert dans ta ville — reviens bientôt !'; errEl.style.display='block'; return; }
   await db.collection('users').doc(uid).update({ city: cityNormG, cityLabel: city, ageRange: _gcwAge, age: _gcwAge, interests: _gcwInterests, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
   // Update city registry for merchant audience targeting
   db.collection('cities').doc(cityNormG).set({ label: city.charAt(0).toUpperCase()+city.slice(1), count: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(()=>{});
