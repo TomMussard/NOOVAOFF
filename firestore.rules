@@ -22,6 +22,11 @@ service cloud.firestore {
     function myCity() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('city', null);
     }
+    // Grille de points FIXE des récompenses (5 paliers, identiques pour tous les
+    // commerçants) — doit rester synchronisée avec REWARD_TIERS dans noova_dashboard.html.
+    function rewardTierCost(slot) {
+      return slot == 1 ? 200 : slot == 2 ? 350 : slot == 3 ? 500 : slot == 4 ? 750 : slot == 5 ? 1000 : -1;
+    }
 
     // ─── Users ────────────────────────────────────────────────────────────────
     // Lecture : soi-même, ses amis, les autres users de sa propre ville (classement/groupes), ou l'admin
@@ -42,7 +47,8 @@ service cloud.firestore {
         )
         ||
         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']) &&
-         request.resource.data.points < resource.data.points)
+         request.resource.data.points < resource.data.points &&
+         request.resource.data.points >= 0)
       ));
       allow delete: if isOwner(uid) || isAdmin();
 
@@ -141,10 +147,12 @@ service cloud.firestore {
       );
       allow create: if isAuth() &&
         request.resource.data.merchantId == request.auth.uid &&
-        getMerchant(request.auth.uid).get('status', null) == 'verified';
+        getMerchant(request.auth.uid).get('status', null) == 'verified' &&
+        request.resource.data.cost == rewardTierCost(request.resource.data.slot);
       allow update: if isAuth() && (
-        // Commerçant : modification complète
-        resource.data.merchantId == request.auth.uid
+        // Commerçant : modification complète (le coût reste verrouillé au palier)
+        (resource.data.merchantId == request.auth.uid &&
+         request.resource.data.cost == rewardTierCost(request.resource.data.slot))
         ||
         // Utilisateur : uniquement incrémenter redeemedCount de 1
         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['redeemedCount']) &&

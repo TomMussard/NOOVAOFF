@@ -2435,12 +2435,10 @@ async function redeemReward(reward) {
   if(reward.expiresAt && reward.expiresAt.seconds && reward.expiresAt.seconds < Date.now()/1000) {
     showVoucherError('Cette récompense a expiré.'); return;
   }
-  // Vérification stock
-  if(reward.stock !== null && reward.stock !== undefined && (reward.redeemedCount||0) >= reward.stock) {
-    showVoucherError('Stock épuisé.'); return;
-  }
 
-  // Vérification perUserLimit (1 fois par personne par défaut) — en échec, on bloque (fail closed)
+  // Vérification perUserLimit (1 fois par personne par défaut) — nécessite une query,
+  // donc faite ici en pré-check (une transaction Firestore ne peut lire que par référence
+  // directe, pas par requête). En échec, on bloque (fail closed).
   const limit = reward.perUserLimit !== undefined ? reward.perUserLimit : 1;
   if(limit > 0) {
     try {
@@ -2463,36 +2461,42 @@ async function redeemReward(reward) {
   for(let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
 
   const expiresAt = new Date(Date.now() + 24*60*60*1000); // 24h
+  const userRef = db.collection('users').doc(u.uid);
+  const rewardRef = db.collection('rewards').doc(reward.id);
+  const redemRef = db.collection('redemptions').doc();
 
   try {
-    const batch = db.batch();
-    const redemRef = db.collection('redemptions').doc();
-    batch.set(redemRef, {
-      userId:     u.uid,
-      rewardId:   reward.id,
-      merchantId: reward.merchantId||null,
-      cost:       reward.cost||0,
-      label:      reward.label||'Récompense',
-      merchantName: reward.merchantName||'',
-      purchaseCondition: reward.purchaseCondition||null,
-      code,
-      status:     'pending',
-      createdAt:  firebase.firestore.FieldValue.serverTimestamp(),
-      expiresAt:  firebase.firestore.Timestamp.fromDate(expiresAt),
-      usedAt:     null
+    // Transaction (pas un simple batch) : relit le solde et le stock qui font foi au
+    // moment même de l'écriture, pas la valeur locale potentiellement périmée. C'est ce
+    // qui empêchait un double-échange rapide (double tap, double onglet) de faire passer
+    // le solde en négatif — le batch précédent ne revérifiait rien à l'écriture.
+    await db.runTransaction(async (tx) => {
+      const [userSnap, rewardSnap] = await Promise.all([tx.get(userRef), tx.get(rewardRef)]);
+      if(!userSnap.exists) throw new Error('Profil introuvable.');
+      if(!rewardSnap.exists) throw new Error('Récompense introuvable.');
+      const userData = userSnap.data();
+      const rewardData = rewardSnap.data();
+      const cost = rewardData.cost || 0;
+      if((userData.points||0) < cost) throw new Error('Solde insuffisant.');
+      if(rewardData.active === false) throw new Error("Cette récompense n'est plus disponible.");
+      if(rewardData.stock !== null && rewardData.stock !== undefined && (rewardData.redeemedCount||0) >= rewardData.stock) {
+        throw new Error('Stock épuisé.');
+      }
+      tx.set(redemRef, {
+        userId: u.uid, rewardId: reward.id, merchantId: rewardData.merchantId||null,
+        cost, label: rewardData.label||'Récompense', merchantName: rewardData.merchantName||'',
+        purchaseCondition: rewardData.purchaseCondition||null, code, status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        expiresAt: firebase.firestore.Timestamp.fromDate(expiresAt), usedAt: null
+      });
+      tx.update(userRef, { points: userData.points - cost });
+      tx.update(rewardRef, { redeemedCount: firebase.firestore.FieldValue.increment(1) });
     });
-    batch.update(db.collection('users').doc(u.uid), {
-      points: firebase.firestore.FieldValue.increment(-(reward.cost||0))
-    });
-    batch.update(db.collection('rewards').doc(reward.id), {
-      redeemedCount: firebase.firestore.FieldValue.increment(1)
-    });
-    await batch.commit();
     S.pts = Math.max(0, S.pts - (reward.cost||0));
     refreshWallet();
     showVoucherModal({ code, label: reward.label, merchantName: reward.merchantName, cost: reward.cost, purchaseCondition: reward.purchaseCondition, expiresAt });
   } catch(e) {
-    showVoucherError('Erreur : ' + e.message);
+    showVoucherError(e.message || ('Erreur : ' + e));
   }
 }
 

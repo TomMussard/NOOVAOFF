@@ -236,7 +236,12 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <div class="tb-brand">Noova</div>
     <div class="tb-badge">Admin</div>
   </div>
-  <button class="tb-logout" onclick="doLogout()">Déconnexion</button>
+  <div style="display:flex;align-items:center;gap:8px">
+    <a href="/" target="_blank" rel="noopener" style="padding:8px 14px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-size:12.5px;font-weight:700;font-family:var(--fb);text-decoration:none">🌐 Site</a>
+    <a href="/app" target="_blank" rel="noopener" style="padding:8px 14px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-size:12.5px;font-weight:700;font-family:var(--fb);text-decoration:none">📱 App</a>
+    <a href="/dashboard" target="_blank" rel="noopener" style="padding:8px 14px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-size:12.5px;font-weight:700;font-family:var(--fb);text-decoration:none">🏪 Dashboard</a>
+    <button class="tb-logout" onclick="doLogout()">Déconnexion</button>
+  </div>
 </div>
 
 <!-- MAIN -->
@@ -467,6 +472,14 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div style="padding:16px 18px">
         <button id="danger-delete-all-btn" onclick="dangerDeleteAll()" style="padding:11px 20px;background:#EF4444;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--fb)">Supprimer TOUS les commerçants et utilisateurs</button>
         <div id="danger-progress" style="margin-top:12px;font-size:12.5px;color:var(--ink3)"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title">🔧 Corriger les soldes négatifs</div>
+      <div style="padding:16px 18px">
+        <div style="font-size:12.5px;color:var(--ink3);margin-bottom:12px">Remet à 0 le solde de tout compte passé en négatif (bug corrigé, mais répare les comptes déjà affectés).</div>
+        <button onclick="dangerFixNegativeBalances()" style="padding:11px 20px;background:var(--bg2);color:var(--ink);border:1.5px solid var(--border);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--fb)">Corriger les soldes négatifs</button>
+        <div id="danger-fix-status" style="margin-top:12px;font-size:12.5px;color:var(--ink3)"></div>
       </div>
     </div>
     <div class="two-col">
@@ -790,9 +803,23 @@ async function loadDangerZone() {
 async function _dangerDeleteQuery(col, field, value) {
   const snap = await db.collection(col).where(field, '==', value).get();
   if (snap.empty) return;
-  const batch = db.batch();
-  snap.forEach(d => batch.delete(d.ref));
-  await batch.commit();
+  // Firestore plafonne un batch à 500 opérations — on découpe par sécurité.
+  const docs = snap.docs;
+  for (let i = 0; i < docs.length; i += 450) {
+    const batch = db.batch();
+    docs.slice(i, i + 450).forEach(d => batch.delete(d.ref));
+    await batch.commit();
+  }
+}
+async function _dangerDeleteCollection(colRef) {
+  const snap = await colRef.get();
+  if (snap.empty) return;
+  const docs = snap.docs;
+  for (let i = 0; i < docs.length; i += 450) {
+    const batch = db.batch();
+    docs.slice(i, i + 450).forEach(d => batch.delete(d.ref));
+    await batch.commit();
+  }
 }
 
 async function dangerDeleteMerchant(merchantId, btn) {
@@ -800,11 +827,20 @@ async function dangerDeleteMerchant(merchantId, btn) {
   try {
     await _dangerDeleteQuery('campaigns', 'merchantId', merchantId);
     await _dangerDeleteQuery('rewards', 'merchantId', merchantId);
+    await _dangerDeleteCollection(db.collection('merchants').doc(merchantId).collection('notifications'));
     await db.collection('merchants').doc(merchantId).delete();
     loadDangerZone();
   } catch (e) {
     showToast('Erreur : ' + e.message, '❌');
     if (btn) { btn.disabled = false; btn.textContent = 'Supprimer'; }
+  }
+}
+
+async function _dangerDeleteUserChats(uid) {
+  const snap = await db.collection('chats').where('participants', 'array-contains', uid).get();
+  for (const d of snap.docs) {
+    await _dangerDeleteCollection(d.ref.collection('messages'));
+    await d.ref.delete();
   }
 }
 
@@ -815,6 +851,8 @@ async function dangerDeleteUser(uid, btn) {
     await _dangerDeleteQuery('redemptions', 'userId', uid);
     await _dangerDeleteQuery('communityEvents', 'userId', uid);
     await _dangerDeleteQuery('friendCodes', 'uid', uid);
+    await _dangerDeleteCollection(db.collection('users').doc(uid).collection('notifications'));
+    await _dangerDeleteUserChats(uid);
     await db.collection('users').doc(uid).delete();
     loadDangerZone();
   } catch (e) {
@@ -824,7 +862,7 @@ async function dangerDeleteUser(uid, btn) {
 }
 
 async function dangerDeleteAll() {
-  if (!confirm("Supprimer TOUS les commerçants et utilisateurs (et leurs campagnes, récompenses, réponses, échanges) ? Action irréversible.")) return;
+  if (!confirm("Supprimer TOUS les commerçants et utilisateurs (et leurs campagnes, récompenses, réponses, échanges, notifications, chats, feed communauté) ? Action irréversible.")) return;
   const btn = document.getElementById('danger-delete-all-btn');
   const progress = document.getElementById('danger-progress');
   btn.disabled = true;
@@ -837,6 +875,7 @@ async function dangerDeleteAll() {
     for (const id of merchants) {
       await _dangerDeleteQuery('campaigns', 'merchantId', id);
       await _dangerDeleteQuery('rewards', 'merchantId', id);
+      await _dangerDeleteCollection(db.collection('merchants').doc(id).collection('notifications'));
       await db.collection('merchants').doc(id).delete();
       done++; progress.textContent = `${done} / ${total}…`;
     }
@@ -845,15 +884,45 @@ async function dangerDeleteAll() {
       await _dangerDeleteQuery('redemptions', 'userId', id);
       await _dangerDeleteQuery('communityEvents', 'userId', id);
       await _dangerDeleteQuery('friendCodes', 'uid', id);
+      await _dangerDeleteCollection(db.collection('users').doc(id).collection('notifications'));
+      await _dangerDeleteUserChats(id);
       await db.collection('users').doc(id).delete();
       done++; progress.textContent = `${done} / ${total}…`;
     }
-    progress.textContent = `✅ Terminé — ${merchants.length} commerçant(s) et ${users.length} utilisateur(s) supprimés.`;
+    // Plus aucun user/commerçant : le feed communauté, les questions de la semaine et
+    // le référentiel de villes (compteurs à zéro) n'ont plus de sens, on repart propre.
+    progress.textContent = 'Nettoyage du feed communauté et des questions de la semaine…';
+    await _dangerDeleteCollection(db.collection('communityEvents'));
+    const wqSnap = await db.collection('weeklyQuestions').get();
+    for (const d of wqSnap.docs) {
+      await _dangerDeleteCollection(d.ref.collection('votes'));
+      await d.ref.delete();
+    }
+    const citiesSnap = await db.collection('cities').get();
+    const cityBatch = db.batch();
+    citiesSnap.forEach(d => cityBatch.update(d.ref, { count: 0 }));
+    if (!citiesSnap.empty) await cityBatch.commit();
+    progress.textContent = `✅ Terminé — ${merchants.length} commerçant(s) et ${users.length} utilisateur(s) supprimés, feed et questions de la semaine réinitialisés.`;
     loadDangerZone();
   } catch (e) {
     progress.textContent = 'Erreur : ' + e.message;
   }
   btn.disabled = false;
+}
+
+async function dangerFixNegativeBalances() {
+  const statusEl = document.getElementById('danger-fix-status');
+  statusEl.textContent = 'Recherche des soldes négatifs…';
+  try {
+    const snap = await db.collection('users').where('points', '<', 0).get();
+    if (snap.empty) { statusEl.textContent = 'Aucun solde négatif trouvé.'; return; }
+    const batch = db.batch();
+    snap.forEach(d => batch.update(d.ref, { points: 0 }));
+    await batch.commit();
+    statusEl.textContent = `✅ ${snap.size} compte(s) corrigé(s) (solde remis à 0).`;
+  } catch (e) {
+    statusEl.textContent = 'Erreur : ' + e.message;
+  }
 }
 
 function renderMerchants() {

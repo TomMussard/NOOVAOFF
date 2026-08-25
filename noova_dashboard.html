@@ -2698,11 +2698,17 @@ function matchSectorKey(sectorText) {
   const found = SECTOR_KEYWORDS.find(entry => entry.words.some(w => s.includes(w)));
   return found ? found.key : 'Commerce';
 }
-const PRICE_GUIDES = [
-  { label: 'Petit geste (café, -10%)', pts: 200 },
-  { label: 'Moyen (dessert, -15%)', pts: 350 },
-  { label: 'Belle offre (-20%)', pts: 500 },
-  { label: 'Grosse offre (-30%, avec condition)', pts: 900 },
+// Grille de points FIXE et identique pour tous les commerçants (même logique que les
+// paliers de récompenses d'une grande enseigne type fast-food) : chaque slot a un coût
+// non négociable, seul le contenu (icône/intitulé/condition) change d'un commerçant à
+// l'autre. Ça donne un repère de valeur cohérent dans toute l'app ("200 pts = petit geste,
+// partout"), plutôt que 500 pts qui veut dire une remise chez l'un et un menu chez l'autre.
+const REWARD_TIERS = [
+  { label: 'Petit geste',   sub: 'café, cookie, -10%…',        pts: 200  },
+  { label: 'Moyen',         sub: 'dessert, boisson, -15%…',    pts: 350  },
+  { label: 'Belle offre',   sub: '-20%, entrée offerte…',      pts: 500  },
+  { label: 'Grande offre',  sub: '-30%, produit premium…',     pts: 750  },
+  { label: 'Offre premium', sub: 'menu offert, -50%…',         pts: 1000 },
 ];
 
 let _rewardSlots = []; // [{id, data}] loaded from Firestore
@@ -2737,11 +2743,13 @@ function renderRewardSuggestions() {
   const sectorKey = matchSectorKey(_mData?.sector || '');
   const suggestions = REWARD_SUGGESTIONS[sectorKey] || REWARD_SUGGESTIONS['Commerce'];
   chipsEl.innerHTML = '';
+  // Le coût est désormais fixé par le palier (slot), pas par le contenu — les suggestions
+  // ne proposent donc plus qu'une idée de contenu (icône/intitulé/condition) à reprendre.
   suggestions.forEach(s => {
     const chip = document.createElement('button');
     chip.type = 'button';
     chip.style.cssText = 'padding:8px 14px;border-radius:99px;border:1.5px solid rgba(242,151,21,.35);background:var(--card);color:var(--ink);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--fb);white-space:nowrap';
-    chip.textContent = `${s.icon} ${s.label} — ${s.cost} pts`;
+    chip.textContent = `${s.icon} ${s.label}`;
     chip.onclick = () => useSuggestedReward(s);
     chipsEl.appendChild(chip);
   });
@@ -2752,11 +2760,9 @@ function useSuggestedReward(s) {
   if (!document.getElementById('new-r-label')) addRewardSlot();
   const iconEl  = document.getElementById('new-r-icon');
   const labelEl = document.getElementById('new-r-label');
-  const costEl  = document.getElementById('new-r-cost');
   const condEl  = document.getElementById('new-r-condition');
   if (iconEl)  iconEl.value = s.icon;
   if (labelEl) labelEl.value = s.label;
-  if (costEl)  costEl.value = s.cost;
   if (condEl && s.condition) condEl.value = s.condition;
   const formCard = labelEl && labelEl.closest('.card');
   if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2800,34 +2806,33 @@ function addRewardSlot() {
   if(_rewardSlots.length >= 5) { showToast('Maximum 5 récompenses','⚠️'); return; }
   const el = document.getElementById('reward-slots');
   const slot = _rewardSlots.length + 1;
+  const tier = REWARD_TIERS[slot-1];
   const form = document.createElement('div');
   form.className = 'card';
   form.style.marginBottom = '14px';
   form.style.border = '2px dashed var(--coral)';
-  const pGuide = PRICE_GUIDES.map(p => `<option value="${p.pts}">${p.label} → ${p.pts} pts</option>`).join('');
   form.innerHTML = `
-    <div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--coral);margin-bottom:14px">Nouvelle récompense (slot ${slot}/5)</div>
+    <div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--coral);margin-bottom:4px">Nouvelle récompense (slot ${slot}/5)</div>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:var(--rs);padding:10px 14px;margin-bottom:14px">
+      <div style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink)">${tier.pts} pts</div>
+      <div style="width:1px;height:16px;background:var(--border)"></div>
+      <div style="font-size:12px;color:var(--ink2)"><strong>${tier.label}</strong> — coût fixe, identique pour tous les commerçants Noova</div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
       <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Emoji icône</label>
         <input class="field-inp" id="new-r-icon" placeholder="🎁" style="font-size:22px;text-align:center" maxlength="2" value="🎁"></div>
-      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Intitulé *</label>
+      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Intitulé * <span style="font-weight:400;color:var(--ink3)">(ex. ${tier.sub})</span></label>
         <input class="field-inp" id="new-r-label" placeholder="ex. Café offert"></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
-      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Prix suggéré</label>
-        <select class="field-inp" id="new-r-guide" onchange="document.getElementById('new-r-cost').value=this.value"><option value="">—</option>${pGuide}</select></div>
-      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Coût en pts *</label>
-        <input class="field-inp" id="new-r-cost" type="number" placeholder="200" min="1"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
       <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Stock (vide=illimité)</label>
         <input class="field-inp" id="new-r-stock" type="number" placeholder="50" min="1"></div>
+      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Expire le (optionnel)</label>
+        <input class="field-inp" id="new-r-expires" type="date"></div>
     </div>
     <div style="margin-bottom:12px">
       <label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Condition d'achat (optionnel)</label>
       <input class="field-inp" id="new-r-condition" placeholder="ex. pour tout plat commandé">
-    </div>
-    <div style="display:flex;gap:10px;margin-bottom:12px">
-      <div style="flex:1"><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Expire le (optionnel)</label>
-        <input class="field-inp" id="new-r-expires" type="date"></div>
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button class="tb-btn" onclick="this.closest('.card').remove();const ab=document.getElementById('add-reward-btn');if(ab)ab.style.display=''">Annuler</button>
@@ -2843,8 +2848,8 @@ async function saveReward(slot, btn) {
   if(!u || !_mData) return;
   if(_mData.status === 'pending') { showToast('Espace en cours de vérification — publication disponible après validation','⏳'); return; }
   const label = document.getElementById('new-r-label')?.value.trim();
-  const cost = parseInt(document.getElementById('new-r-cost')?.value);
-  if(!label || !cost || cost < 1) { showToast('Remplis l\'intitulé et le coût','⚠️'); return; }
+  const cost = (REWARD_TIERS[slot-1] || REWARD_TIERS[REWARD_TIERS.length-1]).pts; // palier fixe, non négociable
+  if(!label) { showToast('Remplis l\'intitulé','⚠️'); return; }
   const icon = document.getElementById('new-r-icon')?.value || '🎁';
   const stockVal = document.getElementById('new-r-stock')?.value;
   const stock = stockVal ? parseInt(stockVal) : null;
