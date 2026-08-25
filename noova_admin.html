@@ -470,7 +470,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
   <!-- ══════════════ TAB ZONE DE DANGER ══════════════ -->
   <div id="tab-danger" style="display:none">
-    <div class="sec-hdr"><h2>⚠️ Zone de danger</h2><p>Supprime des comptes de test avant un vrai lancement. Ça efface les données Firestore (commerçant/utilisateur + campagnes, récompenses, réponses, échanges liés) — <strong>ça ne supprime pas le compte de connexion (Auth)</strong>, à faire en plus dans Firebase Console → Authentication si besoin. Irréversible.</p>
+    <div class="sec-hdr"><h2>⚠️ Zone de danger</h2><p>Supprime des comptes de test avant un vrai lancement. Efface <strong>tout</strong> : données Firestore (campagnes, récompenses, réponses, échanges, notifications, chats liés) <strong>ET le compte de connexion (Auth)</strong> — plus rien ne reste. Irréversible.</p>
     <div class="card" style="margin-bottom:20px;border-color:rgba(239,68,68,.35)">
       <div class="card-title" style="color:#EF4444">🗑️ Tout supprimer</div>
       <div style="padding:16px 18px">
@@ -545,6 +545,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
 <script>
 const ADMIN_EMAILS = ['noovaoffr@gmail.com', 'tomussproduction@gmail.com'];
 
@@ -558,6 +559,9 @@ const app = firebase.initializeApp({
 });
 const auth = firebase.auth();
 const db = firebase.firestore();
+const fx  = firebase.app().functions('europe-west1');
+const callAdminResetAllData  = fx.httpsCallable('adminResetAllData');
+const callAdminDeleteAccount = fx.httpsCallable('adminDeleteAccount');
 
 let allMerchants = [];
 let currentFilter = 'all';
@@ -881,35 +885,13 @@ async function loadDangerZone() {
   }
 }
 
-async function _dangerDeleteQuery(col, field, value) {
-  const snap = await db.collection(col).where(field, '==', value).get();
-  if (snap.empty) return;
-  // Firestore plafonne un batch à 500 opérations — on découpe par sécurité.
-  const docs = snap.docs;
-  for (let i = 0; i < docs.length; i += 450) {
-    const batch = db.batch();
-    docs.slice(i, i + 450).forEach(d => batch.delete(d.ref));
-    await batch.commit();
-  }
-}
-async function _dangerDeleteCollection(colRef) {
-  const snap = await colRef.get();
-  if (snap.empty) return;
-  const docs = snap.docs;
-  for (let i = 0; i < docs.length; i += 450) {
-    const batch = db.batch();
-    docs.slice(i, i + 450).forEach(d => batch.delete(d.ref));
-    await batch.commit();
-  }
-}
-
+// Suppression réelle et complète (Firestore + compte de connexion Auth) via Cloud
+// Function côté serveur — un client web ne peut jamais supprimer le compte Auth de
+// quelqu'un d'autre que lui-même, seul le SDK Admin le peut.
 async function dangerDeleteMerchant(merchantId, btn) {
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
-    await _dangerDeleteQuery('campaigns', 'merchantId', merchantId);
-    await _dangerDeleteQuery('rewards', 'merchantId', merchantId);
-    await _dangerDeleteCollection(db.collection('merchants').doc(merchantId).collection('notifications'));
-    await db.collection('merchants').doc(merchantId).delete();
+    await callAdminDeleteAccount({ uid: merchantId, role: 'merchant' });
     loadDangerZone();
   } catch (e) {
     showToast('Erreur : ' + e.message, '❌');
@@ -917,24 +899,10 @@ async function dangerDeleteMerchant(merchantId, btn) {
   }
 }
 
-async function _dangerDeleteUserChats(uid) {
-  const snap = await db.collection('chats').where('participants', 'array-contains', uid).get();
-  for (const d of snap.docs) {
-    await _dangerDeleteCollection(d.ref.collection('messages'));
-    await d.ref.delete();
-  }
-}
-
 async function dangerDeleteUser(uid, btn) {
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
-    await _dangerDeleteQuery('answers', 'userId', uid);
-    await _dangerDeleteQuery('redemptions', 'userId', uid);
-    await _dangerDeleteQuery('communityEvents', 'userId', uid);
-    await _dangerDeleteQuery('friendCodes', 'uid', uid);
-    await _dangerDeleteCollection(db.collection('users').doc(uid).collection('notifications'));
-    await _dangerDeleteUserChats(uid);
-    await db.collection('users').doc(uid).delete();
+    await callAdminDeleteAccount({ uid, role: 'user' });
     loadDangerZone();
   } catch (e) {
     showToast('Erreur : ' + e.message, '❌');
@@ -943,47 +911,15 @@ async function dangerDeleteUser(uid, btn) {
 }
 
 async function dangerDeleteAll() {
-  if (!confirm("Supprimer TOUS les commerçants et utilisateurs (et leurs campagnes, récompenses, réponses, échanges, notifications, chats, feed communauté) ? Action irréversible.")) return;
+  if (!confirm("Supprimer VRAIMENT TOUT (commerçants, utilisateurs, campagnes, récompenses, réponses, échanges, notifications, chats, feed communauté, ET les comptes de connexion associés) ? Action irréversible.")) return;
   const btn = document.getElementById('danger-delete-all-btn');
   const progress = document.getElementById('danger-progress');
   btn.disabled = true;
+  progress.textContent = 'Suppression en cours (peut prendre une minute)…';
   try {
-    const [mSnap, uSnap] = await Promise.all([db.collection('merchants').get(), db.collection('users').get()]);
-    const merchants = mSnap.docs.map(d => d.id);
-    const users = uSnap.docs.map(d => d.id);
-    let done = 0;
-    const total = merchants.length + users.length;
-    for (const id of merchants) {
-      await _dangerDeleteQuery('campaigns', 'merchantId', id);
-      await _dangerDeleteQuery('rewards', 'merchantId', id);
-      await _dangerDeleteCollection(db.collection('merchants').doc(id).collection('notifications'));
-      await db.collection('merchants').doc(id).delete();
-      done++; progress.textContent = `${done} / ${total}…`;
-    }
-    for (const id of users) {
-      await _dangerDeleteQuery('answers', 'userId', id);
-      await _dangerDeleteQuery('redemptions', 'userId', id);
-      await _dangerDeleteQuery('communityEvents', 'userId', id);
-      await _dangerDeleteQuery('friendCodes', 'uid', id);
-      await _dangerDeleteCollection(db.collection('users').doc(id).collection('notifications'));
-      await _dangerDeleteUserChats(id);
-      await db.collection('users').doc(id).delete();
-      done++; progress.textContent = `${done} / ${total}…`;
-    }
-    // Plus aucun user/commerçant : le feed communauté, les questions de la semaine et
-    // le référentiel de villes (compteurs à zéro) n'ont plus de sens, on repart propre.
-    progress.textContent = 'Nettoyage du feed communauté et des questions de la semaine…';
-    await _dangerDeleteCollection(db.collection('communityEvents'));
-    const wqSnap = await db.collection('weeklyQuestions').get();
-    for (const d of wqSnap.docs) {
-      await _dangerDeleteCollection(d.ref.collection('votes'));
-      await d.ref.delete();
-    }
-    const citiesSnap = await db.collection('cities').get();
-    const cityBatch = db.batch();
-    citiesSnap.forEach(d => cityBatch.update(d.ref, { count: 0 }));
-    if (!citiesSnap.empty) await cityBatch.commit();
-    progress.textContent = `✅ Terminé — ${merchants.length} commerçant(s) et ${users.length} utilisateur(s) supprimés, feed et questions de la semaine réinitialisés.`;
+    const res = await callAdminResetAllData();
+    const n = res.data && res.data.deletedAuthCount;
+    progress.textContent = `✅ Terminé — toutes les données Firestore et ${n} compte(s) de connexion supprimés.`;
     loadDangerZone();
   } catch (e) {
     progress.textContent = 'Erreur : ' + e.message;

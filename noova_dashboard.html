@@ -2533,6 +2533,14 @@ launchCampaign = async function() {
   const u = auth.currentUser;
   if(!u || !_mData) { showToast('Connecte-toi pour lancer','⚠️'); return; }
   if(_mData.status === 'pending') { showToast('Espace en cours de vérification — lancement disponible après validation','⏳'); return; }
+  try {
+    const approvedSnap = await db.collection('rewards').where('merchantId','==',u.uid).where('status','==','approved').limit(1).get();
+    if(approvedSnap.empty) {
+      showToast('Configure et fais valider au moins une récompense avant de lancer une campagne','🎁');
+      navTo('rewards', document.querySelector('.sb-item[onclick*="\'rewards\'"]'));
+      return;
+    }
+  } catch(e) { showToast('Erreur : ' + e.message, '❌'); return; }
   const q1 = document.getElementById('q-text-inp')?.value?.trim();
   if(!q1) { showToast('Saisis une question d\'abord','⚠️'); return; }
   const options  = Array.from(document.querySelectorAll('.mcq-opt-inp')).map(i=>i.value.trim()).filter(Boolean);
