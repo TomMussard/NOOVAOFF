@@ -22,11 +22,6 @@ service cloud.firestore {
     function myCity() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('city', null);
     }
-    // Grille de points FIXE des récompenses (5 paliers, identiques pour tous les
-    // commerçants) — doit rester synchronisée avec REWARD_TIERS dans noova_dashboard.html.
-    function rewardTierCost(slot) {
-      return slot == 1 ? 200 : slot == 2 ? 350 : slot == 3 ? 500 : slot == 4 ? 750 : slot == 5 ? 1000 : -1;
-    }
 
     // ─── Users ────────────────────────────────────────────────────────────────
     // Lecture : soi-même, ses amis, les autres users de sa propre ville (classement/groupes), ou l'admin
@@ -54,7 +49,8 @@ service cloud.firestore {
 
       // Notifications subcollection
       match /notifications/{notifId} {
-        allow read, update: if isOwner(uid);
+        allow read: if isOwner(uid) || isAdmin();
+        allow update: if isOwner(uid);
         allow create: if isAuth();
         allow delete: if isOwner(uid) || isAdmin();
       }
@@ -88,7 +84,8 @@ service cloud.firestore {
 
       // Notifications subcollection (annonces admin, popup de vérification…)
       match /notifications/{notifId} {
-        allow read, update: if isOwner(merchantId);
+        allow read: if isOwner(merchantId) || isAdmin();
+        allow update: if isOwner(merchantId);
         allow create: if isAuth();
         allow delete: if isOwner(merchantId) || isAdmin();
       }
@@ -145,14 +142,21 @@ service cloud.firestore {
         resource.data.merchantId == request.auth.uid ||
         isAdmin()
       );
+      // Une récompense créée par un commerçant démarre toujours en attente de validation
+      // admin — jamais visible/active tant qu'elle n'a pas été approuvée (voir update).
       allow create: if isAuth() &&
         request.resource.data.merchantId == request.auth.uid &&
         getMerchant(request.auth.uid).get('status', null) == 'verified' &&
-        request.resource.data.cost == rewardTierCost(request.resource.data.slot);
+        request.resource.data.status == 'pending' &&
+        request.resource.data.active == false;
       allow update: if isAuth() && (
-        // Commerçant : modification complète (le coût reste verrouillé au palier)
+        isAdmin()
+        ||
+        // Commerçant : modification complète de son propre palier, mais il ne peut ni
+        // s'auto-approuver/rejeter, ni s'auto-activer avant validation par l'admin.
         (resource.data.merchantId == request.auth.uid &&
-         request.resource.data.cost == rewardTierCost(request.resource.data.slot))
+         (request.resource.data.status == 'pending' || request.resource.data.status == resource.data.status) &&
+         (request.resource.data.active == false || resource.data.status == 'approved'))
         ||
         // Utilisateur : uniquement incrémenter redeemedCount de 1
         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['redeemedCount']) &&
@@ -184,7 +188,7 @@ service cloud.firestore {
     // Lecture : événements de MA ville uniquement
     // Création : uniquement pour soi-même
     match /communityEvents/{eventId} {
-      allow read: if isAuth() && resource.data.get('city', null) == myCity();
+      allow read: if isAuth() && (resource.data.get('city', null) == myCity() || isAdmin());
       allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
       allow update: if false;
       allow delete: if isAuth() && (resource.data.userId == request.auth.uid || isAdmin());
@@ -231,13 +235,13 @@ service cloud.firestore {
     // ─── Chats ───────────────────────────────────────────────────────────────
     // Accès uniquement aux participants (stockés dans participants map du doc chat)
     match /chats/{chatId} {
-      allow read: if isAuth() && (resource == null || request.auth.uid in resource.data.participants);
+      allow read: if isAuth() && (resource == null || request.auth.uid in resource.data.participants || isAdmin());
       allow create: if isAuth() && request.auth.uid in request.resource.data.participants;
       allow update: if false;
       allow delete: if isAdmin();
       match /messages/{msgId} {
         allow read: if isAuth() &&
-          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+          (request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants || isAdmin());
         allow create: if isAuth() &&
           request.resource.data.fromUid == request.auth.uid &&
           request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;

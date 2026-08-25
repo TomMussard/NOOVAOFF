@@ -458,6 +458,10 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <!-- ══════════════ TAB MODÉRATION ══════════════ -->
   <div id="tab-moderation" style="display:none">
     <div class="sec-hdr"><h2>Modération</h2><p>Réponses signalées par le score qualité (soumises trop vite pour être un vrai choix humain) — 0 point crédité automatiquement. Tu peux lever le signalement si c'est un faux positif.</p></div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title">🎁 Récompenses en attente de validation <span class="badge badge-pending" id="reward-mod-count">0</span></div>
+      <div id="reward-mod-list"><div class="loading">Chargement</div></div>
+    </div>
     <div class="card">
       <div class="card-title">🚩 Réponses signalées <span class="badge badge-pending" id="mod-count">0</span></div>
       <div id="mod-list"><div class="loading">Chargement</div></div>
@@ -523,6 +527,18 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   </div>
 </div>
 
+<!-- Popup de saisie courte (remplace le prompt() du navigateur) -->
+<div id="text-prompt-modal" onclick="if(event.target===this)closeTextPromptModal(null)" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--card);border-radius:20px;max-width:420px;width:100%;padding:28px 26px;box-shadow:0 24px 64px rgba(0,0,0,.25)">
+    <div id="tpm-label" style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink);margin-bottom:14px">—</div>
+    <textarea id="tpm-input" rows="3" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--ink);font-size:14px;font-family:var(--fb);outline:none;resize:vertical;box-sizing:border-box"></textarea>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button onclick="closeTextPromptModal(null)" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-weight:700;font-family:var(--fb);cursor:pointer">Annuler</button>
+      <button onclick="closeTextPromptModal(document.getElementById('tpm-input').value)" style="flex:1;padding:12px;border-radius:10px;background:var(--grad);border:none;color:var(--brown);font-weight:800;font-family:var(--fd);cursor:pointer">Confirmer</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -556,6 +572,19 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
+}
+// ── Petite popup de saisie texte (remplace prompt()) ─────────────────────────
+let _tpmResolve = null;
+function textPromptModal(label) {
+  document.getElementById('tpm-label').textContent = label;
+  document.getElementById('tpm-input').value = '';
+  document.getElementById('text-prompt-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('tpm-input').focus(), 60);
+  return new Promise(resolve => { _tpmResolve = resolve; });
+}
+function closeTextPromptModal(val) {
+  document.getElementById('text-prompt-modal').style.display = 'none';
+  if (_tpmResolve) { _tpmResolve(val); _tpmResolve = null; }
 }
 function fmtDate(ts) {
   if (!ts) return '—';
@@ -729,8 +758,60 @@ async function loadReadiness() {
   }
 }
 
+// ── Modération : récompenses en attente de validation ───────────────────────
+async function loadRewardModeration() {
+  const el = document.getElementById('reward-mod-list');
+  if (!el) return;
+  el.innerHTML = '<div class="loading">Chargement</div>';
+  try {
+    const snap = await db.collection('rewards').where('status', '==', 'pending').orderBy('createdAt', 'desc').limit(100).get();
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('reward-mod-count').textContent = items.length;
+    if (!items.length) {
+      el.innerHTML = '<div class="empty">Aucune récompense en attente. 🎉</div>';
+      return;
+    }
+    el.innerHTML = items.map(r => `
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border)">
+        <div style="font-size:26px;flex-shrink:0">${esc(r.icon||'🎁')}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13.5px;color:var(--ink)">${esc(r.label||'Récompense')}</div>
+          <div style="font-size:11.5px;color:var(--ink3);margin-top:2px">${esc(r.merchantName||'')} · ${esc(r.city||'')} · palier ${r.slot||'?'} · ${(r.valueEuros||0).toFixed(2)} € → ${r.cost||0} pts${r.purchaseCondition?' · 📋 '+esc(r.purchaseCondition):''}</div>
+        </div>
+        <button onclick="approveReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0">✓ Valider</button>
+        <button onclick="rejectReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">✗ Refuser</button>
+      </div>`).join('');
+  } catch (e) {
+    el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
+  }
+}
+async function approveReward(rewardId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  try {
+    await db.collection('rewards').doc(rewardId).update({ status: 'approved', active: true, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast('Récompense validée', '✅');
+    loadRewardModeration();
+  } catch (e) {
+    showToast('Erreur : ' + e.message, '❌');
+    if (btn) { btn.disabled = false; btn.textContent = '✓ Valider'; }
+  }
+}
+async function rejectReward(rewardId, btn) {
+  const reason = (await textPromptModal('Motif du refus (visible par le commerçant, optionnel)')) || '';
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  try {
+    await db.collection('rewards').doc(rewardId).update({ status: 'rejected', active: false, rejectionReason: reason, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast('Récompense refusée', '🚫');
+    loadRewardModeration();
+  } catch (e) {
+    showToast('Erreur : ' + e.message, '❌');
+    if (btn) { btn.disabled = false; btn.textContent = '✗ Refuser'; }
+  }
+}
+
 // ── Modération : réponses signalées par le score qualité ────────────────────
 async function loadModeration() {
+  loadRewardModeration();
   const el = document.getElementById('mod-list');
   if (!el) return;
   el.innerHTML = '<div class="loading">Chargement</div>';

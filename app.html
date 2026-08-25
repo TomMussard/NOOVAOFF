@@ -809,6 +809,19 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- BRAND PAGE -->
 <div id="brand-page" class="screen"><div class="bp-wrap" id="bp-wrap"></div></div>
 
+<!-- Popup de confirmation de suppression de compte (remplace le prompt() du navigateur) -->
+<div id="delete-account-modal" onclick="if(event.target===this)closeDeleteAccountModal()" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--card);border-radius:20px;max-width:380px;width:100%;padding:28px 26px;box-shadow:0 24px 64px rgba(0,0,0,.25)">
+    <div style="font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink);margin-bottom:8px">Supprimer ton compte</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:16px">Toutes tes données seront effacées de façon permanente. Tape <strong>SUPPRIMER</strong> pour confirmer.</div>
+    <input id="dam-input" type="text" placeholder="SUPPRIMER" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;box-sizing:border-box">
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button onclick="closeDeleteAccountModal()" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-weight:700;cursor:pointer">Annuler</button>
+      <button onclick="confirmDeleteAccount()" style="flex:1;padding:12px;border-radius:10px;background:#EF4444;border:none;color:#fff;font-weight:700;cursor:pointer">Supprimer</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- BOTTOM NAV -->
 <nav class="bnav" id="bnav">
@@ -824,7 +837,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 const S={user:null,pts:0,xp:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],done:{},friends:[],chats:{}};
 const DAILY_CAP=300;
 const BRANDMETA={};
-function logoHTML(name,size){const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#6A6470'};const s=size||44;const r=Math.round(s*0.27),fs=Math.round(s*0.44);return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;}
+function logoHTML(name,size,logoUrl){
+  const s=size||44;const r=Math.round(s*0.27);
+  if(logoUrl) return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.14);overflow:hidden"><img src="${logoUrl}" style="width:100%;height:100%;object-fit:cover" alt=""></div>`;
+  const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#6A6470'};const fs=Math.round(s*0.44);
+  return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;
+}
 // Villes beta connues : rattache les variantes d'\u00e9criture (espace manquant, tirets...)
 // au m\u00eame slug pour \u00e9viter qu'un utilisateur atterrisse dans une "ville fant\u00f4me".
 const NOOVA_KNOWN_CITIES=[{slug:'le-mans',label:'Le Mans'},{slug:'angers',label:'Angers'}];
@@ -1763,7 +1781,7 @@ function refreshProfile(){
   const cm=document.getElementById('consent-mgmt');cm.innerHTML='';
   const _cm=S._nearbyMerchants||[];
   if(!_cm.length){cm.innerHTML='<div style="font-size:12px;color:var(--ink2);text-align:center;padding:8px 0">Aucun commerce autorisé · Appuie sur "Gérer" pour en ajouter.</div>';}
-  else{_cm.slice(0,4).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='consent-it';d.innerHTML=`${logoHTML(label,32)}<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">${esc(label)}</div><div style="font-size:10px;color:var(--ink3);margin-top:1px">${esc(m.sector||m.address||'')}</div></div><span style="font-size:10px;font-weight:700;color:var(--mint);background:var(--md);padding:3px 8px;border-radius:99px">✓ Autorisé</span>`;cm.appendChild(d)});if(_cm.length>4){const more=document.createElement('div');more.style.cssText='font-size:11px;color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`+${_cm.length-4} autres`;cm.appendChild(more);}}
+  else{_cm.slice(0,4).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='consent-it';d.innerHTML=`${logoHTML(label,32,m.logoUrl)}<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">${esc(label)}</div><div style="font-size:10px;color:var(--ink3);margin-top:1px">${esc(m.sector||m.address||'')}</div></div><span style="font-size:10px;font-weight:700;color:var(--mint);background:var(--md);padding:3px 8px;border-radius:99px">✓ Autorisé</span>`;cm.appendChild(d)});if(_cm.length>4){const more=document.createElement('div');more.style.cssText='font-size:11px;color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`+${_cm.length-4} autres`;cm.appendChild(more);}}
   const bl=document.getElementById('badges-list');bl.innerHTML='';
   const earned=[S.ans>0&&'first',S.ans>=3&&'trio',S.streak>=3&&'streak3',S.friends.length>0&&'social',S.ans>=5&&'qual'].filter(Boolean);
   BDGS.forEach(b=>{const e=earned.includes(b.id);const d=document.createElement('div');d.className='bp '+(e?'earned':'locked');d.textContent=(e?b.e:'🔒')+' '+b.n;bl.appendChild(d)});
@@ -1983,7 +2001,7 @@ async function openBrandById(mid, fallbackName) {
     document.getElementById('bp-wrap').innerHTML=`
       <div class="bp-cover" style="background:linear-gradient(150deg,#1A1208 0%,#2B1D0B 38%,rgba(0,0,0,.5) 165%)">
         <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
-        <div class="bp-logo-wrap">${logoHTML(brandName,60)}<div><div class="bp-name">${brandName}</div><div class="bp-tag">${m.sector||'Commerce local'}${m.city?' · '+m.city:''}</div></div></div>
+        <div class="bp-logo-wrap">${logoHTML(brandName,60,m.logoUrl)}<div><div class="bp-name">${brandName}</div><div class="bp-tag">${m.sector||'Commerce local'}${m.city?' · '+m.city:''}</div></div></div>
         <div class="bp-chips"><span class="bp-chip">✓ Commerce vérifié</span>${m.city?`<span class="bp-chip">📍 ${m.city}</span>`:''}${m.sector?`<span class="bp-chip">${m.sector}</span>`:''}</div>
       </div>
       <div class="bp-stats">
@@ -2056,7 +2074,7 @@ function renderBrandRail(){
     if(!seen.has(m.id)){
       seen.add(m.id);
       const hasQ=( S.qs||[]).some(q=>q._merchantId===m.id);
-      cards.push({name:m.brandName||m.name||'Commerce',ico:'🏪',sector:m.sector||'Commerce local',hasQ,_merchantId:m.id});
+      cards.push({name:m.brandName||m.name||'Commerce',ico:'🏪',sector:m.sector||'Commerce local',hasQ,_merchantId:m.id,logoUrl:m.logoUrl||null});
     }
   });
   // Priorité 2 : campagnes actives (pour les commerçants non encore dans _nearbyMerchants)
@@ -2070,7 +2088,7 @@ function renderBrandRail(){
   }
   cards.forEach(c=>{
     const d=document.createElement('div');d.className='br-card';
-    d.innerHTML=`<div class="brc-top">${logoHTML(c.name,40)}</div><div class="brc-name">${esc(c.name)}</div><div class="brc-sec">${esc(c.sector)}</div><div class="brc-chip${c.hasQ?'':' soon'}">${c.hasQ?'📋 Question active':'🔜 Bientôt'}</div>`;
+    d.innerHTML=`<div class="brc-top">${logoHTML(c.name,40,c.logoUrl)}</div><div class="brc-name">${esc(c.name)}</div><div class="brc-sec">${esc(c.sector)}</div><div class="brc-chip${c.hasQ?'':' soon'}">${c.hasQ?'📋 Question active':'🔜 Bientôt'}</div>`;
     if(c._merchantId) d.onclick=()=>openBrandById(c._merchantId,c.name);
     el.appendChild(d);
   });
@@ -2686,7 +2704,7 @@ async function openManageMerchants() {
       const sub   = m.sector || m.address || m.city || '';
       const d = document.createElement('div');
       d.className = 'brand-item' + (checked ? ' on' : '');
-      d.innerHTML = `${logoHTML(label,44)}<div style="flex:1;min-width:0"><div class="bi-name">${esc(label)}</div><div class="bi-use">${esc(sub)}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} data-mid="${m.id}"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
+      d.innerHTML = `${logoHTML(label,44,m.logoUrl)}<div style="flex:1;min-width:0"><div class="bi-name">${esc(label)}</div><div class="bi-use">${esc(sub)}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} data-mid="${m.id}"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
       d.querySelector('input').addEventListener('change', function() {
         _mmConsents[m.id] = this.checked;
         d.classList.toggle('on', this.checked);
@@ -2786,7 +2804,7 @@ function renderBrandsFromFirestore(merchants) {
       const sub   = m.address ? (m.address + (m.city ? ', ' + m.city : '')) : (m.city || '');
       const d = document.createElement('div');
       d.className = 'brand-item' + (checked ? ' on' : '');
-      d.innerHTML = `${logoHTML(label,44)}<div style="flex:1;min-width:0"><div class="bi-name">${label}</div><div class="bi-use">${sub}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} onchange="S.brands['${m.id}']=this.checked;this.closest('.brand-item').classList[this.checked?'add':'remove']('on')"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
+      d.innerHTML = `${logoHTML(label,44,m.logoUrl)}<div style="flex:1;min-width:0"><div class="bi-name">${label}</div><div class="bi-use">${sub}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} onchange="S.brands['${m.id}']=this.checked;this.closest('.brand-item').classList[this.checked?'add':'remove']('on')"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
       el.appendChild(d);
     });
   });
@@ -2956,10 +2974,21 @@ async function revokeAllConsents() {
   refreshProfile();
 }
 
-async function deleteMyAccount() {
+function deleteMyAccount() {
   if(!S.user) return;
-  const conf = prompt('Pour supprimer ton compte, tape SUPPRIMER ci-dessous.\nToutes tes données seront effacées de façon permanente.');
+  const inp = document.getElementById('dam-input');
+  if(inp) inp.value = '';
+  const m = document.getElementById('delete-account-modal');
+  if(m) m.style.display = 'flex';
+}
+function closeDeleteAccountModal() {
+  const m = document.getElementById('delete-account-modal');
+  if(m) m.style.display = 'none';
+}
+async function confirmDeleteAccount() {
+  const conf = document.getElementById('dam-input')?.value;
   if(conf !== 'SUPPRIMER') return;
+  closeDeleteAccountModal();
   const uid = auth.currentUser && auth.currentUser.uid;
   if(!uid) return;
   try {

@@ -1426,6 +1426,18 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   </div>
 </div>
 
+<!-- Popup d'édition d'un paramètre (remplace le prompt() du navigateur) -->
+<div id="edit-field-modal" onclick="if(event.target===this)closeEditFieldModal()" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--card);border-radius:20px;max-width:420px;width:100%;padding:28px 26px;box-shadow:0 24px 64px rgba(0,0,0,.25)">
+    <div id="efm-label" style="font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink);margin-bottom:14px">Modifier</div>
+    <textarea id="efm-input" rows="1" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;font-family:var(--fb);outline:none;resize:vertical;box-sizing:border-box" onkeydown="if(event.key==='Enter'&&!event.shiftKey&&this.rows===1){event.preventDefault();confirmEditField();}"></textarea>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button onclick="closeEditFieldModal()" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-weight:700;font-family:var(--fb);cursor:pointer">Annuler</button>
+      <button onclick="confirmEditField()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:#fff;font-weight:700;font-family:var(--fd);cursor:pointer">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"><span class="toast-ico" id="toast-ico">✅</span><span id="toast-msg">Action effectuée</span></div>
 
@@ -1899,12 +1911,31 @@ const SETTING_FIELD_DOM = {
   email: 'set-contact', phone: 'set-phone', address: 'set-address', sector: 'set-sector',
   siret: 'set-siret', description: 'set-desc', cityLabel: 'set-city'
 };
-async function editSetting(field, label, current) {
-  const val = prompt(`${label} :`, current || '');
-  if(val === null || val.trim() === '') return;
+let _efmField = null;
+function editSetting(field, label, current) {
+  _efmField = field;
+  const titleEl = document.getElementById('efm-label');
+  const inputEl = document.getElementById('efm-input');
+  if(!titleEl || !inputEl) return;
+  titleEl.textContent = label;
+  inputEl.value = current || '';
+  inputEl.rows = field === 'description' ? 4 : 1;
+  document.getElementById('edit-field-modal').style.display = 'flex';
+  setTimeout(() => inputEl.focus(), 60);
+}
+function closeEditFieldModal() {
+  const m = document.getElementById('edit-field-modal');
+  if(m) m.style.display = 'none';
+  _efmField = null;
+}
+async function confirmEditField() {
+  const field = _efmField;
+  const inputEl = document.getElementById('efm-input');
+  const val = inputEl ? inputEl.value : null;
+  if(field === null || val === null || val.trim() === '') { closeEditFieldModal(); return; }
   const trimmed = val.trim();
   const uid = auth.currentUser && auth.currentUser.uid;
-  if(!uid) return;
+  if(!uid) { closeEditFieldModal(); return; }
   const upd = {};
   if(field === 'siret') {
     const digits = trimmed.replace(/\s+/g,'');
@@ -1928,6 +1959,7 @@ async function editSetting(field, label, current) {
   const domId = SETTING_FIELD_DOM[field];
   if(domId) { const el = document.getElementById(domId); if(el) el.textContent = field==='siret' ? upd.siret : trimmed; }
   if(field === 'brandName') document.querySelectorAll('.sb-brand-name').forEach(e => e.textContent = trimmed);
+  closeEditFieldModal();
   await db.collection('merchants').doc(uid).update(upd).catch(() => {});
   showToast('Paramètre mis à jour.', '✅');
 }
@@ -2653,33 +2685,33 @@ function showRejectedScreen(data) {
 
 const REWARD_SUGGESTIONS = {
   'Restauration': [
-    { icon: '☕', label: 'Café offert', cost: 200 },
-    { icon: '🍰', label: 'Dessert offert', cost: 350 },
-    { icon: '💸', label: "-20% sur l'addition", cost: 500 },
-    { icon: '🍽️', label: 'Menu offert', cost: 1000, condition: "pour un plat acheté" },
+    { icon: '☕', label: 'Café offert' },
+    { icon: '🍰', label: 'Dessert offert' },
+    { icon: '💸', label: "-20% sur l'addition" },
+    { icon: '🍽️', label: 'Menu offert', condition: "pour un plat acheté" },
   ],
   'Café': [
-    { icon: '☕', label: 'Expresso offert', cost: 200 },
-    { icon: '🥤', label: 'Boisson chaude offerte', cost: 250 },
-    { icon: '🥐', label: 'Viennoiserie offerte', cost: 200 },
+    { icon: '☕', label: 'Expresso offert' },
+    { icon: '🥤', label: 'Boisson chaude offerte' },
+    { icon: '🥐', label: 'Viennoiserie offerte' },
   ],
   'Beauté': [
-    { icon: '💆', label: 'Soin découverte', cost: 350 },
-    { icon: '💸', label: 'Remise 15%', cost: 300 },
-    { icon: '🎁', label: 'Produit offert', cost: 250 },
+    { icon: '💆', label: 'Soin découverte' },
+    { icon: '💸', label: 'Remise 15%' },
+    { icon: '🎁', label: 'Produit offert' },
   ],
   'Sport': [
-    { icon: '🏋️', label: 'Cours découverte', cost: 300 },
-    { icon: '💸', label: '-20% abonnement', cost: 500 },
+    { icon: '🏋️', label: 'Cours découverte' },
+    { icon: '💸', label: '-20% abonnement' },
   ],
   'Mode': [
-    { icon: '💸', label: '-15% sur un article', cost: 300 },
-    { icon: '🎁', label: 'Accessoire offert', cost: 400 },
+    { icon: '💸', label: '-15% sur un article' },
+    { icon: '🎁', label: 'Accessoire offert' },
   ],
   'Commerce': [
-    { icon: '💸', label: '10% de réduction', cost: 200 },
-    { icon: '🎁', label: 'Produit surprise', cost: 350 },
-    { icon: '💸', label: '-15% sur commande', cost: 400 },
+    { icon: '💸', label: '10% de réduction' },
+    { icon: '🎁', label: 'Produit surprise' },
+    { icon: '💸', label: '-15% sur commande' },
   ],
 };
 
@@ -2698,18 +2730,19 @@ function matchSectorKey(sectorText) {
   const found = SECTOR_KEYWORDS.find(entry => entry.words.some(w => s.includes(w)));
   return found ? found.key : 'Commerce';
 }
-// Grille de points FIXE et identique pour tous les commerçants (même logique que les
-// paliers de récompenses d'une grande enseigne type fast-food) : chaque slot a un coût
-// non négociable, seul le contenu (icône/intitulé/condition) change d'un commerçant à
-// l'autre. Ça donne un repère de valeur cohérent dans toute l'app ("200 pts = petit geste,
-// partout"), plutôt que 500 pts qui veut dire une remise chez l'un et un menu chez l'autre.
-const REWARD_TIERS = [
-  { label: 'Petit geste',   sub: 'café, cookie, -10%…',        pts: 200  },
-  { label: 'Moyen',         sub: 'dessert, boisson, -15%…',    pts: 350  },
-  { label: 'Belle offre',   sub: '-20%, entrée offerte…',      pts: 500  },
-  { label: 'Grande offre',  sub: '-30%, produit premium…',     pts: 750  },
-  { label: 'Offre premium', sub: 'menu offert, -50%…',         pts: 1000 },
+// Le commerçant saisit la valeur réelle en € de chaque récompense ; le coût en points
+// est calculé automatiquement (1 pt ≈ 1 centime, cf. NOOVA_POINTS_SYSTEM.md) plutôt que
+// choisi librement — ça garde un repère de valeur cohérent dans toute l'app. Les 5 slots
+// doivent être des paliers strictement croissants (slot 5 = le gros lot du commerçant).
+const POINTS_PER_EURO = 100;
+const REWARD_TIER_HINTS = [
+  'petit geste — café, cookie, -10%…',
+  'dessert, boisson, -15%…',
+  '-20%, entrée offerte…',
+  '-30%, produit premium…',
+  'le gros lot — menu offert, -50%…',
 ];
+function eurosToPoints(euros) { return Math.round((parseFloat(euros)||0) * POINTS_PER_EURO); }
 
 let _rewardSlots = []; // [{id, data}] loaded from Firestore
 let _slotCount = 0;
@@ -2786,17 +2819,23 @@ function renderRewardCard(r, i) {
   const card = document.createElement('div');
   card.className = 'card';
   card.style.marginBottom = '14px';
+  const statusBadge = {
+    pending:  { bg: 'rgba(245,166,35,.14)', c: 'var(--amber)', txt: '⏳ En attente de validation' },
+    approved: { bg: d.active ? 'rgba(11,171,132,.12)' : 'var(--bg3)', c: d.active ? '#0BAB84' : 'var(--ink3)', txt: d.active ? '✅ Actif' : '⏸️ Inactif' },
+    rejected: { bg: 'rgba(239,68,68,.1)', c: '#EF4444', txt: '❌ Refusée par Noova' }
+  }[d.status || 'pending'];
   card.innerHTML = `
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
       <div style="font-size:28px">${d.icon||'🎁'}</div>
       <div style="flex:1">
         <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink)">${esc(d.label||'Récompense')}</div>
-        <div style="font-size:12px;color:var(--ink3);margin-top:2px">${d.cost||0} pts · Stock : ${d.stock===null||d.stock===undefined?'Illimité':d.stock} · Échangés : ${d.redeemedCount||0}</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:2px">${(d.valueEuros||0).toFixed(2)} € · ${d.cost||0} pts · Stock : ${d.stock===null||d.stock===undefined?'Illimité':d.stock} · Échangés : ${d.redeemedCount||0}</div>
       </div>
-      <span style="padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${d.active?'rgba(11,171,132,.12)':'var(--bg3)'};color:${d.active?'#0BAB84':'var(--ink3)'}">${d.active?'Actif':'Inactif'}</span>
-      <button class="tb-btn" style="font-size:11px;padding:4px 10px" onclick="toggleRewardActive('${r.id}',${!d.active})">${d.active?'Désactiver':'Activer'}</button>
+      <span style="padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${statusBadge.bg};color:${statusBadge.c};white-space:nowrap">${statusBadge.txt}</span>
+      ${d.status==='approved' ? `<button class="tb-btn" style="font-size:11px;padding:4px 10px" onclick="toggleRewardActive('${r.id}',${!d.active})">${d.active?'Désactiver':'Activer'}</button>` : ''}
       <button class="tb-btn" style="font-size:11px;padding:4px 10px;color:var(--coral)" onclick="deleteReward('${r.id}')">Supprimer</button>
     </div>
+    ${d.status==='rejected' && d.rejectionReason ? `<div style="font-size:11px;color:#EF4444;margin-top:-6px;margin-bottom:8px">Motif : ${esc(d.rejectionReason)}</div>` : ''}
     ${d.purchaseCondition ? `<div style="font-size:11px;color:var(--ink2);margin-top:-6px;margin-bottom:8px">📋 Condition : ${esc(d.purchaseCondition)}</div>` : ''}
   `;
   el.appendChild(card);
@@ -2806,23 +2845,26 @@ function addRewardSlot() {
   if(_rewardSlots.length >= 5) { showToast('Maximum 5 récompenses','⚠️'); return; }
   const el = document.getElementById('reward-slots');
   const slot = _rewardSlots.length + 1;
-  const tier = REWARD_TIERS[slot-1];
+  const hint = REWARD_TIER_HINTS[slot-1];
+  const prevValue = slot > 1 ? (_rewardSlots[slot-2].data.valueEuros || 0) : 0;
   const form = document.createElement('div');
   form.className = 'card';
   form.style.marginBottom = '14px';
   form.style.border = '2px dashed var(--coral)';
   form.innerHTML = `
-    <div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--coral);margin-bottom:4px">Nouvelle récompense (slot ${slot}/5)</div>
-    <div style="display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:var(--rs);padding:10px 14px;margin-bottom:14px">
-      <div style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink)">${tier.pts} pts</div>
-      <div style="width:1px;height:16px;background:var(--border)"></div>
-      <div style="font-size:12px;color:var(--ink2)"><strong>${tier.label}</strong> — coût fixe, identique pour tous les commerçants Noova</div>
-    </div>
+    <div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--coral);margin-bottom:4px">Nouvelle récompense (palier ${slot}/5)</div>
+    <div style="font-size:11.5px;color:var(--ink3);margin-bottom:14px">Idée pour ce palier : ${hint}${prevValue?` · doit valoir plus que le palier ${slot-1} (${prevValue.toFixed(2)} €)`:''}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
       <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Emoji icône</label>
         <input class="field-inp" id="new-r-icon" placeholder="🎁" style="font-size:22px;text-align:center" maxlength="2" value="🎁"></div>
-      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Intitulé * <span style="font-weight:400;color:var(--ink3)">(ex. ${tier.sub})</span></label>
+      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Intitulé *</label>
         <input class="field-inp" id="new-r-label" placeholder="ex. Café offert"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Valeur réelle (€) *</label>
+        <input class="field-inp" id="new-r-value" type="number" step="0.10" min="0.10" placeholder="5.00" oninput="document.getElementById('new-r-cost-preview').textContent=eurosToPoints(this.value)+' pts'"></div>
+      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Coût en points (calculé)</label>
+        <div class="field-inp" style="display:flex;align-items:center;color:var(--ink3);font-weight:700" id="new-r-cost-preview">0 pts</div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
       <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Stock (vide=illimité)</label>
@@ -2834,9 +2876,10 @@ function addRewardSlot() {
       <label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Condition d'achat (optionnel)</label>
       <input class="field-inp" id="new-r-condition" placeholder="ex. pour tout plat commandé">
     </div>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:12px">📋 Chaque récompense est vérifiée par Noova avant de devenir visible dans l'app.</div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button class="tb-btn" onclick="this.closest('.card').remove();const ab=document.getElementById('add-reward-btn');if(ab)ab.style.display=''">Annuler</button>
-      <button class="tb-btn tb-btn-primary" onclick="saveReward(${slot},this)">Publier cette récompense</button>
+      <button class="tb-btn tb-btn-primary" onclick="saveReward(${slot},this)">Envoyer pour validation</button>
     </div>
   `;
   el.appendChild(form);
@@ -2848,33 +2891,38 @@ async function saveReward(slot, btn) {
   if(!u || !_mData) return;
   if(_mData.status === 'pending') { showToast('Espace en cours de vérification — publication disponible après validation','⏳'); return; }
   const label = document.getElementById('new-r-label')?.value.trim();
-  const cost = (REWARD_TIERS[slot-1] || REWARD_TIERS[REWARD_TIERS.length-1]).pts; // palier fixe, non négociable
+  const valueEuros = parseFloat(document.getElementById('new-r-value')?.value);
   if(!label) { showToast('Remplis l\'intitulé','⚠️'); return; }
+  if(!valueEuros || valueEuros <= 0) { showToast('Renseigne une valeur en € valide','⚠️'); return; }
+  const prevValue = slot > 1 ? (_rewardSlots[slot-2].data.valueEuros || 0) : 0;
+  if(prevValue && valueEuros <= prevValue) { showToast(`Ce palier doit valoir plus que le palier ${slot-1} (${prevValue.toFixed(2)} €)`,'⚠️'); return; }
+  const cost = eurosToPoints(valueEuros);
   const icon = document.getElementById('new-r-icon')?.value || '🎁';
   const stockVal = document.getElementById('new-r-stock')?.value;
   const stock = stockVal ? parseInt(stockVal) : null;
   const condition = document.getElementById('new-r-condition')?.value.trim() || null;
   const expiresVal = document.getElementById('new-r-expires')?.value;
   const expiresAt = expiresVal ? firebase.firestore.Timestamp.fromDate(new Date(expiresVal)) : null;
-  btn.disabled = true; btn.textContent = 'Publication…';
+  btn.disabled = true; btn.textContent = 'Envoi…';
   try {
     await db.collection('rewards').add({
       merchantId:   u.uid,
       merchantName: _mData.brandName || '',
       city:         _mData.city || '',
       slot,
-      label, icon, cost,
+      label, icon, valueEuros, cost,
       stock, perUserLimit: 1,
       purchaseCondition: condition,
       expiresAt,
-      active: true,
+      status: 'pending',
+      active: false,
       redeemedCount: 0,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    showToast('Récompense publiée !','🎁');
+    showToast('Envoyée pour validation !','📋');
     loadMerchantRewards();
-  } catch(e) { showToast('Erreur : ' + e.message,'❌'); btn.disabled = false; btn.textContent = 'Publier cette récompense'; }
+  } catch(e) { showToast('Erreur : ' + e.message,'❌'); btn.disabled = false; btn.textContent = 'Envoyer pour validation'; }
 }
 
 async function toggleRewardActive(rewardId, active) {
