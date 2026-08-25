@@ -1,0 +1,27 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isOwner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function isAdmin() { return request.auth != null && request.auth.token.email in ['noovaoffr@gmail.com', 'tomussproduction@gmail.com']; }
+
+    // Logo/photo (public, affiché dans l'app) et document d'identité/Kbis (privé,
+    // commerçant + admin uniquement) du commerçant, dans un seul et même match car
+    // les règles Storage ne combinent pas plusieurs blocs sur le même chemin.
+    match /merchants/{merchantId}/{fileName} {
+      allow read: if fileName.matches('logo\\..*')
+        || (fileName.matches('id-document\\..*') && (isOwner(merchantId) || isAdmin()));
+      allow write: if isOwner(merchantId) && (
+        (fileName.matches('logo\\..*')
+          && request.resource.size < 5 * 1024 * 1024
+          && request.resource.contentType.matches('image/.*'))
+        ||
+        (fileName.matches('id-document\\..*') && request.resource.size < 10 * 1024 * 1024)
+      );
+    }
+
+    // Tout le reste : fermé par défaut.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

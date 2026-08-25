@@ -43,6 +43,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <style>
 :root {
   --bg: #F7F6F2;
@@ -672,8 +673,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <button class="sb-item" onclick="navTo('validate',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></span>Valider un bon</button>
       <div class="sb-section">Compte</div>
       <button class="sb-item" onclick="navTo('settings',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M4 12h2M18 12h2M12 4v2M12 18v2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M6.3 17.7l1.4-1.4M16.3 7.7l1.4-1.4"/></svg></span>Paramètres</button>
-      <button class="sb-item" onclick="navTo('plans',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21 7.5 13.5 2 9h7z"/></svg></span>Abonnements</button>
-      <button class="sb-item" onclick="navTo('billing',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>Facturation</button>
+      <!-- Abonnements/Facturation retirés de la beta : pas de tarification prête, on ne parle pas de prix côté commerçant pour l'instant (abonnement annuel prévu plus tard). -->
       <button class="sb-item" onclick="logout()" style="margin-top:auto;color:var(--ink3)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></span>Se déconnecter</button>
     </nav>
     <div class="sb-footer">
@@ -698,7 +698,13 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div class="topbar-sub" id="topbar-sub">Bienvenue — dernière mise à jour il y a 4 min</div>
       </div>
       <button class="tb-btn tb-btn-primary" id="topbar-new-camp-btn" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">✨ Nouvelle campagne</button>
-      <div class="tb-notif"><div class="notif-dot"></div>🔔</div>
+      <div style="position:relative">
+        <div class="tb-notif" id="tb-notif-btn" onclick="toggleNotifPanel()"><div class="notif-dot" id="notif-dot" style="display:none"></div>🔔</div>
+        <div id="notif-panel" style="display:none;position:absolute;top:46px;right:0;width:320px;max-height:400px;overflow-y:auto;background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:0 16px 40px rgba(0,0,0,.16);z-index:200">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-family:var(--fd);font-weight:800;font-size:13px;color:var(--ink)">Notifications</div>
+          <div id="notif-list"><div style="padding:24px;text-align:center;color:var(--ink3);font-size:12.5px">Aucune notification.</div></div>
+        </div>
+      </div>
     </header>
 
     <!-- CONTENT -->
@@ -772,7 +778,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div class="wiz-step-btn active" data-step="0"><div class="wiz-circle">1</div><div class="wiz-step-lbl">Question</div></div>
             <div class="wiz-step-btn" data-step="1"><div class="wiz-circle">2</div><div class="wiz-step-lbl">Format</div></div>
             <div class="wiz-step-btn" data-step="2"><div class="wiz-circle">3</div><div class="wiz-step-lbl">Audience</div></div>
-            <div class="wiz-step-btn" data-step="3"><div class="wiz-circle">4</div><div class="wiz-step-lbl">Budget</div></div>
+            <div class="wiz-step-btn" data-step="3"><div class="wiz-circle">4</div><div class="wiz-step-lbl">Volume</div></div>
             <div class="wiz-step-btn" data-step="4"><div class="wiz-circle">5</div><div class="wiz-step-lbl">Validation</div></div>
           </div>
 
@@ -945,8 +951,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div class="step-card-title">Ciblez votre audience</div>
                   <div class="step-card-sub" id="aud-subtitle">Chaque filtre affine les profils éligibles. C'est la <strong>localisation de la question</strong> (pas de l'entreprise) qui détermine le bassin de répondants.</div>
                   <div class="field">
-                    <label class="field-lbl">Thèmes d'intérêt <span style="color:var(--ink3);font-weight:400">(laisser vide = tous)</span></label>
-                    <div class="theme-grid">
+                    <label class="field-lbl" style="display:flex;align-items:center;justify-content:space-between">Thèmes d'intérêt <span style="color:var(--ink3);font-weight:400">(laisser vide = tous)</span><button type="button" onclick="toggleAllThemes()" style="background:none;border:none;padding:0;font-size:11px;font-weight:700;color:var(--coral);cursor:pointer;text-transform:none;letter-spacing:0">Tout sélectionner</button></label>
+                    <div class="theme-grid" id="theme-grid">
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🏃 Sport</div>
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🧘 Bien-être</div>
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">💻 Tech</div>
@@ -979,7 +985,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     </div>
                   </div>
                   <div class="field" style="margin-bottom:0">
-                    <label class="field-lbl">📍 Localisation des répondants <span style="color:var(--coral);font-weight:600">· affecte le prix</span></label>
+                    <label class="field-lbl">📍 Localisation des répondants</label>
                     <select class="field-inp" id="aud-loc-sel" style="cursor:pointer" onchange="updAud();updVol(document.getElementById('vol-sl').value)">
                       <option value="national">🇫🇷 Toute la France (moins cher)</option>
                       <optgroup label="── Grandes régions ──">
@@ -1001,7 +1007,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                         <option disabled value="">Chargement des villes…</option>
                       </optgroup>
                     </select>
-                    <div style="font-size:11px;color:var(--ink3);margin-top:5px">💡 Cibler une ville ou région augmente le coût au répondant mais garantit une audience locale précise.</div>
+                    <div style="font-size:11px;color:var(--ink3);margin-top:5px">💡 Cibler une ville ou région précise garantit une audience locale plus pertinente.</div>
                   </div>
                 </div>
                 <div class="step-card" style="background:var(--vd);border-color:rgba(161,78,8,.2)">
@@ -1015,7 +1021,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                 </div>
                 <div class="wizard-actions">
                   <button class="wiz-btn-back" onclick="wzGo(1)">← Retour</button>
-                  <button class="wiz-btn-next" onclick="wzGo(3)">Budget →</button>
+                  <button class="wiz-btn-next" onclick="wzGo(3)">Volume →</button>
                 </div>
               </div>
               <div>
@@ -1038,7 +1044,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               <div>
                 <div class="step-card">
                   <div class="step-card-title">Volume de réponses</div>
-                  <div class="step-card-sub">Plus vous ciblez localement, plus le coût par réponse augmente — mais l'audience est plus précise.</div>
+                  <div class="step-card-sub">Plus vous ciblez localement, plus la collecte peut prendre du temps — mais l'audience est plus précise.</div>
                   <div class="field">
                     <label class="field-lbl">Nombre de réponses souhaité</label>
                     <div class="vol-wrap">
@@ -1051,7 +1057,6 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
                       <div class="est-chip"><span class="est-chip-ico">⏱️</span>Délai estimé <span class="est-chip-val" id="est-delay">6h</span></div>
                       <div class="est-chip"><span class="est-chip-ico">📍</span>Localisation <span class="est-chip-val" id="est-loc-label">France entière</span></div>
-                      <div class="est-chip"><span class="est-chip-ico">💶</span>Coût/réponse <span class="est-chip-val" id="est-cpr">0,80 €</span></div>
                     </div>
                   </div>
                   <div class="field" style="margin-bottom:0">
@@ -1060,35 +1065,13 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   </div>
                 </div>
                 <div class="step-card">
-                  <div class="step-card-title">Devis estimatif</div>
-                  <div class="budget-display">
-                    <div>
-                      <div style="font-size:11px;color:var(--ink3);margin-bottom:3px">Total estimé</div>
-                      <div class="budget-amount" id="budget-amt">259 €</div>
-                      <div style="font-size:11px;color:var(--ink3);margin-top:3px">HT · facturé à la livraison</div>
-                    </div>
-                    <div class="budget-breakdown" id="budget-break">
-                      Forfait de base : 99 €<br>
-                      200 réponses × 0,80 €<br>
-                      <span style="color:var(--mint)">Localisation : France entière</span>
-                    </div>
-                  </div>
-                  <div class="budget-inc">
-                    <div class="budget-inc-title">📦 Toujours inclus</div>
+                  <div class="step-card-title">📦 Toujours inclus</div>
+                  <div class="budget-inc" style="margin-top:0">
                     <div class="budget-inc-item">✅ Analyse IA des réponses (clustering thématique)</div>
                     <div class="budget-inc-item">✅ Rapport synthèse exécutive (PDF)</div>
                     <div class="budget-inc-item">✅ Export données brutes (CSV)</div>
                     <div class="budget-inc-item">✅ Score qualité par réponse</div>
                     <div class="budget-inc-item">✅ Dashboard résultats en temps réel</div>
-                  </div>
-                  <div style="margin-top:12px;padding:10px 12px;background:rgba(242,151,21,.08);border-radius:10px;border:1px solid rgba(242,151,21,.2)">
-                    <div style="font-size:11px;font-weight:700;color:var(--coral);margin-bottom:6px">📍 Grille tarifaire selon localisation</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px">
-                      <div style="text-align:center;padding:6px;background:#fff;border-radius:8px;border:1px solid var(--border)"><div style="font-weight:700;color:var(--ink)">0,80 €</div><div style="color:var(--ink3)">France entière</div></div>
-                      <div style="text-align:center;padding:6px;background:#fff;border-radius:8px;border:1px solid var(--border)"><div style="font-weight:700;color:var(--coral)">1,20 €</div><div style="color:var(--ink3)">Région</div></div>
-                      <div style="text-align:center;padding:6px;background:#fff;border-radius:8px;border:1px solid var(--border)"><div style="font-weight:700;color:var(--violet)">1,80 €</div><div style="color:var(--ink3)">Ville précise</div></div>
-                    </div>
-                    <div style="font-size:10px;color:var(--ink3);margin-top:6px">+ Forfait de base 99 € dans tous les cas (analyse IA, PDF, CSV inclus)</div>
                   </div>
                 </div>
                 <div class="wizard-actions">
@@ -1114,10 +1097,6 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <div style="font-size:10px;color:var(--violet);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Livraison</div>
                       <div style="font-size:12px;color:var(--ink2);font-weight:600">📊 Rapport disponible</div>
                     </div>
-                    <div style="background:var(--bg3);border-radius:var(--rx);padding:10px 12px;text-align:center">
-                      <div style="font-size:18px;font-weight:800;color:var(--ink)" id="sim-total">259 €</div>
-                      <div style="font-size:10px;color:var(--ink3)">Total estimé HT</div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -1136,13 +1115,11 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div class="recap-item"><div class="recap-lbl">Audience</div><div class="recap-val" id="recap-aud">Sport + Bien-être · 18–49 ans</div></div>
                     <div class="recap-item"><div class="recap-lbl">Volume</div><div class="recap-val big" id="recap-vol">500</div></div>
                     <div class="recap-item"><div class="recap-lbl">Nom campagne</div><div class="recap-val" id="recap-name">Test équipement sportif — Été 2025</div></div>
-                    <div class="recap-item"><div class="recap-lbl">Budget estimé</div><div class="recap-val" id="recap-budget">625 € HT</div></div>
                     <div class="recap-item" style="grid-column:span 2"><div class="recap-lbl">Livraison</div><div class="recap-val">Rapport complet sous 48–72h après clôture de la collecte · Clustering IA · Export CSV inclus</div></div>
                   </div>
                   <div class="risk-box">
                     <div class="risk-title">⚠️ Points d'attention documentés</div>
                     <div class="risk-item"><div class="risk-dot"></div>Décrochage au palier : maintenir l'engagement avec des questions variées</div>
-                    <div class="risk-item"><div class="risk-dot"></div>Frustration si quota non atteint : Noova garantit un minimum de 80% du volume ou remboursement</div>
                     <div class="risk-item"><div class="risk-dot"></div>Score qualité min. 70/100 par répondant appliqué automatiquement</div>
                     <div class="risk-item"><div class="risk-dot"></div>Révocations RGPD possibles en cours de campagne — décomptées du quota</div>
                   </div>
@@ -1242,9 +1219,28 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div style="max-width:640px">
           <div class="settings-section">
             <div class="settings-section-title">Profil de la marque</div>
+            <div class="setting-row">
+              <div id="set-logo-preview" style="width:40px;height:40px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;flex-shrink:0">⛺</div>
+              <div class="setting-info"><div class="setting-name">Photo / logo</div><div class="setting-desc">Visible dans l'app et sur ta fiche commerce</div></div>
+              <input type="file" id="logo-file-inp" accept="image/*" style="display:none" onchange="changeMerchantLogo(this.files[0])">
+              <button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="document.getElementById('logo-file-inp').click()">Modifier</button>
+            </div>
             <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-6 9 6"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg></div><div class="setting-info"><div class="setting-name">Nom de la marque</div><div class="setting-desc" id="set-brand-name">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('brandName','Nom de la marque',document.getElementById('set-brand-name').textContent)">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></div><div class="setting-info"><div class="setting-name">Prénom</div><div class="setting-desc" id="set-firstname">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('firstName','Prénom',document.getElementById('set-firstname').textContent)">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></div><div class="setting-info"><div class="setting-name">Nom</div><div class="setting-desc" id="set-lastname">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('lastName','Nom',document.getElementById('set-lastname').textContent)">Modifier</button></div>
             <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></div><div class="setting-info"><div class="setting-name">Contact principal</div><div class="setting-desc" id="set-contact">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('email','Contact / Email',document.getElementById('set-contact').textContent)">Modifier</button></div>
-            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg></div><div class="setting-info"><div class="setting-name">Zone de diffusion</div><div class="setting-desc" id="set-zone">France métropolitaine · Toutes régions</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('zone','Zone de diffusion',document.getElementById('set-zone').textContent)">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.902.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.908.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div><div class="setting-info"><div class="setting-name">Téléphone</div><div class="setting-desc" id="set-phone">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('phone','Téléphone',document.getElementById('set-phone').textContent)">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="setting-info"><div class="setting-name">Adresse professionnelle</div><div class="setting-desc" id="set-address">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('address','Adresse professionnelle',document.getElementById('set-address').textContent)">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg></div><div class="setting-info"><div class="setting-name">Secteur d'activité</div><div class="setting-desc" id="set-sector">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('sector','Secteur d\'activité',document.getElementById('set-sector').textContent)">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><div class="setting-info"><div class="setting-name">SIRET</div><div class="setting-desc" id="set-siret">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('siret','SIRET (14 chiffres)',document.getElementById('set-siret').textContent)">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><div class="setting-info"><div class="setting-name">Description de l'établissement</div><div class="setting-desc" id="set-desc">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('description','Description de l\'établissement',document.getElementById('set-desc').textContent)">Modifier</button></div>
+            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg></div><div class="setting-info"><div class="setting-name">Ville</div><div class="setting-desc" id="set-city">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('cityLabel','Ville',document.getElementById('set-city').textContent)">Modifier</button></div>
+            <div class="setting-row">
+              <div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+              <div class="setting-info"><div class="setting-name">Document d'identité / Kbis</div><div class="setting-desc" id="set-iddoc">Non fourni — utile pour accélérer ta vérification</div></div>
+              <input type="file" id="iddoc-file-inp" accept="image/*,.pdf" style="display:none" onchange="changeMerchantIdDocument(this.files[0])">
+              <button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="document.getElementById('iddoc-file-inp').click()">Envoyer</button>
+            </div>
           </div>
           <div class="settings-section">
             <div class="settings-section-title">Notifications</div>
@@ -1417,6 +1413,16 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 <div id="camp-modal" onclick="if(event.target===this)closeCampModal()" style="display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.5);align-items:flex-start;justify-content:center;padding:60px 20px 30px;overflow-y:auto">
   <div style="background:var(--bg);border-radius:var(--r);max-width:580px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.22)">
     <div id="camp-modal-body" style="padding:28px"></div>
+  </div>
+</div>
+
+<!-- Popup affiché une fois, à la reconnexion suivant la validation admin -->
+<div id="verified-modal" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--card);border-radius:20px;max-width:400px;width:100%;padding:32px 28px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.25)">
+    <div style="width:64px;height:64px;border-radius:50%;background:rgba(11,171,132,.12);border:2px solid rgba(11,171,132,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px">✅</div>
+    <div style="font-family:var(--fd);font-weight:800;font-size:21px;color:var(--ink);letter-spacing:-.5px;margin-bottom:8px">Ton espace est vérifié !</div>
+    <div style="font-size:13.5px;color:var(--ink2);line-height:1.7;margin-bottom:24px">Bienvenue sur Noova, <strong id="verified-modal-brand"></strong> 🎉 Tu peux maintenant créer ta première campagne et configurer tes récompenses.</div>
+    <button onclick="closeVerifiedModal()" style="width:100%;padding:13px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:14px;font-weight:700;font-family:var(--fd);cursor:pointer">C'est parti →</button>
   </div>
 </div>
 
@@ -1669,7 +1675,6 @@ function wzGo(n){
     document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple · '+document.querySelectorAll('.mcq-opt-inp').length+' options',scale:'Échelle 1–10',rank:'Classement'}[curFmt];
     document.getElementById('recap-vol').textContent=document.getElementById('vol-num').textContent;
     document.getElementById('recap-name').textContent=document.getElementById('camp-name-inp').value;
-    document.getElementById('recap-budget').textContent=document.getElementById('budget-amt').textContent+' HT';
   }
 }
 function wzSync(){ wzGo(wzCur); }
@@ -1711,6 +1716,8 @@ function selFmt(el, fmt){
 
 // ═══ MCQ BUILDER ═════════════════════════════════════════════
 function addOpt(){
+  const opts=document.querySelectorAll('#mcq-options .mcq-option-row');
+  if(opts.length>=6){showToast('6 options maximum par question','⚠️');return;}
   const div=document.createElement('div');div.className='mcq-option-row';
   div.innerHTML='<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button>';
   document.getElementById('mcq-options').appendChild(div);
@@ -1725,6 +1732,7 @@ function showMcqForQ(qNum, fmt) {
 function addQOpt(containerId) {
   const c = document.getElementById(containerId);
   if(!c) return;
+  if(c.querySelectorAll('.mcq-option-row').length>=6){showToast('6 options maximum par question','⚠️');return;}
   const d = document.createElement('div'); d.className = 'mcq-option-row';
   d.innerHTML = '<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button>';
   c.appendChild(d);
@@ -1750,6 +1758,12 @@ function updatePreview(){
 }
 
 // ═══ AUDIENCE COUNT ══════════════════════════════════════════
+function toggleAllThemes(){
+  const chips=document.querySelectorAll('#theme-grid .th-chip');
+  const allSel=Array.from(chips).every(c=>c.classList.contains('sel'));
+  chips.forEach(c=>c.classList.toggle('sel',!allSel));
+  updAud();
+}
 function updAud(){
   const sel=document.querySelectorAll('.th-chip.sel').length+document.querySelectorAll('.age-chip.sel').length;
   const base=_totalConsentedUsers||0;
@@ -1794,35 +1808,20 @@ async function loadCitiesForAudience() {
 function updVol(v){
   v=parseInt(v)||200;
   document.getElementById('vol-num').textContent=v;
-  // Pricing: base 99€ + per-response cost depending on location scope
   const locSel=document.getElementById('aud-loc-sel');
   const locVal=locSel?locSel.value:'national';
   const LOC_LABELS={'national':'France entière','idf':'Île-de-France','aura':'Auvergne-Rhône-Alpes','paca':'PACA','occ':'Occitanie','na':'Nouvelle-Aquitaine','bre':'Bretagne','pdl':'Pays de la Loire','nor':'Normandie','ge':'Grand Est','hdf':'Hauts-de-France','bfc':'Bourgogne-Franche-Comté','cvl':'Centre-Val de Loire','cor':'Corse'};
   const REGIONS=['idf','aura','paca','occ','na','bre','pdl','nor','ge','hdf','bfc','cvl','cor'];
-  let cpr,locType;
-  if(locVal==='national'){cpr=0.80;locType='national';}
-  else if(REGIONS.includes(locVal)){cpr=1.20;locType='region';}
-  else{cpr=1.80;locType='city';}
-  const base=99;
-  const total=Math.round(base+v*cpr);
+  const locType=locVal==='national'?'national':REGIONS.includes(locVal)?'region':'city';
   const locLabel=LOC_LABELS[locVal]||(locSel&&locSel.options[locSel.selectedIndex]?locSel.options[locSel.selectedIndex].text.replace(/\s*\(\d+.*?\)$/,'').trim():null)||'France entière';
-  // Delay: national responds fastest, city slowest (base: 1200 responses/day avg pool)
+  // Délai indicatif : national répond plus vite, ville précise plus lentement (pool moyen : 1200 réponses/jour)
   const poolFactor=locType==='national'?1:locType==='region'?0.3:0.1;
   const delay=Math.ceil(v/(1200*poolFactor)*24);
   const delayStr=delay<=24?delay+'h':Math.ceil(delay/24)+'j';
-  // Update UI
-  const elNum=document.getElementById('vol-num');if(elNum)elNum.textContent=v;
   const elDelay=document.getElementById('est-delay');if(elDelay)elDelay.textContent=delayStr;
-  const elCpr=document.getElementById('est-cpr');if(elCpr)elCpr.textContent=cpr.toFixed(2).replace('.',',')+' €';
   const elLocLbl=document.getElementById('est-loc-label');if(elLocLbl)elLocLbl.textContent=locLabel;
   const elSimDelay=document.getElementById('sim-delay');if(elSimDelay)elSimDelay.textContent='~'+delayStr;
   const elSimVol=document.getElementById('sim-vol');if(elSimVol)elSimVol.textContent=v;
-  const totalFmt=total.toLocaleString('fr-FR')+' €';
-  const elAmt=document.getElementById('budget-amt');if(elAmt)elAmt.textContent=totalFmt;
-  const elSimTotal=document.getElementById('sim-total');if(elSimTotal)elSimTotal.textContent=totalFmt;
-  const cprColor=locType==='national'?'var(--mint)':locType==='region'?'var(--coral)':'var(--violet)';
-  const elBreak=document.getElementById('budget-break');
-  if(elBreak)elBreak.innerHTML='Forfait de base : 99 €<br>'+v+' réponses × '+cpr.toFixed(2).replace('.',',')+' €<br><span style="color:'+cprColor+'">📍 '+locLabel+'</span>';
   const sl=document.getElementById('vol-sl');if(sl){const pct=(v-50)/(5000-50)*100;sl.style.background=`linear-gradient(to right,var(--coral) ${pct}%,rgba(23,20,26,.1) ${pct}%)`}
 }
 
@@ -1895,40 +1894,81 @@ function showToast(msg,ico='✅'){
 }
 
 // ═══ SETTINGS ════════════════════════════════════════════════
+const SETTING_FIELD_DOM = {
+  brandName: 'set-brand-name', firstName: 'set-firstname', lastName: 'set-lastname',
+  email: 'set-contact', phone: 'set-phone', address: 'set-address', sector: 'set-sector',
+  siret: 'set-siret', description: 'set-desc', cityLabel: 'set-city'
+};
 async function editSetting(field, label, current) {
   const val = prompt(`${label} :`, current || '');
   if(val === null || val.trim() === '') return;
+  const trimmed = val.trim();
   const uid = auth.currentUser && auth.currentUser.uid;
   if(!uid) return;
   const upd = {};
-  if(field === 'zone') {
-    const el = document.getElementById('set-zone');
-    if(el) el.textContent = val.trim();
-    showToast('Zone de diffusion mise à jour.', '🌍');
-    return;
-  }
-  if(field === 'retentionMonths') {
+  if(field === 'siret') {
+    const digits = trimmed.replace(/\s+/g,'');
+    if(!/^\d{14}$/.test(digits)) { showToast('SIRET invalide (14 chiffres).', '⚠️'); return; }
+    upd.siret = digits;
+  } else if(field === 'retentionMonths') {
     const months = parseInt(val) || 24;
     upd.retentionMonths = months;
     const el = document.getElementById('set-retention');
     if(el) el.textContent = `Données réponses conservées ${months} mois`;
   } else if(field === 'dpo') {
-    upd.dpoEmail = val.trim();
+    upd.dpoEmail = trimmed;
     const el = document.getElementById('set-dpo');
-    if(el) el.textContent = val.trim() + ' · Conforme RGPD Art. 37';
+    if(el) el.textContent = trimmed + ' · Conforme RGPD Art. 37';
+  } else if(field === 'cityLabel') {
+    upd.cityLabel = trimmed;
+    upd.city = normalizeCity(trimmed);
   } else {
-    upd[field] = val.trim();
-    if(field === 'brandName') {
-      const el = document.getElementById('set-brand-name');
-      if(el) el.textContent = val.trim();
-      document.querySelectorAll('.sb-brand-name').forEach(e => e.textContent = val.trim());
-    } else if(field === 'email') {
-      const el = document.getElementById('set-contact');
-      if(el) el.textContent = val.trim();
-    }
+    upd[field] = trimmed;
   }
+  const domId = SETTING_FIELD_DOM[field];
+  if(domId) { const el = document.getElementById(domId); if(el) el.textContent = field==='siret' ? upd.siret : trimmed; }
+  if(field === 'brandName') document.querySelectorAll('.sb-brand-name').forEach(e => e.textContent = trimmed);
   await db.collection('merchants').doc(uid).update(upd).catch(() => {});
   showToast('Paramètre mis à jour.', '✅');
+}
+
+async function changeMerchantLogo(file) {
+  if(!file) return;
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if(!uid) return;
+  if(!file.type.startsWith('image/')) { showToast('Choisis une image.', '⚠️'); return; }
+  if(file.size > 5*1024*1024) { showToast('Image trop lourde (5 Mo max).', '⚠️'); return; }
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const ref = firebase.storage().ref().child(`merchants/${uid}/logo.${ext}`);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+    await db.collection('merchants').doc(uid).update({ logoUrl: url });
+    const preview = document.getElementById('set-logo-preview');
+    if(preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+    document.querySelectorAll('.sb-brand-av').forEach(el => el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`);
+    showToast('Logo mis à jour.', '🖼️');
+  } catch(e) {
+    showToast('Erreur upload : ' + e.message, '❌');
+  }
+}
+
+async function changeMerchantIdDocument(file) {
+  if(!file) return;
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if(!uid) return;
+  if(file.size > 10*1024*1024) { showToast('Fichier trop lourd (10 Mo max).', '⚠️'); return; }
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `merchants/${uid}/id-document.${ext}`;
+    await firebase.storage().ref().child(path).put(file);
+    await db.collection('merchants').doc(uid).update({ idDocumentPath: path });
+    const el = document.getElementById('set-iddoc');
+    if(el) el.textContent = 'Envoyé — en cours de vérification';
+    showToast('Document envoyé. Merci !', '📄');
+  } catch(e) {
+    showToast('Erreur upload : ' + e.message, '❌');
+  }
 }
 
 function exportRegistry() {
@@ -2037,6 +2077,14 @@ window.addEventListener('load',()=>{
       <input id="aw-brand"  type="text"     placeholder="Nom de ton commerce"           autocomplete="organization"    style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-sector" type="text"     placeholder="Secteur (ex: Restauration…)"                                  style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-city"   type="text"     placeholder="Ville (ex: Paris, Lyon…)"      autocomplete="address-level2"  style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <div id="aw-name-row" style="display:none;gap:10px">
+        <input id="aw-firstname" type="text" placeholder="Prénom" autocomplete="given-name" style="flex:1;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+        <input id="aw-lastname"  type="text" placeholder="Nom"    autocomplete="family-name" style="flex:1;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      </div>
+      <input id="aw-phone"   type="tel"  placeholder="Téléphone professionnel"     autocomplete="tel"    style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <input id="aw-address" type="text"  placeholder="Adresse professionnelle"     autocomplete="street-address" style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <input id="aw-siret"   type="text"  placeholder="SIRET (14 chiffres)"  inputmode="numeric" maxlength="17" style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <textarea id="aw-desc" placeholder="Décris ton établissement en quelques mots…" maxlength="300" style="display:none;width:100%;height:70px;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);resize:none;box-sizing:border-box"></textarea>
       <input id="aw-email"  type="email"    placeholder="Email professionnel"            autocomplete="email"           style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-pass"   type="password" placeholder="Mot de passe"                  autocomplete="current-password" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <div id="aw-forgot" style="text-align:right;margin-top:-3px"><button type="button" id="aw-forgot-link" onclick="awForgotPassword()" style="background:none;border:none;padding:0;font-size:12px;color:var(--ink3);cursor:pointer;font-family:var(--fb);text-decoration:underline">Mot de passe oublié ?</button></div>
@@ -2068,6 +2116,14 @@ window.addEventListener('load',()=>{
       <input id="gmw-brand"  type="text" placeholder="Nom de ton commerce"       style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="gmw-sector" type="text" placeholder="Secteur (ex: Restauration)" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="gmw-city"   type="text" placeholder="Ville (ex: Paris)"          style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <div style="display:flex;gap:10px">
+        <input id="gmw-firstname" type="text" placeholder="Prénom" style="flex:1;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+        <input id="gmw-lastname"  type="text" placeholder="Nom"    style="flex:1;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      </div>
+      <input id="gmw-phone"   type="tel"  placeholder="Téléphone professionnel" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <input id="gmw-address" type="text" placeholder="Adresse professionnelle" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <input id="gmw-siret"   type="text" placeholder="SIRET (14 chiffres)" inputmode="numeric" maxlength="17" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <textarea id="gmw-desc" placeholder="Décris ton établissement en quelques mots…" maxlength="300" style="width:100%;height:70px;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);resize:none;box-sizing:border-box"></textarea>
       <div id="gmw-err" style="color:#EF4444;font-size:12px;display:none;padding:8px 12px;background:rgba(239,68,68,.08);border-radius:8px"></div>
       <button onclick="saveGoogleMerchant()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg)">Créer mon espace →</button>
     </div>
@@ -2098,10 +2154,12 @@ let _skipNextAuth = false;
 function awTab(mode) {
   _awMode = mode;
   const isReg = mode === 'register';
-  ['aw-brand','aw-sector','aw-city'].forEach(id => {
+  ['aw-brand','aw-sector','aw-city','aw-phone','aw-address','aw-siret','aw-desc'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.style.display = isReg ? 'block' : 'none';
   });
+  const nameRow = document.getElementById('aw-name-row');
+  if(nameRow) nameRow.style.display = isReg ? 'flex' : 'none';
   const a = 'flex:1;padding:10px;border-radius:9px;font-size:13px;font-weight:700;border:none;background:white;color:var(--ink);font-family:var(--fb);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.06)';
   const i = 'flex:1;padding:10px;border-radius:9px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--ink3);font-family:var(--fb);cursor:pointer';
   document.getElementById('aw-tab-login').style.cssText    = !isReg ? a : i;
@@ -2129,10 +2187,18 @@ async function awSubmit() {
     if(_awMode === 'login') {
       await auth.signInWithEmailAndPassword(email, pass);
     } else {
-      const brand  = document.getElementById('aw-brand').value.trim();
-      const sector = document.getElementById('aw-sector').value.trim();
-      const city   = document.getElementById('aw-city').value.trim();
-      if(!brand || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      const brand     = document.getElementById('aw-brand').value.trim();
+      const sector    = document.getElementById('aw-sector').value.trim();
+      const city      = document.getElementById('aw-city').value.trim();
+      const firstName = document.getElementById('aw-firstname').value.trim();
+      const lastName  = document.getElementById('aw-lastname').value.trim();
+      const phone     = document.getElementById('aw-phone').value.trim();
+      const address   = document.getElementById('aw-address').value.trim();
+      const siretRaw  = document.getElementById('aw-siret').value.trim();
+      const siret     = siretRaw.replace(/\s+/g,'');
+      const desc      = document.getElementById('aw-desc').value.trim();
+      if(!brand || !city || !firstName || !lastName || !phone || !address || !desc) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      if(!/^\d{14}$/.test(siret)) { awShowErr('SIRET invalide (14 chiffres).'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       _skipNextAuth = true;
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       cred.user.sendEmailVerification().catch(() => {}); // non bloquant : l'email arrive en tâche de fond
@@ -2140,6 +2206,7 @@ async function awSubmit() {
         role: 'merchant',
         name: brand,
         brandName: brand, email, sector: sector||'Commerce', theme: (sector||'Commerce').toLowerCase(), city: normalizeCity(city), cityLabel: city,
+        firstName, lastName, phone, address, siret, description: desc,
         ownerUid: cred.user.uid,
         status: 'pending',
         submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -2203,14 +2270,25 @@ async function loadMerchantAndStart(uid) {
     }
   }
 
-  // Vérification statut : si pending, accès au dashboard mais création désactivée
+  // Vérification statut : tant que non vérifié, aucun accès au dashboard (écran bloquant).
   if(_mData.status === 'pending') {
-    showPendingBanner(_mData);
+    showPendingScreen(_mData);
+    return;
   }
   if(_mData.status === 'rejected') {
     showRejectedScreen(_mData);
     return;
   }
+  // Première reconnexion après validation admin : popup de bienvenue, une seule fois.
+  if(_mData.status === 'verified' && !_mData.verifiedPopupShown) {
+    const bn = document.getElementById('verified-modal-brand');
+    if(bn) bn.textContent = _mData.brandName || 'ton commerce';
+    const vm = document.getElementById('verified-modal');
+    if(vm) vm.style.display = 'flex';
+    db.collection('merchants').doc(uid).update({ verifiedPopupShown: true }).catch(()=>{});
+  }
+
+  loadMerchantNotifications(uid);
 
   // Mettre à jour la sidebar avec les vraies données
   const sbn = document.querySelector('.sb-brand-name');
@@ -2226,9 +2304,19 @@ async function loadMerchantAndStart(uid) {
   const setBrand = document.getElementById('set-brand-name');
   const setContact = document.getElementById('set-contact');
   const setDpo = document.getElementById('set-dpo');
-  if(setBrand) setBrand.textContent = (_mData.brandName||'—') + (_mData.city?' · '+_mData.city:'');
-  if(setContact) setContact.textContent = (_mData.email||'—') + (_mData.sector?' · '+_mData.sector:'');
+  if(setBrand) setBrand.textContent = _mData.brandName || '—';
+  if(setContact) setContact.textContent = _mData.email || '—';
   if(setDpo) setDpo.textContent = (_mData.email||'—') + ' · Conforme RGPD Art. 37';
+  const setFields = { 'set-firstname':'firstName', 'set-lastname':'lastName', 'set-phone':'phone', 'set-address':'address', 'set-sector':'sector', 'set-siret':'siret', 'set-desc':'description', 'set-city':'cityLabel' };
+  Object.keys(setFields).forEach(domId => {
+    const el = document.getElementById(domId);
+    if(el) el.textContent = _mData[setFields[domId]] || '—';
+  });
+  const logoPreview = document.getElementById('set-logo-preview');
+  if(logoPreview && _mData.logoUrl) logoPreview.innerHTML = `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover">`;
+  document.querySelectorAll('.sb-brand-av').forEach(el => { if(_mData.logoUrl) el.innerHTML = `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`; });
+  const setIddoc = document.getElementById('set-iddoc');
+  if(setIddoc && _mData.idDocumentPath) setIddoc.textContent = 'Envoyé — en cours de vérification';
   // Update wizard preview brand names
   document.querySelectorAll('#preview-brand-nm,#preview-brand-nm-p1').forEach(el => el.textContent = _mData.brandName||'Votre commerce');
   document.querySelectorAll('#preview-brand-sec,#preview-brand-sec-p1').forEach(el => el.textContent = _mData.sector||'Commerce');
@@ -2470,30 +2558,70 @@ launchCampaign = async function() {
 };
 
 // ─── Bannière pending (accès dashboard, création désactivée) ──
-function showPendingBanner(data) {
-  const banner = document.getElementById('pending-banner');
-  if(banner) banner.style.display = 'flex';
-
-  // Désactiver le bouton de création
-  const createBtn = document.getElementById('topbar-new-camp-btn');
-  if(createBtn) {
-    createBtn.disabled = true;
-    createBtn.style.opacity = '.4';
-    createBtn.style.cursor = 'not-allowed';
-    createBtn.title = 'Disponible après validation de ton espace';
-  }
-  // Désactiver le lien sidebar "Créer une campagne"
-  document.querySelectorAll('.sb-item').forEach(btn => {
-    if(btn.textContent.includes('Créer')) {
-      btn.style.opacity = '.4';
-      btn.style.pointerEvents = 'none';
-      btn.title = 'Disponible après validation';
+// ─── Écran d'attente (bloquant : aucun accès au dashboard tant que pending) ─
+function showPendingScreen(data) {
+  const nameEl = document.getElementById('pending-brand');
+  if(nameEl) nameEl.textContent = data.brandName || 'ton commerce';
+  const etaEl = document.getElementById('pending-eta');
+  if(etaEl) {
+    if(data.submittedAt && data.submittedAt.toDate) {
+      const elapsedH = Math.floor((Date.now() - data.submittedAt.toDate().getTime()) / 3600000);
+      const remaining = Math.max(0, 24 - elapsedH);
+      etaEl.textContent = remaining > 0 ? `Encore environ ${remaining}h avant la validation` : 'Validation imminente';
+    } else {
+      etaEl.textContent = 'Validation généralement sous 24h';
     }
-  });
+  }
+  const sc = document.getElementById('pending-screen');
+  if(sc) sc.style.display = 'flex';
 }
 
-// ─── Écran d'attente (gardé pour compatibilité mais plus utilisé) ─
-function showPendingScreen(data) { showPendingBanner(data); }
+function closeVerifiedModal() {
+  const vm = document.getElementById('verified-modal');
+  if(vm) vm.style.display = 'none';
+}
+
+// ─── Notifications commerçant (annonces envoyées par l'admin) ─
+let _notifUnsub = null;
+function loadMerchantNotifications(uid) {
+  if(_notifUnsub) _notifUnsub();
+  _notifUnsub = db.collection('merchants').doc(uid).collection('notifications')
+    .orderBy('createdAt', 'desc').limit(20)
+    .onSnapshot(snap => {
+      const notifs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const dot = document.getElementById('notif-dot');
+      if(dot) dot.style.display = notifs.some(n => !n.read) ? 'block' : 'none';
+      const list = document.getElementById('notif-list');
+      if(!list) return;
+      if(!notifs.length) { list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink3);font-size:12.5px">Aucune notification.</div>'; return; }
+      list.innerHTML = notifs.map(n => {
+        const date = n.createdAt && n.createdAt.toDate ? n.createdAt.toDate().toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+        return `<div style="padding:12px 16px;border-bottom:1px solid var(--border);${n.read?'':'background:var(--ad)'}">
+          <div style="font-size:12.5px;color:var(--ink);line-height:1.5">${esc(n.message||'')}</div>
+          <div style="font-size:10.5px;color:var(--ink3);margin-top:4px">${date}</div>
+        </div>`;
+      }).join('');
+    }, e => console.warn('notifications:', e));
+}
+function toggleNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  if(!panel) return;
+  const opening = panel.style.display !== 'block';
+  panel.style.display = opening ? 'block' : 'none';
+  if(opening) {
+    const uid = auth.currentUser && auth.currentUser.uid;
+    if(uid) {
+      db.collection('merchants').doc(uid).collection('notifications').where('read','==',false).get()
+        .then(snap => { const batch = db.batch(); snap.forEach(d => batch.update(d.ref, { read: true })); if(!snap.empty) batch.commit().catch(()=>{}); })
+        .catch(()=>{});
+    }
+  }
+}
+document.addEventListener('click', e => {
+  const panel = document.getElementById('notif-panel');
+  const btn = document.getElementById('tb-notif-btn');
+  if(panel && panel.style.display==='block' && !panel.contains(e.target) && e.target!==btn && !btn?.contains(e.target)) panel.style.display='none';
+});
 
 // ─── Écran compte refusé ─────────────────────────────────────
 function showRejectedScreen(data) {
@@ -2949,11 +3077,18 @@ async function signInWithGoogle() {
 }
 
 async function saveGoogleMerchant() {
-  const brand  = document.getElementById('gmw-brand').value.trim();
-  const sector = document.getElementById('gmw-sector').value.trim();
-  const city   = document.getElementById('gmw-city').value.trim();
+  const brand     = document.getElementById('gmw-brand').value.trim();
+  const sector    = document.getElementById('gmw-sector').value.trim();
+  const city      = document.getElementById('gmw-city').value.trim();
+  const firstName = document.getElementById('gmw-firstname').value.trim();
+  const lastName  = document.getElementById('gmw-lastname').value.trim();
+  const phone     = document.getElementById('gmw-phone').value.trim();
+  const address   = document.getElementById('gmw-address').value.trim();
+  const siret     = document.getElementById('gmw-siret').value.trim().replace(/\s+/g,'');
+  const desc      = document.getElementById('gmw-desc').value.trim();
   const errEl  = document.getElementById('gmw-err');
-  if(!brand || !city) { errEl.textContent='Remplis les champs obligatoires.'; errEl.style.display='block'; return; }
+  if(!brand || !city || !firstName || !lastName || !phone || !address || !desc) { errEl.textContent='Remplis les champs obligatoires.'; errEl.style.display='block'; return; }
+  if(!/^\d{14}$/.test(siret)) { errEl.textContent='SIRET invalide (14 chiffres).'; errEl.style.display='block'; return; }
   const gmw  = document.getElementById('google-merchant-wall');
   const uid  = gmw._uid || auth.currentUser?.uid;
   const email = gmw._email || auth.currentUser?.email || '';
@@ -2962,6 +3097,7 @@ async function saveGoogleMerchant() {
     role: 'merchant',
     name: brand,
     brandName: brand, email, sector: sector||'Commerce', theme: (sector||'Commerce').toLowerCase(), city: normalizeCity(city), cityLabel: city,
+    firstName, lastName, phone, address, siret, description: desc,
     ownerUid: uid,
     status: 'pending',
     submittedAt: firebase.firestore.FieldValue.serverTimestamp(),

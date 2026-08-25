@@ -31,7 +31,20 @@ service cloud.firestore {
         isFriendOf(uid) ||
         isAdmin() ||
         (isAuth() && myCity() != null && resource.data.get('city', null) == myCity());
-      allow write: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      // Le crédit de points (points/xp/dailyEarned/streak/ans/lastAnswerDate/answeredCampaigns)
+      // passe uniquement par la Cloud Function submitAnswer (SDK Admin, hors règles) — le
+      // client ne peut plus jamais écrire librement ces champs. Seule exception tolérée : le
+      // DÉBIT de points lors d'un échange de récompense (points ne peut alors que baisser).
+      allow update: if isAdmin() || (isOwner(uid) && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(
+          ['points','xp','dailyEarned','dailyEarnedDate','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns']
+        )
+        ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']) &&
+         request.resource.data.points < resource.data.points)
+      ));
+      allow delete: if isOwner(uid) || isAdmin();
 
       // Notifications subcollection
       match /notifications/{notifId} {
@@ -66,6 +79,13 @@ service cloud.firestore {
         )
       );
       allow delete: if isAdmin();
+
+      // Notifications subcollection (annonces admin, popup de vérification…)
+      match /notifications/{notifId} {
+        allow read, update: if isOwner(merchantId);
+        allow create: if isAuth();
+        allow delete: if isOwner(merchantId) || isAdmin();
+      }
     }
 
     // ─── Campaigns ────────────────────────────────────────────────────────────
@@ -84,14 +104,9 @@ service cloud.firestore {
         getMerchant(request.auth.uid).get('status', null) == 'verified' &&
         (getMerchant(request.auth.uid).get('city', null) == null ||
          request.resource.data.get('targetCity', null) == getMerchant(request.auth.uid).get('city', null));
-      allow update: if isAuth() && (
-        // Le commerçant peut modifier sa campagne
-        resource.data.merchantId == request.auth.uid
-        ||
-        // Un user peut incrémenter answersCount uniquement
-        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answersCount']) &&
-         request.resource.data.answersCount == resource.data.answersCount + 1)
-      );
+      // answersCount/responsesCount ne sont plus incrémentables par le client : seule la
+      // Cloud Function submitAnswer (SDK Admin, hors règles) les met à jour désormais.
+      allow update: if isAuth() && (resource.data.merchantId == request.auth.uid || isAdmin());
       allow delete: if isAuth() && (resource.data.merchantId == request.auth.uid || isAdmin());
     }
 
@@ -99,7 +114,9 @@ service cloud.firestore {
     // Création : uniquement par l'auteur (userId doit matcher)
     // Lecture : par l'auteur OU par le commerçant de la campagne
     match /answers/{answerId} {
-      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      // Seule la Cloud Function submitAnswer (SDK Admin, hors règles) crée des réponses
+      // désormais — elle seule peut re-vérifier éligibilité/barème/doublon côté serveur.
+      allow create: if false;
       allow read: if isAuth() && (
         resource.data.userId == request.auth.uid ||
         resource.data.merchantId == request.auth.uid ||
@@ -163,6 +180,27 @@ service cloud.firestore {
       allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
       allow update: if false;
       allow delete: if isAuth() && (resource.data.userId == request.auth.uid || isAdmin());
+
+      // "J'aime" : un doc = un like d'un user (id = son uid), pour empêcher tout double-like
+      // et éviter de devoir valider un diff de tableau dans les règles.
+      match /likes/{uid} {
+        allow read: if isAuth();
+        allow create: if isAuth() && uid == request.auth.uid;
+        allow delete: if isAuth() && uid == request.auth.uid;
+      }
+    }
+
+    // ─── WeeklyQuestions ─────────────────────────────────────────────────────
+    // Question communautaire hebdomadaire, publiée par l'admin dans le feed d'une ville
+    // (ou de toutes). Lecture : tout user de la ville concernée. Écriture : admin seul.
+    match /weeklyQuestions/{qId} {
+      allow read: if isAuth() && (resource.data.get('city', null) == 'all' || resource.data.get('city', null) == myCity() || isAdmin());
+      allow create, update, delete: if isAdmin();
+      match /votes/{uid} {
+        allow read: if isAuth();
+        allow create: if isAuth() && uid == request.auth.uid;
+        allow update, delete: if false;
+      }
     }
 
     // ─── FriendCodes ─────────────────────────────────────────────────────────

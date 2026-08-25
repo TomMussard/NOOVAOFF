@@ -66,6 +66,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
 <style>
 :root{
   --bg:#F7F6F2;--bg2:#EEECEA;--bg3:#E0DDD8;--card:#FFFFFF;
@@ -94,6 +95,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{from{opacity:0;transform:scale(.2) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes confFall{to{transform:translateY(120vh) rotate(720deg);opacity:0}}
+/* Entrée en cascade pour les listes (feed, récompenses, classement…) — chaque carte
+   apparaît légèrement après la précédente, plutôt que tout d'un bloc (statique/plat). */
+.stagger-in{animation:fadeUp .45s cubic-bezier(.22,.9,.35,1) both}
+.feed-post,.fi,.br-card,.today-card{transition:transform .12s ease}
+.feed-post:active,.fi:active,.br-card:active{transform:scale(.97)}
+.today-card:active{transform:scale(.98)}
 /* SPLASH — empty screen covered by #app-loader */
 #splash{position:relative;overflow:hidden;background:var(--bg)}
 /* ONBOARDING */
@@ -167,9 +174,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .home-hdr{padding:52px 20px 12px;display:flex;align-items:center;justify-content:space-between}
 .h-greet{font-size:12px;color:var(--ink2);margin-bottom:2px}
 .h-name{font-family:var(--fd);font-weight:700;font-size:22px;letter-spacing:-.8px;color:var(--ink)}
-.pts-chip{display:flex;align-items:center;gap:6px;background:var(--vd);border:1.5px solid rgba(161,78,8,.14);padding:7px 12px;border-radius:99px;cursor:pointer}
-.pc-n{font-family:var(--fd);font-weight:800;font-size:16px;color:var(--violet)}
-.pc-l{font-size:11px;color:var(--violet);opacity:.6}
+.pts-chip{display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#A14E08,#FBBF24 130%);border:none;padding:8px 14px 8px 10px;border-radius:99px;cursor:pointer;box-shadow:0 6px 16px rgba(161,78,8,.28);transition:transform .13s}
+.pts-chip:active{transform:scale(.94)}
+.pc-ico{font-size:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
+.pc-n{font-family:var(--fd);font-weight:800;font-size:17px;color:#fff;letter-spacing:-.3px}
+.pc-l{font-size:10.5px;color:rgba(255,255,255,.75);font-weight:600}
 .near-miss{margin:0 18px 14px;background:linear-gradient(135deg,#2E1F0C,#23170A);border-radius:var(--r);padding:14px 17px;position:relative;overflow:hidden}
 .near-miss::before{content:'';position:absolute;top:-40px;right:-20px;width:130px;height:130px;background:rgba(255,255,255,.03);border-radius:50%}
 .nm-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;position:relative;z-index:1}
@@ -180,8 +189,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .nm-bot{position:relative;z-index:1}
 .nm-txt{font-size:12px;color:rgba(255,255,255,.8);font-weight:500}
 .nm-txt strong{color:#fff;font-weight:700}
-.streak-card{margin:0 18px 16px;background:var(--card);border:1.5px solid rgba(245,166,35,.2);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:11px}
-.s-fire{font-size:26px}
+.streak-card{margin:0 18px 16px;background:linear-gradient(120deg,var(--cd) 0%,rgba(255,218,9,.07) 100%);border:1.5px solid rgba(245,166,35,.22);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:11px}
+.s-fire{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#f29715,#ffda09);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 10px rgba(242,151,21,.3)}
+.s-fire svg{width:20px;height:20px}
 .s-num{font-family:var(--fd);font-weight:800;font-size:25px;color:var(--amber);line-height:1}
 .s-lbl{font-size:11px;color:var(--ink2);margin-top:1px}
 .s-dots{display:flex;gap:5px}
@@ -330,6 +340,20 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .fp-foot{padding:5px 12px 9px;display:flex;border-top:1px solid var(--bg3)}
 .fp-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:6px;border-radius:8px;font-size:11px;color:var(--ink2);cursor:pointer;background:none;border:none;font-family:var(--fb);transition:all .13s}
 .fp-btn:active{background:var(--bg2)}.fp-btn.liked{color:var(--coral)}
+.wq-card{margin:0 18px 14px;background:linear-gradient(135deg,#0E2A24,#114A3C);border-radius:var(--r);padding:16px 17px;color:#fff;position:relative;overflow:hidden}
+.wq-tag{font-family:var(--fd);font-weight:700;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:#5FE3BC}
+.wq-text{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.22;letter-spacing:-.4px;margin:9px 0 13px}
+.wq-opts{display:flex;flex-direction:column;gap:8px}
+.wq-opt-btn{width:100%;text-align:left;padding:11px 14px;border-radius:11px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.14);color:#fff;font-family:var(--fb);font-size:13px;font-weight:600;cursor:pointer;transition:background .13s}
+.wq-opt-btn:active{background:rgba(255,255,255,.2)}
+.wq-results{display:flex;flex-direction:column;gap:9px}
+.wq-result-row{display:flex;align-items:center;gap:9px}
+.wq-result-lbl{width:42%;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.85)}
+.wq-result-row.mine .wq-result-lbl{color:#5FE3BC}
+.wq-result-bar{flex:1;height:8px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden}
+.wq-result-fill{height:100%;background:#5FE3BC;border-radius:99px;transition:width .5s}
+.wq-result-pct{width:34px;text-align:right;font-size:11px;font-weight:700;color:rgba(255,255,255,.7)}
+.wq-total{margin-top:10px;font-size:11px;color:rgba(255,255,255,.45)}
 .fi{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--bg3);cursor:pointer;transition:opacity .13s}
 .fi:last-child{border-bottom:none}.fi:active{opacity:.6}
 .fi-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:16px;flex-shrink:0;position:relative}
@@ -596,7 +620,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="si">
     <div class="home-hdr">
       <div><div class="h-greet" id="home-greet">Bonjour 👋</div><div class="h-name" id="home-name">Alex</div></div>
-      <div class="pts-chip" onclick="goNav('rewards-tab')"><span class="pc-n" id="home-pts">0</span><span class="pc-l">pts</span></div>
+      <div class="pts-chip" onclick="goNav('rewards-tab')"><span class="pc-ico">💎</span><span class="pc-n" id="home-pts">0</span><span class="pc-l">pts</span></div>
     </div>
     <div class="near-miss">
       <div class="nm-top"><span class="nm-lbl">Progression</span><span class="nm-tgt" id="nm-target">500 pts</span></div>
@@ -604,7 +628,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="nm-bot"><span class="nm-txt" id="nm-txt">Il te reste <strong>496 pts</strong> avant 500</span></div>
     </div>
     <div class="streak-card">
-      <div class="s-fire">🔥</div>
+      <div class="s-fire"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3-2 4-2 7a2 2 0 004 0c1 1 2 2.5 2 4.5A5.5 5.5 0 016.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0012 22a8 8 0 007-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg></div>
       <div style="flex:1"><div class="s-num" id="streak-num">1</div><div class="s-lbl">jour(s) consécutif(s)</div></div>
       <div class="s-dots" id="streak-dots"></div>
     </div>
@@ -680,7 +704,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <button class="tab-btn on" onclick="socTab('feed',this)">Feed</button>
       <button class="tab-btn" onclick="socTab('friends',this)">Amis</button>
       <button class="tab-btn" onclick="socTab('ranking',this)">Classement</button>
-      <button class="tab-btn" onclick="socTab('groups',this)">Groupes</button>
+      <!-- Groupes masqués en beta -->
     </div>
     <div id="panel-feed"></div>
     <div id="panel-friends" style="display:none"></div>
@@ -708,15 +732,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="wallet-wrap">
     <div class="wallet-card">
       <div class="wc-lbl">Mon solde</div>
-      <div class="wc-pts" id="wc-pts">0 <small>pts</small></div>
+      <div class="wc-pts" id="wc-pts"><span id="wc-pts-num">0</span> <small>pts</small></div>
       <div class="wc-bar"><div class="wc-fill" id="wc-fill" style="width:4%"></div></div>
       <div class="wc-level"><span id="wc-level">Niveau 1 · Curieux</span><span id="wc-next">1000 pts</span></div>
       <div style="font-size:10px;color:rgba(255,255,255,.42);margin-top:8px;text-align:center;line-height:1.6"><strong style="color:rgba(255,255,255,.65)">pts</strong> = solde dépensable · <strong style="color:rgba(255,255,255,.65)">xp</strong> = progression palier (ne se dépense pas)</div>
-    </div>
-    <div class="cashout-c">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><span style="font-size:22px">📍</span><div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">Des récompenses concrètes</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">Produits offerts et réductions chez les commerces de ton quartier. C'est là que tes points valent le plus.</div></div></div>
-      <div class="co-req"><div class="req-dot" style="background:var(--mint)"></div><span>Bons à présenter au comptoir, chez les commerces de ta ville</span></div>
-      <div class="co-req"><div class="req-dot" style="background:var(--mint)"></div><span>Tes points n'expirent jamais, tu choisis quand les utiliser</span></div>
     </div>
     <div style="font-family:var(--fd);font-weight:700;font-size:16px;letter-spacing:-.4px;color:var(--ink);margin-bottom:10px">🎁 Récompenses près de toi</div>
     <div class="gift-grid" id="gift-grid"></div>
@@ -920,7 +939,7 @@ async function doBrands(){
 function refreshHome(){
   if(!S.user)return;
   const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour 👋':hr<18?'Bon après-midi ☀️':'Bonsoir 🌙';
-  document.getElementById('home-name').textContent=S.user.name;document.getElementById('home-pts').textContent=S.pts;
+  document.getElementById('home-name').textContent=S.user.name;animateNumber(document.getElementById('home-pts'),S.pts);
   const targets=[1000,3000,6000,10000];const tgt=targets.find(t=>t>S.xp)||10000;const prev=targets.filter(t=>t<=S.xp).pop()||0;
   const pct=Math.min(95,Math.max(4,((S.xp-prev)/(tgt-prev))*100));
   document.getElementById('nm-fill').style.width=pct+'%';document.getElementById('nm-target').textContent=tgt+' xp';
@@ -1010,11 +1029,67 @@ function shareReward(){
 function renderSocial(){
   const fe=document.getElementById('panel-feed');
   fe.innerHTML='';
-  // Jeu du jour retiré du périmètre (GAMEQ est une donnée statique, pas encore de vraie source Firestore)
-  // Chargement du feed depuis Firestore
+  fe.insertAdjacentHTML('beforeend','<div id="weekly-q-slot"></div>');
   fe.insertAdjacentHTML('beforeend','<div id="feed-content" style="min-height:80px;padding:0 18px"><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div></div>');
+  loadWeeklyQuestion();
   loadCommunityFeed();
   initFriendsPanel();initRankingPanel();
+}
+
+// ─── Question de la semaine (postée par l'admin, réelle, sans points en jeu) ──
+async function loadWeeklyQuestion() {
+  const slot = document.getElementById('weekly-q-slot');
+  if(!slot) return;
+  const city = normalizeCity(S._city||'');
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if(!city || !uid) { slot.innerHTML=''; return; }
+  try {
+    const snap = await db.collection('weeklyQuestions').where('active','==',true).where('city','in',[city,'all']).orderBy('createdAt','desc').limit(5).get();
+    const q = snap.docs.map(d=>({id:d.id,...d.data()}))[0];
+    if(!q) { slot.innerHTML=''; return; }
+    const myVoteSnap = await db.collection('weeklyQuestions').doc(q.id).collection('votes').doc(uid).get();
+    if(myVoteSnap.exists) renderWeeklyQuestionResults(q, myVoteSnap.data().optionIndex);
+    else renderWeeklyQuestionVote(q);
+  } catch(e) { console.warn('weeklyQuestion:', e); slot.innerHTML=''; }
+}
+function renderWeeklyQuestionVote(q) {
+  const slot = document.getElementById('weekly-q-slot');
+  if(!slot) return;
+  const opts = (q.options||[]).map((o,i)=>`<button class="wq-opt-btn" onclick="voteWeeklyQuestion('${q.id}',${i})">${esc(o)}</button>`).join('');
+  slot.innerHTML = `<div class="wq-card">
+    <div class="wq-tag">🎮 QUESTION DE LA SEMAINE</div>
+    <div class="wq-text">${esc(q.text||'')}</div>
+    <div class="wq-opts">${opts}</div>
+  </div>`;
+}
+async function voteWeeklyQuestion(qId, optionIndex) {
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if(!uid) return;
+  try {
+    await db.collection('weeklyQuestions').doc(qId).collection('votes').doc(uid).set({ optionIndex, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    const qSnap = await db.collection('weeklyQuestions').doc(qId).get();
+    renderWeeklyQuestionResults({ id: qId, ...qSnap.data() }, optionIndex);
+  } catch(e) { console.warn('voteWeeklyQuestion:', e); }
+}
+async function renderWeeklyQuestionResults(q, myOptionIndex) {
+  const slot = document.getElementById('weekly-q-slot');
+  if(!slot) return;
+  const opts = q.options || [];
+  const votesSnap = await db.collection('weeklyQuestions').doc(q.id).collection('votes').get();
+  const counts = opts.map((_,i) => 0);
+  votesSnap.forEach(d => { const idx = d.data().optionIndex; if(counts[idx]!==undefined) counts[idx]++; });
+  const total = counts.reduce((a,b)=>a+b,0) || 1;
+  const bars = opts.map((o,i) => {
+    const pct = Math.round((counts[i]/total)*100);
+    const mine = i===myOptionIndex;
+    return `<div class="wq-result-row${mine?' mine':''}"><div class="wq-result-lbl">${mine?'✓ ':''}${esc(o)}</div><div class="wq-result-bar"><div class="wq-result-fill" style="width:${pct}%"></div></div><div class="wq-result-pct">${pct}%</div></div>`;
+  }).join('');
+  slot.innerHTML = `<div class="wq-card">
+    <div class="wq-tag">🎮 QUESTION DE LA SEMAINE</div>
+    <div class="wq-text">${esc(q.text||'')}</div>
+    <div class="wq-results">${bars}</div>
+    <div class="wq-total">${total} réponse${total>1?'s':''}</div>
+  </div>`;
 }
 
 async function loadCommunityFeed() {
@@ -1044,20 +1119,82 @@ async function loadCommunityFeed() {
     }
 
     const colors = ['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
-    snap.forEach(doc => {
+    const myUid = auth.currentUser && auth.currentUser.uid;
+    const docs = snap.docs;
+
+    // Likes : compte + "déjà liké par moi" pour chaque post, en parallèle (sous-collection likes/{uid}).
+    const likeInfo = await Promise.all(docs.map(async doc => {
+      try {
+        const [countSnap, mineSnap] = await Promise.all([
+          doc.ref.collection('likes').count().get(),
+          myUid ? doc.ref.collection('likes').doc(myUid).get() : Promise.resolve(null)
+        ]);
+        return { count: countSnap.data().count, liked: !!(mineSnap && mineSnap.exists) };
+      } catch(e) { return { count: 0, liked: false }; }
+    }));
+
+    el.innerHTML = '';
+    if (snap.empty) {
+      el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
+        Aucune activité dans ta ville pour l'instant.<br>
+        <span style="color:var(--coral);font-weight:600">Les réponses apparaissent ici dès qu'elles sont publiées.</span>
+      </div>`;
+      return;
+    }
+
+    const escAttr = s => esc(s).replace(/"/g,'&quot;'); // esc() n'échappe pas les guillemets, nécessaire ici (valeurs insérées dans des attributs data-*)
+    docs.forEach((doc, i) => {
       const ev = doc.data();
       const name = ev.displayName || 'Quelqu\'un';
       const c = colors[name.charCodeAt(0) % colors.length];
       const ts = ev.createdAt ? timeAgo(ev.createdAt.toDate()) : '';
+      const { count: likeCount, liked } = likeInfo[i];
+      const isMe = ev.userId && myUid && ev.userId === myUid;
       const d = document.createElement('div');
       d.className = 'feed-post';
-      d.innerHTML = `<div class="fp-hdr"><div class="fp-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fp-name">${esc(name)}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body"><div class="fp-action">${esc(ev.text||'a répondu à une question')}${ev.brand?` <strong>${esc(ev.brand)}</strong>`:''}</div></div><div class="fp-foot"><button class="fp-btn" onclick="this.classList.toggle('liked');this.textContent=this.classList.contains('liked')?'❤️ J\'aime':'🤍 J\'aime'">🤍 J'aime</button></div>`;
+      d.innerHTML = `<div class="fp-hdr"><div class="fp-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fp-name">${esc(name)}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body"><div class="fp-action">${esc(ev.text||'a répondu à une question')}${ev.brand?` <strong>${esc(ev.brand)}</strong>`:''}</div></div><div class="fp-foot">
+        <button class="fp-btn fp-like-btn${liked?' liked':''}" data-post-id="${escAttr(doc.id)}" data-liked="${liked}" onclick="toggleFeedLike(this)">${liked?'❤️':'🤍'} <span class="fp-like-count">${likeCount>0?likeCount:''}</span> J'aime</button>
+        ${isMe?'':`<button class="fp-btn" data-uid="${escAttr(ev.userId)}" data-name="${escAttr(name)}" onclick="openChatFor({uid:this.dataset.uid,n:this.dataset.name,online:false})">💬 Commenter</button>`}
+        <button class="fp-btn" data-name="${escAttr(name)}" data-text="${escAttr(ev.text||'')}" data-brand="${escAttr(ev.brand||'')}" onclick="shareFeedPost(this.dataset.name,this.dataset.text,this.dataset.brand)">📣 Partager</button>
+      </div>`;
       el.appendChild(d);
     });
+    applyStagger(el);
   } catch (e) {
     console.warn('Feed error:', e);
     el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink3);font-size:12px">Impossible de charger le feed.</div>';
   }
+}
+
+async function toggleFeedLike(btn) {
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if (!uid) return;
+  const postId = btn.getAttribute('data-post-id');
+  const wasLiked = btn.getAttribute('data-liked') === 'true';
+  const countEl = btn.querySelector('.fp-like-count');
+  const count = parseInt(countEl.textContent) || 0;
+  // Optimiste (petite action locale, sans crédit de points ni enjeu d'intégrité)
+  btn.setAttribute('data-liked', (!wasLiked).toString());
+  btn.classList.toggle('liked', !wasLiked);
+  btn.firstChild.textContent = wasLiked ? '🤍 ' : '❤️ ';
+  countEl.textContent = wasLiked ? (count>1?count-1:'') : (count+1);
+  const ref = db.collection('communityEvents').doc(postId).collection('likes').doc(uid);
+  try {
+    if (wasLiked) await ref.delete();
+    else await ref.set({ createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  } catch(e) {
+    // rollback si l'écriture échoue
+    btn.setAttribute('data-liked', wasLiked.toString());
+    btn.classList.toggle('liked', wasLiked);
+    btn.firstChild.textContent = wasLiked ? '❤️ ' : '🤍 ';
+    countEl.textContent = count>0?count:'';
+  }
+}
+
+function shareFeedPost(name, text, brand) {
+  const msg = `${name} ${text}${brand?' '+brand:''} — sur Noova`;
+  if (navigator.share) { navigator.share({ title: 'Noova', text: msg }).catch(()=>{}); }
+  else if (navigator.clipboard) { navigator.clipboard.writeText(msg); }
 }
 
 function timeAgo(date) {
@@ -1070,6 +1207,35 @@ function timeAgo(date) {
 
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── Micro-interactions : entrée en cascade + compteurs animés ────────────
+// Applique une entrée en fondu/translation décalée à chaque enfant direct d'un
+// conteneur qu'on vient de peupler (feed, récompenses, classement…), plutôt que
+// tout afficher d'un bloc statique.
+function applyStagger(container, maxDelayMs) {
+  if (!container) return;
+  const cap = maxDelayMs || 320;
+  Array.from(container.children).forEach((child, i) => {
+    child.classList.add('stagger-in');
+    child.style.animationDelay = Math.min(i * 45, cap) + 'ms';
+  });
+}
+// Anime un nombre affiché en <element> de sa valeur actuelle vers `to`, au lieu
+// de le faire sauter instantanément (plus vivant sur les compteurs de points/xp).
+function animateNumber(el, to, suffix) {
+  if (!el) return;
+  const from = parseInt((el.textContent||'0').replace(/\D/g,'')) || 0;
+  to = Math.max(0, Math.round(to));
+  if (from === to) { el.textContent = to + (suffix||''); return; }
+  const dur = 500, start = performance.now();
+  function step(now) {
+    const p = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(from + (to - from) * eased) + (suffix||'');
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 
 // ─── Social feed helpers ──────────────────────────────────────
@@ -1230,9 +1396,10 @@ function renderFriends(){
     const d=document.createElement('div');
     d.className='fi';
     d.onclick=()=>openChatFor(f);
-    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.pts} pts · <span style="color:var(--amber);font-weight:600">🔥 ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
+    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.xp} xp · <span style="color:var(--amber);font-weight:600">🔥 ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
     el.appendChild(d);
   });
+  applyStagger(el);
 }
 function renderRanking(){
   const el=document.getElementById('ranking-list');
@@ -1269,6 +1436,7 @@ async function loadCityRanking() {
       d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--coral);font-weight:700':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.xp || u.points || 0} xp</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--violet)">${i<3?medals[i]:'#'+(i+1)}</div>`;
       el.appendChild(d);
     });
+    applyStagger(el);
     if(!all.length)el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:13px">Sois le premier à répondre dans ta ville !</div>';
   }catch(e){
     el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Impossible de charger le classement.</div>';
@@ -1575,7 +1743,7 @@ function initPullToRefresh(scrollEl, ptrBarId, refreshFn) {
 
 function getLvl(){return TIERS.find(t=>S.xp>=t.min&&S.xp<t.max)||TIERS[TIERS.length-1]}
 function refreshWallet(){
-  document.getElementById('wc-pts').innerHTML=S.pts+' <small>pts</small>';
+  animateNumber(document.getElementById('wc-pts-num'),S.pts);
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(4,((S.xp-l.min)/(l.max-l.min))*100));
   document.getElementById('wc-fill').style.width=pct+'%';
   document.getElementById('wc-level').textContent='Niveau '+(li+1)+' · '+l.n;
@@ -1835,6 +2003,7 @@ async function openBrandById(mid, fallbackName) {
 }
 
 function startCampaignById(campId) {
+  if((S._answered||[]).includes(campId)) return; // déjà répondu — coupe court même sans reload
   const existing=(S.qs||[]).find(q=>q._firestoreId===campId);
   if(existing){openQ(S.qs.indexOf(existing));return;}
   db.collection('campaigns').doc(campId).get().then(doc=>{
@@ -2059,6 +2228,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+const fx  = firebase.app().functions('europe-west1');
+const callSubmitAnswer = fx.httpsCallable('submitAnswer');
 document.getElementById('aw-pass').addEventListener('input', function(){ _updatePassStrength(this.value); });
 
 // ─── Auth UI ─────────────────────────────────────────────────
@@ -2228,96 +2399,31 @@ async function loadRewardsFromFirestore() {
       const d = doc.data();
       if(normalizeCity(d.city||'') === city) rewards.push({ id: doc.id, ...d });
     });
+    rewards.sort((a,b) => (a.cost||0)-(b.cost||0));
 
-    // Grouper par merchantId
-    const byMerchant = {};
-    rewards.forEach(r => {
-      const mid = r.merchantId || '_';
-      if(!byMerchant[mid]) byMerchant[mid] = [];
-      byMerchant[mid].push(r);
-    });
-    Object.values(byMerchant).forEach(arr => arr.sort((a,b) => (a.cost||0)-(b.cost||0)));
-
-    gg.style.gridTemplateColumns = '1fr'; // une carte pleine largeur par commerce
+    gg.style.gridTemplateColumns = '';
     gg.innerHTML = '';
 
-    if(!Object.keys(byMerchant).length) {
-      gg.style.gridTemplateColumns = '';
+    if(!rewards.length) {
+      gg.style.gridTemplateColumns = '1fr';
       gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px;line-height:1.6">Les récompenses arrivent bientôt dans ta ville !<br>Continue de répondre pour accumuler des points 💪</div>';
       return;
     }
 
-    Object.entries(byMerchant).forEach(([mid, mRewards]) => {
-      const first = mRewards[0];
-      const pct = Math.min(100, Math.round((S.pts / Math.max(1, first.cost||1)) * 100));
-      const unlocked = S.pts >= (first.cost||0);
+    // Grille de carrés simples, une carte par récompense (jusqu'à 5 par commerce, du moins
+    // cher au plus cher) — le solde s'utilise chez n'importe quel commerce visible de la ville.
+    rewards.forEach(r => {
+      const locked = S.pts < (r.cost||0);
       const card = document.createElement('div');
-      card.className = 'gift-c';
-      card.style.display = 'flex'; card.style.alignItems = 'center'; card.style.gap = '13px';
-      card.innerHTML = `
-        <div style="flex-shrink:0">${logoHTML(first.merchantName||first.label,44)}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(first.merchantName||'Commerce')}</div>
-          <div style="font-size:11px;color:var(--ink2);margin-top:1px">${esc(first.icon||'🎁')} ${esc(first.label||'Récompense')} — ${first.cost||0} pts</div>
-          <div style="margin-top:7px;background:var(--bg3);border-radius:99px;height:5px;overflow:hidden">
-            <div style="height:100%;width:${pct}%;background:${unlocked?'#0BAB84':'var(--coral)'};border-radius:99px;transition:width .6s"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);margin-top:3px">
-            <span>${S.pts} pts</span>
-            <span>${unlocked?'✅ Disponible !':pct+'% · '+first.cost+' pts'}${mRewards.length>1?' · '+mRewards.length+' paliers':''}</span>
-          </div>
-        </div>
-        <div style="color:var(--ink3);font-size:18px;flex-shrink:0">›</div>`;
-      card.onclick = () => openMerchantRewards(mid, first.merchantName||'Commerce', mRewards);
+      card.className = 'gift-c' + (locked ? ' locked' : '');
+      card.innerHTML = `<div style="margin-bottom:7px">${logoHTML(r.merchantName||r.label,38)}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${esc(r.merchantName||'Commerce')}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${esc(r.icon||'🎁')} ${esc(r.label||'Récompense')}</div><div style="margin-top:7px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--cd);color:var(--coral);display:inline-block">${r.cost||0} pts</div>`;
+      if(!locked) card.onclick = () => redeemReward(r);
       gg.appendChild(card);
     });
+    applyStagger(gg);
   } catch(e) {
     gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--ink3);font-size:12px">Erreur de chargement.</div>';
   }
-}
-
-function openMerchantRewards(mid, merchantName, rewards) {
-  let ov = document.getElementById('merchant-rewards-overlay');
-  if(!ov){ ov=document.createElement('div'); ov.id='merchant-rewards-overlay'; document.body.appendChild(ov); }
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9998;display:flex;align-items:flex-end;justify-content:center';
-  ov.onclick=e=>{if(e.target===ov)ov.remove();};
-  const _mrRewards = rewards; // closure reference for click handlers
-  const tiers = rewards.map((r,ri)=>{
-    const pct=Math.min(100,Math.round((S.pts/Math.max(1,r.cost||1))*100));
-    const ok=S.pts>=(r.cost||0);
-    return `<div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);border:1.5px solid ${ok?'rgba(11,171,132,.3)':'var(--bg3)'};border-radius:14px;margin-bottom:10px">
-      <div style="font-size:28px">${r.icon||'🎁'}</div>
-      <div style="flex:1">
-        <div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">${esc(r.label||'Récompense')}</div>
-        ${r.purchaseCondition?`<div style="font-size:11px;color:var(--ink3);margin-top:1px">📋 ${esc(r.purchaseCondition)}</div>`:''}
-        <div style="background:var(--bg3);border-radius:99px;height:4px;overflow:hidden;margin-top:8px">
-          <div style="height:100%;width:${pct}%;background:${ok?'#0BAB84':'var(--coral)'};border-radius:99px"></div>
-        </div>
-        <div style="font-size:10px;color:var(--ink3);margin-top:3px">${ok?'✅ Disponible':S.pts+' / '+r.cost+' pts ('+pct+'%)'}</div>
-      </div>
-      ${ok?`<button data-ri="${ri}" class="_mr-redeem-btn" style="padding:8px 14px;border-radius:10px;background:var(--coral);border:none;color:#fff;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap">Échanger</button>`:''}
-    </div>`;
-  }).join('');
-  ov.innerHTML=`<div style="background:var(--card);border-radius:24px 24px 0 0;padding:24px 20px 36px;width:100%;max-width:430px;max-height:80vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.25)">
-    <div style="width:40px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 20px"></div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-      ${logoHTML(merchantName,40)}
-      <div>
-        <div style="font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink)">${esc(merchantName)}</div>
-        <div style="font-size:11px;color:var(--ink3);margin-top:2px">${rewards.length} palier${rewards.length>1?'s':''} de récompense</div>
-      </div>
-    </div>
-    ${tiers}
-    <button onclick="document.getElementById('merchant-rewards-overlay').remove()" style="width:100%;padding:12px;margin-top:4px;border-radius:12px;background:var(--bg2);border:1.5px solid var(--bg3);color:var(--ink2);font-family:var(--fd);font-weight:700;font-size:14px;cursor:pointer">Fermer</button>
-  </div>`;
-  // Attacher les handlers d'échange après injection HTML (sécurité : pas d'inline handlers)
-  ov.querySelectorAll('._mr-redeem-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const r=_mrRewards[parseInt(btn.dataset.ri)];
-      ov.remove();
-      redeemReward(r);
-    });
-  });
 }
 
 async function redeemReward(reward) {
@@ -2525,7 +2631,10 @@ async function loadFriendsFromFirestore(uids) {
     S.friends = allSnaps.filter(s => s.exists).map(s => {
       const d = s.data();
       const online = d.online === true && d.lastSeen && (d.lastSeen.seconds * 1000 > twoMinAgo);
-      return { n: d.name || 'Ami', pts: d.points || 0, str: d.streak || 0, uid: s.id, online };
+      // Classement/liste d'amis basés sur l'XP (à vie, ne descend jamais) et non le solde
+      // de points (dépensable, baisse à chaque échange) — sinon un ami qui vient d'échanger
+      // une récompense semble "redescendre", ce qui n'est pas cohérent pour un classement.
+      return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, online };
     });
     renderFriends();
     // Recharge le feed avec la nouvelle liste d'amis
@@ -2750,127 +2859,68 @@ function getAnswerValue() {
   return '';
 }
 
-// ─── Patch submitAns → sauvegarde Firestore (barème NOOVA) ───
+// ─── Patch submitAns → crédit serveur (Cloud Function submitAnswer) ───
+// Le crédit de points n'est plus jamais fait par écriture Firestore directe du client
+// (faille corrigée : ça permettait de répondre à l'infini à la même question tant que
+// l'app n'était pas rechargée, en incrémentant S.pts localement même quand l'écriture
+// réelle était rejetée par les règles). La Cloud Function re-vérifie tout côté serveur
+// (éligibilité, barème, doublon) dans une transaction et renvoie les totaux faisant foi ;
+// l'écran de récompense n'apparaît qu'une fois cette confirmation reçue.
 const _origSubmitAns = submitAns;
 submitAns = function() {
   const q = curQuestion();
+  if(!q || S._submitting) return;
+  if(q._firestoreId && (S._answered||[]).includes(q._firestoreId)) return; // déjà répondu, coupe court
+
   const answerValue = getAnswerValue();
-  // Capturé avant _origSubmitAns() : détermine si cette soumission alimente S.sv.earned
-  // (démarrage OU poursuite d'un questionnaire de suivi), pour pouvoir corriger l'affichage ensuite.
-  const touchesSurvey = (S.mode === 'survey') || !!(q && q.survey && q.survey.length);
-  _origSubmitAns();
-  const u = auth.currentUser;
-  if(!u || !q) return;
-  const uid = u.uid;
-
-  // ── Score qualité (anti-abus léger) ──────────────────────────
-  // Une réponse rendue en moins de MIN_ANSWER_MS depuis l'affichage de la question
-  // est jugée trop rapide pour être un vrai choix humain (mcq/scale/rank) → 0 pt, flagged.
-  const MIN_ANSWER_MS = 900;
   const elapsedMs = S._qShownAt ? (Date.now() - S._qShownAt) : null;
-  const flagged = elapsedMs !== null && elapsedMs < MIN_ANSWER_MS;
-  const qualityScore = flagged ? 0 : 1;
-
-  // ── Calcul des points réellement attribués ─────────────────
-  const today = new Date().toISOString().slice(0,10);
-
-  // Réinitialiser le compteur quotidien si on change de jour
-  if(S._dailyEarnedDate !== today) { S._dailyEarned = 0; S._dailyEarnedDate = today; }
-
-  let earnedPts = flagged ? 0 : q.pts; // barème déjà fixé (10/15/20), 0 si réponse flaggée
-  if(S._dailyEarned + earnedPts > DAILY_CAP) earnedPts = Math.max(0, DAILY_CAP - S._dailyEarned);
-
-  // Bonus streak (+5 pts au premier point du jour)
-  let streakBonus = 0;
-  if(!flagged && earnedPts > 0 && S._lastAnswerDate !== today) {
-    streakBonus = 5;
-    const prevAnswerDate = S._lastAnswerDate;
-    S._lastAnswerDate = today;
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
-    S.streak = (prevAnswerDate === yesterday) ? S.streak + 1 : 1;
-  }
-
-  // Bonus série complète (+10 si c'est la 3e question d'une même campagne)
-  let serieBonus = 0;
-  if(!flagged && q._questionIdx === 2 && earnedPts > 0) serieBonus = 10; // Q3 = index 2
-
-  const totalEarned = earnedPts + streakBonus + serieBonus;
-  S._dailyEarned += totalEarned;
-
-  // Mettre à jour localement (correction du _origSubmitAns qui a déjà ajouté q.pts)
-  const correction = totalEarned - q.pts;
-  S.pts += correction;
-  S.xp  += totalEarned;
-  if (touchesSurvey && S.sv) S.sv.earned += correction;
-
-  // Re-synchroniser l'écran récompense (déjà affiché par _origSubmitAns avec les points
-  // AVANT bonus série/streak/cap quotidien) — la correction ci-dessus le rend juste avant
-  // le prochain repaint, donc l'utilisateur ne voit jamais le mauvais total.
-  {
-    const rwPtsEl = document.getElementById('rw-pts');
-    if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
-    const rwTotalEl = document.getElementById('rw-total');
-    if (rwTotalEl) rwTotalEl.textContent = S.pts + ' pts';
-  }
-
-  // ── Écriture Firestore ─────────────────────────────────────
-  // Note : seule 'answers' est lue par l'app (historique, "Même avis ?", analytics
-  // commerçant) — plus de double écriture dans une collection 'responses' jamais lue.
-  const batch = db.batch();
   const qIdx = q._questionIdx || 0;
-  const respId = q._firestoreId ? `${uid}_${q._firestoreId}_q${qIdx}` : null;
-  const answerRef = respId ? db.collection('answers').doc(respId) : db.collection('answers').doc();
-  batch.set(answerRef, {
-    campaignId:          q._firestoreId || null,
-    userId:              uid,
-    merchantId:          q._merchantId  || null,
-    questionIdx:         qIdx,
-    brand:               q.brand,
-    question:            (q.q || '').substring(0, 120),
-    ico:                 q.ico || '❓',
-    answer:              answerValue,
-    pointsAwarded:       totalEarned,
-    qualityScore:        qualityScore,
-    flagged:             flagged,
-    respondentAge:       S._age         || '',
-    respondentCity:      S._city        || '',
-    respondentInterests: S._interests   || [],
-    createdAt:           firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: false });
 
-  const userRef = db.collection('users').doc(uid);
-  const upd = {
-    points: firebase.firestore.FieldValue.increment(totalEarned),
-    xp:     firebase.firestore.FieldValue.increment(totalEarned),
-    ans:    firebase.firestore.FieldValue.increment(1),
-    dailyEarned:     S._dailyEarned,
-    dailyEarnedDate: today,
-    lastDailyDate:   today,
-    lastAnswerDate:  today,
-    streak:          S.streak,
-    updatedAt:       firebase.firestore.FieldValue.serverTimestamp()
-  };
-  if(q._firestoreId && qIdx === 0) upd.answeredCampaigns = firebase.firestore.FieldValue.arrayUnion(q._firestoreId);
-  batch.update(userRef, upd);
+  if(!q._firestoreId) { _origSubmitAns(); return; } // question locale sans campagne réelle (aucun cas connu), pas de crédit serveur possible
 
-  if(q._firestoreId) {
-    batch.update(db.collection('campaigns').doc(q._firestoreId), {
-      answersCount: firebase.firestore.FieldValue.increment(1)
+  S._submitting = true;
+  const btn = document.getElementById('sub-btn');
+  if(btn) btn.disabled = true;
+
+  callSubmitAnswer({ campaignId: q._firestoreId, questionIdx: qIdx, answerValue, elapsedMs })
+    .then(res => {
+      const data = res.data || {};
+      // Marque la campagne répondue localement AVANT d'afficher l'écran de récompense :
+      // même sans recharger l'app, elle n'est plus proposable (fiche commerce, file du jour…).
+      S._answered = S._answered || [];
+      if(qIdx === 0) S._answered.push(q._firestoreId);
+      S.streak = typeof data.streak === 'number' ? data.streak : S.streak;
+
+      // Capturé avant _origSubmitAns() : détermine si cette soumission alimente S.sv.earned.
+      const touchesSurvey = (S.mode === 'survey') || !!(q && q.survey && q.survey.length);
+      const totalEarned = typeof data.pointsAwarded === 'number' ? data.pointsAwarded : q.pts;
+      _origSubmitAns(); // affiche l'écran de récompense/confettis (ajoute optimistiquement q.pts)
+
+      // Corrige l'affichage optimiste avec les totaux qui font foi (serveur).
+      const correction = totalEarned - q.pts;
+      S.pts = typeof data.totalPoints === 'number' ? data.totalPoints : (S.pts + correction);
+      S.xp  = typeof data.totalXp === 'number' ? data.totalXp : (S.xp + totalEarned);
+      if (touchesSurvey && S.sv) S.sv.earned += correction;
+      const rwPtsEl = document.getElementById('rw-pts');
+      if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
+      const rwTotalEl = document.getElementById('rw-total');
+      if (rwTotalEl) rwTotalEl.textContent = S.pts + ' pts';
+    })
+    .catch(e => {
+      console.warn('submitAnswer:', e);
+      const msg = e && e.code === 'already-exists'
+        ? 'Tu as déjà répondu à cette question.'
+        : "Impossible d'enregistrer ta réponse, réessaie.";
+      alert(msg);
+      if(e && e.code === 'already-exists' && q._firestoreId) {
+        S._answered = S._answered || [];
+        if(!S._answered.includes(q._firestoreId)) S._answered.push(q._firestoreId);
+      }
+    })
+    .finally(() => {
+      S._submitting = false;
+      if(btn) btn.disabled = false;
     });
-  }
-  if(S._city) {
-    batch.set(db.collection('communityEvents').doc(), {
-      type:        'answer',
-      userId:      uid,
-      displayName: (S.user && S.user.name) || '—',
-      city:        normalizeCity(S._city),
-      merchantId:  q._merchantId || null,
-      brand:       q.brand,
-      text:        `a répondu à une question de ${q.brand}`,
-      createdAt:   firebase.firestore.FieldValue.serverTimestamp()
-    });
-  }
-  batch.commit().catch(e => console.warn('Firestore answer save:', e));
 };
 
 // ─── Présence temps-réel ─────────────────────────────────────

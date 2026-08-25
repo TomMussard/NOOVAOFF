@@ -351,6 +351,14 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
         <div class="card-title">✍️ Nouvelle annonce</div>
         <div style="padding:20px">
           <div style="margin-bottom:14px">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Destinataires</label>
+            <select id="broadcast-audience" onchange="updateAudienceCount()" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+              <option value="users">Habitants</option>
+              <option value="merchants">Commerçants</option>
+              <option value="both">Habitants + Commerçants</option>
+            </select>
+          </div>
+          <div style="margin-bottom:14px">
             <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Message</label>
             <textarea id="broadcast-msg" maxlength="240" placeholder="Ex : Nouvelle fonctionnalité disponible ! Découvrez les récompenses exclusives ce week-end…" style="width:100%;height:110px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:14px;color:var(--ink);resize:none;outline:none;line-height:1.5" oninput="updateCharCount()"></textarea>
             <div style="display:flex;justify-content:space-between;margin-top:6px">
@@ -387,6 +395,40 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
           <div class="card-title">🕐 Envois récents <span class="badge badge-pending" id="hist-count">0</span></div>
           <div id="broadcast-history"><div class="empty" style="padding:24px 16px">Aucun envoi pour l'instant.</div></div>
         </div>
+      </div>
+    </div>
+
+    <!-- Question de la semaine -->
+    <div class="sec-hdr" style="margin-top:32px"><h2>🎮 Question de la semaine</h2><p>Publie une question dans le feed communauté de l'app — les habitants votent, aucun point en jeu.</p></div>
+    <div class="two-col" style="align-items:start">
+      <div class="card">
+        <div class="card-title">✍️ Nouvelle question</div>
+        <div style="padding:20px">
+          <div style="margin-bottom:14px">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Ville concernée</label>
+            <select id="wq-city" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+              <option value="all">Toutes les villes</option>
+            </select>
+          </div>
+          <div style="margin-bottom:14px">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Question</label>
+            <textarea id="wq-text" maxlength="150" placeholder="Ex : Pizza ananas : crime ou génie ?" style="width:100%;height:70px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:14px;color:var(--ink);resize:none;outline:none;line-height:1.5"></textarea>
+          </div>
+          <div style="margin-bottom:14px">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Réponses possibles</label>
+            <div id="wq-opts-list" style="display:flex;flex-direction:column;gap:8px">
+              <input class="wq-opt-inp" placeholder="Option 1" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+              <input class="wq-opt-inp" placeholder="Option 2" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+            </div>
+            <button type="button" onclick="addWqOpt()" style="margin-top:8px;background:none;border:none;padding:0;font-size:12px;font-weight:700;color:var(--coral);cursor:pointer">+ Ajouter une option (4 max)</button>
+          </div>
+          <button onclick="publishWeeklyQuestion()" style="width:100%;padding:12px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--cg)">🚀 Publier dans le feed</button>
+          <div id="wq-status" style="margin-top:12px;font-size:13px;font-weight:600;text-align:center;min-height:20px;color:var(--ink2)"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📌 Question active</div>
+        <div id="wq-active" style="padding:20px"><div class="empty">Aucune question active.</div></div>
       </div>
     </div>
   </div>
@@ -453,12 +495,15 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div class="modal-fields">
         <div class="modal-field"><div class="mf-lbl">Email</div><div class="mf-val" id="md-email">—</div></div>
         <div class="modal-field"><div class="mf-lbl">Statut</div><div class="mf-val" id="md-status">—</div></div>
+        <div class="modal-field"><div class="mf-lbl">Gérant</div><div class="mf-val" id="md-gerant">—</div></div>
+        <div class="modal-field"><div class="mf-lbl">SIRET</div><div class="mf-val" id="md-siret">—</div></div>
         <div class="modal-field"><div class="mf-lbl">Secteur</div><div class="mf-val" id="md-sector">—</div></div>
         <div class="modal-field"><div class="mf-lbl">Ville</div><div class="mf-val" id="md-city">—</div></div>
         <div class="modal-field"><div class="mf-lbl">Adresse</div><div class="mf-val" id="md-address">—</div></div>
         <div class="modal-field"><div class="mf-lbl">Téléphone</div><div class="mf-val" id="md-phone">—</div></div>
       </div>
       <div class="modal-field" style="margin-top:14px"><div class="mf-lbl">Description</div><div class="mf-val muted" id="md-desc" style="font-size:13px;line-height:1.5">—</div></div>
+      <div class="modal-field" style="margin-top:14px" id="md-iddoc-row"><div class="mf-lbl">Document d'identité</div><div class="mf-val" id="md-iddoc">—</div></div>
       <div class="modal-field" style="margin-top:14px"><div class="mf-lbl">ID Firestore</div><div class="mf-val muted" id="md-id" style="font-size:11px;font-family:monospace">—</div></div>
     </div>
     <div class="modal-foot" id="modal-foot"></div>
@@ -470,6 +515,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script>
 const ADMIN_EMAILS = ['noovaoffr@gmail.com', 'tomussproduction@gmail.com'];
 
@@ -911,6 +957,17 @@ function openModal(id) {
   document.getElementById('md-phone').textContent   = m.phone   || '—';
   document.getElementById('md-desc').textContent    = m.description || '—';
   document.getElementById('md-id').textContent      = m.id;
+  document.getElementById('md-gerant').textContent  = (m.firstName || m.lastName) ? `${m.firstName||''} ${m.lastName||''}`.trim() : '—';
+  document.getElementById('md-siret').textContent   = m.siret || '—';
+  const iddocEl = document.getElementById('md-iddoc');
+  if (m.idDocumentPath) {
+    iddocEl.innerHTML = '<span style="color:var(--ink3)">Chargement…</span>';
+    firebase.storage().ref(m.idDocumentPath).getDownloadURL()
+      .then(url => { iddocEl.innerHTML = `<a href="${url}" target="_blank" rel="noopener" style="color:var(--coral);font-weight:700">📄 Voir le document</a>`; })
+      .catch(() => { iddocEl.textContent = 'Erreur de chargement'; });
+  } else {
+    iddocEl.textContent = 'Non fourni';
+  }
   const statusMap = { verified:'✅ Vérifié', pending:'⏳ En attente', rejected:'🚫 Rejeté' };
   document.getElementById('md-status').innerHTML = `<span class="badge ${m.status==='verified'?'badge-verified':m.status==='pending'?'badge-pending':'badge-rejected'}">${statusMap[m.status]||m.status}</span>`;
   const foot = document.getElementById('modal-foot');
@@ -1081,26 +1138,119 @@ function renderUsers(users) {
 // ── Diffusion ──────────────────────────────────────────────────────────────
 let _broadcastHistory = [];
 let _allUserIds = [];
+let _allMerchantIds = [];
 let _diffusionReady = false;
+
+function updateAudienceCount() {
+  const aud = document.getElementById('broadcast-audience')?.value || 'users';
+  const n = aud === 'users' ? _allUserIds.length : aud === 'merchants' ? _allMerchantIds.length : _allUserIds.length + _allMerchantIds.length;
+  const el = document.getElementById('audience-count');
+  if (el) el.textContent = n + (aud === 'merchants' ? ' commerçants' : aud === 'both' ? ' destinataires' : ' utilisateurs');
+}
 
 async function initDiffusion() {
   if (_diffusionReady) { renderBroadcastHistory(); return; }
   const statusEl = document.getElementById('broadcast-status');
-  statusEl.textContent = 'Chargement de la liste des utilisateurs…';
+  statusEl.textContent = 'Chargement des destinataires…';
   try {
-    const snap = await db.collection('users').limit(500).get();
+    const [uSnap, mSnap] = await Promise.all([
+      db.collection('users').limit(500).get(),
+      db.collection('merchants').limit(500).get()
+    ]);
     _allUserIds = [];
-    snap.forEach(doc => _allUserIds.push(doc.id));
+    uSnap.forEach(doc => _allUserIds.push(doc.id));
+    _allMerchantIds = [];
+    mSnap.forEach(doc => _allMerchantIds.push(doc.id));
     _diffusionReady = true;
     statusEl.textContent = '';
-    document.getElementById('audience-count').textContent = _allUserIds.length + ' utilisateurs';
+    updateAudienceCount();
     // Charge l'historique des broadcasts
     const hSnap = await db.collection('broadcasts').orderBy('sentAt','desc').limit(20).get();
     _broadcastHistory = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderBroadcastHistory();
+    initWeeklyQuestion();
   } catch(e) {
     statusEl.textContent = 'Erreur : ' + e.message;
   }
+}
+
+// ── Question de la semaine ───────────────────────────────────────────────
+async function initWeeklyQuestion() {
+  try {
+    const citiesSnap = await db.collection('cities').get();
+    const sel = document.getElementById('wq-city');
+    citiesSnap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a,b) => (a.label||a.id).localeCompare(b.label||b.id))
+      .forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id; opt.textContent = c.label || c.id;
+        sel.appendChild(opt);
+      });
+  } catch(e) { console.warn('cities for wq:', e); }
+  renderActiveWeeklyQuestion();
+}
+function addWqOpt() {
+  const list = document.getElementById('wq-opts-list');
+  if (list.children.length >= 4) { showToast('4 options maximum'); return; }
+  const inp = document.createElement('input');
+  inp.className = 'wq-opt-inp';
+  inp.placeholder = 'Option ' + (list.children.length + 1);
+  inp.style.cssText = 'width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none';
+  list.appendChild(inp);
+}
+async function publishWeeklyQuestion() {
+  const text = document.getElementById('wq-text').value.trim();
+  const city = document.getElementById('wq-city').value;
+  const options = Array.from(document.querySelectorAll('.wq-opt-inp')).map(i => i.value.trim()).filter(Boolean);
+  const statusEl = document.getElementById('wq-status');
+  if (!text || options.length < 2) { statusEl.style.color = '#EF4444'; statusEl.textContent = 'Question + au moins 2 options requises.'; return; }
+  if (!confirm(`Publier cette question pour ${city === 'all' ? 'toutes les villes' : city} ?`)) return;
+  try {
+    // Désactive toute question déjà active pour cette même cible (une seule à la fois)
+    const prevSnap = await db.collection('weeklyQuestions').where('active','==',true).where('city','==',city).get();
+    const batch = db.batch();
+    prevSnap.forEach(d => batch.update(d.ref, { active: false }));
+    const newRef = db.collection('weeklyQuestions').doc();
+    batch.set(newRef, {
+      text, options, city, active: true,
+      sentBy: auth.currentUser.email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await batch.commit();
+    document.getElementById('wq-text').value = '';
+    document.getElementById('wq-opts-list').innerHTML = '<input class="wq-opt-inp" placeholder="Option 1" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none"><input class="wq-opt-inp" placeholder="Option 2" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">';
+    statusEl.style.color = 'var(--mint)';
+    statusEl.textContent = '✅ Question publiée !';
+    setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 4000);
+    renderActiveWeeklyQuestion();
+  } catch(e) {
+    statusEl.style.color = '#EF4444';
+    statusEl.textContent = 'Erreur : ' + e.message;
+  }
+}
+async function renderActiveWeeklyQuestion() {
+  const el = document.getElementById('wq-active');
+  if (!el) return;
+  try {
+    const snap = await db.collection('weeklyQuestions').where('active','==',true).orderBy('createdAt','desc').limit(10).get();
+    if (snap.empty) { el.innerHTML = '<div class="empty">Aucune question active.</div>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const q = d.data();
+      const cityLbl = q.city === 'all' ? 'Toutes les villes' : q.city;
+      return `<div style="padding:12px 14px;background:var(--bg);border-radius:10px;border:1.5px solid var(--border);margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--coral);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${esc(cityLbl)}</div>
+        <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px">${esc(q.text||'')}</div>
+        <div style="font-size:12px;color:var(--ink3);margin-bottom:10px">${(q.options||[]).map(o=>esc(o)).join(' · ')}</div>
+        <button onclick="stopWeeklyQuestion('${d.id}')" style="padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer">Arrêter</button>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<div class="empty">Erreur de chargement.</div>'; }
+}
+async function stopWeeklyQuestion(id) {
+  if (!confirm('Arrêter cette question de la semaine ?')) return;
+  await db.collection('weeklyQuestions').doc(id).update({ active: false }).catch(()=>{});
+  renderActiveWeeklyQuestion();
 }
 
 function updateCharCount() {
@@ -1113,17 +1263,22 @@ async function sendBroadcast() {
   const msg = document.getElementById('broadcast-msg').value.trim();
   if (!msg) { showToast('⚠️ Écris un message avant d\'envoyer'); return; }
   const statusEl = document.getElementById('broadcast-status');
+  const audience = document.getElementById('broadcast-audience')?.value || 'users';
+  const targets = [];
+  if (audience === 'users' || audience === 'both') _allUserIds.forEach(id => targets.push({ id, col: 'users' }));
+  if (audience === 'merchants' || audience === 'both') _allMerchantIds.forEach(id => targets.push({ id, col: 'merchants' }));
+  const audienceLabel = audience === 'users' ? 'habitants' : audience === 'merchants' ? 'commerçants' : 'habitants + commerçants';
 
-  if (!confirm(`Envoyer cette notification à TOUS les utilisateurs (${_allUserIds.length}) ?`)) return;
+  if (!confirm(`Envoyer cette notification à TOUS les ${audienceLabel} (${targets.length}) ?`)) return;
 
-  statusEl.textContent = `Envoi à ${_allUserIds.length} utilisateurs…`;
+  statusEl.textContent = `Envoi à ${targets.length} destinataires…`;
   try {
     const BATCH_SIZE = 499;
     const ts = firebase.firestore.FieldValue.serverTimestamp();
-    for (let i = 0; i < _allUserIds.length; i += BATCH_SIZE) {
+    for (let i = 0; i < targets.length; i += BATCH_SIZE) {
       const batch = db.batch();
-      _allUserIds.slice(i, i + BATCH_SIZE).forEach(uid => {
-        const ref = db.collection('users').doc(uid).collection('notifications').doc();
+      targets.slice(i, i + BATCH_SIZE).forEach(t => {
+        const ref = db.collection(t.col).doc(t.id).collection('notifications').doc();
         batch.set(ref, { type: 'noova_message', message: msg, read: false, createdAt: ts });
       });
       await batch.commit();
@@ -1131,8 +1286,8 @@ async function sendBroadcast() {
 
     await db.collection('broadcasts').add({
       message: msg,
-      audience: 'all',
-      recipientCount: _allUserIds.length,
+      audience,
+      recipientCount: targets.length,
       sentBy: auth.currentUser.email,
       sentAt: ts
     });
@@ -1140,14 +1295,14 @@ async function sendBroadcast() {
     document.getElementById('broadcast-msg').value = '';
     updateCharCount();
     statusEl.style.color = 'var(--mint)';
-    statusEl.textContent = `✅ Envoyé à ${_allUserIds.length} utilisateurs !`;
+    statusEl.textContent = `✅ Envoyé à ${targets.length} destinataires !`;
     setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 5000);
 
     // Rafraîchit l'historique
     const hSnap = await db.collection('broadcasts').orderBy('sentAt','desc').limit(20).get();
     _broadcastHistory = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderBroadcastHistory();
-    showToast(`📢 Notification envoyée à ${_allUserIds.length} users`);
+    showToast(`📢 Notification envoyée à ${targets.length} destinataires`);
   } catch(e) {
     statusEl.textContent = 'Erreur : ' + e.message;
   }
