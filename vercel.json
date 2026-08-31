@@ -1,7 +1,8 @@
 {
   "rewrites": [
     { "source": "/app",       "destination": "/app.html" },
-    { "source": "/dashboard", "destination": "/noova_dashboard.html" }
+    { "source": "/dashboard", "destination": "/noova_dashboard.html" },
+    { "source": "/demo",      "destination": "/noova_dashboard_v2.html" }
   ],
   "headers": [
     {
