@@ -55,6 +55,7 @@
   --border2: rgba(23,20,26,.14);
   --ink: #17141A;
   --ink2: rgba(23,20,26,.62);
+  --icon-gray: #6A6470;
   --ink3: rgba(23,20,26,.42);
   --ink4: rgba(23,20,26,.26);
   --coral: #f29715;
@@ -142,7 +143,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .sb-item:hover { background: var(--card); color: var(--ink2); }
 .sb-item.active { background: var(--cd); color: var(--coral); font-weight: 700; }
 .sb-item.active .sb-ico { background: var(--coral); }
-.sb-ico { width: 26px; height: 26px; border-radius: 8px; background: #6A6470; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sb-ico { width: 26px; height: 26px; border-radius: 8px; background: var(--icon-gray); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sb-ico svg { width: 15px; height: 15px; }
 .sb-badge { margin-left: auto; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 99px; }
 .sb-footer {
@@ -202,7 +203,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 }
 .kpi-card:hover { border-color: var(--border2); }
 .kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.kpi-icon { width: 34px; height: 34px; border-radius: 10px; background: #6A6470; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.kpi-icon { width: 34px; height: 34px; border-radius: 10px; background: var(--icon-gray); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .kpi-icon svg { width: 18px; height: 18px; }
 .kpi-delta { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 99px; }
 .kpi-delta.up { background: rgba(11,171,132,.15); color: var(--mint); }
@@ -228,7 +229,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .camp-row:last-child { border-bottom: none; }
 .camp-row:hover { background: rgba(255,255,255,.03); }
 .camp-name-wrap { display: flex; align-items: center; gap: 10px; }
-.camp-ico { width: 36px; height: 36px; border-radius: 10px; background: #6A6470; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; filter: brightness(0) invert(55%); }
+.camp-ico { width: 36px; height: 36px; border-radius: 10px; background: var(--icon-gray); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; filter: brightness(0) invert(55%); }
 .camp-name { font-size: 13px; font-weight: 700; color: var(--ink); }
 .camp-date { font-size: 11px; color: var(--ink3); margin-top: 2px; }
 .status-pill { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 9px; border-radius: 99px; display: inline-flex; align-items: center; gap: 5px; }
@@ -325,7 +326,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 }
 .fmt-card:hover { border-color: var(--border2); }
 .fmt-card.sel { border-color: var(--coral); background: var(--cd); }
-.fmt-ico { width: 42px; height: 42px; border-radius: 12px; background: #6A6470; color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 9px; }
+.fmt-ico { width: 42px; height: 42px; border-radius: 12px; background: var(--icon-gray); color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 9px; }
 .fmt-ico svg { width: 21px; height: 21px; }
 .fmt-card.sel .fmt-ico { background: var(--coral); }
 .fmt-name { font-size: 12px; font-weight: 700; color: var(--ink2); margin-bottom: 3px; }
@@ -420,7 +421,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 }
 .preview-phone-inner { padding: 14px 13px; }
 .preview-brand-row { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
-.preview-brand-ico { width: 32px; height: 32px; border-radius: 9px; background: #6A6470; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; filter: brightness(0) invert(55%); }
+.preview-brand-ico { width: 32px; height: 32px; border-radius: 9px; background: var(--icon-gray); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; filter: brightness(0) invert(55%); }
 .preview-brand-name { font-family: var(--fd); font-weight: 700; font-size: 12px; color: #17141A; }
 .preview-brand-theme { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: rgba(224,125,10,.12); color: #E07D0A; margin-top: 1px; }
 .preview-q { font-family: var(--fd); font-weight: 800; font-size: 13px; color: #17141A; line-height: 1.25; margin-bottom: 10px; letter-spacing: -.3px; }
@@ -524,7 +525,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .settings-section-title { font-family: var(--fd); font-weight: 700; font-size: 15px; color: var(--ink); letter-spacing: -.3px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .setting-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
 .setting-row:last-child { border-bottom: none; }
-.setting-ico { width: 34px; height: 34px; border-radius: 10px; background: #6A6470; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.setting-ico { width: 34px; height: 34px; border-radius: 10px; background: var(--icon-gray); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .setting-ico svg { width: 18px; height: 18px; }
 .setting-info { flex: 1; }
 .setting-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
@@ -563,7 +564,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   pointer-events: none; z-index: 1000; max-width: 340px;
 }
 .toast.show { transform: translateY(0); opacity: 1; }
-.toast-ico { font-size: 20px; flex-shrink: 0; }
+.toast-ico { flex-shrink: 0; color: var(--icon-gray); }
 
 /* ═══ ANIMATIONS ════════════════════════════════════════════ */
 @keyframes pop { from { opacity: 0; transform: scale(.2) rotate(-20deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
@@ -632,6 +633,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   #mob-camp-fab { display: flex !important; }
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 
@@ -1270,7 +1272,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">5k</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Rép. / campagne</div></div>
               <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--coral)">1.25€</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Par réponse</div></div>
             </div>
-            <div style="display:flex;gap:9px"><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="navTo('plans', document.querySelector('.sb-item[onclick*=plans]'))">Changer de plan</button><button class="tb-btn tb-btn-primary" style="font-size:12px" onclick="showToast('Contacte-nous à contact@noova.fr pour ajouter du crédit.','💳')">Ajouter du crédit</button></div>
+            <div style="display:flex;gap:9px"><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="navTo('plans', document.querySelector('.sb-item[onclick*=plans]'))">Changer de plan</button><button class="tb-btn tb-btn-primary" style="font-size:12px" onclick="showToast('Contacte-nous à contact@noova.fr pour ajouter du crédit.','credit-card')">Ajouter du crédit</button></div>
           </div>
           <div class="section-title">Historique de facturation</div>
           <div class="card" id="billing-history"><div style="padding:20px;text-align:center;color:var(--ink3);font-size:13px">Chargement…</div></div>
@@ -1439,7 +1441,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"><span class="toast-ico" id="toast-ico">✅</span><span id="toast-msg">Action effectuée</span></div>
+<div class="toast" id="toast"><span class="toast-ico" id="toast-ico"></span><span id="toast-msg">Action effectuée</span></div>
 
 <script>
 let curPage='dashboard', wzCur=0, curFmt='mcq';
@@ -1593,9 +1595,9 @@ function closeCampModal() {
 async function toggleCampStatus(id, newStatus) {
   try {
     await db.collection('campaigns').doc(id).update({ status: newStatus });
-    showToast(newStatus==='paused' ? 'Campagne suspendue' : 'Campagne relancée', newStatus==='paused'?'⏸':'▶');
+    showToast(newStatus==='paused' ? 'Campagne suspendue' : 'Campagne relancée', newStatus==='paused'?'⏸':'play');
     closeCampModal();
-  } catch(e) { showToast('Erreur : ' + e.message, '❌'); }
+  } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 
 function openEditCamp(id) {
@@ -1632,20 +1634,20 @@ async function deleteCampaign(id, name) {
   if(!confirm(`Supprimer la campagne "${name}" ? Cette action est irréversible.`)) return;
   try {
     await db.collection('campaigns').doc(id).delete();
-    showToast('Campagne supprimée', '🗑️');
+    showToast('Campagne supprimée', 'delete');
     closeCampModal();
-  } catch(e) { showToast('Erreur : ' + e.message, '❌'); }
+  } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 
 async function saveEditCamp(id) {
   const name   = document.getElementById('edit-camp-name')?.value?.trim();
   const status = document.getElementById('edit-camp-status')?.value;
-  if(!name) { showToast('Le nom ne peut pas être vide','⚠️'); return; }
+  if(!name) { showToast('Le nom ne peut pas être vide','warning'); return; }
   try {
     await db.collection('campaigns').doc(id).update({ name, status });
-    showToast('Campagne mise à jour', '✅');
+    showToast('Campagne mise à jour', 'success');
     closeCampModal();
-  } catch(e) { showToast('Erreur : ' + e.message, '❌'); }
+  } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 
 // ═══ NAVIGATION ══════════════════════════════════════════════
@@ -1729,7 +1731,7 @@ function selFmt(el, fmt){
 // ═══ MCQ BUILDER ═════════════════════════════════════════════
 function addOpt(){
   const opts=document.querySelectorAll('#mcq-options .mcq-option-row');
-  if(opts.length>=6){showToast('6 options maximum par question','⚠️');return;}
+  if(opts.length>=6){showToast('6 options maximum par question','warning');return;}
   const div=document.createElement('div');div.className='mcq-option-row';
   div.innerHTML='<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button>';
   document.getElementById('mcq-options').appendChild(div);
@@ -1744,7 +1746,7 @@ function showMcqForQ(qNum, fmt) {
 function addQOpt(containerId) {
   const c = document.getElementById(containerId);
   if(!c) return;
-  if(c.querySelectorAll('.mcq-option-row').length>=6){showToast('6 options maximum par question','⚠️');return;}
+  if(c.querySelectorAll('.mcq-option-row').length>=6){showToast('6 options maximum par question','warning');return;}
   const d = document.createElement('div'); d.className = 'mcq-option-row';
   d.innerHTML = '<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button>';
   c.appendChild(d);
@@ -1840,7 +1842,7 @@ function updVol(v){
 // ═══ LAUNCH ══════════════════════════════════════════════════
 function launchCampaign(){
   spawnConfetti();
-  setTimeout(()=>{showToast('🚀 Campagne lancée ! Rapport estimé dans 38h','🚀')},200);
+  setTimeout(()=>{showToast('🚀 Campagne lancée ! Rapport estimé dans 38h','rocket')},200);
   setTimeout(()=>{navTo('campaigns',document.querySelectorAll('.sb-item')[2])},1500);
 }
 
@@ -1859,7 +1861,7 @@ function renderVerbatims(filter){
   filtered.forEach(v=>{
     const d=document.createElement('div');d.className='verbatim-card';
     const stars='⭐'.repeat(Math.round(v.score))+'☆'.repeat(5-Math.round(v.score));
-    d.innerHTML=`<div class="vc-header"><span class="vc-theme" style="background:${v.thc};color:${v.tc}">${v.theme}</span><div class="vc-score"><span style="font-size:12px">${stars}</span><span>${v.score}</span></div></div><div class="vc-text">${v.txt}</div><div class="vc-footer"><div class="vc-meta">${v.seg}</div><div class="vc-actions"><button class="vc-btn" style="background:var(--cd);color:var(--coral)" onclick="showToast('Verbatim ajouté aux favoris ⭐','⭐')">⭐ Sauvegarder</button><button class="vc-btn" style="background:var(--md);color:var(--mint)" onclick="showToast('Verbatim copié','📋')">📋 Copier</button></div></div>`;
+    d.innerHTML=`<div class="vc-header"><span class="vc-theme" style="background:${v.thc};color:${v.tc}">${v.theme}</span><div class="vc-score"><span style="font-size:12px">${stars}</span><span>${v.score}</span></div></div><div class="vc-text">${v.txt}</div><div class="vc-footer"><div class="vc-meta">${v.seg}</div><div class="vc-actions"><button class="vc-btn" style="background:var(--cd);color:var(--coral)" onclick="showToast('Verbatim ajouté aux favoris ⭐','star')">⭐ Sauvegarder</button><button class="vc-btn" style="background:var(--md);color:var(--mint)" onclick="showToast('Verbatim copié','document')">📋 Copier</button></div></div>`;
     el.appendChild(d);
   });
 }
@@ -1878,7 +1880,7 @@ function renderClusters(){
 const RECOS=[{priority:'Priorité haute',prio_c:'var(--coral)',border:'var(--coral)',title:'Privilégier la sémantique "Performance" dans le naming final',desc:'74% des répondants associent le trail à la performance et la vitesse. Les noms testés evoquant la cinétique (KinetoRun, VelocityStep) obtiennent les meilleures notes. Évitez les termes trop génériques.',action:'Tester 3 noms phase 2',action_c:'var(--coral)'},{priority:'Priorité haute',prio_c:'var(--coral)',border:'var(--coral)',title:'Segmenter la communication Légèreté vs Performance par âge',desc:'Les 18-24 ans plébiscitent la légèreté (AirTrek, FeatherStep) tandis que les 25-34 ans sont davantage attirés par la performance pure. Envisager deux déclinaisons selon le canal.',action:'Créer étude phase 2',action_c:'var(--coral)'},{priority:'Priorité moyenne',prio_c:'var(--amber)',border:'var(--amber)',title:'Traiter le frein prix dans la stratégie de lancement',desc:'22% des réponses mentionnent le prix comme facteur bloquant indépendamment du nom. Une communication sur le positionnement valeur/qualité est recommandée dès le lancement.',action:'Partager aux équipes',action_c:'var(--amber)'},{priority:'Opportunité',prio_c:'var(--mint)',border:'var(--mint)',title:'Explorer une déclinaison gamme débutants "TrailEase"',desc:'Un segment de 49% prioritise le confort et l\'accessibilité. Le profil 35-49 ans trail loisir est sous-adressé. Un nom rassurant type TrailEase ou OpenRun pourrait conquérir ce segment.',action:'Planifier étude complémentaire',action_c:'var(--mint)'}];
 function renderRecos(){
   const el=document.getElementById('reco-list');if(!el)return;el.innerHTML='';
-  RECOS.forEach((r,i)=>{const d=document.createElement('div');d.className='reco-card';d.style.borderLeftColor=r.border;d.innerHTML=`<div class="reco-priority" style="color:${r.prio_c}">${r.priority}</div><div class="reco-title">${r.title}</div><div class="reco-desc">${r.desc}</div><div class="reco-action"><button class="reco-action-btn" style="background:${r.prio_c}18;color:${r.prio_c};border:none" onclick="showToast('Action enregistrée ✅','✅')">${r.action}</button><button class="reco-action-btn" style="background:var(--card);color:var(--ink3);border:1px solid var(--border)" onclick="showToast('Copié dans le presse-papiers','📋')">📋 Copier</button></div>`;el.appendChild(d)});
+  RECOS.forEach((r,i)=>{const d=document.createElement('div');d.className='reco-card';d.style.borderLeftColor=r.border;d.innerHTML=`<div class="reco-priority" style="color:${r.prio_c}">${r.priority}</div><div class="reco-title">${r.title}</div><div class="reco-desc">${r.desc}</div><div class="reco-action"><button class="reco-action-btn" style="background:${r.prio_c}18;color:${r.prio_c};border:none" onclick="showToast('Action enregistrée ✅','success')">${r.action}</button><button class="reco-action-btn" style="background:var(--card);color:var(--ink3);border:1px solid var(--border)" onclick="showToast('Copié dans le presse-papiers','document')">📋 Copier</button></div>`;el.appendChild(d)});
 }
 
 // ═══ CONFETTI ════════════════════════════════════════════════
@@ -1899,9 +1901,9 @@ function normalizeCity(s){
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 let toastTimer=null;
-function showToast(msg,ico='✅'){
+function showToast(msg,ico='success'){
   const t=document.getElementById('toast');const m=document.getElementById('toast-msg');const i=document.getElementById('toast-ico');
-  if(m)m.textContent=msg;if(i)i.textContent=ico;t.classList.add('show');
+  if(m)m.textContent=msg;if(i)i.innerHTML=icon(ico,{size:20});t.classList.add('show');
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
 }
 
@@ -1939,7 +1941,7 @@ async function confirmEditField() {
   const upd = {};
   if(field === 'siret') {
     const digits = trimmed.replace(/\s+/g,'');
-    if(!/^\d{14}$/.test(digits)) { showToast('SIRET invalide (14 chiffres).', '⚠️'); return; }
+    if(!/^\d{14}$/.test(digits)) { showToast('SIRET invalide (14 chiffres).', 'warning'); return; }
     upd.siret = digits;
   } else if(field === 'retentionMonths') {
     const months = parseInt(val) || 24;
@@ -1961,15 +1963,15 @@ async function confirmEditField() {
   if(field === 'brandName') document.querySelectorAll('.sb-brand-name').forEach(e => e.textContent = trimmed);
   closeEditFieldModal();
   await db.collection('merchants').doc(uid).update(upd).catch(() => {});
-  showToast('Paramètre mis à jour.', '✅');
+  showToast('Paramètre mis à jour.', 'success');
 }
 
 async function changeMerchantLogo(file) {
   if(!file) return;
   const uid = auth.currentUser && auth.currentUser.uid;
   if(!uid) return;
-  if(!file.type.startsWith('image/')) { showToast('Choisis une image.', '⚠️'); return; }
-  if(file.size > 5*1024*1024) { showToast('Image trop lourde (5 Mo max).', '⚠️'); return; }
+  if(!file.type.startsWith('image/')) { showToast('Choisis une image.', 'warning'); return; }
+  if(file.size > 5*1024*1024) { showToast('Image trop lourde (5 Mo max).', 'warning'); return; }
   try {
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const ref = firebase.storage().ref().child(`merchants/${uid}/logo.${ext}`);
@@ -1979,9 +1981,9 @@ async function changeMerchantLogo(file) {
     const preview = document.getElementById('set-logo-preview');
     if(preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
     document.querySelectorAll('.sb-brand-av').forEach(el => el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`);
-    showToast('Logo mis à jour.', '🖼️');
+    showToast('Logo mis à jour.', 'image');
   } catch(e) {
-    showToast('Erreur upload : ' + e.message, '❌');
+    showToast('Erreur upload : ' + e.message, 'error');
   }
 }
 
@@ -1989,7 +1991,7 @@ async function changeMerchantIdDocument(file) {
   if(!file) return;
   const uid = auth.currentUser && auth.currentUser.uid;
   if(!uid) return;
-  if(file.size > 10*1024*1024) { showToast('Fichier trop lourd (10 Mo max).', '⚠️'); return; }
+  if(file.size > 10*1024*1024) { showToast('Fichier trop lourd (10 Mo max).', 'warning'); return; }
   try {
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const path = `merchants/${uid}/id-document.${ext}`;
@@ -1997,22 +1999,22 @@ async function changeMerchantIdDocument(file) {
     await db.collection('merchants').doc(uid).update({ idDocumentPath: path });
     const el = document.getElementById('set-iddoc');
     if(el) el.textContent = 'Envoyé — en cours de vérification';
-    showToast('Document envoyé. Merci !', '📄');
+    showToast('Document envoyé. Merci !', 'document');
   } catch(e) {
-    showToast('Erreur upload : ' + e.message, '❌');
+    showToast('Erreur upload : ' + e.message, 'error');
   }
 }
 
 function exportRegistry() {
-  showToast('Export du registre en cours de préparation…', '📋');
-  setTimeout(() => showToast('Export disponible dans 2 minutes par email.', '📧'), 2000);
+  showToast('Export du registre en cours de préparation…', 'document');
+  setTimeout(() => showToast('Export disponible dans 2 minutes par email.', 'mail'), 2000);
 }
 
 async function choosePlan(planName, price) {
   const uid = auth.currentUser && auth.currentUser.uid;
   if(!uid) return;
   const current = _mData && _mData.plan;
-  if(current === planName) { showToast(`Tu es déjà sur le plan ${planName}.`, 'ℹ️'); return; }
+  if(current === planName) { showToast(`Tu es déjà sur le plan ${planName}.`, 'info'); return; }
   if(!confirm(`Passer au plan ${planName} (${price}€/mois) ? Tu seras contacté sous 24h pour finaliser.`)) return;
   await db.collection('planRequests').doc().set({
     merchantId: uid,
@@ -2021,7 +2023,7 @@ async function choosePlan(planName, price) {
     price,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   }).catch(() => {});
-  showToast(`Demande ${planName} enregistrée. On te contacte sous 24h !`, '🚀');
+  showToast(`Demande ${planName} enregistrée. On te contacte sous 24h !`, 'rocket');
 }
 
 async function loadBillingData(uid) {
@@ -2531,18 +2533,18 @@ function updateKPIFromCampaigns(camps) {
 const _origLaunchCampaign = launchCampaign;
 launchCampaign = async function() {
   const u = auth.currentUser;
-  if(!u || !_mData) { showToast('Connecte-toi pour lancer','⚠️'); return; }
-  if(_mData.status === 'pending') { showToast('Espace en cours de vérification — lancement disponible après validation','⏳'); return; }
+  if(!u || !_mData) { showToast('Connecte-toi pour lancer','warning'); return; }
+  if(_mData.status === 'pending') { showToast('Espace en cours de vérification — lancement disponible après validation','clock'); return; }
   try {
     const approvedSnap = await db.collection('rewards').where('merchantId','==',u.uid).where('status','==','approved').limit(1).get();
     if(approvedSnap.empty) {
-      showToast('Configure et fais valider au moins une récompense avant de lancer une campagne','🎁');
+      showToast('Configure et fais valider au moins une récompense avant de lancer une campagne','gift-generic');
       navTo('rewards', document.querySelector('.sb-item[onclick*="\'rewards\'"]'));
       return;
     }
-  } catch(e) { showToast('Erreur : ' + e.message, '❌'); return; }
+  } catch(e) { showToast('Erreur : ' + e.message, 'error'); return; }
   const q1 = document.getElementById('q-text-inp')?.value?.trim();
-  if(!q1) { showToast('Saisis une question d\'abord','⚠️'); return; }
+  if(!q1) { showToast('Saisis une question d\'abord','warning'); return; }
   const options  = Array.from(document.querySelectorAll('.mcq-opt-inp')).map(i=>i.value.trim()).filter(Boolean);
   const volume   = parseInt(document.getElementById('vol-num')?.textContent)||100;
   const themes   = Array.from(document.querySelectorAll('.th-chip.sel')).map(el=>el.textContent.replace(/[^\w\s\-éèêàùç]/gi,'').trim());
@@ -2593,7 +2595,7 @@ launchCampaign = async function() {
     });
     _origLaunchCampaign();
   } catch(e) {
-    showToast('Erreur : ' + e.message, '❌');
+    showToast('Erreur : ' + e.message, 'error');
   }
 };
 
@@ -2850,7 +2852,7 @@ function renderRewardCard(r, i) {
 }
 
 function addRewardSlot() {
-  if(_rewardSlots.length >= 5) { showToast('Maximum 5 récompenses','⚠️'); return; }
+  if(_rewardSlots.length >= 5) { showToast('Maximum 5 récompenses','warning'); return; }
   const el = document.getElementById('reward-slots');
   const slot = _rewardSlots.length + 1;
   const hint = REWARD_TIER_HINTS[slot-1];
@@ -2897,13 +2899,13 @@ function addRewardSlot() {
 async function saveReward(slot, btn) {
   const u = auth.currentUser;
   if(!u || !_mData) return;
-  if(_mData.status === 'pending') { showToast('Espace en cours de vérification — publication disponible après validation','⏳'); return; }
+  if(_mData.status === 'pending') { showToast('Espace en cours de vérification — publication disponible après validation','clock'); return; }
   const label = document.getElementById('new-r-label')?.value.trim();
   const valueEuros = parseFloat(document.getElementById('new-r-value')?.value);
-  if(!label) { showToast('Remplis l\'intitulé','⚠️'); return; }
-  if(!valueEuros || valueEuros <= 0) { showToast('Renseigne une valeur en € valide','⚠️'); return; }
+  if(!label) { showToast('Remplis l\'intitulé','warning'); return; }
+  if(!valueEuros || valueEuros <= 0) { showToast('Renseigne une valeur en € valide','warning'); return; }
   const prevValue = slot > 1 ? (_rewardSlots[slot-2].data.valueEuros || 0) : 0;
-  if(prevValue && valueEuros <= prevValue) { showToast(`Ce palier doit valoir plus que le palier ${slot-1} (${prevValue.toFixed(2)} €)`,'⚠️'); return; }
+  if(prevValue && valueEuros <= prevValue) { showToast(`Ce palier doit valoir plus que le palier ${slot-1} (${prevValue.toFixed(2)} €)`,'warning'); return; }
   const cost = eurosToPoints(valueEuros);
   const icon = document.getElementById('new-r-icon')?.value || '🎁';
   const stockVal = document.getElementById('new-r-stock')?.value;
@@ -2928,26 +2930,26 @@ async function saveReward(slot, btn) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    showToast('Envoyée pour validation !','📋');
+    showToast('Envoyée pour validation !','document');
     loadMerchantRewards();
-  } catch(e) { showToast('Erreur : ' + e.message,'❌'); btn.disabled = false; btn.textContent = 'Envoyer pour validation'; }
+  } catch(e) { showToast('Erreur : ' + e.message,'error'); btn.disabled = false; btn.textContent = 'Envoyer pour validation'; }
 }
 
 async function toggleRewardActive(rewardId, active) {
   try {
     await db.collection('rewards').doc(rewardId).update({ active, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast(active ? 'Récompense activée' : 'Récompense désactivée', active ? '✅' : '⏸️');
+    showToast(active ? 'Récompense activée' : 'Récompense désactivée', active ? '✅' : 'pause');
     loadMerchantRewards();
-  } catch(e) { showToast('Erreur','❌'); }
+  } catch(e) { showToast('Erreur','error'); }
 }
 
 async function deleteReward(rewardId) {
   if(!confirm('Supprimer cette récompense ?')) return;
   try {
     await db.collection('rewards').doc(rewardId).delete();
-    showToast('Récompense supprimée','🗑️');
+    showToast('Récompense supprimée','delete');
     loadMerchantRewards();
-  } catch(e) { showToast('Erreur','❌'); }
+  } catch(e) { showToast('Erreur','error'); }
 }
 
 // ═══ VALIDATION DE BON ══════════════════════════════════════
@@ -2960,7 +2962,7 @@ async function validateVoucher() {
     return;
   }
   const code = (document.getElementById('voucher-code-inp')?.value || '').trim().toUpperCase();
-  if(!code) { showToast('Saisis un code','⚠️'); return; }
+  if(!code) { showToast('Saisis un code','warning'); return; }
   const el = document.getElementById('voucher-result');
   el.innerHTML = '<div style="color:var(--ink3);font-size:13px;padding:12px 0">Recherche…</div>';
   try {
@@ -3013,9 +3015,9 @@ async function confirmValidateVoucher(redemId, btn) {
     });
     document.getElementById('voucher-code-inp').value = '';
     document.getElementById('voucher-result').innerHTML = `<div style="background:rgba(11,171,132,.1);border-radius:var(--rs);padding:16px;text-align:center;color:#0BAB84;font-weight:700;font-family:var(--fd);font-size:16px">🎉 Bon validé avec succès !</div>`;
-    showToast('Bon validé !','✅');
+    showToast('Bon validé !','success');
     loadRecentRedemptions();
-  } catch(e) { showToast('Erreur : ' + e.message,'❌'); btn.disabled = false; btn.textContent = 'Confirmer l\'utilisation'; }
+  } catch(e) { showToast('Erreur : ' + e.message,'error'); btn.disabled = false; btn.textContent = 'Confirmer l\'utilisation'; }
 }
 
 async function loadRecentRedemptions() {
@@ -3081,7 +3083,7 @@ async function loadConsentJournal() {
 }
 
 function exportConsentJournal() {
-  if(!_consentEvents.length) { showToast('Aucun événement à exporter','⚠️'); return; }
+  if(!_consentEvents.length) { showToast('Aucun événement à exporter','warning'); return; }
   const header = ['Date', 'Profil (anonymisé)', 'Action', 'Ville', 'Tranche d\'âge', 'Statut'];
   const rows = _consentEvents.map(r => {
     const dt = r.createdAt && r.createdAt.toDate ? r.createdAt.toDate() : null;

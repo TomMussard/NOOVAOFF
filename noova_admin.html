@@ -15,7 +15,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#17141A;--ink2:rgba(23,20,26,.65);--ink3:rgba(23,20,26,.38);
+  --ink:#17141A;--ink2:rgba(23,20,26,.65);--ink3:rgba(23,20,26,.38);--icon-gray:#6A6470;
   --bg:#F5F3EF;--bg2:#EEECEA;--card:#fff;--border:rgba(23,20,26,.09);
   --coral:#f29715;--cd:rgba(242,151,21,.1);--cg:rgba(242,151,21,.25);
   --amber:#ffda09;--brown:#1c0e02;--cream:#fffbd7;
@@ -199,7 +199,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 .modal-foot{padding:16px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
 
 /* === TOAST === */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--brown);color:var(--amber);padding:10px 20px;border-radius:99px;font-size:13px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--brown);color:var(--amber);padding:10px 20px;border-radius:99px;font-size:13px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;white-space:nowrap;display:flex;align-items:center;gap:8px}
 .toast.show{opacity:1}
 
 /* === LOADING === */
@@ -207,6 +207,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 .loading::after{content:"";display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--coral);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 
@@ -571,9 +572,9 @@ let modalMerchant = null;
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function showToast(msg) {
+function showToast(msg, ico = 'success') {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = icon(ico, { size: 16 }) + `<span>${esc(msg)}</span>`;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
@@ -676,7 +677,7 @@ async function toggleCityActive(cityId, newActive) {
     await db.collection('cities').doc(cityId).update({ active: newActive });
     loadCityControls();
   } catch(e) {
-    showToast('Erreur : ' + e.message, '❌');
+    showToast('Erreur : ' + e.message, 'error');
   }
 }
 
@@ -793,10 +794,10 @@ async function approveReward(rewardId, btn) {
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
     await db.collection('rewards').doc(rewardId).update({ status: 'approved', active: true, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast('Récompense validée', '✅');
+    showToast('Récompense validée', 'success');
     loadRewardModeration();
   } catch (e) {
-    showToast('Erreur : ' + e.message, '❌');
+    showToast('Erreur : ' + e.message, 'error');
     if (btn) { btn.disabled = false; btn.textContent = '✓ Valider'; }
   }
 }
@@ -805,10 +806,10 @@ async function rejectReward(rewardId, btn) {
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
     await db.collection('rewards').doc(rewardId).update({ status: 'rejected', active: false, rejectionReason: reason, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast('Récompense refusée', '🚫');
+    showToast('Récompense refusée', 'error');
     loadRewardModeration();
   } catch (e) {
-    showToast('Erreur : ' + e.message, '❌');
+    showToast('Erreur : ' + e.message, 'error');
     if (btn) { btn.disabled = false; btn.textContent = '✗ Refuser'; }
   }
 }
@@ -848,7 +849,7 @@ async function unflagAnswer(answerId, btn) {
     await db.collection('answers').doc(answerId).update({ flagged: false });
     loadModeration();
   } catch (e) {
-    showToast('Erreur : ' + e.message, '❌');
+    showToast('Erreur : ' + e.message, 'error');
     if (btn) { btn.disabled = false; btn.textContent = '✓ Lever le signalement'; }
   }
 }
@@ -894,7 +895,7 @@ async function dangerDeleteMerchant(merchantId, btn) {
     await callAdminDeleteAccount({ uid: merchantId, role: 'merchant' });
     loadDangerZone();
   } catch (e) {
-    showToast('Erreur : ' + e.message, '❌');
+    showToast('Erreur : ' + e.message, 'error');
     if (btn) { btn.disabled = false; btn.textContent = 'Supprimer'; }
   }
 }
@@ -905,7 +906,7 @@ async function dangerDeleteUser(uid, btn) {
     await callAdminDeleteAccount({ uid, role: 'user' });
     loadDangerZone();
   } catch (e) {
-    showToast('Erreur : ' + e.message, '❌');
+    showToast('Erreur : ' + e.message, 'error');
     if (btn) { btn.disabled = false; btn.textContent = 'Supprimer'; }
   }
 }
@@ -1012,9 +1013,9 @@ async function approveMerchant(id, name) {
     const idx = allMerchants.findIndex(m => m.id === id);
     if (idx !== -1) allMerchants[idx].status = 'verified';
     renderMerchants();
-    showToast(`✅ ${name} validé`);
+    showToast(`${name} validé`, 'success');
     if (modalMerchant && modalMerchant.id === id) openModal(id);
-  } catch(e) { showToast('Erreur : ' + e.message); }
+  } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 async function rejectMerchant(id, name) {
   if (!confirm(`Rejeter "${name}" ?`)) return;
@@ -1023,9 +1024,9 @@ async function rejectMerchant(id, name) {
     const idx = allMerchants.findIndex(m => m.id === id);
     if (idx !== -1) allMerchants[idx].status = 'rejected';
     renderMerchants();
-    showToast(`🚫 ${name} rejeté`);
+    showToast(`${name} rejeté`, 'error');
     if (modalMerchant && modalMerchant.id === id) openModal(id);
-  } catch(e) { showToast('Erreur : ' + e.message); }
+  } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 
 // ── Merchant Modal ─────────────────────────────────────────────────────────
@@ -1278,7 +1279,7 @@ async function initWeeklyQuestion() {
 }
 function addWqOpt() {
   const list = document.getElementById('wq-opts-list');
-  if (list.children.length >= 4) { showToast('4 options maximum'); return; }
+  if (list.children.length >= 4) { showToast('4 options maximum', 'warning'); return; }
   const inp = document.createElement('input');
   inp.className = 'wq-opt-inp';
   inp.placeholder = 'Option ' + (list.children.length + 1);
@@ -1347,7 +1348,7 @@ function updateCharCount() {
 
 async function sendBroadcast() {
   const msg = document.getElementById('broadcast-msg').value.trim();
-  if (!msg) { showToast('⚠️ Écris un message avant d\'envoyer'); return; }
+  if (!msg) { showToast('Écris un message avant d\'envoyer', 'warning'); return; }
   const statusEl = document.getElementById('broadcast-status');
   const audience = document.getElementById('broadcast-audience')?.value || 'users';
   const targets = [];
@@ -1388,7 +1389,7 @@ async function sendBroadcast() {
     const hSnap = await db.collection('broadcasts').orderBy('sentAt','desc').limit(20).get();
     _broadcastHistory = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderBroadcastHistory();
-    showToast(`📢 Notification envoyée à ${targets.length} destinataires`);
+    showToast(`Notification envoyée à ${targets.length} destinataires`, 'broadcast');
   } catch(e) {
     statusEl.textContent = 'Erreur : ' + e.message;
   }
