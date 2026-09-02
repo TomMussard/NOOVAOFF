@@ -643,7 +643,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 <div id="sidebar-overlay" onclick="toggleMobMenu()"></div>
 
 <!-- Mobile FAB for new campaign -->
-<button id="mob-camp-fab" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])" style="display:none;position:fixed;bottom:24px;right:20px;z-index:200;width:56px;height:56px;border-radius:50%;background:var(--grad);border:none;box-shadow:0 8px 24px rgba(242,151,21,.45);cursor:pointer;align-items:center;justify-content:center;font-size:24px">✨</button>
+<button id="mob-camp-fab" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])" style="display:none;position:fixed;bottom:24px;right:20px;z-index:200;width:56px;height:56px;border-radius:50%;background:var(--grad);border:none;box-shadow:0 8px 24px rgba(242,151,21,.45);cursor:pointer;align-items:center;justify-content:center;color:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></button>
 
   <!-- SIDEBAR -->
   <aside id="sidebar">
@@ -657,7 +657,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       </div>
     </div>
     <div class="sb-brand">
-      <div class="sb-brand-av">⛺</div>
+      <div class="sb-brand-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
       <div>
         <div class="sb-brand-name">—</div>
         <div class="sb-brand-plan">—</div>
@@ -699,9 +699,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div class="topbar-title" id="topbar-title">Dashboard</div>
         <div class="topbar-sub" id="topbar-sub">Bienvenue — dernière mise à jour il y a 4 min</div>
       </div>
-      <button class="tb-btn tb-btn-primary" id="topbar-new-camp-btn" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">✨ Nouvelle campagne</button>
+      <button class="tb-btn tb-btn-primary" id="topbar-new-camp-btn" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg> Nouvelle campagne</button>
       <div style="position:relative">
-        <div class="tb-notif" id="tb-notif-btn" onclick="toggleNotifPanel()"><div class="notif-dot" id="notif-dot" style="display:none"></div>🔔</div>
+        <div class="tb-notif" id="tb-notif-btn" onclick="toggleNotifPanel()"><div class="notif-dot" id="notif-dot" style="display:none"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></div>
         <div id="notif-panel" style="display:none;position:absolute;top:46px;right:0;width:320px;max-height:400px;overflow-y:auto;background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:0 16px 40px rgba(0,0,0,.16);z-index:200">
           <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-family:var(--fd);font-weight:800;font-size:13px;color:var(--ink)">Notifications</div>
           <div id="notif-list"><div style="padding:24px;text-align:center;color:var(--ink3);font-size:12.5px">Aucune notification.</div></div>
@@ -794,18 +794,18 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div class="field">
                     <label class="field-lbl">Templates suggérés</label>
                     <div class="tmpl-grid">
-                      <div class="tmpl-chip sel" onclick="useTmpl(this,&quot;Quel est votre critère principal lors de l'achat d'un équipement sportif ?&quot;)">🎯 Test produit</div>
-                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Comment amélioreriez-vous notre service client sur ce point précis ?&quot;)">😊 Satisfaction</div>
-                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Quel nom trouvez-vous le plus adapté pour ce nouveau produit ?&quot;)">💡 Naming</div>
-                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Sur 10, quelle importance accordez-vous à la durabilité de nos produits ?&quot;)">📏 Échelle</div>
-                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Classez ces attributs par ordre d'importance lors de votre achat.&quot;)">🔢 Classement</div>
-                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Qu'est-ce qui vous ferait recommander notre marque à un proche ?&quot;)">📣 NPS qualitatif</div>
+                      <div class="tmpl-chip sel" onclick="useTmpl(this,&quot;Quel est votre critère principal lors de l'achat d'un équipement sportif ?&quot;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg> Test produit</div>
+                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Comment amélioreriez-vous notre service client sur ce point précis ?&quot;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 13.5c1 1.4 2.4 2 4 2s3-.6 4-2"/><path d="M9 9.5v.01M15 9.5v.01"/></svg> Satisfaction</div>
+                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Quel nom trouvez-vous le plus adapté pour ce nouveau produit ?&quot;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg> Naming</div>
+                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Sur 10, quelle importance accordez-vous à la durabilité de nos produits ?&quot;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3v18"/><path d="M5 8h6M13 8h6"/><path d="M5 8 2.5 13a2.6 2.6 0 0 0 5 0z"/><path d="M19 8l-2.5 5a2.6 2.6 0 0 0 5 0z"/></svg> Échelle</div>
+                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Classez ces attributs par ordre d'importance lors de votre achat.&quot;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M8 5h11M8 12h11M8 19h11"/><path d="M4 4.5v3M4 4.5 3 5.3M4 11.5v3M3 15l1-.5 1 .5M4 18.5v3"/></svg> Classement</div>
+                      <div class="tmpl-chip" onclick="useTmpl(this,&quot;Qu'est-ce qui vous ferait recommander notre marque à un proche ?&quot;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> NPS qualitatif</div>
                     </div>
                   </div>
                   <div class="field">
                     <label class="field-lbl">Votre question <span style="color:var(--coral)">*</span></label>
                     <textarea class="field-ta" id="q-text-inp" placeholder="Ex : Quel est votre critère n°1 lors de l'achat d'un vélo ?" rows="3" oninput="updatePreview()"></textarea>
-                    <div style="display:flex;justify-content:space-between;margin-top:6px"><div style="font-size:11px;color:var(--ink3)">💡 Conseil : une question courte obtient 34% de réponses en plus.</div><div style="font-size:11px;color:var(--ink3)" id="q-char-ct">65 / 150</div></div>
+                    <div style="display:flex;justify-content:space-between;margin-top:6px"><div style="font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg> Conseil : une question courte obtient 34% de réponses en plus.</div><div style="font-size:11px;color:var(--ink3)" id="q-char-ct">65 / 150</div></div>
                   </div>
                   <div class="field" style="margin-bottom:0">
                     <label class="field-lbl">Contexte interne (non visible des répondants)</label>
@@ -855,7 +855,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   </div>
                 </div>
                 <div class="wizard-actions">
-                  <button class="wiz-btn-next" onclick="wzGo(1)">Format de réponse →</button>
+                  <button class="wiz-btn-next" onclick="wzGo(1)">Format de réponse <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
                 </div>
               </div>
               <div>
@@ -865,7 +865,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div class="preview-phone-notch"></div>
                     <div class="preview-phone-inner">
                       <div class="preview-brand-row">
-                        <div class="preview-brand-ico">⛺</div>
+                        <div class="preview-brand-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
                         <div><div class="preview-brand-name" id="preview-brand-nm">Votre commerce</div><div class="preview-brand-theme" id="preview-brand-sec">Commerce</div></div>
                       </div>
                       <div class="preview-q" id="preview-q">Quel est votre critère principal lors de l'achat d'un équipement sportif ?</div>
@@ -874,8 +874,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     </div>
                   </div>
                   <div class="est-chips">
-                    <div class="est-chip"><span class="est-chip-ico">⏱️</span>Réponse moy. <span class="est-chip-val">3 min</span></div>
-                    <div class="est-chip"><span class="est-chip-ico">📊</span>Complétion <span class="est-chip-val">~87%</span></div>
+                    <div class="est-chip"><span class="est-chip-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg></span>Réponse moy. <span class="est-chip-val">3 min</span></div>
+                    <div class="est-chip"><span class="est-chip-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20V9M10 20V4M16 20v-7M21 20H3"/></svg></span>Complétion <span class="est-chip-val">~87%</span></div>
                   </div>
                 </div>
               </div>
@@ -920,8 +920,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   </div>
                 </div>
                 <div class="wizard-actions">
-                  <button class="wiz-btn-back" onclick="wzGo(0)">← Retour</button>
-                  <button class="wiz-btn-next" onclick="wzGo(2)">Audience →</button>
+                  <button class="wiz-btn-back" onclick="wzGo(0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Retour</button>
+                  <button class="wiz-btn-next" onclick="wzGo(2)">Audience <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
                 </div>
               </div>
               <div>
@@ -930,12 +930,12 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div class="preview-phone">
                     <div class="preview-phone-notch"></div>
                     <div class="preview-phone-inner">
-                      <div class="preview-brand-row"><div class="preview-brand-ico">⛺</div><div><div class="preview-brand-name" id="preview-brand-nm-p1">Votre commerce</div><div class="preview-brand-theme" id="preview-brand-sec-p1">Commerce</div></div></div>
+                      <div class="preview-brand-row"><div class="preview-brand-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div><div><div class="preview-brand-name" id="preview-brand-nm-p1">Votre commerce</div><div class="preview-brand-theme" id="preview-brand-sec-p1">Commerce</div></div></div>
                       <div class="preview-q" style="font-size:11px">Quel est votre critère principal lors de l'achat ?</div>
                       <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
-                        <div style="background:#EEECEA;border:1.5px solid #E0DDD8;border-radius:8px;padding:7px 10px;font-size:10px;color:#17141A;display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:50%;border:1.5px solid #B2ADB9;flex-shrink:0"></div>💰 Prix / rapport qualité-prix</div>
-                        <div style="background:#FFF4E6;border:1.5px solid #E07D0A;border-radius:8px;padding:7px 10px;font-size:10px;color:#E07D0A;display:flex;align-items:center;gap:7px;font-weight:700"><div style="width:14px;height:14px;border-radius:50%;background:#E07D0A;border:1.5px solid #E07D0A;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff">✓</div>🏅 Qualité et durabilité</div>
-                        <div style="background:#EEECEA;border:1.5px solid #E0DDD8;border-radius:8px;padding:7px 10px;font-size:10px;color:#17141A;display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:50%;border:1.5px solid #B2ADB9;flex-shrink:0"></div>🎨 Design et esthétique</div>
+                        <div style="background:#EEECEA;border:1.5px solid #E0DDD8;border-radius:8px;padding:7px 10px;font-size:10px;color:#17141A;display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:50%;border:1.5px solid #B2ADB9;flex-shrink:0"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 19V9M10 19V5M16 19v-7M20 19V11"/><path d="M4 19h16"/></svg> Prix / rapport qualité-prix</div>
+                        <div style="background:#FFF4E6;border:1.5px solid #E07D0A;border-radius:8px;padding:7px 10px;font-size:10px;color:#E07D0A;display:flex;align-items:center;gap:7px;font-weight:700"><div style="width:14px;height:14px;border-radius:50%;background:#E07D0A;border:1.5px solid #E07D0A;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff">✓</div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg> Qualité et durabilité</div>
+                        <div style="background:#EEECEA;border:1.5px solid #E0DDD8;border-radius:8px;padding:7px 10px;font-size:10px;color:#17141A;display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:50%;border:1.5px solid #B2ADB9;flex-shrink:0"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 8l8-4.5L20 8l-8 4.5z"/><path d="M6.5 9.5v6L12 18l5.5-2.5v-6"/><path d="M20 8v6.5"/></svg> Design et esthétique</div>
                       </div>
                       <div class="preview-cta">Valider → +20 pts</div>
                     </div>
@@ -955,24 +955,24 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div class="field">
                     <label class="field-lbl" style="display:flex;align-items:center;justify-content:space-between">Thèmes d'intérêt <span style="color:var(--ink3);font-weight:400">(laisser vide = tous)</span><button type="button" onclick="toggleAllThemes()" style="background:none;border:none;padding:0;font-size:11px;font-weight:700;color:var(--coral);cursor:pointer;text-transform:none;letter-spacing:0">Tout sélectionner</button></label>
                     <div class="theme-grid" id="theme-grid">
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🏃 Sport</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🧘 Bien-être</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">💻 Tech</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">✈️ Voyage</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🎮 Gaming</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🍔 Alimentation</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🌱 Éco-responsable</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">👗 Mode & Beauté</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🎵 Musique</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🏠 Maison & Déco</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🚗 Auto & Moto</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">📚 Lecture</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🎬 Cinéma & Séries</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">💰 Finance & Épargne</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🐾 Animaux</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">📸 Photo & Vidéo</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🍷 Gastronomie</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()">🏡 Immobilier</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.3 3.6 5.6 3.6 9s-1.2 6.7-3.6 9c-2.4-2.3-3.6-5.6-3.6-9S9.6 5.3 12 3z"/></svg> Sport</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 20s-7-4.4-7-9.8A4.2 4.2 0 0 1 12 7.5a4.2 4.2 0 0 1 7 2.7C19 15.6 12 20 12 20z"/></svg> Bien-être</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="4" y="5" width="16" height="11" rx="1.4"/><path d="M9 20h6M12 16v4"/><path d="M8 9l2 2-2 2M13 13h3"/></svg> Tech</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M3 13l7-2-3-6 2.5-.7L14 10l6-1.6a1.6 1.6 0 0 1 2 1.5c0 .7-.4 1.3-1 1.5L4.5 17z"/><path d="M9 17.5 7 21M13 17.5l1 3.5"/></svg> Voyage</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> Gaming</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Alimentation</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c5 0 8 3.2 8 8-5 0-8-3.2-8-8z"/><path d="M12 21c0-7 2.5-11 8-13"/><path d="M12 21c0-5-2-8-8-9"/></svg> Éco-responsable</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M9 4h6l1 3-3 2-3-2z"/><path d="M9 4 4 7l2.5 3L8 9v11h8V9l1.5-2L20 7l-5-3"/></svg> Mode & Beauté</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/><path d="M9 17.5V5.5l10-2v10"/></svg> Musique</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/><circle cx="12" cy="15" r="2"/></svg> Maison & Déco</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 16V12l2-5h12l2 5v4"/><path d="M4 16h16M7 16v2.5M17 16v2.5"/><circle cx="8" cy="13.5" r="1.1"/><circle cx="16" cy="13.5" r="1.1"/></svg> Auto & Moto</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 4.5h6v15H4z"/><path d="M14 4.5h6v15h-6z"/><path d="M10 4.5h4v15h-4z"/></svg> Lecture</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 8l8-4.5L20 8l-8 4.5z"/><path d="M6.5 9.5v6L12 18l5.5-2.5v-6"/><path d="M20 8v6.5"/></svg> Cinéma & Séries</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 19V9M10 19V5M16 19v-7M20 19V11"/><path d="M4 19h16"/></svg> Finance & Épargne</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="7" cy="7.5" r="1.8"/><circle cx="12" cy="5.5" r="1.8"/><circle cx="17" cy="7.5" r="1.8"/><path d="M12 12c-3.3 0-6 2-6 4.6 0 1.9 1.6 2.9 3.1 2.1.9-.5 1.9-.7 2.9-.7s2 .2 2.9.7c1.5.8 3.1-.2 3.1-2.1 0-2.6-2.7-4.6-6-4.6z"/></svg> Animaux</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="3" y="7" width="18" height="13" rx="1.5"/><path d="M8 7l1.6-2.5h4.8L16 7"/><circle cx="12" cy="13.5" r="3.4"/></svg> Photo & Vidéo</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Gastronomie</div>
+                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5H18.5V10"/><path d="M10 19.5v-6h4v6"/></svg> Immobilier</div>
                     </div>
                   </div>
                   <div class="field">
@@ -987,9 +987,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     </div>
                   </div>
                   <div class="field" style="margin-bottom:0">
-                    <label class="field-lbl">📍 Localisation des répondants</label>
+                    <label class="field-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg> Localisation des répondants</label>
                     <select class="field-inp" id="aud-loc-sel" style="cursor:pointer" onchange="updAud();updVol(document.getElementById('vol-sl').value)">
-                      <option value="national">🇫🇷 Toute la France (moins cher)</option>
+                      <option value="national">Toute la France (moins cher)</option>
                       <optgroup label="── Grandes régions ──">
                         <option value="idf">Île-de-France</option>
                         <option value="aura">Auvergne-Rhône-Alpes</option>
@@ -1009,12 +1009,12 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                         <option disabled value="">Chargement des villes…</option>
                       </optgroup>
                     </select>
-                    <div style="font-size:11px;color:var(--ink3);margin-top:5px">💡 Cibler une ville ou région précise garantit une audience locale plus pertinente.</div>
+                    <div style="font-size:11px;color:var(--ink3);margin-top:5px;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg> Cibler une ville ou région précise garantit une audience locale plus pertinente.</div>
                   </div>
                 </div>
                 <div class="step-card" style="background:var(--vd);border-color:rgba(161,78,8,.2)">
                   <div style="display:flex;align-items:center;gap:12px">
-                    <div style="font-size:28px">👥</div>
+                    <div style="color:var(--icon-gray)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg></div>
                     <div>
                       <div style="font-family:var(--fd);font-weight:800;font-size:26px;color:var(--ink);letter-spacing:-1px"><span id="aud-count">—</span> <span style="font-size:14px;color:rgba(23,20,26,.55);font-weight:600">profils éligibles</span></div>
                       <div style="font-size:12px;color:var(--coral);margin-top:3px" id="aud-footer">Profils consentants · conforme RGPD</div>
@@ -1022,8 +1022,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   </div>
                 </div>
                 <div class="wizard-actions">
-                  <button class="wiz-btn-back" onclick="wzGo(1)">← Retour</button>
-                  <button class="wiz-btn-next" onclick="wzGo(3)">Volume →</button>
+                  <button class="wiz-btn-back" onclick="wzGo(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Retour</button>
+                  <button class="wiz-btn-next" onclick="wzGo(3)">Volume <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
                 </div>
               </div>
               <div>
@@ -1034,7 +1034,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div class="aud-row"><div class="aud-lbl">35–49 ans</div><div class="aud-bar"><div class="aud-fill" style="width:31%;background:var(--violet)"></div></div><div class="aud-val">31%</div></div>
                     <div class="aud-row"><div class="aud-lbl">50+ ans</div><div class="aud-bar"><div class="aud-fill" style="width:11%;background:var(--ink3)"></div></div><div class="aud-val">11%</div></div>
                   </div>
-                  <div style="background:var(--md);border-radius:var(--rx);padding:10px 12px;font-size:11px;color:var(--mint);line-height:1.6"><strong>🛡️ Conforme RGPD</strong><br>Chaque profil a consenti explicitement à votre commerce. Révocable à tout moment depuis l'app.</div>
+                  <div style="background:var(--md);border-radius:var(--rx);padding:10px 12px;font-size:11px;color:var(--mint);line-height:1.6"><strong style="display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg> Conforme RGPD</strong><br>Chaque profil a consenti explicitement à votre commerce. Révocable à tout moment depuis l'app.</div>
                 </div>
               </div>
             </div>
@@ -1057,8 +1057,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <div class="vol-num" id="vol-num">200</div>
                     </div>
                     <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-                      <div class="est-chip"><span class="est-chip-ico">⏱️</span>Délai estimé <span class="est-chip-val" id="est-delay">6h</span></div>
-                      <div class="est-chip"><span class="est-chip-ico">📍</span>Localisation <span class="est-chip-val" id="est-loc-label">France entière</span></div>
+                      <div class="est-chip"><span class="est-chip-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg></span>Délai estimé <span class="est-chip-val" id="est-delay">6h</span></div>
+                      <div class="est-chip"><span class="est-chip-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg></span>Localisation <span class="est-chip-val" id="est-loc-label">France entière</span></div>
                     </div>
                   </div>
                   <div class="field" style="margin-bottom:0">
@@ -1067,18 +1067,18 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   </div>
                 </div>
                 <div class="step-card">
-                  <div class="step-card-title">📦 Toujours inclus</div>
+                  <div class="step-card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M3.5 8 12 3.5 20.5 8 12 12.5z"/><path d="M3.5 8v8.5L12 21l8.5-4.5V8"/><path d="M12 12.5V21"/></svg> Toujours inclus</div>
                   <div class="budget-inc" style="margin-top:0">
-                    <div class="budget-inc-item">✅ Analyse IA des réponses (clustering thématique)</div>
-                    <div class="budget-inc-item">✅ Rapport synthèse exécutive (PDF)</div>
-                    <div class="budget-inc-item">✅ Export données brutes (CSV)</div>
-                    <div class="budget-inc-item">✅ Score qualité par réponse</div>
-                    <div class="budget-inc-item">✅ Dashboard résultats en temps réel</div>
+                    <div class="budget-inc-item" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Analyse IA des réponses (clustering thématique)</div>
+                    <div class="budget-inc-item" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Rapport synthèse exécutive (PDF)</div>
+                    <div class="budget-inc-item" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Export données brutes (CSV)</div>
+                    <div class="budget-inc-item" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Score qualité par réponse</div>
+                    <div class="budget-inc-item" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Dashboard résultats en temps réel</div>
                   </div>
                 </div>
                 <div class="wizard-actions">
-                  <button class="wiz-btn-back" onclick="wzGo(2)">← Retour</button>
-                  <button class="wiz-btn-next" onclick="wzGo(4)">Vérifier →</button>
+                  <button class="wiz-btn-back" onclick="wzGo(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Retour</button>
+                  <button class="wiz-btn-next" onclick="wzGo(4)">Vérifier <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
                 </div>
               </div>
               <div>
@@ -1087,17 +1087,17 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div style="display:flex;flex-direction:column;gap:10px">
                     <div style="background:var(--bg3);border-radius:var(--rx);padding:11px 12px">
                       <div style="font-size:10px;color:var(--ink3);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Aujourd'hui</div>
-                      <div style="font-size:12px;color:var(--ink2);font-weight:600">🚀 Lancement campagne</div>
+                      <div style="font-size:12px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Lancement campagne</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink3)" id="sim-delay">~6h</div></div>
                     <div style="background:var(--md);border-radius:var(--rx);padding:11px 12px;border:1px solid rgba(11,171,132,.2)">
                       <div style="font-size:10px;color:var(--mint);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Collecte</div>
-                      <div style="font-size:12px;color:var(--ink2);font-weight:600">✅ <span id="sim-vol">200</span> réponses atteintes</div>
+                      <div style="font-size:12px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> <span id="sim-vol">200</span> réponses atteintes</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink3)">+48–72h</div></div>
                     <div style="background:var(--vd);border-radius:var(--rx);padding:11px 12px;border:1px solid rgba(161,78,8,.2)">
                       <div style="font-size:10px;color:var(--violet);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Livraison</div>
-                      <div style="font-size:12px;color:var(--ink2);font-weight:600">📊 Rapport disponible</div>
+                      <div style="font-size:12px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20V9M10 20V4M16 20v-7M21 20H3"/></svg> Rapport disponible</div>
                     </div>
                   </div>
                 </div>
@@ -1109,7 +1109,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
                 <div class="step-card">
-                  <div class="step-card-title">✅ Vérification finale</div>
+                  <div class="step-card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Vérification finale</div>
                   <div class="step-card-sub">Vérifiez tous les paramètres avant de lancer. Cette campagne sera diffusée auprès de vos profils consentants uniquement.</div>
                   <div class="recap-grid">
                     <div class="recap-item"><div class="recap-lbl">Question</div><div class="recap-val" id="recap-q">Quel est votre critère principal lors de l'achat d'un équipement sportif ?</div></div>
@@ -1120,25 +1120,25 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div class="recap-item" style="grid-column:span 2"><div class="recap-lbl">Livraison</div><div class="recap-val">Rapport complet sous 48–72h après clôture de la collecte · Clustering IA · Export CSV inclus</div></div>
                   </div>
                   <div class="risk-box">
-                    <div class="risk-title">⚠️ Points d'attention documentés</div>
+                    <div class="risk-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg> Points d'attention documentés</div>
                     <div class="risk-item"><div class="risk-dot"></div>Décrochage au palier : maintenir l'engagement avec des questions variées</div>
                     <div class="risk-item"><div class="risk-dot"></div>Score qualité min. 70/100 par répondant appliqué automatiquement</div>
                     <div class="risk-item"><div class="risk-dot"></div>Révocations RGPD possibles en cours de campagne — décomptées du quota</div>
                   </div>
                 </div>
                 <div class="wizard-actions" style="justify-content:space-between">
-                  <button class="wiz-btn-back" onclick="wzGo(3)">← Modifier</button>
-                  <button class="wiz-btn-launch" onclick="launchCampaign()">🚀 Lancer la campagne</button>
+                  <button class="wiz-btn-back" onclick="wzGo(3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Modifier</button>
+                  <button class="wiz-btn-launch" onclick="launchCampaign()" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Lancer la campagne</button>
                 </div>
               </div>
               <div>
                 <div class="preview-box">
                   <div class="preview-title">Ce qui se passe après</div>
                   <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:var(--ink2);line-height:1.65">
-                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">📲</span><span>Les répondants éligibles voient votre question apparaître dans leur feed Noova en temps réel.</span></div>
-                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">📊</span><span>Vous suivez la progression en direct depuis ce dashboard.</span></div>
-                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">🤖</span><span>Le clustering IA analyse automatiquement les verbatims et identifie les thèmes émergents.</span></div>
-                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="font-size:16px;flex-shrink:0">📧</span><span>Vous recevez une notification dès que le rapport est disponible (48–72h).</span></div>
+                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><rect x="7" y="2.5" width="10" height="19" rx="1.8"/><path d="M11 18.5h2"/></svg></span><span>Les répondants éligibles voient votre question apparaître dans leur feed Noova en temps réel.</span></div>
+                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M4 20V9M10 20V4M16 20v-7M21 20H3"/></svg></span><span>Vous suivez la progression en direct depuis ce dashboard.</span></div>
+                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><rect x="4" y="9" width="16" height="11" rx="2"/><circle cx="9" cy="14.5" r="1.3"/><circle cx="15" cy="14.5" r="1.3"/><path d="M12 9V5.5"/><circle cx="12" cy="4" r="1.3"/><path d="M2 13v3M22 13v3"/></svg></span><span>Le clustering IA analyse automatiquement les verbatims et identifie les thèmes émergents.</span></div>
+                    <div style="display:flex;gap:9px;align-items:flex-start"><span style="flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/><path d="M4 6.5l8 6.5 8-6.5"/></svg></span><span>Vous recevez une notification dès que le rapport est disponible (48–72h).</span></div>
                   </div>
                 </div>
               </div>
@@ -1157,10 +1157,10 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <!-- Dynamic content area -->
         <div id="results-content">
           <div style="text-align:center;padding:60px 20px">
-            <div style="font-size:40px;margin-bottom:16px">📊</div>
+            <div style="margin-bottom:16px;color:var(--icon-gray);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:40px;height:40px;vertical-align:-2px"><path d="M4 20V9M10 20V4M16 20v-7M21 20H3"/></svg></div>
             <div style="font-family:var(--fd);font-weight:700;font-size:18px;color:var(--ink);margin-bottom:8px">Aucune campagne sélectionnée</div>
             <div style="font-size:13px;color:var(--ink3);line-height:1.65;max-width:320px;margin:0 auto 24px">Va dans <strong>Mes campagnes</strong> et clique sur <strong>Voir</strong> pour consulter les résultats en détail.</div>
-            <button class="tb-btn tb-btn-primary" onclick="navTo('campaigns',[...document.querySelectorAll('.sb-item')].find(b=>b.textContent.includes('campagnes')))">Voir mes campagnes →</button>
+            <button class="tb-btn tb-btn-primary" onclick="navTo('campaigns',[...document.querySelectorAll('.sb-item')].find(b=>b.textContent.includes('campagnes')))">Voir mes campagnes <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
           </div>
         </div>
         <!-- Legacy panels (hidden, kept for resTab() compatibility) -->
@@ -1182,7 +1182,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <!-- ═══ CAMPAIGNS LIST ═══ -->
       <div class="page" id="page-campaigns">
         <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
-          <input class="field-inp" id="camp-search-inp" style="max-width:280px" placeholder="🔍 Rechercher une campagne…" oninput="filterCampaigns()">
+          <input class="field-inp" id="camp-search-inp" style="max-width:280px" placeholder="Rechercher une campagne…" oninput="filterCampaigns()">
           <select class="field-inp" id="camp-status-sel" style="max-width:180px;cursor:pointer" onchange="filterCampaigns()"><option value="">Tous les statuts</option><option value="active">En cours</option><option value="ended">Terminée</option><option value="draft">Brouillon</option></select>
           <button class="tb-btn tb-btn-primary" style="margin-left:auto" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">+ Nouvelle campagne</button>
         </div>
@@ -1199,9 +1199,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <!-- ═══ CONSENTS ═══ -->
       <div class="page" id="page-consents">
         <div style="background:var(--md);border:1px solid rgba(11,171,132,.2);border-radius:var(--rs);padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:12px">
-          <span style="font-size:22px">🛡️</span>
+          <span style="color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span>
           <div style="font-size:13px;color:var(--ink2);line-height:1.65;flex:1"><strong style="color:var(--mint)">Conformité RGPD totale.</strong> Chaque profil a consenti explicitement à votre commerce via l'application Noova. Les consentements sont horodatés, granulaires et révocables en 1 tap par l'utilisateur. Vous ne pouvez pas modifier ces paramètres — seul l'utilisateur en a le contrôle.</div>
-          <button class="tb-btn tb-btn-ghost" style="font-size:12px" id="export-rgpd-btn" onclick="exportConsentJournal()">📥 Export RGPD</button>
+          <button class="tb-btn tb-btn-ghost" style="font-size:12px" id="export-rgpd-btn" onclick="exportConsentJournal()" style="display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3v11"/><path d="M8 7l4-4 4 4"/><path d="M5 15v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></svg> Export RGPD</button>
         </div>
         <div class="section-title">Journal des consentements (50 derniers événements)</div>
         <div class="card">
@@ -1222,7 +1222,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
           <div class="settings-section">
             <div class="settings-section-title">Profil de la marque</div>
             <div class="setting-row">
-              <div id="set-logo-preview" style="width:40px;height:40px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;flex-shrink:0">⛺</div>
+              <div id="set-logo-preview" style="width:40px;height:40px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--icon-gray);overflow:hidden;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
               <div class="setting-info"><div class="setting-name">Photo / logo</div><div class="setting-desc">Visible dans l'app et sur ta fiche commerce</div></div>
               <input type="file" id="logo-file-inp" accept="image/*" style="display:none" onchange="changeMerchantLogo(this.files[0])">
               <button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="document.getElementById('logo-file-inp').click()">Modifier</button>
@@ -1294,12 +1294,12 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               <div><span style="font-family:var(--fd);font-weight:900;font-size:28px;color:var(--ink)">0 €</span><span style="font-size:12px;color:var(--ink3)">/mois</span></div>
               <div style="font-size:11px;color:var(--ink3);line-height:1.5">Pour tester Noova sans engagement.</div>
               <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink2)">
-                <div>✅ 1 campagne active</div>
-                <div>✅ 50 réponses max</div>
-                <div>✅ Analyse IA incluse</div>
-                <div>✅ Export CSV</div>
-                <div style="color:var(--ink3)">❌ Ciblage avancé</div>
-                <div style="color:var(--ink3)">❌ Questions ouvertes</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> 1 campagne active</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> 50 réponses max</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Analyse IA incluse</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Export CSV</div>
+                <div style="color:var(--ink3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg> Ciblage avancé</div>
+                <div style="color:var(--ink3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg> Questions ouvertes</div>
               </div>
               <button style="margin-top:auto;padding:9px;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)">Formule actuelle</button>
             </div>
@@ -1310,12 +1310,12 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               <div><span style="font-family:var(--fd);font-weight:900;font-size:28px;color:var(--ink)">29 €</span><span style="font-size:12px;color:var(--ink3)">/mois</span></div>
               <div style="font-size:11px;color:var(--ink3);line-height:1.5">Idéal pour les indépendants et petits commerces.</div>
               <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink2)">
-                <div>✅ 3 campagnes actives</div>
-                <div>✅ 500 réponses / campagne</div>
-                <div>✅ Analyse IA incluse</div>
-                <div>✅ Export CSV + PDF</div>
-                <div>✅ Score qualité</div>
-                <div style="color:var(--ink3)">❌ Ciblage géographique fin</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> 3 campagnes actives</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> 500 réponses / campagne</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Analyse IA incluse</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Export CSV + PDF</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Score qualité</div>
+                <div style="color:var(--ink3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg> Ciblage géographique fin</div>
               </div>
               <button style="margin-top:auto;padding:9px;background:rgba(242,151,21,.1);border:1.5px solid rgba(242,151,21,.4);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--coral)" onclick="choosePlan('Starter',29)">Choisir Starter</button>
             </div>
@@ -1327,13 +1327,13 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               <div><span style="font-family:var(--fd);font-weight:900;font-size:28px;color:#fff">99 €</span><span style="font-size:12px;color:rgba(255,255,255,.55)">/mois</span></div>
               <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.5">Pour les enseignes et marques en croissance.</div>
               <div style="border-top:1px solid rgba(255,255,255,.12);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:rgba(255,255,255,.85)">
-                <div>✅ Campagnes illimitées</div>
-                <div>✅ 5 000 réponses / campagne</div>
-                <div>✅ Analyse IA avancée</div>
-                <div>✅ Export CSV + PDF + slides</div>
-                <div>✅ Score qualité + verbatims</div>
-                <div>✅ Ciblage région &amp; ville</div>
-                <div>✅ Questions ouvertes + échelle</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Campagnes illimitées</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> 5 000 réponses / campagne</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Analyse IA avancée</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Export CSV + PDF + slides</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Score qualité + verbatims</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Ciblage région &amp; ville</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Questions ouvertes + échelle</div>
               </div>
               <button style="margin-top:auto;padding:9px;background:linear-gradient(135deg,#f29715,#ffda09);border:none;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;color:#1c0e02" onclick="choosePlan('Pro',99)">Choisir Pro</button>
             </div>
@@ -1344,12 +1344,12 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               <div><span style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--ink)">Sur devis</span></div>
               <div style="font-size:11px;color:var(--ink3);line-height:1.5">Grandes enseignes, études multi-sites, accès API.</div>
               <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink2)">
-                <div>✅ Tout ce qui est dans Pro</div>
-                <div>✅ Accès API Noova</div>
-                <div>✅ Multi-utilisateurs</div>
-                <div>✅ Intégration CRM/ERP</div>
-                <div>✅ SLA &amp; support dédié</div>
-                <div>✅ White-label disponible</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Tout ce qui est dans Pro</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Accès API Noova</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Multi-utilisateurs</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Intégration CRM/ERP</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> SLA &amp; support dédié</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> White-label disponible</div>
               </div>
               <button style="margin-top:auto;padding:9px;background:rgba(92,59,245,.1);border:1.5px solid rgba(92,59,245,.3);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--violet)" onclick="window.location.href='mailto:contact@noova.fr?subject=Offre Enterprise'">Nous contacter</button>
             </div>
@@ -1358,12 +1358,12 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 
           <!-- Pricing reminder -->
           <div class="step-card" style="background:rgba(242,151,21,.06);border-color:rgba(242,151,21,.2)">
-            <div class="step-card-title" style="margin-bottom:10px">💡 Rappel : tarification à la réponse</div>
+            <div class="step-card-title" style="margin-bottom:10px;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg> Rappel : tarification à la réponse</div>
             <div style="font-size:12px;color:var(--ink2);line-height:1.8">
               Quel que soit votre abonnement, chaque campagne est facturée <strong>99 € de forfait de base</strong> (analyse IA, PDF, CSV inclus) + un coût par réponse selon la localisation ciblée :<br>
-              &nbsp;&nbsp;🇫🇷 <strong>France entière</strong> → 0,80 € / réponse &nbsp;·&nbsp;
-              📍 <strong>Région</strong> → 1,20 € / réponse &nbsp;·&nbsp;
-              🏙️ <strong>Ville</strong> → 1,80 € / réponse
+              &nbsp;&nbsp;<strong>France entière</strong> → 0,80 € / réponse &nbsp;·&nbsp;
+              <strong>Région</strong> → 1,20 € / réponse &nbsp;·&nbsp;
+              <strong>Ville</strong> → 1,80 € / réponse
             </div>
           </div>
         </div>
@@ -1373,11 +1373,11 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <div class="page" id="page-rewards">
         <div style="max-width:700px">
           <div style="margin-bottom:24px">
-            <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink)">🎁 Mes récompenses</div>
+            <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink);display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-1px"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg> Mes récompenses</div>
             <div style="font-size:13px;color:var(--ink2);margin-top:4px">Proposez jusqu'à 5 récompenses à vos clients. 1 pt ≈ 1 centime de valeur perçue.</div>
           </div>
           <div id="rewards-suggestion" style="display:none;background:var(--ad);border:1.5px solid rgba(242,151,21,.25);border-radius:var(--rs);padding:14px 18px;margin-bottom:20px">
-            <div style="font-size:13px;color:var(--ink2);margin-bottom:10px">💡 <strong>Suggestions selon votre activité</strong> — cliquez pour pré-remplir, vous gardez la main avant de publier.</div>
+            <div style="font-size:13px;color:var(--ink2);margin-bottom:10px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg> <strong>Suggestions selon votre activité</strong> — cliquez pour pré-remplir, vous gardez la main avant de publier.</div>
             <div id="rewards-suggestion-chips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
           </div>
           <div id="reward-slots"></div>
@@ -1389,7 +1389,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <div class="page" id="page-validate">
         <div style="max-width:520px">
           <div style="margin-bottom:28px">
-            <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink)">✅ Valider un bon</div>
+            <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Valider un bon</div>
             <div style="font-size:13px;color:var(--ink2);margin-top:4px">Scannez ou saisissez le code que le client vous présente.</div>
           </div>
           <div class="card" style="padding:28px">
@@ -1421,10 +1421,10 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 <!-- Popup affiché une fois, à la reconnexion suivant la validation admin -->
 <div id="verified-modal" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:24px">
   <div style="background:var(--card);border-radius:20px;max-width:400px;width:100%;padding:32px 28px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.25)">
-    <div style="width:64px;height:64px;border-radius:50%;background:rgba(11,171,132,.12);border:2px solid rgba(11,171,132,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px">✅</div>
+    <div style="width:64px;height:64px;border-radius:50%;background:rgba(11,171,132,.12);border:2px solid rgba(11,171,132,.3);color:#0BAB84;display:flex;align-items:center;justify-content:center;margin:0 auto 18px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg></div>
     <div style="font-family:var(--fd);font-weight:800;font-size:21px;color:var(--ink);letter-spacing:-.5px;margin-bottom:8px">Ton espace est vérifié !</div>
-    <div style="font-size:13.5px;color:var(--ink2);line-height:1.7;margin-bottom:24px">Bienvenue sur Noova, <strong id="verified-modal-brand"></strong> 🎉 Tu peux maintenant créer ta première campagne et configurer tes récompenses.</div>
-    <button onclick="closeVerifiedModal()" style="width:100%;padding:13px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:14px;font-weight:700;font-family:var(--fd);cursor:pointer">C'est parti →</button>
+    <div style="font-size:13.5px;color:var(--ink2);line-height:1.7;margin-bottom:24px">Bienvenue sur Noova, <strong id="verified-modal-brand"></strong>. Tu peux maintenant créer ta première campagne et configurer tes récompenses.</div>
+    <button onclick="closeVerifiedModal()" style="width:100%;padding:13px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:14px;font-weight:700;font-family:var(--fd);cursor:pointer">C'est parti <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
   </div>
 </div>
 
@@ -1581,8 +1581,8 @@ function renderCampModal(c, answers) {
     ${qList}
     <div style="display:flex;gap:9px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);flex-wrap:wrap">
       ${toggleBtn}
-      <button onclick="openEditCamp('${c.id}')" style="background:var(--vd);color:var(--violet);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">✏️ Modifier</button>
-      <button onclick="deleteCampaign('${c.id}','${(c.name||c.question||'').replace(/'/g,'').substring(0,40)}')" style="background:rgba(239,68,68,.1);color:var(--red);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">🗑️ Supprimer</button>
+      <button onclick="openEditCamp('${c.id}')" style="background:var(--vd);color:var(--violet);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">${icon('edit',{size:12})} Modifier</button>
+      <button onclick="deleteCampaign('${c.id}','${(c.name||c.question||'').replace(/'/g,'').substring(0,40)}')" style="background:rgba(239,68,68,.1);color:var(--red);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">${icon('delete',{size:12})} Supprimer</button>
       <button onclick="closeCampModal()" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto">Fermer</button>
     </div>`;
 }
@@ -1842,7 +1842,7 @@ function updVol(v){
 // ═══ LAUNCH ══════════════════════════════════════════════════
 function launchCampaign(){
   spawnConfetti();
-  setTimeout(()=>{showToast('🚀 Campagne lancée ! Rapport estimé dans 38h','rocket')},200);
+  setTimeout(()=>{showToast('Campagne lancée ! Rapport estimé dans 38h','rocket')},200);
   setTimeout(()=>{navTo('campaigns',document.querySelectorAll('.sb-item')[2])},1500);
 }
 
@@ -1861,7 +1861,7 @@ function renderVerbatims(filter){
   filtered.forEach(v=>{
     const d=document.createElement('div');d.className='verbatim-card';
     const stars='⭐'.repeat(Math.round(v.score))+'☆'.repeat(5-Math.round(v.score));
-    d.innerHTML=`<div class="vc-header"><span class="vc-theme" style="background:${v.thc};color:${v.tc}">${v.theme}</span><div class="vc-score"><span style="font-size:12px">${stars}</span><span>${v.score}</span></div></div><div class="vc-text">${v.txt}</div><div class="vc-footer"><div class="vc-meta">${v.seg}</div><div class="vc-actions"><button class="vc-btn" style="background:var(--cd);color:var(--coral)" onclick="showToast('Verbatim ajouté aux favoris ⭐','star')">⭐ Sauvegarder</button><button class="vc-btn" style="background:var(--md);color:var(--mint)" onclick="showToast('Verbatim copié','document')">📋 Copier</button></div></div>`;
+    d.innerHTML=`<div class="vc-header"><span class="vc-theme" style="background:${v.thc};color:${v.tc}">${v.theme}</span><div class="vc-score"><span style="font-size:12px">${stars}</span><span>${v.score}</span></div></div><div class="vc-text">${v.txt}</div><div class="vc-footer"><div class="vc-meta">${v.seg}</div><div class="vc-actions"><button class="vc-btn" style="background:var(--cd);color:var(--coral);display:inline-flex;align-items:center;gap:5px" onclick="showToast('Verbatim ajouté aux favoris','star')">${icon('star',{size:12})} Sauvegarder</button><button class="vc-btn" style="background:var(--md);color:var(--mint);display:inline-flex;align-items:center;gap:5px" onclick="showToast('Verbatim copié','document')">${icon('document',{size:12})} Copier</button></div></div>`;
     el.appendChild(d);
   });
 }
@@ -1880,7 +1880,7 @@ function renderClusters(){
 const RECOS=[{priority:'Priorité haute',prio_c:'var(--coral)',border:'var(--coral)',title:'Privilégier la sémantique "Performance" dans le naming final',desc:'74% des répondants associent le trail à la performance et la vitesse. Les noms testés evoquant la cinétique (KinetoRun, VelocityStep) obtiennent les meilleures notes. Évitez les termes trop génériques.',action:'Tester 3 noms phase 2',action_c:'var(--coral)'},{priority:'Priorité haute',prio_c:'var(--coral)',border:'var(--coral)',title:'Segmenter la communication Légèreté vs Performance par âge',desc:'Les 18-24 ans plébiscitent la légèreté (AirTrek, FeatherStep) tandis que les 25-34 ans sont davantage attirés par la performance pure. Envisager deux déclinaisons selon le canal.',action:'Créer étude phase 2',action_c:'var(--coral)'},{priority:'Priorité moyenne',prio_c:'var(--amber)',border:'var(--amber)',title:'Traiter le frein prix dans la stratégie de lancement',desc:'22% des réponses mentionnent le prix comme facteur bloquant indépendamment du nom. Une communication sur le positionnement valeur/qualité est recommandée dès le lancement.',action:'Partager aux équipes',action_c:'var(--amber)'},{priority:'Opportunité',prio_c:'var(--mint)',border:'var(--mint)',title:'Explorer une déclinaison gamme débutants "TrailEase"',desc:'Un segment de 49% prioritise le confort et l\'accessibilité. Le profil 35-49 ans trail loisir est sous-adressé. Un nom rassurant type TrailEase ou OpenRun pourrait conquérir ce segment.',action:'Planifier étude complémentaire',action_c:'var(--mint)'}];
 function renderRecos(){
   const el=document.getElementById('reco-list');if(!el)return;el.innerHTML='';
-  RECOS.forEach((r,i)=>{const d=document.createElement('div');d.className='reco-card';d.style.borderLeftColor=r.border;d.innerHTML=`<div class="reco-priority" style="color:${r.prio_c}">${r.priority}</div><div class="reco-title">${r.title}</div><div class="reco-desc">${r.desc}</div><div class="reco-action"><button class="reco-action-btn" style="background:${r.prio_c}18;color:${r.prio_c};border:none" onclick="showToast('Action enregistrée ✅','success')">${r.action}</button><button class="reco-action-btn" style="background:var(--card);color:var(--ink3);border:1px solid var(--border)" onclick="showToast('Copié dans le presse-papiers','document')">📋 Copier</button></div>`;el.appendChild(d)});
+  RECOS.forEach((r,i)=>{const d=document.createElement('div');d.className='reco-card';d.style.borderLeftColor=r.border;d.innerHTML=`<div class="reco-priority" style="color:${r.prio_c}">${r.priority}</div><div class="reco-title">${r.title}</div><div class="reco-desc">${r.desc}</div><div class="reco-action"><button class="reco-action-btn" style="background:${r.prio_c}18;color:${r.prio_c};border:none" onclick="showToast('Action enregistrée','success')">${r.action}</button><button class="reco-action-btn" style="background:var(--card);color:var(--ink3);border:1px solid var(--border);display:inline-flex;align-items:center;gap:5px" onclick="showToast('Copié dans le presse-papiers','document')">${icon('document',{size:12})} Copier</button></div>`;el.appendChild(d)});
 }
 
 // ═══ CONFETTI ════════════════════════════════════════════════
@@ -2071,7 +2071,7 @@ window.addEventListener('load',()=>{
     <div style="font-size:14px;color:var(--ink2);margin-bottom:6px;line-height:1.7">Ton espace commerçant pour <strong id="pending-brand"></strong> est en cours de validation.</div>
     <div id="pending-eta" style="font-size:13px;color:var(--coral);font-weight:600;margin-bottom:28px"></div>
     <div style="background:var(--vd);border:1.5px solid rgba(161,78,8,.15);border-radius:14px;padding:16px 18px;text-align:left;margin-bottom:24px">
-      <div style="font-size:12px;color:var(--ink2);line-height:2">✅ Inscription enregistrée<br>⏳ Vérification manuelle en cours (≤ 24h)<br>🚀 Accès au dashboard après validation</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Inscription enregistrée<br><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg> Vérification manuelle en cours (≤ 24h)<br><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Accès au dashboard après validation</div>
     </div>
     <button onclick="auth.signOut()" style="padding:12px 24px;border-radius:11px;background:var(--bg2);border:1.5px solid var(--bg3);color:var(--ink2);font-size:13px;font-weight:600;font-family:var(--fb);cursor:pointer">Se déconnecter</button>
     <div style="margin-top:12px;font-size:11px;color:var(--ink3)">Reviens dans quelques heures — tu recevras un email de confirmation.</div>
@@ -2159,7 +2159,7 @@ window.addEventListener('load',()=>{
       <input id="gmw-siret"   type="text" placeholder="SIRET (14 chiffres)" inputmode="numeric" maxlength="17" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <textarea id="gmw-desc" placeholder="Décris ton établissement en quelques mots…" maxlength="300" style="width:100%;height:70px;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);resize:none;box-sizing:border-box"></textarea>
       <div id="gmw-err" style="color:#EF4444;font-size:12px;display:none;padding:8px 12px;background:rgba(239,68,68,.08);border-radius:8px"></div>
-      <button onclick="saveGoogleMerchant()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg)">Créer mon espace →</button>
+      <button onclick="saveGoogleMerchant()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg)">Créer mon espace <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
     </div>
   </div>
 </div>
@@ -2277,7 +2277,7 @@ async function awForgotPassword() {
   }
   document.getElementById('aw-err').style.display = 'none';
   const wrap = document.getElementById('aw-forgot');
-  if(wrap) wrap.innerHTML = '<span style="font-size:12px;color:var(--ink2)">✅ Si ce compte existe, un email a été envoyé.</span>';
+  if(wrap) wrap.innerHTML = `<span style="font-size:12px;color:var(--ink2);display:inline-flex;align-items:center;gap:4px">${icon('success',{size:12})} Si ce compte existe, un email a été envoyé.</span>`;
 }
 
 // ─── Load merchant + init dashboard ─────────────────────────
@@ -2424,7 +2424,7 @@ function renderFirestoreCampaigns(camps) {
     const page = document.getElementById(pageId);
     if(page) page.querySelectorAll('.camp-row').forEach(r=>r.remove());
   });
-  const emptyMsg = camps.length ? '' : 'Aucune campagne pour l\'instant — crée ta première campagne ✨';
+  const emptyMsg = camps.length ? '' : 'Aucune campagne pour l\'instant — crée ta première campagne';
   // État vide dashboard
   const dashEmpty = document.getElementById('dash-empty-camps');
   if(dashEmpty) dashEmpty.remove();
@@ -2463,7 +2463,7 @@ function renderFirestoreCampaigns(camps) {
       row.className = 'camp-row';
       const label = (c.name||c.question||'—');
       row.innerHTML = `
-        <div class="camp-name-wrap"><div class="camp-ico">${c.brandEmoji||'🏪'}</div><div><div class="camp-name">${label.substring(0,38)}${label.length>38?'…':''}</div><div class="camp-date">${c.targetCity||'France'} · ${c.questions?.length>1?c.questions.length+' q.':'1 q.'}</div></div></div>
+        <div class="camp-name-wrap"><div class="camp-ico" style="color:var(--icon-gray);display:flex;align-items:center;justify-content:center">${icon('store',{size:16})}</div><div><div class="camp-name">${label.substring(0,38)}${label.length>38?'…':''}</div><div class="camp-date">${c.targetCity||'France'} · ${c.questions?.length>1?c.questions.length+' q.':'1 q.'}</div></div></div>
         <div><span class="status-pill ${st}">${stLbl[c.status]||'Brouillon'}</span></div>
         <div><div class="camp-metric">${c.answersCount||0}</div><div class="camp-metric-sub">/ ${c.volumeTarget||100} obj.</div></div>
         <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:${pct}%;background:var(--mint)"></div></div><div class="cprog-lbl">${pct}%</div></div>
@@ -2830,9 +2830,9 @@ function renderRewardCard(r, i) {
   card.className = 'card';
   card.style.marginBottom = '14px';
   const statusBadge = {
-    pending:  { bg: 'rgba(245,166,35,.14)', c: 'var(--amber)', txt: '⏳ En attente de validation' },
-    approved: { bg: d.active ? 'rgba(11,171,132,.12)' : 'var(--bg3)', c: d.active ? '#0BAB84' : 'var(--ink3)', txt: d.active ? '✅ Actif' : '⏸️ Inactif' },
-    rejected: { bg: 'rgba(239,68,68,.1)', c: '#EF4444', txt: '❌ Refusée par Noova' }
+    pending:  { bg: 'rgba(245,166,35,.14)', c: 'var(--amber)', txt: icon('clock',{size:11})+' En attente de validation' },
+    approved: { bg: d.active ? 'rgba(11,171,132,.12)' : 'var(--bg3)', c: d.active ? '#0BAB84' : 'var(--ink3)', txt: d.active ? icon('success',{size:11})+' Actif' : icon('pause',{size:11})+' Inactif' },
+    rejected: { bg: 'rgba(239,68,68,.1)', c: '#EF4444', txt: icon('error',{size:11})+' Refusée par Noova' }
   }[d.status || 'pending'];
   card.innerHTML = `
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
@@ -2841,12 +2841,12 @@ function renderRewardCard(r, i) {
         <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink)">${esc(d.label||'Récompense')}</div>
         <div style="font-size:12px;color:var(--ink3);margin-top:2px">${(d.valueEuros||0).toFixed(2)} € · ${d.cost||0} pts · Stock : ${d.stock===null||d.stock===undefined?'Illimité':d.stock} · Échangés : ${d.redeemedCount||0}</div>
       </div>
-      <span style="padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${statusBadge.bg};color:${statusBadge.c};white-space:nowrap">${statusBadge.txt}</span>
+      <span style="padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${statusBadge.bg};color:${statusBadge.c};white-space:nowrap;display:inline-flex;align-items:center;gap:4px">${statusBadge.txt}</span>
       ${d.status==='approved' ? `<button class="tb-btn" style="font-size:11px;padding:4px 10px" onclick="toggleRewardActive('${r.id}',${!d.active})">${d.active?'Désactiver':'Activer'}</button>` : ''}
       <button class="tb-btn" style="font-size:11px;padding:4px 10px;color:var(--coral)" onclick="deleteReward('${r.id}')">Supprimer</button>
     </div>
     ${d.status==='rejected' && d.rejectionReason ? `<div style="font-size:11px;color:#EF4444;margin-top:-6px;margin-bottom:8px">Motif : ${esc(d.rejectionReason)}</div>` : ''}
-    ${d.purchaseCondition ? `<div style="font-size:11px;color:var(--ink2);margin-top:-6px;margin-bottom:8px">📋 Condition : ${esc(d.purchaseCondition)}</div>` : ''}
+    ${d.purchaseCondition ? `<div style="font-size:11px;color:var(--ink2);margin-top:-6px;margin-bottom:8px;display:flex;align-items:center;gap:4px">${icon('document',{size:11})} Condition : ${esc(d.purchaseCondition)}</div>` : ''}
   `;
   el.appendChild(card);
 }
@@ -2886,7 +2886,7 @@ function addRewardSlot() {
       <label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Condition d'achat (optionnel)</label>
       <input class="field-inp" id="new-r-condition" placeholder="ex. pour tout plat commandé">
     </div>
-    <div style="font-size:11px;color:var(--ink3);margin-bottom:12px">📋 Chaque récompense est vérifiée par Noova avant de devenir visible dans l'app.</div>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:12px;display:flex;align-items:center;gap:5px">${icon('document',{size:12})} Chaque récompense est vérifiée par Noova avant de devenir visible dans l'app.</div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button class="tb-btn" onclick="this.closest('.card').remove();const ab=document.getElementById('add-reward-btn');if(ab)ab.style.display=''">Annuler</button>
       <button class="tb-btn tb-btn-primary" onclick="saveReward(${slot},this)">Envoyer pour validation</button>
@@ -2938,7 +2938,7 @@ async function saveReward(slot, btn) {
 async function toggleRewardActive(rewardId, active) {
   try {
     await db.collection('rewards').doc(rewardId).update({ active, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast(active ? 'Récompense activée' : 'Récompense désactivée', active ? '✅' : 'pause');
+    showToast(active ? 'Récompense activée' : 'Récompense désactivée', active ? 'success' : 'pause');
     loadMerchantRewards();
   } catch(e) { showToast('Erreur','error'); }
 }
@@ -2958,7 +2958,7 @@ async function validateVoucher() {
   const u = auth.currentUser;
   if(!u) {
     const el2 = document.getElementById('voucher-result');
-    if(el2) el2.innerHTML = '<div style="background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--rs);padding:16px 18px"><div style="font-weight:700;color:#EF4444;margin-bottom:4px">⚠️ Non connecté</div><div style="font-size:12px;color:var(--ink2)">Connecte-toi à ton espace commerçant pour valider un bon.</div></div>';
+    if(el2) el2.innerHTML = `<div style="background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--rs);padding:16px 18px"><div style="font-weight:700;color:#EF4444;margin-bottom:4px;display:flex;align-items:center;gap:5px">${icon('warning',{size:14})} Non connecté</div><div style="font-size:12px;color:var(--ink2)">Connecte-toi à ton espace commerçant pour valider un bon.</div></div>`;
     return;
   }
   const code = (document.getElementById('voucher-code-inp')?.value || '').trim().toUpperCase();
@@ -2972,7 +2972,7 @@ async function validateVoucher() {
       .limit(1).get();
     if(snap.empty) {
       el.innerHTML = `<div style="background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--rs);padding:16px 18px">
-        <div style="font-weight:700;color:#EF4444;margin-bottom:4px">❌ Code introuvable</div>
+        <div style="font-weight:700;color:#EF4444;margin-bottom:4px;display:flex;align-items:center;gap:5px">${icon('error',{size:14})} Code introuvable</div>
         <div style="font-size:12px;color:var(--ink2)">Ce code n'appartient pas à votre commerce ou n'existe pas.</div></div>`;
       return;
     }
@@ -2981,24 +2981,24 @@ async function validateVoucher() {
     const now = Date.now() / 1000;
     if(d.status === 'used') {
       el.innerHTML = `<div style="background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--rs);padding:16px 18px">
-        <div style="font-weight:700;color:#EF4444;margin-bottom:4px">❌ Bon déjà utilisé</div>
+        <div style="font-weight:700;color:#EF4444;margin-bottom:4px;display:flex;align-items:center;gap:5px">${icon('error',{size:14})} Bon déjà utilisé</div>
         <div style="font-size:12px;color:var(--ink2)">Ce bon a été validé le ${d.usedAt?.toDate ? d.usedAt.toDate().toLocaleDateString('fr-FR') : '—'}.</div></div>`;
       return;
     }
     if(d.expiresAt && d.expiresAt.seconds < now) {
       el.innerHTML = `<div style="background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--rs);padding:16px 18px">
-        <div style="font-weight:700;color:#EF4444;margin-bottom:4px">❌ Bon expiré</div>
+        <div style="font-weight:700;color:#EF4444;margin-bottom:4px;display:flex;align-items:center;gap:5px">${icon('error',{size:14})} Bon expiré</div>
         <div style="font-size:12px;color:var(--ink2)">Ce bon n'est plus valable.</div></div>`;
       return;
     }
     // Bon valide — afficher et proposer de valider
     el.innerHTML = `<div style="background:rgba(11,171,132,.08);border:1.5px solid rgba(11,171,132,.25);border-radius:var(--rs);padding:20px 22px">
-      <div style="font-weight:800;font-size:16px;font-family:var(--fd);color:#0BAB84;margin-bottom:12px">✅ Bon valide</div>
+      <div style="font-weight:800;font-size:16px;font-family:var(--fd);color:#0BAB84;margin-bottom:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Bon valide</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--ink2);margin-bottom:16px">
-        <div>🎁 <strong style="color:var(--ink)">${esc(d.label||'Récompense')}</strong></div>
-        <div>💳 <strong style="color:var(--ink)">${d.cost||0} pts déduits</strong></div>
-        <div>🔑 Code : <code style="font-size:13px;font-weight:700;color:var(--coral)">${esc(d.code)}</code></div>
-        ${d.purchaseCondition ? `<div>📋 Condition : ${esc(d.purchaseCondition)}</div>` : '<div></div>'}
+        <div style="display:flex;align-items:center;gap:5px">${icon('gift-generic',{size:13})} <strong style="color:var(--ink)">${esc(d.label||'Récompense')}</strong></div>
+        <div style="display:flex;align-items:center;gap:5px">${icon('credit-card',{size:13})} <strong style="color:var(--ink)">${d.cost||0} pts déduits</strong></div>
+        <div style="display:flex;align-items:center;gap:5px">${icon('key',{size:13})} Code : <code style="font-size:13px;font-weight:700;color:var(--coral)">${esc(d.code)}</code></div>
+        ${d.purchaseCondition ? `<div style="display:flex;align-items:center;gap:5px">${icon('document',{size:13})} Condition : ${esc(d.purchaseCondition)}</div>` : '<div></div>'}
       </div>
       <button class="tb-btn tb-btn-primary" style="width:100%;padding:12px" onclick="confirmValidateVoucher('${doc.id}',this)">Confirmer l'utilisation</button>
     </div>`;
@@ -3014,7 +3014,7 @@ async function confirmValidateVoucher(redemId, btn) {
       usedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     document.getElementById('voucher-code-inp').value = '';
-    document.getElementById('voucher-result').innerHTML = `<div style="background:rgba(11,171,132,.1);border-radius:var(--rs);padding:16px;text-align:center;color:#0BAB84;font-weight:700;font-family:var(--fd);font-size:16px">🎉 Bon validé avec succès !</div>`;
+    document.getElementById('voucher-result').innerHTML = `<div style="background:rgba(11,171,132,.1);border-radius:var(--rs);padding:16px;text-align:center;color:#0BAB84;font-weight:700;font-family:var(--fd);font-size:16px;display:flex;align-items:center;justify-content:center;gap:6px">${icon('success',{size:18})} Bon validé avec succès !</div>`;
     showToast('Bon validé !','success');
     loadRecentRedemptions();
   } catch(e) { showToast('Erreur : ' + e.message,'error'); btn.disabled = false; btn.textContent = 'Confirmer l\'utilisation'; }

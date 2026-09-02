@@ -238,9 +238,9 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <div class="tb-badge">Admin</div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
-    <a href="/" target="_blank" rel="noopener" style="padding:8px 14px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-size:12.5px;font-weight:700;font-family:var(--fb);text-decoration:none">🌐 Site</a>
-    <a href="/app" target="_blank" rel="noopener" style="padding:8px 14px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-size:12.5px;font-weight:700;font-family:var(--fb);text-decoration:none">📱 App</a>
-    <a href="/dashboard" target="_blank" rel="noopener" style="padding:8px 14px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-size:12.5px;font-weight:700;font-family:var(--fb);text-decoration:none">🏪 Dashboard</a>
+    <a href="/" target="_blank" rel="noopener" style="padding:8px 14px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-size:12.5px;font-weight:700;font-family:var(--fb);text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg> Site</a>
+    <a href="/app" target="_blank" rel="noopener" style="padding:8px 14px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-size:12.5px;font-weight:700;font-family:var(--fb);text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="7" y="2.5" width="10" height="19" rx="1.8"/><path d="M11 18.5h2"/></svg> App</a>
+    <a href="/dashboard" target="_blank" rel="noopener" style="padding:8px 14px;border-radius:9px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-size:12.5px;font-weight:700;font-family:var(--fb);text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg> Dashboard</a>
     <button class="tb-logout" onclick="doLogout()">Déconnexion</button>
   </div>
 </div>
@@ -250,12 +250,12 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab-btn-main active" onclick="switchTab('entreprises',this)">🏪 Entreprises<span class="tab-badge" id="tb-ent">—</span></button>
-    <button class="tab-btn-main" onclick="switchTab('utilisateurs',this)">👥 Utilisateurs<span class="tab-badge" id="tb-usr">—</span></button>
-    <button class="tab-btn-main" onclick="switchTab('diffusion',this)">📢 Diffusion</button>
-    <button class="tab-btn-main" onclick="switchTab('lancement',this)">🚦 Lancement</button>
-    <button class="tab-btn-main" onclick="switchTab('moderation',this)">🚩 Modération</button>
-    <button class="tab-btn-main" onclick="switchTab('danger',this)" style="color:#EF4444">⚠️ Zone de danger</button>
+    <button class="tab-btn-main active" onclick="switchTab('entreprises',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg> Entreprises<span class="tab-badge" id="tb-ent">—</span></button>
+    <button class="tab-btn-main" onclick="switchTab('utilisateurs',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> Utilisateurs<span class="tab-badge" id="tb-usr">—</span></button>
+    <button class="tab-btn-main" onclick="switchTab('diffusion',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> Diffusion</button>
+    <button class="tab-btn-main" onclick="switchTab('lancement',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Lancement</button>
+    <button class="tab-btn-main" onclick="switchTab('moderation',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M6 21V4"/><path d="M6 4h12l-3 4.5L18 13H6"/></svg> Modération</button>
+    <button class="tab-btn-main" onclick="switchTab('danger',this)" style="color:#EF4444;display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg> Zone de danger</button>
   </div>
 
   <!-- ══════════════ TAB ENTREPRISES ══════════════ -->
@@ -263,10 +263,10 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <div class="sec-hdr"><h2>Entreprises</h2><p>Gestion et validation des commerçants inscrits sur Noova.</p></div>
 
     <div class="stats">
-      <div class="stat-card hl"><div class="stat-icon">🏪</div><div class="stat-n" id="cnt-total">—</div><div class="stat-l">Total</div></div>
-      <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-n" id="cnt-pending">—</div><div class="stat-l">En attente</div></div>
-      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-n" id="cnt-verified">—</div><div class="stat-l">Vérifiés</div></div>
-      <div class="stat-card red"><div class="stat-icon">🚫</div><div class="stat-n" id="cnt-rejected">—</div><div class="stat-l">Rejetés</div></div>
+      <div class="stat-card hl"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div><div class="stat-n" id="cnt-total">—</div><div class="stat-l">Total</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg></div><div class="stat-n" id="cnt-pending">—</div><div class="stat-l">En attente</div></div>
+      <div class="stat-card green"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg></div><div class="stat-n" id="cnt-verified">—</div><div class="stat-l">Vérifiés</div></div>
+      <div class="stat-card red"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg></div><div class="stat-n" id="cnt-rejected">—</div><div class="stat-l">Rejetés</div></div>
     </div>
 
     <!-- En attente -->
@@ -279,7 +279,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <!-- Tous les commerçants -->
     <div class="card">
       <div class="card-title">
-        📋 Toutes les entreprises
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg> Toutes les entreprises
         <div class="ct-right" style="display:flex;gap:6px">
           <button onclick="filterMerchants('all')" id="f-all" style="padding:4px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:var(--ink);color:#fff;font-family:var(--fb)">Tous</button>
           <button onclick="filterMerchants('verified')" id="f-verified" style="padding:4px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:var(--ink3);font-family:var(--fb)">Vérifiés</button>
@@ -296,22 +296,22 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between"><div><h2>Utilisateurs</h2><p>Aperçu de la communauté Noova — données agrégées en temps réel.</p></div><button onclick="_usersLoaded=false;loadUsers(true)" style="padding:8px 16px;background:var(--grad);color:var(--brown);border:none;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--fb);white-space:nowrap">↻ Actualiser</button></div>
 
     <div class="stats">
-      <div class="stat-card hl"><div class="stat-icon">👥</div><div class="stat-n" id="u-total">—</div><div class="stat-l">Utilisateurs</div></div>
-      <div class="stat-card green"><div class="stat-icon">📍</div><div class="stat-n" id="u-cities">—</div><div class="stat-l">Villes</div></div>
+      <div class="stat-card hl"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg></div><div class="stat-n" id="u-total">—</div><div class="stat-l">Utilisateurs</div></div>
+      <div class="stat-card green"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg></div><div class="stat-n" id="u-cities">—</div><div class="stat-l">Villes</div></div>
       <div class="stat-card violet"><div class="stat-icon">⭐</div><div class="stat-n" id="u-avgpts">—</div><div class="stat-l">Pts moyen</div></div>
-      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-n" id="u-avgstreak">—</div><div class="stat-l">Streak moyen</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c1 1 2 2.5 2 4.5A5.5 5.5 0 0 1 6.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0 0 12 22a8 8 0 0 0 7-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg></div><div class="stat-n" id="u-avgstreak">—</div><div class="stat-l">Streak moyen</div></div>
     </div>
 
     <div class="two-col">
       <!-- Répartition géographique -->
       <div class="card">
-        <div class="card-title">📍 Répartition géographique <span class="badge badge-verified" id="u-cities-count">—</span></div>
+        <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg> Répartition géographique <span class="badge badge-verified" id="u-cities-count">—</span></div>
         <div id="geo-chart-wrap"><div class="loading">Chargement</div></div>
       </div>
 
       <!-- Répartition par âge -->
       <div class="card">
-        <div class="card-title">🎂 Répartition par âge</div>
+        <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20v-7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"/><path d="M4 20h16"/><path d="M4 15c1.5 1 2.5 1 4 0s2.5-1 4 0 2.5 1 4 0 2.5-1 4 0"/><path d="M12 11V7"/><path d="M12 5.5v.01"/></svg> Répartition par âge</div>
         <div style="overflow-x:auto">
           <table class="age-table" id="age-table-wrap">
             <thead><tr><th>Tranche d'âge</th><th>Utilisateurs</th><th>%</th><th>Distribution</th></tr></thead>
@@ -324,13 +324,13 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <div class="two-col">
       <!-- Engagement par niveau -->
       <div class="card">
-        <div class="card-title">🏆 Niveaux de la communauté</div>
+        <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 3.5"/><path d="M17 6h2.5A2.5 2.5 0 0 1 17 9.5"/><path d="M12 15v3"/><path d="M8.5 21h7l-1-3h-5z"/></svg> Niveaux de la communauté</div>
         <div id="tiers-wrap"><div class="loading">Chargement</div></div>
       </div>
 
       <!-- Métriques clés -->
       <div class="card">
-        <div class="card-title">📊 Métriques clés</div>
+        <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20V9M10 20V4M16 20v-7M21 20H3"/></svg> Métriques clés</div>
         <div class="metrics-grid" id="metrics-wrap">
           <div class="metric-cell"><div class="metric-val" id="m-withloc">—</div><div class="metric-lbl">Avec localisation</div></div>
           <div class="metric-cell"><div class="metric-val" id="m-withage">—</div><div class="metric-lbl">Avec âge renseigné</div></div>
@@ -342,19 +342,19 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
     <!-- Inscriptions récentes -->
     <div class="card">
-      <div class="card-title">🕐 Inscrits récemment <span class="badge badge-pending" id="u-recent-count">—</span></div>
+      <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg> Inscrits récemment <span class="badge badge-pending" id="u-recent-count">—</span></div>
       <div id="recent-users-wrap"><div class="loading">Chargement</div></div>
     </div>
   </div>
 
   <!-- ══════════════ TAB DIFFUSION ══════════════ -->
   <div id="tab-diffusion" style="display:none">
-    <div class="sec-hdr"><h2>Diffusion</h2><p>Envoie une notification à tous les utilisateurs de l'app. Elle apparaîtra dans leur cloche 🔔.</p></div>
+    <div class="sec-hdr"><h2>Diffusion</h2><p>Envoie une notification à tous les utilisateurs de l'app. Elle apparaîtra dans leur cloche.</p></div>
 
     <div class="two-col" style="align-items:start">
       <!-- Formulaire d'envoi -->
       <div class="card">
-        <div class="card-title">✍️ Nouvelle annonce</div>
+        <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20l1-4.5L15.5 5 19 8.5 8.5 19z"/><path d="M13.5 6.5 17.5 10.5"/></svg> Nouvelle annonce</div>
         <div style="padding:20px">
           <div style="margin-bottom:14px">
             <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Destinataires</label>
@@ -374,7 +374,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
           </div>
 
           <button onclick="sendBroadcast()" style="width:100%;padding:12px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--cg);letter-spacing:-.2px">
-            📢 Envoyer l'annonce
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> Envoyer l'annonce
           </button>
           <div id="broadcast-status" style="margin-top:12px;font-size:13px;font-weight:600;text-align:center;min-height:20px;color:var(--ink2)"></div>
         </div>
@@ -384,12 +384,12 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div style="display:flex;flex-direction:column;gap:20px">
         <!-- Aperçu de la notif -->
         <div class="card">
-          <div class="card-title">👁️ Aperçu</div>
+          <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> Aperçu</div>
           <div style="padding:16px">
             <div style="background:var(--bg);border-radius:12px;padding:12px 14px;border:1.5px solid var(--border)">
               <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:8px">Tel qu'il apparaîtra dans l'app :</div>
               <div style="display:flex;flex-direction:column;gap:4px;background:var(--card);border-radius:10px;padding:12px 14px;border:1px solid var(--border)">
-                <div style="font-size:13px;color:var(--ink);line-height:1.45">📢 <strong>Noova</strong> · <span id="preview-msg" style="color:var(--ink2)">Votre message ici…</span></div>
+                <div style="font-size:13px;color:var(--ink);line-height:1.45"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> <strong>Noova</strong> · <span id="preview-msg" style="color:var(--ink2)">Votre message ici…</span></div>
                 <div style="font-size:11px;color:var(--ink3)">À l'instant</div>
               </div>
             </div>
@@ -398,17 +398,17 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
         <!-- Historique récent -->
         <div class="card">
-          <div class="card-title">🕐 Envois récents <span class="badge badge-pending" id="hist-count">0</span></div>
+          <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg> Envois récents <span class="badge badge-pending" id="hist-count">0</span></div>
           <div id="broadcast-history"><div class="empty" style="padding:24px 16px">Aucun envoi pour l'instant.</div></div>
         </div>
       </div>
     </div>
 
     <!-- Question de la semaine -->
-    <div class="sec-hdr" style="margin-top:32px"><h2>🎮 Question de la semaine</h2><p>Publie une question dans le feed communauté de l'app — les habitants votent, aucun point en jeu.</p></div>
+    <div class="sec-hdr" style="margin-top:32px"><h2 style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> Question de la semaine</h2><p>Publie une question dans le feed communauté de l'app — les habitants votent, aucun point en jeu.</p></div>
     <div class="two-col" style="align-items:start">
       <div class="card">
-        <div class="card-title">✍️ Nouvelle question</div>
+        <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20l1-4.5L15.5 5 19 8.5 8.5 19z"/><path d="M13.5 6.5 17.5 10.5"/></svg> Nouvelle question</div>
         <div style="padding:20px">
           <div style="margin-bottom:14px">
             <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Ville concernée</label>
@@ -428,12 +428,12 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
             </div>
             <button type="button" onclick="addWqOpt()" style="margin-top:8px;background:none;border:none;padding:0;font-size:12px;font-weight:700;color:var(--coral);cursor:pointer">+ Ajouter une option (4 max)</button>
           </div>
-          <button onclick="publishWeeklyQuestion()" style="width:100%;padding:12px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--cg)">🚀 Publier dans le feed</button>
+          <button onclick="publishWeeklyQuestion()" style="width:100%;padding:12px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--cg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Publier dans le feed</button>
           <div id="wq-status" style="margin-top:12px;font-size:13px;font-weight:600;text-align:center;min-height:20px;color:var(--ink2)"></div>
         </div>
       </div>
       <div class="card">
-        <div class="card-title">📌 Question active</div>
+        <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg> Question active</div>
         <div id="wq-active" style="padding:20px"><div class="empty">Aucune question active.</div></div>
       </div>
     </div>
@@ -443,15 +443,15 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <div id="tab-lancement" style="display:none">
     <div class="sec-hdr"><h2>Lancement</h2><p>Combien de commerçants sont réellement opérationnels par ville — vérifié, avec au moins une campagne active et une récompense active. C'est ce qu'un nouvel utilisateur voit en arrivant sur l'app.</p></div>
     <div class="card" style="margin-bottom:20px">
-      <div class="card-title">🌍 Villes — ouverture aux habitants</div>
+      <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg> Villes — ouverture aux habitants</div>
       <div style="padding:14px 18px;font-size:12.5px;color:var(--ink3);border-bottom:1px solid var(--border)">Une ville désactivée reste accessible aux commerçants (pour se préparer), mais bloque l'inscription des habitants avec cette ville — utile pour ne pas ouvrir une ville avant d'avoir assez de commerçants opérationnels.</div>
       <div id="city-controls"><div class="loading">Chargement</div></div>
     </div>
     <div class="stats" id="global-stats">
-      <div class="stat-card hl"><div class="stat-icon">📋</div><div class="stat-n" id="g-camps-active">—</div><div class="stat-l">Campagnes actives</div></div>
-      <div class="stat-card green"><div class="stat-icon">💬</div><div class="stat-n" id="g-answers">—</div><div class="stat-l">Réponses totales</div></div>
-      <div class="stat-card violet"><div class="stat-icon">🎁</div><div class="stat-n" id="g-redemptions">—</div><div class="stat-l">Échanges totaux</div></div>
-      <div class="stat-card"><div class="stat-icon">🚩</div><div class="stat-n" id="g-flagged">—</div><div class="stat-l">Réponses signalées</div></div>
+      <div class="stat-card hl"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg></div><div class="stat-n" id="g-camps-active">—</div><div class="stat-l">Campagnes actives</div></div>
+      <div class="stat-card green"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M4 5h16v11H9l-4 4V5z"/><path d="M8 9h8M8 12.5h5"/></svg></div><div class="stat-n" id="g-answers">—</div><div class="stat-l">Réponses totales</div></div>
+      <div class="stat-card violet"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg></div><div class="stat-n" id="g-redemptions">—</div><div class="stat-l">Échanges totaux</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M6 21V4"/><path d="M6 4h12l-3 4.5L18 13H6"/></svg></div><div class="stat-n" id="g-flagged">—</div><div class="stat-l">Réponses signalées</div></div>
     </div>
     <div id="readiness-cities"><div class="loading">Chargement</div></div>
   </div>
@@ -460,27 +460,27 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <div id="tab-moderation" style="display:none">
     <div class="sec-hdr"><h2>Modération</h2><p>Réponses signalées par le score qualité (soumises trop vite pour être un vrai choix humain) — 0 point crédité automatiquement. Tu peux lever le signalement si c'est un faux positif.</p></div>
     <div class="card" style="margin-bottom:20px">
-      <div class="card-title">🎁 Récompenses en attente de validation <span class="badge badge-pending" id="reward-mod-count">0</span></div>
+      <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg> Récompenses en attente de validation <span class="badge badge-pending" id="reward-mod-count">0</span></div>
       <div id="reward-mod-list"><div class="loading">Chargement</div></div>
     </div>
     <div class="card">
-      <div class="card-title">🚩 Réponses signalées <span class="badge badge-pending" id="mod-count">0</span></div>
+      <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M6 21V4"/><path d="M6 4h12l-3 4.5L18 13H6"/></svg> Réponses signalées <span class="badge badge-pending" id="mod-count">0</span></div>
       <div id="mod-list"><div class="loading">Chargement</div></div>
     </div>
   </div>
 
   <!-- ══════════════ TAB ZONE DE DANGER ══════════════ -->
   <div id="tab-danger" style="display:none">
-    <div class="sec-hdr"><h2>⚠️ Zone de danger</h2><p>Supprime des comptes de test avant un vrai lancement. Efface <strong>tout</strong> : données Firestore (campagnes, récompenses, réponses, échanges, notifications, chats liés) <strong>ET le compte de connexion (Auth)</strong> — plus rien ne reste. Irréversible.</p>
+    <div class="sec-hdr"><h2 style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg> Zone de danger</h2><p>Supprime des comptes de test avant un vrai lancement. Efface <strong>tout</strong> : données Firestore (campagnes, récompenses, réponses, échanges, notifications, chats liés) <strong>ET le compte de connexion (Auth)</strong> — plus rien ne reste. Irréversible.</p>
     <div class="card" style="margin-bottom:20px;border-color:rgba(239,68,68,.35)">
-      <div class="card-title" style="color:#EF4444">🗑️ Tout supprimer</div>
+      <div class="card-title" style="color:#EF4444;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M5 7h14"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v6M14 11v6"/></svg> Tout supprimer</div>
       <div style="padding:16px 18px">
         <button id="danger-delete-all-btn" onclick="dangerDeleteAll()" style="padding:11px 20px;background:#EF4444;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--fb)">Supprimer TOUS les commerçants et utilisateurs</button>
         <div id="danger-progress" style="margin-top:12px;font-size:12.5px;color:var(--ink3)"></div>
       </div>
     </div>
     <div class="card" style="margin-bottom:20px">
-      <div class="card-title">🔧 Corriger les soldes négatifs</div>
+      <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M14.5 6.5a4 4 0 0 1-5.3 5.3L4 17l3 3 5.2-5.2a4 4 0 0 1 5.3-5.3l-3 3-2-2z"/></svg> Corriger les soldes négatifs</div>
       <div style="padding:16px 18px">
         <div style="font-size:12.5px;color:var(--ink3);margin-bottom:12px">Remet à 0 le solde de tout compte passé en négatif (bug corrigé, mais répare les comptes déjà affectés).</div>
         <button onclick="dangerFixNegativeBalances()" style="padding:11px 20px;background:var(--bg2);color:var(--ink);border:1.5px solid var(--border);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--fb)">Corriger les soldes négatifs</button>
@@ -489,11 +489,11 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     </div>
     <div class="two-col">
       <div class="card">
-        <div class="card-title">🏪 Commerçants <span class="badge" id="danger-merchant-count">—</span></div>
+        <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg> Commerçants <span class="badge" id="danger-merchant-count">—</span></div>
         <div id="danger-merchant-list"><div class="loading">Chargement</div></div>
       </div>
       <div class="card">
-        <div class="card-title">👥 Utilisateurs <span class="badge" id="danger-user-count">—</span></div>
+        <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> Utilisateurs <span class="badge" id="danger-user-count">—</span></div>
         <div id="danger-user-list"><div class="loading">Chargement</div></div>
       </div>
     </div>
@@ -505,7 +505,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 <div class="modal-ov" id="modal-ov" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-head">
-      <div class="modal-ico" id="modal-ico">🏪</div>
+      <div class="modal-ico" id="modal-ico" style="display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
       <div><div class="modal-ttl" id="modal-ttl">—</div><div class="modal-sub" id="modal-sub">—</div></div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
@@ -601,7 +601,7 @@ function fmtDate(ts) {
 auth.onAuthStateChanged(async user => {
   if (!user) { showGoogleLogin(); return; }
   if (!ADMIN_EMAILS.includes(user.email)) {
-    document.getElementById('auth-wall').innerHTML = `<div class="aw-deco"><svg viewBox="0 0 800 600" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><ellipse cx="650" cy="80" rx="300" ry="220" fill="rgba(255,255,255,.12)"/></svg></div><div class="aw-card" style="text-align:center"><div style="font-size:40px;margin-bottom:12px">🚫</div><div style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--ink);margin-bottom:8px;letter-spacing:-.5px">Accès refusé</div><p style="font-size:13px;color:var(--ink3);margin-bottom:20px">Ce compte n'est pas autorisé.</p><button onclick="auth.signOut()" style="padding:10px 20px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;cursor:pointer;font-weight:800;font-family:var(--fb);font-size:14px">Changer de compte</button></div>`;
+    document.getElementById('auth-wall').innerHTML = `<div class="aw-deco"><svg viewBox="0 0 800 600" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><ellipse cx="650" cy="80" rx="300" ry="220" fill="rgba(255,255,255,.12)"/></svg></div><div class="aw-card" style="text-align:center"><div style="margin-bottom:12px;color:#EF4444;display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:40px;height:40px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg></div><div style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--ink);margin-bottom:8px;letter-spacing:-.5px">Accès refusé</div><p style="font-size:13px;color:var(--ink3);margin-bottom:20px">Ce compte n'est pas autorisé.</p><button onclick="auth.signOut()" style="padding:10px 20px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;cursor:pointer;font-weight:800;font-family:var(--fb);font-size:14px">Changer de compte</button></div>`;
     return;
   }
   document.getElementById('auth-wall').style.display = 'none';
@@ -665,7 +665,7 @@ async function loadCityControls() {
       const active = c.active !== false; // par défaut active tant que non désactivée explicitement
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border)">
         <div><div style="font-weight:700;font-size:13.5px;color:var(--ink)">${esc(c.label||c.id)}</div><div style="font-size:11px;color:var(--ink3)">${c.count||0} habitant${(c.count||0)>1?'s':''} inscrit${(c.count||0)>1?'s':''}</div></div>
-        <button onclick="toggleCityActive('${c.id}',${!active})" style="padding:6px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid ${active?'rgba(11,171,132,.35)':'var(--border)'};background:${active?'rgba(11,171,132,.1)':'var(--bg)'};color:${active?'#0BAB84':'var(--ink3)'};cursor:pointer">${active?'✓ Ouverte aux habitants':'⏸ Fermée'}</button>
+        <button onclick="toggleCityActive('${c.id}',${!active})" style="padding:6px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid ${active?'rgba(11,171,132,.35)':'var(--border)'};background:${active?'rgba(11,171,132,.1)':'var(--bg)'};color:${active?'#0BAB84':'var(--ink3)'};cursor:pointer">${active?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg>'+' Ouverte aux habitants':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><rect x="7" y="5.5" width="4" height="13" rx="1"/><rect x="13" y="5.5" width="4" height="13" rx="1"/></svg>'+' Fermée'}</button>
       </div>`;
     }).join('');
   } catch(e) {
@@ -741,7 +741,7 @@ async function loadReadiness() {
     }
     el.innerHTML = cities.map(c => `
       <div class="card">
-        <div class="card-title">📍 ${esc(c.label)}<span class="badge" style="background:var(--ad);color:var(--brown)">${c.operational} / ${c.verified} opérationnels</span></div>
+        <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg> ${esc(c.label)}<span class="badge" style="background:var(--ad);color:var(--brown)">${c.operational} / ${c.verified} opérationnels</span></div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:18px 20px">
           <div style="text-align:center">
             <div style="font-family:var(--fd);font-weight:800;font-size:26px;color:var(--ink)">${c.verified}</div>
@@ -773,7 +773,7 @@ async function loadRewardModeration() {
     const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     document.getElementById('reward-mod-count').textContent = items.length;
     if (!items.length) {
-      el.innerHTML = '<div class="empty">Aucune récompense en attente. 🎉</div>';
+      el.innerHTML = '<div class="empty">Aucune récompense en attente.</div>';
       return;
     }
     el.innerHTML = items.map(r => `
@@ -781,10 +781,10 @@ async function loadRewardModeration() {
         <div style="font-size:26px;flex-shrink:0">${esc(r.icon||'🎁')}</div>
         <div style="flex:1;min-width:0">
           <div style="font-weight:700;font-size:13.5px;color:var(--ink)">${esc(r.label||'Récompense')}</div>
-          <div style="font-size:11.5px;color:var(--ink3);margin-top:2px">${esc(r.merchantName||'')} · ${esc(r.city||'')} · palier ${r.slot||'?'} · ${(r.valueEuros||0).toFixed(2)} € → ${r.cost||0} pts${r.purchaseCondition?' · 📋 '+esc(r.purchaseCondition):''}</div>
+          <div style="font-size:11.5px;color:var(--ink3);margin-top:2px">${esc(r.merchantName||'')} · ${esc(r.city||'')} · palier ${r.slot||'?'} · ${(r.valueEuros||0).toFixed(2)} € → ${r.cost||0} pts${r.purchaseCondition?' · '+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg>'+' '+esc(r.purchaseCondition):''}</div>
         </div>
-        <button onclick="approveReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0">✓ Valider</button>
-        <button onclick="rejectReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">✗ Refuser</button>
+        <button onclick="approveReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>
+        <button onclick="rejectReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Refuser</button>
       </div>`).join('');
   } catch (e) {
     el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
@@ -798,7 +798,7 @@ async function approveReward(rewardId, btn) {
     loadRewardModeration();
   } catch (e) {
     showToast('Erreur : ' + e.message, 'error');
-    if (btn) { btn.disabled = false; btn.textContent = '✓ Valider'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Valider'; }
   }
 }
 async function rejectReward(rewardId, btn) {
@@ -810,7 +810,7 @@ async function rejectReward(rewardId, btn) {
     loadRewardModeration();
   } catch (e) {
     showToast('Erreur : ' + e.message, 'error');
-    if (btn) { btn.disabled = false; btn.textContent = '✗ Refuser'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Refuser'; }
   }
 }
 
@@ -825,7 +825,7 @@ async function loadModeration() {
     const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     document.getElementById('mod-count').textContent = items.length;
     if (!items.length) {
-      el.innerHTML = '<div class="empty">Aucune réponse signalée pour l\'instant. 🎉</div>';
+      el.innerHTML = '<div class="empty">Aucune réponse signalée pour l\'instant.</div>';
       return;
     }
     el.innerHTML = items.map(a => {
@@ -836,7 +836,7 @@ async function loadModeration() {
           <div style="font-size:12px;color:var(--ink2);margin-bottom:3px">${esc(a.question||'')}</div>
           <div style="font-size:13px;color:var(--ink);font-weight:600">"${esc(String(a.answer ?? '—'))}"</div>
         </div>
-        <button onclick="unflagAnswer('${a.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap">✓ Lever le signalement</button>
+        <button onclick="unflagAnswer('${a.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Lever le signalement</button>
       </div>`;
     }).join('');
   } catch (e) {
@@ -850,7 +850,7 @@ async function unflagAnswer(answerId, btn) {
     loadModeration();
   } catch (e) {
     showToast('Erreur : ' + e.message, 'error');
-    if (btn) { btn.disabled = false; btn.textContent = '✓ Lever le signalement'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Lever le signalement'; }
   }
 }
 
@@ -920,7 +920,7 @@ async function dangerDeleteAll() {
   try {
     const res = await callAdminResetAllData();
     const n = res.data && res.data.deletedAuthCount;
-    progress.textContent = `✅ Terminé — toutes les données Firestore et ${n} compte(s) de connexion supprimés.`;
+    progress.textContent = `Terminé — toutes les données Firestore et ${n} compte(s) de connexion supprimés.`;
     loadDangerZone();
   } catch (e) {
     progress.textContent = 'Erreur : ' + e.message;
@@ -937,7 +937,7 @@ async function dangerFixNegativeBalances() {
     const batch = db.batch();
     snap.forEach(d => batch.update(d.ref, { points: 0 }));
     await batch.commit();
-    statusEl.textContent = `✅ ${snap.size} compte(s) corrigé(s) (solde remis à 0).`;
+    statusEl.textContent = `${snap.size} compte(s) corrigé(s) (solde remis à 0).`;
   } catch (e) {
     statusEl.textContent = 'Erreur : ' + e.message;
   }
@@ -957,7 +957,7 @@ function renderMerchants() {
   // Pending list
   const lp = document.getElementById('list-pending');
   if (!pending.length) {
-    lp.innerHTML = '<div class="empty">✅ Aucun commerçant en attente</div>';
+    lp.innerHTML = `<div class="empty" style="display:flex;align-items:center;gap:6px;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Aucun commerçant en attente</div>`;
   } else {
     lp.innerHTML = pending.map(m => `
       <div class="merchant-row" id="row-${m.id}">
@@ -965,8 +965,8 @@ function renderMerchants() {
         <div class="m-cell">${esc(m.sector||'—')}</div>
         <div class="m-cell">${esc(m.city||'—')}</div>
         <div class="row-actions">
-          <button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')">✓ Valider</button>
-          <button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')">✗ Rejeter</button>
+          <button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>
+          <button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Rejeter</button>
           <button class="btn-detail" onclick="openModal('${m.id}')">Détails ▸</button>
         </div>
       </div>`).join('');
@@ -1050,16 +1050,16 @@ function openModal(id) {
   if (m.idDocumentPath) {
     iddocEl.innerHTML = '<span style="color:var(--ink3)">Chargement…</span>';
     firebase.storage().ref(m.idDocumentPath).getDownloadURL()
-      .then(url => { iddocEl.innerHTML = `<a href="${url}" target="_blank" rel="noopener" style="color:var(--coral);font-weight:700">📄 Voir le document</a>`; })
+      .then(url => { iddocEl.innerHTML = `<a href="${url}" target="_blank" rel="noopener" style="color:var(--coral);font-weight:700;display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg> Voir le document</a>`; })
       .catch(() => { iddocEl.textContent = 'Erreur de chargement'; });
   } else {
     iddocEl.textContent = 'Non fourni';
   }
-  const statusMap = { verified:'✅ Vérifié', pending:'⏳ En attente', rejected:'🚫 Rejeté' };
+  const statusMap = { verified: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg>'+' Vérifié', pending: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg>'+' En attente', rejected: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg>'+' Rejeté' };
   document.getElementById('md-status').innerHTML = `<span class="badge ${m.status==='verified'?'badge-verified':m.status==='pending'?'badge-pending':'badge-rejected'}">${statusMap[m.status]||m.status}</span>`;
   const foot = document.getElementById('modal-foot');
   if (m.status === 'pending') {
-    foot.innerHTML = `<button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')">✗ Rejeter</button><button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')">✓ Valider</button>`;
+    foot.innerHTML = `<button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Rejeter</button><button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>`;
   } else if (m.status === 'verified') {
     foot.innerHTML = `<button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')">Révoquer l'accès</button>`;
   } else {
@@ -1308,7 +1308,7 @@ async function publishWeeklyQuestion() {
     document.getElementById('wq-text').value = '';
     document.getElementById('wq-opts-list').innerHTML = '<input class="wq-opt-inp" placeholder="Option 1" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none"><input class="wq-opt-inp" placeholder="Option 2" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">';
     statusEl.style.color = 'var(--mint)';
-    statusEl.textContent = '✅ Question publiée !';
+    statusEl.textContent = 'Question publiée !';
     setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 4000);
     renderActiveWeeklyQuestion();
   } catch(e) {
@@ -1382,7 +1382,7 @@ async function sendBroadcast() {
     document.getElementById('broadcast-msg').value = '';
     updateCharCount();
     statusEl.style.color = 'var(--mint)';
-    statusEl.textContent = `✅ Envoyé à ${targets.length} destinataires !`;
+    statusEl.textContent = `Envoyé à ${targets.length} destinataires !`;
     setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 5000);
 
     // Rafraîchit l'historique
@@ -1404,9 +1404,9 @@ function renderBroadcastHistory() {
   }
   el.innerHTML = _broadcastHistory.map(b => {
     const ts = b.sentAt ? fmtDate(b.sentAt) : '—';
-    const aud = b.audience === 'all' ? 'Tous les users' : '📍 ' + b.audience;
+    const aud = b.audience === 'all' ? 'Tous les users' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>' + ' ' + b.audience;
     return `<div class="act-row">
-      <div class="act-av" style="background:var(--cd);color:var(--coral);font-size:16px">📢</div>
+      <div class="act-av" style="background:var(--cd);color:var(--coral);display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg></div>
       <div class="act-info">
         <div class="act-name" style="font-weight:600">${esc(b.message)}</div>
         <div class="act-meta">${b.recipientCount||'?'} destinataires · par ${esc(b.sentBy||'admin')}</div>
