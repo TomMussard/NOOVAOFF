@@ -53,6 +53,8 @@
     phone: `<svg ${S}><rect x="7" y="2.5" width="10" height="19" rx="1.8"/><path d="M11 18.5h2"/></svg>`,
     robot: `<svg ${S}><rect x="4" y="9" width="16" height="11" rx="2"/><circle cx="9" cy="14.5" r="1.3"/><circle cx="15" cy="14.5" r="1.3"/><path d="M12 9V5.5"/><circle cx="12" cy="4" r="1.3"/><path d="M2 13v3M22 13v3"/></svg>`,
     key: `<svg ${S}><circle cx="7.5" cy="15.5" r="4"/><path d="M10.5 12.5 20 3"/><path d="M16.5 6.5 19 9M13.5 9.5 15.5 11.5"/></svg>`,
+    heart: `<svg ${S}><path d="M12 20.5S3.5 15 3.5 8.8A4.8 4.8 0 0 1 12 6a4.8 4.8 0 0 1 8.5 2.8C20.5 15 12 20.5 12 20.5z"/></svg>`,
+    'heart-filled': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.5S3.5 15 3.5 8.8A4.8 4.8 0 0 1 12 6a4.8 4.8 0 0 1 8.5 2.8C20.5 15 12 20.5 12 20.5z"/></svg>`,
     globe: `<svg ${S}><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg>`,
     flag: `<svg ${S}><path d="M6 21V4"/><path d="M6 4h12l-3 4.5L18 13H6"/></svg>`,
     eye: `<svg ${S}><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>`,

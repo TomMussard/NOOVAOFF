@@ -1467,20 +1467,27 @@ function removeWizQ(n) {
 }
 
 // ═══ CAMPAIGN MODAL ══════════════════════════════════════════
+let _campModalCampUnsub = null;
+let _campModalAnswersUnsub = null;
+let _campModalCache = { c: null, answers: null };
 function viewCampaign(campaignId) {
   const modal = document.getElementById('camp-modal');
   document.getElementById('camp-modal-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink3);font-size:13px">Chargement…</div>';
   modal.style.display = 'flex';
-  Promise.all([
-    db.collection('campaigns').doc(campaignId).get(),
-    db.collection('answers').where('campaignId','==',campaignId).where('merchantId','==',auth.currentUser.uid).get()
-  ]).then(([campDoc, answersSnap]) => {
+  if (_campModalCampUnsub) _campModalCampUnsub();
+  if (_campModalAnswersUnsub) _campModalAnswersUnsub();
+  _campModalCache = { c: null, answers: null };
+  _campModalCampUnsub = db.collection('campaigns').doc(campaignId).onSnapshot(campDoc => {
     if(!campDoc.exists){ document.getElementById('camp-modal-body').innerHTML='<div style="padding:20px;color:var(--red)">Campagne introuvable.</div>'; return; }
-    const c = { id: campDoc.id, ...campDoc.data() };
-    const answers = [];
-    answersSnap.forEach(d => answers.push(d.data()));
-    renderCampModal(c, answers);
-  }).catch(e => {
+    _campModalCache.c = { id: campDoc.id, ...campDoc.data() };
+    if (_campModalCache.answers) renderCampModal(_campModalCache.c, _campModalCache.answers);
+  }, e => {
+    document.getElementById('camp-modal-body').innerHTML = `<div style="padding:20px;color:var(--red)">Erreur : ${e.message}</div>`;
+  });
+  _campModalAnswersUnsub = db.collection('answers').where('campaignId','==',campaignId).where('merchantId','==',auth.currentUser.uid).onSnapshot(answersSnap => {
+    _campModalCache.answers = answersSnap.docs.map(d => d.data());
+    if (_campModalCache.c) renderCampModal(_campModalCache.c, _campModalCache.answers);
+  }, e => {
     document.getElementById('camp-modal-body').innerHTML = `<div style="padding:20px;color:var(--red)">Erreur : ${e.message}</div>`;
   });
 }
@@ -1590,6 +1597,8 @@ function renderCampModal(c, answers) {
 function closeCampModal() {
   const m = document.getElementById('camp-modal');
   if(m) m.style.display = 'none';
+  if (_campModalCampUnsub) { _campModalCampUnsub(); _campModalCampUnsub = null; }
+  if (_campModalAnswersUnsub) { _campModalAnswersUnsub(); _campModalAnswersUnsub = null; }
 }
 
 async function toggleCampStatus(id, newStatus) {
@@ -2066,7 +2075,7 @@ window.addEventListener('load',()=>{
 <!-- Écran d'attente vérification commerçant -->
 <div id="pending-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);align-items:center;justify-content:center;padding:32px;flex-direction:column;text-align:center">
   <div style="max-width:380px">
-    <div style="font-size:52px;margin-bottom:16px">⏳</div>
+    <div style="margin-bottom:16px;color:var(--coral);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:52px;height:52px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg></div>
     <div style="font-family:var(--fd);font-weight:800;font-size:26px;letter-spacing:-.8px;color:var(--ink);margin-bottom:8px">Vérification en cours</div>
     <div style="font-size:14px;color:var(--ink2);margin-bottom:6px;line-height:1.7">Ton espace commerçant pour <strong id="pending-brand"></strong> est en cours de validation.</div>
     <div id="pending-eta" style="font-size:13px;color:var(--coral);font-weight:600;margin-bottom:28px"></div>
@@ -2762,6 +2771,7 @@ function navToRewards() {
   loadMerchantRewards();
 }
 
+let _merchantRewardsUnsub = null;
 function loadMerchantRewards() {
   const u = auth.currentUser;
   if(!u) return;
@@ -2769,12 +2779,13 @@ function loadMerchantRewards() {
   if(!el) return;
   el.innerHTML = '<div style="color:var(--ink3);font-size:13px;padding:12px 0">Chargement…</div>';
 
-  db.collection('rewards').where('merchantId','==',u.uid).orderBy('slot','asc').get().then(snap => {
+  if (_merchantRewardsUnsub) _merchantRewardsUnsub();
+  _merchantRewardsUnsub = db.collection('rewards').where('merchantId','==',u.uid).orderBy('slot','asc').onSnapshot(snap => {
     _rewardSlots = [];
     snap.forEach(doc => _rewardSlots.push({ id: doc.id, data: doc.data() }));
     renderRewardSuggestions();
     renderRewardSlots();
-  }).catch(() => { renderRewardSuggestions(); renderRewardSlots(); });
+  }, () => { renderRewardSuggestions(); renderRewardSlots(); });
 }
 
 // Suggestions selon secteur — affichées seulement tant qu'aucune récompense n'existe,
@@ -3021,15 +3032,16 @@ async function confirmValidateVoucher(redemId, btn) {
   } catch(e) { showToast('Erreur : ' + e.message,'error'); btn.disabled = false; btn.textContent = 'Confirmer l\'utilisation'; }
 }
 
-async function loadRecentRedemptions() {
+let _recentRedemptionsUnsub = null;
+function loadRecentRedemptions() {
   const u = auth.currentUser;
   if(!u) return;
   const el = document.getElementById('recent-redemptions');
   if(!el) return;
-  try {
-    const snap = await db.collection('redemptions')
-      .where('merchantId','==',u.uid)
-      .orderBy('createdAt','desc').limit(10).get();
+  if (_recentRedemptionsUnsub) _recentRedemptionsUnsub();
+  _recentRedemptionsUnsub = db.collection('redemptions')
+    .where('merchantId','==',u.uid)
+    .orderBy('createdAt','desc').limit(10).onSnapshot(snap => {
     if(snap.empty) { el.innerHTML = '<div style="color:var(--ink3);font-size:13px">Aucun bon échangé pour le moment.</div>'; return; }
     el.innerHTML = '';
     snap.forEach(doc => {
@@ -3042,7 +3054,7 @@ async function loadRecentRedemptions() {
         <span style="padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;background:${st.c}18;color:${st.c}">${st.t}</span>`;
       el.appendChild(row);
     });
-  } catch(e) { el.innerHTML = '<div style="color:var(--ink3);font-size:12px">Erreur de chargement.</div>'; }
+  }, () => { el.innerHTML = '<div style="color:var(--ink3);font-size:12px">Erreur de chargement.</div>'; });
 }
 
 // Intercepter navTo pour charger les données au besoin

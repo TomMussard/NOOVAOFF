@@ -1111,23 +1111,23 @@ async function renderWeeklyQuestionResults(q, myOptionIndex) {
   </div>`;
 }
 
+let _communityFeedUnsub = null;
 async function loadCommunityFeed() {
   const el = document.getElementById('feed-content');
   if (!el) return;
 
   const city = normalizeCity(S._city || '');
+  if (_communityFeedUnsub) { _communityFeedUnsub(); _communityFeedUnsub = null; }
   if (!city) {
     el.innerHTML = '<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">Renseigne ta ville pour voir l’activité locale.</div>';
     return;
   }
 
-  try {
-    const snap = await db.collection('communityEvents')
-      .where('city', '==', city)
-      .orderBy('createdAt', 'desc')
-      .limit(25)
-      .get();
-
+  _communityFeedUnsub = db.collection('communityEvents')
+    .where('city', '==', city)
+    .orderBy('createdAt', 'desc')
+    .limit(25)
+    .onSnapshot(async snap => {
     el.innerHTML = '';
     if (snap.empty) {
       el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
@@ -1172,17 +1172,17 @@ async function loadCommunityFeed() {
       const d = document.createElement('div');
       d.className = 'feed-post';
       d.innerHTML = `<div class="fp-hdr"><div class="fp-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fp-name">${esc(name)}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body"><div class="fp-action">${esc(ev.text||'a répondu à une question')}${ev.brand?` <strong>${esc(ev.brand)}</strong>`:''}</div></div><div class="fp-foot">
-        <button class="fp-btn fp-like-btn${liked?' liked':''}" data-post-id="${escAttr(doc.id)}" data-liked="${liked}" onclick="toggleFeedLike(this)">${liked?'❤️':'🤍'} <span class="fp-like-count">${likeCount>0?likeCount:''}</span> J'aime</button>
-        ${isMe?'':`<button class="fp-btn" data-uid="${escAttr(ev.userId)}" data-name="${escAttr(name)}" onclick="openChatFor({uid:this.dataset.uid,n:this.dataset.name,online:false})">💬 Commenter</button>`}
-        <button class="fp-btn" data-name="${escAttr(name)}" data-text="${escAttr(ev.text||'')}" data-brand="${escAttr(ev.brand||'')}" onclick="shareFeedPost(this.dataset.name,this.dataset.text,this.dataset.brand)">📣 Partager</button>
+        <button class="fp-btn fp-like-btn${liked?' liked':''}" data-post-id="${escAttr(doc.id)}" data-liked="${liked}" onclick="toggleFeedLike(this)">${icon(liked?'heart-filled':'heart',{size:13})} <span class="fp-like-count">${likeCount>0?likeCount:''}</span> J'aime</button>
+        ${isMe?'':`<button class="fp-btn" data-uid="${escAttr(ev.userId)}" data-name="${escAttr(name)}" onclick="openChatFor({uid:this.dataset.uid,n:this.dataset.name,online:false})">${icon('chat',{size:13})} Commenter</button>`}
+        <button class="fp-btn" data-name="${escAttr(name)}" data-text="${escAttr(ev.text||'')}" data-brand="${escAttr(ev.brand||'')}" onclick="shareFeedPost(this.dataset.name,this.dataset.text,this.dataset.brand)">${icon('broadcast',{size:13})} Partager</button>
       </div>`;
       el.appendChild(d);
     });
     applyStagger(el);
-  } catch (e) {
+  }, e => {
     console.warn('Feed error:', e);
     el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink3);font-size:12px">Impossible de charger le feed.</div>';
-  }
+  });
 }
 
 async function toggleFeedLike(btn) {
@@ -1195,7 +1195,7 @@ async function toggleFeedLike(btn) {
   // Optimiste (petite action locale, sans crédit de points ni enjeu d'intégrité)
   btn.setAttribute('data-liked', (!wasLiked).toString());
   btn.classList.toggle('liked', !wasLiked);
-  btn.firstChild.textContent = wasLiked ? '🤍 ' : '❤️ ';
+  btn.firstElementChild.innerHTML = NOOVA_ICONS[wasLiked ? 'heart' : 'heart-filled'];
   countEl.textContent = wasLiked ? (count>1?count-1:'') : (count+1);
   const ref = db.collection('communityEvents').doc(postId).collection('likes').doc(uid);
   try {
@@ -1205,7 +1205,7 @@ async function toggleFeedLike(btn) {
     // rollback si l'écriture échoue
     btn.setAttribute('data-liked', wasLiked.toString());
     btn.classList.toggle('liked', wasLiked);
-    btn.firstChild.textContent = wasLiked ? '❤️ ' : '🤍 ';
+    btn.firstElementChild.innerHTML = NOOVA_ICONS[wasLiked ? 'heart-filled' : 'heart'];
     countEl.textContent = count>0?count:'';
   }
 }
@@ -1427,16 +1427,17 @@ function renderRanking(){
   loadCityRanking();
 }
 
+let _cityRankingUnsub = null;
 async function loadCityRanking() {
   const el=document.getElementById('ranking-list');if(!el)return;
   const city=normalizeCity(S._city||'');
+  if (_cityRankingUnsub) { _cityRankingUnsub(); _cityRankingUnsub = null; }
   if(!city){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Renseigne ta ville pour voir le classement.</div>';return;}
-  try{
-    const snap=await db.collection('users')
-      .where('city','==',city)
-      .orderBy('xp','desc')
-      .limit(20)
-      .get();
+  _cityRankingUnsub = db.collection('users')
+    .where('city','==',city)
+    .orderBy('xp','desc')
+    .limit(20)
+    .onSnapshot(snap => {
     const myUid=auth.currentUser&&auth.currentUser.uid;
     const all=[];
     snap.forEach(doc=>all.push({uid:doc.id,...doc.data()}));
@@ -1457,9 +1458,9 @@ async function loadCityRanking() {
     });
     applyStagger(el);
     if(!all.length)el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:13px">Sois le premier à répondre dans ta ville !</div>';
-  }catch(e){
+  }, e => {
     el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Impossible de charger le classement.</div>';
-  }
+  });
 }
 function socTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
@@ -2403,16 +2404,17 @@ async function awForgotPassword() {
 }
 
 // ─── Récompenses Firestore — groupées par commerce ────────────
+let _rewardsUnsub = null;
 async function loadRewardsFromFirestore() {
   const gg = document.getElementById('gift-grid');
   if(!gg) return;
   const city = normalizeCity(S._city || '');
+  if (_rewardsUnsub) { _rewardsUnsub(); _rewardsUnsub = null; }
   if(!city) {
     gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px">Renseigne ta ville pour voir les récompenses.</div>';
     return;
   }
-  try {
-    const snap = await db.collection('rewards').where('active','==',true).where('city','==',city).get();
+  _rewardsUnsub = db.collection('rewards').where('active','==',true).where('city','==',city).onSnapshot(snap => {
     const rewards = [];
     snap.forEach(doc => {
       const d = doc.data();
@@ -2425,7 +2427,7 @@ async function loadRewardsFromFirestore() {
 
     if(!rewards.length) {
       gg.style.gridTemplateColumns = '1fr';
-      gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px;line-height:1.6">Les récompenses arrivent bientôt dans ta ville !<br>Continue de répondre pour accumuler des points 💪</div>';
+      gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px;line-height:1.6">Les récompenses arrivent bientôt dans ta ville !<br>Continue de répondre pour accumuler des points</div>';
       return;
     }
 
@@ -2440,9 +2442,9 @@ async function loadRewardsFromFirestore() {
       gg.appendChild(card);
     });
     applyStagger(gg);
-  } catch(e) {
+  }, e => {
     gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--ink3);font-size:12px">Erreur de chargement.</div>';
-  }
+  });
 }
 
 async function redeemReward(reward) {
@@ -2558,80 +2560,27 @@ function showToast(msg, ico = 'error') {
 function showVoucherError(msg) { showToast(msg, 'error'); }
 
 // ─── Load user + démarrer l'app ──────────────────────────────
+let _userDocUnsub = null;
 async function loadUserAndStart(uid) {
-  try {
-    const snap = await db.collection('users').doc(uid).get();
-    const data = snap.exists ? snap.data() : {};
-    const fbDisplayName = auth.currentUser && auth.currentUser.displayName;
-    const resolvedName = data.name || fbDisplayName || 'Toi';
-    if (!data.name && fbDisplayName) {
-      db.collection('users').doc(uid).update({ name: fbDisplayName }).catch(() => {});
+  let firstLoad = true;
+  if (_userDocUnsub) _userDocUnsub();
+  _userDocUnsub = db.collection('users').doc(uid).onSnapshot(async snap => {
+    const isFirstLoad = firstLoad;
+    firstLoad = false;
+    try {
+      await handleUserSnapshot(uid, snap, isFirstLoad);
+    } catch (e) {
+      if (isFirstLoad) handleUserLoadError(uid, e);
     }
-    S.user = { name: resolvedName, uid };
-    S.pts              = data.points || 0;
-    S.xp               = data.xp !== undefined ? data.xp : (data.points || 0);
-    S.streak           = data.streak || 0;
-    S.ans              = data.ans || 0;
-    S._lastAnswerDate  = data.lastAnswerDate || null;
-    // Streak cassé si un jour a été manqué : ne pas attendre la prochaine réponse pour l'afficher à 0
-    {
-      const _today = new Date().toISOString().slice(0,10);
-      const _yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
-      if (S._lastAnswerDate !== _today && S._lastAnswerDate !== _yesterday) S.streak = 0;
-    }
-    S._dailyEarned     = data.dailyEarned || 0;
-    S._dailyEarnedDate = data.dailyEarnedDate || null;
-    S._city            = data.city || '';
-    // Auto-canonicalisation : un compte créé avant le fix "ville fantôme" peut avoir
-    // un city stocké différent du slug canonique actuel — on le corrige silencieusement.
-    if (S._city) {
-      const canonCity = normalizeCity(S._city);
-      if (canonCity !== S._city) {
-        db.collection('users').doc(uid).update({ city: canonCity }).catch(() => {});
-        S._city = canonCity;
-      }
-    }
-    S._age             = data.ageRange || data.age || '';
-    S._interests       = data.interests || [];
-    S._answered        = data.answeredCampaigns || [];
-    S._authorizedMerchants = data.authorizedMerchants || [];
-    S._nearbyMerchants = [];
-    S._friendUids      = data.friendUids || [];
-    S._groups          = data.groups || [];
-    startPresenceHeartbeat(uid);
-    // Charger les infos complètes des commerçants autorisés (rail + récompenses)
-    if(S._authorizedMerchants.length) loadNearbyMerchants(S._authorizedMerchants);
-    if(data.friendCode && data.friendCode.startsWith('NOOVA-')) {
-      S._friendCode = data.friendCode;
-      // S'assure que le code existe dans friendCodes
-      db.collection('friendCodes').doc(data.friendCode)
-        .set({ uid, name: resolvedName }, { merge: true }).catch(()=>{});
-    } else {
-      // Génère un nouveau code NOOVA- (6 chars alphanumériques)
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let code = 'NOOVA-';
-      for(let i=0;i<6;i++) code += chars[Math.floor(Math.random()*chars.length)];
-      S._friendCode = code;
-      db.collection('users').doc(uid).update({ friendCode: code, friendUids: data.friendUids||[] }).catch(()=>{});
-      db.collection('friendCodes').doc(code).set({ uid, name: resolvedName }).catch(()=>{});
-    }
-    if(S._friendUids.length) loadFriendsFromFirestore(S._friendUids);
-    initNotifications(uid);
-    loadHistFromFirestore(uid);
-
-    if(data.onboardingStep === 'merchants') {
-      document.getElementById('auth-wall').style.display = 'none';
-      await loadMerchantsForOnboarding(data);
-      return;
-    }
-
-    await loadCampaignsFromFirestore(data);
-    loadFriendAnswers().then(() => { renderStoriesBar(); renderQueue(); }).catch(() => {});
-  } catch(e) {
-    const fbName = auth.currentUser && auth.currentUser.displayName;
-    S.user = { name: fbName || 'Toi', uid };
-    S.qs = [];
-  }
+  }, err => { if (firstLoad) { firstLoad = false; handleUserLoadError(uid, err); } });
+}
+function handleUserLoadError(uid, e) {
+  const fbName = auth.currentUser && auth.currentUser.displayName;
+  S.user = { name: fbName || 'Toi', uid };
+  S.qs = [];
+  finishAuthTransition();
+}
+function finishAuthTransition() {
   const aw = document.getElementById('auth-wall');
   aw.style.transition = 'opacity .3s';
   aw.style.opacity = '0';
@@ -2646,6 +2595,85 @@ async function loadUserAndStart(uid) {
     if(socScroll)  initPullToRefresh(socScroll,  'ptr-social', ()=>{ loadCommunityFeed(); });
   }
   refreshHome(); renderSocial(); goTo('home');
+}
+async function handleUserSnapshot(uid, snap, isFirstLoad) {
+  const data = snap.exists ? snap.data() : {};
+  const fbDisplayName = auth.currentUser && auth.currentUser.displayName;
+  const resolvedName = data.name || fbDisplayName || 'Toi';
+  if (!data.name && fbDisplayName) {
+    db.collection('users').doc(uid).update({ name: fbDisplayName }).catch(() => {});
+  }
+  S.user = { name: resolvedName, uid };
+  S.pts              = data.points || 0;
+  S.xp               = data.xp !== undefined ? data.xp : (data.points || 0);
+  S.streak           = data.streak || 0;
+  S.ans              = data.ans || 0;
+  S._lastAnswerDate  = data.lastAnswerDate || null;
+  // Streak cassé si un jour a été manqué : ne pas attendre la prochaine réponse pour l'afficher à 0
+  {
+    const _today = new Date().toISOString().slice(0,10);
+    const _yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+    if (S._lastAnswerDate !== _today && S._lastAnswerDate !== _yesterday) S.streak = 0;
+  }
+  S._dailyEarned     = data.dailyEarned || 0;
+  S._dailyEarnedDate = data.dailyEarnedDate || null;
+  S._city            = data.city || '';
+  // Auto-canonicalisation : un compte créé avant le fix "ville fantôme" peut avoir
+  // un city stocké différent du slug canonique actuel — on le corrige silencieusement.
+  if (S._city) {
+    const canonCity = normalizeCity(S._city);
+    if (canonCity !== S._city) {
+      db.collection('users').doc(uid).update({ city: canonCity }).catch(() => {});
+      S._city = canonCity;
+    }
+  }
+  S._age             = data.ageRange || data.age || '';
+  S._interests       = data.interests || [];
+  S._answered        = data.answeredCampaigns || [];
+  S._authorizedMerchants = data.authorizedMerchants || [];
+  S._friendUids      = data.friendUids || [];
+  S._groups          = data.groups || [];
+
+  if (!isFirstLoad) {
+    // Mises à jour en direct (points/xp/streak déjà crédités par la Cloud Function submitAnswer) :
+    // on rafraîchit juste les écrans concernés, sans rejouer l'initialisation complète.
+    refreshHome();
+    if (document.getElementById('rewards-tab').classList.contains('active')) refreshWallet();
+    if (document.getElementById('profile').classList.contains('active')) refreshProfile();
+    return;
+  }
+
+  S._nearbyMerchants = [];
+  startPresenceHeartbeat(uid);
+  // Charger les infos complètes des commerçants autorisés (rail + récompenses)
+  if(S._authorizedMerchants.length) loadNearbyMerchants(S._authorizedMerchants);
+  if(data.friendCode && data.friendCode.startsWith('NOOVA-')) {
+    S._friendCode = data.friendCode;
+    // S'assure que le code existe dans friendCodes
+    db.collection('friendCodes').doc(data.friendCode)
+      .set({ uid, name: resolvedName }, { merge: true }).catch(()=>{});
+  } else {
+    // Génère un nouveau code NOOVA- (6 chars alphanumériques)
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = 'NOOVA-';
+    for(let i=0;i<6;i++) code += chars[Math.floor(Math.random()*chars.length)];
+    S._friendCode = code;
+    db.collection('users').doc(uid).update({ friendCode: code, friendUids: data.friendUids||[] }).catch(()=>{});
+    db.collection('friendCodes').doc(code).set({ uid, name: resolvedName }).catch(()=>{});
+  }
+  if(S._friendUids.length) loadFriendsFromFirestore(S._friendUids);
+  initNotifications(uid);
+  loadHistFromFirestore(uid);
+
+  if(data.onboardingStep === 'merchants') {
+    document.getElementById('auth-wall').style.display = 'none';
+    await loadMerchantsForOnboarding(data);
+    return;
+  }
+
+  await loadCampaignsFromFirestore(data);
+  loadFriendAnswers().then(() => { renderStoriesBar(); renderQueue(); }).catch(() => {});
+  finishAuthTransition();
 }
 
 async function loadFriendsFromFirestore(uids) {
@@ -2816,28 +2844,47 @@ function renderBrandsFromFirestore(merchants) {
   });
 }
 
+let _verifiedMerchantsUnsub = null;
+let _campaignsUnsub = null;
+let _verifiedMerchantsCache = {};
+let _campaignsCache = [];
 async function loadCampaignsFromFirestore(userData) {
+  const city = normalizeCity((userData && userData.city) || S._city || '');
+  if (_verifiedMerchantsUnsub) _verifiedMerchantsUnsub();
+  if (_campaignsUnsub) _campaignsUnsub();
+  return new Promise(resolve => {
+    let merchantsReady = false, campaignsReady = false;
+    const maybeResolve = () => { if (merchantsReady && campaignsReady) resolve(); };
+    _verifiedMerchantsUnsub = db.collection('merchants').where('status', '==', 'verified').where('city', '==', city)
+      .onSnapshot(snap => {
+        const map = {};
+        snap.forEach(doc => { const d = doc.data(); if (d && doc.id) map[doc.id] = d; });
+        _verifiedMerchantsCache = map;
+        merchantsReady = true;
+        recomputeCampaignFeed(city);
+        maybeResolve();
+      }, e => { console.warn('merchants listener:', e); merchantsReady = true; maybeResolve(); });
+    _campaignsUnsub = db.collection('campaigns').where('status', '==', 'active').where('targetCity', '==', city).limit(200)
+      .onSnapshot(snap => {
+        _campaignsCache = snap.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+        campaignsReady = true;
+        recomputeCampaignFeed(city);
+        maybeResolve();
+      }, e => { console.warn('campaigns listener:', e); S.qs = []; campaignsReady = true; maybeResolve(); });
+  });
+}
+function recomputeCampaignFeed(city) {
   try {
-    const city = normalizeCity(userData.city || S._city || '');
-    const answered = userData.answeredCampaigns || [];
-    const authorized = userData.authorizedMerchants || [];
-    const userAge = normalizeAgeRange(userData.ageRange || userData.age || '');
+    const answered = S._answered || [];
+    const authorized = S._authorizedMerchants || [];
+    const userAge = normalizeAgeRange(S._age || '');
+    const wasFirstRender = !window._campaignFeedRenderedOnce;
 
-    const verifiedSnap = await db.collection('merchants').where('status', '==', 'verified').where('city', '==', city).get();
-    const verifiedMerchants = {};
-    verifiedSnap.forEach(doc => {
-      const d = doc.data();
-      if (!d || !doc.id) return;
-      verifiedMerchants[doc.id] = d;
-    });
-
-    const snap = await db.collection('campaigns').where('status', '==', 'active').where('targetCity', '==', city).limit(200).get();
     const campaigns = [];
-    snap.forEach(doc => {
-      if (answered.includes(doc.id)) return;
-      const d = doc.data();
+    _campaignsCache.forEach(({ id, data: d }) => {
+      if (answered.includes(id)) return;
       const campaignCity = getCampaignCity(d);
-      const merchantData = verifiedMerchants[d.merchantId] || null;
+      const merchantData = _verifiedMerchantsCache[d.merchantId] || null;
       const merchantCity = normalizeCity(merchantData?.city || d.city || '');
       if (city && campaignCity && campaignCity !== city) return;
       if (city && merchantCity && merchantCity !== city) return;
@@ -2850,7 +2897,7 @@ async function loadCampaignsFromFirestore(userData) {
       const allQs = getCampaignQuestions(d);
       const SCALE = [10, 15, 20];
       const surveyList = allQs.slice(1).map((sq, idx) => ({
-        _firestoreId: doc.id, _merchantId: d.merchantId || null, _questionIdx: idx + 1,
+        _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: idx + 1,
         brand: d.merchantName || 'Commerce', ico: d.brandEmoji || '🏪',
         theme: d.sector || 'Commerce local', pts: SCALE[idx + 1] || 20,
         type: sq.format || 'text', q: sq.q, hint: '',
@@ -2858,7 +2905,7 @@ async function loadCampaignsFromFirestore(userData) {
         usage: (d.merchantName || 'Ce commerce') + ' veut ton avis'
       }));
       campaigns.push({
-        _firestoreId: doc.id, _merchantId: d.merchantId || null, _questionIdx: 0,
+        _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: 0,
         _surveyCount: allQs.length,
         brand: d.merchantName || 'Commerce', ico: d.brandEmoji || '🏪',
         theme: d.sector || 'Commerce local', pts: 10,
@@ -2870,9 +2917,13 @@ async function loadCampaignsFromFirestore(userData) {
       });
     });
     S.qs = campaigns;
-    S.qIdx = 0;
+    if (S.qIdx === undefined) S.qIdx = 0;
+    // Rafraîchit l'écran uniquement pour les mises à jour en direct (le premier
+    // rendu est déjà déclenché par handleUserSnapshot juste après ce chargement).
+    if (!wasFirstRender && document.getElementById('home').classList.contains('active')) refreshHome();
+    window._campaignFeedRenderedOnce = true;
   } catch (e) {
-    console.warn('loadCampaignsFromFirestore:', e);
+    console.warn('recomputeCampaignFeed:', e);
     S.qs = [];
   }
 }

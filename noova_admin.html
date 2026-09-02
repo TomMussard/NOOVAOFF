@@ -764,12 +764,13 @@ async function loadReadiness() {
 }
 
 // ── Modération : récompenses en attente de validation ───────────────────────
-async function loadRewardModeration() {
+let _rewardModUnsub = null;
+function loadRewardModeration() {
   const el = document.getElementById('reward-mod-list');
   if (!el) return;
   el.innerHTML = '<div class="loading">Chargement</div>';
-  try {
-    const snap = await db.collection('rewards').where('status', '==', 'pending').orderBy('createdAt', 'desc').limit(100).get();
+  if (_rewardModUnsub) _rewardModUnsub();
+  _rewardModUnsub = db.collection('rewards').where('status', '==', 'pending').orderBy('createdAt', 'desc').limit(100).onSnapshot(snap => {
     const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     document.getElementById('reward-mod-count').textContent = items.length;
     if (!items.length) {
@@ -786,9 +787,9 @@ async function loadRewardModeration() {
         <button onclick="approveReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>
         <button onclick="rejectReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Refuser</button>
       </div>`).join('');
-  } catch (e) {
+  }, e => {
     el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
-  }
+  });
 }
 async function approveReward(rewardId, btn) {
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
@@ -815,13 +816,14 @@ async function rejectReward(rewardId, btn) {
 }
 
 // ── Modération : réponses signalées par le score qualité ────────────────────
-async function loadModeration() {
+let _flaggedModUnsub = null;
+function loadModeration() {
   loadRewardModeration();
   const el = document.getElementById('mod-list');
   if (!el) return;
   el.innerHTML = '<div class="loading">Chargement</div>';
-  try {
-    const snap = await db.collection('answers').where('flagged', '==', true).orderBy('createdAt', 'desc').limit(100).get();
+  if (_flaggedModUnsub) _flaggedModUnsub();
+  _flaggedModUnsub = db.collection('answers').where('flagged', '==', true).orderBy('createdAt', 'desc').limit(100).onSnapshot(snap => {
     const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     document.getElementById('mod-count').textContent = items.length;
     if (!items.length) {
@@ -839,9 +841,9 @@ async function loadModeration() {
         <button onclick="unflagAnswer('${a.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Lever le signalement</button>
       </div>`;
     }).join('');
-  } catch (e) {
+  }, e => {
     el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
-  }
+  });
 }
 async function unflagAnswer(answerId, btn) {
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
