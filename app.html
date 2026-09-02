@@ -2368,11 +2368,12 @@ async function awSubmit() {
         label: city.charAt(0).toUpperCase() + city.slice(1),
         count: firebase.firestore.FieldValue.increment(1)
       }, { merge: true }).catch(() => {});
-      // Gérer manuellement la suite (évite race avec onAuthStateChanged)
-      S.user = { name, uid: cred.user.uid };
-      S.pts = 0; S.xp = 0; S._city = cityNorm; S._age = _awAge; S._interests = _awInterests; S._answered = []; S._authorizedMerchants = [];
+      // Gérer manuellement la suite (évite race avec onAuthStateChanged) : on appelle
+      // loadUserAndStart plutôt que de dupliquer sa logique, pour que l'écoute en
+      // direct du solde de points démarre dès cette première session (sinon aucun
+      // listener n'existe tant que l'utilisateur n'a pas rechargé/relogué).
       document.getElementById('auth-wall').style.display = 'none';
-      await loadMerchantsForOnboarding({ city, interests: _awInterests, authorizedMerchants: [] });
+      loadUserAndStart(cred.user.uid);
       return;
     }
   } catch(e) {
