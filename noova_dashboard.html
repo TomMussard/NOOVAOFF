@@ -2250,6 +2250,7 @@ async function awSubmit() {
       });
       // Gérer manuellement la suite (évite la race avec onAuthStateChanged,
       // qui peut se déclencher avant la fin de l'écriture Firestore ci-dessus)
+      document.getElementById('auth-wall').style.display = 'none';
       loadMerchantAndStart(cred.user.uid);
       return;
     }
