@@ -307,6 +307,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .cs-ov{position:absolute;inset:0;background:rgba(0,0,0,.38);backdrop-filter:blur(3px);cursor:pointer}
 .cs-box{position:relative;z-index:1;width:100%;background:var(--card);border-radius:24px 24px 0 0;padding:0 20px calc(32px + env(safe-area-inset-bottom,0px));max-height:82vh;overflow-y:auto}
 .cs-handle{width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:13px auto 20px}
+#celebrate-sheet{position:fixed;inset:0;z-index:8100;display:none;align-items:flex-end}
+#celebrate-sheet.open{display:flex}
+.celebrate-ico{position:relative;z-index:1;width:84px;height:84px;margin:8px auto 16px;border-radius:50%;background:var(--grad);color:var(--gi);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px var(--cg);animation:pop .5s cubic-bezier(.34,1.56,.64,1) both}
+.celebrate-title{position:relative;z-index:1;font-family:var(--fd);font-weight:800;font-size:21px;letter-spacing:-.5px;color:var(--ink);margin-bottom:6px}
+.celebrate-sub{position:relative;z-index:1;font-size:13px;color:var(--ink2);line-height:1.6;padding:0 12px}
 .soc-hdr{padding:0 20px 11px;display:flex;align-items:center;justify-content:space-between}
 .soc-title{font-family:var(--fd);font-weight:800;font-size:25px;letter-spacing:-.8px;color:var(--ink)}
 .soc-bell{width:38px;height:38px;border-radius:11px;background:var(--card);border:1.5px solid var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative}
@@ -403,6 +408,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .wc-bar{height:6px;background:rgba(255,255,255,.17);border-radius:99px;margin-bottom:6px}
 .wc-fill{height:100%;background:rgba(255,255,255,.75);border-radius:99px;transition:width 1s}
 .wc-level{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.55)}
+.wc-ring-wrap{position:relative;width:72px;height:72px;flex-shrink:0}
+.wc-ring{width:100%;height:100%;transform:rotate(-90deg)}
+.wc-ring-track{fill:none;stroke:rgba(255,255,255,.17);stroke-width:7}
+.wc-ring-fill{fill:none;stroke:#fff;stroke-width:7;stroke-linecap:round;stroke-dasharray:213.6;stroke-dashoffset:213.6;transition:stroke-dashoffset 1s ease}
+.wc-ring-ico{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff}
+.wc-ring-ico svg{width:26px;height:26px}
 .cashout-c{background:var(--card);border:1.5px solid var(--bg3);border-radius:var(--r);padding:13px 14px;margin-bottom:10px}
 .co-req{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink2);margin-top:6px}
 .req-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
@@ -601,11 +612,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <p class="auth-sub" style="margin-bottom:4px">Active ou désactive chaque commerce en un tap. Seuls ceux que tu acceptes peuvent te poser des questions.</p>
     </div>
     <div id="mm-authorized-section">
-      <div class="brand-cat-hdr">✅ Autorisés</div>
+      <div class="brand-cat-hdr" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Autorisés</div>
       <div id="mm-authorized-list"></div>
     </div>
     <div id="mm-available-section" style="margin-top:8px">
-      <div class="brand-cat-hdr">➕ Autres commerces près de toi</div>
+      <div class="brand-cat-hdr" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 5v14M5 12h14"/></svg> Autres commerces près de toi</div>
       <div id="mm-available-list"></div>
     </div>
     <div class="consent-note" style="margin:14px 18px"><strong style="color:var(--violet)">Tu gardes le contrôle.</strong> Un commerce retiré ne pourra plus te contacter. Aucune revente à des tiers.</div>
@@ -659,7 +670,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="q-pts" id="q-pts-tag">+25 pts</div>
     </div>
     <div class="brand-hdr" onclick="openBrandFromQ()" style="cursor:pointer" title="Voir la page du commerce">
-      <div class="bh-logo" id="bh-logo">⛺</div>
+      <div class="bh-logo" id="bh-logo" style="display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
       <div style="flex:1;min-width:0">
         <div class="bh-name" id="bh-name">Commerce</div>
         <div class="bh-usage" id="bh-usage"></div>
@@ -680,12 +691,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- REWARD -->
 <div id="reward" class="screen">
   <div class="conf-layer" id="conf-layer"></div>
-  <div class="rw-circle">🎉</div>
+  <div class="rw-circle" style="display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg></div>
   <div class="rw-title">Bien joué !</div>
   <div class="rw-sub">Ta réponse a été envoyée</div>
   <div class="pts-earned"><div class="pe-plus">+</div><div class="pe-num" id="rw-pts">25</div><div class="pe-right"><div class="pe-lbl">Total cumulé</div><div class="pe-tot" id="rw-total">25 pts</div></div></div>
-  <div class="usage-card"><span style="font-size:16px;flex-shrink:0;margin-top:1px">💡</span><div style="font-size:11px;color:var(--ink2);line-height:1.6" id="rw-usage">Ta réponse aide <strong>les commerces de ton quartier</strong> à mieux servir le coin.</div></div>
-  <div class="share-row" onclick="shareReward()"><span style="font-size:19px">📣</span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">Partager ma réponse</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">Montre-la à tes amis</div></div><span style="color:var(--ink3)">→</span></div>
+  <div class="usage-card"><span style="flex-shrink:0;margin-top:1px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6" id="rw-usage">Ta réponse aide <strong>les commerces de ton quartier</strong> à mieux servir le coin.</div></div>
+  <div class="share-row" onclick="shareReward()"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:19px;height:19px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg></span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">Partager ma réponse</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">Montre-la à tes amis</div></div><span style="color:var(--ink3)">→</span></div>
   <div id="rw-actions" style="width:100%;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1"></div>
 </div>
 
@@ -695,7 +706,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="social-wrap">
     <div class="soc-hdr">
       <div class="soc-title">Communauté</div>
-      <div class="soc-bell" id="soc-bell" onclick="toggleNotifPanel(event)"><div class="bell-dot" id="bell-dot"></div>🔔</div>
+      <div class="soc-bell" id="soc-bell" onclick="toggleNotifPanel(event)"><div class="bell-dot" id="bell-dot"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></div>
     </div>
     <div class="notif-panel" id="notif-panel">
       <div class="notif-hdr"><span>Notifications</span><span class="notif-close" onclick="closeNotifPanel()">✕</span></div>
@@ -732,10 +743,21 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <div id="rewards-tab" class="screen">
   <div class="wallet-wrap">
     <div class="wallet-card">
-      <div class="wc-lbl">Mon solde</div>
-      <div class="wc-pts" id="wc-pts"><span id="wc-pts-num">0</span> <small>pts</small></div>
-      <div class="wc-bar"><div class="wc-fill" id="wc-fill" style="width:4%"></div></div>
-      <div class="wc-level"><span id="wc-level">Niveau 1 · Curieux</span><span id="wc-next">1000 pts</span></div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="flex:1;min-width:0">
+          <div class="wc-lbl">Mon solde</div>
+          <div class="wc-pts" id="wc-pts"><span id="wc-pts-num">0</span> <small>pts</small></div>
+          <div class="wc-bar"><div class="wc-fill" id="wc-fill" style="width:4%"></div></div>
+          <div class="wc-level"><span id="wc-level">Niveau 1 · Curieux</span><span id="wc-next">1000 pts</span></div>
+        </div>
+        <div class="wc-ring-wrap">
+          <svg viewBox="0 0 80 80" class="wc-ring">
+            <circle cx="40" cy="40" r="34" class="wc-ring-track"/>
+            <circle cx="40" cy="40" r="34" class="wc-ring-fill" id="wc-ring-fill"/>
+          </svg>
+          <div class="wc-ring-ico" id="wc-ring-ico"></div>
+        </div>
+      </div>
       <div style="font-size:10px;color:rgba(255,255,255,.42);margin-top:8px;text-align:center;line-height:1.6"><strong style="color:rgba(255,255,255,.65)">pts</strong> = solde dépensable · <strong style="color:rgba(255,255,255,.65)">xp</strong> = progression palier (ne se dépense pas)</div>
     </div>
     <div style="font-family:var(--fd);font-weight:700;font-size:16px;letter-spacing:-.4px;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:7px"><span style="display:inline-flex;width:18px;height:18px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg></span> Récompenses près de toi</div>
@@ -800,7 +822,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="so-steps" id="so-steps"></div>
     <div class="so-gain" style="display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:16px;height:16px;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg></span> <span>À gagner si tu continues :</span> <b id="so-gain-pts">+80 pts</b></div>
   </div>
-  <div class="so-note"><span style="font-size:13px">🔒</span><span>Aucune obligation : tes points sont déjà acquis, et tu sais exactement pour quel commerce tu réponds.</span></div>
+  <div class="so-note"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><span>Aucune obligation : tes points sont déjà acquis, et tu sais exactement pour quel commerce tu réponds.</span></div>
   <div class="so-actions">
     <button class="btn-p" onclick="startSurvey()">Continuer le questionnaire →</button>
     <button class="btn-s" onclick="endSurveyEarly()">Garder mes points et m'arrêter</button>
@@ -966,13 +988,13 @@ function refreshHome(){
   document.getElementById('streak-num').textContent=S.streak;
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<7;i++){const d=document.createElement('div');d.className='sdk'+(i<S.streak?' done':'');sd.appendChild(d)}
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent='+'+q.pts+' pts';document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .tc-cta').style.display='flex'}
-  else{document.getElementById('tc-brand').textContent='Pas encore de question';document.getElementById('tc-pts').textContent='📍';document.getElementById('tc-q').textContent='Aucun commerce de ta zone n\'a encore posté de question. Reviens bientôt !';document.getElementById('today-card').style.opacity='.75';document.querySelector('#today-card .tc-cta').style.display='none'}
+  else{document.getElementById('tc-brand').textContent='Pas encore de question';document.getElementById('tc-pts').textContent='';document.getElementById('tc-q').textContent='Aucun commerce de ta zone n\'a encore posté de question. Reviens bientôt !';document.getElementById('today-card').style.opacity='.75';document.querySelector('#today-card .tc-cta').style.display='none'}
   renderStoriesBar();
   renderQueue();
 }
 function renderQueue(){
   const el=document.getElementById('queue-list');el.innerHTML='';
-  if(!S.qs||S.qs.length<=1){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--ink2);font-size:13px">'+(S.qs&&S.qs.length===1?'🎉 Plus que cette question !':'📭 Pas d\'autres questions pour l\'instant.')+'</div>';return}
+  if(!S.qs||S.qs.length<=1){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--ink2);font-size:13px">'+(S.qs&&S.qs.length===1?icon('success',{size:14})+' Plus que cette question !':icon('mail',{size:14})+' Pas d\'autres questions pour l\'instant.')+'</div>';return}
   window._scPool = {};
   const clrs=['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
   let cnt=0;
@@ -1033,8 +1055,8 @@ function buildAns(q){
   }
 }
 function nextQ(){if(S.qs&&S.qs.length>0)openQ(0);else{refreshHome();goNav('home')}}
-function spawnConfetti(){
-  const el=document.getElementById('conf-layer');el.innerHTML='';
+function spawnConfetti(targetId){
+  const el=document.getElementById(targetId||'conf-layer');if(!el)return;el.innerHTML='';
   const clrs=['#E07D0A','#A14E08','#F5A623','#0BAB84','#E8A33C','#FF69B4'];
   for(let i=0;i<36;i++){const p=document.createElement('div');p.className='conf-p';const c=clrs[Math.floor(Math.random()*clrs.length)];const w=Math.random()*10+4,h=Math.random()*10+4;p.style.cssText=`width:${w}px;height:${h}px;background:${c};left:${Math.random()*100}%;animation-duration:${Math.random()*1.5+1}s;animation-delay:${Math.random()*.5}s`;el.appendChild(p)}
 }
@@ -1076,7 +1098,7 @@ function renderWeeklyQuestionVote(q) {
   if(!slot) return;
   const opts = (q.options||[]).map((o,i)=>`<button class="wq-opt-btn" onclick="voteWeeklyQuestion('${q.id}',${i})">${esc(o)}</button>`).join('');
   slot.innerHTML = `<div class="wq-card">
-    <div class="wq-tag">🎮 QUESTION DE LA SEMAINE</div>
+    <div class="wq-tag" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> QUESTION DE LA SEMAINE</div>
     <div class="wq-text">${esc(q.text||'')}</div>
     <div class="wq-opts">${opts}</div>
   </div>`;
@@ -1104,7 +1126,7 @@ async function renderWeeklyQuestionResults(q, myOptionIndex) {
     return `<div class="wq-result-row${mine?' mine':''}"><div class="wq-result-lbl">${mine?'✓ ':''}${esc(o)}</div><div class="wq-result-bar"><div class="wq-result-fill" style="width:${pct}%"></div></div><div class="wq-result-pct">${pct}%</div></div>`;
   }).join('');
   slot.innerHTML = `<div class="wq-card">
-    <div class="wq-tag">🎮 QUESTION DE LA SEMAINE</div>
+    <div class="wq-tag" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> QUESTION DE LA SEMAINE</div>
     <div class="wq-text">${esc(q.text||'')}</div>
     <div class="wq-results">${bars}</div>
     <div class="wq-total">${total} réponse${total>1?'s':''}</div>
@@ -1318,7 +1340,7 @@ function buildSocialCard() {
   window._scPool[key] = { campId, friendName, friendAnswer: shortAns, qIdx: S.qs.indexOf(q) };
   const d = document.createElement('div');
   d.className = 'social-card';
-  d.innerHTML = `<div class="sc-label">👥 Même avis ?</div><div class="sc-friend"><div class="sc-fav" style="background:${c}20;color:${c}">${(friendName||'?')[0].toUpperCase()}</div><div><div class="sc-fname">${esc(friendName)}</div><div class="sc-brand">a répondu à ${esc(q.brand)}</div></div></div><div class="sc-q">${esc((q.q||'').substring(0,60))}…</div><div class="sc-answer">${shortAns ? '&ldquo;' + esc(shortAns) + '&rdquo;' : '…'}</div><div class="sc-actions"><button class="sc-btn p" onclick="openCompare('${key}')">Comparer →</button><button class="sc-btn g" onclick="this.closest('.social-card').remove()">Passer</button></div>`;
+  d.innerHTML = `<div class="sc-label" style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> Même avis ?</div><div class="sc-friend"><div class="sc-fav" style="background:${c}20;color:${c}">${(friendName||'?')[0].toUpperCase()}</div><div><div class="sc-fname">${esc(friendName)}</div><div class="sc-brand">a répondu à ${esc(q.brand)}</div></div></div><div class="sc-q">${esc((q.q||'').substring(0,60))}…</div><div class="sc-answer">${shortAns ? '&ldquo;' + esc(shortAns) + '&rdquo;' : '…'}</div><div class="sc-actions"><button class="sc-btn p" onclick="openCompare('${key}')">Comparer →</button><button class="sc-btn g" onclick="this.closest('.social-card').remove()">Passer</button></div>`;
   return d;
 }
 
@@ -1350,7 +1372,7 @@ function initFriendsPanel(){
   const pending=(_notifs||[]).filter(n=>n.type==='friend_request'&&!n.read);
   const pendingHTML=pending.length?`
     <div style="margin:0 18px 14px;background:var(--cd);border:1.5px solid rgba(242,151,21,.25);border-radius:14px;padding:14px 15px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--coral);margin-bottom:10px">🔔 Demandes reçues (${pending.length})</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--coral);margin-bottom:10px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg> Demandes reçues (${pending.length})</div>
       <div id="pending-requests-list">${pending.map(n=>`
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
           <div style="width:36px;height:36px;border-radius:10px;background:var(--coral);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:15px;flex-shrink:0">${(n.fromName||'?')[0].toUpperCase()}</div>
@@ -1407,7 +1429,7 @@ function renderFriends(){
   if(countEl)countEl.textContent=S.friends.length?'('+S.friends.length+')':'';
   el.innerHTML='';
   if(!S.friends.length){
-    el.innerHTML='<div style="text-align:center;padding:28px 16px 8px"><div style="font-size:32px;margin-bottom:10px">🤝</div><div style="color:var(--ink2);font-size:13px;line-height:1.6">Aucun ami pour l\'instant.<br>Partage ton code pour commencer !</div></div>';
+    el.innerHTML=`<div style="text-align:center;padding:28px 16px 8px"><div style="margin-bottom:10px;color:var(--ink3);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;vertical-align:-2px"><path d="M2 12l4-3 4 3 3-3 2 2"/><path d="M22 12l-4-3-3.5 3-2.5-1"/><path d="M9 12l3 3 2-2"/><path d="M12 15l2 2 2-2"/></svg></div><div style="color:var(--ink2);font-size:13px;line-height:1.6">Aucun ami pour l'instant.<br>Partage ton code pour commencer !</div></div>`;
     return;
   }
   S.friends.forEach((f,i)=>{
@@ -1415,7 +1437,7 @@ function renderFriends(){
     const d=document.createElement('div');
     d.className='fi';
     d.onclick=()=>openChatFor(f);
-    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.xp} xp · <span style="color:var(--amber);font-weight:600">🔥 ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
+    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.xp} xp · <span style="color:var(--amber);font-weight:600;display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c1 1 2 2.5 2 4.5A5.5 5.5 0 0 1 6.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0 0 12 22a8 8 0 0 0 7-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg> ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
     el.appendChild(d);
   });
   applyStagger(el);
@@ -1548,7 +1570,7 @@ async function addFriend(){
       createdAt:firebase.firestore.FieldValue.serverTimestamp()
     });
     inp.value='';
-    if(errEl){errEl.style.color='var(--ink)';errEl.textContent='✅ Demande envoyée !';}
+    if(errEl){errEl.style.color='var(--ink)';errEl.textContent='Demande envoyée !';}
     setTimeout(()=>{if(errEl){errEl.style.color='var(--coral)';errEl.textContent=''}},3000);
   }catch(e){if(errEl)errEl.textContent='Erreur : '+e.message;}
 }
@@ -1626,17 +1648,17 @@ function renderNotifications(){
     const ts=fmtNotifTime(n.createdAt);
     let inner='';
     if(n.type==='friend_request'){
-      inner=`<div class="notif-txt">👥 <strong>${esc(n.fromName)}</strong> veut être ton ami !</div>
+      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> <strong>${esc(n.fromName)}</strong> veut être ton ami !</div>
         <div class="notif-meta">${ts}</div>
         ${!n.read?`<div class="notif-actions">
           <button class="notif-btn accept" onclick="acceptFriendRequest('${n.id}','${n.fromUid}','${esc(n.fromName)}')">Accepter</button>
           <button class="notif-btn decline" onclick="declineFriendRequest('${n.id}')">Refuser</button>
         </div>`:'<div class="notif-done">Traitée</div>'}`;
     }else if(n.type==='friend_accepted'){
-      inner=`<div class="notif-txt">🎉 <strong>${esc(n.fromName)}</strong> a accepté ta demande d'ami !</div>
+      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> <strong>${esc(n.fromName)}</strong> a accepté ta demande d'ami !</div>
         <div class="notif-meta">${ts}</div>`;
     }else if(n.type==='noova_message'){
-      inner=`<div class="notif-txt">📢 <strong>Noova</strong> · ${esc(n.message||'')}</div>
+      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> <strong>Noova</strong> · ${esc(n.message||'')}</div>
         <div class="notif-meta">${ts}</div>`;
     }else{
       inner=`<div class="notif-txt">${esc(n.message||'Notification')}</div><div class="notif-meta">${ts}</div>`;
@@ -1762,12 +1784,33 @@ function initPullToRefresh(scrollEl, ptrBarId, refreshFn) {
 }
 
 function getLvl(){return TIERS.find(t=>S.xp>=t.min&&S.xp<t.max)||TIERS[TIERS.length-1]}
+// Détecte un palier franchi ou un badge nouvellement débloqué depuis le dernier appel, et
+// déclenche la popup de célébration — appelé une seule fois par mise à jour de S.pts/xp/ans,
+// indépendamment de l'écran actuellement affiché (contrairement à refreshWallet/refreshProfile).
+function checkTierAndBadgeCelebrations(){
+  const l=getLvl();const li=TIERS.indexOf(l);
+  if(S._lastTierIndex!=null&&li>S._lastTierIndex){
+    showCelebration({icon:l.ico,title:'Palier '+l.n+' atteint !',subtitle:'Tu débloques de nouveaux avantages sur Noova.'});
+  }
+  S._lastTierIndex=li;
+  const earned=[S.ans>0&&'first',S.ans>=3&&'trio',S.streak>=3&&'streak3',S.friends.length>0&&'social',S.ans>=5&&'qual'].filter(Boolean);
+  if(S._lastEarnedBadges){
+    const newBadge=earned.find(id=>!S._lastEarnedBadges.includes(id));
+    if(newBadge){const b=BDGS.find(x=>x.id===newBadge);if(b)showCelebration({icon:b.e,title:'Badge débloqué !',subtitle:b.n});}
+  }
+  S._lastEarnedBadges=earned;
+}
 function refreshWallet(){
+  checkTierAndBadgeCelebrations();
   animateNumber(document.getElementById('wc-pts-num'),S.pts);
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(4,((S.xp-l.min)/(l.max-l.min))*100));
   document.getElementById('wc-fill').style.width=pct+'%';
   document.getElementById('wc-level').textContent='Niveau '+(li+1)+' · '+l.n;
   document.getElementById('wc-next').textContent=l.max===99999?'Max !':l.max+' xp';
+  const ringFill=document.getElementById('wc-ring-fill');
+  if(ringFill){const circ=213.6;ringFill.style.strokeDashoffset=(circ*(1-pct/100)).toFixed(1);}
+  const ringIco=document.getElementById('wc-ring-ico');
+  if(ringIco)ringIco.innerHTML=icon(l.ico,{size:26});
   const gg=document.getElementById('gift-grid');gg.style.gridTemplateColumns='1fr';gg.innerHTML='<div class="sk sk-card"></div><div class="sk sk-card"></div>';
   loadRewardsFromFirestore();
   const tl=document.getElementById('tiers-list');tl.innerHTML='';
@@ -1783,13 +1826,14 @@ function refreshProfile(){
   const cm=document.getElementById('consent-mgmt');cm.innerHTML='';
   const _cm=S._nearbyMerchants||[];
   if(!_cm.length){cm.innerHTML='<div style="font-size:12px;color:var(--ink2);text-align:center;padding:8px 0">Aucun commerce autorisé · Appuie sur "Gérer" pour en ajouter.</div>';}
-  else{_cm.slice(0,4).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='consent-it';d.innerHTML=`${logoHTML(label,32,m.logoUrl)}<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">${esc(label)}</div><div style="font-size:10px;color:var(--ink3);margin-top:1px">${esc(m.sector||m.address||'')}</div></div><span style="font-size:10px;font-weight:700;color:var(--mint);background:var(--md);padding:3px 8px;border-radius:99px">✓ Autorisé</span>`;cm.appendChild(d)});if(_cm.length>4){const more=document.createElement('div');more.style.cssText='font-size:11px;color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`+${_cm.length-4} autres`;cm.appendChild(more);}}
+  else{_cm.slice(0,4).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='consent-it';d.innerHTML=`${logoHTML(label,32,m.logoUrl)}<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">${esc(label)}</div><div style="font-size:10px;color:var(--ink3);margin-top:1px">${esc(m.sector||m.address||'')}</div></div><span style="font-size:10px;font-weight:700;color:var(--mint);background:var(--md);padding:3px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Autorisé</span>`;cm.appendChild(d)});if(_cm.length>4){const more=document.createElement('div');more.style.cssText='font-size:11px;color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`+${_cm.length-4} autres`;cm.appendChild(more);}}
   const bl=document.getElementById('badges-list');bl.innerHTML='';
-  const earned=[S.ans>0&&'first',S.ans>=3&&'trio',S.streak>=3&&'streak3',S.friends.length>0&&'social',S.ans>=5&&'qual'].filter(Boolean);
+  checkTierAndBadgeCelebrations();
+  const earned=S._lastEarnedBadges||[];
   BDGS.forEach(b=>{const e=earned.includes(b.id);const d=document.createElement('div');d.className='bp '+(e?'earned':'locked');d.style.cssText='display:inline-flex;align-items:center;gap:5px';d.innerHTML=(e?icon(b.e,{size:14}):icon('lock',{size:14}))+' '+esc(b.n);bl.appendChild(d)});
   const hl=document.getElementById('hist-list');hl.innerHTML='';
   if(!S.hist||!S.hist.length){hl.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:13px">Aucune réponse pour l\'instant.</div>';return}
-  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--cd);flex-shrink:0">${h.ico||'❓'}</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:12px;font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">+${h.pts} pts</div>`;hl.appendChild(d)});
+  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?h.ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:12px;font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">+${h.pts} pts</div>`;hl.appendChild(d)});
 }
 function boTab(tab,btn){document.querySelectorAll('.bo-tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');['dashboard','create','results'].forEach(t=>document.getElementById('bo-'+t).style.display=t===tab?'block':'none');if(tab==='create')wzStep(0)}
 function renderCampaigns(){
@@ -1807,7 +1851,7 @@ function wzStep(n){
 }
 function selFmt(el,fmt){document.querySelectorAll('.fmt-opt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle 1–10',rank:'Classement'}[fmt]}
 function useTmpl(txt){document.getElementById('bo-q').value=txt}
-function launchCampaign(){alert('🚀 Ta question est en ligne ! Tes voisins vont y répondre, premiers avis sous quelques heures.');boTab('dashboard',document.querySelectorAll('.bo-tab')[0])}
+function launchCampaign(){alert('Ta question est en ligne ! Tes voisins vont y répondre, premiers avis sous quelques heures.');boTab('dashboard',document.querySelectorAll('.bo-tab')[0])}
 let _authDone=false;
 window.addEventListener('load',()=>{renderBrands();});
 
@@ -1861,7 +1905,7 @@ function finishSurvey(){
   const sv=S.sv;refreshHome();refreshWallet();
   const done=sv.idx;
   openReward({pts:sv.earned,total:S.pts,brand:sv.brand,usage:sv.base.usage,
-    title:done>=sv.list.length?'Questionnaire terminé 🎉':'Bien joué !',
+    title:done>=sv.list.length?'Questionnaire terminé !':'Bien joué !',
     sub:done>=sv.list.length?('Tu as répondu à tout le questionnaire '+sv.brand):'Tu gardes tes points, à bientôt !',
     brandName:sv.brand,merchantId:sv.base._merchantId});
   S.mode='hook';
@@ -1937,7 +1981,7 @@ function brandSurveys(name){
 }
 function statusBadge(s){
   if(s==='active')return '<span class="bp-sv-badge" style="background:var(--cd);color:var(--coral)">● Actif</span>';
-  if(s==='done')return '<span class="bp-sv-badge" style="background:rgba(11,171,132,.12);color:#0BAB84">✓ Répondu</span>';
+  if(s==='done')return '<span class="bp-sv-badge" style="background:rgba(11,171,132,.12);color:#0BAB84;display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Répondu</span>';
   if(s==='soon')return `<span class="bp-sv-badge" style="background:var(--bg2);color:var(--ink2)">${icon('clock',{size:11})} Bientôt</span>`;
   return '<span class="bp-sv-badge" style="background:var(--bg2);color:var(--ink3)">Clôturé</span>';
 }
@@ -1952,7 +1996,7 @@ function openBrand(name,back){
   surveys.forEach(s=>{
     const active=s.status==='active';
     const isdone=s.status==='done';
-    sv+=`<div class="bp-survey${active?' active':''}"><div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:#0BAB84;font-weight:600">✓ Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
+    sv+=`<div class="bp-survey${active?' active':''}"><div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:#0BAB84;font-weight:600;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
   });
   if(!surveys.length)sv='<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>';
   document.getElementById('bp-wrap').innerHTML=`
@@ -1966,7 +2010,7 @@ function openBrand(name,back){
       <div class="bp-block"><div class="bp-sec">À propos</div><div class="bp-text">${p.about||''}</div></div>
       <div class="bp-block"><div class="bp-sec">En bref</div><div class="bp-info">${info.map(i=>`<div class="bp-info-it"><div class="bp-info-l">${i[0]}</div><div class="bp-info-v">${i[1]}</div></div>`).join('')}</div></div>
       <div class="bp-block"><div class="bp-sec">Leurs sondages</div>${sv}</div>
-      <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di">🔒</span><div class="bp-text" style="font-size:12.5px">${p.why||'Données agrégées et anonymes.'}</div></div></div>
+      <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di" style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="bp-text" style="font-size:12.5px">${p.why||'Données agrégées et anonymes.'}</div></div></div>
     </div>`;
   goTo('brand-page');
 }
@@ -1992,11 +2036,11 @@ async function openBrandById(mid, fallbackName) {
       :camps.map(c=>{
           const done=answered.includes(c.id);
           return done
-            ?`<div class="bp-survey"><div class="bp-sv-q">${c.question}</div><div class="bp-sv-meta" style="margin-bottom:0;color:#0BAB84;font-weight:600">✓ Tu as déjà répondu — merci !</div></div>`
+            ?`<div class="bp-survey"><div class="bp-sv-q">${c.question}</div><div class="bp-sv-meta" style="margin-bottom:0;color:#0BAB84;font-weight:600;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div></div>`
             :`<div class="bp-survey active">
-                <div class="bp-sv-top"><span class="bp-sv-badge" style="background:rgba(11,171,132,.12);color:#0BAB84">✓ Actif</span><span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${(c.questions&&c.questions.length||1)*(c.pointsPerAnswer||20)} pts</span></div>
+                <div class="bp-sv-top"><span class="bp-sv-badge" style="background:rgba(11,171,132,.12);color:#0BAB84;display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Actif</span><span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${(c.questions&&c.questions.length||1)*(c.pointsPerAnswer||20)} pts</span></div>
                 <div class="bp-sv-q">${c.question}</div>
-                <div class="bp-sv-meta"><span>📝 ${c.questions&&c.questions.length||1} question(s)</span><span>⏱️ ~${(c.questions&&c.questions.length||1)*15}s</span></div>
+                <div class="bp-sv-meta"><span style="display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg> ${c.questions&&c.questions.length||1} question(s)</span><span>⏱️ ~${(c.questions&&c.questions.length||1)*15}s</span></div>
                 <button class="btn-p" onclick="startCampaignById('${c.id}')">Répondre au questionnaire →</button>
               </div>`;
         }).join('');
@@ -2008,14 +2052,14 @@ async function openBrandById(mid, fallbackName) {
       </div>
       <div class="bp-stats">
         <div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center;gap:4px">${icon('document',{size:14})} ${camps.length}</div><div class="bp-stat-l">Sondage${camps.length>1?'s':''}</div></div>
-        <div class="bp-stat"><div class="bp-stat-n">💎 ${camps[0]&&camps[0].pointsPerAnswer||20}</div><div class="bp-stat-l">Pts / quest.</div></div>
+        <div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><path d="M6 4h12l3 5-9 11L3 9z"/><path d="M3 9h18"/><path d="M9 4l3 5 3-5"/><path d="M12 9l-2 11M12 9l2 11"/></svg> ${camps[0]&&camps[0].pointsPerAnswer||20}</div><div class="bp-stat-l">Pts / quest.</div></div>
         <div class="bp-stat"><div class="bp-stat-n">⏱️ ~30s</div><div class="bp-stat-l">Par question</div></div>
         <div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center">${icon('lock',{size:16})}</div><div class="bp-stat-l">Données protégées</div></div>
       </div>
       <div class="bp-body">
         <div class="bp-block"><div class="bp-sec">À propos</div><div class="bp-text">${m.description||m.about||'Commerce local vérifié sur Noova. Réponds à leurs questions pour gagner des points !'}</div></div>
         <div class="bp-block"><div class="bp-sec">Leurs sondages</div>${sv}</div>
-        <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di">🔒</span><div class="bp-text" style="font-size:12.5px">Tes réponses sont agrégées et anonymes. Ce commerçant ne voit jamais ton identité.</div></div></div>
+        <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di" style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="bp-text" style="font-size:12.5px">Tes réponses sont agrégées et anonymes. Ce commerçant ne voit jamais ton identité.</div></div></div>
       </div>`;
   } catch(e) {
     document.getElementById('bp-wrap').innerHTML=`<div style="text-align:center;padding:40px;color:var(--coral)">Impossible de charger ce commerce.<br><button class="btn-p" style="margin-top:16px" onclick="goTo('home')">Retour</button></div>`;
@@ -2534,7 +2578,7 @@ function showVoucherModal({ code, label, merchantName, cost, purchaseCondition, 
   }
   ov.innerHTML = `<div style="background:var(--card);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:430px;box-shadow:0 -8px 40px rgba(0,0,0,.25)">
     <div style="width:40px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 24px"></div>
-    <div style="text-align:center;font-size:40px;margin-bottom:12px">🎟️</div>
+    <div style="text-align:center;margin-bottom:12px;color:var(--coral);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:40px;height:40px;vertical-align:-2px"><path d="M3 9a2 2 0 0 1 0-4h18a2 2 0 0 1 0 4 2 2 0 0 0 0 6 2 2 0 0 1 0 4H3a2 2 0 0 1 0-4 2 2 0 0 0 0-6z"/></svg></div>
     <div style="font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:-.5px;text-align:center;color:var(--ink);margin-bottom:4px">${esc(label||'Récompense')}</div>
     <div style="text-align:center;font-size:13px;color:var(--ink2);margin-bottom:20px">${esc(merchantName||'')}</div>
     <div style="background:var(--bg2);border:2px dashed var(--coral);border-radius:14px;padding:18px;text-align:center;margin-bottom:16px">
@@ -2638,6 +2682,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   if (!isFirstLoad) {
     // Mises à jour en direct (points/xp/streak déjà crédités par la Cloud Function submitAnswer) :
     // on rafraîchit juste les écrans concernés, sans rejouer l'initialisation complète.
+    checkTierAndBadgeCelebrations();
     refreshHome();
     if (document.getElementById('rewards-tab').classList.contains('active')) refreshWallet();
     if (document.getElementById('profile').classList.contains('active')) refreshProfile();
@@ -3237,6 +3282,32 @@ auth.onAuthStateChanged(user => {
     <div id="cs-content"></div>
   </div>
 </div>
+
+<!-- CELEBRATION SHEET (palier franchi, badge débloqué, récompense échangée) -->
+<div id="celebrate-sheet">
+  <div class="cs-ov" onclick="closeCelebration()"></div>
+  <div class="cs-box" style="text-align:center;padding-top:8px">
+    <div class="cs-handle"></div>
+    <div class="conf-layer" id="celebrate-conf-layer" style="position:absolute;inset:0 0 auto 0;height:220px;pointer-events:none;overflow:hidden"></div>
+    <div class="celebrate-ico" id="celebrate-ico"></div>
+    <div class="celebrate-title" id="celebrate-title"></div>
+    <div class="celebrate-sub" id="celebrate-sub"></div>
+    <button class="btn-p" style="margin:20px 0 4px" onclick="closeCelebration()">Continuer</button>
+  </div>
+</div>
+<script>
+function showCelebration({icon:iconName,title,subtitle}){
+  const sheet=document.getElementById('celebrate-sheet');if(!sheet)return;
+  document.getElementById('celebrate-ico').innerHTML=icon(iconName,{size:44});
+  document.getElementById('celebrate-title').textContent=title||'';
+  document.getElementById('celebrate-sub').textContent=subtitle||'';
+  sheet.classList.add('open');
+  spawnConfetti('celebrate-conf-layer');
+}
+function closeCelebration(){
+  const sheet=document.getElementById('celebrate-sheet');if(sheet)sheet.classList.remove('open');
+}
+</script>
 
 <!-- Loader initial — seul écran visible au démarrage -->
 <div id="app-loader" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(130% 120% at 55% -5%,#241F2B 0%,#0F0D12 60%);transition:opacity .7s ease">
