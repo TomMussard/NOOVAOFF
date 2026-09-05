@@ -2412,30 +2412,47 @@ function jsonpRequest(url, timeoutMs){
     document.body.appendChild(script);
   });
 }
-function geocodeAddress(address, city){
-  const key = normalizeCity(city||'') + '|' + (address||'').trim().toLowerCase();
-  const cache = loadGeocache();
-  if(cache[key]) return Promise.resolve(cache[key]);
-  if(!address) return Promise.resolve(null);
-  const run = () => {
-    const q = encodeURIComponent([address, city, 'France'].filter(Boolean).join(', '));
-    return jsonpRequest(`https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=fr&q=${q}`)
-      .then(data => {
-        if(data && data[0]){
-          const loc = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-          const c2 = loadGeocache(); c2[key] = loc; saveGeocache(c2);
-          return loc;
-        }
-        return null;
-      })
-      .catch(() => null);
-  };
+function _queueGeocode(url){
   // Nominatim tolère ~1 requête/seconde : on chaîne les appels (avec un délai entre
   // chacun) plutôt que de les paralléliser, sans retarder la valeur déjà obtenue.
+  const run = () => jsonpRequest(url)
+    .then(data => (data && data[0]) ? { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) } : null)
+    .catch(() => null);
   const result = _geocodeChain.then(run);
   const wait = () => new Promise(r => setTimeout(r, 1100));
   _geocodeChain = result.then(wait, wait);
   return result;
+}
+// Géocode juste le nom de ville (beaucoup plus fiable qu'une adresse précise mal
+// orthographiée ou incomplète) — sert de repli et de garde-fou ci-dessous.
+function geocodeCityOnly(city){
+  if(!city) return Promise.resolve(null);
+  const key = 'CITY|' + normalizeCity(city);
+  const cache = loadGeocache();
+  if(cache[key]) return Promise.resolve(cache[key]);
+  return _queueGeocode(`https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=fr&q=${encodeURIComponent(city + ', France')}`)
+    .then(loc => { if(loc){ const c2 = loadGeocache(); c2[key] = loc; saveGeocache(c2); } return loc; });
+}
+async function geocodeAddress(address, city){
+  const key = normalizeCity(city||'') + '|' + (address||'').trim().toLowerCase();
+  const cache = loadGeocache();
+  if(cache[key]) return cache[key];
+  if(!address) return geocodeCityOnly(city);
+  const q = encodeURIComponent([address, city, 'France'].filter(Boolean).join(', '));
+  const loc = await _queueGeocode(`https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=fr&q=${q}`);
+  let finalLoc = loc;
+  if(!loc){
+    finalLoc = await geocodeCityOnly(city);
+  } else if(city){
+    // Garde-fou : une adresse mal orthographiée/incomplète peut faire retomber Nominatim
+    // sur une rue homonyme à l'autre bout du pays. Si le résultat est à plus de 50 km de
+    // la ville renseignée, on lui préfère le centre-ville (mieux vaut un pin approximatif
+    // mais dans la bonne ville qu'un pin précis mais au mauvais endroit).
+    const cityLoc = await geocodeCityOnly(city);
+    if(cityLoc && distMeters(loc, cityLoc) > 50000) finalLoc = cityLoc;
+  }
+  if(finalLoc){ const c2 = loadGeocache(); c2[key] = finalLoc; saveGeocache(c2); }
+  return finalLoc;
 }
 async function getGeocodedNearbyCards(){
   const cards = getNearbyCards().filter(c => c._merchantId);
