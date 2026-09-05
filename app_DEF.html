@@ -505,7 +505,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .bp-chips{display:flex;gap:7px;flex-wrap:wrap}
 .bp-chip{font-size:11px;font-weight:600;background:rgba(255,255,255,.22);color:#fff;padding:5px 11px;border-radius:99px}
 .bp-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:-30px 18px 22px;position:relative;z-index:2}
-.bp-stat{background:var(--card);border:1.5px solid var(--bg3);border-radius:13px;padding:11px 5px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.bp-stat{background:var(--card);border-radius:16px;padding:11px 5px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.06)}
 .bp-stat-n{font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-.5px}
 .bp-stat-l{font-size:8.5px;color:var(--ink2);margin-top:3px;line-height:1.2;text-transform:uppercase;letter-spacing:.3px}
 .bp-body{padding:0 18px}
@@ -513,13 +513,13 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .bp-sec{font-family:var(--fd);font-weight:700;font-size:16px;color:var(--ink);letter-spacing:-.3px;margin-bottom:11px}
 .bp-text{font-size:13.5px;color:var(--ink2);line-height:1.66}
 .bp-info{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.bp-info-it{background:var(--card);border:1.5px solid var(--bg3);border-radius:12px;padding:11px 13px}
+.bp-info-it{background:var(--card);border-radius:14px;padding:11px 13px;box-shadow:0 3px 12px rgba(0,0,0,.04)}
 .bp-info-l{font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .bp-info-v{font-size:13px;color:var(--ink);font-weight:600;margin-top:3px}
 .bp-data{background:var(--md);border:1.5px solid var(--mg);border-radius:14px;padding:14px 15px;display:flex;gap:11px;align-items:flex-start}
 .bp-data .di{font-size:20px;flex-shrink:0;margin-top:1px}
-.bp-survey{background:var(--card);border:1.5px solid var(--bg3);border-radius:15px;padding:15px;margin-bottom:10px}
-.bp-survey.active{border-color:var(--coral);box-shadow:0 6px 20px var(--cg)}
+.bp-survey{background:var(--card);border-radius:18px;padding:15px;margin-bottom:10px;box-shadow:0 3px 12px rgba(0,0,0,.04)}
+.bp-survey.active{box-shadow:0 6px 20px var(--cg);outline:2px solid var(--coral);outline-offset:-2px}
 .bp-sv-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
 .bp-sv-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px}
 .bp-sv-q{font-size:13.5px;color:var(--ink);font-weight:600;line-height:1.45;margin-bottom:11px}
@@ -1998,6 +1998,10 @@ function getLvl(){return TIERS.find(t=>S.xp>=t.min&&S.xp<t.max)||TIERS[TIERS.len
 // déclenche la popup de célébration — appelé une seule fois par mise à jour de S.pts/xp/ans,
 // indépendamment de l'écran actuellement affiché (contrairement à refreshWallet/refreshProfile).
 function checkTierAndBadgeCelebrations(){
+  // Tant que la liste d'amis n'a pas fini son premier chargement (S._celebrationsReady),
+  // le badge "Premier ami" se baserait sur S.friends encore vide et paraîtrait "nouveau"
+  // dès qu'il se charge réellement — d'où la popup qui revenait à chaque session.
+  if(!S._celebrationsReady) return;
   const l=getLvl();const li=TIERS.indexOf(l);
   if(S._lastTierIndex!=null&&li>S._lastTierIndex){
     showCelebration({icon:l.ico,title:'Palier '+l.n+' atteint !',subtitle:'Tu débloques de nouveaux avantages sur Noova.'});
@@ -2263,7 +2267,7 @@ async function openBrandById(mid, fallbackName) {
               </div>`;
         }).join('');
     document.getElementById('bp-wrap').innerHTML=`
-      <div class="bp-cover" style="background:linear-gradient(150deg,#1A1208 0%,#2B1D0B 38%,rgba(0,0,0,.5) 165%)">
+      <div class="bp-cover" style="background:linear-gradient(150deg,#181410 0%,#1F1A13 38%,rgba(0,0,0,.55) 165%)">
         <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
         <div class="bp-logo-wrap">${logoHTML(brandName,60,m.logoUrl)}<div><div class="bp-name">${brandName}</div><div class="bp-tag">${m.sector||'Commerce local'}${m.city?' · '+m.city:''}</div></div></div>
         <div class="bp-chips"><span class="bp-chip">${icon('check',{size:11})} Commerce vérifié</span>${m.city?`<span class="bp-chip">${icon('pin',{size:11})} ${m.city}</span>`:''}${m.sector?`<span class="bp-chip">${m.sector}</span>`:''}</div>
@@ -2390,6 +2394,24 @@ const GEOCACHE_KEY = 'noova_geocache_v1';
 function loadGeocache(){ try{ return JSON.parse(localStorage.getItem(GEOCACHE_KEY)||'{}'); }catch(e){ return {}; } }
 function saveGeocache(c){ try{ localStorage.setItem(GEOCACHE_KEY, JSON.stringify(c)); }catch(e){} }
 let _geocodeChain = Promise.resolve();
+// Nominatim ne renvoie aucun en-tête CORS (Access-Control-Allow-Origin) — un fetch()
+// classique est donc bloqué par le navigateur, silencieusement (la promesse part juste
+// en erreur réseau). Nominatim documente en revanche un mode JSONP (paramètre
+// json_callback), non soumis à la politique CORS puisqu'il passe par une balise <script>.
+let _jsonpSeq = 0;
+function jsonpRequest(url, timeoutMs){
+  return new Promise((resolve, reject) => {
+    const cbName = '_nvJsonp' + (_jsonpSeq++);
+    const script = document.createElement('script');
+    let done = false;
+    const cleanup = () => { if(window[cbName]) delete window[cbName]; script.remove(); };
+    const timer = setTimeout(() => { if(!done){ done=true; cleanup(); reject(new Error('jsonp timeout')); } }, timeoutMs||8000);
+    window[cbName] = (data) => { if(done) return; done=true; clearTimeout(timer); cleanup(); resolve(data); };
+    script.onerror = () => { if(done) return; done=true; clearTimeout(timer); cleanup(); reject(new Error('jsonp load error')); };
+    script.src = url + (url.includes('?') ? '&' : '?') + 'json_callback=' + cbName;
+    document.body.appendChild(script);
+  });
+}
 function geocodeAddress(address, city){
   const key = normalizeCity(city||'') + '|' + (address||'').trim().toLowerCase();
   const cache = loadGeocache();
@@ -2397,8 +2419,7 @@ function geocodeAddress(address, city){
   if(!address) return Promise.resolve(null);
   const run = () => {
     const q = encodeURIComponent([address, city, 'France'].filter(Boolean).join(', '));
-    return fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${q}`, { headers:{ 'Accept-Language':'fr' } })
-      .then(r => r.json())
+    return jsonpRequest(`https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=fr&q=${q}`)
       .then(data => {
         if(data && data[0]){
           const loc = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
@@ -3167,6 +3188,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
     db.collection('friendCodes').doc(code).set({ uid, name: resolvedName }).catch(()=>{});
   }
   if(S._friendUids.length) loadFriendsFromFirestore(S._friendUids);
+  else if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }
   initNotifications(uid);
   loadHistFromFirestore(uid);
 
@@ -3182,7 +3204,11 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
 }
 
 async function loadFriendsFromFirestore(uids) {
-  if (!uids || !uids.length) { S.friends = []; renderFriends(); return; }
+  if (!uids || !uids.length) {
+    S.friends = []; renderFriends();
+    if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }
+    return;
+  }
   try {
     // Promise.allSettled : un ami inaccessible (règle refusée) ne doit pas faire échouer tous les autres
     const capped = uids.slice(0, 30);
@@ -3198,6 +3224,7 @@ async function loadFriendsFromFirestore(uids) {
       return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, online };
     });
     renderFriends();
+    if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }
     // Recharge le feed avec la nouvelle liste d'amis
     const feedEl = document.getElementById('feed-content');
     if (feedEl) loadCommunityFeed();
