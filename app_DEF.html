@@ -521,7 +521,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .bp-data{background:var(--green-bg);border:none;border-radius:var(--r-card);padding:16px;display:flex;gap:12px;align-items:flex-start}
 .bp-data .di{font-size:20px;flex-shrink:0;margin-top:1px;color:var(--green-ink)}
 .bp-data .bp-text{color:var(--green-ink);font-weight:600}
-.bp-survey{background:var(--surface);border-radius:var(--r-card);padding:16px;margin-bottom:10px;box-shadow:var(--shadow-card)}
+.bp-survey{background:var(--surface);border-radius:var(--r-card);padding:16px;margin-bottom:10px;box-shadow:var(--shadow-card);position:relative;overflow:hidden}
+.bp-survey>*{position:relative;z-index:1}
+.bp-survey .mark{font-size:110px;bottom:-34px;z-index:0}
 .bp-survey.active{background:var(--yellow);box-shadow:var(--shadow-raised)}
 .bp-survey.active .bp-sv-q,.bp-survey.active .bp-text,.bp-survey.active .bp-sv-meta{color:var(--ink)}
 .bp-survey.active .btn-p{background:var(--ink);color:#fff;box-shadow:none}
@@ -558,16 +560,21 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dh-pts-l{font-size:10px;color:rgba(255,255,255,.55);font-weight:600}
 
 /* — Carte question du jour (photo + bandeau jaune) — */
-.dtoday-card{margin:0 18px 14px;border-radius:26px;overflow:hidden;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
+.dtoday-card{margin:0 18px 14px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
+.dtoday-card>.dtoday-photo{border-radius:26px 26px 0 0;overflow:hidden}
+.dtoday-card>.dtoday-body{border-radius:0 0 26px 26px;overflow:hidden}
 .dtoday-card:active{transform:scale(.98)}
 .dtoday-photo{height:92px;background:var(--nv-photo);position:relative;padding:12px;display:flex;flex-direction:column;justify-content:flex-end}
-.dtoday-photo .dt-pts{position:absolute;top:10px;right:10px;background:var(--nv-black);color:var(--nv-yellow);font-size:10.5px;font-weight:800;padding:4px 10px;border-radius:99px}
+.dt-pts{position:absolute;top:76px;right:14px;background:var(--nv-black);color:var(--nv-yellow);font-size:12px;font-weight:800;padding:8px 14px;border-radius:var(--r-pill);transform:rotate(-4deg);z-index:3;box-shadow:0 6px 16px rgba(28,25,23,.25)}
 .dtoday-brand{color:#fff;font-family:var(--fd);font-weight:700;font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,.3)}
 .dtoday-sub{color:rgba(255,255,255,.8);font-size:10.5px;margin-top:1px}
-.dtoday-body{background:var(--nv-yellow);padding:16px}
+.dtoday-body{background:var(--nv-yellow);padding:16px;position:relative;overflow:hidden}
+.dtoday-body>*{position:relative;z-index:1}
 .dtoday-q{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.22;color:var(--nv-yellow-ink);margin-bottom:13px;letter-spacing:-.4px}
 .dtoday-cta{display:inline-flex;align-items:center;gap:9px;background:var(--nv-black);color:#fff;font-size:12.5px;font-weight:700;padding:11px 8px 11px 16px;border-radius:99px}
 .dtoday-cta .tc-arr{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:12px}
+/* Filigrane de marque — signature visuelle sur chaque surface jaune */
+.mark{position:absolute;right:-14px;bottom:-40px;font-size:128px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.3);pointer-events:none;z-index:0}
 
 /* — Streak (noir) — */
 .dstreak-card{margin:0 18px 14px;background:var(--nv-black);border-radius:22px;padding:14px 16px;color:#fff}
@@ -640,7 +647,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dcomm-hero{background:var(--nv-black);padding:16px 18px;border-radius:var(--r-card);margin:0 18px 12px}
 .dcomm-title{font-family:var(--fd);font-weight:800;font-size:19px;color:#fff;letter-spacing:-.5px}
 .dcomm-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px}
-.drank-me{margin:0 18px 16px;background:var(--nv-yellow);border-radius:var(--r-card);padding:13px 15px;display:flex;align-items:center;gap:12px;position:relative;z-index:2;box-shadow:var(--shadow-raised)}
+.drank-me{margin:0 18px 16px;background:var(--nv-yellow);border-radius:var(--r-card);padding:13px 15px;display:flex;align-items:center;gap:12px;position:relative;z-index:2;overflow:hidden;box-shadow:var(--shadow-raised)}
+.drank-me .mark{font-size:100px;bottom:-30px;z-index:0}
+.drank-me>:not(.mark){position:relative;z-index:1}
 .drank-num{width:28px;height:28px;border-radius:50%;background:var(--nv-black);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .drank-me .drank-num{background:rgba(24,20,16,.9)}
 .drank-av{width:38px;height:38px;border-radius:50%;background:rgba(24,20,16,.14);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:14px;color:var(--nv-yellow-ink)}
@@ -682,7 +691,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 /* — Profil : commerces autorisés avec toggle — */
 .dprof-hdr{padding:52px 18px 16px;background:var(--nv-yellow);border-radius:0 0 28px 28px;position:relative;overflow:hidden}
 .dprof-title{font-family:var(--fd);font-weight:800;font-size:24px;color:var(--nv-yellow-ink);letter-spacing:-.6px;margin-bottom:14px}
-.dprof-id{display:flex;align-items:center;gap:12px}
+.dprof-id{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
 .dprof-av{width:56px;height:56px;border-radius:50%;background:rgba(24,20,16,.14);border:2.5px solid rgba(24,20,16,.18);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:21px;color:var(--nv-yellow-ink)}
 .dprof-city{font-size:12.5px;color:rgba(24,20,16,.7);margin-bottom:5px}
 .dprof-lvl{display:inline-block;font-size:10.5px;font-weight:700;background:rgba(24,20,16,.12);color:var(--nv-yellow-ink);padding:4px 10px;border-radius:99px}
@@ -821,11 +830,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     </div>
     <div class="dtoday-card" id="today-card" onclick="openQ(0)">
       <div class="dtoday-photo" id="dtoday-photo">
-        <div class="dt-pts" id="tc-pts">+pts</div>
         <div class="dtoday-brand" id="tc-brand">Commerce</div>
         <div class="dtoday-sub" id="dtoday-dist"></div>
       </div>
+      <div class="dt-pts" id="tc-pts">+pts</div>
       <div class="dtoday-body">
+        <div class="mark">?!</div>
         <div class="dtoday-q" id="tc-q">Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?</div>
         <div class="dtoday-cta">Répondre en 30 secondes <div class="tc-arr">→</div></div>
       </div>
@@ -981,7 +991,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <div id="profile" class="screen">
   <div class="profile-wrap" style="padding-top:0">
     <div class="dprof-hdr">
-      <div class="dprof-title">Ton profil</div>
+      <div class="mark" style="font-size:148px;bottom:-44px;right:-16px">?!</div>
+      <div class="dprof-title" style="position:relative">Ton profil</div>
       <div class="dprof-id">
         <div class="dprof-av" id="prof-av">A</div>
         <div>
@@ -1685,7 +1696,7 @@ function renderRanking(){
   const myPos=all.findIndex(u=>u.me)+1;
   if(meSlot){
     const me=all.find(u=>u.me);
-    meSlot.innerHTML=`<div class="drank-me"><div class="drank-num">${myPos}</div><div class="drank-av">${(me.n||'?')[0].toUpperCase()}</div><div style="flex:1;min-width:0"><div class="drank-name">Toi</div><div class="drank-sub">${me.str} jour${me.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${me.xp}</div></div>`;
+    meSlot.innerHTML=`<div class="drank-me"><div class="mark">?!</div><div class="drank-num">${myPos}</div><div class="drank-av">${(me.n||'?')[0].toUpperCase()}</div><div style="flex:1;min-width:0"><div class="drank-name">Toi</div><div class="drank-sub">${me.str} jour${me.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${me.xp}</div></div>`;
   }
   el.innerHTML='';
   const others=all.filter(u=>!u.me);
@@ -2226,7 +2237,7 @@ function openBrand(name,back){
   surveys.forEach(s=>{
     const active=s.status==='active';
     const isdone=s.status==='done';
-    sv+=`<div class="bp-survey${active?' active':''}"><div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
+    sv+=`<div class="bp-survey${active?' active':''}">${active?'<div class="mark">?!</div>':''}<div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
   });
   if(!surveys.length)sv='<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>';
   document.getElementById('bp-wrap').innerHTML=`
@@ -2268,6 +2279,7 @@ async function openBrandById(mid, fallbackName) {
           return done
             ?`<div class="bp-survey"><div class="bp-sv-q">${c.question}</div><div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div></div>`
             :`<div class="bp-survey active">
+                <div class="mark">?!</div>
                 <div class="bp-sv-top"><span class="bp-sv-badge" style="background:var(--ink);color:var(--yellow)">● Actif</span><span style="font-size:11px;font-weight:700;color:var(--ink);font-family:var(--fd)">jusqu'à +${(c.questions&&c.questions.length||1)*(c.pointsPerAnswer||20)} pts</span></div>
                 <div class="bp-sv-q">${c.question}</div>
                 <div class="bp-sv-meta"><span style="display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg> ${c.questions&&c.questions.length||1} question(s)</span><span>⏱️ ~${(c.questions&&c.questions.length||1)*15}s</span></div>
