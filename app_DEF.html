@@ -542,8 +542,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
    ===== récompenses / profil, carte des commerçants proches
    ============================================================ */
 :root{
-  --nv-yellow:#FFD400;--nv-yellow-ink:#181410;
-  --nv-black:#181410;--nv-black2:#241C11;
+  --nv-yellow:var(--yellow);--nv-yellow-ink:var(--ink);
+  --nv-black:var(--ink);--nv-black2:#241C11;
   --nv-photo:linear-gradient(160deg,#CDAC71 0%,#8A6A3A 100%);
 }
 /* — Nav du bas : pilule noire flottante, icône active en cercle jaune — */
@@ -1276,7 +1276,7 @@ function buildAns(q){
 function nextQ(){if(S.qs&&S.qs.length>0)openQ(0);else{refreshHome();goNav('home')}}
 function spawnConfetti(targetId){
   const el=document.getElementById(targetId||'conf-layer');if(!el)return;el.innerHTML='';
-  const clrs=['#FFD400','#181410','#FFF6CC','#FFE07A'];
+  const clrs=['#FFC300','#1C1917','#FFF3D1','#FFE07A'];
   for(let i=0;i<36;i++){const p=document.createElement('div');p.className='conf-p';const c=clrs[Math.floor(Math.random()*clrs.length)];const w=Math.random()*10+4,h=Math.random()*10+4;p.style.cssText=`width:${w}px;height:${h}px;background:${c};left:${Math.random()*100}%;animation-duration:${Math.random()*1.5+1}s;animation-delay:${Math.random()*.5}s`;el.appendChild(p)}
 }
 function shareReward(){
@@ -2230,7 +2230,7 @@ function openBrand(name,back){
   surveys.forEach(s=>{
     const active=s.status==='active';
     const isdone=s.status==='done';
-    sv+=`<div class="bp-survey${active?' active':''}"><div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:#0BAB84;font-weight:600;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
+    sv+=`<div class="bp-survey${active?' active':''}"><div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
   });
   if(!surveys.length)sv='<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>';
   document.getElementById('bp-wrap').innerHTML=`
@@ -3788,7 +3788,7 @@ function hideAppLoader() {
   el.style.opacity = '0';
   el.style.pointerEvents = 'none';
   const tc = document.querySelector('meta[name="theme-color"]');
-  if(tc) tc.content = '#FFD400';
+  if(tc) tc.content = '#FFC300';
   setTimeout(() => { try { el.remove(); } catch(e){} }, 650);
 }
 
