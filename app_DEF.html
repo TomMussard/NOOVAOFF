@@ -125,7 +125,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .ob-slide{position:absolute;inset:0;padding:16px 26px 10px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(40px);transition:opacity .32s,transform .32s;pointer-events:none}
 .ob-slide.active{opacity:1;transform:translateX(0);pointer-events:all}
 .ob-slide.done{opacity:0;transform:translateX(-40px)}
-.ob-illo{width:100%;height:175px;border-radius:22px;margin-bottom:26px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ob-illo{width:100%;height:175px;border-radius:var(--r-card);margin-bottom:26px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .ob-title{font-family:var(--fd);font-weight:900;font-size:34px;line-height:1.07;letter-spacing:-1.5px;margin-bottom:11px;color:var(--ink)}
 .ob-title em{color:var(--ink);font-style:normal;text-decoration:underline;text-decoration-color:var(--coral);text-decoration-thickness:4px;text-underline-offset:2px}
 .ob-desc{font-size:14px;color:var(--ink2);line-height:1.7}
@@ -724,7 +724,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="ob-topbar"><button class="ob-skip" onclick="showAuthWall('register')">Passer</button></div>
     <div class="ob-slides">
       <div class="ob-slide active" id="ob0">
-        <div class="ob-illo" style="background:linear-gradient(135deg,#FFF6D6,#FFE9A3)">
+        <div class="ob-illo" style="background:var(--yellow-soft)">
           <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:9px;padding:16px">
             <div style="color:var(--icon-gray);background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg></div>
             <div style="color:var(--icon-gray);background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg></div>
@@ -743,25 +743,25 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
         </div>
       </div>
       <div class="ob-slide" id="ob1">
-        <div class="ob-illo" style="background:linear-gradient(135deg,#FFF1B8,#FFE07A);flex-direction:column;gap:9px;padding:16px">
+        <div class="ob-illo" style="background:var(--yellow-soft);flex-direction:column;gap:9px;padding:16px">
           <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:7px">
-            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:#E07D0A;color:#fff;font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">B</span>Ta boulangerie</div>
-            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:#0BAB84;color:#fff;font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">R</span>Ton restaurant</div>
-            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:#A14E08;color:#fff;font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">S</span>Ton salon</div>
+            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">B</span>Ta boulangerie</div>
+            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">R</span>Ton restaurant</div>
+            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">S</span>Ton salon</div>
             <div style="font-size:13px;font-weight:800;letter-spacing:1.5px;color:var(--ink3);background:#fff;border-radius:11px;padding:8px 14px;display:flex;align-items:center">•••</div>
           </div>
-          <div style="font-size:11px;color:rgba(161,78,8,.65);font-weight:600;text-align:center">Consentement révocable en 1 tap</div>
+          <div style="font-size:11px;color:var(--gold-text);font-weight:600;text-align:center">Consentement révocable en 1 tap</div>
         </div>
         <h1 class="ob-title">Tu choisis<br>qui te<br><em>contacte.</em></h1>
         <p class="ob-desc">Tu décides, commerce par commerce, qui peut te poser des questions. Seuls ceux que tu acceptes te contactent, et tu peux en retirer un quand tu veux.</p>
       </div>
       <div class="ob-slide" id="ob2">
-        <div class="ob-illo" style="background:linear-gradient(135deg,#F5EFD5,#EAE0AE);flex-direction:column;align-items:center;justify-content:center;gap:12px">
-          <div style="font-family:var(--fd);font-weight:800;font-size:58px;color:#0BAB84;line-height:1;letter-spacing:-2px">+25</div>
-          <div style="font-size:13px;color:#0BAB84;font-weight:600">points gagnés</div>
+        <div class="ob-illo" style="background:var(--yellow-soft);flex-direction:column;align-items:center;justify-content:center;gap:12px">
+          <div style="font-family:var(--fd);font-weight:800;font-size:58px;color:var(--ink);line-height:1;letter-spacing:-2px">+25</div>
+          <div style="font-size:13px;color:var(--gold-text);font-weight:600">points gagnés</div>
           <div style="display:flex;gap:7px;margin-top:4px">
-            <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:#0BAB84;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg> Café offert</div>
-            <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:#D6442E;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Kebab offert</div>
+            <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:var(--ink);display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg> Café offert</div>
+            <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:var(--ink);display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Kebab offert</div>
           </div>
         </div>
         <h1 class="ob-title">Réponds.<br><em>Gagne.</em><br>Régale-toi.</h1>
