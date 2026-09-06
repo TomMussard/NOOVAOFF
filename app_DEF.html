@@ -247,7 +247,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .q-text{font-family:var(--fd);font-weight:800;font-size:23px;line-height:1.2;letter-spacing:-.6px;margin-bottom:7px;color:var(--ink)}
 .q-hint{font-size:13px;color:var(--ink2);margin-bottom:15px;line-height:1.6}
 .ans-area{flex:1;display:flex;flex-direction:column;gap:8px}
-.ans-ta{min-height:120px;background:var(--card);border:1.5px solid var(--bg3);border-radius:13px;padding:13px 14px;color:var(--ink);font-size:15px;line-height:1.6;resize:none;outline:none;transition:border-color .17s;flex:1;font-family:var(--fb)}
+.ans-ta{min-height:120px;background:var(--surface);border:1.5px solid var(--line-strong);border-radius:18px;padding:16px;color:var(--ink);font-size:16px;line-height:1.6;resize:none;outline:none;transition:border-color .17s;flex:1;font-family:var(--fb)}
 .ans-ta:focus{border-color:var(--coral);box-shadow:0 0 0 3px var(--cd)}
 .ans-ta::placeholder{color:var(--ink3)}
 .char-ct{font-size:11px;color:var(--ink3);text-align:right}
@@ -262,7 +262,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .scale-inp::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--coral);box-shadow:0 4px 12px var(--cg);cursor:pointer;transition:transform .12s}
 .scale-inp::-webkit-slider-thumb:active{transform:scale(1.2)}
 .rank-list{display:flex;flex-direction:column;gap:7px}
-.rank-item{padding:11px 13px;border-radius:12px;background:var(--card);border:1.5px solid var(--bg3);display:flex;align-items:center;gap:10px;cursor:default;user-select:none}
+.rank-item{padding:13px;border-radius:18px;background:var(--surface);border:1.5px solid var(--line-strong);display:flex;align-items:center;gap:10px;cursor:default;user-select:none}
 .rank-item.dragging{opacity:.4;transform:scale(.96)}
 .rank-grip{font-size:14px;color:var(--ink3)}
 .rank-num{width:24px;height:24px;border-radius:7px;background:var(--vd);color:var(--violet);font-family:var(--fd);font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -331,9 +331,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .soc-title{font-family:var(--fd);font-weight:800;font-size:25px;letter-spacing:-.8px;color:var(--ink)}
 .soc-bell{width:40px;height:40px;border-radius:var(--r-pill);background:var(--surface);border:none;box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative}
 .bell-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--coral);border:2px solid var(--card);display:none}
-.notif-panel{position:fixed;top:60px;right:16px;width:min(320px,calc(100vw - 32px));max-height:420px;background:var(--card);border:1.5px solid var(--bg3);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.22);overflow-y:auto;z-index:9000;display:none}
+.notif-panel{position:fixed;top:60px;right:16px;width:min(320px,calc(100vw - 32px));max-height:420px;background:var(--surface);border:none;border-radius:var(--r-card);box-shadow:var(--shadow-raised);overflow-y:auto;z-index:9000;display:none}
 .notif-panel.open{display:block}
-.notif-hdr{padding:14px 16px 10px;font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink);border-bottom:1.5px solid var(--bg3);display:flex;align-items:center;justify-content:space-between}
+.notif-hdr{padding:14px 16px 10px;font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink);border-bottom:1.5px solid var(--line);display:flex;align-items:center;justify-content:space-between}
 .notif-close{font-size:18px;color:var(--ink3);cursor:pointer;line-height:1}
 .notif-item{padding:12px 16px;border-bottom:1px solid var(--bg2);display:flex;flex-direction:column;gap:5px}
 .notif-item.unread{background:color-mix(in srgb,var(--amber) 8%,var(--card))}
@@ -360,7 +360,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .fp-foot{padding:8px 14px 10px;display:flex;gap:18px;border-top:1px solid var(--line)}
 .fp-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:0;border-radius:8px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;background:none;border:none;font-family:var(--fb);transition:all .13s}
 .fp-btn:active{opacity:.6}.fp-btn.liked{color:var(--ink);font-weight:800}
-.wq-card{margin:0 18px 14px;background:var(--nv-black);border-radius:22px;padding:16px 17px;color:#fff;position:relative;overflow:hidden}
+.wq-card{margin:0 18px 14px;background:var(--nv-black);border-radius:var(--r-card);padding:16px 17px;color:#fff;position:relative;overflow:hidden}
 .wq-tag{font-family:var(--fd);font-weight:700;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--coral)}
 .wq-text{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.22;letter-spacing:-.4px;margin:9px 0 13px}
 .wq-opts{display:flex;flex-direction:column;gap:8px}
@@ -383,7 +383,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .group-c{background:var(--card);border:1.5px solid var(--bg3);border-radius:var(--r);padding:12px 13px;margin:0 18px 8px;display:flex;gap:11px;align-items:center;cursor:pointer}
 .gc-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
 .rank-hero{margin:0 18px 12px;background:linear-gradient(135deg,#2B1D0B,#241A0A);border-radius:var(--r);padding:16px 18px;display:flex;align-items:center;gap:12px}
-.inv-c{margin:0 18px 11px;background:var(--cd);border:1.5px solid var(--cg);border-radius:var(--r);padding:14px 16px}
+.inv-c{margin:0 18px 11px;background:var(--yellow-soft);border:none;border-radius:var(--r-card);padding:16px}
 .inv-code{font-family:var(--fd);font-weight:800;font-size:20px;color:var(--ink);letter-spacing:2px;flex:1}
 .copy-btn{padding:8px 12px;background:var(--ink);color:var(--coral);font-size:12px;font-weight:700;border:none;border-radius:9px;cursor:pointer;font-family:var(--fd);white-space:nowrap}
 /* CHAT */
@@ -391,11 +391,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .chat-hdr{padding:52px 16px 11px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);background:var(--surface)}
 .chat-msgs{padding:13px 16px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1;max-height:580px}
 .msg{max-width:78%;padding:10px 13px;border-radius:15px;font-size:13px;line-height:1.5}
-.msg.them{background:var(--card);border:1.5px solid var(--bg3);align-self:flex-start;border-bottom-left-radius:4px;color:var(--ink)}
+.msg.them{background:var(--surface);border:none;box-shadow:var(--shadow-card);align-self:flex-start;border-bottom-left-radius:4px;color:var(--ink)}
 .msg.me{background:var(--ink);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
 .msg-t{font-size:10px;color:var(--ink3);margin-top:2px}.msg-t.r{text-align:right}
 .chat-inp-row{padding:9px 16px 9px;display:flex;gap:8px;border-top:1px solid var(--bg3);background:var(--card)}
-.chat-inp{flex:1;padding:10px 13px;background:var(--bg2);border:1.5px solid var(--bg3);border-radius:99px;color:var(--ink);font-size:14px;outline:none;font-family:var(--fb)}
+.chat-inp{flex:1;padding:11px 15px;background:var(--cream);border:none;border-radius:var(--r-pill);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb)}
 .chat-inp:focus{border-color:var(--coral)}.chat-inp::placeholder{color:var(--ink3)}
 .chat-send{width:40px;height:40px;background:var(--ink);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;color:#fff;transition:transform .13s}
 .chat-send:active{transform:scale(.9)}
@@ -451,7 +451,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .hist-it{display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--bg3)}
 .hist-it:last-child{border-bottom:none}
 .danger-c{background:var(--card);border-radius:18px;padding:13px;margin-bottom:11px;box-shadow:0 3px 12px rgba(0,0,0,.04)}
-.dbtn{width:100%;padding:10px;border-radius:9px;background:transparent;border:1.5px solid var(--bg3);color:var(--ink2);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .13s;margin-bottom:7px}
+.dbtn{width:100%;padding:12px;border-radius:var(--r-pill);background:var(--cream);border:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .13s;margin-bottom:7px}
 .dbtn:last-child{margin:0;border-color:rgba(239,68,68,.22);color:#EF4444}
 .badge-list{display:flex;flex-wrap:wrap;gap:6px;padding:11px 13px}
 .bp{padding:4px 10px;border-radius:99px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px}
@@ -643,10 +643,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .mf-popup button{width:100%;background:var(--nv-black);color:#fff;border:none;padding:8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fb)}
 
 /* — Communauté / classement amis — */
-.dcomm-hero{background:var(--nv-black);padding:18px 20px 36px;border-radius:0 0 28px 28px;margin-top:-8px}
-.dcomm-title{font-family:var(--fd);font-weight:800;font-size:26px;color:#fff;letter-spacing:-.7px}
-.dcomm-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px}
-.drank-me{margin:-22px 18px 16px;background:var(--nv-yellow);border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:12px;position:relative;z-index:2;box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.dcomm-hero{background:var(--nv-black);padding:16px 18px;border-radius:var(--r-card);margin:0 18px 12px}
+.dcomm-title{font-family:var(--fd);font-weight:800;font-size:19px;color:#fff;letter-spacing:-.5px}
+.dcomm-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px}
+.drank-me{margin:0 18px 16px;background:var(--nv-yellow);border-radius:var(--r-card);padding:13px 15px;display:flex;align-items:center;gap:12px;position:relative;z-index:2;box-shadow:var(--shadow-raised)}
 .drank-num{width:28px;height:28px;border-radius:50%;background:var(--nv-black);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .drank-me .drank-num{background:rgba(24,20,16,.9)}
 .drank-av{width:38px;height:38px;border-radius:50%;background:rgba(24,20,16,.14);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:14px;color:var(--nv-yellow-ink)}
@@ -656,7 +656,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .drank-list-title{padding:0 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .drank-list-title span{font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink);letter-spacing:-.4px}
 .drank-list-title small{font-size:11px;color:var(--ink2);font-weight:500}
-.drank-row{background:var(--card);border-radius:16px;padding:11px 14px;margin:0 18px 8px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.drank-row{background:var(--surface);border-radius:var(--r-media);padding:12px 14px;margin:0 18px 8px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card)}
 .drank-row .drank-av{background:var(--bg2);color:var(--ink2)}
 .drank-row .drank-name{color:var(--ink)}
 .drank-row .drank-sub{color:var(--ink3)}
@@ -757,7 +757,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="ob-slide" id="ob2">
         <div class="ob-illo" style="background:linear-gradient(135deg,#F5EFD5,#EAE0AE);flex-direction:column;align-items:center;justify-content:center;gap:12px">
           <div style="font-family:var(--fd);font-weight:800;font-size:58px;color:#0BAB84;line-height:1;letter-spacing:-2px">+25</div>
-          <div style="font-size:13px;color:#0BAB84;font-weight:600">points gagnés 🎉</div>
+          <div style="font-size:13px;color:#0BAB84;font-weight:600">points gagnés</div>
           <div style="display:flex;gap:7px;margin-top:4px">
             <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:#0BAB84;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg> Café offert</div>
             <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:#D6442E;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Kebab offert</div>
@@ -786,7 +786,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     </div>
     <div id="brands-list"></div>
     <div class="consent-note" style="margin-bottom:14px"><strong style="color:var(--violet)">Tu gardes le contrôle.</strong> Un commerce ne voit que les réponses que tu lui donnes, rien d'autre. Aucune revente à des tiers. Tu peux n'en activer aucun et jouer quand même.</div>
-    <div style="padding:0 18px 24px"><button class="btn-p" onclick="doBrands()">Commencer à gagner 🚀</button></div>
+    <div style="padding:0 18px 24px"><button class="btn-p" onclick="doBrands()">Commencer à gagner</button></div>
   </div>
 </div>
 
@@ -819,7 +819,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="ptr-bar" id="ptr-home">↻ Actualisation…</div>
   <div class="si">
     <div class="dh-hdr">
-      <div><div class="dh-greet" id="home-greet">Bonjour 👋</div><div class="dh-name" id="home-name">Alex</div></div>
+      <div><div class="dh-greet" id="home-greet">Bonjour</div><div class="dh-name" id="home-name">Alex</div></div>
       <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
     </div>
     <div id="stories-bar" style="display:none;overflow-x:auto;margin:0 0 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch"><div id="stories-inner" style="display:flex;gap:10px;padding:2px 18px 10px"></div></div>
@@ -1023,7 +1023,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div id="hist-list"></div>
     </div>
     <div style="padding:0 0 12px">
-      <button onclick="logout()" style="width:100%;padding:13px;border-radius:12px;background:var(--bg2);border:1.5px solid var(--bg3);color:var(--ink2);font-family:var(--fd);font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><span style="display:inline-flex;width:16px;height:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M20 12H10"/><path d="M16 8l4 4-4 4"/></svg></span> Se déconnecter</button>
+      <button onclick="logout()" class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fd)"><span style="display:inline-flex;width:16px;height:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M20 12H10"/><path d="M16 8l4 4-4 4"/></svg></span> Se déconnecter</button>
     </div>
     <div class="danger-c">
       <div style="font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:15px;height:15px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg></span> Zone danger</div>
@@ -1213,7 +1213,7 @@ async function doBrands(){
 }
 function refreshHome(){
   if(!S.user)return;
-  const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour 👋':hr<18?'Bon après-midi ☀️':'Bonsoir 🌙';
+  const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour':hr<18?'Bon après-midi':'Bonsoir';
   document.getElementById('home-name').textContent=S.user.name;animateNumber(document.getElementById('home-pts'),S.pts);
   document.getElementById('streak-num').textContent=S.streak;
   const streakSub=document.getElementById('streak-sub');
@@ -1297,7 +1297,7 @@ function spawnConfetti(targetId){
 function shareReward(){
   const brand=(S.curQ||S.sv&&S.sv.base)?((S.curQ||S.sv.base).brand||'un commerce'):'un commerce';
   const pts=S.pts;
-  const msg=`Je viens de répondre à une question de ${brand} sur Noova et j'ai maintenant ${pts} pts 🎉 Rejoins-moi avec mon code : ${S._friendCode||''}`;
+  const msg=`Je viens de répondre à une question de ${brand} sur Noova et j'ai maintenant ${pts} pts. Rejoins-moi avec mon code : ${S._friendCode||''}`;
   if(navigator.share){navigator.share({title:'Noova',text:msg}).catch(()=>{});}
   else{navigator.clipboard&&navigator.clipboard.writeText(msg);showToast('Lien copié !','success');}
 }
@@ -1605,8 +1605,8 @@ function initFriendsPanel(){
   // Demandes reçues en attente
   const pending=(_notifs||[]).filter(n=>n.type==='friend_request'&&!n.read);
   const pendingHTML=pending.length?`
-    <div style="margin:0 18px 14px;background:var(--card);border:1.5px solid var(--bg3);border-radius:18px;padding:14px 15px;box-shadow:0 3px 12px rgba(0,0,0,.04)">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink2);margin-bottom:10px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg> Demandes reçues (${pending.length})</div>
+    <div style="margin:0 18px 14px;background:var(--surface);border:none;border-radius:var(--r-card);padding:14px 15px;box-shadow:var(--shadow-card)">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg> Demandes reçues (${pending.length})</div>
       <div id="pending-requests-list">${pending.map(n=>`
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
           <div style="width:36px;height:36px;border-radius:10px;background:var(--ink);color:var(--coral);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:15px;flex-shrink:0">${(n.fromName||'?')[0].toUpperCase()}</div>
@@ -1629,8 +1629,8 @@ function initFriendsPanel(){
       <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Ajouter un ami</div>
       <div style="font-size:12px;color:var(--ink2);margin-bottom:9px;line-height:1.5">Saisis le code de ton ami. Une fois qu'il accepte ta demande, vous serez connectés et verrez vos activités dans le feed.</div>
       <div style="display:flex;gap:8px">
-        <input style="flex:1;padding:11px 13px;background:var(--card);border:1.5px solid var(--bg3);border-radius:12px;font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOOVA-AB1234)" id="fi-inp" oninput="this.value=this.value.toUpperCase()">
-        <button style="padding:11px 16px;background:var(--grad);color:var(--gi);font-size:12px;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-family:var(--fd);box-shadow:0 4px 10px var(--cg);white-space:nowrap" onclick="addFriend()">Envoyer →</button>
+        <input style="flex:1;padding:12px 14px;background:var(--surface);border:1.5px solid var(--line-strong);border-radius:var(--r-media);font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOOVA-AB1234)" id="fi-inp" oninput="this.value=this.value.toUpperCase()">
+        <button style="padding:12px 16px;background:var(--yellow);color:var(--ink);font-size:12px;font-weight:800;border:none;border-radius:var(--r-media);cursor:pointer;font-family:var(--fd);box-shadow:none;white-space:nowrap" onclick="addFriend()">Envoyer →</button>
       </div>
       <div id="fi-err" style="font-size:12px;color:var(--danger);min-height:18px;margin-top:6px"></div>
     </div>
@@ -1978,7 +1978,7 @@ function renderChat(){
   const myUid=auth.currentUser&&auth.currentUser.uid;
   const el=document.getElementById('chat-msgs');el.innerHTML='';
   if(!_chatMessages.length){
-    el.innerHTML=`<div style="text-align:center;padding:32px 16px;color:var(--ink3);font-size:13px">Dis bonjour à ${esc(_chatFriendName||'ton ami')} 👋</div>`;
+    el.innerHTML=`<div style="text-align:center;padding:32px 16px;color:var(--ink3);font-size:13px">Dis bonjour à ${esc(_chatFriendName||'ton ami')}</div>`;
     return;
   }
   _chatMessages.forEach(m=>{
@@ -2600,8 +2600,8 @@ function closeFullMap(){ goTo('home'); }
   </div>
 
   <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:11px">
-    <input id="aw-name" type="text" placeholder="Ton prénom" autocomplete="name" style="display:none;width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
-    <input id="aw-city" type="text" placeholder="Ta ville (ex: Paris, Lyon…)" autocomplete="address-level2" style="display:none;width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+    <input id="aw-name" type="text" placeholder="Ton prénom" autocomplete="name" style="display:none;width:100%;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+    <input id="aw-city" type="text" placeholder="Ta ville (ex: Paris, Lyon…)" autocomplete="address-level2" style="display:none;width:100%;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
 
     <div id="aw-age-wrap" style="display:none">
       <div style="font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink2);margin-bottom:7px">Ton âge</div>
@@ -2631,10 +2631,10 @@ function closeFullMap(){ goTo('home'); }
       </div>
     </div>
 
-    <input id="aw-email" type="email" placeholder="Email" autocomplete="email" style="width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+    <input id="aw-email" type="email" placeholder="Email" autocomplete="email" style="width:100%;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
     <div>
       <div style="position:relative">
-        <input id="aw-pass" type="password" placeholder="Mot de passe" autocomplete="current-password" style="width:100%;padding:14px 48px 14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+        <input id="aw-pass" type="password" placeholder="Mot de passe" autocomplete="current-password" style="width:100%;padding:14px 48px 14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
         <button type="button" onclick="togglePassVis()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:var(--ink3);padding:4px;line-height:1">👁</button>
       </div>
       <div class="pw-str-wrap" id="pw-str-wrap">
@@ -2652,7 +2652,7 @@ function closeFullMap(){ goTo('home'); }
       <div style="flex:1;height:1px;background:var(--bg3)"></div>
     </div>
 
-    <button onclick="signInWithGoogle()" style="width:100%;padding:14px 16px;border-radius:14px;background:white;border:1.5px solid var(--bg3);color:#17141A;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+    <button onclick="signInWithGoogle()" class="sso-btn">
       <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
       Continuer avec Google
     </button>
@@ -2672,10 +2672,10 @@ function closeFullMap(){ goTo('home'); }
 <!-- Complétion profil Google (profil manquant) -->
 <div id="google-city-wall" style="position:fixed;inset:0;z-index:10000;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;overflow-y:auto">
   <div style="width:100%;max-width:340px">
-    <div style="font-family:var(--fd);font-weight:800;font-size:28px;color:var(--ink);letter-spacing:-.8px;margin-bottom:8px">Dernière étape 👋</div>
+    <div style="font-family:var(--fd);font-weight:800;font-size:28px;color:var(--ink);letter-spacing:-.8px;margin-bottom:8px">Dernière étape</div>
     <div style="font-size:14px;color:var(--ink2);margin-bottom:24px;line-height:1.7">Pour te montrer les questions des commerces près de toi,<br>dis-nous un peu qui tu es.</div>
     <div style="display:flex;flex-direction:column;gap:14px">
-      <input id="gcw-city" type="text" placeholder="Ta ville (ex: Paris, Lyon…)" autocomplete="address-level2" style="width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bg3);background:var(--bg2);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <input id="gcw-city" type="text" placeholder="Ta ville (ex: Paris, Lyon…)" autocomplete="address-level2" style="width:100%;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
 
       <div>
         <div style="font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink2);margin-bottom:7px">Ton âge</div>
