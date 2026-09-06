@@ -183,7 +183,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .tgl input:checked~.tgl-t{background:var(--coral)}
 .tgl-k{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s}
 .tgl input:checked~.tgl-k{transform:translateX(20px)}
-.consent-note{margin:10px 18px 0;padding:10px 12px;background:var(--vd);border:1px solid rgba(161,78,8,.12);border-radius:10px;font-size:10px;color:var(--ink2);line-height:1.65}
+.consent-note{margin:10px 18px 0;padding:14px 16px;background:var(--green-bg);border:none;border-radius:var(--r-media);font-size:12px;color:var(--green-ink);line-height:1.6}
 /* HOME */
 .home-hdr{padding:52px 20px 12px;display:flex;align-items:center;justify-content:space-between}
 .h-greet{font-size:12px;color:var(--ink2);margin-bottom:2px}
@@ -312,6 +312,16 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 /* COMPARE SHEET */
 #compare-sheet{position:fixed;inset:0;z-index:8000;display:none;align-items:flex-end}
 #compare-sheet.open{display:flex}
+#rewards-sheet{position:fixed;inset:0;z-index:8000;display:none;align-items:flex-end}
+#rewards-sheet.open{display:flex}
+.reward-featured{margin:0 18px 14px;border-radius:var(--r-card);padding:16px;position:relative;overflow:hidden;box-shadow:var(--shadow-raised)}
+.reward-featured.on{background:var(--yellow)}
+.reward-featured.off{background:var(--surface);box-shadow:var(--shadow-card)}
+.rf-top{display:flex;align-items:center;gap:13px;margin-bottom:12px;position:relative;z-index:1}
+.rf-name{font-family:var(--fd);font-weight:800;font-size:17px;letter-spacing:-.3px;color:var(--ink)}
+.rf-sub{font-size:12px;color:var(--ink);opacity:.7;margin-top:2px}
+.reward-featured.off .rf-sub{color:var(--muted);opacity:1}
+.reward-featured .btn-p{background:var(--ink);color:var(--yellow);box-shadow:none;position:relative;z-index:1}
 .cs-ov{position:absolute;inset:0;background:rgba(0,0,0,.38);backdrop-filter:blur(3px);cursor:pointer}
 .cs-box{position:relative;z-index:1;width:100%;background:var(--card);border-radius:24px 24px 0 0;padding:0 20px calc(32px + env(safe-area-inset-bottom,0px));max-height:82vh;overflow-y:auto}
 .cs-handle{width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:13px auto 20px}
@@ -426,7 +436,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .co-req{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink2);margin-top:6px}
 .req-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .gift-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
-.gift-c{background:var(--card);border-radius:18px;padding:13px;cursor:pointer;transition:all .13s;box-shadow:0 3px 12px rgba(0,0,0,.05)}
+.gift-c{background:var(--surface);border-radius:var(--r-media);padding:13px;cursor:pointer;transition:all .13s;box-shadow:var(--shadow-card)}
 .gift-c:active{transform:scale(.95)}.gift-c.locked{opacity:.45;pointer-events:none}
 /* PROFILE */
 .profile-wrap{padding:52px 18px;padding-bottom:112px}
@@ -706,7 +716,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dimpact-ico{width:34px;height:34px;border-radius:10px;background:rgba(255,212,0,.16);color:var(--nv-yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .dimpact-txt{font-size:12.5px;line-height:1.55;color:rgba(255,255,255,.8)}
 .dimpact-txt strong{color:var(--nv-yellow)}
-.dconsent-row{background:var(--card);border-radius:16px;padding:12px 14px;margin:0 18px 8px;display:flex;align-items:center;gap:11px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.dconsent-row{background:var(--surface);border-radius:var(--r-media);padding:12px 14px;margin:0 18px 8px;display:flex;align-items:center;gap:11px;box-shadow:var(--shadow-card)}
 .dconsent-name{font-size:13px;font-weight:700;color:var(--ink)}
 .dconsent-sub{font-size:10.5px;color:var(--ink3);margin-top:1px}
 
@@ -978,12 +988,14 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
         </div>
       </div>
     </div>
-    <div class="dsec-h"><span style="display:inline-flex;width:16px;height:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg></span> Récompenses près de toi</div>
-    <div class="gift-grid" id="gift-grid"></div>
+    <div id="reward-featured-wrap"></div>
     <div class="dsec-h">En cours <span id="dprog-count" style="font-weight:500;color:var(--ink2);font-size:12px;margin-left:2px"></span></div>
     <div id="dprog-list"></div>
-    <div class="dsec-h"><span style="display:inline-flex;width:16px;height:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 3.5"/><path d="M17 6h2.5A2.5 2.5 0 0 1 17 9.5"/><path d="M12 15v3"/><path d="M8.5 21h7l-1-3h-5z"/></svg></span> Paliers</div>
-    <div id="tiers-list"></div>
+    <div class="dprog-row" id="rewards-all-btn" onclick="openRewardsSheet()" style="cursor:pointer">
+      <div style="width:52px;height:52px;border-radius:14px;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg></div>
+      <div style="flex:1;min-width:0"><div class="dprog-name">Toutes les récompenses</div><div class="dprog-sub" id="rewards-all-count">Voir le catalogue et les paliers</div></div>
+      <span style="color:#A9A296;font-size:18px">›</span>
+    </div>
   </div>
 </div>
 
@@ -1588,6 +1600,14 @@ function openCompare(key) {
 
 function closeCompare() {
   const s = document.getElementById('compare-sheet');
+  if (s) s.classList.remove('open');
+}
+function openRewardsSheet() {
+  const s = document.getElementById('rewards-sheet');
+  if (s) s.classList.add('open');
+}
+function closeRewardsSheet() {
+  const s = document.getElementById('rewards-sheet');
   if (s) s.classList.remove('open');
 }
 function initFriendsPanel(){
@@ -2882,7 +2902,7 @@ async function loadRewardsFromFirestore() {
     S._rewardsCache = [];
     const gg = document.getElementById('gift-grid');
     if(gg) gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px">Renseigne ta ville pour voir les récompenses.</div>';
-    renderAlmostReward(); renderInProgressRewards();
+    renderAlmostReward(); renderFeaturedReward(); renderInProgressRewards();
     return;
   }
   _rewardsUnsub = db.collection('rewards').where('active','==',true).where('city','==',city).onSnapshot(snap => {
@@ -2916,6 +2936,7 @@ async function loadRewardsFromFirestore() {
       }
     }
     renderAlmostReward();
+    renderFeaturedReward();
     renderInProgressRewards();
   }, e => {
     const gg = document.getElementById('gift-grid');
@@ -2945,11 +2966,52 @@ function renderAlmostReward(){
     <div class="dpat-txt">Encore <strong>${missing} pts</strong> et elle est à toi</div>
   </div>`;
 }
+// ─── Récompense mise en avant (écran Récompenses) — logique "appli de fidélité" :
+// une seule récompense à la fois (celle qu'on peut échanger, sinon la plus proche),
+// le reste du catalogue et les paliers passent dans la feuille "Voir tout". ───────
+function renderFeaturedReward(){
+  const wrap = document.getElementById('reward-featured-wrap');
+  if(!wrap) return;
+  const all = S._rewardsCache||[];
+  if(!all.length){ wrap.innerHTML=''; S._featuredRewardId=null; return; }
+  const redeemable = all.filter(r => (r.cost||0) <= S.pts).sort((a,b)=>(b.cost||0)-(a.cost||0));
+  if(redeemable.length){
+    const r = redeemable[0];
+    S._featuredRewardId = r.id;
+    wrap.innerHTML = `<div class="reward-featured on">
+      <div class="mark">?!</div>
+      <div class="rf-top">
+        ${logoHTML(r.merchantName||r.label,52,r.logoUrl)}
+        <div style="flex:1;min-width:0"><div class="rf-name">${esc(r.label||'Récompense')}</div><div class="rf-sub">${esc(r.merchantName||'')}</div></div>
+      </div>
+      <button class="btn-p" onclick="redeemFeaturedReward()">Échanger contre ${r.cost||0} pts</button>
+    </div>`;
+  } else {
+    const r = all.slice().sort((a,b)=>(a.cost||0)-(b.cost||0))[0];
+    S._featuredRewardId = r.id;
+    const pct = Math.max(4, Math.min(96, (S.pts / (r.cost||1)) * 100));
+    const missing = Math.max(0, (r.cost||0) - S.pts);
+    const circ = 2*Math.PI*20;
+    wrap.innerHTML = `<div class="reward-featured off">
+      <div class="rf-top">
+        ${logoHTML(r.merchantName||r.label,52,r.logoUrl)}
+        <div style="flex:1;min-width:0"><div class="rf-name">${esc(r.label||'Récompense')}</div><div class="rf-sub">${esc(r.merchantName||'')} · encore ${missing} pts</div></div>
+        <div class="dprog-ring-wrap"><svg viewBox="0 0 48 48" class="dprog-ring"><circle cx="24" cy="24" r="20" class="dprog-ring-track"/><circle cx="24" cy="24" r="20" class="dprog-ring-fill" style="stroke-dasharray:${circ.toFixed(1)};stroke-dashoffset:${(circ*(1-pct/100)).toFixed(1)}"/></svg><div class="dprog-pct">${Math.round(pct)}%</div></div>
+      </div>
+    </div>`;
+  }
+  const countEl = document.getElementById('rewards-all-count');
+  if(countEl) countEl.textContent = all.length+' récompense'+(all.length>1?'s':'')+' · paliers';
+}
+function redeemFeaturedReward(){
+  const r = (S._rewardsCache||[]).find(x=>x.id===S._featuredRewardId);
+  if(r) redeemReward(r);
+}
 function renderInProgressRewards(){
   const el = document.getElementById('dprog-list');
   const countEl = document.getElementById('dprog-count');
   if(!el) return;
-  const rewards = (S._rewardsCache||[]).filter(r => (r.cost||0) > S.pts)
+  const rewards = (S._rewardsCache||[]).filter(r => (r.cost||0) > S.pts && r.id!==S._featuredRewardId)
     .sort((a,b) => ((a.cost||0)-S.pts) - ((b.cost||0)-S.pts)).slice(0,5);
   if(countEl) countEl.textContent = rewards.length ? '· '+rewards.length : '';
   if(!rewards.length){ el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:12.5px">Tu peux échanger tous tes points dès maintenant !</div>'; return; }
@@ -3821,6 +3883,18 @@ auth.onAuthStateChanged(user => {
   <div class="cs-box">
     <div class="cs-handle"></div>
     <div id="cs-content"></div>
+  </div>
+</div>
+
+<!-- TOUTES LES RÉCOMPENSES (catalogue complet + paliers) -->
+<div id="rewards-sheet">
+  <div class="cs-ov" onclick="closeRewardsSheet()"></div>
+  <div class="cs-box">
+    <div class="cs-handle"></div>
+    <div class="dsec-h" style="padding:0">Récompenses près de toi</div>
+    <div class="gift-grid" id="gift-grid"></div>
+    <div class="dsec-h" style="padding:0"><span style="display:inline-flex;width:16px;height:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 3.5"/><path d="M17 6h2.5A2.5 2.5 0 0 1 17 9.5"/><path d="M12 15v3"/><path d="M8.5 21h7l-1-3h-5z"/></svg></span> Paliers</div>
+    <div id="tiers-list"></div>
   </div>
 </div>
 
