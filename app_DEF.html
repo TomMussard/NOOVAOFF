@@ -292,13 +292,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .share-row:active{background:var(--bg2)}
 /* SOCIAL */
 .social-wrap{padding:52px 0;padding-bottom:112px}
-/* STORIES BAR */
-#stories-bar::-webkit-scrollbar{display:none}
-.story-pill{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;flex-shrink:0;transition:opacity .13s}
-.story-pill:active{opacity:.65}
-.story-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:17px;border:2.5px solid var(--coral);box-sizing:border-box}
-.story-av.unseen{border-color:var(--bg3)}
-.story-name{font-size:10px;font-weight:600;color:var(--ink2);max-width:54px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;text-align:center}
 /* FRIEND BADGE */
 .friend-badge{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:4px 8px 4px 5px;background:var(--cd);border:1px solid var(--cg);border-radius:99px;font-size:10px;color:var(--ink2)}
 .fb-av{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;flex-shrink:0}
@@ -826,7 +819,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       </div>
       <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
     </div>
-    <div id="stories-bar" style="display:none;overflow-x:auto;margin:0 0 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch"><div id="stories-inner" style="display:flex;gap:10px;padding:2px 18px 10px"></div></div>
     <div class="dtoday-card" id="today-card" onclick="openQ(0)">
       <div class="dtoday-photo" id="dtoday-photo">
         <div class="dt-pts" id="tc-pts">+pts</div>
@@ -1226,7 +1218,6 @@ function refreshHome(){
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<10;i++){const d=document.createElement('div');d.className='dstreak-dot'+(i<S.streak?' on':'');sd.appendChild(d)}
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent='+'+q.pts+' pts';document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex'}
   else{document.getElementById('tc-brand').textContent='Pas encore de question';document.getElementById('tc-pts').textContent='';document.getElementById('tc-q').textContent='Aucun commerce de ta zone n\'a encore posté de question. Reviens bientôt !';document.getElementById('today-card').style.opacity='.75';document.querySelector('#today-card .dtoday-cta').style.display='none'}
-  renderStoriesBar();
   renderQueue();
   renderAlmostReward();
   renderNearbyMap();
@@ -1545,21 +1536,6 @@ async function loadFriendAnswers() {
 function getFriendName(uid) {
   const f = (S.friends || []).find(x => x.uid === uid);
   return f ? f.n : 'Un ami';
-}
-
-function renderStoriesBar() {
-  const bar = document.getElementById('stories-bar');
-  const inner = document.getElementById('stories-inner');
-  if (!bar || !inner) return;
-  const friends = S.friends && S.friends.length ? S.friends.slice(0, 10) : [];
-  if (!friends.length) { bar.style.display = 'none'; return; }
-  const colors = ['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623','#E07D0A'];
-  inner.innerHTML = friends.map(f => {
-    const c = colors[(f.n || 'A').charCodeAt(0) % colors.length];
-    const hasAct = Object.values(S._friendAnswers || {}).some(arr => arr.some(a => a.uid === f.uid));
-    return `<div class="story-pill" onclick="goNav('social')"><div class="story-av${hasAct ? '' : ' unseen'}" style="background:${c}20;color:${c}">${(f.n||'?')[0].toUpperCase()}</div><div class="story-name">${esc(f.n||'Ami')}</div></div>`;
-  }).join('');
-  bar.style.display = 'block';
 }
 
 function buildSocialCard() {
@@ -3239,7 +3215,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   }
 
   await loadCampaignsFromFirestore(data);
-  loadFriendAnswers().then(() => { renderStoriesBar(); renderQueue(); }).catch(() => {});
+  loadFriendAnswers().then(() => { renderQueue(); }).catch(() => {});
   finishAuthTransition();
 }
 
@@ -3268,7 +3244,7 @@ async function loadFriendsFromFirestore(uids) {
     // Recharge le feed avec la nouvelle liste d'amis
     const feedEl = document.getElementById('feed-content');
     if (feedEl) loadCommunityFeed();
-    loadFriendAnswers().then(() => { renderStoriesBar(); renderQueue(); }).catch(() => {});
+    loadFriendAnswers().then(() => { renderQueue(); }).catch(() => {});
   } catch (e) { console.warn('loadFriends:', e); }
 }
 
