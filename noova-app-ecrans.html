@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOOVA — maquettes des écrans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   NOOVA — SYSTÈME DE DESIGN
+   Remplacer les .photo par de vraies images :
+   .photo { background-image: url(...); background-size: cover; }
+   ========================================================= */
+
+:root{
+  /* Couleurs */
+  --cream:#F4F2EC;         /* fond d'écran */
+  --surface:#FFFFFF;       /* cartes */
+  --ink:#1C1917;           /* texte principal + surfaces sombres */
+  --ink-soft:#3D3830;      /* paragraphes */
+  --muted:#6B6559;         /* métadonnées (contraste AA sur blanc) */
+  --line:#EDE9DF;          /* séparateurs */
+  --line-strong:#E0DBCE;   /* bordures d'états inactifs */
+  --yellow:#FFC300;        /* couleur d'action, une seule par écran */
+  --yellow-soft:#FFF3D1;   /* fonds de pastilles */
+  --gold-text:#7A5A00;     /* texte sur jaune clair */
+  --gold-deep:#6B4E00;     /* texte sur jaune plein */
+  --green-bg:#E7F0E9;      /* blocs confidentialité */
+  --green-ink:#264F3C;
+  --nav-off:#B0A89A;       /* icônes de nav inactives */
+
+  /* Rayons — échelle stricte, ne pas en ajouter */
+  --r-card:24px;
+  --r-media:16px;
+  --r-icon:14px;
+  --r-pill:999px;
+
+  /* Ombres */
+  --shadow-card:0 8px 22px rgba(28,25,23,.09);
+  --shadow-raised:0 10px 26px rgba(28,25,23,.10);
+  --shadow-nav:0 8px 24px rgba(28,25,23,.22);
+
+  /* Espacement */
+  --gutter:18px;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#DDD8CC;
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+  color:var(--ink);
+  padding:40px 20px 60px;
+}
+
+/* ---------- Page de présentation ---------- */
+.doc-head{max-width:1180px;margin:0 auto 36px}
+.doc-head h1{font-size:30px;font-weight:800;letter-spacing:-.8px;margin:0 0 8px}
+.doc-head p{font-size:15px;color:#4A4438;line-height:1.6;margin:0 0 18px;max-width:70ch}
+.tokens{display:flex;flex-wrap:wrap;gap:10px}
+.token{background:#fff;border-radius:12px;padding:8px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px}
+.sw{width:18px;height:18px;border-radius:6px;border:1px solid rgba(0,0,0,.08)}
+
+.grid{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:34px;justify-content:center}
+.frame{width:390px}
+.frame > h2{font-size:14px;font-weight:700;margin:0 0 10px;color:#3D3830}
+
+/* ---------- Écran ---------- */
+.screen{
+  width:390px;
+  background:var(--cream);
+  border-radius:38px;
+  overflow:hidden;
+  box-shadow:0 20px 50px rgba(28,25,23,.22);
+  display:flex;
+  flex-direction:column;
+  min-height:844px;
+}
+.g{padding:0 var(--gutter)}
+.grow{flex:1}
+
+/* Barre d'état */
+.status{display:flex;justify-content:space-between;font-size:11px;font-weight:600;padding:14px 20px 16px}
+.status--light{color:var(--muted)}
+.status--over{position:absolute;top:0;left:0;right:0;color:#fff;z-index:3}
+
+/* ---------- Photos (placeholders) ---------- */
+.photo{background:linear-gradient(150deg,#D2C09A,#8A7355);position:relative;overflow:hidden}
+.photo--bread{background:linear-gradient(150deg,#E0B776,#B07C35)}
+.photo--shop{background:linear-gradient(150deg,#D8B98A,#9A7245)}
+.photo--green{background:linear-gradient(150deg,#B9C4A8,#75855F)}
+.photo--blue{background:linear-gradient(150deg,#A8B6C4,#5F7285)}
+.photo--rose{background:linear-gradient(150deg,#E0B0A0,#A56A55)}
+.photo--cafe{background:linear-gradient(150deg,#D9BE8C,#8C6A3C)}
+/* Voile obligatoire : garantit la lisibilité du texte blanc sur n'importe quelle photo */
+.veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(28,25,23,.5) 0%,rgba(28,25,23,.12) 42%,rgba(28,25,23,.8) 100%)}
+
+.hero{position:relative}
+.hero__top{position:absolute;top:44px;left:var(--gutter);right:var(--gutter);display:flex;justify-content:space-between;align-items:center;z-index:2}
+.hero__bottom{position:absolute;left:var(--gutter);right:var(--gutter);bottom:48px;z-index:2}
+.hero__title{margin:0;font-size:21px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.hero__sub{margin:1px 0 0;font-size:12px;font-weight:600;color:#EFEADC}
+
+/* ---------- Typographie ---------- */
+.h-screen{margin:0;font-size:24px;font-weight:800;letter-spacing:-.7px}
+.h-section{margin:0;font-size:19px;font-weight:800;letter-spacing:-.5px}
+.meta{margin:0;font-size:12px;font-weight:600;color:var(--muted)}
+.body{margin:0;font-size:14px;line-height:1.55;color:var(--ink-soft)}
+
+/* ---------- Blocs ---------- */
+.row{display:flex;align-items:center;gap:12px}
+.row--between{justify-content:space-between}
+.card{background:var(--surface);border-radius:var(--r-card);padding:14px;box-shadow:var(--shadow-card)}
+.card--pad{padding:18px}
+.card--dark{background:var(--ink);color:#fff}
+.card--yellow{background:var(--yellow);position:relative;overflow:hidden}
+.card--flush{padding:0;overflow:hidden}
+.raised{box-shadow:var(--shadow-raised)}
+/* Carte qui remonte sur la photo : geste signature de l'app */
+.overlap{margin:-34px var(--gutter) 0;position:relative;z-index:2}
+
+.icon{width:44px;height:44px;border-radius:var(--r-icon);display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-weight:700}
+.icon--sm{width:38px;height:38px;border-radius:12px}
+.avatar{border-radius:var(--r-pill);flex:0 0 auto}
+.thumb{border-radius:var(--r-media);flex:0 0 auto}
+
+/* Filigrane de marque */
+.mark{position:absolute;right:-14px;bottom:-40px;font-size:128px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.3);pointer-events:none}
+.rel{position:relative}
+
+/* Pastilles */
+.chip{display:inline-block;font-size:11px;font-weight:800;padding:5px 10px;border-radius:var(--r-pill)}
+.chip--yellow{background:var(--yellow);color:var(--ink)}
+.chip--soft{background:var(--yellow-soft);color:var(--gold-text)}
+.chip--dark{background:var(--ink);color:var(--yellow)}
+.chip--grey{background:#EFEBE0;color:var(--muted)}
+.chip--glass{background:rgba(28,25,23,.6);color:#fff}
+.chip--white{background:rgba(255,255,255,.92);color:var(--ink)}
+
+/* Boutons */
+.btn{border-radius:var(--r-pill);padding:15px;display:flex;justify-content:center;align-items:center;gap:8px;font-size:15px;font-weight:700;cursor:pointer;border:0}
+.btn--dark{background:var(--ink);color:#fff}
+.btn--yellow{background:var(--yellow);color:var(--ink);font-weight:800}
+.btn--ghost{background:var(--cream);color:var(--muted);font-weight:700}
+.btn .arrow{font-size:17px}
+.btn--dark .arrow{color:var(--yellow)}
+
+/* Compteur de points en en-tête */
+.points{display:flex;align-items:center;gap:5px;border-radius:var(--r-pill);padding:8px 13px}
+.points--glass{background:rgba(28,25,23,.62)}
+.points--dark{background:var(--ink)}
+.points b{font-size:14px;font-weight:800;color:var(--yellow)}
+.points span{font-size:10px;font-weight:700;color:#E4DECE}
+
+/* Étiquette inclinée qui déborde */
+.sticker{position:absolute;top:-13px;right:12px;background:var(--ink);color:var(--yellow);font-size:13px;font-weight:800;padding:9px 15px;border-radius:var(--r-pill);transform:rotate(-4deg);z-index:3;box-shadow:0 6px 16px rgba(28,25,23,.25)}
+
+/* Progression — deux métaphores seulement :
+   segments (série de jours) et anneau (récompenses) */
+.segments{display:flex;gap:5px}
+.segments i{flex:1;height:6px;border-radius:var(--r-pill);background:#3A3632;display:block}
+.segments i.on{background:var(--yellow)}
+.ring{position:relative;flex:0 0 auto}
+.ring svg{transform:rotate(-90deg);display:block}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+
+/* Segmented control */
+.segmented{display:flex;background:#E9E5DA;border-radius:var(--r-pill);padding:4px}
+.segmented div{flex:1;text-align:center;padding:9px;border-radius:var(--r-pill);font-size:13px;font-weight:700;color:var(--muted)}
+.segmented div.on{background:var(--ink);color:#fff}
+
+/* Options de réponse */
+.option{background:var(--surface);border:1.5px solid var(--line-strong);border-radius:18px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:13px;font-size:16px;font-weight:500}
+.option.on{border-color:var(--ink);background:#FFFBEF;font-weight:700}
+.radio{width:22px;height:22px;border-radius:var(--r-pill);border:2px solid #C9C3B5;flex:0 0 auto}
+.option.on .radio{border:7px solid var(--yellow);background:var(--ink)}
+
+/* Interrupteurs de consentement */
+.toggle{width:46px;height:27px;border-radius:var(--r-pill);background:var(--line-strong);position:relative;flex:0 0 auto}
+.toggle b{position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:var(--r-pill);background:#fff;display:block}
+.toggle.on{background:var(--yellow)}
+.toggle.on b{left:auto;right:3px}
+
+/* Barre d'action fixe (écran de réponse) */
+.actionbar{padding:14px var(--gutter) 18px;background:var(--surface);border-top:1px solid var(--line);display:flex;gap:10px}
+.actionbar .btn--ghost{width:96px;flex:0 0 auto}
+.actionbar .btn--yellow{flex:1}
+
+/* Navigation */
+.nav{margin:0 14px 16px;background:var(--ink);border-radius:26px;display:flex;justify-content:space-around;padding:11px 6px 9px;box-shadow:var(--shadow-nav)}
+.nav a{flex:1;text-align:center;text-decoration:none}
+.nav svg{width:21px;height:21px;stroke:var(--nav-off);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.nav span{display:block;margin-top:3px;font-size:10px;font-weight:700;color:var(--nav-off)}
+.nav a.on svg{stroke:var(--yellow)}
+.nav a.on span{color:var(--yellow)}
+
+/* Rail horizontal — la 3e carte dépasse pour signaler le défilement */
+.rail{overflow-x:auto;padding:0 0 4px var(--gutter);margin-bottom:20px;-webkit-overflow-scrolling:touch}
+.rail::-webkit-scrollbar{display:none}
+.rail__inner{display:flex;gap:11px;width:max-content;padding-right:var(--gutter)}
+.rail .card{width:158px}
+
+.spacer{height:20px}
+.mb-s{margin-bottom:9px}
+.mb-m{margin-bottom:16px}
+.mb-l{margin-bottom:24px}
+</style>
+</head>
+<body>
+
+<div class="doc-head">
+  <h1>NOOVA — maquettes des écrans</h1>
+  <p>Huit écrans dans une seule direction : fond crème, une seule surface jaune par écran pour l'action principale, cartes blanches pour le contenu, noir pour les moments de progression. Les zones dégradées sont les emplacements photo : devanture du commerce, produit de la récompense, avatars. Deux métaphores de progression seulement — segments pour la série de jours, anneau pour les récompenses. Rayons : 24 pour les cartes, 16 pour les médias, 14 pour les icônes.</p>
+  <div class="tokens">
+    <div class="token"><span class="sw" style="background:#F4F2EC"></span>cream #F4F2EC</div>
+    <div class="token"><span class="sw" style="background:#FFFFFF"></span>surface #FFFFFF</div>
+    <div class="token"><span class="sw" style="background:#1C1917"></span>ink #1C1917</div>
+    <div class="token"><span class="sw" style="background:#FFC300"></span>yellow #FFC300</div>
+    <div class="token"><span class="sw" style="background:#FFF3D1"></span>yellow-soft #FFF3D1</div>
+    <div class="token"><span class="sw" style="background:#6B6559"></span>muted #6B6559</div>
+    <div class="token">Plus Jakarta Sans · 800 / 700 / 500</div>
+  </div>
+</div>
+
+<div class="grid">
+
+<!-- ============ 1. ACCUEIL ============ -->
+<div class="frame">
+<h2>1 · Accueil</h2>
+<div class="screen">
+  <div class="hero">
+    <div class="photo photo--cafe" style="height:214px">
+      <div class="veil"></div>
+      <div class="status status--over"><span>9:41</span><span>▮▮▮ ⌁ ▰</span></div>
+      <div class="hero__top">
+        <div class="row" style="gap:9px">
+          <div class="photo avatar" style="width:36px;height:36px;border:2px solid rgba(255,255,255,.7)"></div>
+          <p style="margin:0;font-size:16px;font-weight:800;color:#fff;letter-spacing:-.3px">Salut Tom</p>
+        </div>
+        <div class="points points--glass"><b>210</b><span>PTS</span></div>
+      </div>
+      <div class="hero__bottom row">
+        <div class="photo thumb" style="width:42px;height:42px;border:2px solid #fff"></div>
+        <div>
+          <p class="hero__title" style="font-size:16px">Café de la place</p>
+          <p class="hero__sub">Ouvert · à 180 m de toi</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlap">
+    <div class="sticker">+10 pts</div>
+    <div class="card card--yellow raised card--pad">
+      <div class="mark">?!</div>
+      <div class="row rel" style="gap:6px;margin-bottom:12px">
+        <span style="width:26px;height:4px;border-radius:999px;background:#1C1917"></span>
+        <span style="width:26px;height:4px;border-radius:999px;background:rgba(28,25,23,.25)"></span>
+        <span style="width:26px;height:4px;border-radius:999px;background:rgba(28,25,23,.25)"></span>
+        <span style="font-size:11px;font-weight:800;color:var(--gold-deep);margin-left:4px">1 sur 3 aujourd'hui</span>
+      </div>
+      <p class="rel" style="margin:0 0 20px;font-size:23px;line-height:1.25;font-weight:800;letter-spacing:-.6px">On ouvre le dimanche matin. Tu viendrais&nbsp;?</p>
+      <div class="btn btn--dark rel">Répondre en 30 secondes <span class="arrow">→</span></div>
+    </div>
+  </div>
+
+  <div class="g" style="padding-top:16px">
+    <div class="card card--dark card--pad raised mb-l">
+      <div class="row mb-m">
+        <div class="icon" style="background:rgba(255,138,61,.2);color:#FF9D5C;font-size:20px">🔥</div>
+        <div style="flex:1;min-width:0">
+          <p style="margin:0;font-size:17px;font-weight:800;letter-spacing:-.3px">7 jours d'affilée</p>
+          <p style="margin:1px 0 0;font-size:12px;color:#C0B9AC">Encore 3 jours pour 50 pts bonus</p>
+        </div>
+        <div class="row" style="gap:0">
+          <div class="photo avatar" style="width:26px;height:26px;border:2px solid #1C1917"></div>
+          <div class="photo photo--rose avatar" style="width:26px;height:26px;border:2px solid #1C1917;margin-left:-9px"></div>
+          <div class="avatar" style="width:26px;height:26px;border:2px solid #1C1917;margin-left:-9px;background:#3A3632;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#E4DECE">+2</div>
+        </div>
+      </div>
+      <div class="segments">
+        <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+      </div>
+    </div>
+
+    <p class="h-section" style="margin-bottom:12px">Presque à toi</p>
+    <div class="card row mb-l" style="gap:14px">
+      <div class="photo photo--bread thumb" style="width:70px;height:70px"></div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:16px;font-weight:800;letter-spacing:-.3px">1 viennoiserie</p>
+        <p class="meta" style="margin:2px 0 8px">Le Fournil de la Cité</p>
+        <span class="chip chip--soft">Encore 3 réponses</span>
+      </div>
+      <div class="ring" style="width:56px;height:56px">
+        <svg viewBox="0 0 56 56" width="56" height="56" role="img" aria-label="70 %">
+          <circle cx="28" cy="28" r="23" fill="none" stroke="#E6E2D8" stroke-width="7"/>
+          <circle cx="28" cy="28" r="23" fill="none" stroke="#FFC300" stroke-width="7" stroke-linecap="round" stroke-dasharray="101.2 144.5"/>
+        </svg>
+        <b>70%</b>
+      </div>
+    </div>
+
+    <div class="row row--between" style="margin-bottom:12px">
+      <p class="h-section">À deux pas</p>
+      <span style="font-size:13px;font-weight:700;color:var(--muted)">Voir la carte</span>
+    </div>
+  </div>
+
+  <div class="rail">
+    <div class="rail__inner">
+      <div class="card card--flush">
+        <div class="photo photo--shop" style="height:90px">
+          <span class="chip chip--yellow" style="position:absolute;top:9px;left:9px">1 question</span>
+        </div>
+        <div style="padding:12px 13px 14px">
+          <p style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.2px">Le Fournil</p>
+          <p class="meta" style="margin-top:2px">Boulangerie · 240 m</p>
+        </div>
+      </div>
+      <div class="card card--flush">
+        <div class="photo photo--green" style="height:90px">
+          <span class="chip chip--glass" style="position:absolute;top:9px;left:9px">Bientôt</span>
+        </div>
+        <div style="padding:12px 13px 14px">
+          <p style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.2px">L'Épicerie</p>
+          <p class="meta" style="margin-top:2px">Épicerie · 400 m</p>
+        </div>
+      </div>
+      <div class="card card--flush">
+        <div class="photo photo--blue" style="height:90px"></div>
+        <div style="padding:12px 13px 14px">
+          <p style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.2px">Studio 24</p>
+          <p class="meta" style="margin-top:2px">Sport · 600 m</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g">
+    <div class="card card--flush raised" style="background:#E9E5D8;margin-bottom:16px;position:relative">
+      <svg viewBox="0 0 340 122" style="display:block;width:100%;height:auto" role="img" aria-label="Carte du quartier">
+        <rect width="340" height="122" fill="#E9E5D8"/>
+        <path d="M0 42 H340" stroke="#D8D2C0" stroke-width="10"/>
+        <path d="M0 94 H340" stroke="#D8D2C0" stroke-width="7"/>
+        <path d="M92 0 V122" stroke="#D8D2C0" stroke-width="9"/>
+        <path d="M238 0 V122" stroke="#D8D2C0" stroke-width="6"/>
+        <rect x="104" y="52" width="48" height="30" rx="6" fill="#DCD6C4"/>
+        <rect x="252" y="10" width="54" height="22" rx="6" fill="#DCD6C4"/>
+        <circle cx="170" cy="66" r="20" fill="#3F7BD6" opacity=".18"/>
+        <circle cx="170" cy="66" r="7" fill="#3F7BD6" stroke="#fff" stroke-width="3"/>
+        <circle cx="92" cy="42" r="17" fill="#FFC300"/><circle cx="92" cy="42" r="6" fill="#1C1917"/>
+        <circle cx="238" cy="94" r="13" fill="#1C1917"/><circle cx="238" cy="94" r="4" fill="#FFC300"/>
+      </svg>
+      <div style="position:absolute;left:14px;bottom:12px;background:#fff;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:800">4 commerces autour de toi</div>
+    </div>
+  </div>
+
+  <div class="grow"></div>
+  <nav class="nav">
+    <a href="#" class="on"><svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Accueil</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 11a3 3 0 1 0 0-6"/><path d="M18 20a5 5 0 0 0-3-4.6"/></svg><span>Amis</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13M12 8S9 3 7 5s5 3 5 3zM12 8s3-5 5-3-5 3-5 3z"/></svg><span>Cadeaux</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profil</span></a>
+  </nav>
+</div>
+</div>
+
+<!-- ============ 2. RÉPONDRE ============ -->
+<div class="frame">
+<h2>2 · Répondre (mode focus, sans navigation)</h2>
+<div class="screen">
+  <div class="status status--light"><span>9:41</span><span>▮▮▮ ⌁ ▰</span></div>
+  <div class="g">
+    <div class="row mb-l">
+      <div style="width:38px;height:38px;border-radius:999px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-card);font-size:18px;font-weight:600">✕</div>
+      <div class="row" style="gap:5px;flex:1">
+        <span style="flex:1;height:5px;border-radius:999px;background:var(--ink)"></span>
+        <span style="flex:1;height:5px;border-radius:999px;background:var(--line-strong)"></span>
+        <span style="flex:1;height:5px;border-radius:999px;background:var(--line-strong)"></span>
+      </div>
+      <span class="chip chip--yellow">+10 pts</span>
+    </div>
+
+    <div class="row" style="margin-bottom:26px">
+      <div class="photo photo--cafe thumb" style="width:44px;height:44px"></div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:15px;font-weight:800">Café de la place</p>
+        <p class="meta" style="margin-top:2px">Question 1 sur 3 · à 180 m</p>
+      </div>
+    </div>
+
+    <p style="margin:0 0 6px;font-size:27px;line-height:1.22;font-weight:800;letter-spacing:-.8px">On ouvre le dimanche matin. Tu viendrais&nbsp;?</p>
+    <p class="meta" style="margin-bottom:22px;font-weight:500">Une seule réponse</p>
+
+    <div class="option on"><span class="radio"></span>Oui, pour un brunch</div>
+    <div class="option"><span class="radio"></span>Oui, juste un café</div>
+    <div class="option"><span class="radio"></span>Ça dépend du monde</div>
+    <div class="option"><span class="radio"></span>Non, je dors</div>
+
+    <p class="meta" style="text-align:center;font-weight:500;margin-top:22px">Anonyme · le commerçant ne voit que les totaux</p>
+  </div>
+  <div class="grow"></div>
+  <div class="actionbar">
+    <div class="btn btn--ghost">Passer</div>
+    <div class="btn btn--yellow">Valider <span class="arrow">→</span></div>
+  </div>
+</div>
+</div>
+
+<!-- ============ 3. RÉSULTAT ============ -->
+<div class="frame">
+<h2>3 · Résultat — la vraie récompense</h2>
+<div class="screen">
+  <div class="status status--light"><span>9:41</span><span>▮▮▮ ⌁ ▰</span></div>
+  <div class="g">
+    <div class="card card--yellow card--pad raised mb-l" style="display:flex;align-items:center;gap:14px">
+      <div class="mark" style="font-size:110px;bottom:-34px">?!</div>
+      <span class="rel" style="font-size:30px;font-weight:800;letter-spacing:-1px">+10</span>
+      <div class="rel" style="flex:1;min-width:0">
+        <p style="margin:0;font-size:14px;font-weight:800">points gagnés</p>
+        <p style="margin:1px 0 0;font-size:12px;font-weight:700;color:var(--gold-deep)">Série de 7 jours tenue</p>
+      </div>
+    </div>
+
+    <p class="h-section" style="margin-bottom:4px">Ton quartier a répondu</p>
+    <p class="meta" style="margin-bottom:20px;font-weight:500">84 voisins · résultat en direct</p>
+
+    <div style="margin-bottom:18px">
+      <div class="row row--between" style="margin-bottom:8px">
+        <span style="font-size:14px;font-weight:800">Oui, pour un brunch</span>
+        <span style="font-size:16px;font-weight:800">62 %</span>
+      </div>
+      <div style="height:10px;background:#E6E2D8;border-radius:999px;overflow:hidden"><div style="width:62%;height:100%;background:var(--yellow)"></div></div>
+      <p class="meta" style="margin-top:6px">C'est ce que tu as répondu</p>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div class="row row--between" style="margin-bottom:8px">
+        <span style="font-size:14px;color:var(--muted);font-weight:600">Oui, juste un café</span>
+        <span style="font-size:14px;color:var(--muted);font-weight:700">21 %</span>
+      </div>
+      <div style="height:10px;background:#E6E2D8;border-radius:999px;overflow:hidden"><div style="width:21%;height:100%;background:#C9C3B5"></div></div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div class="row row--between" style="margin-bottom:8px">
+        <span style="font-size:14px;color:var(--muted);font-weight:600">Ça dépend du monde</span>
+        <span style="font-size:14px;color:var(--muted);font-weight:700">11 %</span>
+      </div>
+      <div style="height:10px;background:#E6E2D8;border-radius:999px;overflow:hidden"><div style="width:11%;height:100%;background:#C9C3B5"></div></div>
+    </div>
+    <div class="mb-l">
+      <div class="row row--between" style="margin-bottom:8px">
+        <span style="font-size:14px;color:var(--muted);font-weight:600">Non, je dors</span>
+        <span style="font-size:14px;color:var(--muted);font-weight:700">6 %</span>
+      </div>
+      <div style="height:10px;background:#E6E2D8;border-radius:999px;overflow:hidden"><div style="width:6%;height:100%;background:#C9C3B5"></div></div>
+    </div>
+
+    <p class="h-section" style="margin-bottom:12px">Tes amis</p>
+    <div class="card row mb-s">
+      <div class="photo photo--rose avatar" style="width:42px;height:42px"></div>
+      <p style="margin:0;flex:1;font-size:15px;font-weight:700">Maddy</p>
+      <span class="chip chip--soft">Même avis</span>
+    </div>
+    <div class="card row mb-l">
+      <div class="photo photo--green avatar" style="width:42px;height:42px"></div>
+      <p style="margin:0;flex:1;font-size:15px;font-weight:700">Léa</p>
+      <span class="chip chip--grey">Juste un café</span>
+    </div>
+  </div>
+  <div class="grow"></div>
+  <div class="actionbar">
+    <div class="btn btn--yellow" style="flex:1">Question suivante <span class="arrow">→</span></div>
+  </div>
+</div>
+</div>
+
+<!-- ============ 4. FICHE COMMERCE ============ -->
+<div class="frame">
+<h2>4 · Fiche commerce</h2>
+<div class="screen">
+  <div class="hero">
+    <div class="photo photo--cafe" style="height:224px">
+      <div class="veil"></div>
+      <div class="status status--over"><span>9:41</span><span>▮▮▮ ⌁ ▰</span></div>
+      <div class="hero__top" style="top:42px">
+        <div style="width:38px;height:38px;border-radius:999px;background:rgba(28,25,23,.55);display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px">←</div>
+        <div style="width:38px;height:38px;border-radius:999px;background:rgba(28,25,23,.55);display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px">♡</div>
+      </div>
+      <div class="hero__bottom" style="bottom:46px">
+        <div class="row" style="margin-bottom:10px">
+          <div class="photo thumb" style="width:52px;height:52px;border:2px solid #fff"></div>
+          <div>
+            <p class="hero__title">Café de la place</p>
+            <p class="hero__sub">Restauration · à 180 m de toi</p>
+          </div>
+        </div>
+        <div class="row" style="gap:7px">
+          <span class="chip chip--white">✓ Vérifié</span>
+          <span class="chip chip--glass">Ouvert jusqu'à 19 h</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlap" style="margin-top:-30px">
+    <div class="card raised" style="padding:16px;display:grid;grid-template-columns:repeat(3,1fr)">
+      <div style="text-align:center"><p style="margin:0;font-size:19px;font-weight:800">1</p><p class="meta" style="margin-top:1px;font-size:11px">Sondage actif</p></div>
+      <div style="text-align:center;border-left:1px solid var(--line);border-right:1px solid var(--line)"><p style="margin:0;font-size:19px;font-weight:800">20</p><p class="meta" style="margin-top:1px;font-size:11px">Pts / question</p></div>
+      <div style="text-align:center"><p style="margin:0;font-size:19px;font-weight:800">30 s</p><p class="meta" style="margin-top:1px;font-size:11px">Pour répondre</p></div>
+    </div>
+  </div>
+
+  <div class="g" style="padding-top:22px">
+    <p class="h-section" style="margin-bottom:8px">À propos</p>
+    <p class="body mb-l">Restaurant familial du centre-ville, cuisine locale et produits de saison. Ouvert depuis 2016 place des Jacobins.</p>
+
+    <p class="h-section" style="margin-bottom:12px">Leur question du moment</p>
+    <div class="card card--yellow card--pad raised mb-l">
+      <div class="mark" style="font-size:126px">?!</div>
+      <div class="row row--between rel" style="margin-bottom:12px">
+        <span class="chip chip--dark">Active</span>
+        <span style="font-size:13px;font-weight:800">+20 pts</span>
+      </div>
+      <p class="rel" style="margin:0 0 6px;font-size:21px;line-height:1.28;font-weight:800;letter-spacing:-.5px">On ouvre le dimanche matin. Tu viendrais&nbsp;?</p>
+      <p class="rel" style="margin:0 0 18px;font-size:12px;font-weight:700;color:var(--gold-deep)">1 question · environ 15 secondes</p>
+      <div class="btn btn--dark rel">Répondre <span class="arrow">→</span></div>
+    </div>
+
+    <p class="h-section" style="margin-bottom:12px">Sa récompense</p>
+    <div class="card row mb-l" style="gap:14px">
+      <div class="photo photo--cafe thumb" style="width:66px;height:66px"></div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:16px;font-weight:800;letter-spacing:-.2px">1 café offert</p>
+        <p class="meta" style="margin:2px 0 7px">200 pts · à retirer sur place</p>
+        <span class="chip chip--soft">Tu l'as débloqué</span>
+      </div>
+      <span style="color:#A9A296;font-size:18px">›</span>
+    </div>
+
+    <div class="row mb-l" style="background:var(--green-bg);border-radius:var(--r-card);padding:16px;gap:12px">
+      <span style="font-size:18px">🔒</span>
+      <p style="margin:0;font-size:13px;line-height:1.5;font-weight:600;color:var(--green-ink)">Tes réponses sont agrégées et anonymes. Ce commerçant ne voit jamais ton identité.</p>
+    </div>
+  </div>
+
+  <div class="grow"></div>
+  <nav class="nav">
+    <a href="#" class="on"><svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Accueil</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 11a3 3 0 1 0 0-6"/><path d="M18 20a5 5 0 0 0-3-4.6"/></svg><span>Amis</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/></svg><span>Cadeaux</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profil</span></a>
+  </nav>
+</div>
+</div>
+
+<!-- ============ 5. AMIS ============ -->
+<div class="frame">
+<h2>5 · Amis</h2>
+<div class="screen">
+  <div style="background:var(--ink);height:186px;position:relative;overflow:hidden">
+    <div style="position:absolute;right:-34px;top:-34px;width:190px;height:190px;border-radius:50%;background:rgba(255,195,0,.13)"></div>
+    <div class="status status--over"><span>9:41</span><span>▮▮▮ ⌁ ▰</span></div>
+    <div style="position:absolute;top:46px;left:var(--gutter);right:var(--gutter)">
+      <p class="h-screen" style="color:#fff">Tes amis</p>
+      <p style="margin:4px 0 0;font-size:13px;color:#C0B9AC">Le classement se remet à zéro dans 3 jours</p>
+    </div>
+  </div>
+
+  <div class="overlap" style="margin-top:-70px">
+    <div class="card card--yellow raised row" style="padding:16px 18px">
+      <div class="mark" style="font-size:108px;bottom:-32px">?!</div>
+      <div class="rel" style="width:36px;height:36px;border-radius:999px;background:var(--ink);color:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex:0 0 auto">1</div>
+      <div class="photo avatar" style="width:42px;height:42px;border:2px solid var(--ink)"></div>
+      <div class="rel" style="flex:1;min-width:0">
+        <p style="margin:0;font-size:16px;font-weight:800;letter-spacing:-.2px">Toi</p>
+        <p style="margin:1px 0 0;font-size:12px;font-weight:700;color:var(--gold-deep)">265 XP cette semaine</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="g" style="padding-top:22px">
+    <p class="h-section" style="margin-bottom:12px">Ton quartier</p>
+
+    <div class="card row mb-s">
+      <span style="width:16px;font-size:15px;font-weight:800;color:#A9A296">2</span>
+      <div class="photo photo--rose avatar" style="width:44px;height:44px"></div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:15px;font-weight:700">Maddy</p>
+        <p class="meta" style="margin-top:2px">Même avis 8 fois sur 10</p>
+      </div>
+      <span style="font-size:15px;font-weight:800">240</span>
+    </div>
+    <div class="card row mb-s">
+      <span style="width:16px;font-size:15px;font-weight:800;color:#A9A296">3</span>
+      <div class="photo photo--green avatar" style="width:44px;height:44px"></div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:15px;font-weight:700">Léa</p>
+        <p class="meta" style="margin-top:2px">Même avis 5 fois sur 9</p>
+      </div>
+      <span style="font-size:15px;font-weight:800">175</span>
+    </div>
+    <div class="card row mb-l">
+      <span style="width:16px;font-size:15px;font-weight:800;color:#A9A296">4</span>
+      <div class="photo photo--blue avatar" style="width:44px;height:44px"></div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:15px;font-weight:700">Karim</p>
+        <p class="meta" style="margin-top:2px">Pas encore de question commune</p>
+      </div>
+      <span style="font-size:15px;font-weight:800">95</span>
+    </div>
+
+    <div class="card card--pad mb-m">
+      <div class="row" style="gap:11px;margin-bottom:14px">
+        <div class="icon icon--sm" style="background:var(--yellow-soft);color:var(--gold-text);font-size:18px">＋</div>
+        <div style="flex:1;min-width:0">
+          <p style="margin:0;font-size:16px;font-weight:800;letter-spacing:-.2px">Invite un voisin</p>
+          <p class="meta" style="margin-top:2px;font-weight:500">50 pts chacun dès sa première réponse</p>
+        </div>
+      </div>
+      <div class="row row--between" style="background:var(--cream);border-radius:var(--r-media);padding:12px 14px">
+        <span style="font-size:16px;font-weight:800;letter-spacing:2px">LBJBY4</span>
+        <span class="chip chip--dark" style="padding:8px 15px;font-size:12px">Partager</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grow"></div>
+  <nav class="nav">
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Accueil</span></a>
+    <a href="#" class="on"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 11a3 3 0 1 0 0-6"/><path d="M18 20a5 5 0 0 0-3-4.6"/></svg><span>Amis</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/></svg><span>Cadeaux</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profil</span></a>
+  </nav>
+</div>
+</div>
+
+<!-- ============ 6. FEED ============ -->
+<div class="frame">
+<h2>6 · Activité — un format de carte par type d'événement</h2>
+<div class="screen">
+  <div class="status status--light"><span>9:41</span><span>▮▮▮ ⌁ ▰</span></div>
+  <div class="g">
+    <div class="row row--between mb-m">
+      <p class="h-screen">Communauté</p>
+      <div style="width:40px;height:40px;border-radius:999px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-card);position:relative">🔔
+        <span style="position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--yellow);border:1.5px solid #fff"></span>
+      </div>
+    </div>
+
+    <div class="segmented mb-l">
+      <div class="on">Activité</div><div>Amis</div><div>Classement</div>
+    </div>
+
+    <div class="card card--pad" style="margin-bottom:11px">
+      <div class="row" style="margin-bottom:12px">
+        <div class="photo photo--rose avatar" style="width:42px;height:42px"></div>
+        <div style="flex:1;min-width:0">
+          <p style="margin:0;font-size:15px;font-weight:700">Maddy</p>
+          <p class="meta" style="margin-top:1px;font-weight:500">il y a 2 h</p>
+        </div>
+        <span class="chip chip--soft">Même avis</span>
+      </div>
+      <p class="body" style="margin-bottom:12px">A donné son avis sur les horaires du dimanche chez <b>Café de la place</b>.</p>
+      <div class="row" style="gap:18px;padding-top:12px;border-top:1px solid var(--line)">
+        <span class="meta">♡ 4</span><span class="meta">Réagir</span>
+      </div>
+    </div>
+
+    <div class="card card--pad" style="margin-bottom:11px">
+      <div class="row" style="margin-bottom:12px">
+        <div class="photo photo--green avatar" style="width:42px;height:42px"></div>
+        <div style="flex:1;min-width:0">
+          <p style="margin:0;font-size:15px;font-weight:700">Léa</p>
+          <p class="meta" style="margin-top:1px;font-weight:500">hier</p>
+        </div>
+      </div>
+      <div class="row" style="background:var(--cream);border-radius:18px;padding:12px;gap:12px;margin-bottom:12px">
+        <div class="photo photo--bread thumb" style="width:52px;height:52px"></div>
+        <div style="flex:1;min-width:0">
+          <p style="margin:0;font-size:14px;font-weight:800">A débloqué 1 viennoiserie</p>
+          <p class="meta" style="margin-top:2px">Le Fournil de la Cité</p>
+        </div>
+      </div>
+      <div class="row" style="gap:18px"><span class="meta">♡ 7</span><span class="meta">Réagir</span></div>
+    </div>
+
+    <div class="card card--dark card--pad row" style="margin-bottom:11px;gap:14px">
+      <div class="icon" style="background:rgba(255,195,0,.2);color:var(--yellow);font-size:18px">🏪</div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:15px;font-weight:800">L'Épicerie du coin arrive</p>
+        <p style="margin:2px 0 0;font-size:12px;font-weight:600;color:#C0B9AC">Nouveau commerce à 400 m · première question demain</p>
+      </div>
+    </div>
+
+    <div class="card card--pad row mb-l">
+      <div class="photo photo--blue avatar" style="width:42px;height:42px"></div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:15px;font-weight:700">Karim a rejoint ton quartier</p>
+        <p class="meta" style="margin-top:1px;font-weight:500">il y a 3 jours</p>
+      </div>
+      <span class="chip chip--dark">Ajouter</span>
+    </div>
+  </div>
+
+  <div class="grow"></div>
+  <nav class="nav">
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Accueil</span></a>
+    <a href="#" class="on"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 11a3 3 0 1 0 0-6"/><path d="M18 20a5 5 0 0 0-3-4.6"/></svg><span>Amis</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/></svg><span>Cadeaux</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profil</span></a>
+  </nav>
+</div>
+</div>
+
+<!-- ============ 7. CADEAUX ============ -->
+<div class="frame">
+<h2>7 · Cadeaux</h2>
+<div class="screen">
+  <div class="hero">
+    <div class="photo photo--cafe" style="height:206px">
+      <div class="veil"></div>
+      <div class="status status--over"><span>9:41</span><span>▮▮▮ ⌁ ▰</span></div>
+      <div class="hero__top">
+        <p class="h-screen" style="font-size:22px;color:#fff">Tes cadeaux</p>
+        <div class="points points--glass"><b>210</b><span>PTS</span></div>
+      </div>
+      <div class="hero__bottom" style="bottom:52px"><span class="chip chip--yellow">Débloqué</span></div>
+    </div>
+  </div>
+
+  <div class="overlap">
+    <div class="card raised card--pad">
+      <p style="margin:0;font-size:21px;font-weight:800;letter-spacing:-.5px">1 café offert</p>
+      <p class="meta" style="margin:3px 0 16px">Café de la place · à 180 m de toi</p>
+      <div class="btn btn--yellow" style="margin-bottom:10px">Échanger contre 200 pts</div>
+      <p class="meta" style="text-align:center">Il te restera 10 pts · ton niveau ne bouge pas</p>
+    </div>
+  </div>
+
+  <div class="g" style="padding-top:24px">
+    <div class="row row--between" style="margin-bottom:12px">
+      <p class="h-section">En cours</p><span class="meta">3</span>
+    </div>
+
+    <div class="card row mb-s" style="gap:14px">
+      <div class="photo photo--bread thumb" style="width:66px;height:66px"></div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:16px;font-weight:800;letter-spacing:-.2px">1 viennoiserie</p>
+        <p class="meta" style="margin:2px 0 7px">Le Fournil · 300 pts</p>
+        <span class="chip chip--soft">Encore 3 réponses</span>
+      </div>
+      <div class="ring" style="width:54px;height:54px">
+        <svg viewBox="0 0 54 54" width="54" height="54" role="img" aria-label="70 %">
+          <circle cx="27" cy="27" r="22" fill="none" stroke="#E6E2D8" stroke-width="6"/>
+          <circle cx="27" cy="27" r="22" fill="none" stroke="#FFC300" stroke-width="6" stroke-linecap="round" stroke-dasharray="96.8 138.2"/>
+        </svg><b>70%</b>
+      </div>
+    </div>
+
+    <div class="card row mb-s" style="gap:14px">
+      <div class="photo photo--green thumb" style="width:66px;height:66px"></div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:16px;font-weight:800;letter-spacing:-.2px">5 € de cash back</p>
+        <p class="meta" style="margin:2px 0 7px">Sur ton compte · 800 pts</p>
+        <span class="chip chip--grey">Encore 59 réponses</span>
+      </div>
+      <div class="ring" style="width:54px;height:54px">
+        <svg viewBox="0 0 54 54" width="54" height="54" role="img" aria-label="26 %">
+          <circle cx="27" cy="27" r="22" fill="none" stroke="#E6E2D8" stroke-width="6"/>
+          <circle cx="27" cy="27" r="22" fill="none" stroke="#FFC300" stroke-width="6" stroke-linecap="round" stroke-dasharray="35.9 199.1"/>
+        </svg><b>26%</b>
+      </div>
+    </div>
+
+    <div class="card row mb-l" style="gap:14px">
+      <div class="photo photo--blue thumb" style="width:66px;height:66px"></div>
+      <div style="flex:1;min-width:0">
+        <p style="margin:0;font-size:16px;font-weight:800;letter-spacing:-.2px">1 séance de sport</p>
+        <p class="meta" style="margin:2px 0 7px">Studio 24 · 1000 pts</p>
+        <span class="chip chip--grey">Encore 79 réponses</span>
+      </div>
+      <div class="ring" style="width:54px;height:54px">
+        <svg viewBox="0 0 54 54" width="54" height="54" role="img" aria-label="21 %">
+          <circle cx="27" cy="27" r="22" fill="none" stroke="#E6E2D8" stroke-width="6"/>
+          <circle cx="27" cy="27" r="22" fill="none" stroke="#FFC300" stroke-width="6" stroke-linecap="round" stroke-dasharray="29 206"/>
+        </svg><b>21%</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="grow"></div>
+  <nav class="nav">
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Accueil</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 11a3 3 0 1 0 0-6"/><path d="M18 20a5 5 0 0 0-3-4.6"/></svg><span>Amis</span></a>
+    <a href="#" class="on"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/></svg><span>Cadeaux</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profil</span></a>
+  </nav>
+</div>
+</div>
+
+<!-- ============ 8. PROFIL ============ -->
+<div class="frame">
+<h2>8 · Profil</h2>
+<div class="screen">
+  <div style="background:var(--yellow);height:146px;position:relative;overflow:hidden">
+    <div class="mark" style="font-size:148px;bottom:-44px;right:-16px">?!</div>
+    <div class="status status--over" style="color:var(--ink)"><span>9:41</span><span>▮▮▮ ⌁ ▰</span></div>
+    <div style="position:absolute;top:46px;left:var(--gutter);right:var(--gutter);display:flex;justify-content:space-between;align-items:center">
+      <p class="h-screen" style="font-size:22px">Ton profil</p>
+      <div style="width:38px;height:38px;border-radius:999px;background:rgba(28,25,23,.16);display:flex;align-items:center;justify-content:center">⚙</div>
+    </div>
+  </div>
+
+  <div class="overlap" style="margin-top:-48px">
+    <div class="card raised card--pad">
+      <div class="row" style="gap:14px;margin-bottom:18px">
+        <div class="ring" style="width:72px;height:72px">
+          <svg viewBox="0 0 72 72" width="72" height="72" role="img" aria-label="Niveau 27 %">
+            <circle cx="36" cy="36" r="33" fill="none" stroke="#E6E2D8" stroke-width="5"/>
+            <circle cx="36" cy="36" r="33" fill="none" stroke="#FFC300" stroke-width="5" stroke-linecap="round" stroke-dasharray="56 151.4"/>
+          </svg>
+          <div class="photo avatar" style="position:absolute;inset:7px"></div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <p style="margin:0;font-size:19px;font-weight:800;letter-spacing:-.4px">Tom Mussard</p>
+          <p class="meta" style="margin:2px 0 8px">Le Mans centre</p>
+          <span class="chip chip--soft">Niveau 1 · 265 / 1000 XP</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+        <div style="background:var(--cream);border-radius:var(--r-media);padding:12px;text-align:center"><p style="margin:0;font-size:19px;font-weight:800">24</p><p class="meta" style="margin-top:1px;font-size:11px;font-weight:700">Avis</p></div>
+        <div style="background:var(--yellow-soft);border-radius:var(--r-media);padding:12px;text-align:center"><p style="margin:0;font-size:19px;font-weight:800">7 j</p><p style="margin:1px 0 0;font-size:11px;font-weight:700;color:var(--gold-text)">Série</p></div>
+        <div style="background:var(--cream);border-radius:var(--r-media);padding:12px;text-align:center"><p style="margin:0;font-size:19px;font-weight:800">210</p><p class="meta" style="margin-top:1px;font-size:11px;font-weight:700">Points</p></div>
+      </div>
+      <p class="meta" style="font-weight:500;line-height:1.45">Les points s'échangent contre des cadeaux. L'XP fait monter ton niveau et ne se dépense jamais.</p>
+    </div>
+  </div>
+
+  <div class="g" style="padding-top:22px">
+    <div class="card card--dark card--pad raised row mb-l" style="gap:14px">
+      <div class="icon" style="background:rgba(255,195,0,.2);color:var(--yellow);font-size:18px">🏪</div>
+      <p style="margin:0;flex:1;font-size:14px;line-height:1.5">Tes avis ont aidé <b style="color:var(--yellow)">3 commerces</b> à choisir leurs horaires et leur carte.</p>
+    </div>
+
+    <div class="row row--between" style="margin-bottom:12px">
+      <p class="h-section">Commerces autorisés</p><span class="meta">2 actifs</span>
+    </div>
+
+    <div class="card row mb-s">
+      <div class="photo photo--shop thumb" style="width:44px;height:44px;border-radius:var(--r-icon)"></div>
+      <div style="flex:1;min-width:0"><p style="margin:0;font-size:15px;font-weight:700">Café de la place</p><p class="meta" style="margin-top:2px">12 questions posées</p></div>
+      <div class="toggle on"><b></b></div>
+    </div>
+    <div class="card row mb-s">
+      <div class="photo photo--bread thumb" style="width:44px;height:44px;border-radius:var(--r-icon)"></div>
+      <div style="flex:1;min-width:0"><p style="margin:0;font-size:15px;font-weight:700">Le Fournil</p><p class="meta" style="margin-top:2px">8 questions posées</p></div>
+      <div class="toggle on"><b></b></div>
+    </div>
+    <div class="card row mb-l">
+      <div class="photo photo--blue thumb" style="width:44px;height:44px;border-radius:var(--r-icon)"></div>
+      <div style="flex:1;min-width:0"><p style="margin:0;font-size:15px;font-weight:700">Mairie du Mans</p><p class="meta" style="margin-top:2px">En pause · tu ne reçois plus ses questions</p></div>
+      <div class="toggle"><b></b></div>
+    </div>
+
+    <div class="card row mb-s" style="gap:12px">
+      <span style="font-size:17px">🔒</span>
+      <span style="flex:1;font-size:15px;font-weight:700">Données et confidentialité</span>
+      <span style="color:#A9A296;font-size:18px">›</span>
+    </div>
+    <div class="card row mb-l" style="gap:12px">
+      <span style="font-size:17px">🔔</span>
+      <span style="flex:1;font-size:15px;font-weight:700">Notifications</span>
+      <span class="meta" style="font-weight:700">1 par jour</span>
+    </div>
+  </div>
+
+  <div class="grow"></div>
+  <nav class="nav">
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Accueil</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 11a3 3 0 1 0 0-6"/><path d="M18 20a5 5 0 0 0-3-4.6"/></svg><span>Amis</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/></svg><span>Cadeaux</span></a>
+    <a href="#" class="on"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profil</span></a>
+  </nav>
+</div>
+</div>
+
+</div>
+</body>
+</html>
