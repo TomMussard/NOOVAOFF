@@ -1953,6 +1953,19 @@ function merchantLogoFallbackHTML(){
 function merchantCoverFallbackHTML(){
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:50%;height:50%"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15l4.5-4.5a2 2 0 0 1 2.8 0L15 15"/><path d="M14 14l1.5-1.5a2 2 0 0 1 2.8 0L21 15"/><circle cx="8" cy="8.5" r="1.5"/></svg>';
 }
+// Vérifie que le fichier choisi est bien une image décodable AVANT de l'envoyer au Storage —
+// un fichier tronqué/corrompu (export mobile interrompu...) uploadé sans ce contrôle s'affiche
+// ensuite en blocs noir/blanc chez tous les habitants qui voient cette photo (signalé en prod).
+function fileIsDecodableImage(file){
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = url;
+    const cleanup = ok => { URL.revokeObjectURL(url); resolve(ok); };
+    if(img.decode){ img.decode().then(()=>cleanup(true)).catch(()=>cleanup(false)); }
+    else { img.onload = ()=>cleanup(true); img.onerror = ()=>cleanup(false); }
+  });
+}
 let toastTimer=null;
 function showToast(msg,ico='success'){
   const t=document.getElementById('toast');const m=document.getElementById('toast-msg');const i=document.getElementById('toast-ico');
@@ -2029,6 +2042,7 @@ async function changeMerchantLogo(file) {
   if(!uid) return;
   if(!file.type.startsWith('image/')) { showToast('Choisis une image.', 'warning'); return; }
   if(file.size > 5*1024*1024) { showToast('Image trop lourde (5 Mo max).', 'warning'); return; }
+  if(!(await fileIsDecodableImage(file))) { showToast('Ce fichier semble abîmé, essaie une autre photo.', 'warning'); return; }
   try {
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const ref = firebase.storage().ref().child(`merchants/${uid}/logo.${ext}`);
@@ -2050,6 +2064,7 @@ async function changeMerchantCoverPhoto(file) {
   if(!uid) return;
   if(!file.type.startsWith('image/')) { showToast('Choisis une image.', 'warning'); return; }
   if(file.size > 8*1024*1024) { showToast('Image trop lourde (8 Mo max).', 'warning'); return; }
+  if(!(await fileIsDecodableImage(file))) { showToast('Ce fichier semble abîmé, essaie une autre photo.', 'warning'); return; }
   try {
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const ref = firebase.storage().ref().child(`merchants/${uid}/cover.${ext}`);
@@ -2057,7 +2072,7 @@ async function changeMerchantCoverPhoto(file) {
     const url = await ref.getDownloadURL();
     await db.collection('merchants').doc(uid).update({ coverUrl: url });
     const preview = document.getElementById('set-cover-preview');
-    if(preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()">`;
+    if(preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()" onload="this.decode?this.decode().catch(()=>this.parentElement.innerHTML=merchantCoverFallbackHTML()):0">`;
     showToast('Photo de couverture mise à jour.', 'image');
   } catch(e) {
     showToast('Erreur upload : ' + e.message, 'error');
@@ -2446,7 +2461,7 @@ async function loadMerchantAndStart(uid) {
   if(logoPreview && _mData.logoUrl) logoPreview.innerHTML = `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`;
   document.querySelectorAll('.sb-brand-av').forEach(el => { if(_mData.logoUrl) el.innerHTML = `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`; });
   const coverPreview = document.getElementById('set-cover-preview');
-  if(coverPreview && _mData.coverUrl) coverPreview.innerHTML = `<img src="${_mData.coverUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()">`;
+  if(coverPreview && _mData.coverUrl) coverPreview.innerHTML = `<img src="${_mData.coverUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()" onload="this.decode?this.decode().catch(()=>this.parentElement.innerHTML=merchantCoverFallbackHTML()):0">`;
   const setIddoc = document.getElementById('set-iddoc');
   if(setIddoc && _mData.idDocumentPath) setIddoc.textContent = 'Envoyé — en cours de vérification';
   // Update wizard preview brand names

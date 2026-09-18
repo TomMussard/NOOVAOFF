@@ -1307,6 +1307,19 @@ function logoHTML(name,size,logoUrl){
   }
   return logoFallbackHTML(name,size);
 }
+// Vérifie que le fichier choisi est bien une image décodable AVANT de l'envoyer au Storage —
+// un fichier tronqué/corrompu uploadé sans ce contrôle s'affiche ensuite en blocs noir/blanc
+// chez tout le monde (signalé en prod sur une photo de couverture commerçant).
+function fileIsDecodableImage(file){
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = url;
+    const cleanup = ok => { URL.revokeObjectURL(url); resolve(ok); };
+    if(img.decode){ img.decode().then(()=>cleanup(true)).catch(()=>cleanup(false)); }
+    else { img.onload = ()=>cleanup(true); img.onerror = ()=>cleanup(false); }
+  });
+}
 // Affiche la photo de profil de l'utilisateur dans un avatar rond existant (home/profil),
 // ou la repasse en lettre d'initiale si aucune photo n'est définie.
 function renderUserAvatar(avEl, letterEl, name, photoUrl){
@@ -1328,6 +1341,7 @@ async function changeMyAvatar(file){
   if(!uid) return;
   if(!file.type.startsWith('image/')) { showToast('Choisis une image.', 'warning'); return; }
   if(file.size > 5*1024*1024) { showToast('Image trop lourde (5 Mo max).', 'warning'); return; }
+  if(!(await fileIsDecodableImage(file))) { showToast('Ce fichier semble abîmé, essaie une autre photo.', 'warning'); return; }
   const avEl = document.getElementById('prof-av');
   try {
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
@@ -1575,7 +1589,25 @@ function refreshHome(){
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<10;i++){const d=document.createElement('div');d.className='dstreak-dot'+(i<S.streak?' on':'');sd.appendChild(d)}
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent='+'+q.pts+' pts';document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector('img');
-    if(q.photoUrl){ if(existingImg){existingImg.src=q.photoUrl;} else { const img=document.createElement('img'); img.src=q.photoUrl; img.alt=''; img.onerror=()=>img.remove(); tcPhoto.insertBefore(img, tcPhoto.firstChild); } }
+    if(q.photoUrl){
+      // Certains fichiers Storage sont corrompus/tronqués : ils chargent (pas d'erreur réseau)
+      // mais se décodent en blocs noir/blanc à l'écran (signalé en prod). decode() détecte
+      // l'échec de décodage AVANT d'insérer l'image dans le DOM, pour ne jamais l'afficher.
+      const url=q.photoUrl;
+      const dropPhoto=()=>{ if(existingImg) existingImg.remove(); };
+      if(window.Image && Image.prototype.decode){
+        // On réutilise l'image déjà décodée par la sonde (pas de second fetch) plutôt que
+        // de recréer un <img> qui redemanderait le même fichier au réseau.
+        const probe=new Image(); probe.alt=''; probe.src=url;
+        probe.decode().then(()=>{
+          if(existingImg){ existingImg.onerror=dropPhoto; existingImg.src=url; }
+          else { probe.onerror=()=>probe.remove(); tcPhoto.insertBefore(probe, tcPhoto.firstChild); }
+        }).catch(dropPhoto);
+      } else {
+        if(existingImg){ existingImg.onerror=dropPhoto; existingImg.src=url; }
+        else { const img=document.createElement('img'); img.alt=''; img.onerror=()=>img.remove(); img.src=url; tcPhoto.insertBefore(img, tcPhoto.firstChild); }
+      }
+    }
     else if(existingImg){ existingImg.remove(); }
     document.getElementById('dtoday-logo').innerHTML=logoHTML(q.brand,40,q.logoUrl);
   }
@@ -2922,7 +2954,7 @@ async function renderNearbyGrid(){
   }
   el.innerHTML = withDist.slice(0,4).map(c => `
     <div class="dnb-card" ${c._merchantId?`onclick="openBrandById('${c._merchantId}','${esc(c.name).replace(/'/g,"\\'")}')"`:''}>
-      <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="" onerror="this.remove()">`:''}</div>
+      <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}</div>
       <div class="dnb-scrim"></div>
       <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':'Bientôt'}</div>
       <div class="dnb-body"><div class="dnb-name">${esc(c.name)}</div><div class="dnb-meta">${esc(c.sector)}${c._dist!=null?' · '+fmtDist(c._dist):''}</div></div>
@@ -3361,7 +3393,7 @@ function renderAlmostReward(){
   const pct = Math.max(4, Math.min(96, (S.pts / (r.cost||1)) * 100));
   const missing = Math.max(0, (r.cost||0) - S.pts);
   wrap.innerHTML = `<div class="dpat-card" onclick="goNav('rewards-tab')">
-    <div class="dpat-photo">${r.photoUrl?`<img src="${r.photoUrl}" alt="" onerror="this.remove()">`:''}<div class="dpat-pct">${Math.round(pct)}%</div></div>
+    <div class="dpat-photo">${r.photoUrl?`<img src="${r.photoUrl}" alt="" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}<div class="dpat-pct">${Math.round(pct)}%</div></div>
     <div class="dpat-body">
       <div class="mark">?!</div>
       <div class="dpat-name">${esc(r.label||'Récompense')}</div>
