@@ -462,8 +462,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .badge-list{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:4px 13px 13px}
 .bp{display:flex;flex-direction:column;align-items:center;gap:5px}
 .bp-ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center}
-.bp.earned .bp-ico{background:var(--yellow-soft);color:var(--gold-text)}
-.bp.locked .bp-ico{background:var(--bg2);color:var(--ink3)}
+.bp.earned .bp-ico{background:var(--yellow);color:var(--ink);box-shadow:0 4px 12px var(--cg)}
+.bp.locked .bp-ico{background:rgba(107,101,89,.12);color:var(--ink3)}
 .bp-lbl{font-size:9.5px;font-weight:700;color:var(--ink2);text-align:center;line-height:1.25}
 .bp.locked .bp-lbl{color:var(--ink3)}
 /* BOTTOM NAV */
@@ -755,7 +755,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dprof-hdr{padding:52px 18px 16px;background:var(--nv-yellow);border-radius:0 0 28px 28px;position:relative;overflow:hidden}
 .dprof-title{font-family:var(--fd);font-weight:800;font-size:24px;color:var(--nv-yellow-ink);letter-spacing:-.6px;margin-bottom:14px}
 .dprof-id{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
-.dprof-av{width:56px;height:56px;border-radius:50%;background:rgba(24,20,16,.14);border:2.5px solid rgba(24,20,16,.18);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:21px;color:var(--nv-yellow-ink)}
+.dprof-av{width:56px;height:56px;border-radius:50%;background:rgba(28,25,23,.88);border:2.5px solid rgba(255,255,255,.5);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:21px;color:var(--nv-yellow)}
 .dprof-city{font-size:12.5px;color:rgba(24,20,16,.7);margin-bottom:5px}
 .dprof-lvl{display:inline-block;font-size:10.5px;font-weight:700;background:rgba(24,20,16,.12);color:var(--nv-yellow-ink);padding:4px 10px;border-radius:99px}
 .dprof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:-18px 18px 14px;position:relative;z-index:2}
@@ -1786,20 +1786,21 @@ function renderRanking(){
   if(countEl)countEl.textContent=(S.friends||[]).length+' ami'+((S.friends||[]).length>1?'s':'');
   const myPos=all.findIndex(u=>u.me)+1;
 
-  // Podium visuel pour le top 3 — uniquement si assez de monde pour que ça ait un sens.
-  const podiumCount=all.length>=3?3:0;
+  // Podium visuel — dès 2 participants (toi + 1 ami) : 1er/2e, la case 3e n'apparaît
+  // que si un 3e participant existe. Avec 1 seul participant (toi tout seul), pas de podium.
+  const podiumCount=all.length>=2?Math.min(3,all.length):0;
   if(podiumEl){
     if(!podiumCount){ podiumEl.innerHTML=''; }
     else{
-      const top3=all.slice(0,3);
-      const order=[top3[1],top3[0],top3[2]]; // 2e, 1er, 3e — ordre podium classique
-      const crowns=['🥈','👑','🥉'];
-      podiumEl.innerHTML=order.map((u,i)=>{
+      const top3=all.slice(0,podiumCount);
+      const order=[top3[1],top3[0],top3[2]].filter(Boolean); // 2e, 1er, (3e) — ordre podium classique
+      const crownByRank={1:'👑',2:'🥈',3:'🥉'};
+      podiumEl.innerHTML=order.map((u)=>{
         const rank=all.indexOf(u)+1;
         const cls=rank===1?'p1':rank===2?'p2':'p3';
         const label=u.me?'Toi':esc(u.n||'Ami');
         return `<div class="podium-slot ${cls}${u.me?' me':''}">
-          <div class="podium-crown">${crowns[i]}</div>
+          <div class="podium-crown">${crownByRank[rank]}</div>
           <div class="podium-av" style="background:rgba(255,255,255,.16);color:#fff">${(u.n||'?')[0].toUpperCase()}</div>
           <div class="podium-name">${label}</div>
           <div class="podium-pts">${u.xp} xp</div>
