@@ -1231,6 +1231,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               <div id="set-cover-preview" style="width:64px;height:40px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--icon-gray);overflow:hidden;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:50%;height:50%"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15l4.5-4.5a2 2 0 0 1 2.8 0L15 15"/><path d="M14 14l1.5-1.5a2 2 0 0 1 2.8 0L21 15"/><circle cx="8" cy="8.5" r="1.5"/></svg></div>
               <div class="setting-info"><div class="setting-name">Photo de couverture</div><div class="setting-desc">La grande photo affichée derrière tes questions et sur ta fiche (différente du logo — utilise une photo de ton établissement, pas ton logo)</div></div>
               <input type="file" id="cover-file-inp" accept="image/*" style="display:none" onchange="changeMerchantCoverPhoto(this.files[0])">
+              <button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="removeMerchantCoverPhoto()">Retirer</button>
               <button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="document.getElementById('cover-file-inp').click()">Modifier</button>
             </div>
             <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-6 9 6"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg></div><div class="setting-info"><div class="setting-name">Nom de la marque</div><div class="setting-desc" id="set-brand-name">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('brandName','Nom de la marque',document.getElementById('set-brand-name').textContent)">Modifier</button></div>
@@ -2019,6 +2020,19 @@ async function changeMerchantCoverPhoto(file) {
     showToast('Photo de couverture mise à jour.', 'image');
   } catch(e) {
     showToast('Erreur upload : ' + e.message, 'error');
+  }
+}
+
+async function removeMerchantCoverPhoto() {
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if(!uid) return;
+  try {
+    await db.collection('merchants').doc(uid).update({ coverUrl: firebase.firestore.FieldValue.delete() });
+    const preview = document.getElementById('set-cover-preview');
+    if(preview) preview.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:50%;height:50%"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15l4.5-4.5a2 2 0 0 1 2.8 0L15 15"/><path d="M14 14l1.5-1.5a2 2 0 0 1 2.8 0L21 15"/><circle cx="8" cy="8.5" r="1.5"/></svg>';
+    showToast('Photo de couverture retirée.', 'success');
+  } catch(e) {
+    showToast('Erreur : ' + e.message, 'error');
   }
 }
 
