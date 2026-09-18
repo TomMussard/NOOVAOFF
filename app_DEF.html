@@ -1289,11 +1289,23 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 const S={user:null,pts:0,xp:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],done:{},friends:[],chats:{}};
 const DAILY_CAP=300;
 const BRANDMETA={};
-function logoHTML(name,size,logoUrl){
+function logoFallbackHTML(name,size){
   const s=size||44;const r=Math.round(s*0.27);
-  if(logoUrl) return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.14);overflow:hidden"><img src="${logoUrl}" style="width:100%;height:100%;object-fit:cover" alt=""></div>`;
   const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#1C1917',t:'#FFC300'};const fs=Math.round(s*0.44);
   return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:${m.t||'#fff'};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;
+}
+// Si logoUrl échoue à charger (URL cassée, fichier supprimé du Storage...), l'onerror
+// remplace la vignette par le repli initiale — sans ça, une image cassée laissait un
+// badge vide/déformé à la place (signalé en prod : "le logo bug, il doit rester à sa place").
+function logoHTML(name,size,logoUrl){
+  const s=size||44;const r=Math.round(s*0.27);
+  if(logoUrl){
+    // Échappement à deux niveaux : \' pour rester une chaîne JS valide dans l'attribut
+    // onerror, &quot; pour ne pas casser l'attribut HTML lui-même (double-quoté).
+    const safeName=esc(name).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.14);overflow:hidden;background:#1C1917"><img src="${logoUrl}" style="width:100%;height:100%;object-fit:cover;display:block" alt="" onerror="this.closest('div').outerHTML=logoFallbackHTML('${safeName}',${s})"></div>`;
+  }
+  return logoFallbackHTML(name,size);
 }
 // Affiche la photo de profil de l'utilisateur dans un avatar rond existant (home/profil),
 // ou la repasse en lettre d'initiale si aucune photo n'est définie.
@@ -1563,7 +1575,7 @@ function refreshHome(){
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<10;i++){const d=document.createElement('div');d.className='dstreak-dot'+(i<S.streak?' on':'');sd.appendChild(d)}
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent='+'+q.pts+' pts';document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector('img');
-    if(q.photoUrl){ if(existingImg){existingImg.src=q.photoUrl;} else { const img=document.createElement('img'); img.src=q.photoUrl; img.alt=''; tcPhoto.insertBefore(img, tcPhoto.firstChild); } }
+    if(q.photoUrl){ if(existingImg){existingImg.src=q.photoUrl;} else { const img=document.createElement('img'); img.src=q.photoUrl; img.alt=''; img.onerror=()=>img.remove(); tcPhoto.insertBefore(img, tcPhoto.firstChild); } }
     else if(existingImg){ existingImg.remove(); }
     document.getElementById('dtoday-logo').innerHTML=logoHTML(q.brand,40,q.logoUrl);
   }
@@ -2910,7 +2922,7 @@ async function renderNearbyGrid(){
   }
   el.innerHTML = withDist.slice(0,4).map(c => `
     <div class="dnb-card" ${c._merchantId?`onclick="openBrandById('${c._merchantId}','${esc(c.name).replace(/'/g,"\\'")}')"`:''}>
-      <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="">`:''}</div>
+      <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="" onerror="this.remove()">`:''}</div>
       <div class="dnb-scrim"></div>
       <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':'Bientôt'}</div>
       <div class="dnb-body"><div class="dnb-name">${esc(c.name)}</div><div class="dnb-meta">${esc(c.sector)}${c._dist!=null?' · '+fmtDist(c._dist):''}</div></div>
@@ -3349,7 +3361,7 @@ function renderAlmostReward(){
   const pct = Math.max(4, Math.min(96, (S.pts / (r.cost||1)) * 100));
   const missing = Math.max(0, (r.cost||0) - S.pts);
   wrap.innerHTML = `<div class="dpat-card" onclick="goNav('rewards-tab')">
-    <div class="dpat-photo">${r.photoUrl?`<img src="${r.photoUrl}" alt="">`:''}<div class="dpat-pct">${Math.round(pct)}%</div></div>
+    <div class="dpat-photo">${r.photoUrl?`<img src="${r.photoUrl}" alt="" onerror="this.remove()">`:''}<div class="dpat-pct">${Math.round(pct)}%</div></div>
     <div class="dpat-body">
       <div class="mark">?!</div>
       <div class="dpat-name">${esc(r.label||'Récompense')}</div>
@@ -3644,6 +3656,15 @@ const HOME_TOUR_STEPS=[
 let _tourIdx=0;
 function maybeShowHomeTour(){
   if(S._seenHomeTour) return;
+  // Double sécurité : ne jamais démarrer le tuto tant qu'un mur de connexion/complétion de
+  // profil est encore à l'écran (ex: google-city-wall) — même si la course entre
+  // onAuthStateChanged et le flux Google/Apple était censée être déjà évitée en amont.
+  const gcw = document.getElementById('google-city-wall');
+  const aw = document.getElementById('auth-wall');
+  if((gcw && gcw.style.display === 'flex') || (aw && aw.style.display !== 'none')){
+    setTimeout(maybeShowHomeTour, 400);
+    return;
+  }
   trackEvent('tutorial_begin');
   setTimeout(()=>showTourStep(0), 550);
 }
@@ -4333,16 +4354,24 @@ async function _completeSocialSignIn(cred) {
     gcw.style.display = 'flex'; gcw._uid = uid;
   } else {
     trackEvent('login', { method });
+    // onAuthStateChanged a été volontairement court-circuité (_skipNextAuth) le temps de
+    // savoir si le compte était nouveau ou non — pour un compte existant on prend le relais ici.
+    loadUserAndStart(uid);
   }
-  // Si existant, onAuthStateChanged s'en occupe
 }
 
 async function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
   try {
+    // Comme pour l'inscription email/mot de passe : on prend nous-mêmes la main sur la
+    // suite (_completeSocialSignIn) plutôt que de laisser onAuthStateChanged se déclencher
+    // tout seul — sinon il peut charger l'accueil (et le tuto) avant même que la page
+    // "en savoir plus sur toi" (google-city-wall) ait eu le temps de s'afficher.
+    _skipNextAuth = true;
     const cred = await auth.signInWithPopup(provider);
     await _completeSocialSignIn(cred);
   } catch(e) {
+    _skipNextAuth = false;
     if(e.code !== 'auth/popup-closed-by-user') awShowErr(awFrErr(e.code));
   }
 }
@@ -4354,9 +4383,11 @@ async function signInWithApple() {
   provider.addScope('email');
   provider.addScope('name');
   try {
+    _skipNextAuth = true;
     const cred = await auth.signInWithPopup(provider);
     await _completeSocialSignIn(cred);
   } catch(e) {
+    _skipNextAuth = false;
     if(e.code !== 'auth/popup-closed-by-user') awShowErr(awFrErr(e.code));
   }
 }
