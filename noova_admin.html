@@ -892,6 +892,7 @@ async function loadDangerZone() {
 // Function côté serveur — un client web ne peut jamais supprimer le compte Auth de
 // quelqu'un d'autre que lui-même, seul le SDK Admin le peut.
 async function dangerDeleteMerchant(merchantId, btn) {
+  if (!confirm("Supprimer définitivement ce commerçant (fiche, campagnes, récompenses ET son compte de connexion) ? Action irréversible.")) return;
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
     await callAdminDeleteAccount({ uid: merchantId, role: 'merchant' });
@@ -903,6 +904,7 @@ async function dangerDeleteMerchant(merchantId, btn) {
 }
 
 async function dangerDeleteUser(uid, btn) {
+  if (!confirm("Supprimer définitivement cet utilisateur (données Firestore ET son compte de connexion) ? Action irréversible.")) return;
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
     await callAdminDeleteAccount({ uid, role: 'user' });
@@ -914,7 +916,8 @@ async function dangerDeleteUser(uid, btn) {
 }
 
 async function dangerDeleteAll() {
-  if (!confirm("Supprimer VRAIMENT TOUT (commerçants, utilisateurs, campagnes, récompenses, réponses, échanges, notifications, chats, feed communauté, ET les comptes de connexion associés) ? Action irréversible.")) return;
+  const typed = await textPromptModal('Action IRRÉVERSIBLE : supprime TOUT (commerçants, utilisateurs, campagnes, récompenses, réponses, échanges, notifications, chats, feed communauté, ET les comptes de connexion associés). Tape SUPPRIMER pour confirmer.');
+  if ((typed || '').trim().toUpperCase() !== 'SUPPRIMER') return;
   const btn = document.getElementById('danger-delete-all-btn');
   const progress = document.getElementById('danger-progress');
   btn.disabled = true;

@@ -2719,7 +2719,7 @@ function closeFullMap(){ goTo('home'); }
       </div>
 
       <div id="gcw-err" style="color:#EF4444;font-size:12px;display:none;padding:9px 12px;background:rgba(239,68,68,.08);border-radius:8px;text-align:center"></div>
-      <button onclick="saveGoogleCity()" style="width:100%;padding:16px;border-radius:14px;background:var(--coral);border:none;color:var(--ink);font-size:16px;font-weight:800;font-family:var(--fd);cursor:pointer">C'est parti →</button>
+      <button id="gcw-submit-btn" onclick="saveGoogleCity()" style="width:100%;padding:16px;border-radius:14px;background:var(--coral);border:none;color:var(--ink);font-size:16px;font-weight:800;font-family:var(--fd);cursor:pointer">C'est parti →</button>
     </div>
   </div>
 </div>
@@ -3834,11 +3834,21 @@ async function saveGoogleCity() {
   if(!_gcwInterests.length) { errEl.textContent = 'Sélectionne au moins un centre d\'intérêt.'; errEl.style.display='block'; return; }
   const cityNormG = normalizeCity(city);
   if(!(await isCityOpen(cityNormG))) { errEl.textContent = 'Noova n\'est pas encore ouvert dans ta ville — reviens bientôt !'; errEl.style.display='block'; return; }
-  await db.collection('users').doc(uid).update({ city: cityNormG, cityLabel: city, ageRange: _gcwAge, age: _gcwAge, interests: _gcwInterests, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  // Update city registry for merchant audience targeting
-  db.collection('cities').doc(cityNormG).set({ label: city.charAt(0).toUpperCase()+city.slice(1), count: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(()=>{});
-  document.getElementById('google-city-wall').style.display = 'none';
-  loadUserAndStart(uid);
+  const btn = document.getElementById('gcw-submit-btn');
+  errEl.style.display = 'none';
+  if(btn) { btn.disabled = true; btn.textContent = '…'; }
+  try {
+    await db.collection('users').doc(uid).update({ city: cityNormG, cityLabel: city, ageRange: _gcwAge, age: _gcwAge, interests: _gcwInterests, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    // Update city registry for merchant audience targeting
+    db.collection('cities').doc(cityNormG).set({ label: city.charAt(0).toUpperCase()+city.slice(1), count: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(()=>{});
+    document.getElementById('google-city-wall').style.display = 'none';
+    loadUserAndStart(uid);
+  } catch(e) {
+    console.warn('saveGoogleCity:', e);
+    errEl.textContent = 'Erreur lors de l\'enregistrement. Réessaie.';
+    errEl.style.display = 'block';
+    if(btn) { btn.disabled = false; btn.textContent = "C'est parti →"; }
+  }
 }
 
 // ─── Observer principal ───────────────────────────────────────

@@ -2168,7 +2168,7 @@ window.addEventListener('load',()=>{
       <input id="gmw-siret"   type="text" placeholder="SIRET (14 chiffres)" inputmode="numeric" maxlength="17" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <textarea id="gmw-desc" placeholder="Décris ton établissement en quelques mots…" maxlength="300" style="width:100%;height:70px;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);resize:none;box-sizing:border-box"></textarea>
       <div id="gmw-err" style="color:#EF4444;font-size:12px;display:none;padding:8px 12px;background:rgba(239,68,68,.08);border-radius:8px"></div>
-      <button onclick="saveGoogleMerchant()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg)">Créer mon espace <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
+      <button id="gmw-submit-btn" onclick="saveGoogleMerchant()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg)">Créer mon espace <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
     </div>
   </div>
 </div>
@@ -3169,20 +3169,31 @@ async function saveGoogleMerchant() {
   const uid  = gmw._uid || auth.currentUser?.uid;
   const email = gmw._email || auth.currentUser?.email || '';
   if(!uid) return;
-  await db.collection('merchants').doc(uid).set({
-    role: 'merchant',
-    name: brand,
-    brandName: brand, email, sector: sector||'Commerce', theme: (sector||'Commerce').toLowerCase(), city: normalizeCity(city), cityLabel: city,
-    firstName, lastName, phone, address, siret, description: desc,
-    ownerUid: uid,
-    status: 'pending',
-    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    plan: 'starter',
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  gmw.style.display = 'none';
-  loadMerchantAndStart(uid);
+  const btn = document.getElementById('gmw-submit-btn');
+  const btnHtml = btn ? btn.innerHTML : '';
+  errEl.style.display = 'none';
+  if(btn) { btn.disabled = true; btn.innerHTML = '…'; }
+  try {
+    await db.collection('merchants').doc(uid).set({
+      role: 'merchant',
+      name: brand,
+      brandName: brand, email, sector: sector||'Commerce', theme: (sector||'Commerce').toLowerCase(), city: normalizeCity(city), cityLabel: city,
+      firstName, lastName, phone, address, siret, description: desc,
+      ownerUid: uid,
+      status: 'pending',
+      submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      plan: 'starter',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    gmw.style.display = 'none';
+    loadMerchantAndStart(uid);
+  } catch(e) {
+    console.warn('saveGoogleMerchant:', e);
+    errEl.textContent = 'Erreur lors de la création. Réessaie.';
+    errEl.style.display = 'block';
+    if(btn) { btn.disabled = false; btn.innerHTML = btnHtml; }
+  }
 }
 
 // ─── Observer principal ───────────────────────────────────────

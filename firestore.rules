@@ -108,8 +108,13 @@ service cloud.firestore {
         (getMerchant(request.auth.uid).get('city', null) == null ||
          request.resource.data.get('targetCity', null) == getMerchant(request.auth.uid).get('city', null));
       // answersCount/responsesCount ne sont plus incrémentables par le client : seule la
-      // Cloud Function submitAnswer (SDK Admin, hors règles) les met à jour désormais.
-      allow update: if isAuth() && (resource.data.merchantId == request.auth.uid || isAdmin());
+      // Cloud Function submitAnswer (SDK Admin, hors règles) les met à jour désormais. Le
+      // commerçant ne peut pas non plus changer merchantId (transfert de propriété).
+      allow update: if isAuth() && (
+        isAdmin() ||
+        (resource.data.merchantId == request.auth.uid &&
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['answersCount', 'responsesCount', 'merchantId']))
+      );
       allow delete: if isAuth() && (resource.data.merchantId == request.auth.uid || isAdmin());
     }
 
