@@ -211,7 +211,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .s-dots{display:flex;gap:5px}
 .sdk{width:20px;height:5px;border-radius:99px;background:var(--bg3)}
 .sdk.done{background:var(--amber)}
-.sec-lbl{padding:0 20px;margin-bottom:10px;font-family:var(--fd);font-weight:800;font-size:19px;letter-spacing:-.5px;color:var(--ink)}
+.sec-lbl{padding:0 20px;margin:4px 0 10px;font-family:var(--fd);font-weight:800;font-size:19px;letter-spacing:-.5px;color:var(--ink)}
 .today-card{margin:0 18px 14px;background:var(--grad);border-radius:var(--r);padding:18px;cursor:pointer;position:relative;overflow:hidden;transition:transform .13s;box-shadow:0 14px 32px rgba(245,158,11,.32)}
 .today-card:active{transform:scale(.975)}
 .today-card::after{content:'';position:absolute;top:-60px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,.04);border-radius:50%}
@@ -580,7 +580,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .si{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 
 /* — En-tête accueil — */
-.dh-hdr{padding:52px 20px 14px;display:flex;align-items:center;justify-content:space-between}
+.dh-hdr{padding:52px 20px 20px;display:flex;align-items:center;justify-content:space-between}
 .dh-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:16px;flex-shrink:0}
 .dh-greet{font-size:12px;color:var(--ink2);margin-bottom:2px}
 .dh-name{font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.8px;color:var(--ink)}
@@ -590,7 +590,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dh-pts-l{font-size:10px;color:rgba(255,255,255,.55);font-weight:600}
 
 /* — Carte question du jour (photo + bandeau jaune) — */
-.dtoday-card{margin:0 18px 14px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
+.dtoday-card{margin:0 18px 18px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
 .dtoday-card>.dtoday-photo{border-radius:26px 26px 0 0;overflow:hidden}
 .dtoday-card>.dtoday-body{border-radius:0 0 26px 26px;overflow:hidden}
 .dtoday-card:active{transform:scale(.98)}
@@ -612,7 +612,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .mark{position:absolute;right:-14px;bottom:-40px;font-size:128px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.3);pointer-events:none;z-index:0}
 
 /* — Streak (noir) — */
-.dstreak-card{margin:0 18px 14px;background:var(--nv-black);border-radius:22px;padding:14px 16px;color:#fff}
+.dstreak-card{margin:0 18px 22px;background:var(--nv-black);border-radius:22px;padding:16px 18px;color:#fff}
 .dstreak-top{display:flex;align-items:center;gap:11px;margin-bottom:12px}
 .dstreak-fire{width:36px;height:36px;border-radius:11px;background:rgba(255,212,0,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--nv-yellow)}
 .dstreak-title{font-family:var(--fd);font-weight:700;font-size:14px}
@@ -640,12 +640,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dpat-txt strong{color:var(--nv-black)}
 
 /* — Section titres type "À deux pas" — */
-.dsec-row{padding:2px 20px 10px;display:flex;align-items:center;justify-content:space-between}
+.dsec-row{padding:2px 20px 14px;display:flex;align-items:center;justify-content:space-between}
 .dsec-title{font-family:var(--fd);font-weight:800;font-size:19px;letter-spacing:-.5px;color:var(--ink)}
 .dsec-link{font-size:12px;font-weight:700;color:var(--ink2);cursor:pointer;white-space:nowrap}
 
 /* — Carte carte (mini-map preview) — */
-.dmap-card{margin:0 18px 12px;border-radius:20px;overflow:hidden;height:172px;position:relative;background:var(--bg2);cursor:pointer}
+.dmap-card{margin:0 18px 16px;border-radius:20px;overflow:hidden;height:172px;position:relative;background:var(--bg2);cursor:pointer}
 .dmap-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:18px;text-align:center;color:var(--ink2);font-size:12px;line-height:1.5;z-index:2;background:var(--bg2)}
 .dmap-empty svg{color:var(--ink3)}
 .dmap-empty button{background:var(--nv-black);color:#fff;border:none;padding:9px 18px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fb)}
@@ -1243,7 +1243,7 @@ function goTo(id){
   document.getElementById('bnav').classList[S.user&&isN?'add':'remove']('show');
   navS.forEach(s=>{const el=document.getElementById('nav-'+s);if(el)el.classList[s===id?'add':'remove']('on')});
 }
-function goNav(id){goTo(id);if(id==='rewards-tab')refreshWallet();if(id==='profile')refreshProfile();if(id==='home')refreshHome();if(id==='social'){renderSocial();const b=document.querySelector('#nav-social .nav-badge');if(b)b.style.display='none';}}
+function goNav(id){goTo(id);if(id==='rewards-tab')refreshWallet();if(id==='profile')refreshProfile();if(id==='home'){refreshHome();applyStagger(document.querySelector('#home .si'));}if(id==='social'){renderSocial();const b=document.querySelector('#nav-social .nav-badge');if(b)b.style.display='none';}}
 
 function obNext(){
   if(obIdx<2){
@@ -3368,6 +3368,7 @@ function finishAuthTransition() {
     if(socScroll)  initPullToRefresh(socScroll,  'ptr-social', ()=>{ loadCommunityFeed(); });
   }
   refreshHome(); renderSocial(); goTo('home');
+  applyStagger(document.querySelector('#home .si'));
   maybeShowHomeTour();
 }
 
