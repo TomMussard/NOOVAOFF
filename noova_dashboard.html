@@ -1945,6 +1945,14 @@ function normalizeCity(s){
   return known?known.slug:base;
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// Icône de repli affichée à la place du logo commerçant si l'image ne charge pas
+// (Storage supprimé, URL cassée...) — évite l'icône "image cassée" du navigateur.
+function merchantLogoFallbackHTML(){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg>';
+}
+function merchantCoverFallbackHTML(){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:50%;height:50%"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15l4.5-4.5a2 2 0 0 1 2.8 0L15 15"/><path d="M14 14l1.5-1.5a2 2 0 0 1 2.8 0L21 15"/><circle cx="8" cy="8.5" r="1.5"/></svg>';
+}
 let toastTimer=null;
 function showToast(msg,ico='success'){
   const t=document.getElementById('toast');const m=document.getElementById('toast-msg');const i=document.getElementById('toast-ico');
@@ -2028,8 +2036,8 @@ async function changeMerchantLogo(file) {
     const url = await ref.getDownloadURL();
     await db.collection('merchants').doc(uid).update({ logoUrl: url });
     const preview = document.getElementById('set-logo-preview');
-    if(preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
-    document.querySelectorAll('.sb-brand-av').forEach(el => el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`);
+    if(preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`;
+    document.querySelectorAll('.sb-brand-av').forEach(el => el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`);
     showToast('Logo mis à jour.', 'image');
   } catch(e) {
     showToast('Erreur upload : ' + e.message, 'error');
@@ -2049,7 +2057,7 @@ async function changeMerchantCoverPhoto(file) {
     const url = await ref.getDownloadURL();
     await db.collection('merchants').doc(uid).update({ coverUrl: url });
     const preview = document.getElementById('set-cover-preview');
-    if(preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+    if(preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()">`;
     showToast('Photo de couverture mise à jour.', 'image');
   } catch(e) {
     showToast('Erreur upload : ' + e.message, 'error');
@@ -2435,10 +2443,10 @@ async function loadMerchantAndStart(uid) {
     if(el) el.textContent = _mData[setFields[domId]] || '—';
   });
   const logoPreview = document.getElementById('set-logo-preview');
-  if(logoPreview && _mData.logoUrl) logoPreview.innerHTML = `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover">`;
-  document.querySelectorAll('.sb-brand-av').forEach(el => { if(_mData.logoUrl) el.innerHTML = `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`; });
+  if(logoPreview && _mData.logoUrl) logoPreview.innerHTML = `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`;
+  document.querySelectorAll('.sb-brand-av').forEach(el => { if(_mData.logoUrl) el.innerHTML = `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`; });
   const coverPreview = document.getElementById('set-cover-preview');
-  if(coverPreview && _mData.coverUrl) coverPreview.innerHTML = `<img src="${_mData.coverUrl}" style="width:100%;height:100%;object-fit:cover">`;
+  if(coverPreview && _mData.coverUrl) coverPreview.innerHTML = `<img src="${_mData.coverUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()">`;
   const setIddoc = document.getElementById('set-iddoc');
   if(setIddoc && _mData.idDocumentPath) setIddoc.textContent = 'Envoyé — en cours de vérification';
   // Update wizard preview brand names
@@ -3001,7 +3009,7 @@ function renderRewardCard(r, i) {
   card.className = 'card';
   card.style.marginBottom = '14px';
   const statusBadge = {
-    pending:  { bg: 'rgba(245,166,35,.14)', c: 'var(--amber)', txt: icon('clock',{size:11})+' En attente de validation' },
+    pending:  { bg: 'rgba(59,130,246,.12)', c: '#3B82F6', txt: icon('clock',{size:11})+' En attente de validation' },
     approved: { bg: d.active ? 'rgba(11,171,132,.12)' : 'var(--bg3)', c: d.active ? '#0BAB84' : 'var(--ink3)', txt: d.active ? icon('success',{size:11})+' Actif' : icon('pause',{size:11})+' Inactif' },
     rejected: { bg: 'rgba(239,68,68,.1)', c: '#EF4444', txt: icon('error',{size:11})+' Refusée par Noova' }
   }[d.status || 'pending'];
