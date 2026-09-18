@@ -1094,7 +1094,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Conforme RGPD — révoque ou supprime tes données ci-dessous.</div></div>
     </div>
     <div class="sec-card">
-      <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span><div class="sc-title">Badges</div></div>
+      <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span><div class="sc-title">Badges</div><span style="font-size:11px;color:var(--ink2);font-weight:700" id="badges-count"></span></div>
       <div class="badge-list" id="badges-list"></div>
     </div>
     <div class="sec-card">
@@ -1744,10 +1744,7 @@ function initRankingPanel(){
   const rp=document.getElementById('panel-ranking');rp.innerHTML='';
   const days=daysUntilNextMonday();
   rp.innerHTML=`
-    <div class="dcomm-hero">
-      <div class="dcomm-title">Tes amis</div>
-      <div class="dcomm-sub">Le classement se remet à zéro dans ${days} jour${days>1?'s':''}</div>
-    </div>
+    <div class="dsec-h" style="justify-content:space-between"><span>Cette semaine</span><small style="font-weight:500;color:var(--ink2);font-size:12px">se réinitialise dans ${days} j</small></div>
     <div id="drank-podium"></div>
     <div id="drank-me-slot"></div>
     <div class="drank-list-title"><span>Classement</span><small id="drank-count"></small></div>
@@ -2192,6 +2189,7 @@ function refreshProfile(){
   const bl=document.getElementById('badges-list');bl.innerHTML='';
   checkTierAndBadgeCelebrations();
   const earned=S._lastEarnedBadges||[];
+  const bc=document.getElementById('badges-count');if(bc)bc.textContent=earned.length+'/'+BDGS.length;
   BDGS.forEach(b=>{const e=earned.includes(b.id);const d=document.createElement('div');d.className='bp '+(e?'earned':'locked');d.innerHTML=`<div class="bp-ico">${icon(e?b.e:'lock',{size:18})}</div><div class="bp-lbl">${esc(b.n)}</div>`;bl.appendChild(d)});
   const hl=document.getElementById('hist-list');hl.innerHTML='';
   if(!S.hist||!S.hist.length){hl.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:13px">Aucune réponse pour l\'instant.</div>';return}
