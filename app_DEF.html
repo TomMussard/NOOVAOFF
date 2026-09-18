@@ -384,6 +384,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .fi{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--bg3);cursor:pointer;transition:opacity .13s}
 .fi:last-child{border-bottom:none}.fi:active{opacity:.6}
 .fi-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:16px;flex-shrink:0;position:relative}
+.fi-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
 .fi-online{position:absolute;bottom:1px;right:1px;width:10px;height:10px;background:#22C55E;border-radius:50%;border:2px solid var(--bg)}
 .fi-name{font-size:13px;font-weight:600;color:var(--ink)}
 .fi-pts{font-size:11px;color:var(--ink2);margin-top:1px}
@@ -592,7 +593,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 /* — En-tête accueil — */
 .dh-hdr{padding:52px 22px 28px;display:flex;align-items:center;justify-content:space-between}
-.dh-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:16px;flex-shrink:0}
+.dh-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:16px;flex-shrink:0;position:relative;overflow:hidden}
+.dh-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .dh-greet{font-size:12px;color:var(--ink2);margin-bottom:2px}
 .dh-name{font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.8px;color:var(--ink)}
 .dh-pts{display:flex;align-items:center;gap:6px;background:var(--nv-black);color:var(--nv-yellow);padding:9px 15px;border-radius:99px;cursor:pointer;transition:transform .13s;border:none}
@@ -705,7 +707,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .drank-me>:not(.mark){position:relative;z-index:1}
 .drank-num{width:28px;height:28px;border-radius:50%;background:var(--nv-black);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .drank-me .drank-num{background:rgba(24,20,16,.9)}
-.drank-av{width:38px;height:38px;border-radius:50%;background:rgba(24,20,16,.14);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:14px;color:var(--nv-yellow-ink)}
+.drank-av{width:38px;height:38px;border-radius:50%;background:rgba(24,20,16,.14);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:14px;color:var(--nv-yellow-ink);position:relative;overflow:hidden}
+.drank-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .drank-name{font-family:var(--fd);font-weight:800;font-size:14px;color:var(--nv-yellow-ink)}
 .drank-sub{font-size:11px;color:rgba(24,20,16,.6);margin-top:1px}
 .drank-pts{margin-left:auto;font-family:var(--fd);font-weight:800;font-size:20px;color:var(--nv-yellow-ink);flex-shrink:0}
@@ -723,7 +726,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .podium::after{content:'';position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,rgba(255,212,0,.18) 0%,rgba(255,212,0,0) 60%);pointer-events:none}
 .podium-slot{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1;min-width:0}
 .podium-crown{font-size:18px;margin-bottom:2px;line-height:1}
-.podium-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:16px;margin-bottom:7px;border:2.5px solid rgba(255,255,255,.9);box-shadow:0 6px 14px rgba(0,0,0,.3);flex-shrink:0}
+.podium-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:16px;margin-bottom:7px;border:2.5px solid rgba(255,255,255,.9);box-shadow:0 6px 14px rgba(0,0,0,.3);flex-shrink:0;position:relative;overflow:hidden}
+.podium-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .podium-slot.p1 .podium-av{width:58px;height:58px;font-size:20px}
 .podium-name{font-family:var(--fd);font-weight:800;font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 2px}
 .podium-pts{font-size:10.5px;color:rgba(255,255,255,.55);font-weight:700;margin-top:1px;margin-bottom:8px}
@@ -780,7 +784,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dprof-hdr{padding:52px 18px 16px;background:var(--nv-yellow);border-radius:0 0 28px 28px;position:relative;overflow:hidden}
 .dprof-title{font-family:var(--fd);font-weight:800;font-size:24px;color:var(--nv-yellow-ink);letter-spacing:-.6px;margin-bottom:14px}
 .dprof-id{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
-.dprof-av{width:56px;height:56px;border-radius:50%;background:rgba(28,25,23,.88);border:2.5px solid rgba(255,255,255,.5);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:21px;color:var(--nv-yellow)}
+.dprof-av{width:56px;height:56px;border-radius:50%;background:rgba(28,25,23,.88);border:2.5px solid rgba(255,255,255,.5);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:21px;color:var(--nv-yellow);position:relative;overflow:hidden;cursor:pointer}
+.dprof-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.dprof-av-edit{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;background:rgba(28,25,23,.92);color:var(--nv-yellow);border:2px solid var(--nv-yellow);display:flex;align-items:center;justify-content:center;z-index:2}
 .dprof-city{font-size:12.5px;color:rgba(24,20,16,.7);margin-bottom:5px}
 .dprof-lvl{display:inline-block;font-size:10.5px;font-weight:700;background:rgba(24,20,16,.12);color:var(--nv-yellow-ink);padding:4px 10px;border-radius:99px}
 .dprof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:-18px 18px 14px;position:relative;z-index:2}
@@ -911,7 +917,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="si">
     <div class="dh-hdr">
       <div style="display:flex;align-items:center;gap:11px">
-        <div class="dh-av" id="home-av">A</div>
+        <div class="dh-av" id="home-av"><span id="home-av-letter">A</span></div>
         <div><div class="dh-greet" id="home-greet">Bonjour</div><div class="dh-name" id="home-name">Alex</div></div>
       </div>
       <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
@@ -1088,7 +1094,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="mark" style="font-size:148px;bottom:-44px;right:-16px">?!</div>
       <div class="dprof-title" style="position:relative">Ton profil</div>
       <div class="dprof-id">
-        <div class="dprof-av" id="prof-av">A</div>
+        <div class="dprof-av" id="prof-av" onclick="document.getElementById('avatar-file-inp').click()">
+          <span id="prof-av-letter">A</span>
+          <div class="dprof-av-edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><circle cx="12" cy="13.5" r="3.2"/></svg></div>
+        </div>
+        <input type="file" id="avatar-file-inp" accept="image/*" style="display:none" onchange="changeMyAvatar(this.files[0])">
         <div>
           <div class="dprof-city" id="prof-email">alex@noova.app</div>
           <div class="dprof-lvl" id="pl-name">Niveau 1 · Curieux</div>
@@ -1203,6 +1213,43 @@ function logoHTML(name,size,logoUrl){
   if(logoUrl) return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.14);overflow:hidden"><img src="${logoUrl}" style="width:100%;height:100%;object-fit:cover" alt=""></div>`;
   const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#1C1917',t:'#FFC300'};const fs=Math.round(s*0.44);
   return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:${m.t||'#fff'};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;
+}
+// Affiche la photo de profil de l'utilisateur dans un avatar rond existant (home/profil),
+// ou la repasse en lettre d'initiale si aucune photo n'est définie.
+function renderUserAvatar(avEl, letterEl, name, photoUrl){
+  if(!avEl) return;
+  let img = avEl.querySelector('img');
+  if(photoUrl){
+    if(!img){ img=document.createElement('img'); img.alt=''; avEl.insertBefore(img, avEl.firstChild); }
+    img.src = photoUrl;
+    if(letterEl) letterEl.style.visibility='hidden';
+  } else {
+    if(img) img.remove();
+    if(letterEl) letterEl.style.visibility='visible';
+  }
+  if(letterEl && name) letterEl.textContent = name[0].toUpperCase();
+}
+async function changeMyAvatar(file){
+  if(!file) return;
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if(!uid) return;
+  if(!file.type.startsWith('image/')) { showToast('Choisis une image.', 'warning'); return; }
+  if(file.size > 5*1024*1024) { showToast('Image trop lourde (5 Mo max).', 'warning'); return; }
+  const avEl = document.getElementById('prof-av');
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const ref = firebase.storage().ref().child(`users/${uid}/avatar.${ext}`);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+    await db.collection('users').doc(uid).update({ photoUrl: url });
+    S.user.photoUrl = url;
+    renderUserAvatar(avEl, document.getElementById('prof-av-letter'), S.user.name, url);
+    renderUserAvatar(document.getElementById('home-av'), document.getElementById('home-av-letter'), S.user.name, url);
+    showToast('Photo de profil mise à jour.', 'image');
+    trackEvent('avatar_updated');
+  } catch(e) {
+    showToast('Erreur upload : ' + e.message, 'error');
+  }
 }
 // Villes beta connues : rattache les variantes d'\u00e9criture (espace manquant, tirets...)
 // au m\u00eame slug pour \u00e9viter qu'un utilisateur atterrisse dans une "ville fant\u00f4me".
@@ -1324,7 +1371,7 @@ function refreshHome(){
   if(!S.user)return;
   const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour':hr<18?'Bon après-midi':'Bonsoir';
   document.getElementById('home-name').textContent=S.user.name;animateNumber(document.getElementById('home-pts'),S.pts);
-  {const av=document.getElementById('home-av');const n=S.user.name||'?';const c=AVC[n.charCodeAt(0)%AVC.length];av.textContent=n[0].toUpperCase();av.style.background=c+'22';av.style.color=c;}
+  {const av=document.getElementById('home-av');const n=S.user.name||'?';const c=AVC[n.charCodeAt(0)%AVC.length];av.style.background=c+'22';av.style.color=c;renderUserAvatar(av,document.getElementById('home-av-letter'),n,S.user.photoUrl);}
   document.getElementById('streak-num').textContent=S.streak;
   const streakSub=document.getElementById('streak-sub');
   if(streakSub) streakSub.textContent = S.streak>=10 ? 'Bonus débloqué !' : `Encore ${10-S.streak} jour${10-S.streak>1?'s':''} pour +50 pts bonus`;
@@ -1792,7 +1839,7 @@ function renderFriends(){
     const d=document.createElement('div');
     d.className='fi';
     d.onclick=()=>openChatFor(f);
-    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.n[0]}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.xp} xp · <span style="color:var(--ink2);font-weight:700;display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c1 1 2 2.5 2 4.5A5.5 5.5 0 0 1 6.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0 0 12 22a8 8 0 0 0 7-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg> ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
+    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.photoUrl?`<img src="${f.photoUrl}" alt="">`:esc((f.n||'?')[0])}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.xp} xp · <span style="color:var(--ink2);font-weight:700;display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c1 1 2 2.5 2 4.5A5.5 5.5 0 0 1 6.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0 0 12 22a8 8 0 0 0 7-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg> ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
     el.appendChild(d);
   });
   applyStagger(el);
@@ -1806,8 +1853,8 @@ function renderRanking(){
   const podiumEl=document.getElementById('drank-podium');
   const countEl=document.getElementById('drank-count');
   if(!el)return;
-  const all=[{uid:'__me',n:S.user?S.user.name:'Toi',xp:S.xp||0,str:S.streak||0,me:true}]
-    .concat((S.friends||[]).map(f=>({uid:f.uid,n:f.n,xp:f.xp||0,str:f.str||0,me:false})));
+  const all=[{uid:'__me',n:S.user?S.user.name:'Toi',xp:S.xp||0,str:S.streak||0,me:true,photoUrl:S.user&&S.user.photoUrl}]
+    .concat((S.friends||[]).map(f=>({uid:f.uid,n:f.n,xp:f.xp||0,str:f.str||0,me:false,photoUrl:f.photoUrl})));
   all.sort((a,b)=>b.xp-a.xp);
   if(countEl)countEl.textContent=(S.friends||[]).length+' ami'+((S.friends||[]).length>1?'s':'');
   const myPos=all.findIndex(u=>u.me)+1;
@@ -1828,7 +1875,7 @@ function renderRanking(){
         const label=u.me?'Toi':esc(u.n||'Ami');
         return `<div class="podium-slot ${cls}${u.me?' me':''}">
           <div class="podium-crown">${crownByRank[rank]}</div>
-          <div class="podium-av" style="background:rgba(255,255,255,.16);color:#fff">${(u.n||'?')[0].toUpperCase()}</div>
+          <div class="podium-av" style="background:rgba(255,255,255,.16);color:#fff">${u.photoUrl?`<img src="${u.photoUrl}" alt="">`:esc((u.n||'?')[0].toUpperCase())}</div>
           <div class="podium-name">${label}</div>
           <div class="podium-pts">${u.xp} xp</div>
           <div class="podium-bar">${rank}</div>
@@ -1841,7 +1888,7 @@ function renderRanking(){
     if(myPos<=podiumCount){ meSlot.innerHTML=''; }
     else{
       const me=all.find(u=>u.me);
-      meSlot.innerHTML=`<div class="drank-me"><div class="mark">?!</div><div class="drank-num">${myPos}</div><div class="drank-av">${(me.n||'?')[0].toUpperCase()}</div><div style="flex:1;min-width:0"><div class="drank-name">Toi</div><div class="drank-sub">${me.str} jour${me.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${me.xp}</div></div>`;
+      meSlot.innerHTML=`<div class="drank-me"><div class="mark">?!</div><div class="drank-num">${myPos}</div><div class="drank-av">${me.photoUrl?`<img src="${me.photoUrl}" alt="">`:esc((me.n||'?')[0].toUpperCase())}</div><div style="flex:1;min-width:0"><div class="drank-name">Toi</div><div class="drank-sub">${me.str} jour${me.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${me.xp}</div></div>`;
     }
   }
   el.innerHTML='';
@@ -1854,7 +1901,7 @@ function renderRanking(){
     const rank=all.indexOf(u)+1;
     const c=AVC[i%AVC.length];
     const d=document.createElement('div');d.className='drank-row';
-    d.innerHTML=`<div class="drank-num" style="background:var(--bg2);color:var(--ink2)">${rank}</div><div class="drank-av" style="background:${c}18;color:${c}">${(u.n||'?')[0].toUpperCase()}</div><div style="flex:1;min-width:0"><div class="drank-name">${esc(u.n||'Ami')}</div><div class="drank-sub">${u.str} jour${u.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${u.xp}</div>`;
+    d.innerHTML=`<div class="drank-num" style="background:var(--bg2);color:var(--ink2)">${rank}</div><div class="drank-av" style="background:${c}18;color:${c}">${u.photoUrl?`<img src="${u.photoUrl}" alt="">`:esc((u.n||'?')[0].toUpperCase())}</div><div style="flex:1;min-width:0"><div class="drank-name">${esc(u.n||'Ami')}</div><div class="drank-sub">${u.str} jour${u.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${u.xp}</div>`;
     el.appendChild(d);
   });
   applyStagger(el);
@@ -1921,7 +1968,7 @@ async function loadGroupMembers(g){
     top.forEach((u,i)=>{
       const isMe=u.uid===myUid;const name=u.name||'Anonyme';const c=isMe?'#E07D0A':AVC[i%AVC.length];
       const d=document.createElement('div');d.className='fi';
-      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--ink);font-weight:800':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.xp || u.points || 0} xp</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)">${i<3?medals[i]:'#'+(i+1)}</div>`;
+      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${u.photoUrl?`<img src="${u.photoUrl}" alt="">`:esc(name[0].toUpperCase())}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--ink);font-weight:800':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.xp || u.points || 0} xp</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)">${i<3?medals[i]:'#'+(i+1)}</div>`;
       el.appendChild(d);
     });
   }catch(e){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Impossible de charger les membres.</div>';}
@@ -2100,7 +2147,7 @@ function openChatFor(friend){
   const friendUid=friend.uid,friendName=friend.n;
   _chatFriendUid=friendUid;_chatFriendName=friendName;
   const idx=S.friends.findIndex(f=>f.uid===friendUid);const c=idx>=0?AVC[idx%AVC.length]:'#A14E08';
-  const av=document.getElementById('ch-av');av.textContent=(friendName[0]||'?').toUpperCase();av.style.background=c+'18';av.style.color=c;
+  const av=document.getElementById('ch-av');av.innerHTML=friend.photoUrl?`<img src="${friend.photoUrl}" alt="">`:esc((friendName[0]||'?').toUpperCase());av.style.background=c+'18';av.style.color=c;
   document.getElementById('ch-name').textContent=friendName;
   const st=document.getElementById('ch-status');if(st){st.textContent=friend.online?'En ligne':'Ami Noova';st.style.color=friend.online?'#22C55E':'var(--ink3)';}
   if(_chatUnsub){_chatUnsub();_chatUnsub=null;}
@@ -2217,7 +2264,7 @@ function refreshWallet(){
 }
 function refreshProfile(){
   if(!S.user)return;
-  document.getElementById('prof-av').textContent=S.user.name[0].toUpperCase();
+  renderUserAvatar(document.getElementById('prof-av'), document.getElementById('prof-av-letter'), S.user.name, S.user.photoUrl);
   document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.email||S._city||'';
   document.getElementById('s-pts').textContent=S.pts;document.getElementById('s-ans').textContent=S.ans;document.getElementById('s-str').textContent=S.streak;
   const friendsEl=document.getElementById('s-friends');if(friendsEl)friendsEl.textContent=(S.friends||[]).length;
@@ -3521,7 +3568,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   if (!data.name && fbDisplayName) {
     db.collection('users').doc(uid).update({ name: fbDisplayName }).catch(() => {});
   }
-  S.user = { name: resolvedName, uid };
+  S.user = { name: resolvedName, uid, photoUrl: data.photoUrl || null };
   S.pts              = data.points || 0;
   S.xp               = data.xp !== undefined ? data.xp : (data.points || 0);
   S.streak           = data.streak || 0;
@@ -3615,7 +3662,7 @@ async function loadFriendsFromFirestore(uids) {
       // Classement/liste d'amis basés sur l'XP (à vie, ne descend jamais) et non le solde
       // de points (dépensable, baisse à chaque échange) — sinon un ami qui vient d'échanger
       // une récompense semble "redescendre", ce qui n'est pas cohérent pour un classement.
-      return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, online };
+      return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, online, photoUrl: d.photoUrl || null };
     });
     renderFriends();
     if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }

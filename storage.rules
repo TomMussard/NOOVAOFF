@@ -24,6 +24,15 @@ service firebase.storage {
       );
     }
 
+    // Photo de profil de l'habitant (public dans l'app — visible des amis, du classement,
+    // du feed communauté) — même modèle que le logo commerçant, propriétaire seul en écriture.
+    match /users/{uid}/{fileName} {
+      allow read: if fileName.matches('avatar\\..*');
+      allow write: if isOwner(uid) && fileName.matches('avatar\\..*')
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
     // Tout le reste : fermé par défaut.
     match /{allPaths=**} {
       allow read, write: if false;
