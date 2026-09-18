@@ -156,7 +156,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .field-inp::placeholder{color:var(--ink3)}
 .age-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .age-opt{padding:12px 6px;border-radius:var(--r-media);background:var(--surface);border:1.5px solid var(--line-strong);color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .13s}
-.age-opt.sel{border-color:var(--coral);background:var(--cd);color:var(--ink);font-weight:700}
+.age-opt.sel{border-color:var(--ink);background:var(--yellow-soft);color:var(--gold-text);font-weight:700}
 .privacy-tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 8px;justify-content:center}
 .p-tag{font-size:10px;font-weight:600;color:var(--ink2);background:var(--bg2);border:1px solid var(--bg3);padding:3px 9px;border-radius:99px}
 .privacy-note{font-size:10px;color:var(--ink3);text-align:center;margin-top:10px;line-height:1.7}
@@ -2697,13 +2697,13 @@ function closeFullMap(){ goTo('home'); }
 <!-- ═══ AUTH WALL ══════════════════════════════════════════════ -->
 <style>
 .int-chip{padding:8px 13px;border-radius:99px;background:var(--bg2);border:1.5px solid var(--bg3);color:var(--ink2);font-size:12px;font-weight:500;cursor:pointer;transition:all .13s;font-family:var(--fb)}
-.int-chip.sel{border-color:var(--coral);background:var(--cd);color:var(--ink);font-weight:700}
+.int-chip.sel{border-color:var(--ink);background:var(--ink);color:var(--coral);font-weight:700}
 </style>
 
 <div id="auth-wall" style="position:fixed;inset:0;z-index:9999;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;overflow-y:auto;padding-top:calc(40px + env(safe-area-inset-top,0px));padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))">
 
   <div style="text-align:center;margin-bottom:36px">
-    <img src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Noova" style="height:64px;width:auto;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.12);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
+    <img src="favicon.svg" alt="Noova" style="height:64px;width:64px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.12);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
     <div style="font-family:var(--fd);font-weight:900;font-size:26px;letter-spacing:-1px;color:var(--ink);line-height:1">Noova</div>
     <div style="font-size:14px;color:var(--ink2);margin-top:8px;line-height:1.7">Tes avis valent de l'argent.<br>Réponds aux commerces de ton quartier.</div>
   </div>
