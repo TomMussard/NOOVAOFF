@@ -76,7 +76,7 @@
      maquette noova-app-ecrans.html. Un seul jeu de tokens pour tout l'app —
      les anciens noms sont conservés en alias pour ne pas casser les usages
      existants, mais pointent tous vers les mêmes valeurs de référence. */
-  --bg:#F4F2EC;--bg2:#EDE9DF;--bg3:#E0DBCE;--card:#FFFFFF;
+  --bg:#FFFBD7;--bg2:#FFF6B8;--bg3:#FFEC96;--card:#FFFFFF;
   --ink:#1C1917;--ink2:#6B6559;--ink3:#B0A89A;--icon-gray:#6B6559;
   --coral:#FFC300;--cd:rgba(255,195,0,.16);--cg:rgba(255,195,0,.4);
   --violet:#1C1917;--vd:rgba(28,25,23,.06);--vg:rgba(28,25,23,.14);
@@ -574,10 +574,13 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dtoday-card>.dtoday-photo{border-radius:26px 26px 0 0;overflow:hidden}
 .dtoday-card>.dtoday-body{border-radius:0 0 26px 26px;overflow:hidden}
 .dtoday-card:active{transform:scale(.98)}
-.dtoday-photo{height:92px;background:var(--nv-photo);position:relative;padding:12px;display:flex;flex-direction:column;justify-content:flex-end}
-.dt-pts{position:absolute;top:76px;right:14px;background:var(--nv-black);color:var(--nv-yellow);font-size:12px;font-weight:800;padding:8px 14px;border-radius:var(--r-pill);transform:rotate(-4deg);z-index:3;box-shadow:0 6px 16px rgba(28,25,23,.25)}
-.dtoday-brand{color:#fff;font-family:var(--fd);font-weight:700;font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,.3)}
-.dtoday-sub{color:rgba(255,255,255,.8);font-size:10.5px;margin-top:1px}
+.dtoday-photo{height:150px;background:var(--nv-photo);position:relative;padding:12px;display:flex;flex-direction:column;justify-content:flex-end}
+.dtoday-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.dtoday-photo>*:not(img){position:relative;z-index:1}
+.dt-pts{position:absolute;top:134px;right:14px;background:var(--nv-black);color:var(--nv-yellow);font-size:12px;font-weight:800;padding:8px 14px;border-radius:var(--r-pill);transform:rotate(-4deg);z-index:3;box-shadow:0 6px 16px rgba(28,25,23,.25)}
+.dtoday-info{display:flex;align-items:center;gap:10px}
+.dtoday-brand{color:#fff;font-family:var(--fd);font-weight:800;font-size:15.5px;letter-spacing:-.3px;text-shadow:0 1px 3px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dtoday-sub{color:rgba(255,255,255,.8);font-size:11px;margin-top:1px}
 .dtoday-body{background:var(--nv-yellow);padding:16px;position:relative;overflow:hidden}
 .dtoday-body>*{position:relative;z-index:1}
 .dtoday-q{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.22;color:var(--nv-yellow-ink);margin-bottom:13px;letter-spacing:-.4px}
@@ -592,22 +595,26 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dstreak-fire{width:36px;height:36px;border-radius:11px;background:rgba(255,212,0,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--nv-yellow)}
 .dstreak-title{font-family:var(--fd);font-weight:700;font-size:14px}
 .dstreak-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
-.dstreak-dots{display:flex;gap:4px}
-.dstreak-dot{flex:1;height:5px;border-radius:99px;background:rgba(255,255,255,.14)}
+.dstreak-dots{display:flex;gap:5px}
+.dstreak-dot{flex:1;height:9px;border-radius:99px;background:rgba(255,255,255,.14)}
 .dstreak-dot.on{background:var(--nv-yellow)}
 
-/* — Presque à toi — */
-.dpat-card{margin:0 18px 14px;background:var(--card);border-radius:22px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.05);cursor:pointer}
-.dpat-top{padding:14px 16px 0;display:flex;align-items:center;gap:12px}
-.dpat-ico{width:44px;height:44px;border-radius:13px;flex-shrink:0;background:var(--nv-photo)}
-.dpat-name{font-family:var(--fd);font-weight:800;font-size:14.5px;color:var(--ink);letter-spacing:-.3px}
-.dpat-sub{font-size:11px;color:var(--ink2);margin-top:1px}
-.dpat-pct{margin-left:auto;background:var(--nv-yellow);color:var(--nv-yellow-ink);font-family:var(--fd);font-weight:800;font-size:13px;padding:5px 11px;border-radius:99px;flex-shrink:0}
-.dpat-bar-wrap{padding:12px 16px 4px}
-.dpat-bar{height:6px;background:var(--bg2);border-radius:99px;overflow:hidden}
-.dpat-bar-fill{height:100%;background:var(--nv-yellow);border-radius:99px;transition:width .6s ease}
-.dpat-txt{padding:8px 16px 14px;font-size:12px;color:var(--ink2)}
-.dpat-txt strong{color:var(--ink)}
+/* — Presque à toi (même langage visuel que la carte question du jour : photo + bandeau) — */
+.dpat-card{margin:0 18px 14px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
+.dpat-card:active{transform:scale(.98)}
+.dpat-card>.dpat-photo{border-radius:26px 26px 0 0;overflow:hidden}
+.dpat-card>.dpat-body{border-radius:0 0 26px 26px;overflow:hidden}
+.dpat-photo{height:118px;background:var(--nv-photo);position:relative}
+.dpat-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.dpat-pct{position:absolute;top:12px;right:12px;background:var(--nv-black);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:13px;padding:7px 13px;border-radius:var(--r-pill);z-index:2;box-shadow:0 6px 16px rgba(28,25,23,.25)}
+.dpat-body{background:var(--nv-yellow);padding:14px 16px 16px;position:relative;overflow:hidden}
+.dpat-body>*{position:relative;z-index:1}
+.dpat-name{font-family:var(--fd);font-weight:800;font-size:16px;color:var(--nv-yellow-ink);letter-spacing:-.3px}
+.dpat-sub{font-size:12px;color:rgba(28,25,23,.65);margin-top:1px;margin-bottom:10px}
+.dpat-bar{height:8px;background:rgba(28,25,23,.16);border-radius:99px;overflow:hidden;margin-bottom:9px}
+.dpat-bar-fill{height:100%;background:var(--nv-black);border-radius:99px;transition:width .6s ease}
+.dpat-txt{font-size:12px;color:rgba(28,25,23,.75)}
+.dpat-txt strong{color:var(--nv-black)}
 
 /* — Section titres type "À deux pas" — */
 .dsec-row{padding:2px 20px 10px;display:flex;align-items:center;justify-content:space-between}
@@ -622,16 +629,18 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dmap-illo{position:absolute;inset:0;width:100%;height:100%;display:block}
 .dmap-label{position:absolute;left:14px;bottom:12px;background:var(--surface);border-radius:var(--r-pill);padding:8px 14px;font-size:12px;font-weight:800;color:var(--ink);box-shadow:var(--shadow-card);z-index:1}
 
-/* — Cartes commerces proches (grille 2 col.) — */
+/* — Cartes commerces proches (grille 2 col., texte incrusté sur la photo) — */
 .dnearby-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 6px}
-.dnb-card{background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.05);cursor:pointer;transition:transform .13s}
+.dnb-card{background:var(--nv-photo);border-radius:18px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.08);cursor:pointer;transition:transform .13s;position:relative;height:148px}
 .dnb-card:active{transform:scale(.97)}
-.dnb-photo{height:76px;position:relative;background:var(--nv-photo)}
-.dnb-badge{position:absolute;top:8px;left:8px;font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:99px;background:var(--nv-yellow);color:var(--nv-yellow-ink)}
-.dnb-badge.soon{background:rgba(255,255,255,.9);color:var(--ink2)}
-.dnb-body{padding:9px 10px 11px}
-.dnb-name{font-family:var(--fd);font-weight:700;font-size:12.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dnb-meta{font-size:10.5px;color:var(--ink2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dnb-photo{position:absolute;inset:0}
+.dnb-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.dnb-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(20,12,4,.68) 0%,rgba(20,12,4,0) 58%)}
+.dnb-badge{position:absolute;top:8px;left:8px;z-index:2;font-size:9.5px;font-weight:800;padding:4px 9px;border-radius:99px;background:var(--nv-yellow);color:var(--nv-yellow-ink)}
+.dnb-badge.soon{background:rgba(255,255,255,.92);color:var(--ink2)}
+.dnb-body{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:9px 11px 11px}
+.dnb-name{font-family:var(--fd);font-weight:800;font-size:13.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+.dnb-meta{font-size:10.5px;color:rgba(255,255,255,.85);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* — Pins Leaflet personnalisés + teinte crème sur les tuiles OSM — */
 .nv-pin-wrap{background:none;border:none}
@@ -840,8 +849,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     </div>
     <div class="dtoday-card" id="today-card" onclick="openQ(0)">
       <div class="dtoday-photo" id="dtoday-photo">
-        <div class="dtoday-brand" id="tc-brand">Commerce</div>
-        <div class="dtoday-sub" id="dtoday-dist"></div>
+        <div class="dtoday-info">
+          <div id="dtoday-logo"></div>
+          <div style="min-width:0"><div class="dtoday-brand" id="tc-brand">Commerce</div><div class="dtoday-sub" id="dtoday-dist"></div></div>
+        </div>
       </div>
       <div class="dt-pts" id="tc-pts">+pts</div>
       <div class="dtoday-body">
@@ -1239,8 +1250,16 @@ function refreshHome(){
   const streakSub=document.getElementById('streak-sub');
   if(streakSub) streakSub.textContent = S.streak>=10 ? 'Bonus débloqué !' : `Encore ${10-S.streak} jour${10-S.streak>1?'s':''} pour +50 pts bonus`;
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<10;i++){const d=document.createElement('div');d.className='dstreak-dot'+(i<S.streak?' on':'');sd.appendChild(d)}
-  if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent='+'+q.pts+' pts';document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex'}
-  else{document.getElementById('tc-brand').textContent='Pas encore de question';document.getElementById('tc-pts').textContent='';document.getElementById('tc-q').textContent='Aucun commerce de ta zone n\'a encore posté de question. Reviens bientôt !';document.getElementById('today-card').style.opacity='.75';document.querySelector('#today-card .dtoday-cta').style.display='none'}
+  if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent='+'+q.pts+' pts';document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
+    const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector('img');
+    if(q.logoUrl){ if(existingImg){existingImg.src=q.logoUrl;} else { const img=document.createElement('img'); img.src=q.logoUrl; img.alt=''; tcPhoto.insertBefore(img, tcPhoto.firstChild); } }
+    else if(existingImg){ existingImg.remove(); }
+    document.getElementById('dtoday-logo').innerHTML=logoHTML(q.brand,40,null);
+  }
+  else{document.getElementById('tc-brand').textContent='Pas encore de question';document.getElementById('tc-pts').textContent='';document.getElementById('tc-q').textContent='Aucun commerce de ta zone n\'a encore posté de question. Reviens bientôt !';document.getElementById('today-card').style.opacity='.75';document.querySelector('#today-card .dtoday-cta').style.display='none';
+    document.getElementById('dtoday-logo').innerHTML='';
+    const tcImg=document.getElementById('dtoday-photo').querySelector('img'); if(tcImg) tcImg.remove();
+  }
   renderQueue();
   renderAlmostReward();
   renderNearbyMap();
@@ -2530,7 +2549,9 @@ async function renderNearbyGrid(){
   }
   el.innerHTML = withDist.slice(0,4).map(c => `
     <div class="dnb-card" ${c._merchantId?`onclick="openBrandById('${c._merchantId}','${esc(c.name).replace(/'/g,"\\'")}')"`:''}>
-      <div class="dnb-photo">${c.logoUrl?`<img src="${c.logoUrl}" style="width:100%;height:100%;object-fit:cover" alt="">`:''}<div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':'Bientôt'}</div></div>
+      <div class="dnb-photo">${c.logoUrl?`<img src="${c.logoUrl}" alt="">`:''}</div>
+      <div class="dnb-scrim"></div>
+      <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':'Bientôt'}</div>
       <div class="dnb-body"><div class="dnb-name">${esc(c.name)}</div><div class="dnb-meta">${esc(c.sector)}${c._dist!=null?' · '+fmtDist(c._dist):''}</div></div>
     </div>`).join('');
 }
@@ -2909,7 +2930,7 @@ async function loadRewardsFromFirestore() {
     const rewards = [];
     snap.forEach(doc => {
       const d = doc.data();
-      if(normalizeCity(d.city||'') === city) rewards.push({ id: doc.id, ...d });
+      if(normalizeCity(d.city||'') === city) rewards.push({ id: doc.id, ...d, logoUrl: (_verifiedMerchantsCache[d.merchantId]||{}).logoUrl || null });
     });
     rewards.sort((a,b) => (a.cost||0)-(b.cost||0));
     S._rewardsCache = rewards;
@@ -2957,13 +2978,14 @@ function renderAlmostReward(){
   const pct = Math.max(4, Math.min(96, (S.pts / (r.cost||1)) * 100));
   const missing = Math.max(0, (r.cost||0) - S.pts);
   wrap.innerHTML = `<div class="dpat-card" onclick="goNav('rewards-tab')">
-    <div class="dpat-top">
-      ${logoHTML(r.merchantName||r.label,44,r.logoUrl)}
-      <div style="flex:1;min-width:0"><div class="dpat-name">${esc(r.label||'Récompense')}</div><div class="dpat-sub">${esc(r.merchantName||'')}</div></div>
-      <div class="dpat-pct">${Math.round(pct)}%</div>
+    <div class="dpat-photo">${r.logoUrl?`<img src="${r.logoUrl}" alt="">`:''}<div class="dpat-pct">${Math.round(pct)}%</div></div>
+    <div class="dpat-body">
+      <div class="mark">?!</div>
+      <div class="dpat-name">${esc(r.label||'Récompense')}</div>
+      <div class="dpat-sub">${esc(r.merchantName||'')}</div>
+      <div class="dpat-bar"><div class="dpat-bar-fill" style="width:${pct}%"></div></div>
+      <div class="dpat-txt">Encore <strong>${missing} pts</strong> et elle est à toi</div>
     </div>
-    <div class="dpat-bar-wrap"><div class="dpat-bar"><div class="dpat-bar-fill" style="width:${pct}%"></div></div></div>
-    <div class="dpat-txt">Encore <strong>${missing} pts</strong> et elle est à toi</div>
   </div>`;
 }
 // ─── Récompense mise en avant (écran Récompenses) — logique "appli de fidélité" :
@@ -3556,6 +3578,7 @@ function recomputeCampaignFeed(city) {
         _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: 0,
         _surveyCount: allQs.length,
         brand: d.merchantName || 'Commerce', ico: d.brandEmoji || '🏪',
+        logoUrl: merchantData.logoUrl || null,
         theme: d.sector || 'Commerce local', pts: 10,
         type: allQs[0].format || d.format || 'text',
         q: allQs[0].q || d.question, hint: 'Donne ton avis',
@@ -3935,10 +3958,11 @@ function closeCelebration(){
 </script>
 
 <!-- Loader initial — seul écran visible au démarrage -->
-<div id="app-loader" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(130% 120% at 55% -5%,#241F1C 0%,#1C1917 60%);transition:opacity .7s ease">
-  <img src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Noova" style="height:118px;width:auto;animation:pop .65s cubic-bezier(.34,1.56,.64,1) .2s both">
-  <div style="width:36px;height:1.5px;background:#FFC300;border-radius:99px;animation:fadeUp .4s ease .95s both"></div>
-  <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:4px;color:rgba(255,255,255,.48);text-align:center;padding:0 24px;animation:fadeUp .5s ease 1.05s both">Là où vos avis ont de la valeur</div>
+<div id="app-loader" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:38px;background:radial-gradient(130% 120% at 55% -5%,#241F1C 0%,#1C1917 60%);transition:opacity .7s ease">
+  <img src="favicon.svg" alt="Noova" style="width:136px;height:136px;border-radius:31px;box-shadow:0 22px 54px rgba(0,0,0,.4);animation:pop .65s cubic-bezier(.34,1.56,.64,1) .2s both">
+  <div style="transform:skewX(-9deg);background:linear-gradient(100deg,#f29715 0%,#ffda09 100%);padding:12px 24px;border-radius:9px;box-shadow:0 10px 26px rgba(0,0,0,.3);animation:fadeUp .5s ease .95s both">
+    <div style="transform:skewX(9deg);font-family:var(--fd);font-weight:800;font-style:italic;font-size:13px;letter-spacing:.3px;color:#1C1917;text-align:center;white-space:nowrap">LÀ OÙ TES AVIS ONT DE LA VALEUR.</div>
+  </div>
 </div>
 </body>
 </html>
