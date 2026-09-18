@@ -687,6 +687,21 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .drank-row .drank-sub{color:var(--ink3)}
 .drank-row .drank-pts{color:var(--ink)}
 
+/* — Podium top 3 (Classement) — */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:0 18px 18px;padding:14px 10px 0;background:var(--nv-black);border-radius:var(--r-card);overflow:hidden;position:relative}
+.podium::after{content:'';position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,rgba(255,212,0,.18) 0%,rgba(255,212,0,0) 60%);pointer-events:none}
+.podium-slot{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1;min-width:0}
+.podium-crown{font-size:18px;margin-bottom:2px;line-height:1}
+.podium-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:16px;margin-bottom:7px;border:2.5px solid rgba(255,255,255,.9);box-shadow:0 6px 14px rgba(0,0,0,.3);flex-shrink:0}
+.podium-slot.p1 .podium-av{width:58px;height:58px;font-size:20px}
+.podium-name{font-family:var(--fd);font-weight:800;font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 2px}
+.podium-pts{font-size:10.5px;color:rgba(255,255,255,.55);font-weight:700;margin-top:1px;margin-bottom:8px}
+.podium-bar{width:100%;border-radius:12px 12px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:7px;font-family:var(--fd);font-weight:800;font-size:14px;color:rgba(28,25,23,.55)}
+.podium-slot.p1 .podium-bar{height:58px;background:linear-gradient(180deg,#FFDE5C 0%,#F0B400 100%)}
+.podium-slot.p2 .podium-bar{height:40px;background:linear-gradient(180deg,#E4DFD3 0%,#B9B2A0 100%)}
+.podium-slot.p3 .podium-bar{height:30px;background:linear-gradient(180deg,#E3AD79 0%,#B97D42 100%)}
+.podium-slot.me .podium-av{outline:2.5px solid var(--nv-yellow);outline-offset:2px}
+
 /* — Récompenses (wallet) — */
 .dwal-hdr{padding:52px 18px 12px;display:flex;align-items:center;justify-content:space-between}
 .dwal-title{font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.7px;color:var(--ink)}
@@ -1002,6 +1017,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
         </div>
       </div>
     </div>
+    <div class="dsec-h" id="reward-featured-label"></div>
     <div id="reward-featured-wrap"></div>
     <div class="dsec-h">En cours <span id="dprog-count" style="font-weight:500;color:var(--ink2);font-size:12px;margin-left:2px"></span></div>
     <div id="dprog-list"></div>
@@ -1043,10 +1059,13 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="sec-card">
       <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="openManageMerchants()">Gérer</span></div>
       <div id="consent-mgmt"></div>
-      <div class="consent-it" style="cursor:pointer" onclick="goTo('manage-merchants');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
-      <div class="consent-it" style="cursor:pointer;border-bottom:none" onclick="showToast('Réglages des notifications bientôt disponibles','success')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Notifications</div><span style="color:var(--ink3);font-size:12px">1 par jour ›</span></div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;background:var(--md);border:1.5px solid var(--mg);border-radius:12px;padding:11px 13px;margin-bottom:11px"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Révoque chaque consentement ou supprime ton compte ci-dessous. Conforme RGPD.</div></div>
+    <div class="sec-card">
+      <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div></div>
+      <div class="consent-it" style="cursor:pointer" onclick="goTo('manage-merchants');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
+      <div class="consent-it" style="cursor:pointer;border-bottom:none" onclick="showToast('Réglages des notifications bientôt disponibles','success')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Notifications</div><span style="color:var(--ink3);font-size:12px">Bientôt ›</span></div>
+      <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Conforme RGPD — révoque ou supprime tes données ci-dessous.</div></div>
+    </div>
     <div class="sec-card">
       <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span><div class="sc-title">Badges</div></div>
       <div class="badge-list" id="badges-list"></div>
@@ -1702,6 +1721,7 @@ function initRankingPanel(){
       <div class="dcomm-title">Tes amis</div>
       <div class="dcomm-sub">Le classement se remet à zéro dans ${days} jour${days>1?'s':''}</div>
     </div>
+    <div id="drank-podium"></div>
     <div id="drank-me-slot"></div>
     <div class="drank-list-title"><span>Classement</span><small id="drank-count"></small></div>
     <div id="ranking-list"></div>`;
@@ -1733,6 +1753,7 @@ function renderFriends(){
 function renderRanking(){
   const el=document.getElementById('ranking-list');
   const meSlot=document.getElementById('drank-me-slot');
+  const podiumEl=document.getElementById('drank-podium');
   const countEl=document.getElementById('drank-count');
   if(!el)return;
   const all=[{uid:'__me',n:S.user?S.user.name:'Toi',xp:S.xp||0,str:S.streak||0,me:true}]
@@ -1740,14 +1761,41 @@ function renderRanking(){
   all.sort((a,b)=>b.xp-a.xp);
   if(countEl)countEl.textContent=(S.friends||[]).length+' ami'+((S.friends||[]).length>1?'s':'');
   const myPos=all.findIndex(u=>u.me)+1;
+
+  // Podium visuel pour le top 3 — uniquement si assez de monde pour que ça ait un sens.
+  const podiumCount=all.length>=3?3:0;
+  if(podiumEl){
+    if(!podiumCount){ podiumEl.innerHTML=''; }
+    else{
+      const top3=all.slice(0,3);
+      const order=[top3[1],top3[0],top3[2]]; // 2e, 1er, 3e — ordre podium classique
+      const crowns=['🥈','👑','🥉'];
+      podiumEl.innerHTML=order.map((u,i)=>{
+        const rank=all.indexOf(u)+1;
+        const cls=rank===1?'p1':rank===2?'p2':'p3';
+        const label=u.me?'Toi':esc(u.n||'Ami');
+        return `<div class="podium-slot ${cls}${u.me?' me':''}">
+          <div class="podium-crown">${crowns[i]}</div>
+          <div class="podium-av" style="background:rgba(255,255,255,.16);color:#fff">${(u.n||'?')[0].toUpperCase()}</div>
+          <div class="podium-name">${label}</div>
+          <div class="podium-pts">${u.xp} xp</div>
+          <div class="podium-bar">${rank}</div>
+        </div>`;
+      }).join('');
+    }
+  }
+
   if(meSlot){
-    const me=all.find(u=>u.me);
-    meSlot.innerHTML=`<div class="drank-me"><div class="mark">?!</div><div class="drank-num">${myPos}</div><div class="drank-av">${(me.n||'?')[0].toUpperCase()}</div><div style="flex:1;min-width:0"><div class="drank-name">Toi</div><div class="drank-sub">${me.str} jour${me.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${me.xp}</div></div>`;
+    if(myPos<=podiumCount){ meSlot.innerHTML=''; }
+    else{
+      const me=all.find(u=>u.me);
+      meSlot.innerHTML=`<div class="drank-me"><div class="mark">?!</div><div class="drank-num">${myPos}</div><div class="drank-av">${(me.n||'?')[0].toUpperCase()}</div><div style="flex:1;min-width:0"><div class="drank-name">Toi</div><div class="drank-sub">${me.str} jour${me.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${me.xp}</div></div>`;
+    }
   }
   el.innerHTML='';
-  const others=all.filter(u=>!u.me);
+  const others=all.filter((u,i)=>!u.me && i>=podiumCount);
   if(!others.length){
-    el.innerHTML='<div style="text-align:center;padding:24px 16px;color:var(--ink3);font-size:13px;line-height:1.6">Invite des amis pour voir un classement !</div>';
+    el.innerHTML=all.length>1?'':'<div style="text-align:center;padding:24px 16px;color:var(--ink3);font-size:13px;line-height:1.6">Invite des amis pour voir un classement !</div>';
     return;
   }
   others.forEach((u,i)=>{
@@ -3000,10 +3048,14 @@ function renderAlmostReward(){
 // le reste du catalogue et les paliers passent dans la feuille "Voir tout". ───────
 function renderFeaturedReward(){
   const wrap = document.getElementById('reward-featured-wrap');
+  const labelEl = document.getElementById('reward-featured-label');
   if(!wrap) return;
   const all = S._rewardsCache||[];
-  if(!all.length){ wrap.innerHTML=''; S._featuredRewardId=null; return; }
+  if(!all.length){ wrap.innerHTML=''; if(labelEl) labelEl.innerHTML=''; S._featuredRewardId=null; return; }
   const redeemable = all.filter(r => (r.cost||0) <= S.pts).sort((a,b)=>(b.cost||0)-(a.cost||0));
+  if(labelEl) labelEl.innerHTML = redeemable.length
+    ? '🎉 Disponible maintenant'
+    : 'Ta prochaine récompense';
   if(redeemable.length){
     const r = redeemable[0];
     S._featuredRewardId = r.id;
