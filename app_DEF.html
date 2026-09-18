@@ -1119,6 +1119,38 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="dimpact-txt" id="dimpact-txt">Réponds à quelques questions pour commencer à aider les commerces de ton quartier.</div>
     </div>
     <div class="sec-card">
+      <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span><div class="sc-title">Mes informations</div></div>
+      <div class="consent-it" style="cursor:pointer" onclick="document.getElementById('avatar-file-inp').click()">
+        <div class="dprof-av" id="settings-av-thumb" style="width:34px;height:34px;font-size:13px;border-width:1.5px;cursor:pointer"><span id="settings-av-thumb-letter">A</span></div>
+        <div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Photo de profil</div>
+        <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
+      </div>
+      <div class="consent-it" style="cursor:pointer" onclick="editUserField('name','Prénom',S.user.name)">
+        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span>
+        <div style="flex:1"><div class="dconsent-name">Prénom</div><div class="dconsent-sub" id="set-u-name">—</div></div>
+        <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
+      </div>
+      <div class="consent-it" style="cursor:pointer" onclick="editUserCity()">
+        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg></span>
+        <div style="flex:1"><div class="dconsent-name">Ville</div><div class="dconsent-sub" id="set-u-city">—</div></div>
+        <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
+      </div>
+      <div class="consent-it" style="cursor:pointer" onclick="openAgeEditSheet()">
+        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
+        <div style="flex:1"><div class="dconsent-name">Tranche d'âge</div><div class="dconsent-sub" id="set-u-age">—</div></div>
+        <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
+      </div>
+      <div class="consent-it" style="cursor:pointer" onclick="openInterestsEditSheet()">
+        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span>
+        <div style="flex:1;min-width:0"><div class="dconsent-name">Centres d'intérêt</div><div class="dconsent-sub" id="set-u-interests" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div>
+        <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;flex-shrink:0">Modifier</span>
+      </div>
+      <div class="consent-it" style="border-bottom:none">
+        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+        <div style="flex:1;min-width:0"><div class="dconsent-name">Email</div><div class="dconsent-sub" id="set-u-email" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div>
+      </div>
+    </div>
+    <div class="sec-card">
       <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="openManageMerchants()">Gérer</span></div>
       <div id="consent-mgmt"></div>
     </div>
@@ -1184,6 +1216,55 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   </div>
 </div>
 
+<!-- Modale générique d'édition d'un champ texte du profil (prénom) -->
+<div id="user-edit-modal" onclick="if(event.target===this)closeUserEditModal()" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--card);border-radius:20px;max-width:400px;width:100%;padding:26px 24px;box-shadow:0 24px 64px rgba(0,0,0,.25)">
+    <div id="uem-label" style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink);margin-bottom:12px">Modifier</div>
+    <input id="uem-input" type="text" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:14px;outline:none;box-sizing:border-box" onkeydown="if(event.key==='Enter')confirmUserEditModal()">
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button onclick="closeUserEditModal()" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--line-strong);color:var(--ink2);font-weight:700;cursor:pointer">Annuler</button>
+      <button onclick="confirmUserEditModal()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:var(--ink);font-weight:800;font-family:var(--fd);cursor:pointer">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Feuille d'édition de la tranche d'âge -->
+<div id="age-edit-sheet" onclick="if(event.target===this)closeAgeEditSheet()" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:center;padding:0">
+  <div style="background:var(--card);border-radius:24px 24px 0 0;max-width:430px;width:100%;padding:22px 22px calc(24px + env(safe-area-inset-bottom,0px))">
+    <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
+    <div style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink);margin-bottom:14px;text-align:center">Ta tranche d'âge</div>
+    <div id="age-edit-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px">
+      <button type="button" class="age-opt" onclick="selSettingsAge(this,'16-17')">16–17 ans</button>
+      <button type="button" class="age-opt" onclick="selSettingsAge(this,'18-24')">18–24 ans</button>
+      <button type="button" class="age-opt" onclick="selSettingsAge(this,'25-34')">25–34 ans</button>
+      <button type="button" class="age-opt" onclick="selSettingsAge(this,'35-49')">35–49 ans</button>
+      <button type="button" class="age-opt" onclick="selSettingsAge(this,'50-64')">50–64 ans</button>
+      <button type="button" class="age-opt" onclick="selSettingsAge(this,'65+')">65+ ans</button>
+    </div>
+    <button class="btn-p" onclick="confirmAgeEditSheet()">Enregistrer</button>
+  </div>
+</div>
+
+<!-- Feuille d'édition des centres d'intérêt -->
+<div id="interests-edit-sheet" onclick="if(event.target===this)closeInterestsEditSheet()" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:center;padding:0">
+  <div style="background:var(--card);border-radius:24px 24px 0 0;max-width:430px;width:100%;padding:22px 22px calc(24px + env(safe-area-inset-bottom,0px))">
+    <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
+    <div style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink);margin-bottom:14px;text-align:center">Tes centres d'intérêt</div>
+    <div id="interests-edit-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'restauration')">🍔 Restauration</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'sport')">⚽ Sport</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'gaming')">🎮 Gaming</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'musique')">🎵 Musique</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'voyage')">✈️ Voyage</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'mode')">👗 Mode</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'tech')">💻 Tech</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'culture')">🎭 Culture</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'cafe')">☕ Café</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'shopping')">🛍️ Shopping</button>
+    </div>
+    <button class="btn-p" onclick="confirmInterestsEditSheet()">Enregistrer</button>
+  </div>
+</div>
 
 <!-- CARTE DES COMMERÇANTS PROCHES (plein écran) -->
 <div id="map-full" class="screen">
@@ -1245,12 +1326,116 @@ async function changeMyAvatar(file){
     S.user.photoUrl = url;
     renderUserAvatar(avEl, document.getElementById('prof-av-letter'), S.user.name, url);
     renderUserAvatar(document.getElementById('home-av'), document.getElementById('home-av-letter'), S.user.name, url);
+    renderUserAvatar(document.getElementById('settings-av-thumb'), document.getElementById('settings-av-thumb-letter'), S.user.name, url);
     showToast('Photo de profil mise à jour.', 'image');
     trackEvent('avatar_updated');
   } catch(e) {
     showToast('Erreur upload : ' + e.message, 'error');
   }
 }
+
+// \u2500\u2500\u2500 \u00c9dition des informations du profil (pr\u00e9nom, ville, \u00e2ge, int\u00e9r\u00eats) \u2500\u2500\u2500\u2500
+function refreshSettingsDisplay(){
+  const nEl=document.getElementById('set-u-name'); if(nEl) nEl.textContent=(S.user&&S.user.name)||'\u2014';
+  const cEl=document.getElementById('set-u-city'); if(cEl) cEl.textContent=S._cityLabel||'\u2014';
+  const AGE_LABELS={'16-17':'16\u201317 ans','18-24':'18\u201324 ans','25-34':'25\u201334 ans','35-49':'35\u201349 ans','50-64':'50\u201364 ans','65+':'65+ ans'};
+  const aEl=document.getElementById('set-u-age'); if(aEl) aEl.textContent=AGE_LABELS[S._age]||'\u2014';
+  const INT_LABELS={restauration:'Restauration',sport:'Sport',gaming:'Gaming',musique:'Musique',voyage:'Voyage',mode:'Mode',tech:'Tech',culture:'Culture',cafe:'Caf\u00e9',shopping:'Shopping'};
+  const iEl=document.getElementById('set-u-interests'); if(iEl) iEl.textContent=(S._interests&&S._interests.length)?S._interests.map(i=>INT_LABELS[i]||i).join(', '):'\u2014';
+  const eEl=document.getElementById('set-u-email'); if(eEl) eEl.textContent=(S.user&&S.user.email)||(auth.currentUser&&auth.currentUser.email)||'\u2014';
+}
+
+let _uemField=null;
+function editUserField(field,label,current){
+  _uemField=field;
+  document.getElementById('uem-label').textContent=label;
+  const inp=document.getElementById('uem-input');
+  inp.value=current||'';
+  document.getElementById('user-edit-modal').style.display='flex';
+  setTimeout(()=>inp.focus(),60);
+}
+function editUserCity(){ editUserField('cityLabel','Ville',S._cityLabel); }
+function closeUserEditModal(){ document.getElementById('user-edit-modal').style.display='none'; _uemField=null; }
+async function confirmUserEditModal(){
+  const val=document.getElementById('uem-input').value.trim();
+  const field=_uemField;
+  if(!val){ showToast('Ce champ ne peut pas \u00eatre vide.','warning'); return; }
+  const uid=auth.currentUser&&auth.currentUser.uid;
+  if(!uid) return;
+  try{
+    if(field==='name'){
+      await db.collection('users').doc(uid).update({ name: val });
+      S.user.name=val;
+      document.getElementById('home-name').textContent=val;
+      document.getElementById('prof-name').textContent=val;
+    } else if(field==='cityLabel'){
+      const norm=normalizeCity(val);
+      if(!(await isCityOpen(norm))){ showToast("Noova n'est pas encore ouvert dans cette ville.",'warning'); return; }
+      await db.collection('users').doc(uid).update({ city: norm, cityLabel: val });
+      S._city=norm; S._cityLabel=val;
+      db.collection('cities').doc(norm).set({ label: val.charAt(0).toUpperCase()+val.slice(1), count: firebase.firestore.FieldValue.increment(1) }, { merge:true }).catch(()=>{});
+      // Change de ville : la file du jour, la carte et le classement (tous scop\u00e9s par ville) doivent recharger.
+      loadCampaignsFromFirestore({ city:S._city, interests:S._interests, answeredCampaigns:S._answered||[], authorizedMerchants:S._authorizedMerchants||[] });
+      loadNearbyMerchants(S._authorizedMerchants||[]);
+    }
+    refreshSettingsDisplay();
+    closeUserEditModal();
+    showToast('Mis \u00e0 jour.','success');
+    trackEvent('profile_field_updated', { field });
+  }catch(e){ showToast('Erreur : '+e.message,'error'); }
+}
+
+let _settingsAge=null;
+function openAgeEditSheet(){
+  _settingsAge=S._age||null;
+  document.querySelectorAll('#age-edit-grid .age-opt').forEach(b=>b.classList.toggle('sel', b.getAttribute('onclick').includes(`'${_settingsAge}'`)));
+  document.getElementById('age-edit-sheet').style.display='flex';
+}
+function closeAgeEditSheet(){ document.getElementById('age-edit-sheet').style.display='none'; }
+function selSettingsAge(el,val){ _settingsAge=val; document.querySelectorAll('#age-edit-grid .age-opt').forEach(b=>b.classList.remove('sel')); el.classList.add('sel'); }
+async function confirmAgeEditSheet(){
+  if(!_settingsAge){ showToast('Choisis une tranche d\'\u00e2ge.','warning'); return; }
+  const uid=auth.currentUser&&auth.currentUser.uid;
+  if(!uid) return;
+  try{
+    await db.collection('users').doc(uid).update({ ageRange:_settingsAge, age:_settingsAge });
+    S._age=_settingsAge;
+    refreshSettingsDisplay();
+    closeAgeEditSheet();
+    showToast('Mis \u00e0 jour.','success');
+    trackEvent('profile_field_updated', { field:'age' });
+  }catch(e){ showToast('Erreur : '+e.message,'error'); }
+}
+
+let _settingsInterests=[];
+function openInterestsEditSheet(){
+  _settingsInterests=(S._interests||[]).slice();
+  document.querySelectorAll('#interests-edit-grid .int-chip').forEach(b=>{
+    const val=b.getAttribute('onclick').match(/'([a-z]+)'/)[1];
+    b.classList.toggle('sel', _settingsInterests.includes(val));
+  });
+  document.getElementById('interests-edit-sheet').style.display='flex';
+}
+function closeInterestsEditSheet(){ document.getElementById('interests-edit-sheet').style.display='none'; }
+function toggleSettingsInterest(el,val){
+  const idx=_settingsInterests.indexOf(val);
+  if(idx===-1){ _settingsInterests.push(val); el.classList.add('sel'); }
+  else { _settingsInterests.splice(idx,1); el.classList.remove('sel'); }
+}
+async function confirmInterestsEditSheet(){
+  if(!_settingsInterests.length){ showToast('Choisis au moins un centre d\'int\u00e9r\u00eat.','warning'); return; }
+  const uid=auth.currentUser&&auth.currentUser.uid;
+  if(!uid) return;
+  try{
+    await db.collection('users').doc(uid).update({ interests:_settingsInterests });
+    S._interests=_settingsInterests.slice();
+    refreshSettingsDisplay();
+    closeInterestsEditSheet();
+    showToast('Mis \u00e0 jour.','success');
+    trackEvent('profile_field_updated', { field:'interests' });
+  }catch(e){ showToast('Erreur : '+e.message,'error'); }
+}
+
 // Villes beta connues : rattache les variantes d'\u00e9criture (espace manquant, tirets...)
 // au m\u00eame slug pour \u00e9viter qu'un utilisateur atterrisse dans une "ville fant\u00f4me".
 const NOOVA_KNOWN_CITIES=[{slug:'le-mans',label:'Le Mans'},{slug:'angers',label:'Angers'}];
@@ -2265,6 +2450,8 @@ function refreshWallet(){
 function refreshProfile(){
   if(!S.user)return;
   renderUserAvatar(document.getElementById('prof-av'), document.getElementById('prof-av-letter'), S.user.name, S.user.photoUrl);
+  renderUserAvatar(document.getElementById('settings-av-thumb'), document.getElementById('settings-av-thumb-letter'), S.user.name, S.user.photoUrl);
+  refreshSettingsDisplay();
   document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.email||S._city||'';
   document.getElementById('s-pts').textContent=S.pts;document.getElementById('s-ans').textContent=S.ans;document.getElementById('s-str').textContent=S.streak;
   const friendsEl=document.getElementById('s-friends');if(friendsEl)friendsEl.textContent=(S.friends||[]).length;
@@ -3568,7 +3755,8 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   if (!data.name && fbDisplayName) {
     db.collection('users').doc(uid).update({ name: fbDisplayName }).catch(() => {});
   }
-  S.user = { name: resolvedName, uid, photoUrl: data.photoUrl || null };
+  const resolvedEmail = data.email || (auth.currentUser && auth.currentUser.email) || '';
+  S.user = { name: resolvedName, uid, photoUrl: data.photoUrl || null, email: resolvedEmail };
   S.pts              = data.points || 0;
   S.xp               = data.xp !== undefined ? data.xp : (data.points || 0);
   S.streak           = data.streak || 0;
@@ -3583,6 +3771,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   S._dailyEarned     = data.dailyEarned || 0;
   S._dailyEarnedDate = data.dailyEarnedDate || null;
   S._city            = data.city || '';
+  S._cityLabel       = data.cityLabel || data.city || '';
   // Auto-canonicalisation : un compte créé avant le fix "ville fantôme" peut avoir
   // un city stocké différent du slug canonique actuel — on le corrige silencieusement.
   if (S._city) {
