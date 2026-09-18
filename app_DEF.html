@@ -66,6 +66,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
 <!-- Leaflet — carte "commerces près de toi" (OpenStreetMap, gratuit, sans clé API) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -1252,6 +1253,7 @@ function goTo(id){
   const isN=navS.includes(id);
   document.getElementById('bnav').classList[S.user&&isN?'add':'remove']('show');
   navS.forEach(s=>{const el=document.getElementById('nav-'+s);if(el)el.classList[s===id?'add':'remove']('on')});
+  trackEvent('screen_view', { screen_name: id, firebase_screen: id, firebase_screen_class: id });
 }
 function goNav(id){goTo(id);if(id==='rewards-tab')refreshWallet();if(id==='profile')refreshProfile();if(id==='home'){refreshHome();applyStagger(document.querySelector('#home .si'));}if(id==='social'){renderSocial();const b=document.querySelector('#nav-social .nav-badge');if(b)b.style.display='none';}}
 
@@ -2071,6 +2073,8 @@ async function acceptFriendRequest(notifId,fromUid,fromName){
       S._friendUids=[...(S._friendUids||[]),fromUid];
       await loadFriendsFromFirestore(S._friendUids);
     }
+    trackEvent('friend_added');
+    checkTierAndBadgeCelebrations();
   }catch(e){console.warn('acceptFriend:',e);}
 }
 
@@ -2876,12 +2880,20 @@ const firebaseConfig = {
   projectId: "noova-366d0",
   storageBucket: "noova-366d0.firebasestorage.app",
   messagingSenderId: "710589257687",
-  appId: "1:710589257687:web:946b5d1efffabff14d9d92"
+  appId: "1:710589257687:web:946b5d1efffabff14d9d92",
+  measurementId: "G-3E6ZPKLY64"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const fx  = firebase.app().functions('europe-west1');
+// Analytics : peut échouer silencieusement (bloqueur de pub, ITP Safari...) sans jamais
+// casser l'app — trackEvent() encapsule cette tolérance pour tous les appels du fichier.
+let analytics = null;
+try { analytics = firebase.analytics(); } catch(e) { console.warn('analytics init:', e); }
+function trackEvent(name, params) {
+  try { if(analytics) analytics.logEvent(name, params||{}); } catch(e) {}
+}
 const callSubmitAnswer = fx.httpsCallable('submitAnswer');
 document.getElementById('aw-pass').addEventListener('input', function(){ _updatePassStrength(this.value); });
 
@@ -2971,6 +2983,7 @@ async function awSubmit() {
   try {
     if(_awMode === 'login') {
       await auth.signInWithEmailAndPassword(email, pass);
+      trackEvent('login', { method: 'password' });
     } else {
       const name = document.getElementById('aw-name').value.trim();
       const city = document.getElementById('aw-city').value.trim();
@@ -3001,6 +3014,7 @@ async function awSubmit() {
         label: city.charAt(0).toUpperCase() + city.slice(1),
         count: firebase.firestore.FieldValue.increment(1)
       }, { merge: true }).catch(() => {});
+      trackEvent('sign_up', { method: 'password' });
       // Gérer manuellement la suite (évite race avec onAuthStateChanged) : on appelle
       // loadUserAndStart plutôt que de dupliquer sa logique, pour que l'écoute en
       // direct du solde de points démarre dès cette première session (sinon aucun
@@ -3295,6 +3309,7 @@ async function redeemReward(reward) {
     });
     S.pts = Math.max(0, S.pts - (reward.cost||0));
     refreshWallet();
+    trackEvent('spend_virtual_currency', { virtual_currency_name: 'points', value: reward.cost||0, item_name: reward.label||'Récompense' });
     showVoucherModal({ code, label: reward.label, merchantName: reward.merchantName, cost: reward.cost, purchaseCondition: reward.purchaseCondition, expiresAt });
   } catch(e) {
     showVoucherError(e.message || ('Erreur : ' + e));
@@ -3395,6 +3410,7 @@ const HOME_TOUR_STEPS=[
 let _tourIdx=0;
 function maybeShowHomeTour(){
   if(S._seenHomeTour) return;
+  trackEvent('tutorial_begin');
   setTimeout(()=>showTourStep(0), 550);
 }
 function showTourStep(i){
@@ -3437,6 +3453,7 @@ function nextTourStep(){
 function endHomeTour(){
   const overlay=document.getElementById('home-tour');
   if(overlay) overlay.classList.remove('show');
+  trackEvent('tutorial_complete', { last_step: _tourIdx });
   S._seenHomeTour=true;
   const uid=auth.currentUser&&auth.currentUser.uid;
   if(uid) db.collection('users').doc(uid).update({seenHomeTour:true}).catch(()=>{});
@@ -3465,13 +3482,16 @@ function maybeShowInstallInvite(){
     <button class="install-banner-cta" onclick="triggerInstall()">${NV_IS_IOS?'Comment faire':'Installer'}</button>`;
   document.body.appendChild(b);
   requestAnimationFrame(()=>b.classList.add('show'));
+  trackEvent('pwa_install_prompt_shown', { platform: NV_IS_IOS?'ios':'android' });
 }
 function dismissInstallInvite(){
   const b=document.getElementById('install-banner');
   if(b) b.remove();
   try{ localStorage.setItem('nv_install_dismissed','1'); }catch(e){}
+  trackEvent('pwa_install_dismissed');
 }
 function triggerInstall(){
+  trackEvent('pwa_install_accepted', { platform: NV_IS_IOS?'ios':'android' });
   if(NV_IS_IOS){ showIOSInstallSheet(); return; }
   if(!_deferredInstallPrompt) return;
   _deferredInstallPrompt.prompt();
@@ -3912,6 +3932,7 @@ submitAns = function() {
       const correction = totalEarned - q.pts;
       S.pts = typeof data.totalPoints === 'number' ? data.totalPoints : (S.pts + correction);
       S.xp  = typeof data.totalXp === 'number' ? data.totalXp : (S.xp + totalEarned);
+      trackEvent('earn_virtual_currency', { virtual_currency_name: 'points', value: totalEarned });
       if (touchesSurvey && S.sv) S.sv.earned += correction;
       const rwPtsEl = document.getElementById('rw-pts');
       if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
@@ -4050,8 +4071,10 @@ function logout() {
 // réutilisé tel quel — son contenu n'est pas spécifique à Google).
 async function _completeSocialSignIn(cred) {
   const uid  = cred.user.uid;
+  const method = (cred.additionalUserInfo && cred.additionalUserInfo.providerId) || 'unknown';
   const snap = await db.collection('users').doc(uid).get();
   if(!snap.exists) {
+    trackEvent('sign_up', { method });
     await db.collection('users').doc(uid).set({
       role: 'user',
       name:  cred.user.displayName || 'Utilisateur',
@@ -4072,6 +4095,8 @@ async function _completeSocialSignIn(cred) {
     document.getElementById('auth-wall').style.display = 'none';
     const gcw = document.getElementById('google-city-wall');
     gcw.style.display = 'flex'; gcw._uid = uid;
+  } else {
+    trackEvent('login', { method });
   }
   // Si existant, onAuthStateChanged s'en occupe
 }
