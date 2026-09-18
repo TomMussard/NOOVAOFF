@@ -1,19 +1,37 @@
 {
-  "name": "Noova",
+  "name": "Noova — Là où tes avis ont de la valeur",
   "short_name": "Noova",
   "description": "Là où tes avis ont de la valeur",
-  "start_url": "/app.html",
+  "start_url": "/app-v2",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F7F6F2",
-  "theme_color": "#F7F6F2",
+  "background_color": "#FFFBD7",
+  "theme_color": "#FFFBD7",
   "icons": [
     {
-      "src": "Plan%20de%20travail%208LOGO_NOOVAV2.png",
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

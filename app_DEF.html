@@ -31,13 +31,13 @@
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="Plan%20de%20travail%208LOGO_NOOVAV2.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 
 <!-- PWA — iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Noova">
-<link rel="apple-touch-icon" href="Plan%20de%20travail%208LOGO_NOOVAV2.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 <!-- PWA — Android / Chrome -->
 <meta name="mobile-web-app-capable" content="yes">
@@ -575,6 +575,16 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .tour-dot.on{background:var(--coral);width:16px}
 .tour-skip{font-size:11.5px;color:var(--ink3);font-weight:600;cursor:pointer}
 .tour-next{background:var(--ink);color:var(--coral);font-family:var(--fd);font-weight:800;font-size:12.5px;padding:9px 16px;border-radius:99px;border:none;cursor:pointer}
+
+/* — Invite à installer l'app sur l'écran d'accueil — */
+.install-banner{position:fixed;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9500;background:var(--nv-black);color:#fff;border-radius:20px;padding:14px 16px;display:none;align-items:center;gap:12px;box-shadow:0 16px 40px rgba(0,0,0,.35);opacity:0;transform:translateY(12px);transition:opacity .3s ease,transform .3s ease}
+.install-banner.show{display:flex;opacity:1;transform:translateY(0)}
+.install-banner-close{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-size:10px;cursor:pointer}
+.install-banner-ico{width:42px;height:42px;border-radius:13px;background:linear-gradient(120deg,#f29715,#ffda09);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.install-banner-txt{flex:1;min-width:0}
+.install-banner-title{font-family:var(--fd);font-weight:800;font-size:13px}
+.install-banner-sub{font-size:10.5px;color:rgba(255,255,255,.6);margin-top:2px;line-height:1.4}
+.install-banner-cta{background:var(--nv-yellow);color:var(--nv-yellow-ink);font-family:var(--fd);font-weight:800;font-size:11.5px;padding:9px 14px;border-radius:99px;border:none;cursor:pointer;flex-shrink:0;white-space:nowrap}
 .nav-it.on .nav-ico{background:var(--nv-yellow);color:var(--nv-yellow-ink)}
 .nav-badge{border-color:var(--nv-black);top:2px;right:calc(50% - 18px)}
 .si{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
@@ -3369,7 +3379,10 @@ function finishAuthTransition() {
   }
   refreshHome(); renderSocial(); goTo('home');
   applyStagger(document.querySelector('#home .si'));
-  maybeShowHomeTour();
+  // Le tuto et l'invite d'installation ne se chevauchent jamais : un nouveau compte voit
+  // d'abord le tuto (cette session), l'invite d'installation arrive à une session suivante.
+  if(S._seenHomeTour) setTimeout(maybeShowInstallInvite, 1200);
+  else maybeShowHomeTour();
 }
 
 // ─── Mini-didacticiel de première connexion : info-bulles sur l'accueil ────
@@ -3427,6 +3440,59 @@ function endHomeTour(){
   S._seenHomeTour=true;
   const uid=auth.currentUser&&auth.currentUser.uid;
   if(uid) db.collection('users').doc(uid).update({seenHomeTour:true}).catch(()=>{});
+  setTimeout(maybeShowInstallInvite, 900);
+}
+
+// ─── Invite à installer l'app (écran d'accueil) ────────────────────────────
+// Android/Chrome : déclenchement natif via beforeinstallprompt. iOS Safari n'expose
+// aucune API d'installation — seul un guide manuel ("Partager" > "Sur l'écran
+// d'accueil") est possible, d'où le mode d'emploi affiché à la place du prompt natif.
+let _deferredInstallPrompt=null;
+const NV_IS_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+function nvIsStandalone(){ return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true; }
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); _deferredInstallPrompt=e; });
+function maybeShowInstallInvite(){
+  if(nvIsStandalone()) return;
+  if(document.getElementById('install-banner')) return;
+  try{ if(localStorage.getItem('nv_install_dismissed')) return; }catch(e){}
+  if(!NV_IS_IOS && !_deferredInstallPrompt) return; // navigateur sans support d'installation connu
+  const b=document.createElement('div');
+  b.className='install-banner';
+  b.id='install-banner';
+  b.innerHTML=`<div class="install-banner-close" onclick="dismissInstallInvite()">✕</div>
+    <div class="install-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1C1917" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M9 7c1-.2 2 .3 2.2 1.5.2 1.3-1.6 1.8-1.6 3.3a1.6 1.6 0 0 0 3.2 0"/><circle cx="12" cy="16.3" r="1.3" fill="#1C1917" stroke="none"/></svg></div>
+    <div class="install-banner-txt"><div class="install-banner-title">Installe Noova</div><div class="install-banner-sub">Sur ton écran d'accueil, pour ne rater aucune récompense.</div></div>
+    <button class="install-banner-cta" onclick="triggerInstall()">${NV_IS_IOS?'Comment faire':'Installer'}</button>`;
+  document.body.appendChild(b);
+  requestAnimationFrame(()=>b.classList.add('show'));
+}
+function dismissInstallInvite(){
+  const b=document.getElementById('install-banner');
+  if(b) b.remove();
+  try{ localStorage.setItem('nv_install_dismissed','1'); }catch(e){}
+}
+function triggerInstall(){
+  if(NV_IS_IOS){ showIOSInstallSheet(); return; }
+  if(!_deferredInstallPrompt) return;
+  _deferredInstallPrompt.prompt();
+  _deferredInstallPrompt.userChoice.finally(()=>{ _deferredInstallPrompt=null; dismissInstallInvite(); });
+}
+function showIOSInstallSheet(){
+  let ov=document.getElementById('ios-install-sheet');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='ios-install-sheet';
+    ov.style.cssText='position:fixed;inset:0;z-index:10060;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center';
+    ov.onclick=e=>{ if(e.target===ov){ ov.remove(); dismissInstallInvite(); } };
+    document.body.appendChild(ov);
+  }
+  ov.innerHTML=`<div style="background:var(--card);border-radius:24px 24px 0 0;padding:22px 22px calc(30px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px">
+    <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
+    <div style="font-family:var(--fd);font-weight:800;font-size:18px;color:var(--ink);margin-bottom:16px;text-align:center">Installer Noova</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:30px;height:30px;border-radius:50%;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:13px;flex-shrink:0">1</div><div style="font-size:13.5px;color:var(--ink);line-height:1.5">Appuie sur <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><rect x="4" y="13" width="16" height="7" rx="1.5"/></svg> en bas de Safari</div></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><div style="width:30px;height:30px;border-radius:50%;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:13px;flex-shrink:0">2</div><div style="font-size:13.5px;color:var(--ink)">Choisis <strong>« Sur l'écran d'accueil »</strong></div></div>
+    <button class="btn-p" onclick="document.getElementById('ios-install-sheet').remove();dismissInstallInvite()">Compris</button>
+  </div>`;
 }
 async function handleUserSnapshot(uid, snap, isFirstLoad) {
   const data = snap.exists ? snap.data() : {};
