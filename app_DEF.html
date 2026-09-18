@@ -211,7 +211,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .s-dots{display:flex;gap:5px}
 .sdk{width:20px;height:5px;border-radius:99px;background:var(--bg3)}
 .sdk.done{background:var(--amber)}
-.sec-lbl{padding:0 20px;margin:4px 0 10px;font-family:var(--fd);font-weight:800;font-size:19px;letter-spacing:-.5px;color:var(--ink)}
+.sec-lbl{padding:0 22px;margin:0 0 14px;font-family:var(--fd);font-weight:800;font-size:19px;letter-spacing:-.5px;color:var(--ink)}
 .today-card{margin:0 18px 14px;background:var(--grad);border-radius:var(--r);padding:18px;cursor:pointer;position:relative;overflow:hidden;transition:transform .13s;box-shadow:0 14px 32px rgba(245,158,11,.32)}
 .today-card:active{transform:scale(.975)}
 .today-card::after{content:'';position:absolute;top:-60px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,.04);border-radius:50%}
@@ -221,7 +221,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .tc-q{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.24;color:var(--gi);margin-bottom:13px;letter-spacing:-.4px;position:relative}
 .tc-cta{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:rgba(42,30,8,.72);position:relative}
 .tc-arr{width:28px;height:28px;border-radius:50%;background:rgba(42,30,8,.16);color:var(--gi);display:flex;align-items:center;justify-content:center;font-size:13px}
-.q-list{padding:0 18px;display:flex;flex-direction:column;gap:8px}
+.q-list{padding:0 22px;display:flex;flex-direction:column;gap:10px}
 .q-card{background:var(--card);border-radius:18px;padding:13px;display:flex;gap:11px;align-items:flex-start;cursor:pointer;transition:all .13s;box-shadow:0 3px 12px rgba(0,0,0,.04)}
 .q-card:active{transform:scale(.98)}
 .q-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
@@ -580,7 +580,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .si{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 
 /* — En-tête accueil — */
-.dh-hdr{padding:52px 20px 20px;display:flex;align-items:center;justify-content:space-between}
+.dh-hdr{padding:52px 22px 28px;display:flex;align-items:center;justify-content:space-between}
 .dh-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:16px;flex-shrink:0}
 .dh-greet{font-size:12px;color:var(--ink2);margin-bottom:2px}
 .dh-name{font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.8px;color:var(--ink)}
@@ -590,7 +590,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dh-pts-l{font-size:10px;color:rgba(255,255,255,.55);font-weight:600}
 
 /* — Carte question du jour (photo + bandeau jaune) — */
-.dtoday-card{margin:0 18px 18px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
+.dtoday-card{margin:0 22px 28px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
 .dtoday-card>.dtoday-photo{border-radius:26px 26px 0 0;overflow:hidden}
 .dtoday-card>.dtoday-body{border-radius:0 0 26px 26px;overflow:hidden}
 .dtoday-card:active{transform:scale(.98)}
@@ -603,16 +603,16 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dtoday-info{display:flex;align-items:center;gap:10px}
 .dtoday-brand{color:#fff;font-family:var(--fd);font-weight:800;font-size:15.5px;letter-spacing:-.3px;text-shadow:0 1px 3px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dtoday-sub{color:rgba(255,255,255,.8);font-size:11px;margin-top:1px}
-.dtoday-body{background:var(--nv-yellow);padding:16px;position:relative;overflow:hidden}
+.dtoday-body{background:var(--nv-yellow);padding:22px;position:relative;overflow:hidden}
 .dtoday-body>*{position:relative;z-index:1}
-.dtoday-q{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.22;color:var(--nv-yellow-ink);margin-bottom:13px;letter-spacing:-.4px}
+.dtoday-q{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.28;color:var(--nv-yellow-ink);margin-bottom:18px;letter-spacing:-.4px}
 .dtoday-cta{display:inline-flex;align-items:center;gap:9px;background:var(--nv-black);color:#fff;font-size:12.5px;font-weight:700;padding:11px 8px 11px 16px;border-radius:99px}
 .dtoday-cta .tc-arr{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:12px}
 /* Filigrane de marque — signature visuelle sur chaque surface jaune */
 .mark{position:absolute;right:-14px;bottom:-40px;font-size:128px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.3);pointer-events:none;z-index:0}
 
 /* — Streak (noir) — */
-.dstreak-card{margin:0 18px 22px;background:var(--nv-black);border-radius:22px;padding:16px 18px;color:#fff}
+.dstreak-card{margin:0 22px 30px;background:var(--nv-black);border-radius:22px;padding:20px 22px;color:#fff}
 .dstreak-top{display:flex;align-items:center;gap:11px;margin-bottom:12px}
 .dstreak-fire{width:36px;height:36px;border-radius:11px;background:rgba(255,212,0,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--nv-yellow)}
 .dstreak-title{font-family:var(--fd);font-weight:700;font-size:14px}
@@ -622,7 +622,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dstreak-dot.on{background:var(--nv-yellow)}
 
 /* — Presque à toi (même langage visuel que la carte question du jour : photo + bandeau) — */
-.dpat-card{margin:0 18px 14px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
+.dpat-card{margin:0 22px 22px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
 .dpat-card:active{transform:scale(.98)}
 .dpat-card>.dpat-photo{border-radius:26px 26px 0 0;overflow:hidden}
 .dpat-card>.dpat-body{border-radius:0 0 26px 26px;overflow:hidden}
@@ -640,12 +640,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dpat-txt strong{color:var(--nv-black)}
 
 /* — Section titres type "À deux pas" — */
-.dsec-row{padding:2px 20px 14px;display:flex;align-items:center;justify-content:space-between}
+.dsec-row{padding:10px 22px 18px;display:flex;align-items:center;justify-content:space-between}
 .dsec-title{font-family:var(--fd);font-weight:800;font-size:19px;letter-spacing:-.5px;color:var(--ink)}
 .dsec-link{font-size:12px;font-weight:700;color:var(--ink2);cursor:pointer;white-space:nowrap}
 
 /* — Carte carte (mini-map preview) — */
-.dmap-card{margin:0 18px 16px;border-radius:20px;overflow:hidden;height:172px;position:relative;background:var(--bg2);cursor:pointer}
+.dmap-card{margin:0 22px 22px;border-radius:20px;overflow:hidden;height:172px;position:relative;background:var(--bg2);cursor:pointer}
 .dmap-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:18px;text-align:center;color:var(--ink2);font-size:12px;line-height:1.5;z-index:2;background:var(--bg2)}
 .dmap-empty svg{color:var(--ink3)}
 .dmap-empty button{background:var(--nv-black);color:#fff;border:none;padding:9px 18px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fb)}
@@ -653,7 +653,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dmap-label{position:absolute;left:14px;bottom:12px;background:var(--surface);border-radius:var(--r-pill);padding:8px 14px;font-size:12px;font-weight:800;color:var(--ink);box-shadow:var(--shadow-card);z-index:1}
 
 /* — Cartes commerces proches (grille 2 col., texte incrusté sur la photo) — */
-.dnearby-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 6px}
+.dnearby-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 22px 10px}
 .dnb-card{background:var(--nv-photo);border-radius:18px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.08);cursor:pointer;transition:transform .13s;position:relative;height:148px}
 .dnb-card:active{transform:scale(.97)}
 .dnb-photo{position:absolute;inset:0}
