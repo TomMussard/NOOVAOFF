@@ -1,4 +1,5 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 
@@ -166,6 +167,56 @@ exports.submitAnswer = onCall(async (request) => {
       flagged,
     };
   });
+});
+
+/**
+ * notifyNewCampaign — push aux habitants de la ville ciblée quand un commerçant lance
+ * une nouvelle campagne (déclenché à la création du doc, toujours status "active" dès
+ * la création côté dashboard — cf. launchCampaign dans noova_dashboard.html).
+ */
+exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (event) => {
+  const camp = event.data && event.data.data();
+  if (!camp || camp.status !== "active") return;
+  const city = (camp.targetCity || camp.city || "").toLowerCase();
+  if (!city) return;
+
+  const usersSnap = await db.collection("users").where("city", "==", city).get();
+  const tokens = [];
+  const tokenOwnerRefs = [];
+  usersSnap.forEach((doc) => {
+    const t = doc.data().fcmTokens;
+    if (Array.isArray(t)) t.forEach((tok) => { tokens.push(tok); tokenOwnerRefs.push(doc.ref); });
+  });
+  if (!tokens.length) return;
+
+  const title = `${camp.merchantName || "Un commerce"} a une question pour toi`;
+  const body = (camp.question || "Réponds en 30 secondes et gagne des points.").toString().substring(0, 120);
+
+  // FCM limite sendEachForMulticast à 500 tokens par appel.
+  for (let i = 0; i < tokens.length; i += 500) {
+    const chunkTokens = tokens.slice(i, i + 500);
+    const chunkOwners = tokenOwnerRefs.slice(i, i + 500);
+    let res;
+    try {
+      res = await admin.messaging().sendEachForMulticast({
+        tokens: chunkTokens,
+        notification: { title, body },
+        webpush: {
+          notification: { icon: "/icon-192.png" },
+          fcmOptions: { link: "https://noovaoff.fr/app-v2" },
+        },
+      });
+    } catch (e) {
+      continue;
+    }
+    // Purge les tokens qui ne sont plus valides (désinstallation, permission révoquée...).
+    const deadCodes = ["messaging/registration-token-not-registered", "messaging/invalid-registration-token"];
+    res.responses.forEach((r, idx) => {
+      if (!r.success && r.error && deadCodes.includes(r.error.code)) {
+        chunkOwners[idx].update({ fcmTokens: admin.firestore.FieldValue.arrayRemove(chunkTokens[idx]) }).catch(() => {});
+      }
+    });
+  }
 });
 
 const ADMIN_EMAILS = ["noovaoffr@gmail.com", "tomussproduction@gmail.com"];

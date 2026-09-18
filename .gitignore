@@ -3,3 +3,4 @@
 Thumbs.db
 .firebase/
 node_modules/
+firebase-debug.log

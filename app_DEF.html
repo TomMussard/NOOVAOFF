@@ -66,8 +66,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <!-- Leaflet — carte "commerces près de toi" (OpenStreetMap, gratuit, sans clé API) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -1157,7 +1159,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="sec-card">
       <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div></div>
       <div class="consent-it" style="cursor:pointer" onclick="goTo('manage-merchants');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
-      <div class="consent-it" style="cursor:pointer;border-bottom:none" onclick="showToast('Réglages des notifications bientôt disponibles','success')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Notifications</div><span style="color:var(--ink3);font-size:12px">Bientôt ›</span></div>
+      <div class="consent-it" style="cursor:pointer;border-bottom:none" onclick="toggleNotifications()"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Notifications</div><span style="color:var(--ink3);font-size:12px" id="notif-settings-state">Activer ›</span></div>
       <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Conforme RGPD — révoque ou supprime tes données ci-dessous.</div></div>
     </div>
     <div class="sec-card">
@@ -2496,6 +2498,7 @@ function refreshProfile(){
   renderUserAvatar(document.getElementById('prof-av'), document.getElementById('prof-av-letter'), S.user.name, S.user.photoUrl);
   renderUserAvatar(document.getElementById('settings-av-thumb'), document.getElementById('settings-av-thumb-letter'), S.user.name, S.user.photoUrl);
   refreshSettingsDisplay();
+  refreshNotifSettingsUI();
   document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.email||S._city||'';
   document.getElementById('s-pts').textContent=S.pts;document.getElementById('s-ans').textContent=S.ans;document.getElementById('s-str').textContent=S.streak;
   const friendsEl=document.getElementById('s-friends');if(friendsEl)friendsEl.textContent=(S.friends||[]).length;
@@ -3171,6 +3174,79 @@ let analytics = null;
 try { analytics = firebase.analytics(); } catch(e) { console.warn('analytics init:', e); }
 function trackEvent(name, params) {
   try { if(analytics) analytics.logEvent(name, params||{}); } catch(e) {}
+}
+
+// ─── Notifications push (FCM) ───────────────────────────────
+// Sur iPhone, les notifications web n'existent qu'à partir d'iOS 16.4+ ET seulement
+// si l'app a été ajoutée à l'écran d'accueil (mode standalone) — jamais depuis un
+// simple onglet Safari. Sur Android/desktop ça marche directement depuis l'onglet.
+const FCM_VAPID_KEY = ''; // Firebase Console > Paramètres du projet > Cloud Messaging > Config Web Push > générer une paire de clés
+let _fcmMessaging = null;
+(async () => {
+  try {
+    if ('Notification' in window && 'serviceWorker' in navigator && firebase.messaging && (await firebase.messaging.isSupported())) {
+      _fcmMessaging = firebase.messaging();
+      _fcmMessaging.onMessage((payload) => {
+        const n = payload.notification || {};
+        if (n.title) showToast(n.title, 'success');
+      });
+    }
+  } catch(e) { _fcmMessaging = null; }
+  refreshNotifSettingsUI();
+})();
+function notifSupportReason() {
+  if (!_fcmMessaging || !FCM_VAPID_KEY) return 'unsupported';
+  if (NV_IS_IOS && !nvIsStandalone()) return 'needs-install';
+  return 'ok';
+}
+async function toggleNotifications() {
+  const reason = notifSupportReason();
+  if (reason === 'unsupported') { showToast('Notifications indisponibles sur ce navigateur pour le moment.', 'warning'); return; }
+  if (reason === 'needs-install') { showToast("Installe d'abord Noova sur ton écran d'accueil (Partager > Sur l'écran d'accueil) pour activer les notifications.", 'warning'); return; }
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if (!uid) return;
+  if (Notification.permission === 'granted' && localStorage.getItem('nv_fcm_token')) await disableNotifications(uid);
+  else await enableNotifications(uid);
+}
+async function enableNotifications(uid) {
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      showToast('Notifications refusées — tu peux les activer dans les réglages du téléphone.', 'warning');
+      refreshNotifSettingsUI();
+      return;
+    }
+    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    const token = await _fcmMessaging.getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg });
+    if (!token) throw new Error('no-token');
+    await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayUnion(token) });
+    localStorage.setItem('nv_fcm_token', token);
+    trackEvent('push_enabled');
+    showToast('Notifications activées !', 'success');
+  } catch(e) {
+    console.warn('enableNotifications:', e);
+    showToast("Impossible d'activer les notifications pour l'instant.", 'error');
+  }
+  refreshNotifSettingsUI();
+}
+async function disableNotifications(uid) {
+  const token = localStorage.getItem('nv_fcm_token');
+  try {
+    if (token) await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayRemove(token) });
+    localStorage.removeItem('nv_fcm_token');
+    trackEvent('push_disabled');
+    showToast('Notifications désactivées.', 'success');
+  } catch(e) { console.warn('disableNotifications:', e); }
+  refreshNotifSettingsUI();
+}
+function refreshNotifSettingsUI() {
+  const el = document.getElementById('notif-settings-state');
+  if (!el) return;
+  const reason = notifSupportReason();
+  if (reason === 'unsupported') { el.textContent = 'Indisponible'; return; }
+  if (reason === 'needs-install') { el.textContent = "Installer l'app ›"; return; }
+  const on = typeof Notification !== 'undefined' && Notification.permission === 'granted' && !!localStorage.getItem('nv_fcm_token');
+  el.textContent = on ? 'Activées ✓' : 'Activer ›';
 }
 const callSubmitAnswer = fx.httpsCallable('submitAnswer');
 document.getElementById('aw-pass').addEventListener('input', function(){ _updatePassStrength(this.value); });
