@@ -325,6 +325,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .cs-ov{position:absolute;inset:0;background:rgba(0,0,0,.38);backdrop-filter:blur(3px);cursor:pointer}
 .cs-box{position:relative;z-index:1;width:100%;background:var(--card);border-radius:24px 24px 0 0;padding:0 20px calc(32px + env(safe-area-inset-bottom,0px));max-height:82vh;overflow-y:auto}
 .cs-handle{width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:13px auto 20px}
+/* Barre de fermeture collée en haut de la feuille — reste visible même en scrollant le contenu, pour toujours avoir un moyen de fermer. */
+.cs-close-bar{position:sticky;top:0;z-index:5;background:var(--card);display:flex;justify-content:flex-end;padding-bottom:8px;margin-top:-6px}
+.cs-close-bar .back-btn{margin-bottom:0;width:34px;height:34px;font-size:15px}
 #celebrate-sheet{position:fixed;inset:0;z-index:8100;display:none;align-items:flex-end}
 #celebrate-sheet.open{display:flex}
 .celebrate-ico{position:relative;z-index:1;width:84px;height:84px;margin:8px auto 16px;border-radius:50%;background:var(--grad);color:var(--gi);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px var(--cg);animation:pop .5s cubic-bezier(.34,1.56,.64,1) both}
@@ -1173,8 +1176,8 @@ const BRANDMETA={};
 function logoHTML(name,size,logoUrl){
   const s=size||44;const r=Math.round(s*0.27);
   if(logoUrl) return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.14);overflow:hidden"><img src="${logoUrl}" style="width:100%;height:100%;object-fit:cover" alt=""></div>`;
-  const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#6A6470'};const fs=Math.round(s*0.44);
-  return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;
+  const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#1C1917',t:'#FFC300'};const fs=Math.round(s*0.44);
+  return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:${m.t||'#fff'};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;
 }
 // Villes beta connues : rattache les variantes d'\u00e9criture (espace manquant, tirets...)
 // au m\u00eame slug pour \u00e9viter qu'un utilisateur atterrisse dans une "ville fant\u00f4me".
@@ -1342,7 +1345,7 @@ function openQ(idx){
   const pg=document.getElementById('q-prog');pg.innerHTML='';
   S.qs.forEach((_,i)=>{const s=document.createElement('div');s.className='q-seg'+(i<idx?' done':i===idx?' cur':'');pg.appendChild(s)});
   document.getElementById('q-pts-tag').textContent='+'+q.pts+' pts';
-  {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50);}document.getElementById('bh-name').textContent=q.brand;
+  {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||'Ta réponse aidera '+q.brand+'.';
   document.getElementById('bh-tag').textContent=q.theme;document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint;
   document.getElementById('sub-btn').disabled=true;buildAns(q);goTo('question');
@@ -2227,7 +2230,7 @@ S.mode=S.mode||'hook';S.sv=S.sv||null;S.brandBack=S.brandBack||'home';
 function fillQuestion(q,opts){
   S._qShownAt = Date.now(); // sert au score qualité (temps de réponse minimal)
   document.getElementById('q-pts-tag').textContent='+'+q.pts+' pts';
-  {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50);}
+  {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}
   document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||('Ta réponse aide '+q.brand+'.');
   document.getElementById('bh-tag').textContent=q.theme||'';
@@ -4022,6 +4025,7 @@ auth.onAuthStateChanged(user => {
   <div class="cs-ov" onclick="closeCompare()"></div>
   <div class="cs-box">
     <div class="cs-handle"></div>
+    <div class="cs-close-bar"><div class="back-btn" onclick="closeCompare()">✕</div></div>
     <div id="cs-content"></div>
   </div>
 </div>
@@ -4031,6 +4035,7 @@ auth.onAuthStateChanged(user => {
   <div class="cs-ov" onclick="closeRewardsSheet()"></div>
   <div class="cs-box">
     <div class="cs-handle"></div>
+    <div class="cs-close-bar"><div class="back-btn" onclick="closeRewardsSheet()">✕</div></div>
     <div class="dsec-h" style="padding:0">Récompenses près de toi</div>
     <div class="gift-grid" id="gift-grid"></div>
     <div class="dsec-h" style="padding:0"><span style="display:inline-flex;width:16px;height:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 3.5"/><path d="M17 6h2.5A2.5 2.5 0 0 1 17 9.5"/><path d="M12 15v3"/><path d="M8.5 21h7l-1-3h-5z"/></svg></span> Paliers</div>
