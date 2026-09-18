@@ -1790,8 +1790,9 @@ function renderRanking(){
   // que si un 3e participant existe. Avec 1 seul participant (toi tout seul), pas de podium.
   const podiumCount=all.length>=2?Math.min(3,all.length):0;
   if(podiumEl){
-    if(!podiumCount){ podiumEl.innerHTML=''; }
+    if(!podiumCount){ podiumEl.innerHTML=''; podiumEl.classList.remove('podium'); }
     else{
+      podiumEl.classList.add('podium');
       const top3=all.slice(0,podiumCount);
       const order=[top3[1],top3[0],top3[2]].filter(Boolean); // 2e, 1er, (3e) — ordre podium classique
       const crownByRank={1:'👑',2:'🥈',3:'🥉'};
