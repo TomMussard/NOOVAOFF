@@ -78,7 +78,9 @@ exports.submitAnswer = onCall(async (request) => {
     }
 
     // ── Score qualité (réponse trop rapide pour être un vrai choix humain) ──
-    const flagged = typeof elapsedMs === "number" && elapsedMs >= 0 && elapsedMs < MIN_ANSWER_MS;
+    // Un elapsedMs manquant ou invalide est traité comme suspect (fail-safe) : le client
+    // ne peut pas contourner l'anti-triche en omettant simplement ce champ.
+    const flagged = typeof elapsedMs !== "number" || elapsedMs < 0 || elapsedMs < MIN_ANSWER_MS;
     const qualityScore = flagged ? 0 : 1;
 
     // ── Barème (§2 NOOVA_POINTS_SYSTEM.md) ──
@@ -86,7 +88,6 @@ exports.submitAnswer = onCall(async (request) => {
     let dailyEarned = user.dailyEarnedDate === today ? (user.dailyEarned || 0) : 0;
 
     let earnedPts = flagged ? 0 : (POINTS_BY_INDEX[qIdx] || 10);
-    if (dailyEarned + earnedPts > DAILY_CAP) earnedPts = Math.max(0, DAILY_CAP - dailyEarned);
 
     let streakBonus = 0;
     let newStreak = user.streak || 0;
@@ -100,7 +101,10 @@ exports.submitAnswer = onCall(async (request) => {
     let serieBonus = 0;
     if (!flagged && qIdx === 2 && earnedPts > 0) serieBonus = 10;
 
-    const totalEarned = earnedPts + streakBonus + serieBonus;
+    // Le cap journalier s'applique au TOTAL (points + bonus streak/série), pas seulement
+    // aux points de base — sinon les bonus permettaient de le dépasser de 15 pts.
+    let totalEarned = earnedPts + streakBonus + serieBonus;
+    if (dailyEarned + totalEarned > DAILY_CAP) totalEarned = Math.max(0, DAILY_CAP - dailyEarned);
     dailyEarned += totalEarned;
 
     // ── Écritures (transaction atomique) ──
@@ -232,23 +236,30 @@ exports.adminDeleteAccount = onCall(async (request) => {
   }
 
   if (role === "merchant") {
-    const [campSnap, rewSnap] = await Promise.all([
+    const [campSnap, rewSnap, redemSnap, answSnap, consentSnap, invSnap] = await Promise.all([
       db.collection("campaigns").where("merchantId", "==", uid).get(),
       db.collection("rewards").where("merchantId", "==", uid).get(),
+      db.collection("redemptions").where("merchantId", "==", uid).get(),
+      db.collection("answers").where("merchantId", "==", uid).get(),
+      db.collection("consentEvents").where("merchantId", "==", uid).get(),
+      db.collection("invoices").where("merchantId", "==", uid).get(),
     ]);
-    for (const d of [...campSnap.docs, ...rewSnap.docs]) await db.recursiveDelete(d.ref);
+    const merchantDocs = [...campSnap.docs, ...rewSnap.docs, ...redemSnap.docs, ...answSnap.docs, ...consentSnap.docs, ...invSnap.docs];
+    for (const d of merchantDocs) await db.recursiveDelete(d.ref);
     await db.recursiveDelete(db.collection("merchants").doc(uid));
   } else {
-    const queries = await Promise.all([
+    const [answSnap, redemSnap, commSnap, friendCodeSnap, chatSnap, consentSnap, notifFromSnap, notifToSnap] = await Promise.all([
       db.collection("answers").where("userId", "==", uid).get(),
       db.collection("redemptions").where("userId", "==", uid).get(),
       db.collection("communityEvents").where("userId", "==", uid).get(),
       db.collection("friendCodes").where("uid", "==", uid).get(),
       db.collection("chats").where("participants", "array-contains", uid).get(),
+      db.collection("consentEvents").where("userId", "==", uid).get(),
+      db.collection("friendNotifications").where("fromUid", "==", uid).get(),
+      db.collection("friendNotifications").where("toUid", "==", uid).get(),
     ]);
-    for (const snap of queries) {
-      for (const d of snap.docs) await db.recursiveDelete(d.ref);
-    }
+    const userDocs = [...answSnap.docs, ...redemSnap.docs, ...commSnap.docs, ...friendCodeSnap.docs, ...chatSnap.docs, ...consentSnap.docs, ...notifFromSnap.docs, ...notifToSnap.docs];
+    for (const d of userDocs) await db.recursiveDelete(d.ref);
     await db.recursiveDelete(db.collection("users").doc(uid));
   }
 

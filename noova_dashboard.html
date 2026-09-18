@@ -1978,8 +1978,12 @@ async function confirmEditField() {
   if(domId) { const el = document.getElementById(domId); if(el) el.textContent = field==='siret' ? upd.siret : trimmed; }
   if(field === 'brandName') document.querySelectorAll('.sb-brand-name').forEach(e => e.textContent = trimmed);
   closeEditFieldModal();
-  await db.collection('merchants').doc(uid).update(upd).catch(() => {});
-  showToast('Paramètre mis à jour.', 'success');
+  try {
+    await db.collection('merchants').doc(uid).update(upd);
+    showToast('Paramètre mis à jour.', 'success');
+  } catch(e) {
+    showToast('Erreur lors de la sauvegarde : ' + e.message, 'error');
+  }
 }
 
 async function changeMerchantLogo(file) {
@@ -2065,14 +2069,18 @@ async function choosePlan(planName, price) {
   const current = _mData && _mData.plan;
   if(current === planName) { showToast(`Tu es déjà sur le plan ${planName}.`, 'info'); return; }
   if(!confirm(`Passer au plan ${planName} (${price}€/mois) ? Tu seras contacté sous 24h pour finaliser.`)) return;
-  await db.collection('planRequests').doc().set({
-    merchantId: uid,
-    brandName: (_mData && _mData.brandName) || '',
-    requestedPlan: planName,
-    price,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).catch(() => {});
-  showToast(`Demande ${planName} enregistrée. On te contacte sous 24h !`, 'rocket');
+  try {
+    await db.collection('planRequests').doc().set({
+      merchantId: uid,
+      brandName: (_mData && _mData.brandName) || '',
+      requestedPlan: planName,
+      price,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast(`Demande ${planName} enregistrée. On te contacte sous 24h !`, 'rocket');
+  } catch(e) {
+    showToast('Erreur lors de la demande : ' + e.message, 'error');
+  }
 }
 
 async function loadBillingData(uid) {

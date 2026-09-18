@@ -295,6 +295,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <div id="tab-utilisateurs" style="display:none">
     <div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between"><div><h2>Utilisateurs</h2><p>Aperçu de la communauté Noova — données agrégées en temps réel.</p></div><button onclick="_usersLoaded=false;loadUsers(true)" style="padding:8px 16px;background:var(--grad);color:var(--brown);border:none;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--fb);white-space:nowrap">↻ Actualiser</button></div>
 
+    <div id="u-cap-warn" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.25);border-radius:10px;font-size:12.5px;color:#B91C1C">⚠️ 500 utilisateurs ou plus : ces stats et le classement ci-dessous sont un échantillon, pas le total réel.</div>
     <div class="stats">
       <div class="stat-card hl"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg></div><div class="stat-n" id="u-total">—</div><div class="stat-l">Utilisateurs</div></div>
       <div class="stat-card green"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg></div><div class="stat-n" id="u-cities">—</div><div class="stat-l">Villes</div></div>
@@ -896,6 +897,8 @@ async function dangerDeleteMerchant(merchantId, btn) {
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
     await callAdminDeleteAccount({ uid: merchantId, role: 'merchant' });
+    const idx = allMerchants.findIndex(m => m.id === merchantId);
+    if (idx !== -1) allMerchants.splice(idx, 1);
     loadDangerZone();
   } catch (e) {
     showToast('Erreur : ' + e.message, 'error');
@@ -908,6 +911,7 @@ async function dangerDeleteUser(uid, btn) {
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
     await callAdminDeleteAccount({ uid, role: 'user' });
+    _usersLoaded = false;
     loadDangerZone();
   } catch (e) {
     showToast('Erreur : ' + e.message, 'error');
@@ -1088,7 +1092,9 @@ async function loadUsers(force) {
     snap.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
     _usersLoaded = true;
     renderUsers(users);
-    document.getElementById('tb-usr').textContent = users.length;
+    document.getElementById('tb-usr').textContent = users.length >= 500 ? '500+' : users.length;
+    const capWarn = document.getElementById('u-cap-warn');
+    if(capWarn) capWarn.style.display = users.length >= 500 ? 'block' : 'none';
   } catch(e) {
     _usersLoaded = false;
     statIds.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '—'; });
@@ -1236,8 +1242,9 @@ let _diffusionReady = false;
 function updateAudienceCount() {
   const aud = document.getElementById('broadcast-audience')?.value || 'users';
   const n = aud === 'users' ? _allUserIds.length : aud === 'merchants' ? _allMerchantIds.length : _allUserIds.length + _allMerchantIds.length;
+  const capped = (aud !== 'merchants' && _allUserIds.length >= 500) || (aud !== 'users' && _allMerchantIds.length >= 500);
   const el = document.getElementById('audience-count');
-  if (el) el.textContent = n + (aud === 'merchants' ? ' commerçants' : aud === 'both' ? ' destinataires' : ' utilisateurs');
+  if (el) el.textContent = n + (aud === 'merchants' ? ' commerçants' : aud === 'both' ? ' destinataires' : ' utilisateurs') + (capped ? ' — ⚠️ au-delà de 500, les suivants ne recevront rien' : '');
 }
 
 async function initDiffusion() {
@@ -1341,7 +1348,12 @@ async function renderActiveWeeklyQuestion() {
 }
 async function stopWeeklyQuestion(id) {
   if (!confirm('Arrêter cette question de la semaine ?')) return;
-  await db.collection('weeklyQuestions').doc(id).update({ active: false }).catch(()=>{});
+  try {
+    await db.collection('weeklyQuestions').doc(id).update({ active: false });
+  } catch(e) {
+    showToast('Erreur : ' + e.message, 'error');
+    return;
+  }
   renderActiveWeeklyQuestion();
 }
 

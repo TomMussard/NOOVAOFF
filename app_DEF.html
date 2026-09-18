@@ -1240,7 +1240,11 @@ async function doBrands(){
     // Peupler _nearbyMerchants depuis les objets déjà en mémoire (onboarding)
     S._nearbyMerchants=(S._merchantsForOnboarding||[]).filter(m=>authorized.includes(m.id));
     await loadCampaignsFromFirestore({city:S._city,interests:S._interests,answeredCampaigns:S._answered||[],authorizedMerchants:authorized});
-  }catch(e){console.warn('doBrands:',e);S.qs=[];}
+  }catch(e){
+    console.warn('doBrands:',e);
+    showToast("Erreur lors de l'enregistrement. Réessaie.", 'error');
+    return;
+  }
   document.getElementById('bnav').classList.add('show');
   refreshHome();renderSocial();goTo('home');
 }
@@ -3148,7 +3152,9 @@ async function redeemReward(reward) {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         expiresAt: firebase.firestore.Timestamp.fromDate(expiresAt), usedAt: null
       });
-      tx.update(userRef, { points: userData.points - cost });
+      // N'écrit points que si la récompense coûte réellement quelque chose : à cost=0, la
+      // règle Firestore exige une baisse stricte, et écrire la même valeur serait refusé.
+      if(cost > 0) tx.update(userRef, { points: userData.points - cost });
       tx.update(rewardRef, { redeemedCount: firebase.firestore.FieldValue.increment(1) });
     });
     S.pts = Math.max(0, S.pts - (reward.cost||0));
@@ -3698,7 +3704,13 @@ async function revokeAllConsents() {
   const batch = db.batch();
   batch.update(db.collection('users').doc(uid), { authorizedMerchants: [], onboardingStep: 'merchants' });
   logConsentEvents(batch, uid, S._authorizedMerchants || [], []);
-  await batch.commit().catch(() => {});
+  try {
+    await batch.commit();
+  } catch(e) {
+    console.warn('revokeAllConsents:', e);
+    showToast('Erreur lors de la révocation. Réessaie.', 'error');
+    return;
+  }
   S._authorizedMerchants = [];
   S._nearbyMerchants = [];
   showToast('Tous les consentements ont été révoqués.','success');
