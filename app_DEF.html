@@ -561,6 +561,20 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .bnav{background:var(--nv-black);border-top:none;left:14px;right:14px;bottom:calc(10px + env(safe-area-inset-bottom,0px));border-radius:26px;padding:9px 10px;box-shadow:0 16px 36px rgba(0,0,0,.32);backdrop-filter:none;-webkit-backdrop-filter:none}
 .nav-ico{width:38px;height:38px;border-radius:50%;color:rgba(255,255,255,.5);transition:all .15s}
 .nav-lbl{display:none}
+
+/* — Mini-didacticiel première connexion (info-bulles) — */
+#home-tour{position:fixed;inset:0;z-index:10050;display:none;opacity:0;transition:opacity .25s ease}
+#home-tour.show{display:block;opacity:1}
+.tour-spot{position:fixed;border-radius:20px;box-shadow:0 0 0 9999px rgba(20,15,10,.78);transition:top .32s cubic-bezier(.4,0,.2,1),left .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1),height .32s cubic-bezier(.4,0,.2,1);pointer-events:none}
+.tour-card{position:fixed;width:264px;background:#fff;border-radius:18px;padding:16px 17px;box-shadow:0 16px 40px rgba(0,0,0,.32);transition:top .32s cubic-bezier(.4,0,.2,1),left .32s cubic-bezier(.4,0,.2,1);animation:tourPop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes tourPop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.tour-txt{font-size:13px;color:var(--ink);line-height:1.55;font-weight:600;margin-bottom:13px}
+.tour-foot{display:flex;align-items:center;justify-content:space-between}
+.tour-dots{display:flex;gap:5px}
+.tour-dot{width:6px;height:6px;border-radius:99px;background:var(--bg3);transition:all .2s}
+.tour-dot.on{background:var(--coral);width:16px}
+.tour-skip{font-size:11.5px;color:var(--ink3);font-weight:600;cursor:pointer}
+.tour-next{background:var(--ink);color:var(--coral);font-family:var(--fd);font-weight:800;font-size:12.5px;padding:9px 16px;border-radius:99px;border:none;cursor:pointer}
 .nav-it.on .nav-ico{background:var(--nv-yellow);color:var(--nv-yellow-ink)}
 .nav-badge{border-color:var(--nv-black);top:2px;right:calc(50% - 18px)}
 .si{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
@@ -1833,10 +1847,19 @@ function renderRanking(){
   });
   applyStagger(el);
 }
+// Astuce contextuelle affichée une seule fois par appareil (localStorage — pas besoin
+// de la synchroniser entre appareils comme le tuto d'accueil, donc pas de champ Firestore).
+function showTipOnce(key,msg){
+  try{
+    if(localStorage.getItem('nv_tip_'+key)) return;
+    localStorage.setItem('nv_tip_'+key,'1');
+  }catch(e){ /* stockage indisponible (navigation privée…) : on affiche quand même, sans persister */ }
+  setTimeout(()=>showToast(msg,'sparkle'),450);
+}
 function socTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
   ['feed','friends','ranking','groups'].forEach(t=>document.getElementById('panel-'+t).style.display=t===tab?'block':'none');
-  if(tab==='friends')renderFriends();if(tab==='ranking')renderRanking();if(tab==='groups')renderGroups();
+  if(tab==='friends')renderFriends();if(tab==='ranking'){renderRanking();showTipOnce('ranking','Le classement se base sur tes points cumulés à vie, pas ton solde actuel.');}if(tab==='groups')renderGroups();
 }
 function renderGroups(){
   const el=document.getElementById('panel-groups');
@@ -2152,6 +2175,13 @@ function checkTierAndBadgeCelebrations(){
     if(newBadge){const b=BDGS.find(x=>x.id===newBadge);if(b)showCelebration({icon:b.e,title:'Badge débloqué !',subtitle:b.n});}
   }
   S._lastEarnedBadges=earned;
+  // Paliers de série au-delà du badge "streak3" — encourage à tenir dans la durée.
+  const STREAK_MILESTONES=[7,14,30,60,100];
+  const milestone=STREAK_MILESTONES.filter(m=>S.streak>=m).pop();
+  if(milestone && S._lastStreakMilestone!=null && milestone>S._lastStreakMilestone){
+    showCelebration({icon:'fire',title:milestone+' jours d\'affilée !',subtitle:'Ta régularité paie — continue comme ça.'});
+  }
+  S._lastStreakMilestone=milestone||0;
 }
 function refreshWallet(){
   checkTierAndBadgeCelebrations();
@@ -2380,6 +2410,7 @@ async function openBrandById(mid, fallbackName) {
   S.brandBack='home';
   document.getElementById('bp-wrap').innerHTML='<div style="text-align:center;padding:80px 20px;color:var(--ink3);font-size:14px">Chargement…</div>';
   goTo('brand-page');
+  showTipOnce('brand-page','Tes réponses sont toujours agrégées et anonymes — le commerçant ne voit jamais qui a répondu quoi.');
   try {
     // Promise.allSettled : un des deux appels refusé par les règles ne doit pas vider toute la page
     const [merchantRes,campsRes]=await Promise.allSettled([
@@ -3270,7 +3301,7 @@ function showVoucherModal({ code, label, merchantName, cost, purchaseCondition, 
     ov.onclick = e => { if(e.target === ov) ov.remove(); };
     document.body.appendChild(ov);
   }
-  ov.innerHTML = `<div style="background:var(--card);border-radius:26px 26px 0 0;padding:10px 20px calc(28px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px">
+  ov.innerHTML = `<div class="conf-layer" id="voucher-conf-layer"></div><div style="background:var(--card);border-radius:26px 26px 0 0;padding:10px 20px calc(28px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px;position:relative">
     <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
     <div style="text-align:center;margin-bottom:14px"><span style="display:inline-flex;width:52px;height:52px;border-radius:50%;background:var(--coral);color:var(--ink);align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M4 12.5 9.5 18 20 6"/></svg></span></div>
     <div style="font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:-.5px;text-align:center;color:var(--ink);margin-bottom:4px">${esc(label||'Récompense')}</div>
@@ -3285,6 +3316,7 @@ function showVoucherModal({ code, label, merchantName, cost, purchaseCondition, 
     <div style="font-size:11px;color:var(--ink3);text-align:center;margin-bottom:18px">Valable jusqu'au ${exp} · -${cost} pts de ton solde</div>
     <button onclick="document.getElementById('voucher-overlay').remove()" style="width:100%;padding:14px;border-radius:99px;background:var(--coral);border:none;color:var(--ink);font-family:var(--fd);font-weight:800;font-size:15px;cursor:pointer">Fermer</button>
   </div>`;
+  spawnConfetti('voucher-conf-layer');
 }
 
 function showToast(msg, ico = 'error') {
@@ -3336,6 +3368,64 @@ function finishAuthTransition() {
     if(socScroll)  initPullToRefresh(socScroll,  'ptr-social', ()=>{ loadCommunityFeed(); });
   }
   refreshHome(); renderSocial(); goTo('home');
+  maybeShowHomeTour();
+}
+
+// ─── Mini-didacticiel de première connexion : info-bulles sur l'accueil ────
+const HOME_TOUR_STEPS=[
+  {sel:'#today-card', txt:'La question du jour est ici — réponds en quelques secondes pour gagner des points.'},
+  {sel:'.dstreak-card', txt:'Réponds chaque jour pour construire ta série et débloquer un bonus.'},
+  {sel:'#nav-rewards-tab', txt:'Échange tes points contre de vraies récompenses chez les commerces du quartier.'},
+  {sel:'#nav-social', txt:'Défie tes amis et grimpe dans le classement de la semaine.'}
+];
+let _tourIdx=0;
+function maybeShowHomeTour(){
+  if(S._seenHomeTour) return;
+  setTimeout(()=>showTourStep(0), 550);
+}
+function showTourStep(i){
+  while(i<HOME_TOUR_STEPS.length && !document.querySelector(HOME_TOUR_STEPS[i].sel)) i++;
+  if(i>=HOME_TOUR_STEPS.length){ endHomeTour(); return; }
+  _tourIdx=i;
+  const step=HOME_TOUR_STEPS[i];
+  const target=document.querySelector(step.sel);
+  const r=target.getBoundingClientRect();
+  let overlay=document.getElementById('home-tour');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='home-tour';
+    overlay.innerHTML='<div class="tour-spot"></div><div class="tour-card"><div class="tour-txt"></div><div class="tour-foot"><span class="tour-skip" onclick="endHomeTour()">Passer</span><div style="display:flex;align-items:center;gap:10px"><div class="tour-dots"></div><button class="tour-next" onclick="nextTourStep()">Suivant</button></div></div></div>';
+    document.body.appendChild(overlay);
+  }
+  overlay.classList.add('show');
+  const pad=8;
+  const spot=overlay.querySelector('.tour-spot');
+  spot.style.top=(r.top-pad)+'px'; spot.style.left=(r.left-pad)+'px';
+  spot.style.width=(r.width+pad*2)+'px'; spot.style.height=(r.height+pad*2)+'px';
+  const card=overlay.querySelector('.tour-card');
+  overlay.querySelector('.tour-txt').textContent=step.txt;
+  overlay.querySelector('.tour-dots').innerHTML=HOME_TOUR_STEPS.map((_,idx)=>`<div class="tour-dot${idx===i?' on':''}"></div>`).join('');
+  overlay.querySelector('.tour-next').textContent = i===HOME_TOUR_STEPS.length-1 ? 'Terminer' : 'Suivant';
+  requestAnimationFrame(()=>{
+    const ch=card.offsetHeight;
+    let top = r.bottom+pad+14;
+    if(top+ch>window.innerHeight-20){ top = r.top-pad-14-ch; }
+    top=Math.max(20,Math.min(top, window.innerHeight-ch-20));
+    let left = r.left+r.width/2-140;
+    left=Math.max(16,Math.min(left, window.innerWidth-296));
+    card.style.top=top+'px'; card.style.left=left+'px';
+  });
+}
+function nextTourStep(){
+  if(_tourIdx>=HOME_TOUR_STEPS.length-1){ endHomeTour(); return; }
+  showTourStep(_tourIdx+1);
+}
+function endHomeTour(){
+  const overlay=document.getElementById('home-tour');
+  if(overlay) overlay.classList.remove('show');
+  S._seenHomeTour=true;
+  const uid=auth.currentUser&&auth.currentUser.uid;
+  if(uid) db.collection('users').doc(uid).update({seenHomeTour:true}).catch(()=>{});
 }
 async function handleUserSnapshot(uid, snap, isFirstLoad) {
   const data = snap.exists ? snap.data() : {};
@@ -3374,6 +3464,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   S._authorizedMerchants = data.authorizedMerchants || [];
   S._friendUids      = data.friendUids || [];
   S._groups          = data.groups || [];
+  S._seenHomeTour    = !!data.seenHomeTour;
 
   if (!isFirstLoad) {
     // Mises à jour en direct (points/xp/streak déjà crédités par la Cloud Function submitAnswer) :
