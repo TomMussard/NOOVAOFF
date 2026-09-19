@@ -12,17 +12,18 @@ setGlobalOptions({ region: "europe-west1", maxInstances: 10 });
 
 // Système de notifications (web push habitant, email + in-app commerçant) : voir notifications.js.
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./notifications")));
+// Reveal, compatibilité, prédiction, actualités : voir engagement.js.
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./engagement")));
 
-// Économie NOOVA : seules les 3 premières réponses de la journée rapportent des POINTS
-// échangeables ; au-delà, chaque réponse rapporte 1 NOOV (monnaie virtuelle : concours, retrait
-// des pubs, cash, bons cadeaux — à venir), sans bonus de série. Une réponse trop rapide est non lue.
-const NOOVS_PER_ANSWER = 1;
-const MAX_POINT_ANSWERS_PER_DAY = 3;
-// Le client impose 3 s avant « Valider » ; le serveur mesure lui-même le temps écoulé depuis
-// beginQuestion (le client ne peut pas tricher sur la durée), avec une marge de 500 ms pour la latence.
-const MIN_ANSWER_MS = 2500;
-const DEMO_POINTS = 10;
-const POINTS_BY_INDEX = [10, 15, 20]; // Q1/Q2/Q3, barème fixé par NOOVA (§2 NOOVA_POINTS_SYSTEM.md)
+// Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
+// au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.
+const CFG = require("./engagementConfig");
+const { sectorCategory } = require("./lib");
+const NOOVS_PER_ANSWER = CFG.POINTS.NOOVS_PER_ANSWER;
+const MAX_POINT_ANSWERS_PER_DAY = CFG.POINTS.MAX_ANSWERS_PER_DAY;
+const MIN_ANSWER_MS = CFG.RESPONSE_TIME.MIN_FOR_GAIN_MS;
+const DEMO_POINTS = CFG.POINTS.DEMO_POINTS;
+const POINTS_BY_INDEX = CFG.POINTS.BY_QUESTION_INDEX;
 
 // « Aujourd'hui » = jour civil à Paris (le quota se réinitialise à minuit en France, pas à 1h/2h du matin).
 function parisDay(ms) {
@@ -115,6 +116,8 @@ exports.submitAnswer = onCall(async (request) => {
     const started = user.lastQuestionStart;
     const serverElapsed = (started && started.key === `${campaignId}_${qIdx}` && typeof started.at === "number") ? Date.now() - started.at : null;
     const flagged = serverElapsed === null || serverElapsed < MIN_ANSWER_MS;
+    // Marquage « suspect » (seuil plus large, configurable) : SANS exclusion, pour analyse ultérieure.
+    const suspect = serverElapsed === null || serverElapsed < CFG.RESPONSE_TIME.SUSPECT_MS;
     const qualityScore = flagged ? 0 : 1;
 
     // ── Barème : 3 réponses/jour en points, ensuite des NOOVS ──
@@ -129,11 +132,11 @@ exports.submitAnswer = onCall(async (request) => {
       if (pointsEligible) {
         earnedPts = POINTS_BY_INDEX[qIdx] || 10;
         if (user.lastAnswerDate !== today) {
-          streakBonus = 5;
+          streakBonus = CFG.POINTS.STREAK_BONUS;
           newStreak = user.lastAnswerDate === yesterdayStr() ? (user.streak || 0) + 1 : 1;
           newLastAnswerDate = today;
         }
-        if (qIdx === 2) serieBonus = 10;
+        if (qIdx === 2) serieBonus = CFG.POINTS.SERIE_BONUS;
       } else {
         noovsEarned = NOOVS_PER_ANSWER;
       }
@@ -142,7 +145,16 @@ exports.submitAnswer = onCall(async (request) => {
     // Une réponse trop rapide (non lue) ne consomme pas le quota du jour.
     const newAnswersToday = answersToday + (flagged ? 0 : 1);
 
+    // Reveal : index de l'option choisie (question à choix) ; le texte reste la référence stockée.
+    const qDef = (camp.questions && camp.questions[qIdx]) || { format: camp.format, options: camp.options };
+    const optionIdx = (qDef.format === "mcq" && Array.isArray(qDef.options)) ? qDef.options.indexOf(answerValue != null ? String(answerValue) : "") : -1;
+    const counted = optionIdx >= 0 && (CFG.REVEAL.COUNT_SUSPECT || !suspect) && (CFG.REVEAL.COUNT_FLAGGED || !flagged);
+
     // ── Écritures (transaction atomique) ──
+    if (counted) {
+      // Compteur serveur-seul par option : le client ne peut jamais lire la répartition avant d'avoir répondu.
+      tx.set(db.collection("campaignStats").doc(campaignId), { [`q${qIdx}`]: { n: FieldValue.increment(1), c: { [String(optionIdx)]: FieldValue.increment(1) } } }, { merge: true });
+    }
     tx.set(answerRef, {
       campaignId,
       userId: uid,
@@ -156,6 +168,10 @@ exports.submitAnswer = onCall(async (request) => {
       noovsAwarded: noovsEarned,
       qualityScore,
       flagged,
+      responseMs: serverElapsed,
+      suspect,
+      category: sectorCategory(camp.sector || camp.merchantTheme),
+      optionIdx,
       respondentAge: userAge,
       respondentCity: user.city || "",
       respondentInterests: user.interests || [],
@@ -166,6 +182,8 @@ exports.submitAnswer = onCall(async (request) => {
       ans: FieldValue.increment(1),
       dailyAnswerCount: newAnswersToday,
       dailyAnswerDate: today,
+      dailyPointsDate: today,
+      dailyPoints: (user.dailyPointsDate === today ? (user.dailyPoints || 0) : 0) + totalEarned,
       lastAnswerDate: newLastAnswerDate,
       streak: newStreak,
       updatedAt: FieldValue.serverTimestamp(),
@@ -205,6 +223,8 @@ exports.submitAnswer = onCall(async (request) => {
       totalPoints: (user.points || 0) + totalEarned,
       totalXp: (user.xp || 0) + totalEarned,
       totalNoovs: (user.noovs || 0) + noovsEarned,
+      pointsToday: (user.dailyPointsDate === today ? (user.dailyPoints || 0) : 0) + totalEarned,
+      pointAnswersLimit: MAX_POINT_ANSWERS_PER_DAY,
       answersToday: newAnswersToday,
       pointAnswersLeft: Math.max(0, MAX_POINT_ANSWERS_PER_DAY - newAnswersToday),
       streak: newStreak,
@@ -256,16 +276,6 @@ exports.claimDemoPoints = onCall(async (request) => {
  * règles interdisent au commerçant de lire les comptes habitants ; seuls des nombres
  * agrégés sont renvoyés, jamais d'identité.
  */
-function sectorCategory(sec) {
-  const s = String(sec || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  if (/boulang|patiss|viennois/.test(s)) return "boulangerie";
-  if (/restau|cafe|\bbar\b|traiteur|pizz|kebab|snack/.test(s)) return "restauration";
-  if (/sport|fitness|gym/.test(s)) return "sport";
-  if (/beaut|coiff|esthet|\bspa\b|barbier/.test(s)) return "beaute";
-  if (/cultur|librair|cinema|musee|musique/.test(s)) return "culture";
-  if (/service|mairie|ville/.test(s)) return "services";
-  return "commerce";
-}
 exports.estimateReach = onCall(async (request) => {
   const uid = request.auth && request.auth.uid;
   if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi.");

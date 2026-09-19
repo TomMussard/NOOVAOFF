@@ -287,16 +287,7 @@ async function drainQueue(now) {
 }
 
 // ─────────────────────────── Données de ciblage ───────────────────────────
-function sectorCategory(sec) {
-  const s = String(sec || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  if (/boulang|patiss|viennois/.test(s)) return "boulangerie";
-  if (/restau|cafe|\bbar\b|traiteur|pizz|kebab|snack/.test(s)) return "restauration";
-  if (/sport|fitness|gym/.test(s)) return "sport";
-  if (/beaut|coiff|esthet|\bspa\b|barbier/.test(s)) return "beaute";
-  if (/cultur|librair|cinema|musee|musique/.test(s)) return "culture";
-  if (/service|mairie|ville/.test(s)) return "services";
-  return "commerce";
-}
+const { sectorCategory } = require("./lib");
 // Un profil sans catégorie reconnue (ancien compte) ou « tout m'intéresse » voit tout.
 function matchesCategory(u, sector) {
   const ints = (u.interests || []).filter((i) => CAT_KEYS.includes(i));

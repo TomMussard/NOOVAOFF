@@ -126,6 +126,25 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .how-t{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink);letter-spacing:-.3px}
 .how-d{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:2px}
 .ob-wrap{height:100%;display:flex;flex-direction:column}
+.rv{background:var(--surface);border-radius:var(--r-card);padding:16px 16px 14px;box-shadow:var(--shadow-card);margin-bottom:10px;text-align:left}
+.rv-h{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink);letter-spacing:-.3px;margin-bottom:12px}
+.rv-row{margin-bottom:12px}
+.rv-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:5px;font-size:13.5px;color:var(--ink)}
+.rv-row.mine .rv-l{font-weight:800}
+.rv-l{display:flex;align-items:center;gap:6px;min-width:0}
+.rv-p{font-family:var(--fd);font-weight:800;font-size:14px;flex-shrink:0}
+.rv-bar{height:10px;border-radius:99px;background:var(--bg2);overflow:hidden}
+.rv-bar>div{height:100%;border-radius:99px;background:#C9C3B5;transition:width .6s ease}
+.rv-row.mine .rv-bar>div{background:var(--ink)}
+.rv-fr{display:flex;margin-top:6px;padding-left:2px}
+.rv-av{width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--yellow);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;overflow:hidden;border:2px solid var(--surface);margin-left:-6px;flex-shrink:0}
+.rv-av:first-child{margin-left:0}
+.rv-av img{width:100%;height:100%;object-fit:cover;display:block}
+.rv-note{font-size:12px;color:var(--ink2);line-height:1.5;margin-top:2px}
+.rv-foot{font-size:11.5px;color:var(--ink3);margin-top:6px}
+.rv-info{display:flex;gap:9px;align-items:center;background:var(--md);border-radius:12px;padding:9px 11px;font-size:11.5px;color:var(--ink2);line-height:1.45;margin-top:10px}
+.rv-info button{background:none;border:none;color:var(--ink);font-weight:800;text-decoration:underline;font-size:11.5px;cursor:pointer;font-family:var(--fb);padding:0;flex-shrink:0}
+.rv-skel .rv-bar{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
 #lock-bar{height:6px;border-radius:99px;overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
 #lock-bar.on{opacity:1}
 #lock-fill{height:100%;width:100%;background:var(--yellow);border-radius:99px}
@@ -266,6 +285,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .q-prog{display:flex;gap:5px;flex:1;margin:0 11px}
 .q-seg{height:5px;flex:1;border-radius:var(--r-pill);background:var(--line-strong);transition:background .28s}
 .q-seg.done{background:var(--ink)}.q-seg.cur{background:var(--line-strong)}
+.q-pts.free{background:var(--nv-black);color:var(--nv-yellow)}
 .q-pts{font-size:11px;font-weight:800;background:var(--yellow);color:var(--ink);border:none;padding:5px 10px;border-radius:var(--r-pill)}
 .brand-hdr{background:none;border:none;border-radius:0;padding:0;display:flex;align-items:center;gap:11px;margin-bottom:20px}
 .bh-logo{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;background:var(--bg2)}
@@ -1004,6 +1024,15 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   </div>
 </div>
 
+<!-- Reveal entre deux questions d'une même campagne -->
+<div id="reveal-sheet" onclick="if(event.target===this)closeRevealSheet()" style="display:none;position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:center">
+  <div style="background:var(--card);border-radius:24px 24px 0 0;max-width:430px;width:100%;max-height:88%;overflow-y:auto;padding:14px 20px calc(22px + env(safe-area-inset-bottom,0px))">
+    <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 14px"></div>
+    <div id="rs-body"></div>
+    <button class="btn-p" style="margin-top:14px" onclick="closeRevealSheet()">Continuer</button>
+  </div>
+</div>
+
 <!-- COMMENT ÇA MARCHE -->
 <div id="how-it-works" class="screen">
   <div class="qw">
@@ -1158,6 +1187,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="pts-earned"><div class="pe-plus">+</div><div class="pe-num" id="rw-pts">25</div><div class="pe-right"><div class="pe-lbl">Total cumulé</div><div class="pe-tot" id="rw-total">25 pts</div></div></div>
   <div class="usage-card"><span style="flex-shrink:0;margin-top:1px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6" id="rw-usage">Ta réponse aide <strong>les commerces de ton quartier</strong> à mieux servir le coin.</div></div>
   <div class="share-row" onclick="shareReward()"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:19px;height:19px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg></span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">Partager ma réponse</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">Montre-la à tes amis</div></div><span style="color:var(--ink3)">→</span></div>
+  <div id="rw-reveal" style="width:100%;position:relative;z-index:1"></div>
   <div id="rw-actions" style="width:100%;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1"></div>
 </div>
 
@@ -1316,10 +1346,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div id="consent-mgmt"></div>
       </div>
     </div>
-    <div class="sec-card acc">
+    <div class="sec-card acc" id="share-answers-card">
       <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div class="consent-it" style="cursor:pointer" onclick="goTo('manage-merchants');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
+      <div class="consent-it"><div style="flex:1;min-width:0"><div class="dconsent-name">Montrer mes réponses à mes amis</div><div class="dconsent-sub" style="white-space:normal">Tes amis voient ce que tu as répondu. Tu comptes toujours dans les résultats.</div></div><label class="tgl"><input type="checkbox" id="share-answers-inp" checked onchange="setShareAnswers(this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>
       <div class="consent-it" style="cursor:pointer" onclick="goTo('how-it-works');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Comment ça marche</div><span style="color:var(--ink3);font-size:17px">›</span></div>
       <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Conforme RGPD — révoque ou supprime tes données ci-dessous.</div></div>
       </div>
@@ -1467,12 +1498,17 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 </div>
 <script>
 const S={user:null,pts:0,xp:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],done:{},friends:[],chats:{}};
-const MAX_POINT_ANSWERS=3;
+// Config d'engagement côté écran. Doit rester alignée avec functions/engagementConfig.js (POINTS.MAX_ANSWERS_PER_DAY) ;
+// tous les autres seuils (reveal, prédiction, compatibilité...) sont décidés côté serveur.
+const ENGAGEMENT={MAX_ANSWERS_PER_DAY:3};
+const MAX_POINT_ANSWERS=ENGAGEMENT.MAX_ANSWERS_PER_DAY;
 // « Aujourd'hui » = jour civil à Paris, comme côté serveur (le quota se réinitialise à minuit en France).
 function parisToday(ms){return new Date(ms||Date.now()).toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});}
 function getAnswersToday(){return S._answersDate===parisToday()?(S._answersToday||0):0;}
-// Libellé de gain d'une question : points tant que le quota du jour n'est pas atteint, ensuite 1 NOOV.
-function ptsTag(q){return getAnswersToday()>=MAX_POINT_ANSWERS?'+1 NOOV':'+'+q.pts+' pts';}
+// Libellé de gain d'une question : points tant que le quota du jour n'est pas atteint, ensuite « Mode libre ».
+function isFreeMode(){return getAnswersToday()>=MAX_POINT_ANSWERS;}
+function ptsTag(q){return isFreeMode()?'Mode libre':'+'+q.pts+' pts';}
+function setQPtsTag(q){const el=document.getElementById('q-pts-tag');if(!el)return;el.textContent=ptsTag(q);el.classList.toggle('free',isFreeMode());}
 const BRANDMETA={};
 function logoFallbackHTML(name,size){
   const s=size||44;const r=Math.round(s*0.27);
@@ -1841,7 +1877,7 @@ function openQ(idx){
   S.qIdx=idx;S.curQ=S.qs[idx];if(!S.curQ)return;const q=S.curQ;
   const pg=document.getElementById('q-prog');pg.innerHTML='';
   S.qs.forEach((_,i)=>{const s=document.createElement('div');s.className='q-seg'+(i<idx?' done':i===idx?' cur':'');pg.appendChild(s)});
-  document.getElementById('q-pts-tag').textContent=ptsTag(q);
+  setQPtsTag(q);
   {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||'Ta réponse aidera '+q.brand+'.';
   document.getElementById('bh-tag').textContent=q.theme;document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint;
@@ -2775,6 +2811,7 @@ function refreshProfile(){
   renderUserAvatar(document.getElementById('settings-av-thumb'), document.getElementById('settings-av-thumb-letter'), S.user.name, S.user.photoUrl);
   refreshSettingsDisplay();
   refreshNotifSettingsUI();
+  {const si=document.getElementById('share-answers-inp');if(si)si.checked=S._shareAnswers!==false;}
   document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.email||S._city||'';
   document.getElementById('s-pts').textContent=S.pts;document.getElementById('s-ans').textContent=S.ans;document.getElementById('s-str').textContent=S.streak;
   const friendsEl=document.getElementById('s-friends');if(friendsEl)friendsEl.textContent=(S.friends||[]).length;
@@ -2830,14 +2867,14 @@ S.mode=S.mode||'hook';S.sv=S.sv||null;S.brandBack=S.brandBack||'home';
 /* --- Rendu d'une question (commun hook + suivi) --- */
 function fillQuestion(q,opts){
   S._qShownAt = Date.now();
-  document.getElementById('q-pts-tag').textContent=ptsTag(q);
+  setQPtsTag(q);
   beginQuestionOnServer(q);
   startAnswerLock();
   {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}
   document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||('Ta réponse aide '+q.brand+'.');
   document.getElementById('bh-tag').textContent=q.theme||'';
-  document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=getAnswersToday()>=MAX_POINT_ANSWERS?'Points du jour atteints : cette réponse rapporte 1 NOOV.':(q.hint||'');
+  document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=isFreeMode()?'Mode libre : ton avis compte, même sans points.':(q.hint||'');
   const sk=document.getElementById('skip-btn');if(sk){sk.textContent=opts.skipLabel;sk.setAttribute('onclick',opts.skipFn);}
   document.getElementById('sub-btn').disabled=true;buildAns(q);
 }
@@ -2920,6 +2957,7 @@ function showSurveyOffer(){
 
 /* --- Écran récompense paramétrable --- */
 function openReward(o){
+  {const rv=document.getElementById('rw-reveal');if(rv)rv.innerHTML='';}
   const t=document.querySelector('#reward .rw-title');if(t)t.textContent=o.title||'Bien joué !';
   const s=document.querySelector('#reward .rw-sub');if(s)s.textContent=o.sub||'Ta réponse a été envoyée';
   document.getElementById('rw-pts').textContent=o.pts;
@@ -3633,6 +3671,7 @@ if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('messa
   if(d.type==='notif-open'&&d.nid){ try{ sessionStorage.setItem('nv_open',JSON.stringify({nid:d.nid,go:d.go||'home'})); }catch(x){} flushNotifOpen(); }
 });
 const callSubmitAnswer = fx.httpsCallable('submitAnswer');
+const callGetReveal = fx.httpsCallable('getReveal');
 const callSetNotifPref = fx.httpsCallable('setNotifPref');
 const callTrackNotifOpen = fx.httpsCallable('trackNotifOpen');
 const callBeginQuestion = fx.httpsCallable('beginQuestion');
@@ -3966,6 +4005,45 @@ async function declineMerchant(mid){
   }catch(e){console.warn('declineMerchant:',e);showToast("Impossible d'enregistrer ton choix.",'error');}
 }
 
+// ─── Reveal : comment les autres ont répondu (questions à choix, après avoir répondu) ───
+function closeRevealSheet(){const sh=document.getElementById('reveal-sheet');if(sh)sh.style.display='none';}
+function revealCardHTML(r,compact){
+  const showPct=!r.belowThreshold;
+  const friendsBy={};(r.friends||[]).forEach(f=>{if(f.optionIdx>=0)(friendsBy[f.optionIdx]=friendsBy[f.optionIdx]||[]).push(f);});
+  const rows=r.options.map((o,i)=>{
+    const mine=i===r.myIdx;
+    const av=(friendsBy[i]||[]).map(f=>`<div class="rv-av" title="${esc(f.name)}">${avInner(f.photoUrl,f.name)}</div>`).join('');
+    return `<div class="rv-row${mine?' mine':''}"><div class="rv-top"><span class="rv-l">${mine?icon('check',{size:14}):''}${esc(o.text)}</span>${showPct?`<span class="rv-p">${o.pct} %</span>`:''}</div><div class="rv-bar"><div style="width:${showPct?o.pct:0}%"></div></div>${av?`<div class="rv-fr">${av}</div>`:''}</div>`;
+  }).join('');
+  const note=r.belowThreshold?`<div class="rv-note">Encore ${r.needed} réponse${r.needed>1?'s':''} avant de voir les résultats.</div>`:`<div class="rv-foot">${r.n} réponse${r.n>1?'s':''}</div>`;
+  let info='';
+  try{if(!localStorage.getItem('nv_reveal_info')){localStorage.setItem('nv_reveal_info','1');info=`<div class="rv-info"><span style="flex:1">Tes amis voient ce que tu réponds. Tu comptes toujours dans les résultats, même si tu coupes ce partage.</span><button onclick="closeRevealSheet();openPrivacySettings()">Régler</button></div>`;}}catch(e){}
+  return `<div class="rv"><div class="rv-h">${compact?'Les autres ont répondu':'Comment les autres ont répondu'}</div>${rows}${note}${info}</div>`;
+}
+function openPrivacySettings(){goNav('profile');setTimeout(()=>{const c=document.getElementById('share-answers-card');if(c&&!c.classList.contains('open'))c.classList.add('open');const i=document.getElementById('share-answers-inp');if(i)i.scrollIntoView({block:'center'});},350);}
+async function showReveal(q,qIdx){
+  if(!q||!q._firestoreId||q.type!=='mcq') return;
+  const inline=(cur==='reward');
+  let target;
+  if(inline){target=document.getElementById('rw-reveal');}
+  else{target=document.getElementById('rs-body');const sh=document.getElementById('reveal-sheet');if(!target||!sh)return;sh.style.display='flex';}
+  if(!target)return;
+  const skel=(q.opts||[]).map(()=>'<div class="rv-row"><div class="rv-top"><span class="rv-l">&nbsp;</span></div><div class="rv-bar"><div style="width:40%"></div></div></div>').join('');
+  target.innerHTML=`<div class="rv rv-skel"><div class="rv-h">Comment les autres ont répondu</div>${skel}</div>`;
+  try{
+    const r=(await callGetReveal({campaignId:q._firestoreId,questionIdx:qIdx})).data;
+    if(!r||!r.available){target.innerHTML='';if(!inline)closeRevealSheet();return;}
+    target.innerHTML=revealCardHTML(r,!inline);
+    trackEvent('reveal_shown',{below_threshold:!!r.belowThreshold,friends:(r.friends||[]).length});
+  }catch(e){console.warn('getReveal:',e);target.innerHTML='';if(!inline)closeRevealSheet();}
+}
+async function setShareAnswers(v){
+  const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
+  const prev=S._shareAnswers!==false;S._shareAnswers=!!v;
+  try{await db.collection('users').doc(uid).update({shareAnswers:!!v});trackEvent('share_answers',{enabled:!!v});}
+  catch(e){console.warn('setShareAnswers:',e);S._shareAnswers=prev;const i=document.getElementById('share-answers-inp');if(i)i.checked=prev;showToast("Impossible d'enregistrer ce réglage.",'error');}
+}
+
 // ─── États de l'accueil (U6) ─────────────────────────────────
 function cityPhrase(label){
   label=(label||'').trim();
@@ -3989,7 +4067,7 @@ function renderDailyTrack(){
   const left=MAX_POINT_ANSWERS-n;
   el.className='dtrack';
   el.innerHTML='<div class="dt-dots">'+[0,1,2].map(i=>'<div class="dt-dot'+(i<n?' on':'')+'"></div>').join('')+'</div><div class="dt-txt">'
-    +(left>0?left+' réponse'+(left>1?'s':'')+' en points aujourd\'hui':'Points du jour atteints : tes réponses rapportent des NOOVS')
+    +(left>0?left+' réponse'+(left>1?'s':'')+' en points aujourd\'hui':'Tes '+(S._pointsToday||0)+' pts du jour sont validés · mode libre')
     +'</div><div class="dt-noov">'+(S.noovs||0)+' NOOVS</div>';
 }
 function renderHomeState(){
@@ -4642,6 +4720,8 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
     if (S._lastAnswerDate !== _today && S._lastAnswerDate !== _yesterday) S.streak = 0;
   }
   S.noovs            = data.noovs || 0;
+  S._pointsToday     = data.dailyPointsDate === parisToday() ? (data.dailyPoints || 0) : 0;
+  S._shareAnswers    = data.shareAnswers !== false;
   S._notifPrefs      = data.notifPrefs || {};
   if ((data.fcmTokens || []).length && !data.pushEnabled) db.collection('users').doc(uid).update({ pushEnabled: true }).catch(() => {});
   S._answersToday    = data.dailyAnswerCount || 0;
@@ -5087,6 +5167,7 @@ submitAns = function() {
       const noovsGot = data.noovsAwarded || 0;
       S.noovs = typeof data.totalNoovs === 'number' ? data.totalNoovs : (S.noovs || 0);
       if (typeof data.answersToday === 'number') { S._answersToday = data.answersToday; S._answersDate = parisToday(); }
+      if (typeof data.pointsToday === 'number') S._pointsToday = data.pointsToday;
       if (S.hist && S.hist[0]) { S.hist[0].pts = totalEarned; S.hist[0].noovs = noovsGot; }
       trackEvent('earn_virtual_currency', { virtual_currency_name: noovsGot ? 'noovs' : 'points', value: noovsGot || totalEarned });
       if (touchesSurvey && S.sv) S.sv.earned += correction;
@@ -5101,14 +5182,19 @@ submitAns = function() {
         if (rwPtsEl) rwPtsEl.textContent = noovsGot;
         if (rwLbl) rwLbl.textContent = 'NOOVS · total';
         if (rwTotalEl) rwTotalEl.textContent = S.noovs + ' NOOVS';
-        if (rwSub) rwSub.textContent = 'Tes 3 réponses en points du jour sont faites : celle-ci rapporte des NOOVS.';
+        if (rwSub) rwSub.textContent = 'Mode libre : merci pour ton avis.';
       } else {
         if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
         if (rwTotalEl) rwTotalEl.textContent = S.pts + ' pts';
         const left = typeof data.pointAnswersLeft === 'number' ? data.pointAnswersLeft : null;
-        if (rwSub && left !== null) rwSub.textContent = left > 0 ? ('Encore ' + left + ' réponse' + (left > 1 ? 's' : '') + ' en points aujourd\'hui, puis des NOOVS.') : 'C\'était ta dernière réponse en points du jour. Les suivantes rapportent des NOOVS.';
+        // Fin de palier : présenté comme un palier débloqué, pas comme une interdiction.
+        if (rwSub && left !== null) {
+          if (left > 0) rwSub.textContent = 'Encore ' + left + ' réponse' + (left > 1 ? 's' : '') + ' en points aujourd\'hui.';
+          else rwSub.innerHTML = 'Tes ' + (S._pointsToday || 0) + ' pts du jour sont validés ' + icon('check', { size: 15 }) + ' place au mode libre';
+        }
       }
       renderDailyTrack();
+      showReveal(q, qIdx);
       if (!data.flagged) setTimeout(maybeAskNotifications, 1800);
     })
     .catch(e => {

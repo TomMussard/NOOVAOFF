@@ -469,6 +469,10 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M6 21V4"/><path d="M6 4h12l-3 4.5L18 13H6"/></svg> Réponses signalées <span class="badge badge-pending" id="mod-count">0</span></div>
       <div id="mod-list"><div class="loading">Chargement</div></div>
     </div>
+    <div class="card" style="margin-top:20px">
+      <div class="card-title">Qualité des réponses : temps de réponse <span class="ct-right" id="quality-sub"></span></div>
+      <div id="quality-body"><div class="loading">Chargement</div></div>
+    </div>
   </div>
 
   <!-- ══════════════ TAB NOTIFICATIONS ══════════════ -->
@@ -637,6 +641,30 @@ function showGoogleLogin() {
 function doLogout() { auth.signOut().then(() => location.reload()); }
 
 // ── Tabs ───────────────────────────────────────────────────────────────────
+// ─── Qualité des réponses : temps de réponse mesuré par le serveur (marquage seul, rien n'est exclu) ───
+async function loadResponseQuality() {
+  const body = document.getElementById('quality-body');
+  try {
+    const snap = await db.collection('answers').orderBy('createdAt', 'desc').limit(500).get();
+    const rows = snap.docs.map(d => d.data());
+    const measured = rows.filter(a => typeof a.responseMs === 'number');
+    document.getElementById('quality-sub').textContent = rows.length + ' dernières réponses, ' + measured.length + ' mesurées';
+    if (!measured.length) { body.innerHTML = '<div class="loading">Aucune réponse mesurée pour l\'instant.</div>'; return; }
+    const ms = measured.map(a => a.responseMs).sort((x, y) => x - y);
+    const median = ms[Math.floor(ms.length / 2)];
+    const flagged = measured.filter(a => a.flagged).length, suspect = measured.filter(a => a.suspect).length;
+    const buckets = [['moins de 2,5 s', 0, 2500], ['2,5 à 4 s', 2500, 4000], ['4 à 8 s', 4000, 8000], ['8 à 15 s', 8000, 15000], ['plus de 15 s', 15000, Infinity]];
+    const pct = n => (n / measured.length * 100).toFixed(1) + ' %';
+    body.innerHTML = '<div style="padding:14px 18px;font-size:13px;line-height:1.9">'
+      + 'Médiane : <b>' + (median / 1000).toFixed(1) + ' s</b> · Sans gain (trop rapides) : <b>' + pct(flagged) + '</b> · Marquées suspectes : <b>' + pct(suspect) + '</b>'
+      + '<div style="color:var(--ink3);font-size:11.5px">Seuils modifiables dans functions/engagementConfig.js (RESPONSE_TIME).</div></div>'
+      + '<table class="age-table" style="width:100%"><tbody>' + buckets.map(b => {
+        const n = measured.filter(a => a.responseMs >= b[1] && a.responseMs < b[2]).length;
+        return '<tr><td style="padding:9px 18px">' + b[0] + '</td><td style="width:55%"><div style="height:8px;border-radius:99px;background:var(--bg3);overflow:hidden"><div style="height:100%;width:' + (n / measured.length * 100) + '%;background:var(--coral)"></div></div></td><td style="text-align:right;padding:9px 18px">' + n + ' · ' + pct(n) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+  } catch (e) { body.innerHTML = '<div class="loading">Erreur : ' + esc(e.message) + '</div>'; }
+}
+
 // ─── Notifications : métriques par type (envois, ouvertures, désactivations) ───
 const NOTIF_LABELS = {
   question_du_jour: 'Question du jour', nouveau_commerce: 'Nouveau commerce', resultat_dispo: 'Résultat disponible',
@@ -671,7 +699,7 @@ function switchTab(tab, btn) {
   if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
   if (tab === 'diffusion') initDiffusion();
   if (tab === 'lancement') loadReadiness();
-  if (tab === 'moderation') loadModeration();
+  if (tab === 'moderation') { loadModeration(); loadResponseQuality(); }
   if (tab === 'notifications') loadNotifMetrics();
   if (tab === 'danger') loadDangerZone();
 }
