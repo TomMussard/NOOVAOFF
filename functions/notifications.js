@@ -12,11 +12,11 @@
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
-const admin = require("firebase-admin");
-const { FieldValue, Timestamp } = require("firebase-admin/firestore");
+const { FieldValue, Timestamp, getFirestore } = require("firebase-admin/firestore");
+const { getMessaging } = require("firebase-admin/messaging");
 const logger = require("firebase-functions/logger");
 
-const db = () => admin.firestore();
+const db = () => getFirestore();
 
 // ─────────────────────────── Configuration ───────────────────────────
 const DAY = 86400000;
@@ -124,7 +124,7 @@ async function sendPush(uid, tokens, payload) {
   }
   // Message « data » SEUL : une seule voie d'affichage (le service worker), `tag` unique par
   // notification. Un bloc `notification` serait en plus affiché par le navigateur (doublon).
-  const res = await admin.messaging().sendEachForMulticast({
+  const res = await getMessaging().sendEachForMulticast({
     tokens,
     data: { title: payload.title, body: payload.body, url: payload.url, tag: payload.tag, nid: payload.nid, ntype: payload.ntype },
     webpush: { headers: { Urgency: "high", TTL: "86400" } },

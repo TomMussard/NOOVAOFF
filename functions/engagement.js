@@ -8,12 +8,12 @@
  * confidentialité « Montrer mes réponses à mes amis » (users.shareAnswers, activé par défaut).
  */
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
-const admin = require("firebase-admin");
+const { getFirestore } = require("firebase-admin/firestore");
 const CFG = require("./engagementConfig");
 const crypto = require("crypto");
 const { sectorCategory, parisDay } = require("./lib");
 
-const db = () => admin.firestore();
+const db = () => getFirestore();
 const uniq = (a) => [...new Set((a || []).filter(Boolean))];
 
 // Définition d'une question d'une campagne (les anciennes campagnes n'ont pas de tableau `questions`).

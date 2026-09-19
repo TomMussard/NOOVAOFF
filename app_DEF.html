@@ -64,6 +64,7 @@
 </script>
 <!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
@@ -3667,6 +3668,9 @@ const firebaseConfig = {
   measurementId: "G-3E6ZPKLY64"
 };
 firebase.initializeApp(firebaseConfig);
+// App Check (protection anti-abus) : inactif tant qu'aucune clé reCAPTCHA v3 n'est renseignée ici.
+const APP_CHECK_SITE_KEY = '';
+if (APP_CHECK_SITE_KEY) { try { firebase.appCheck().activate(APP_CHECK_SITE_KEY, true); } catch (e) { console.warn('AppCheck:', e); } }
 const auth = firebase.auth();
 const db = firebase.firestore();
 const fx  = firebase.app().functions('europe-west1');

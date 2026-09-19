@@ -2,13 +2,17 @@ const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
-const { FieldValue } = require("firebase-admin/firestore");
+const { FieldValue, getFirestore } = require("firebase-admin/firestore");
+const { getAuth } = require("firebase-admin/auth");
 const logger = require("firebase-functions/logger");
 
 admin.initializeApp();
-const db = admin.firestore();
+const db = getFirestore();
 
-setGlobalOptions({ region: "europe-west1", maxInstances: 10 });
+// App Check : passer à true UNIQUEMENT quand les 3 pages envoient un jeton (APP_CHECK_SITE_KEY renseignée
+// et statistiques de la console à ~100 % de requêtes vérifiées), sinon toutes les fonctions seraient refusées.
+const ENFORCE_APP_CHECK = false;
+setGlobalOptions({ region: "europe-west1", maxInstances: 10, enforceAppCheck: ENFORCE_APP_CHECK });
 
 // Système de notifications (web push habitant, email + in-app commerçant) : voir notifications.js.
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./notifications")));
@@ -325,14 +329,14 @@ exports.adminResetAllData = onCall({ timeoutSeconds: 300 }, async (request) => {
   let deletedAuthCount = 0;
   let pageToken;
   do {
-    const result = await admin.auth().listUsers(1000, pageToken);
+    const result = await getAuth().listUsers(1000, pageToken);
     const toDelete = result.users
       .filter((u) => !ADMIN_EMAILS.includes(u.email))
       .map((u) => u.uid);
     for (let i = 0; i < toDelete.length; i += 1000) {
       const chunk = toDelete.slice(i, i + 1000);
       if (chunk.length) {
-        const res = await admin.auth().deleteUsers(chunk);
+        const res = await getAuth().deleteUsers(chunk);
         deletedAuthCount += res.successCount;
       }
     }
@@ -385,7 +389,7 @@ exports.adminDeleteAccount = onCall(async (request) => {
   }
 
   try {
-    await admin.auth().deleteUser(uid);
+    await getAuth().deleteUser(uid);
   } catch (e) {
     // Compte Auth déjà absent ou introuvable : les données Firestore sont supprimées
     // quand même, ce n'est pas bloquant.

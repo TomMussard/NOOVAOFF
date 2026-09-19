@@ -1,0 +1,7 @@
+{
+  "name": "noova-tests",
+  "private": true,
+  "description": "Tests de bout en bout NOOVA (émulateurs Firebase + Chrome). Lancer : sh tests/run.sh",
+  "scripts": { "test": "sh run.sh" },
+  "dependencies": { "puppeteer-core": "^25.11.0" }
+}

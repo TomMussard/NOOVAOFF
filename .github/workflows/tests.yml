@@ -1,0 +1,32 @@
+name: Tests
+
+# Tests de bout en bout : émulateurs Firebase (règles et fonctions réelles) + Chrome.
+# Ils ne touchent JAMAIS la production. Durée : une vingtaine de minutes.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Dépendances des fonctions
+        run: npm ci
+        working-directory: functions
+      - name: Dépendances des tests
+        run: npm ci
+        working-directory: tests
+      - name: Suites de bout en bout
+        run: sh tests/run.sh
+        env:
+          CHROME_PATH: /usr/bin/google-chrome

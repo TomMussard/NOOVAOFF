@@ -12,13 +12,12 @@
  * réservé à l'admin par les règles Firestore, le fait.
  */
 const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
-const admin = require("firebase-admin");
-const { FieldValue, Timestamp } = require("firebase-admin/firestore");
+const { FieldValue, Timestamp, getFirestore } = require("firebase-admin/firestore");
 const logger = require("firebase-functions/logger");
 const CFG = require("./engagementConfig");
 const N = require("./notifications")._t;
 
-const db = () => admin.firestore();
+const db = () => getFirestore();
 const DAY = 86400000;
 
 // Habitants à prévenir : ont répondu (réponse non signalée) à une question rattachée, ou à défaut à

@@ -1,0 +1,124 @@
+process.env.FIRESTORE_EMULATOR_HOST='127.0.0.1:8080';process.env.FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:9099';
+const fs=require('fs');const puppeteer=require('puppeteer-core');
+const admin=require(__dirname+'/helpers/admin');
+admin.initializeApp({projectId:'noova-366d0'});const adb=admin.firestore(),aauth=admin.auth();
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));fs.mkdirSync('/tmp/shots',{recursive:true});
+const check=(n,ok,x)=>console.log((ok?'PASS ':'FAIL ')+n+(x?'  -> '+x:''));
+const wf=(p,fn,arg,t=25000)=>p.waitForFunction(fn,{timeout:t,polling:200},arg);
+const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));},v);
+const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,String(e.message).split('\n')[0]);}};
+(async()=>{
+ await fetch('http://127.0.0.1:8080/emulator/v1/projects/noova-366d0/databases/(default)/documents',{method:'DELETE'});
+ await fetch('http://127.0.0.1:9099/emulator/v1/projects/noova-366d0/accounts',{method:'DELETE'});
+ await aauth.createUser({uid:'uA',email:'a@t.fr',password:'secret123'});
+ await adb.doc('users/uA').set({role:'user',name:'Alice',email:'a@t.fr',city:'le-mans',cityLabel:'Le Mans',points:0,xp:0,streak:0,ans:0,interests:['restauration'],authorizedMerchants:['mM1'],friendUids:[],answeredCampaigns:[],onboardingStep:'done',seenHomeTour:true});
+ await adb.doc('merchants/mM1').set({role:'merchant',ownerUid:'mM1',brandName:'Le Bistrot',name:'Le Bistrot',sector:'Restauration',city:'le-mans',cityLabel:'Le Mans',address:'Place de la République',status:'verified'});
+ const camps=[];for(let i=0;i<6;i++){const c=await adb.collection('campaigns').add({merchantId:'mM1',merchantName:'Le Bistrot',status:'active',targetCity:'le-mans',city:'le-mans',question:'Question '+i+' ?',questions:[{q:'Question '+i+' ?',format:'mcq',options:['Oui','Non']}],targetVolume:100,answersCount:0,createdAt:admin.firestore.FieldValue.serverTimestamp()});camps.push(c.id);}
+ const browser=await puppeteer.launch({executablePath:(process.env.CHROME_PATH||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'),headless:'new',args:['--no-sandbox']});
+ const p=await browser.newPage();await p.setViewport({width:430,height:900});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+ await p.goto('http://localhost:8950/app.html');
+ await wf(p,()=>document.getElementById('onboard').classList.contains('active'),null,30000);
+ await p.evaluate(()=>showAuthWall('login'));await setVal(p,'#aw-email','a@t.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());
+ await wf(p,()=>document.getElementById('home').classList.contains('active')&&S.user&&S.qs.length>=6,null,30000);
+ await p.addStyleTag({content:'body>div[style*="emulator"]{display:none!important}'});
+ const answerOne=async(waitMs)=>{
+   await p.evaluate(()=>openQ(0));
+   await wf(p,()=>document.querySelectorAll('#ans-area .mcq-opt').length>0);
+   await p.evaluate(()=>document.querySelector('#ans-area .mcq-opt').click());
+   if(waitMs)await sleep(waitMs);
+   await p.evaluate(()=>submitAns());
+ };
+ await T('daily tracker',async()=>{
+   await p.evaluate(()=>{refreshHome();});
+   const t=await p.$eval('#daily-track',e=>e.textContent);
+   check('Accueil : suivi « 3 réponses en points aujourd\'hui »',/3 réponses en points/.test(t)&&/0 NOOVS/.test(t),t);
+ });
+ await T('lock ui',async()=>{
+   await p.evaluate(()=>openQ(0));
+   await sleep(300);
+   await p.evaluate(()=>document.querySelector('#ans-area .mcq-opt').click());
+   const st1=await p.evaluate(()=>({locked:document.getElementById('sub-btn').classList.contains('locked'),bar:document.getElementById('lock-bar').classList.contains('on'),w:Math.round(document.getElementById('lock-fill').getBoundingClientRect().width)}));
+   await sleep(1200);
+   const w2=await p.evaluate(()=>Math.round(document.getElementById('lock-fill').getBoundingClientRect().width));
+   await p.screenshot({path:'/tmp/shots/lock.png'});
+   check('Barre jaune au-dessus de « Valider » qui se vide, bouton verrouillé',st1.locked&&st1.bar&&w2<st1.w,JSON.stringify(st1)+' -> '+w2);
+   await p.evaluate(()=>submitAns());await sleep(1500);
+   const early=(await adb.collection('answers').where('userId','==','uA').get()).size;
+   check('Valider avant 3 s : ignoré (aucune réponse envoyée)',early===0,'answers='+early);
+   await sleep(2200);
+   const st3=await p.evaluate(()=>({locked:document.getElementById('sub-btn').classList.contains('locked'),bar:document.getElementById('lock-bar').classList.contains('on'),dis:document.getElementById('sub-btn').disabled}));
+   check('Après 3 s : verrou levé, bouton actif',!st3.locked&&!st3.bar&&!st3.dis,JSON.stringify(st3));
+   await p.evaluate(()=>submitAns());
+   await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);
+   const u=(await adb.doc('users/uA').get()).data();
+   check('Réponse 1 : points crédités (10 + 5 série)',u.points===15&&!u.noovs&&u.dailyAnswerCount===1,'points='+u.points+' count='+u.dailyAnswerCount);
+   const sub=await p.$eval('#reward .rw-sub',e=>e.textContent);
+   check('Écran de récompense : « encore 2 réponses en points »',/Encore 2 réponses/.test(sub),sub);
+ });
+ await T('answers 2-3 points',async()=>{
+   await answerOne(3300);await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);await sleep(1200);
+   await p.evaluate(()=>goNav('home'));
+   await answerOne(3300);await sleep(2500);
+   const u=(await adb.doc('users/uA').get()).data();
+   check('Réponses 2 et 3 : points (total 35), aucun NOOV',u.points===35&&!u.noovs&&u.dailyAnswerCount===3,'points='+u.points+' noovs='+u.noovs);
+   await p.evaluate(()=>goNav('home'));await sleep(500);
+   const t=await p.$eval('#daily-track',e=>e.textContent);
+   check('Accueil : quota atteint, message NOOVS',/pts du jour sont validés/.test(t)&&!/mode libre/i.test(t),t);
+ });
+ await T('answers 4-5 noovs',async()=>{
+   await p.evaluate(()=>openQ(0));await wf(p,()=>document.getElementById('q-pts-tag').textContent.length>0);
+   const tag=await p.$eval('#q-pts-tag',e=>e.textContent);const hint=await p.$eval('#q-hint',e=>e.textContent);
+   check('Question suivante annoncée en NOOV (pas en points)',/\+1 NOOV/.test(tag)&&!/mode libre/i.test(hint),tag+' | '+hint);
+   await p.evaluate(()=>goNav('home'));
+   await answerOne(3300);await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);await sleep(1500);
+   const rw=await p.evaluate(()=>({lbl:document.querySelector('#reward .pe-lbl').textContent,num:document.getElementById('rw-pts').textContent,tot:document.getElementById('rw-total').textContent,sub:document.querySelector('#reward .rw-sub').textContent}));
+   await p.screenshot({path:'/tmp/shots/noov_reward.png'});
+   check('Écran de récompense en NOOVS',/NOOVS/.test(rw.lbl)&&rw.num==='1'&&/1 NOOVS/.test(rw.tot),JSON.stringify(rw));
+   await p.evaluate(()=>goNav('home'));
+   await answerOne(3300);await sleep(2500);
+   const u=(await adb.doc('users/uA').get()).data();
+   check('Réponses 4 et 5 : 1 NOOV chacune, points inchangés',u.noovs===2&&u.points===35,'noovs='+u.noovs+' points='+u.points);
+   await p.evaluate(()=>{goNav('home');});await sleep(700);
+   await p.screenshot({path:'/tmp/shots/home_noov.png'});
+   await p.evaluate(()=>{goNav('rewards-tab');});await sleep(1200);
+   await p.screenshot({path:'/tmp/shots/wallet_noov.png'});
+   check('Portefeuille : solde de NOOVS affiché',await p.$eval('#noov-num',e=>e.textContent)==='2');
+   const soon=await p.$eval('#noov-rewards',e=>e.textContent);
+   check('Récompenses NOOVS affichées « Arrive bientôt » (concours, sans pub, cash, bons cadeaux)',(soon.match(/Arrive bientôt/g)||[]).length===4&&/Concours/.test(soon)&&/Cash/.test(soon)&&/Bons cadeaux/.test(soon)&&/Sans publicité/.test(soon),soon.slice(0,80));
+   await p.evaluate(()=>{document.querySelector('#rewards-tab').scrollTop=9999;});await sleep(400);
+   await p.screenshot({path:'/tmp/shots/noov_soon.png'});
+ });
+ await T('server anti-farm',async()=>{
+   const unansweredId=await p.evaluate(()=>S.qs[0]._firestoreId);
+   const r=await p.evaluate(async(id)=>{
+     const out={};
+     const call=async(k,fn)=>{try{out[k]=(await fn()).data;}catch(e){out[k]=e.code;}};
+     await call('noBegin',()=>callSubmitAnswer({campaignId:id,questionIdx:0,answerValue:'Oui',elapsedMs:99999}));
+     return out;},unansweredId);
+   check('Sans beginQuestion (script) : réponse marquée rapide, 0 gain, même avec elapsedMs forgé',r.noBegin&&r.noBegin.flagged===true&&r.noBegin.pointsAwarded===0&&r.noBegin.noovsAwarded===0,JSON.stringify(r.noBegin));
+   const u=(await adb.doc('users/uA').get()).data();
+   check('Réponse rapide : ne consomme pas le quota du jour',u.dailyAnswerCount===5,'count='+u.dailyAnswerCount);
+ });
+ await T('rules',async()=>{
+   const r=await p.evaluate(async()=>{const t=async fn=>{try{await fn();return 'allowed';}catch(e){return e.code;}};const ref=db.collection('users').doc(auth.currentUser.uid);
+     return {noovs:await t(()=>ref.update({noovs:999})),cnt:await t(()=>ref.update({dailyAnswerCount:0})),start:await t(()=>ref.update({lastQuestionStart:{key:'x',at:1}})),pts:await t(()=>ref.update({points:9999}))};});
+   check('Règles : le client ne peut écrire ni NOOVS, ni quota, ni horodatage de question',r.noovs==='permission-denied'&&r.cnt==='permission-denied'&&r.start==='permission-denied'&&r.pts==='permission-denied',JSON.stringify(r));
+   await aauth.createUser({uid:'uZ',email:'z@t.fr',password:'secret123'});
+   const ctx2=await browser.createBrowserContext();const p2=await ctx2.newPage();await p2.goto('http://localhost:8950/app.html');
+   await wf(p2,()=>document.getElementById('onboard').classList.contains('active'),null,30000);
+   const cr=await p2.evaluate(async()=>{await auth.signInWithEmailAndPassword('z@t.fr','secret123');const t=async fn=>{try{await fn();return 'allowed';}catch(e){return e.code;}};
+     const rich=await t(()=>db.collection('users').doc('uZ').set({role:'user',name:'Z',points:500,xp:0}));
+     const noov=await t(()=>db.collection('users').doc('uZ').set({role:'user',name:'Z',points:0,xp:0,noovs:50}));
+     const ok=await t(()=>db.collection('users').doc('uZ').set({role:'user',name:'Z',points:0,xp:0,noovs:0}));
+     return {rich,noov,ok};});
+   check('Règles : impossible de créer un compte avec un solde de points ou de NOOVS',cr.rich==='permission-denied'&&cr.noov==='permission-denied'&&cr.ok==='allowed',JSON.stringify(cr));
+ });
+ await T('push message',async()=>{
+   await adb.collection('campaigns').add({merchantId:'mM1',merchantName:'Le Bistrot',status:'active',targetCity:'le-mans',city:'le-mans',question:'Q ?',questions:[{q:'Q ?',format:'mcq',options:['a','b']}],targetVolume:10,answersCount:0});
+   await sleep(5000);
+   const logs=await adb.collection('_notifLog').get();
+   check('Push : ancien journal _notifLog supprimé (couvert par notif_server)',logs.size===0,'n='+logs.size);
+ });
+ await browser.close();
+ console.log('JS errors:',[...new Set(errs)].join(' | ')||'aucune');process.exit(0);
+})().catch(e=>{console.log('EXC',e);process.exit(1);});
