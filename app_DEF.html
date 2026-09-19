@@ -167,6 +167,15 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .fpr-cat-top{display:flex;justify-content:space-between;font-size:13px;color:var(--ink);margin-bottom:5px}
 .fpr-cat-top b{font-family:var(--fd);font-weight:800}
 .fpr-btn{width:100%;padding:15px;border:none;border-radius:var(--r-pill);background:var(--yellow);color:var(--ink);font-family:var(--fd);font-weight:800;font-size:15px;cursor:pointer}
+.pd-sub{font-size:12px;color:var(--ink2);line-height:1.5;margin:-6px 0 12px}
+.pd-opt{display:flex;align-items:center;width:100%;text-align:left;padding:12px 14px;margin-bottom:8px;border:1.5px solid var(--line-strong);border-radius:var(--r-media);background:var(--surface);color:var(--ink);font-family:var(--fb);font-size:14px;font-weight:600;cursor:pointer;transition:transform .12s,background .12s}
+.pd-opt:active{transform:scale(.98);background:var(--md)}
+.pd-opt[disabled]{opacity:.55;pointer-events:none}
+.pd-skip{display:block;margin:4px auto 0;background:none;border:none;color:var(--ink2);font-size:12.5px;font-weight:700;text-decoration:underline;cursor:pointer;font-family:var(--fb);padding:6px 10px}
+.pd-res{display:flex;gap:9px;align-items:center;border-radius:14px;padding:11px 13px;font-size:13px;line-height:1.45;margin-bottom:10px;text-align:left;font-weight:600}
+.pd-res.ok{background:var(--ink);color:#fff}.pd-res.ok svg{color:var(--yellow)}
+.pd-res.ko{background:var(--md);color:var(--ink)}
+.pd-res small{display:block;font-weight:500;opacity:.75;font-size:11.5px;margin-top:1px}
 .rv-skel .rv-bar{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
 #lock-bar{height:6px;border-radius:99px;overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
 #lock-bar.on{opacity:1}
@@ -1337,6 +1346,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="dimpact-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
       <div class="dimpact-txt" id="dimpact-txt">Réponds à quelques questions pour commencer à aider les commerces de ton quartier.</div>
     </div>
+    <div class="dimpact" id="dpred" style="display:none"><div class="dimpact-ico" id="dpred-ico"></div><div class="dimpact-txt" id="dpred-txt"></div></div>
     <div class="sec-card acc">
       <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span><div class="sc-title">Mes informations</div><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
@@ -2910,6 +2920,7 @@ function refreshProfile(){
   refreshSettingsDisplay();
   refreshNotifSettingsUI();
   {const si=document.getElementById('share-answers-inp');if(si)si.checked=S._shareAnswers!==false;}
+  renderPredCard();
   document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.email||S._city||'';
   document.getElementById('s-pts').textContent=S.pts;document.getElementById('s-ans').textContent=S.ans;document.getElementById('s-str').textContent=S.streak;
   const friendsEl=document.getElementById('s-friends');if(friendsEl)friendsEl.textContent=(S.friends||[]).length;
@@ -4119,6 +4130,25 @@ function revealCardHTML(r,compact){
   return `<div class="rv"><div class="rv-h">${compact?'Les autres ont répondu':'Comment les autres ont répondu'}</div>${rows}${note}${info}</div>`;
 }
 function openPrivacySettings(){goNav('profile');setTimeout(()=>{const c=document.getElementById('share-answers-card');if(c&&!c.classList.contains('open'))c.classList.add('open');const i=document.getElementById('share-answers-inp');if(i)i.scrollIntoView({block:'center'});},350);}
+function renderPredCard(){
+  const el=document.getElementById('dpred'),tx=document.getElementById('dpred-txt');if(!el||!tx)return;
+  const p=S._pred;
+  if(!p||!p.total){el.style.display='none';return;}
+  document.getElementById('dpred-ico').innerHTML=icon('target',{size:18});
+  tx.innerHTML=`Mode prédiction : série de <strong>${p.streak||0}</strong> · record <strong>${p.best||0}</strong> · ${p.right||0} bonne${(p.right||0)>1?'s':''} sur ${p.total}.`;
+  el.style.display='flex';
+}
+// Prédiction : on devine l'option la plus choisie avant de voir la répartition (aucun point en jeu).
+function predictionHTML(q,r){
+  const streak=(S._pred&&S._pred.streak)||0;
+  const opts=r.options.map((o,i)=>`<button class="pd-opt" data-i="${i}" onclick="answerPrediction(${i})">${esc(o.text)}</button>`).join('');
+  return `<div class="rv pd"><div class="rv-h">Devine : quelle réponse est la plus choisie ?</div><div class="pd-sub">Pour le plaisir, sans points.${streak>0?' Série en cours : '+streak+'.':''}</div>${opts}<button class="pd-skip" onclick="answerPrediction(null)">Passer</button></div>`;
+}
+function predictionResultHTML(pr){
+  if(pr.skipped) return '';
+  if(pr.correct) return `<div class="pd-res ok">${icon('check',{size:18})}<div>Bien vu !${pr.streak>1?' '+pr.streak+' bonnes prédictions d’affilée.':''}<small>${pr.streak>=pr.best&&pr.best>1?'Nouveau record personnel.':'Record : '+pr.best+'.'}</small></div></div>`;
+  return `<div class="pd-res ko">${icon('close',{size:18})}<div>Raté, cette fois.<small>Ta série repart de zéro (record : ${pr.best}).</small></div></div>`;
+}
 async function showReveal(q,qIdx){
   if(!q||!q._firestoreId||q.type!=='mcq') return;
   const inline=(cur==='reward');
@@ -4128,12 +4158,33 @@ async function showReveal(q,qIdx){
   if(!target)return;
   const skel=(q.opts||[]).map(()=>'<div class="rv-row"><div class="rv-top"><span class="rv-l">&nbsp;</span></div><div class="rv-bar"><div style="width:40%"></div></div></div>').join('');
   target.innerHTML=`<div class="rv rv-skel"><div class="rv-h">Comment les autres ont répondu</div>${skel}</div>`;
+  const done=()=>{if(!inline)closeRevealSheet();};
   try{
     const r=(await callGetReveal({campaignId:q._firestoreId,questionIdx:qIdx})).data;
-    if(!r||!r.available){target.innerHTML='';if(!inline)closeRevealSheet();return;}
+    if(!r||!r.available){target.innerHTML='';done();return;}
+    if(r.prediction&&r.prediction.offered){
+      S._predCtx={q,qIdx,inline,r};
+      target.innerHTML=predictionHTML(q,r);
+      trackEvent('prediction_offered',{});
+      return;
+    }
     target.innerHTML=revealCardHTML(r,!inline);
     trackEvent('reveal_shown',{below_threshold:!!r.belowThreshold,friends:(r.friends||[]).length});
-  }catch(e){console.warn('getReveal:',e);target.innerHTML='';if(!inline)closeRevealSheet();}
+  }catch(e){console.warn('getReveal:',e);target.innerHTML='';done();}
+}
+async function answerPrediction(guess){
+  const c=S._predCtx;if(!c)return;S._predCtx=null;
+  const target=c.inline?document.getElementById('rw-reveal'):document.getElementById('rs-body');if(!target)return;
+  target.querySelectorAll('.pd-opt,.pd-skip').forEach(b=>b.disabled=true);
+  try{
+    const res=(await fx.httpsCallable('submitPrediction')({campaignId:c.q._firestoreId,questionIdx:c.qIdx,guessIdx:guess})).data;
+    if(res.prediction&&!res.prediction.skipped){S._pred=Object.assign({},S._pred,{streak:res.prediction.streak,best:res.prediction.best,total:res.prediction.total,right:res.prediction.right});renderPredCard();}
+    target.innerHTML=predictionResultHTML(res.prediction)+revealCardHTML(res.reveal,!c.inline);
+    trackEvent('prediction_answered',{skipped:guess===null,correct:!!(res.prediction&&res.prediction.correct)});
+  }catch(e){
+    console.warn('submitPrediction:',e);
+    showReveal(c.q,c.qIdx);      // l'offre a expiré ou échoué : on affiche simplement la répartition
+  }
 }
 async function setShareAnswers(v){
   const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
@@ -4820,6 +4871,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   S.noovs            = data.noovs || 0;
   S._pointsToday     = data.dailyPointsDate === parisToday() ? (data.dailyPoints || 0) : 0;
   S._shareAnswers    = data.shareAnswers !== false;
+  S._pred            = data.predStats || null;
   S._notifPrefs      = data.notifPrefs || {};
   if ((data.fcmTokens || []).length && !data.pushEnabled) db.collection('users').doc(uid).update({ pushEnabled: true }).catch(() => {});
   S._answersToday    = data.dailyAnswerCount || 0;

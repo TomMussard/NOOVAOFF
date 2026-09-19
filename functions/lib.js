@@ -10,4 +10,8 @@ function sectorCategory(sec) {
   if (/service|mairie|ville/.test(s)) return "services";
   return "commerce";
 }
-module.exports = { sectorCategory };
+// Jour calendaire à Paris (AAAA-MM-JJ) : base de tous les plafonds « par jour ».
+function parisDay(ms) {
+  return new Date(ms).toLocaleDateString("sv-SE", { timeZone: "Europe/Paris" });
+}
+module.exports = { sectorCategory, parisDay };

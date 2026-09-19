@@ -18,7 +18,7 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./engagement")));
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.
 const CFG = require("./engagementConfig");
-const { sectorCategory } = require("./lib");
+const { sectorCategory, parisDay } = require("./lib");
 const NOOVS_PER_ANSWER = CFG.POINTS.NOOVS_PER_ANSWER;
 const MAX_POINT_ANSWERS_PER_DAY = CFG.POINTS.MAX_ANSWERS_PER_DAY;
 const MIN_ANSWER_MS = CFG.RESPONSE_TIME.MIN_FOR_GAIN_MS;
@@ -26,9 +26,6 @@ const DEMO_POINTS = CFG.POINTS.DEMO_POINTS;
 const POINTS_BY_INDEX = CFG.POINTS.BY_QUESTION_INDEX;
 
 // « Aujourd'hui » = jour civil à Paris (le quota se réinitialise à minuit en France, pas à 1h/2h du matin).
-function parisDay(ms) {
-  return new Date(ms).toLocaleDateString("sv-SE", { timeZone: "Europe/Paris" });
-}
 function todayStr() {
   return parisDay(Date.now());
 }

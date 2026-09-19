@@ -10,7 +10,8 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const CFG = require("./engagementConfig");
-const { sectorCategory } = require("./lib");
+const crypto = require("crypto");
+const { sectorCategory, parisDay } = require("./lib");
 
 const db = () => admin.firestore();
 const uniq = (a) => [...new Set((a || []).filter(Boolean))];
@@ -70,7 +71,7 @@ async function friendsWhoAnswered(uid, user, campaignId, qIdx, options) {
 }
 
 // ─────────────────────────── Reveal ───────────────────────────
-async function revealCore(uid, data) {
+async function revealCore(uid, data, opts = {}) {
   const campaignId = data && data.campaignId;
   if (!campaignId || typeof campaignId !== "string") throw new HttpsError("invalid-argument", "Question invalide.");
   const qIdx = clampIdx(data.questionIdx);
@@ -91,6 +92,10 @@ async function revealCore(uid, data) {
   const st = stats[`q${qIdx}`] || { n: 0, c: {} };
   const n = st.n || 0, min = CFG.REVEAL.MIN_ANSWERS;
 
+  // Mode prédiction : la répartition est retenue jusqu'à ce que l'habitant ait deviné (ou passé).
+  if (n >= CFG.PREDICTION.MIN_ANSWERS && await maybeOfferPrediction(uid, keyOf(campaignId, qIdx), opts)) {
+    return { available: true, myIdx, prediction: { offered: true }, options: options.map((text) => ({ text })) };
+  }
   const out = { available: true, myIdx, n, min, options: options.map((text, i) => ({ text })) };
   if (n >= min) {
     out.options = options.map((text, i) => { const count = (st.c && st.c[i]) || 0; return { text, count, pct: Math.round((count * 100) / n) }; });
@@ -107,6 +112,80 @@ const getReveal = onCall(async (request) => {
   const uid = request.auth && request.auth.uid;
   if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi.");
   return revealCore(uid, request.data || {});
+});
+
+// ─────────────────────────── Mode prédiction ───────────────────────────
+// Après sa réponse, l'habitant peut deviner l'option la plus choisie AVANT de voir les résultats.
+// Proposé rarement (hasard stable par utilisateur+question, plafonds par jour et par semaine glissante),
+// jamais de points. Tout l'état vit dans users.predStats, que seuls les serveurs écrivent :
+//   { streak, best, total, right, offers:[ms], offeredKeys:[clé], pendingKey, pendingAt }
+const keyOf = (campaignId, qIdx) => `${campaignId}#${qIdx}`;
+// Nombre pseudo-aléatoire stable dans [0,1) : recharger la page ne relance pas le tirage.
+const rollOf = (uid, key) => parseInt(crypto.createHash("sha1").update(`${uid}|${key}`).digest("hex").slice(0, 8), 16) / 0x100000000;
+
+async function maybeOfferPrediction(uid, key, opts = {}) {
+  const P = CFG.PREDICTION, now = opts.now != null ? opts.now : Date.now();
+  const ref = db().collection("users").doc(uid);
+  return db().runTransaction(async (tx) => {
+    const ps = ((await tx.get(ref)).data() || {}).predStats || {};
+    if (ps.pendingKey === key && now - (ps.pendingAt || 0) < P.PENDING_MINUTES * 60000) return true;   // déjà en cours
+    if ((ps.offeredKeys || []).includes(key)) return false;                                            // déjà proposée
+    if ((opts.roll != null ? opts.roll : rollOf(uid, key)) >= P.PROBABILITY) return false;
+    const offers = (ps.offers || []).filter((t) => now - t < 7 * 86400000);
+    if (offers.length >= P.MAX_PER_ROLLING_WEEK) return false;
+    const day = parisDay(now);
+    if (offers.filter((t) => parisDay(t) === day).length >= P.MAX_PER_DAY) return false;
+    tx.update(ref, {
+      "predStats.offers": [...offers, now].slice(-20),
+      "predStats.offeredKeys": [...(ps.offeredKeys || []), key].slice(-P.OFFER_HISTORY),
+      "predStats.pendingKey": key,
+      "predStats.pendingAt": now,
+    });
+    return true;
+  });
+}
+
+// guessIdx = null → « Passer » : la série n'est pas touchée.
+async function predictCore(uid, data, opts = {}) {
+  const campaignId = data && data.campaignId;
+  if (!campaignId || typeof campaignId !== "string") throw new HttpsError("invalid-argument", "Question invalide.");
+  const qIdx = clampIdx(data.questionIdx), key = keyOf(campaignId, qIdx);
+  const now = opts.now != null ? opts.now : Date.now();
+  const guess = data.guessIdx == null ? null : Number(data.guessIdx);
+  const camp = (await db().collection("campaigns").doc(campaignId).get()).data();
+  if (!camp) throw new HttpsError("not-found", "Campagne introuvable.");
+  const options = (qDefOf(camp, qIdx).options || []).map(String);
+  if (guess !== null && !(Number.isInteger(guess) && guess >= 0 && guess < options.length)) throw new HttpsError("invalid-argument", "Choix invalide.");
+  const st = (await loadStats(campaignId, camp))[`q${qIdx}`] || { n: 0, c: {} };
+  const counts = options.map((_, i) => (st.c && st.c[i]) || 0), max = Math.max(...counts);
+  const top = counts.map((c, i) => (c === max ? i : -1)).filter((i) => i >= 0);   // égalité : toute option en tête est bonne
+
+  const ref = db().collection("users").doc(uid);
+  const result = await db().runTransaction(async (tx) => {
+    const ps = ((await tx.get(ref)).data() || {}).predStats || {};
+    if (ps.pendingKey !== key || now - (ps.pendingAt || 0) >= CFG.PREDICTION.PENDING_MINUTES * 60000) {
+      throw new HttpsError("failed-precondition", "Aucune prédiction en attente pour cette question.");
+    }
+    if (guess === null) {
+      tx.update(ref, { "predStats.pendingKey": null, "predStats.pendingAt": null });
+      return { skipped: true, streak: ps.streak || 0, best: ps.best || 0 };
+    }
+    const correct = top.includes(guess);
+    const streak = correct ? (ps.streak || 0) + 1 : 0, best = Math.max(ps.best || 0, streak);
+    tx.update(ref, {
+      "predStats.streak": streak, "predStats.best": best,
+      "predStats.total": (ps.total || 0) + 1, "predStats.right": (ps.right || 0) + (correct ? 1 : 0),
+      "predStats.pendingKey": null, "predStats.pendingAt": null,
+    });
+    return { correct, streak, best, total: (ps.total || 0) + 1, right: (ps.right || 0) + (correct ? 1 : 0), majority: top };
+  });
+  return { prediction: result, reveal: await revealCore(uid, { campaignId, questionIdx: qIdx }, opts) };
+}
+
+const submitPrediction = onCall(async (request) => {
+  const uid = request.auth && request.auth.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi.");
+  return predictCore(uid, request.data || {});
 });
 
 // ─────────────────────────── Compatibilité entre amis ───────────────────────────
@@ -207,5 +286,6 @@ const getCompat = onCall(async (request) => {
 module.exports = {
   getReveal,
   getCompat,
-  _t: { compatCore, revealCore, loadStats, friendsWhoAnswered, qDefOf, uniq },
+  submitPrediction,
+  _t: { predictCore, maybeOfferPrediction, rollOf, compatCore, revealCore, loadStats, friendsWhoAnswered, qDefOf, uniq },
 };

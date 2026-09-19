@@ -39,6 +39,8 @@ module.exports = {
     PROBABILITY: 0.3,            // chance de proposer le mode sur une réponse éligible
     MAX_PER_ROLLING_WEEK: 4,     // par utilisateur, sur 7 jours glissants
     MAX_PER_DAY: 1,
+    PENDING_MINUTES: 10,         // au-delà, une prédiction laissée sans réponse est considérée comme passée
+    OFFER_HISTORY: 30,           // dernières questions proposées (évite de reproposer la même)
   },
 
   // ─── Compatibilité entre amis ─── (étape 2)
