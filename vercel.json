@@ -1,14 +1,44 @@
 {
   "rewrites": [
-    { "source": "/app",       "destination": "/app.html" },
-    { "source": "/app-v2",    "destination": "/app_DEF.html" },
-    { "source": "/dashboard", "destination": "/noova_dashboard.html" },
-    { "source": "/demo",      "destination": "/noova_dashboard_v2.html" }
+    {
+      "source": "/app",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/app-v2",
+      "destination": "/app_DEF.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/noova_dashboard.html"
+    },
+    {
+      "source": "/demo",
+      "destination": "/noova_dashboard_v2.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)\\.html",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/firebase-messaging-sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
     }
   ]
 }

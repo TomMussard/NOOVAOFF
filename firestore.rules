@@ -42,7 +42,10 @@ service cloud.firestore {
         isFriendOf(uid) ||
         isAdmin() ||
         (isAuth() && myCity() != null && resource.data.get('city', null) == myCity());
-      allow create: if isOwner(uid) && ownFile(request.resource.data.get('photoUrl', null), 'users', uid);
+      // À la création, un compte démarre TOUJOURS à zéro : impossible de s'inscrire avec un solde.
+      allow create: if isOwner(uid) && ownFile(request.resource.data.get('photoUrl', null), 'users', uid) &&
+        request.resource.data.get('points', 0) == 0 && request.resource.data.get('xp', 0) == 0 &&
+        request.resource.data.get('noovs', 0) == 0 && request.resource.data.get('demoClaimed', false) == false;
       // Le crédit de points (points/xp/dailyEarned/streak/ans/lastAnswerDate/answeredCampaigns)
       // passe uniquement par la Cloud Function submitAnswer (SDK Admin, hors règles) — le
       // client ne peut plus jamais écrire librement ces champs. Seule exception tolérée : le
@@ -50,7 +53,7 @@ service cloud.firestore {
       allow update: if isAdmin() || (isOwner(uid) &&
         ownFile(request.resource.data.get('photoUrl', null), 'users', uid) && (
         !request.resource.data.diff(resource.data).affectedKeys().hasAny(
-          ['points','xp','dailyEarned','dailyEarnedDate','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns']
+          ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed']
         )
         ||
         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']) &&

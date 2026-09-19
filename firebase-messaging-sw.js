@@ -12,6 +12,11 @@ firebase.initializeApp({
   appId: "1:710589257687:web:946b5d1efffabff14d9d92"
 });
 
+// Version du script : v3. Activation immédiate pour que les appareils déjà abonnés passent tout de
+// suite sur le nouveau comportement (une seule notification, regroupée par tag).
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+
 const messaging = firebase.messaging();
 
 // Les messages avec un bloc "notification" sont déjà affichés par le navigateur/SDK :

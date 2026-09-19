@@ -126,6 +126,22 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .how-t{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink);letter-spacing:-.3px}
 .how-d{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:2px}
 .ob-wrap{height:100%;display:flex;flex-direction:column}
+#lock-bar{height:6px;border-radius:99px;overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
+#lock-bar.on{opacity:1}
+#lock-fill{height:100%;width:100%;background:var(--yellow);border-radius:99px}
+#lock-bar.on #lock-fill{animation:lockDrain 3s linear forwards}
+@keyframes lockDrain{from{width:100%}to{width:0}}
+.btn-sub.locked{pointer-events:none;opacity:.27;box-shadow:none}
+.dtrack{margin:0 22px 14px;background:var(--surface);border-radius:var(--r-card);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card)}
+.dt-dots{display:flex;gap:6px;flex-shrink:0}
+.dt-dot{width:14px;height:14px;border-radius:50%;background:var(--bg3)}
+.dt-dot.on{background:var(--yellow);box-shadow:inset 0 0 0 2px var(--ink)}
+.dt-txt{flex:1;min-width:0;font-size:12.5px;color:var(--ink);font-weight:600;line-height:1.4}
+.dt-noov{flex-shrink:0;background:var(--nv-black);color:var(--nv-yellow);border-radius:99px;padding:6px 11px;font-family:var(--fd);font-weight:800;font-size:12px}
+.noov-card{margin:0 22px 14px;background:var(--nv-black);border-radius:var(--r-card);padding:15px 16px;display:flex;gap:14px;align-items:center}
+.noov-ico{width:44px;height:44px;border-radius:50%;background:var(--nv-yellow);color:var(--nv-black);font-family:var(--fd);font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 0 0 3px var(--nv-black),inset 0 0 0 5px rgba(0,0,0,.25)}
+.noov-t{font-family:var(--fd);font-weight:800;font-size:20px;color:#fff;letter-spacing:-.5px}
+.noov-d{font-size:11.5px;color:rgba(255,255,255,.62);line-height:1.5;margin-top:2px}
 .ob-topbar{padding:56px 22px 0;display:flex;justify-content:flex-end}
 .ob-skip{font-size:13px;font-weight:600;color:var(--ink3);background:none;border:none;cursor:pointer;font-family:var(--fb)}
 .ob-slides{flex:1;overflow:hidden;position:relative}
@@ -984,7 +1000,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="q-hint">Quatre étapes, aucune obligation.</div>
     <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
       <div class="how-row"><div class="how-n">1</div><div><div class="how-t">Un commerce te pose une question</div><div class="how-d">Seulement s'il a ton accord. Tu réponds en 30 secondes.</div></div></div>
-      <div class="how-row"><div class="how-n">2</div><div><div class="how-t">Tu gagnes des points</div><div class="how-d">10 points pour la première question du jour, un peu plus pour les suivantes.</div></div></div>
+      <div class="how-row"><div class="how-n">2</div><div><div class="how-t">Tu gagnes des points, puis des NOOVS</div><div class="how-d">Tes 3 premières réponses du jour rapportent des points échangeables. Les suivantes rapportent des NOOVS, la monnaie de NOOVA (concours, cash et bons cadeaux à venir).</div></div></div>
       <div class="how-row"><div class="how-n">3</div><div><div class="how-t">Tu échanges tes points</div><div class="how-d">Contre une récompense choisie par le commerce, à récupérer chez lui.</div></div></div>
       <div class="how-row"><div class="how-n">4</div><div><div class="how-t">Tu montres ton code en caisse</div><div class="how-d">Il est valable 24 h et ne sert qu'une fois.</div></div></div>
     </div>
@@ -1058,6 +1074,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     </div>
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
     <div id="home-requests"></div>
+    <div id="daily-track"></div>
     <div class="dstreak-card">
       <div class="dstreak-top">
         <div class="dstreak-fire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 2c1 3-2 4-2 7a2 2 0 004 0c1 1 2 2.5 2 4.5A5.5 5.5 0 016.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0012 22a8 8 0 007-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg></div>
@@ -1112,6 +1129,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="q-text" id="q-text">Question…</div>
     <div class="q-hint" id="q-hint">Réponds librement.</div>
     <div class="ans-area" id="ans-area"></div>
+    <div id="lock-bar"><div id="lock-fill"></div></div>
     <div class="q-actions">
       <button class="skip-btn" id="skip-btn" onclick="goNav('home')">Passer</button>
       <button class="btn-sub" id="sub-btn" onclick="submitAns()" disabled>Valider →</button>
@@ -1178,6 +1196,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="dh-pts"><span class="dh-pts-n" id="wc-pts-num-hdr">0</span><span class="dh-pts-l">PTS</span></div>
     </div>
     <div id="dcode-wrap"></div>
+    <div class="noov-card">
+      <div class="noov-ico">N</div>
+      <div style="flex:1;min-width:0"><div class="noov-t"><span id="noov-num">0</span> NOOVS</div><div class="noov-d">Tes réponses au-delà des 3 du jour rapportent des NOOVS, la monnaie de NOOVA. Bientôt : concours, retrait des pubs, cash et bons cadeaux.</div></div>
+    </div>
     <!-- Solde détaillé + progression de palier — conservés pour le calcul, visuels sur le Profil -->
     <div class="wallet-card" style="display:none">
       <div style="display:flex;align-items:center;gap:16px">
@@ -1424,7 +1446,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 </div>
 <script>
 const S={user:null,pts:0,xp:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],done:{},friends:[],chats:{}};
-const DAILY_CAP=300;
+const MAX_POINT_ANSWERS=3;
+// « Aujourd'hui » = jour civil à Paris, comme côté serveur (le quota se réinitialise à minuit en France).
+function parisToday(ms){return new Date(ms||Date.now()).toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});}
+function getAnswersToday(){return S._answersDate===parisToday()?(S._answersToday||0):0;}
+// Libellé de gain d'une question : points tant que le quota du jour n'est pas atteint, ensuite 1 NOOV.
+function ptsTag(q){return getAnswersToday()>=MAX_POINT_ANSWERS?'+1 NOOV':'+'+q.pts+' pts';}
 const BRANDMETA={};
 function logoFallbackHTML(name,size){
   const s=size||44;const r=Math.round(s*0.27);
@@ -1731,7 +1758,7 @@ function refreshHome(){
   const streakSub=document.getElementById('streak-sub');
   if(streakSub) streakSub.textContent = S.streak>=10 ? 'Bonus débloqué !' : `Encore ${10-S.streak} jour${10-S.streak>1?'s':''} pour +50 pts bonus`;
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<10;i++){const d=document.createElement('div');d.className='dstreak-dot'+(i<S.streak?' on':'');sd.appendChild(d)}
-  if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent='+'+q.pts+' pts';document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
+  if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector('img');
     if(q.photoUrl){
       // Certains fichiers Storage sont corrompus/tronqués : ils chargent (pas d'erreur réseau)
@@ -1761,6 +1788,7 @@ function refreshHome(){
   }
   renderHomeState();
   renderRequests();
+  renderDailyTrack();
   renderQueue();
   renderAlmostReward();
   renderNearbyMap();
@@ -1783,7 +1811,7 @@ function renderQueue(){
       const verb=friendArr.length>1?'ont répondu':'a répondu';
       badge=`<div class="friend-badge"><div class="fb-av" style="background:${c}22;color:${c}">${(fn||'?')[0]}</div>${esc(fn)}${more>0?` + ${more} ami${more>1?'s':''}`:''} ${verb}</div>`;
     }
-    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta"><span class="q-pts-t">+${q.pts} pts</span><span class="q-type-t">${tc}</span></div>${badge}</div>`;
+    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta"><span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${badge}</div>`;
     el.appendChild(d);cnt++;
     if(cnt%3===0){const sc=buildSocialCard();if(sc)el.appendChild(sc);}
   });
@@ -1792,7 +1820,7 @@ function openQ(idx){
   S.qIdx=idx;S.curQ=S.qs[idx];if(!S.curQ)return;const q=S.curQ;
   const pg=document.getElementById('q-prog');pg.innerHTML='';
   S.qs.forEach((_,i)=>{const s=document.createElement('div');s.className='q-seg'+(i<idx?' done':i===idx?' cur':'');pg.appendChild(s)});
-  document.getElementById('q-pts-tag').textContent='+'+q.pts+' pts';
+  document.getElementById('q-pts-tag').textContent=ptsTag(q);
   {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||'Ta réponse aidera '+q.brand+'.';
   document.getElementById('bh-tag').textContent=q.theme;document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint;
@@ -2700,6 +2728,7 @@ function refreshWallet(){
   checkTierAndBadgeCelebrations();
   animateNumber(document.getElementById('wc-pts-num'),S.pts);
   const hdrPts=document.getElementById('wc-pts-num-hdr');if(hdrPts)animateNumber(hdrPts,S.pts);
+  {const nn=document.getElementById('noov-num');if(nn)animateNumber(nn,S.noovs||0);}
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(4,((S.xp-l.min)/(l.max-l.min))*100));
   document.getElementById('wc-fill').style.width=pct+'%';
   document.getElementById('wc-level').textContent='Niveau '+(li+1)+' · '+l.n;
@@ -2745,7 +2774,7 @@ function refreshProfile(){
   BDGS.forEach(b=>{const e=earned.includes(b.id);const d=document.createElement('div');d.className='bp '+(e?'earned':'locked');d.innerHTML=`<div class="bp-ico">${icon(e?b.e:'lock',{size:18})}</div><div class="bp-lbl">${esc(b.n)}</div>`;bl.appendChild(d)});
   const hl=document.getElementById('hist-list');hl.innerHTML='';
   if(!S.hist||!S.hist.length){hl.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:13px">Aucune réponse pour l\'instant.</div>';return}
-  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?h.ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:12px;font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">+${h.pts} pts</div>`;hl.appendChild(d)});
+  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?h.ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:12px;font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">${h.noovs?'+'+h.noovs+' NOOV':'+'+h.pts+' pts'}</div>`;hl.appendChild(d)});
 }
 function boTab(tab,btn){document.querySelectorAll('.bo-tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');['dashboard','create','results'].forEach(t=>document.getElementById('bo-'+t).style.display=t===tab?'block':'none');if(tab==='create')wzStep(0)}
 function renderCampaigns(){
@@ -2778,13 +2807,15 @@ S.mode=S.mode||'hook';S.sv=S.sv||null;S.brandBack=S.brandBack||'home';
 
 /* --- Rendu d'une question (commun hook + suivi) --- */
 function fillQuestion(q,opts){
-  S._qShownAt = Date.now(); // sert au score qualité (temps de réponse minimal)
-  document.getElementById('q-pts-tag').textContent='+'+q.pts+' pts';
+  S._qShownAt = Date.now();
+  document.getElementById('q-pts-tag').textContent=ptsTag(q);
+  beginQuestionOnServer(q);
+  startAnswerLock();
   {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}
   document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||('Ta réponse aide '+q.brand+'.');
   document.getElementById('bh-tag').textContent=q.theme||'';
-  document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||'';
+  document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=getAnswersToday()>=MAX_POINT_ANSWERS?'Points du jour atteints : cette réponse rapporte 1 NOOV.':(q.hint||'');
   const sk=document.getElementById('skip-btn');if(sk){sk.textContent=opts.skipLabel;sk.setAttribute('onclick',opts.skipFn);}
   document.getElementById('sub-btn').disabled=true;buildAns(q);
 }
@@ -2856,12 +2887,12 @@ function showSurveyOffer(){
   {const tt=document.getElementById('so-title');if(tt)tt.textContent=sv.brand+' aimerait creuser le sujet';}
   document.getElementById('so-bname').textContent=sv.brand;
   document.getElementById('so-title').textContent=sv.brand+' aimerait creuser le sujet';
-  const more=sv.list.length;const gain=sv.list.reduce((a,b)=>a+b.pts,0);
+  const more=sv.list.length;const _k=Math.max(0,MAX_POINT_ANSWERS-getAnswersToday());const _ptsPart=sv.list.slice(0,_k).reduce((a,b)=>a+b.pts,0);const _nvPart=Math.max(0,more-_k);const gain=_ptsPart;
   document.getElementById('so-desc').textContent=more+' question'+(more>1?'s':'')+' de plus, en lien direct avec ta réponse. ~'+(more*15)+' sec. C\u2019est toi qui décides.';
   const st=document.getElementById('so-steps');st.innerHTML='';
   const tl={text:'✍️',mcq:'☑️',scale:'🎚️',rank:'↕️'},tn={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle',rank:'Classement'};
-  sv.list.forEach(q=>{const d=document.createElement('div');d.className='so-step';d.innerHTML=`<div class="sd">${tl[q.type]||'•'}</div><span>${tn[q.type]||'Question'} · +${q.pts} pts</span>`;st.appendChild(d)});
-  document.getElementById('so-gain-pts').textContent='+'+gain+' pts';
+  sv.list.forEach(q=>{const d=document.createElement('div');d.className='so-step';d.innerHTML=`<div class="sd">${tl[q.type]||'•'}</div><span>${tn[q.type]||'Question'} · ${ptsTag(q)}</span>`;st.appendChild(d)});
+  document.getElementById('so-gain-pts').textContent=(_ptsPart>0?'+'+_ptsPart+' pts':'')+(_ptsPart>0&&_nvPart>0?' et ':'')+(_nvPart>0?'+'+_nvPart+' NOOV'+(_nvPart>1?'S':''):'');
   goTo('survey-offer');
 }
 
@@ -2870,6 +2901,7 @@ function openReward(o){
   const t=document.querySelector('#reward .rw-title');if(t)t.textContent=o.title||'Bien joué !';
   const s=document.querySelector('#reward .rw-sub');if(s)s.textContent=o.sub||'Ta réponse a été envoyée';
   document.getElementById('rw-pts').textContent=o.pts;
+  {const l=document.querySelector('#reward .pe-lbl');if(l)l.textContent='Total cumulé';}
   document.getElementById('rw-total').textContent=o.total+' pts';
   document.getElementById('rw-usage').innerHTML='Ta réponse aide <strong>'+o.brand+'</strong>, '+(o.usage||'à mieux servir le quartier.');
   const act=document.getElementById('rw-actions');act.innerHTML='';
@@ -3474,9 +3506,12 @@ let _fcmMessaging = null;
     if ('Notification' in window && 'serviceWorker' in navigator && firebase.messaging && (await firebase.messaging.isSupported())) {
       _fcmMessaging = firebase.messaging();
       _fcmMessaging.onMessage((payload) => {
-        const n = payload.notification || {};
-        if (n.title) showToast(n.title, 'success');
+        const t = (payload.data && payload.data.title) || (payload.notification && payload.notification.title);
+        if (t) showToast(t, 'success');
       });
+      // Enregistre le service worker à CHAQUE ouverture (et pas seulement à l'activation) : sans ça,
+      // un appareil déjà abonné garde indéfiniment l'ancien script (source des notifications en double).
+      if (Notification.permission === 'granted') navigator.serviceWorker.register('/firebase-messaging-sw.js').then(r => r.update()).catch(() => {});
     }
   } catch(e) { _fcmMessaging = null; }
   refreshNotifSettingsUI();
@@ -3556,6 +3591,24 @@ function refreshNotifSettingsUI() {
   el.textContent = on ? 'Activées ✓' : 'Activer ›';
 }
 const callSubmitAnswer = fx.httpsCallable('submitAnswer');
+const callBeginQuestion = fx.httpsCallable('beginQuestion');
+// Délai de lecture : « Valider » reste verrouillé 3 s après l'affichage d'une question (barre jaune
+// qui se vide). Le serveur mesure lui-même ce temps depuis beginQuestion : impossible à contourner.
+const ANSWER_LOCK_MS = 3000;
+function startAnswerLock(){
+  S._qLockUntil = Date.now() + ANSWER_LOCK_MS;
+  const bar = document.getElementById('lock-bar'), btn = document.getElementById('sub-btn');
+  if(!bar || !btn) return;
+  bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on');
+  btn.classList.add('locked');
+  clearTimeout(S._qLockTimer);
+  S._qLockTimer = setTimeout(() => { btn.classList.remove('locked'); bar.classList.remove('on'); }, ANSWER_LOCK_MS);
+}
+function beginQuestionOnServer(q){
+  S._qBegin = null;
+  if(!q || !q._firestoreId) return;
+  S._qBegin = callBeginQuestion({ campaignId: q._firestoreId, questionIdx: q._questionIdx || 0 }).catch(e => console.warn('beginQuestion:', e));
+}
 document.getElementById('aw-pass').addEventListener('input', function(){ _updatePassStrength(this.value); });
 
 // ─── Auth UI ─────────────────────────────────────────────────
@@ -3874,6 +3927,15 @@ function cityPhrase(label){
   label=(label||'').trim();
   if(!label)return 'chez toi';
   return /^le\s/i.test(label)?'au '+label.replace(/^le\s+/i,''):'\u00e0 '+label;
+}
+function renderDailyTrack(){
+  const el=document.getElementById('daily-track');if(!el)return;
+  const n=Math.min(MAX_POINT_ANSWERS,getAnswersToday());
+  const left=MAX_POINT_ANSWERS-n;
+  el.className='dtrack';
+  el.innerHTML='<div class="dt-dots">'+[0,1,2].map(i=>'<div class="dt-dot'+(i<n?' on':'')+'"></div>').join('')+'</div><div class="dt-txt">'
+    +(left>0?left+' réponse'+(left>1?'s':'')+' en points aujourd\'hui':'Points du jour atteints : tes réponses rapportent des NOOVS')
+    +'</div><div class="dt-noov">'+(S.noovs||0)+' NOOVS</div>';
 }
 function renderHomeState(){
   const el=document.getElementById('home-state'),card=document.getElementById('today-card');
@@ -4491,12 +4553,13 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   S._lastAnswerDate  = data.lastAnswerDate || null;
   // Streak cassé si un jour a été manqué : ne pas attendre la prochaine réponse pour l'afficher à 0
   {
-    const _today = new Date().toISOString().slice(0,10);
-    const _yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+    const _today = parisToday();
+    const _yesterday = parisToday(Date.now() - 86400000);
     if (S._lastAnswerDate !== _today && S._lastAnswerDate !== _yesterday) S.streak = 0;
   }
-  S._dailyEarned     = data.dailyEarned || 0;
-  S._dailyEarnedDate = data.dailyEarnedDate || null;
+  S.noovs            = data.noovs || 0;
+  S._answersToday    = data.dailyAnswerCount || 0;
+  S._answersDate     = data.dailyAnswerDate || null;
   S._city            = data.city || '';
   S._cityLabel       = data.cityLabel || data.city || '';
   // Auto-canonicalisation : un compte créé avant le fix "ville fantôme" peut avoir
@@ -4534,6 +4597,13 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   startPresenceHeartbeat(uid);
   // Charger les infos complètes des commerçants autorisés (rail + récompenses)
   if(S._authorizedMerchants.length) loadNearbyMerchants(S._authorizedMerchants);
+  // Migration : l'ancien jeton (clé globale) est rattaché au compte qui le possède réellement.
+  try {
+    const legacyTok = localStorage.getItem('nv_fcm_token');
+    if (legacyTok && (data.fcmTokens || []).includes(legacyTok) && !localStorage.getItem('nv_fcm_token_' + uid)) {
+      localStorage.setItem('nv_fcm_token_' + uid, legacyTok); localStorage.setItem('nv_fcm_optin_' + uid, '1'); localStorage.removeItem('nv_fcm_token');
+    }
+  } catch(e) {}
   S._friendCode = (data.friendCode && data.friendCode.startsWith('NOOVA-')) ? data.friendCode : '';
   ensureFriendCode(uid, resolvedName, data.friendCode).then(c => {
     if(c && c !== S._friendCode){ S._friendCode = c; const fp=document.getElementById('panel-friends'); if(fp && fp.style.display!=='none') initFriendsPanel(); }
@@ -4897,10 +4967,10 @@ const _origSubmitAns = submitAns;
 submitAns = function() {
   const q = curQuestion();
   if(!q || S._submitting) return;
+  if(Date.now() < (S._qLockUntil || 0)) return; // délai de lecture de 3 s
   if(q._firestoreId && (S._answered||[]).includes(q._firestoreId)) return; // déjà répondu, coupe court
 
   const answerValue = getAnswerValue();
-  const elapsedMs = S._qShownAt ? (Date.now() - S._qShownAt) : null;
   const qIdx = q._questionIdx || 0;
 
   if(!q._firestoreId) { _origSubmitAns(); return; } // question locale sans campagne réelle (aucun cas connu), pas de crédit serveur possible
@@ -4909,7 +4979,7 @@ submitAns = function() {
   const btn = document.getElementById('sub-btn');
   if(btn) btn.disabled = true;
 
-  callSubmitAnswer({ campaignId: q._firestoreId, questionIdx: qIdx, answerValue, elapsedMs })
+  Promise.resolve(S._qBegin).then(() => callSubmitAnswer({ campaignId: q._firestoreId, questionIdx: qIdx, answerValue }))
     .then(res => {
       const data = res.data || {};
       // Marque la campagne répondue localement AVANT d'afficher l'écran de récompense :
@@ -4927,12 +4997,31 @@ submitAns = function() {
       const correction = totalEarned - q.pts;
       S.pts = typeof data.totalPoints === 'number' ? data.totalPoints : (S.pts + correction);
       S.xp  = typeof data.totalXp === 'number' ? data.totalXp : (S.xp + totalEarned);
-      trackEvent('earn_virtual_currency', { virtual_currency_name: 'points', value: totalEarned });
+      const noovsGot = data.noovsAwarded || 0;
+      S.noovs = typeof data.totalNoovs === 'number' ? data.totalNoovs : (S.noovs || 0);
+      if (typeof data.answersToday === 'number') { S._answersToday = data.answersToday; S._answersDate = parisToday(); }
+      if (S.hist && S.hist[0]) { S.hist[0].pts = totalEarned; S.hist[0].noovs = noovsGot; }
+      trackEvent('earn_virtual_currency', { virtual_currency_name: noovsGot ? 'noovs' : 'points', value: noovsGot || totalEarned });
       if (touchesSurvey && S.sv) S.sv.earned += correction;
       const rwPtsEl = document.getElementById('rw-pts');
-      if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
       const rwTotalEl = document.getElementById('rw-total');
-      if (rwTotalEl) rwTotalEl.textContent = S.pts + ' pts';
+      const rwLbl = document.querySelector('#reward .pe-lbl');
+      const rwSub = document.querySelector('#reward .rw-sub');
+      if (data.flagged) {
+        if (rwPtsEl) rwPtsEl.textContent = 0;
+        if (rwSub) rwSub.textContent = 'Réponse enregistrée. Prends le temps de lire : les réponses trop rapides ne rapportent rien.';
+      } else if (noovsGot > 0) {
+        if (rwPtsEl) rwPtsEl.textContent = noovsGot;
+        if (rwLbl) rwLbl.textContent = 'NOOVS · total';
+        if (rwTotalEl) rwTotalEl.textContent = S.noovs + ' NOOVS';
+        if (rwSub) rwSub.textContent = 'Tes 3 réponses en points du jour sont faites : celle-ci rapporte des NOOVS.';
+      } else {
+        if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
+        if (rwTotalEl) rwTotalEl.textContent = S.pts + ' pts';
+        const left = typeof data.pointAnswersLeft === 'number' ? data.pointAnswersLeft : null;
+        if (rwSub && left !== null) rwSub.textContent = left > 0 ? ('Encore ' + left + ' réponse' + (left > 1 ? 's' : '') + ' en points aujourd\'hui, puis des NOOVS.') : 'C\'était ta dernière réponse en points du jour. Les suivantes rapportent des NOOVS.';
+      }
+      renderDailyTrack();
     })
     .catch(e => {
       console.warn('submitAnswer:', e);

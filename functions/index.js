@@ -10,17 +10,41 @@ const db = admin.firestore();
 
 setGlobalOptions({ region: "europe-west1", maxInstances: 10 });
 
-const DAILY_CAP = 300;
-const MIN_ANSWER_MS = 900;
+// Économie NOOVA : seules les 3 premières réponses de la journée rapportent des POINTS
+// échangeables ; les suivantes rapportent des NOOVS (monnaie virtuelle : concours, retrait des
+// pubs, cash, bons cadeaux — à venir). Une réponse en moins de 3 s est considérée non lue.
+const MAX_POINT_ANSWERS_PER_DAY = 3;
+const NOOVS_PER_ANSWER = 1;
+// Le client impose 3 s avant « Valider » ; le serveur mesure lui-même le temps écoulé depuis
+// beginQuestion (le client ne peut pas tricher sur la durée), avec une marge de 500 ms pour la latence.
+const MIN_ANSWER_MS = 2500;
 const DEMO_POINTS = 10;
 const POINTS_BY_INDEX = [10, 15, 20]; // Q1/Q2/Q3, barème fixé par NOOVA (§2 NOOVA_POINTS_SYSTEM.md)
 
+// « Aujourd'hui » = jour civil à Paris (le quota se réinitialise à minuit en France, pas à 1h/2h du matin).
+function parisDay(ms) {
+  return new Date(ms).toLocaleDateString("sv-SE", { timeZone: "Europe/Paris" });
+}
 function todayStr() {
-  return new Date().toISOString().slice(0, 10);
+  return parisDay(Date.now());
 }
 function yesterdayStr() {
-  return new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  return parisDay(Date.now() - 86400000);
 }
+
+/**
+ * beginQuestion — horodate CÔTÉ SERVEUR l'affichage d'une question. submitAnswer s'appuie sur
+ * cette heure (et non sur une durée envoyée par le client) pour appliquer le délai de lecture.
+ */
+exports.beginQuestion = onCall(async (request) => {
+  const uid = request.auth && request.auth.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi pour répondre.");
+  const { campaignId, questionIdx } = request.data || {};
+  if (!campaignId || typeof questionIdx !== "number") throw new HttpsError("invalid-argument", "Paramètres invalides.");
+  const qIdx = Math.max(0, Math.min(2, Math.floor(questionIdx)));
+  await db.collection("users").doc(uid).update({ lastQuestionStart: { key: `${campaignId}_${qIdx}`, at: Date.now() } });
+  return { ok: true };
+});
 
 /**
  * submitAnswer — crédite une réponse côté serveur (remplace l'écriture directe
@@ -32,7 +56,7 @@ exports.submitAnswer = onCall(async (request) => {
   const uid = request.auth && request.auth.uid;
   if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi pour répondre.");
 
-  const { campaignId, questionIdx, answerValue, elapsedMs } = request.data || {};
+  const { campaignId, questionIdx, answerValue } = request.data || {};
   if (!campaignId || typeof questionIdx !== "number") {
     throw new HttpsError("invalid-argument", "Paramètres de réponse invalides.");
   }
@@ -82,35 +106,38 @@ exports.submitAnswer = onCall(async (request) => {
       throw new HttpsError("resource-exhausted", "Cette campagne a atteint son volume cible.");
     }
 
-    // ── Score qualité (réponse trop rapide pour être un vrai choix humain) ──
-    // Un elapsedMs manquant ou invalide est traité comme suspect (fail-safe) : le client
-    // ne peut pas contourner l'anti-triche en omettant simplement ce champ.
-    const flagged = typeof elapsedMs !== "number" || elapsedMs < 0 || elapsedMs < MIN_ANSWER_MS;
+    // ── Score qualité (réponse trop rapide pour être lue) ──
+    // Temps mesuré CÔTÉ SERVEUR depuis beginQuestion : sans appel préalable (script qui saute
+    // l'écran de question) ou en moins de 2,5 s, la réponse est marquée « rapide » et ne rapporte rien.
+    const started = user.lastQuestionStart;
+    const serverElapsed = (started && started.key === `${campaignId}_${qIdx}` && typeof started.at === "number") ? Date.now() - started.at : null;
+    const flagged = serverElapsed === null || serverElapsed < MIN_ANSWER_MS;
     const qualityScore = flagged ? 0 : 1;
 
-    // ── Barème (§2 NOOVA_POINTS_SYSTEM.md) ──
+    // ── Barème : 3 réponses/jour en points, ensuite des NOOVS ──
     const today = todayStr();
-    let dailyEarned = user.dailyEarnedDate === today ? (user.dailyEarned || 0) : 0;
+    const answersToday = user.dailyAnswerDate === today ? (user.dailyAnswerCount || 0) : 0;
+    const pointsEligible = answersToday < MAX_POINT_ANSWERS_PER_DAY;
 
-    let earnedPts = flagged ? 0 : (POINTS_BY_INDEX[qIdx] || 10);
-
-    let streakBonus = 0;
+    let earnedPts = 0, streakBonus = 0, serieBonus = 0, noovsEarned = 0;
     let newStreak = user.streak || 0;
     let newLastAnswerDate = user.lastAnswerDate || null;
-    if (!flagged && earnedPts > 0 && user.lastAnswerDate !== today) {
-      streakBonus = 5;
-      newStreak = user.lastAnswerDate === yesterdayStr() ? (user.streak || 0) + 1 : 1;
-      newLastAnswerDate = today;
+    if (!flagged) {
+      if (pointsEligible) {
+        earnedPts = POINTS_BY_INDEX[qIdx] || 10;
+        if (user.lastAnswerDate !== today) {
+          streakBonus = 5;
+          newStreak = user.lastAnswerDate === yesterdayStr() ? (user.streak || 0) + 1 : 1;
+          newLastAnswerDate = today;
+        }
+        if (qIdx === 2) serieBonus = 10;
+      } else {
+        noovsEarned = NOOVS_PER_ANSWER;
+      }
     }
-
-    let serieBonus = 0;
-    if (!flagged && qIdx === 2 && earnedPts > 0) serieBonus = 10;
-
-    // Le cap journalier s'applique au TOTAL (points + bonus streak/série), pas seulement
-    // aux points de base — sinon les bonus permettaient de le dépasser de 15 pts.
-    let totalEarned = earnedPts + streakBonus + serieBonus;
-    if (dailyEarned + totalEarned > DAILY_CAP) totalEarned = Math.max(0, DAILY_CAP - dailyEarned);
-    dailyEarned += totalEarned;
+    const totalEarned = earnedPts + streakBonus + serieBonus;
+    // Une réponse trop rapide (non lue) ne consomme pas le quota du jour.
+    const newAnswersToday = answersToday + (flagged ? 0 : 1);
 
     // ── Écritures (transaction atomique) ──
     tx.set(answerRef, {
@@ -123,6 +150,7 @@ exports.submitAnswer = onCall(async (request) => {
       ico: camp.brandEmoji || "❓",
       answer: answerValue != null ? String(answerValue).substring(0, 500) : "",
       pointsAwarded: totalEarned,
+      noovsAwarded: noovsEarned,
       qualityScore,
       flagged,
       respondentAge: userAge,
@@ -132,16 +160,15 @@ exports.submitAnswer = onCall(async (request) => {
     });
 
     const userUpdate = {
-      points: FieldValue.increment(totalEarned),
-      xp: FieldValue.increment(totalEarned),
       ans: FieldValue.increment(1),
-      dailyEarned,
-      dailyEarnedDate: today,
-      lastDailyDate: today,
+      dailyAnswerCount: newAnswersToday,
+      dailyAnswerDate: today,
       lastAnswerDate: newLastAnswerDate,
       streak: newStreak,
       updatedAt: FieldValue.serverTimestamp(),
     };
+    if (totalEarned > 0) { userUpdate.points = FieldValue.increment(totalEarned); userUpdate.xp = FieldValue.increment(totalEarned); }
+    if (noovsEarned > 0) userUpdate.noovs = FieldValue.increment(noovsEarned);
     if (qIdx === 0) userUpdate.answeredCampaigns = FieldValue.arrayUnion(campaignId);
     tx.update(userRef, userUpdate);
 
@@ -165,8 +192,12 @@ exports.submitAnswer = onCall(async (request) => {
 
     return {
       pointsAwarded: totalEarned,
+      noovsAwarded: noovsEarned,
       totalPoints: (user.points || 0) + totalEarned,
       totalXp: (user.xp || 0) + totalEarned,
+      totalNoovs: (user.noovs || 0) + noovsEarned,
+      answersToday: newAnswersToday,
+      pointAnswersLeft: Math.max(0, MAX_POINT_ANSWERS_PER_DAY - newAnswersToday),
       streak: newStreak,
       flagged,
     };
@@ -179,6 +210,10 @@ exports.submitAnswer = onCall(async (request) => {
  * la création côté dashboard — cf. launchCampaign dans noova_dashboard.html).
  */
 exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (event) => {
+  // Les triggers Firestore sont « au moins une fois » : un même événement peut être livré deux fois.
+  // On réserve l'identifiant d'événement ; si le journal existe déjà, cette livraison est ignorée.
+  try { await db.collection("_notifLog").doc(event.id).create({ campaignId: event.params.campaignId, at: FieldValue.serverTimestamp() }); }
+  catch (e) { logger.info("notifyNewCampaign: événement déjà traité", { id: event.id }); return; }
   const camp = event.data && event.data.data();
   if (!camp || camp.status !== "active") { logger.info("notifyNewCampaign: ignorée (statut)", { status: camp && camp.status }); return; }
   const city = (camp.targetCity || camp.city || "").toLowerCase();
@@ -222,13 +257,14 @@ exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (e
       const chunkOwners = owners.slice(i, i + 500);
       let res;
       try {
+        // Message « data » SEUL : une seule voie d'affichage (le service worker), avec un `tag` par
+        // campagne. Ainsi même deux envois vers le même appareil (deux jetons, relivraison) se
+        // fondent en UNE notification visible. Un bloc `notification` était en plus affiché par le
+        // navigateur en parallèle du service worker (double notification).
         res = await admin.messaging().sendEachForMulticast({
           tokens: chunkTokens,
-          notification: messages[key],
-          webpush: {
-            notification: { icon: "/icon-192.png", tag: `camp-${event.params.campaignId}` },
-            fcmOptions: { link: "https://noovaoff.fr/app-v2" },
-          },
+          data: { title: messages[key].title, body: messages[key].body, tag: `camp-${event.params.campaignId}`, url: "/app-v2" },
+          webpush: { headers: { Urgency: "high", TTL: "86400" } },
         });
       } catch (e) {
         logger.error("notifyNewCampaign: échec d'envoi", { message: e.message });
