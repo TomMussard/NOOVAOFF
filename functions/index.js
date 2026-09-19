@@ -2,6 +2,7 @@ const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
+const logger = require("firebase-functions/logger");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -176,9 +177,9 @@ exports.submitAnswer = onCall(async (request) => {
  */
 exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (event) => {
   const camp = event.data && event.data.data();
-  if (!camp || camp.status !== "active") return;
+  if (!camp || camp.status !== "active") { logger.info("notifyNewCampaign: ignorée (statut)", { status: camp && camp.status }); return; }
   const city = (camp.targetCity || camp.city || "").toLowerCase();
-  if (!city) return;
+  if (!city) { logger.info("notifyNewCampaign: campagne sans ville"); return; }
 
   const usersSnap = await db.collection("users").where("city", "==", city).get();
   const tokens = [];
@@ -187,6 +188,7 @@ exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (e
     const t = doc.data().fcmTokens;
     if (Array.isArray(t)) t.forEach((tok) => { tokens.push(tok); tokenOwnerRefs.push(doc.ref); });
   });
+  logger.info("notifyNewCampaign: ciblage", { city, users: usersSnap.size, tokens: tokens.length });
   if (!tokens.length) return;
 
   const title = `${camp.merchantName || "Un commerce"} a une question pour toi`;
@@ -207,8 +209,10 @@ exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (e
         },
       });
     } catch (e) {
+      logger.error("notifyNewCampaign: échec d'envoi", { message: e.message });
       continue;
     }
+    logger.info("notifyNewCampaign: envoi", { success: res.successCount, failure: res.failureCount, errors: res.responses.filter((r) => !r.success).map((r) => r.error && r.error.code) });
     // Purge les tokens qui ne sont plus valides (désinstallation, permission révoquée...).
     const deadCodes = ["messaging/registration-token-not-registered", "messaging/invalid-registration-token"];
     res.responses.forEach((r, idx) => {

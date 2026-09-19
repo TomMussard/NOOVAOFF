@@ -3225,7 +3225,7 @@ async function enableNotifications(uid) {
     showToast('Notifications activées !', 'success');
   } catch(e) {
     console.warn('enableNotifications:', e);
-    showToast("Impossible d'activer les notifications pour l'instant.", 'error');
+    showToast("Activation impossible : " + ((e && (e.code || e.message)) || 'erreur inconnue').toString().substring(0, 90), 'error');
   }
   refreshNotifSettingsUI();
 }
