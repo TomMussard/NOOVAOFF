@@ -256,7 +256,14 @@ service cloud.firestore {
     // Lecture : événements de MA ville uniquement
     // Création : uniquement pour soi-même
     match /communityEvents/{eventId} {
-      allow read: if isAuth() && (resource.data.get('city', null) == myCity() || isAdmin());
+      // Le fil n'est visible que pour : ses propres événements, ceux de ses amis (réciproques) et les
+      // actualités de commerces de sa ville. Jamais l'activité d'un inconnu.
+      allow read: if isAuth() && (
+        isAdmin() ||
+        resource.data.get('userId', null) == request.auth.uid ||
+        (resource.data.get('type', null) == 'merchant_post' && resource.data.get('city', null) == myCity()) ||
+        (resource.data.get('userId', null) != null && isFriendOf(resource.data.userId))
+      );
       allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
       allow update: if false;
       allow delete: if isAuth() && (resource.data.userId == request.auth.uid || isAdmin());

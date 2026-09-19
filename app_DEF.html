@@ -317,7 +317,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .q-prog{display:flex;gap:5px;flex:1;margin:0 11px}
 .q-seg{height:5px;flex:1;border-radius:var(--r-pill);background:var(--line-strong);transition:background .28s}
 .q-seg.done{background:var(--ink)}.q-seg.cur{background:var(--line-strong)}
-.q-pts.free{background:var(--nv-black);color:var(--nv-yellow)}
 .q-pts{font-size:11px;font-weight:800;background:var(--yellow);color:var(--ink);border:none;padding:5px 10px;border-radius:var(--r-pill)}
 .brand-hdr{background:none;border:none;border-radius:0;padding:0;display:flex;align-items:center;gap:11px;margin-bottom:20px}
 .bh-logo{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;background:var(--bg2)}
@@ -1547,10 +1546,10 @@ const MAX_POINT_ANSWERS=ENGAGEMENT.MAX_ANSWERS_PER_DAY;
 // « Aujourd'hui » = jour civil à Paris, comme côté serveur (le quota se réinitialise à minuit en France).
 function parisToday(ms){return new Date(ms||Date.now()).toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});}
 function getAnswersToday(){return S._answersDate===parisToday()?(S._answersToday||0):0;}
-// Libellé de gain d'une question : points tant que le quota du jour n'est pas atteint, ensuite « Mode libre ».
+// Libellé de gain d'une question : points tant que le quota du jour n'est pas atteint, ensuite 1 NOOV.
 function isFreeMode(){return getAnswersToday()>=MAX_POINT_ANSWERS;}
-function ptsTag(q){return isFreeMode()?'Mode libre':'+'+q.pts+' pts';}
-function setQPtsTag(q){const el=document.getElementById('q-pts-tag');if(!el)return;el.textContent=ptsTag(q);el.classList.toggle('free',isFreeMode());}
+function ptsTag(q){return isFreeMode()?'+1 NOOV':'+'+q.pts+' pts';}
+function setQPtsTag(q){const el=document.getElementById('q-pts-tag');if(!el)return;el.textContent=ptsTag(q);}
 const BRANDMETA={};
 function logoFallbackHTML(name,size){
   const s=size||44;const r=Math.round(s*0.27);
@@ -2034,6 +2033,9 @@ async function renderWeeklyQuestionResults(q, myOptionIndex) {
 }
 
 let _communityFeedUnsub = null;
+let _feedRenderToken = 0;
+// Le fil montre : moi, mes amis (amitié réciproque) et les actualités des commerces de ma ville.
+// Jamais l'activité d'un inconnu (les règles Firestore l'interdisent aussi).
 async function loadCommunityFeed() {
   const el = document.getElementById('feed-content');
   if (!el) return;
@@ -2044,25 +2046,47 @@ async function loadCommunityFeed() {
     el.innerHTML = '<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">Renseigne ta ville pour voir l’activité locale.</div>';
     return;
   }
+  const myUid = auth.currentUser && auth.currentUser.uid;
+  const ids = [...new Set([myUid, ...(S.friends || []).filter(f => f.mutual !== false).map(f => f.uid)])].filter(Boolean);
+  const parts = new Map(), listeners = [];
+  const paint = () => {
+    if (parts.size < listeners.length) return;      // on attend que toutes les écoutes aient répondu (pas de faux « vide »)
+    const seen = new Set();
+    const all = [...parts.values()].flat().filter(d => !seen.has(d.id) && seen.add(d.id));
+    all.sort((a, b) => ((b.data().createdAt && b.data().createdAt.seconds) || 0) - ((a.data().createdAt && a.data().createdAt.seconds) || 0));
+    renderFeedDocs(el, all.slice(0, 25));
+  };
+  // Une écoute par tranche de 10 personnes. Si une tranche est refusée (un ancien ami a retiré l'amitié
+  // et notre liste n'est pas encore à jour), on la refait personne par personne : seul le refusé disparaît.
+  const feedQ = list => db.collection('communityEvents').where('userId', 'in', list).orderBy('createdAt', 'desc').limit(25);
+  const add = (key, q, onFail) => listeners.push(q.onSnapshot(snap => { parts.set(key, snap.docs); paint(); }, e => {
+    console.warn('Feed error (' + key + '):', e);
+    if (onFail) onFail(); else { parts.set(key, []); paint(); }
+  }));
+  for (let i = 0; i < ids.length; i += 10) {
+    const chunk = ids.slice(i, i + 10), key = 'f' + i;
+    add(key, feedQ(chunk), () => {
+      chunk.forEach(id => add(key + '_' + id, feedQ([id]), null));
+      parts.set(key, []); paint();
+    });
+  }
+  add('news', db.collection('communityEvents').where('type', '==', 'merchant_post').where('city', '==', city).orderBy('createdAt', 'desc').limit(10));
+  _communityFeedUnsub = () => listeners.forEach(u => u());
+}
 
-  _communityFeedUnsub = db.collection('communityEvents')
-    .where('city', '==', city)
-    .orderBy('createdAt', 'desc')
-    .limit(25)
-    .onSnapshot(async snap => {
-    el.innerHTML = '';
-    if (snap.empty) {
+async function renderFeedDocs(el, docs) {
+  const token = ++_feedRenderToken;
+    if (!docs.length) {
       el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
-        Aucune activité dans ta ville pour l'instant.<br>
-        <span style="color:var(--ink);font-weight:700">Les réponses apparaissent ici dès qu'elles sont publiées.</span>
+        Aucune activité de tes amis pour l'instant.<br>
+        <span style="color:var(--ink);font-weight:700">Ajoute des amis pour voir ce qu'ils répondent.</span>
       </div>`;
       return;
     }
 
     const colors = ['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
     const myUid = auth.currentUser && auth.currentUser.uid;
-    const docs = snap.docs;
-
+    
     // Likes : compte + "déjà liké par moi" pour chaque post, en parallèle (sous-collection likes/{uid}).
     const likeInfo = await Promise.all(docs.map(async doc => {
       try {
@@ -2075,14 +2099,8 @@ async function loadCommunityFeed() {
       } catch(e) { return { count: 0, liked: false, comments: 0 }; }
     }));
 
+    if (token !== _feedRenderToken) return;          // un affichage plus récent a pris le relais
     el.innerHTML = '';
-    if (snap.empty) {
-      el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
-        Aucune activité dans ta ville pour l'instant.<br>
-        <span style="color:var(--ink);font-weight:700">Les réponses apparaissent ici dès qu'elles sont publiées.</span>
-      </div>`;
-      return;
-    }
 
     const escAttr = s => esc(s).replace(/"/g,'&quot;'); // esc() n'échappe pas les guillemets, nécessaire ici (valeurs insérées dans des attributs data-*)
     docs.forEach((doc, i) => {
@@ -2104,10 +2122,6 @@ async function loadCommunityFeed() {
     applyStagger(el);
     // Les commentaires ouverts restent ouverts quand le fil se rafraîchit.
     _openComments.forEach(id => { const box = document.getElementById('cm-' + id); if(box){ box.style.display = 'block'; loadComments(id); } });
-  }, e => {
-    console.warn('Feed error:', e);
-    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink3);font-size:12px">Impossible de charger le feed.</div>';
-  });
 }
 
 async function toggleFeedLike(btn) {
@@ -2984,7 +2998,7 @@ function fillQuestion(q,opts){
   document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||('Ta réponse aide '+q.brand+'.');
   document.getElementById('bh-tag').textContent=q.theme||'';
-  document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=isFreeMode()?'Mode libre : ton avis compte, même sans points.':(q.hint||'');
+  document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||'';
   const sk=document.getElementById('skip-btn');if(sk){sk.textContent=opts.skipLabel;sk.setAttribute('onclick',opts.skipFn);}
   document.getElementById('sub-btn').disabled=true;buildAns(q);
 }
@@ -4218,7 +4232,7 @@ function renderDailyTrack(){
   const left=MAX_POINT_ANSWERS-n;
   el.className='dtrack';
   el.innerHTML='<div class="dt-dots">'+[0,1,2].map(i=>'<div class="dt-dot'+(i<n?' on':'')+'"></div>').join('')+'</div><div class="dt-txt">'
-    +(left>0?left+' réponse'+(left>1?'s':'')+' en points aujourd\'hui':'Tes '+(S._pointsToday||0)+' pts du jour sont validés · mode libre')
+    +(left>0?left+' réponse'+(left>1?'s':'')+' en points aujourd\'hui':'Tes '+(S._pointsToday||0)+' pts du jour sont validés')
     +'</div><div class="dt-noov">'+(S.noovs||0)+' NOOVS</div>';
 }
 function renderHomeState(){
@@ -4995,7 +5009,7 @@ async function loadFriendsFromFirestore(uids) {
       // Classement/liste d'amis basés sur l'XP (à vie, ne descend jamais) et non le solde
       // de points (dépensable, baisse à chaque échange) — sinon un ami qui vient d'échanger
       // une récompense semble "redescendre", ce qui n'est pas cohérent pour un classement.
-      return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, online, photoUrl: d.photoUrl || null, share: d.shareAnswers !== false };
+      return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, online, photoUrl: d.photoUrl || null, share: d.shareAnswers !== false, mutual: (d.friendUids || []).includes(myUid) };
     });
     renderFriends();
     if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }
@@ -5334,7 +5348,7 @@ submitAns = function() {
         if (rwPtsEl) rwPtsEl.textContent = noovsGot;
         if (rwLbl) rwLbl.textContent = 'NOOVS · total';
         if (rwTotalEl) rwTotalEl.textContent = S.noovs + ' NOOVS';
-        if (rwSub) rwSub.textContent = 'Mode libre : merci pour ton avis.';
+        if (rwSub) rwSub.textContent = 'Merci pour ton avis.';
       } else {
         if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
         if (rwTotalEl) rwTotalEl.textContent = S.pts + ' pts';
@@ -5342,7 +5356,7 @@ submitAns = function() {
         // Fin de palier : présenté comme un palier débloqué, pas comme une interdiction.
         if (rwSub && left !== null) {
           if (left > 0) rwSub.textContent = 'Encore ' + left + ' réponse' + (left > 1 ? 's' : '') + ' en points aujourd\'hui.';
-          else rwSub.innerHTML = 'Tes ' + (S._pointsToday || 0) + ' pts du jour sont validés ' + icon('check', { size: 15 }) + ' place au mode libre';
+          else rwSub.innerHTML = 'Tes ' + (S._pointsToday || 0) + ' pts du jour sont validés ' + icon('check', { size: 15 });
         }
       }
       renderDailyTrack();
