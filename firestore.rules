@@ -180,6 +180,28 @@ service cloud.firestore {
     // ─── Rewards ─────────────────────────────────────────────────────────────
     // Lecture : récompenses actives de MA ville pour tous les users connectés
     // Écriture : uniquement le commerçant propriétaire, vérifié
+    // Actualités « Ton avis a compté » : le commerçant vérifié propose (toujours « pending »), l'admin
+    // publie ou refuse. Seules les actualités publiées sont lisibles par les habitants.
+    match /merchantPosts/{postId} {
+      allow read: if isAuth() && (resource.data.status == 'published' || resource.data.merchantId == request.auth.uid || isAdmin());
+      allow create: if isAuth() &&
+        request.resource.data.merchantId == request.auth.uid &&
+        getMerchant(request.auth.uid).get('status', null) == 'verified' &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.keys().hasOnly(['merchantId', 'merchantName', 'text', 'campaignIds', 'status', 'city', 'createdAt']) &&
+        request.resource.data.text is string && request.resource.data.text.size() >= 10 && request.resource.data.text.size() <= 200 &&
+        request.resource.data.campaignIds is list && request.resource.data.campaignIds.size() <= 3;
+      allow update: if isAuth() && (
+        (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'rejectionReason', 'reviewedAt', 'publishedAt'])) ||
+        (resource.data.merchantId == request.auth.uid &&
+         resource.data.status in ['pending', 'rejected'] &&
+         request.resource.data.status == 'pending' &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'campaignIds', 'status', 'rejectionReason']) &&
+         request.resource.data.text is string && request.resource.data.text.size() >= 10 && request.resource.data.text.size() <= 200 &&
+         request.resource.data.campaignIds is list && request.resource.data.campaignIds.size() <= 3)
+      );
+      allow delete: if isAuth() && ((resource.data.merchantId == request.auth.uid && resource.data.status != 'published') || isAdmin());
+    }
     match /rewards/{rewardId} {
       allow read: if isAuth() && (
         (resource.data.active == true && resource.data.get('city', null) == myCity()) ||

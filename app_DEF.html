@@ -437,6 +437,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .fp-hdr{padding:14px 14px 10px;display:flex;align-items:center;gap:9px}
 .fp-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:14px;flex-shrink:0}
 .fp-name{font-size:15px;font-weight:700;color:var(--ink)}
+.fp-tag{display:inline-block;vertical-align:1px;margin-left:6px;padding:2px 8px;border-radius:99px;background:var(--ink);color:var(--yellow);font-size:9.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase}
 .fp-time{font-size:11px;color:var(--muted);margin-top:1px;font-weight:500}
 .fp-theme{font-size:11px;font-weight:800;padding:5px 10px;border-radius:var(--r-pill);margin-left:auto;align-self:flex-start;background:var(--yellow-soft);color:var(--gold-text)}
 .fp-body{padding:0 14px 12px}
@@ -2093,7 +2094,7 @@ async function loadCommunityFeed() {
       const isMe = ev.userId && myUid && ev.userId === myUid;
       const d = document.createElement('div');
       d.className = 'feed-post';
-      d.innerHTML = `<div class="fp-hdr"><div class="fp-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fp-name">${esc(name)}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body"><div class="fp-action">${esc(ev.text||'a répondu à une question')}${ev.brand?` <strong>${esc(ev.brand)}</strong>`:''}</div></div><div class="fp-foot">
+      d.innerHTML = `<div class="fp-hdr"><div class="fp-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fp-name">${esc(name)}${ev.type==='merchant_post'?' <span class="fp-tag">Actualité</span>':''}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body"><div class="fp-action">${esc(ev.text||'a répondu à une question')}${ev.brand&&ev.type!=='merchant_post'?` <strong>${esc(ev.brand)}</strong>`:''}</div></div><div class="fp-foot">
         <button class="fp-btn fp-like-btn${liked?' liked':''}" data-post-id="${escAttr(doc.id)}" data-liked="${liked}" onclick="toggleFeedLike(this)">${icon(liked?'heart-filled':'heart',{size:13})} <span class="fp-like-count">${likeCount>0?likeCount:''}</span> J'aime</button>
         <button class="fp-btn" data-post-id="${escAttr(doc.id)}" onclick="toggleComments(this.dataset.postId)">${icon('chat',{size:13})} <span class="fp-com-count">${commentCount>0?commentCount:''}</span> Commenter</button>
         <button class="fp-btn" data-name="${escAttr(name)}" data-text="${escAttr(ev.text||'')}" data-brand="${escAttr(ev.brand||'')}" onclick="shareFeedPost(this.dataset.name,this.dataset.text,this.dataset.brand)">${icon('broadcast',{size:13})} Partager</button>
@@ -3739,7 +3740,8 @@ const NOTIF_GROUPS=[
   {g:'resultats',t:'Résultats',d:'Quand les résultats de ta réponse sont prêts'},
   {g:'serie',t:'Ma série',d:'Un rappel le soir si ta série est en jeu'},
   {g:'recompenses',t:'Mes récompenses',d:'Récompense débloquée, code bientôt expiré'},
-  {g:'amis',t:'Mes amis',d:"Demandes d'ami et réponses en commun"}
+  {g:'amis',t:'Mes amis',d:"Demandes d'ami et réponses en commun"},
+  {g:'actualites',t:'Actualités des commerces',d:"Quand un commerce t'annonce ce qui a changé grâce à ton avis"}
 ];
 function notifPrefOn(g){return (S._notifPrefs||{})[g]!==false;}
 function refreshNotifSettingsUI() {

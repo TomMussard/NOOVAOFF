@@ -56,6 +56,9 @@ module.exports = {
   // ─── Impact visible ─── (étape 4)
   IMPACT: {
     MAX_TEXT: 200,               // longueur d'une actualité commerçant
+    MIN_TEXT: 10,
+    MAX_CAMPAIGNS_LINKED: 3,     // questions auxquelles une actualité peut être rattachée
     NOTIFY_GAP_DAYS: 14,         // au plus une actualité notifiée par commerce tous les N jours
+    MAX_AUDIENCE_SCAN: 5000,     // réponses lues pour retrouver les habitants concernés
   },
 };

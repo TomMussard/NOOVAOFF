@@ -40,6 +40,8 @@ const TYPES = {
   serie_en_danger:      { group: "serie",       nudge: true,  exceptional: true, gapDays: 1 },
   code_expire:          { group: "recompenses", nudge: false, exceptional: true },
   ami:                  { group: "amis",        nudge: true,  gapDays: 1, deferQuiet: true, ttlH: 12 },
+  // « Ton avis a compté » : issu de l'action de l'habitant (il a répondu), donc pas une relance.
+  impact:               { group: "actualites",  nudge: false, deferQuiet: true, ttlH: 48 },
 };
 const GROUPS = {
   question: ["question_du_jour"],
@@ -48,6 +50,7 @@ const GROUPS = {
   serie: ["serie_en_danger"],
   recompenses: ["recompense_debloquee", "code_expire"],
   amis: ["ami"],
+  actualites: ["impact"],
 };
 const CAT_KEYS = ["restauration", "boulangerie", "sport", "beaute", "culture", "commerce", "services"];
 
@@ -95,6 +98,7 @@ const copy = {
   recompense: ({ reward, merchant, cost }) => finish({ title: `Ton ${short(reward, 26)} chez ${short(merchant, 20)} est à toi`, body: `Échange-le contre tes ${cost} points`, screen: "rewards-tab" }),
   serie: ({ n, merchant }) => finish({ title: `Ta série est à ${n} jours`, body: `${short(merchant, 30)} a une question : 30 secondes, +10 points`, screen: "home" }),
   code: ({ reward, merchant, when, until }) => finish({ title: `Ton ${short(reward, 26)} expire ${when}`, body: `Chez ${short(merchant, 30)}, à utiliser avant ${until}`, screen: "rewards-tab" }),
+  impact: ({ merchant, text }) => finish({ title: `Ton avis a compté chez ${short(merchant, 30)}`, body: short(text, 110), screen: "social" }),
   amiRequest: ({ name }) => finish({ title: `${short(name, 30)} veut être ton ami`, body: "Accepte sa demande dans NOOVA", screen: "social" }),
   amiAccepted: ({ name }) => finish({ title: `${short(name, 30)} est maintenant ton ami`, body: "Découvre votre classement", screen: "social" }),
   amiSame: ({ name, merchant }) => finish({ title: `${short(name, 30)} a répondu comme toi`, body: `Sur une question de ${short(merchant, 30)}`, screen: "social" }),
@@ -586,5 +590,5 @@ module.exports = {
   notifTick, notifyNewCampaign, onAnswerNotifs, onFriendNotif, onCampaignProgress, onRedemptionUpdated, onMerchantStatus,
   trackNotifOpen, setNotifPref,
   // Internes exposés aux tests
-  _t: { deliver, runTick, trackOpen, setPref, processMisses, drainQueue, habitMinutes, parisParts, next9h, copy, TYPES, GROUPS, notifyMerchant, notifyExpiringCodes, notifyEndingCampaigns, loadCaches, sectorCategory },
+  _t: { deliver, runTick, nowMs, trackOpen, setPref, processMisses, drainQueue, habitMinutes, parisParts, next9h, copy, TYPES, GROUPS, notifyMerchant, notifyExpiringCodes, notifyEndingCampaigns, loadCaches, sectorCategory },
 };

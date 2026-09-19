@@ -686,6 +686,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <button class="sb-item" id="nav-campaigns" onclick="navTo('campaigns',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span>Mes campagnes<span class="sb-badge" id="camp-badge" style="background:rgba(224,125,10,.15);color:var(--coral);display:none"></span></button>
       <button class="sb-item" id="nav-results" onclick="navTo('results',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>Résultats</button>
       <button class="sb-item" onclick="navTo('consents',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>Consentements RGPD</button>
+      <button class="sb-item" id="nav-news" onclick="navTo('news',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2V5z"/><path d="M19 9h1a1 1 0 0 1 1 1v7a2 2 0 0 1-2 2"/><path d="M8 9h6M8 13h6"/></svg></span>Actualités</button>
       <button class="sb-item" id="nav-rewards" onclick="navTo('rewards',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="13" rx="1"/><path d="M4 12h16"/><path d="M12 8v13"/><path d="M12 8c-1.2-3-5-3.3-5-.6 0 1.8 2.2.6 5 .6zM12 8c1.2-3 5-3.3 5-.6 0 1.8-2.2.6-5 .6z"/></svg></span>Mes récompenses</button>
       <button class="sb-item" id="nav-validate" onclick="navTo('validate',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></span>Valider un code</button>
       <div class="sb-section">Compte</div>
@@ -1399,6 +1400,33 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
           </div>
           <div id="reward-slots"></div>
           <button class="tb-btn tb-btn-primary" style="margin-top:8px" id="add-reward-btn" onclick="addRewardSlot()">+ Ajouter une récompense</button>
+        </div>
+      </div>
+
+      <!-- ═══ ACTUALITÉS (impact visible) ═══ -->
+      <div class="page" id="page-news">
+        <div style="max-width:700px">
+          <div style="margin-bottom:22px">
+            <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink)">Actualités</div>
+            <div style="font-size:13px;color:var(--ink2);margin-top:4px;line-height:1.6">Montrez à vos clients ce que leurs réponses ont changé chez vous. Après validation par l'équipe NOOVA, votre actualité apparaît dans la communauté de votre ville, et les habitants qui ont répondu à vos questions reçoivent « Ton avis a compté ».</div>
+          </div>
+          <div id="news-locked" style="display:none;background:var(--ad);border:1.5px solid rgba(242,151,21,.25);border-radius:var(--rs);padding:14px 18px;margin-bottom:18px;font-size:13px;color:var(--ink2)">Les actualités seront disponibles après la vérification de votre établissement.</div>
+          <div class="card" style="padding:18px;margin-bottom:22px" id="news-form">
+            <label class="field-lbl" for="news-text">Votre actualité</label>
+            <textarea class="field-inp" id="news-text" rows="4" maxlength="200" placeholder="Ex. : Suite à vos avis, notre boulangerie ouvre désormais dès 6h30 le samedi." oninput="newsCount()" style="resize:vertical;line-height:1.5"></textarea>
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink3);margin-top:6px"><span>Court et concret : ce qui a changé grâce aux avis. Pas de promotion.</span><span id="news-count">0 / 200</span></div>
+            <div style="margin-top:16px">
+              <div class="field-lbl">Rattacher à des questions (facultatif, 3 maximum)</div>
+              <div style="font-size:11.5px;color:var(--ink3);margin-bottom:8px">Sans rattachement, tous les habitants qui ont répondu à l'une de vos questions sont prévenus.</div>
+              <div id="news-camps" style="display:flex;flex-direction:column;gap:6px;max-height:190px;overflow:auto"></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;margin-top:18px">
+              <button class="tb-btn tb-btn-primary" id="news-submit" onclick="submitNews()">Envoyer pour validation</button>
+              <button class="tb-btn tb-btn-ghost" id="news-cancel" onclick="resetNewsForm()" style="display:none">Annuler la modification</button>
+            </div>
+          </div>
+          <div class="section-title">Mes actualités</div>
+          <div id="news-list"><div style="color:var(--ink3);font-size:13px;padding:12px 0">Chargement…</div></div>
         </div>
       </div>
 
@@ -3590,6 +3618,86 @@ function loadRecentRedemptions() {
   }, () => { el.innerHTML = '<div style="color:var(--ink3);font-size:12px">Erreur de chargement.</div>'; });
 }
 
+
+// ─── Actualités « Ton avis a compté » ─────────────────────────
+// Le commerçant propose, l'équipe NOOVA valide (règles Firestore : impossible de se publier soi-même).
+let _newsUnsub = null, _newsEditId = null, _newsPosts = [];
+const NEWS_MAX_LINKED = 3;
+function newsCount(){const t=document.getElementById('news-text');const c=document.getElementById('news-count');if(t&&c)c.textContent=t.value.length+' / 200';}
+function renderNewsCamps(selected){
+  const el=document.getElementById('news-camps');if(!el)return;
+  const sel=new Set(selected||[...el.querySelectorAll('input:checked')].map(i=>i.value));
+  if(!(_mCampaigns||[]).length){el.innerHTML='<div style="font-size:12px;color:var(--ink3)">Aucune question pour le moment.</div>';return;}
+  el.innerHTML=_mCampaigns.map(c=>`<label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--ink2);cursor:pointer"><input type="checkbox" value="${esc(c.id)}" ${sel.has(c.id)?'checked':''} onchange="limitNewsLinked(this)" style="margin-top:2px"><span>${esc((c.question||c.name||'Question').slice(0,90))}</span></label>`).join('');
+}
+function limitNewsLinked(cb){
+  const n=document.querySelectorAll('#news-camps input:checked').length;
+  if(n>NEWS_MAX_LINKED){cb.checked=false;showToast('3 questions au maximum','warning');}
+}
+function resetNewsForm(){
+  _newsEditId=null;
+  const t=document.getElementById('news-text');if(t)t.value='';
+  newsCount();renderNewsCamps([]);
+  const b=document.getElementById('news-submit');if(b)b.textContent='Envoyer pour validation';
+  const c=document.getElementById('news-cancel');if(c)c.style.display='none';
+}
+function loadMerchantNews(){
+  const u=auth.currentUser;if(!u)return;
+  const verified=_mData&&_mData.status==='verified';
+  const lock=document.getElementById('news-locked');if(lock)lock.style.display=verified?'none':'block';
+  const form=document.getElementById('news-form');if(form){form.style.opacity=verified?'1':'.5';form.style.pointerEvents=verified?'auto':'none';}
+  renderNewsCamps();newsCount();
+  if(_newsUnsub)_newsUnsub();
+  _newsUnsub=db.collection('merchantPosts').where('merchantId','==',u.uid).onSnapshot(snap=>{
+    _newsPosts=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    renderNewsList();
+  },e=>{const el=document.getElementById('news-list');if(el)el.innerHTML='<div style="color:var(--ink3);font-size:12px">Erreur de chargement.</div>';});
+}
+function renderNewsList(){
+  const el=document.getElementById('news-list');if(!el)return;
+  if(!_newsPosts.length){el.innerHTML='<div style="color:var(--ink3);font-size:13px;padding:8px 0">Aucune actualité pour le moment.</div>';return;}
+  const ST={pending:['En validation','var(--coral)'],published:['Publiée','var(--mint)'],rejected:['Refusée','#EF4444']};
+  el.innerHTML=_newsPosts.map(p=>{
+    const st=ST[p.status]||['—','var(--ink3)'];
+    let note='';
+    if(p.status==='published'){
+      const n=(p.notifySent||0)+(p.notifyQueued||0);
+      note=p.notifyNote==='sent'?`${n} habitant${n>1?'s':''} prévenu${n>1?'s':''}`:p.notifyNote==='gap'?'Visible dans la communauté (habitants non prévenus : une actualité notifiée tous les 14 jours)':p.notifyNote==='no_audience'?'Visible dans la communauté':'';
+    }
+    if(p.status==='rejected')note=p.rejectionReason?'Motif : '+p.rejectionReason:'';
+    const acts=p.status==='published'?'':`<div style="display:flex;gap:8px;margin-top:10px">${p.status==='rejected'?`<button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editNews('${esc(p.id)}')">Corriger et renvoyer</button>`:''}<button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="deleteNews('${esc(p.id)}')">Supprimer</button></div>`;
+    return `<div class="card" style="padding:16px 18px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:6px"><span style="padding:2px 9px;border-radius:99px;font-size:10.5px;font-weight:700;background:${st[1]}18;color:${st[1]}">${st[0]}</span><span style="font-size:11px;color:var(--ink3)">${p.createdAt?new Date(p.createdAt.seconds*1000).toLocaleDateString('fr-FR'):''}</span></div><div style="font-size:13.5px;color:var(--ink);line-height:1.55;white-space:pre-wrap">${esc(p.text)}</div>${note?`<div style="font-size:11.5px;color:var(--ink3);margin-top:6px">${esc(note)}</div>`:''}${acts}</div>`;
+  }).join('');
+}
+async function submitNews(){
+  const u=auth.currentUser;if(!u||!_mData)return;
+  if(_mData.status!=='verified'){showToast('Disponible après la vérification de votre établissement.','clock');return;}
+  const text=(document.getElementById('news-text').value||'').trim();
+  if(text.length<10){showToast('Écrivez au moins une phrase (10 caractères).','warning');return;}
+  if(text.length>200){showToast('200 caractères maximum.','warning');return;}
+  const campaignIds=[...document.querySelectorAll('#news-camps input:checked')].map(i=>i.value).slice(0,NEWS_MAX_LINKED);
+  const btn=document.getElementById('news-submit');btn.disabled=true;
+  try{
+    if(_newsEditId){
+      await db.collection('merchantPosts').doc(_newsEditId).update({text,campaignIds,status:'pending',rejectionReason:firebase.firestore.FieldValue.delete()});
+    }else{
+      await db.collection('merchantPosts').add({merchantId:u.uid,merchantName:_mData.brandName||_mData.name||'',text,campaignIds,status:'pending',city:String(_mData.city||'').toLowerCase(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    }
+    resetNewsForm();showToast('Actualité envoyée : elle sera publiée après validation.','check');
+  }catch(e){console.warn('submitNews:',e);showToast("Impossible d'envoyer l'actualité.",'warning');}
+  btn.disabled=false;
+}
+function editNews(id){
+  const p=_newsPosts.find(x=>x.id===id);if(!p)return;
+  _newsEditId=id;document.getElementById('news-text').value=p.text||'';newsCount();renderNewsCamps(p.campaignIds||[]);
+  document.getElementById('news-submit').textContent='Renvoyer pour validation';document.getElementById('news-cancel').style.display='inline-flex';
+  document.getElementById('news-form').scrollIntoView({behavior:'smooth',block:'center'});
+}
+async function deleteNews(id){
+  if(!confirm('Supprimer cette actualité ?'))return;
+  try{await db.collection('merchantPosts').doc(id).delete();if(_newsEditId===id)resetNewsForm();}catch(e){showToast('Suppression impossible.','warning');}
+}
+
 // Intercepter navTo pour charger les données au besoin
 const _origNavTo = navTo;
 navTo = function(page, btn) {
@@ -3597,6 +3705,11 @@ navTo = function(page, btn) {
   if(page === 'rewards') { loadMerchantRewards(); }
   if(page === 'validate') { loadRecentRedemptions(); }
   if(page === 'consents') { loadConsentJournal(); }
+  if(page === 'news') {
+    document.getElementById('topbar-title').textContent = 'Actualités';
+    document.getElementById('topbar-sub').textContent = 'Montrez ce que vos clients ont changé chez vous';
+    loadMerchantNews();
+  }
 };
 
 // ─── Journal des consentements RGPD (réel, Firestore) ─────────

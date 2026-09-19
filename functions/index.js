@@ -14,6 +14,7 @@ setGlobalOptions({ region: "europe-west1", maxInstances: 10 });
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./notifications")));
 // Reveal, compatibilité, prédiction, actualités : voir engagement.js.
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./engagement")));
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./impact")));
 
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.
