@@ -140,6 +140,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dt-noov{flex-shrink:0;background:var(--nv-black);color:var(--nv-yellow);border-radius:99px;padding:6px 11px;font-family:var(--fd);font-weight:800;font-size:12px}
 .noov-card{margin:0 22px 14px;background:var(--nv-black);border-radius:var(--r-card);padding:15px 16px;display:flex;gap:14px;align-items:center}
 .noov-ico{width:44px;height:44px;border-radius:50%;background:var(--nv-yellow);color:var(--nv-black);font-family:var(--fd);font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 0 0 3px var(--nv-black),inset 0 0 0 5px rgba(0,0,0,.25)}
+.noov-soon{margin:0 22px 10px;background:var(--surface);border-radius:var(--r-card);padding:13px 14px;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow-card);opacity:.92}
+.noov-soon .ns-ico{width:46px;height:46px;border-radius:14px;background:var(--bg2);color:var(--ink2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.noov-soon .ns-t{font-family:var(--fd);font-weight:800;font-size:14.5px;color:var(--ink);letter-spacing:-.3px}
+.noov-soon .ns-d{font-size:12px;color:var(--ink2);line-height:1.45;margin-top:2px}
+.noov-soon .ns-tag{flex-shrink:0;background:var(--bg2);color:var(--ink2);border-radius:99px;padding:6px 11px;font-size:10.5px;font-weight:800;white-space:nowrap}
 .noov-t{font-family:var(--fd);font-weight:800;font-size:20px;color:#fff;letter-spacing:-.5px}
 .noov-d{font-size:11.5px;color:rgba(255,255,255,.62);line-height:1.5;margin-top:2px}
 .ob-topbar{padding:56px 22px 0;display:flex;justify-content:flex-end}
@@ -1228,6 +1233,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div style="flex:1;min-width:0"><div class="dprog-name">Toutes les récompenses</div><div class="dprog-sub" id="rewards-all-count">Voir le catalogue et les paliers</div></div>
       <span style="color:#A9A296;font-size:18px">›</span>
     </div>
+    <div class="dsec-h">Avec tes NOOVS</div>
+    <div id="noov-rewards"></div>
   </div>
 </div>
 
@@ -1451,7 +1458,7 @@ const MAX_POINT_ANSWERS=3;
 function parisToday(ms){return new Date(ms||Date.now()).toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});}
 function getAnswersToday(){return S._answersDate===parisToday()?(S._answersToday||0):0;}
 // Libellé de gain d'une question : points tant que le quota du jour n'est pas atteint, ensuite 1 NOOV.
-function ptsTag(q){return getAnswersToday()>=MAX_POINT_ANSWERS?'+'+q.pts+' NOOVS':'+'+q.pts+' pts';}
+function ptsTag(q){return getAnswersToday()>=MAX_POINT_ANSWERS?'+1 NOOV':'+'+q.pts+' pts';}
 const BRANDMETA={};
 function logoFallbackHTML(name,size){
   const s=size||44;const r=Math.round(s*0.27);
@@ -2729,6 +2736,7 @@ function refreshWallet(){
   animateNumber(document.getElementById('wc-pts-num'),S.pts);
   const hdrPts=document.getElementById('wc-pts-num-hdr');if(hdrPts)animateNumber(hdrPts,S.pts);
   {const nn=document.getElementById('noov-num');if(nn)animateNumber(nn,S.noovs||0);}
+  renderNoovRewards();
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(4,((S.xp-l.min)/(l.max-l.min))*100));
   document.getElementById('wc-fill').style.width=pct+'%';
   document.getElementById('wc-level').textContent='Niveau '+(li+1)+' · '+l.n;
@@ -2774,7 +2782,7 @@ function refreshProfile(){
   BDGS.forEach(b=>{const e=earned.includes(b.id);const d=document.createElement('div');d.className='bp '+(e?'earned':'locked');d.innerHTML=`<div class="bp-ico">${icon(e?b.e:'lock',{size:18})}</div><div class="bp-lbl">${esc(b.n)}</div>`;bl.appendChild(d)});
   const hl=document.getElementById('hist-list');hl.innerHTML='';
   if(!S.hist||!S.hist.length){hl.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:13px">Aucune réponse pour l\'instant.</div>';return}
-  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?h.ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:12px;font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">${h.noovs?'+'+h.noovs+' NOOVS':'+'+h.pts+' pts'}</div>`;hl.appendChild(d)});
+  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?h.ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:12px;font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">${h.noovs?'+'+h.noovs+' NOOV'+(h.noovs>1?'S':''):'+'+h.pts+' pts'}</div>`;hl.appendChild(d)});
 }
 function boTab(tab,btn){document.querySelectorAll('.bo-tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');['dashboard','create','results'].forEach(t=>document.getElementById('bo-'+t).style.display=t===tab?'block':'none');if(tab==='create')wzStep(0)}
 function renderCampaigns(){
@@ -2815,7 +2823,7 @@ function fillQuestion(q,opts){
   document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||('Ta réponse aide '+q.brand+'.');
   document.getElementById('bh-tag').textContent=q.theme||'';
-  document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=getAnswersToday()>=MAX_POINT_ANSWERS?'Points du jour atteints : cette réponse rapporte '+q.pts+' NOOVS.':(q.hint||'');
+  document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=getAnswersToday()>=MAX_POINT_ANSWERS?'Points du jour atteints : cette réponse rapporte 1 NOOV.':(q.hint||'');
   const sk=document.getElementById('skip-btn');if(sk){sk.textContent=opts.skipLabel;sk.setAttribute('onclick',opts.skipFn);}
   document.getElementById('sub-btn').disabled=true;buildAns(q);
 }
@@ -2887,12 +2895,12 @@ function showSurveyOffer(){
   {const tt=document.getElementById('so-title');if(tt)tt.textContent=sv.brand+' aimerait creuser le sujet';}
   document.getElementById('so-bname').textContent=sv.brand;
   document.getElementById('so-title').textContent=sv.brand+' aimerait creuser le sujet';
-  const more=sv.list.length;const _k=Math.max(0,MAX_POINT_ANSWERS-getAnswersToday());const _ptsPart=sv.list.slice(0,_k).reduce((a,b)=>a+b.pts,0);const _nvPart=sv.list.slice(_k).reduce((a,b)=>a+b.pts,0);const gain=_ptsPart;
+  const more=sv.list.length;const _k=Math.max(0,MAX_POINT_ANSWERS-getAnswersToday());const _ptsPart=sv.list.slice(0,_k).reduce((a,b)=>a+b.pts,0);const _nvPart=Math.max(0,more-_k);const gain=_ptsPart;
   document.getElementById('so-desc').textContent=more+' question'+(more>1?'s':'')+' de plus, en lien direct avec ta réponse. ~'+(more*15)+' sec. C\u2019est toi qui décides.';
   const st=document.getElementById('so-steps');st.innerHTML='';
   const tl={text:'✍️',mcq:'☑️',scale:'🎚️',rank:'↕️'},tn={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle',rank:'Classement'};
   sv.list.forEach(q=>{const d=document.createElement('div');d.className='so-step';d.innerHTML=`<div class="sd">${tl[q.type]||'•'}</div><span>${tn[q.type]||'Question'} · ${ptsTag(q)}</span>`;st.appendChild(d)});
-  document.getElementById('so-gain-pts').textContent=(_ptsPart>0?'+'+_ptsPart+' pts':'')+(_ptsPart>0&&_nvPart>0?' et ':'')+(_nvPart>0?'+'+_nvPart+' NOOVS':'');
+  document.getElementById('so-gain-pts').textContent=(_ptsPart>0?'+'+_ptsPart+' pts':'')+(_ptsPart>0&&_nvPart>0?' et ':'')+(_nvPart>0?'+'+_nvPart+' NOOV'+(_nvPart>1?'S':''):'');
   goTo('survey-offer');
 }
 
@@ -3927,6 +3935,17 @@ function cityPhrase(label){
   label=(label||'').trim();
   if(!label)return 'chez toi';
   return /^le\s/i.test(label)?'au '+label.replace(/^le\s+/i,''):'\u00e0 '+label;
+}
+// Récompenses payables en NOOVS : annoncées, pas encore ouvertes.
+function renderNoovRewards(){
+  const el=document.getElementById('noov-rewards');if(!el)return;
+  const items=[
+    {ico:'trophy',t:'Concours',d:'Tente de gagner de gros lots en jouant tes NOOVS.'},
+    {ico:'eye',t:'Sans publicité',d:'Retire les publicités de l\'app avec tes NOOVS.'},
+    {ico:'credit-card',t:'Cash',d:'Échange tes NOOVS contre de l\'argent.'},
+    {ico:'gift-generic',t:'Bons cadeaux',d:'Des bons chez tes enseignes préférées.'}
+  ];
+  el.innerHTML=items.map(i=>`<div class="noov-soon"><div class="ns-ico">${icon(i.ico,{size:22})}</div><div style="flex:1;min-width:0"><div class="ns-t">${i.t}</div><div class="ns-d">${i.d}</div></div><div class="ns-tag">Arrive bientôt</div></div>`).join('');
 }
 function renderDailyTrack(){
   const el=document.getElementById('daily-track');if(!el)return;

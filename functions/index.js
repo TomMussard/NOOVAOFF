@@ -11,8 +11,9 @@ const db = admin.firestore();
 setGlobalOptions({ region: "europe-west1", maxInstances: 10 });
 
 // Économie NOOVA : seules les 3 premières réponses de la journée rapportent des POINTS
-// échangeables ; au-delà, chaque réponse rapporte la MÊME valeur mais en NOOVS (monnaie virtuelle :
-// concours, retrait des pubs, cash, bons cadeaux — à venir), sans bonus de série. Une réponse en moins de 3 s est considérée non lue.
+// échangeables ; au-delà, chaque réponse rapporte 1 NOOV (monnaie virtuelle : concours, retrait
+// des pubs, cash, bons cadeaux — à venir), sans bonus de série. Une réponse trop rapide est non lue.
+const NOOVS_PER_ANSWER = 1;
 const MAX_POINT_ANSWERS_PER_DAY = 3;
 // Le client impose 3 s avant « Valider » ; le serveur mesure lui-même le temps écoulé depuis
 // beginQuestion (le client ne peut pas tricher sur la durée), avec une marge de 500 ms pour la latence.
@@ -131,7 +132,7 @@ exports.submitAnswer = onCall(async (request) => {
         }
         if (qIdx === 2) serieBonus = 10;
       } else {
-        noovsEarned = POINTS_BY_INDEX[qIdx] || 10;
+        noovsEarned = NOOVS_PER_ANSWER;
       }
     }
     const totalEarned = earnedPts + streakBonus + serieBonus;
