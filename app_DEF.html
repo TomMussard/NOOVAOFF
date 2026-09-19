@@ -919,6 +919,17 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div style="font-size:13px;color:var(--ink2);margin-top:8px">Bienvenue sur NOOVA.</div>
 </div>
 
+<!-- Feuille d'explication avant une permission système (notifications, position) -->
+<div id="perm-sheet" onclick="if(event.target===this)permLater()" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:center">
+  <div style="background:var(--card);border-radius:24px 24px 0 0;max-width:430px;width:100%;padding:22px 22px calc(24px + env(safe-area-inset-bottom,0px))">
+    <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
+    <div id="perm-title" style="font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:-.5px;color:var(--ink);margin-bottom:8px">Titre</div>
+    <div id="perm-text" style="font-size:14px;color:var(--ink2);line-height:1.65;margin-bottom:20px">Texte</div>
+    <button class="btn-p" id="perm-cta" onclick="permAccept()">Activer</button>
+    <button class="btn-s" style="margin-top:8px" onclick="permLater()">Pas maintenant</button>
+  </div>
+</div>
+
 <!-- BRANDS CONSENT -->
 <div id="brands" class="screen">
   <div class="brands-body">
@@ -983,6 +994,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
         <div class="dtoday-cta">Répondre en 30 secondes <div class="tc-arr">→</div></div>
       </div>
     </div>
+    <div id="home-state" style="display:none;margin:0 22px 14px"></div>
     <div class="dstreak-card">
       <div class="dstreak-top">
         <div class="dstreak-fire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 2c1 3-2 4-2 7a2 2 0 004 0c1 1 2 2.5 2 4.5A5.5 5.5 0 016.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0012 22a8 8 0 007-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg></div>
@@ -1659,6 +1671,7 @@ function refreshHome(){
     document.getElementById('dtoday-logo').innerHTML='';
     const tcImg=document.getElementById('dtoday-photo').querySelector('img'); if(tcImg) tcImg.remove();
   }
+  renderHomeState();
   renderQueue();
   renderAlmostReward();
   renderNearbyMap();
@@ -2696,6 +2709,7 @@ function openReward(o){
   if(o.brandName)mk('btn-s','Voir la page de '+o.brandName, o.merchantId ? ()=>openBrandById(o.merchantId,o.brandName) : ()=>openBrand(o.brandName,'home'));
   if(S.qs&&S.qs.length>0)mk('btn-s','Revenir à l’accueil',()=>goNav('home'));
   spawnConfetti();goTo('reward');
+  setTimeout(maybeAskNotifications,1600);
 }
 
 /* --- Sortie écran question (✕ / Terminer) --- */
@@ -2887,7 +2901,7 @@ function ensureUserLocation(){
   S._geoPromise = new Promise(resolve => {
     if(!navigator.geolocation){ S._geoDenied=true; resolve(null); return; }
     navigator.geolocation.getCurrentPosition(
-      pos => { S.userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude }; resolve(S.userLoc); },
+      pos => { S.userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude }; try{localStorage.setItem('nv_geo_ok','1');}catch(e){} resolve(S.userLoc); },
       () => { S._geoDenied = true; resolve(null); },
       { enableHighAccuracy:false, timeout:8000, maximumAge:300000 }
     );
@@ -3017,10 +3031,10 @@ async function renderNearbyMap(){
     emptyEl.innerHTML='Autorise des commerces pour voir la carte de ton quartier.';
     return;
   }
-  const loc=await ensureUserLocation();
+  const loc=geoAllowed()?await ensureUserLocation():null;
   if(!loc){
     emptyEl.style.display='flex';
-    emptyEl.innerHTML='Active ta position pour voir les commerces autour de toi.<button onclick="retryUserLocation()">Activer ma position</button>';
+    emptyEl.innerHTML='Active ta position pour voir les commerces autour de toi.<button onclick="askGeo()">Activer ma position</button>';
     return;
   }
   emptyEl.style.display='none';
@@ -3032,7 +3046,8 @@ async function renderNearbyMap(){
 
 async function openFullMap(){
   goTo('map-full');
-  const loc=await ensureUserLocation();
+  if(!geoAllowed()) setTimeout(askGeo,400);
+  const loc=geoAllowed()?await ensureUserLocation():null;
   const geo=await getGeocodedNearbyCards();
   if(!_fullMap){
     _fullMap=L.map('nv-full-map',{zoomControl:true});
@@ -3514,6 +3529,79 @@ async function saveCategories(){
   btn.disabled=false;btn.textContent='Continuer';
 }
 
+// ─── États de l'accueil (U6) ─────────────────────────────────
+function cityPhrase(label){
+  label=(label||'').trim();
+  if(!label)return 'chez toi';
+  return /^le\s/i.test(label)?'au '+label.replace(/^le\s+/i,''):'\u00e0 '+label;
+}
+function renderHomeState(){
+  const el=document.getElementById('home-state'),card=document.getElementById('today-card');
+  if(!el||!card)return;
+  if(S.qs&&S.qs.length){el.style.display='none';card.style.display='';return;}
+  card.style.display='none';el.style.display='block';
+  const merchants=Object.keys(_verifiedMerchantsCache||{}).length;
+  const box='background:var(--yellow);border-radius:var(--r-card);padding:22px 20px;margin-bottom:14px;box-shadow:var(--shadow-raised)';
+  const h='font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.8px;color:var(--ink);line-height:1.15;margin-bottom:8px';
+  if(!merchants){
+    el.innerHTML='<div style="'+box+'"><div style="'+h+'">NOOVA arrive '+esc(cityPhrase(S._cityLabel))+'.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Aucun commerce de ta ville n\'a encore lancé de question. Dis-nous lesquels tu aimerais voir ici.</div></div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:10px"><input id="suggest-inp" type="text" maxlength="80" placeholder="Un commerce à suggérer" style="flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb)"><button onclick="suggestMerchant()" style="padding:0 18px;border-radius:16px;border:none;background:var(--ink);color:#fff;font-family:var(--fd);font-weight:800;font-size:14px;cursor:pointer">Suggérer</button></div>'
+      +'<button class="btn-s" onclick="shareNoova()">Inviter mes amis</button>';
+  }else if((S.ans||0)>0){
+    el.innerHTML='<div style="'+box+'"><div style="'+h+'">C\'est fait pour aujourd\'hui.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Merci pour tes réponses. Reviens demain pour de nouvelles questions.</div></div>';
+  }else{
+    el.innerHTML='<div style="'+box+'"><div style="'+h+'">Pas encore de question.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Les commerces de ta ville n\'ont rien posé pour l\'instant. Reviens bientôt.</div></div>';
+  }
+}
+async function suggestMerchant(){
+  const inp=document.getElementById('suggest-inp'),uid=auth.currentUser&&auth.currentUser.uid;
+  const v=inp&&inp.value.trim();
+  if(!v||!uid)return;
+  try{
+    await db.collection('users').doc(uid).update({suggestedMerchants:firebase.firestore.FieldValue.arrayUnion(v.substring(0,80))});
+    inp.value='';trackEvent('merchant_suggested');
+    showToast('Merci, on transmet ta suggestion.','success');
+  }catch(e){showToast("Envoi impossible pour l'instant.",'error');}
+}
+async function shareNoova(){
+  const data={title:'NOOVA',text:'Réponds aux commerces de ton quartier et gagne des récompenses.',url:'https://noovaoff.fr/app-v2'};
+  try{
+    if(navigator.share){await navigator.share(data);trackEvent('share',{method:'native'});}
+    else{await navigator.clipboard.writeText(data.url);showToast('Lien copié.','success');}
+  }catch(e){}
+}
+
+// ─── Permissions en contexte (U7) : explication maison avant la pop-up système ─
+// Refus ou « pas maintenant » : on ne redemande pas avant 7 jours.
+let _permCb=null,_permKey=null;
+function askPerm(o){
+  try{const t=+localStorage.getItem('nv_perm_'+o.key)||0;if(Date.now()-t<7*86400000)return false;}catch(e){}
+  _permCb=o.onAccept;_permKey=o.key;
+  document.getElementById('perm-title').textContent=o.title;
+  document.getElementById('perm-text').textContent=o.text;
+  document.getElementById('perm-cta').textContent=o.cta;
+  document.getElementById('perm-sheet').style.display='flex';
+  return true;
+}
+function permAccept(){
+  document.getElementById('perm-sheet').style.display='none';
+  const cb=_permCb;_permCb=null;if(cb)cb();
+}
+function permLater(){
+  document.getElementById('perm-sheet').style.display='none';
+  try{localStorage.setItem('nv_perm_'+_permKey,String(Date.now()));}catch(e){}
+  _permCb=null;
+}
+function maybeAskNotifications(){
+  if(!auth.currentUser||typeof Notification==='undefined'||Notification.permission!=='default')return;
+  if(notifSupportReason()!=='ok')return;
+  askPerm({key:'notif',title:'Une notification par jour',text:'Une notification par jour, quand un commerce a besoin de ton avis. Tu peux l\'arrêter à tout moment depuis ton profil.',cta:'Activer les notifications',onAccept:()=>enableNotifications(auth.currentUser.uid)});
+}
+function geoAllowed(){try{return localStorage.getItem('nv_geo_ok')==='1';}catch(e){return false;}}
+function askGeo(){
+  askPerm({key:'geo',title:'Voir les commerces à deux pas',text:'NOOVA utilise ta position uniquement pour afficher les commerces autour de toi. Elle n\'est pas enregistrée.',cta:'Autoriser la position',onAccept:()=>{try{localStorage.setItem('nv_geo_ok','1');}catch(e){}retryUserLocation();}});
+}
+
 // ─── Récompenses Firestore — groupées par commerce ────────────
 let _rewardsUnsub = null;
 async function loadRewardsFromFirestore() {
@@ -3681,6 +3769,7 @@ function loadActiveRedemptions(){
   _redemptionsUnsub = db.collection('redemptions').where('userId','==',uid).onSnapshot(snap => {
     const now = Date.now();
     const active = [];
+    if(!snap.empty) S._everRedeemed = true;
     snap.forEach(doc => {
       const d = doc.data();
       if(d.status !== 'pending') return;
@@ -3771,6 +3860,8 @@ async function redeemReward(reward) {
       tx.update(rewardRef, { redeemedCount: firebase.firestore.FieldValue.increment(1) });
     });
     S.pts = Math.max(0, S.pts - (reward.cost||0));
+    S._everRedeemed = true;
+    setTimeout(maybeShowInstallInvite, 2500);
     refreshWallet();
     trackEvent('spend_virtual_currency', { virtual_currency_name: 'points', value: reward.cost||0, item_name: reward.label||'Récompense' });
     showVoucherModal({ code, label: reward.label, merchantName: reward.merchantName, cost: reward.cost, purchaseCondition: reward.purchaseCondition, expiresAt });
@@ -3886,7 +3977,7 @@ function maybeShowHomeTour(){
   setTimeout(()=>showTourStep(0), 550);
 }
 function showTourStep(i){
-  while(i<HOME_TOUR_STEPS.length && !document.querySelector(HOME_TOUR_STEPS[i].sel)) i++;
+  while(i<HOME_TOUR_STEPS.length){ const el=document.querySelector(HOME_TOUR_STEPS[i].sel); if(el && el.offsetParent!==null) break; i++; }
   if(i>=HOME_TOUR_STEPS.length){ endHomeTour(); return; }
   _tourIdx=i;
   const step=HOME_TOUR_STEPS[i];
@@ -3942,6 +4033,7 @@ function nvIsStandalone(){ return window.matchMedia('(display-mode: standalone)'
 window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); _deferredInstallPrompt=e; });
 function maybeShowInstallInvite(){
   if(nvIsStandalone()) return;
+  if(!((S.streak||0) >= 2 || S._everRedeemed)) return;
   if(document.getElementById('install-banner')) return;
   try{ if(localStorage.getItem('nv_install_dismissed')) return; }catch(e){}
   if(!NV_IS_IOS && !_deferredInstallPrompt) return; // navigateur sans support d'installation connu
