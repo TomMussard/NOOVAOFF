@@ -19,6 +19,11 @@ service cloud.firestore {
         otherUid in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('friendUids', []) &&
         request.auth.uid in get(/databases/$(database)/documents/users/$(otherUid)).data.get('friendUids', []);
     }
+    // Réponses d'un ami : lisibles seulement s'il n'a pas coupé « Montrer mes réponses à mes amis »
+    // (users.shareAnswers, activé par défaut). Le réglage est donc appliqué aussi côté règles.
+    function friendSharesAnswers(otherUid) {
+      return get(/databases/$(database)/documents/users/$(otherUid)).data.get('shareAnswers', true) != false;
+    }
     // Une photo (avatar, logo, couverture) ne peut pointer que vers un fichier du compte lui-même :
     // /users/{uid}/... ou /merchants/{uid}/... dans le Storage. Impossible d'afficher la photo d'un autre.
     function ownFile(url, folder, id) {
@@ -162,7 +167,7 @@ service cloud.firestore {
       allow read: if isAuth() && (
         resource.data.userId == request.auth.uid ||
         resource.data.merchantId == request.auth.uid ||
-        isFriendOf(resource.data.userId) ||
+        (isFriendOf(resource.data.userId) && friendSharesAnswers(resource.data.userId)) ||
         isAdmin()
       );
       // Modération : l'admin peut uniquement lever/poser le flag anti-abus
@@ -360,6 +365,7 @@ service cloud.firestore {
     match /notifQueue/{id}     { allow read, write: if false; }
     // Compteurs de réponses par option (reveal) : serveur uniquement, jamais lisibles avant d'avoir répondu.
     match /campaignStats/{id}  { allow read, write: if false; }
+    match /compatCache/{id}    { allow read, write: if false; }
     match /mail/{id}           { allow read, write: if false; }
   }
 }

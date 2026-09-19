@@ -10,6 +10,7 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const CFG = require("./engagementConfig");
+const { sectorCategory } = require("./lib");
 
 const db = () => admin.firestore();
 const uniq = (a) => [...new Set((a || []).filter(Boolean))];
@@ -108,7 +109,103 @@ const getReveal = onCall(async (request) => {
   return revealCore(uid, request.data || {});
 });
 
+// ─────────────────────────── Compatibilité entre amis ───────────────────────────
+// Accord = part des questions à choix (répondues par les DEUX) où l'on a donné la même réponse.
+// Jamais de réponse individuelle renvoyée : seulement un pourcentage, et seulement si l'ami partage
+// ses réponses (users.shareAnswers) et si les deux ont assez de questions en commun.
+const pairId = (a, b) => [a, b].sort().join("_");
+
+async function answersOf(uid) {
+  const snap = await db().collection("answers").where("userId", "==", uid)
+    .select("campaignId", "questionIdx", "answer", "category").limit(CFG.COMPAT.MAX_ANSWERS_SCAN).get();
+  const m = new Map();
+  snap.forEach((d) => { const a = d.data(); m.set(`${a.campaignId}#${a.questionIdx || 0}`, a); });
+  return m;
+}
+
+async function campaignsOf(ids, memo) {
+  const need = ids.filter((id) => !memo.has(id));
+  if (need.length) {
+    const snaps = await db().getAll(...need.map((id) => db().collection("campaigns").doc(id)));
+    snaps.forEach((s, i) => memo.set(need[i], s.exists ? s.data() : null));
+  }
+  return memo;
+}
+
+// { common, agree, cats: { boulangerie: { c, a } } } — mis en cache CACHE_MINUTES (id de paire).
+async function pairStats(uid, fid, mine, memo, now) {
+  const ref = db().collection("compatCache").doc(pairId(uid, fid));
+  const cached = await ref.get();
+  if (cached.exists && now - cached.data().computedAt < CFG.COMPAT.CACHE_MINUTES * 60000) return cached.data();
+  const theirs = await answersOf(fid);
+  const keys = [...mine.keys()].filter((k) => theirs.has(k));
+  await campaignsOf(uniq(keys.map((k) => k.split("#")[0])), memo);
+  const out = { computedAt: now, common: 0, agree: 0, cats: {} };
+  keys.forEach((k) => {
+    const [cid, qi] = k.split("#");
+    const camp = memo.get(cid);
+    if (!camp) return;
+    const def = qDefOf(camp, Number(qi));
+    if (!CFG.COMPAT.FORMATS.includes(def.format)) return;
+    const same = String(mine.get(k).answer) === String(theirs.get(k).answer);
+    const cat = mine.get(k).category || sectorCategory(camp.sector || camp.merchantTheme);
+    out.common++;
+    if (same) out.agree++;
+    out.cats[cat] = out.cats[cat] || { c: 0, a: 0 };
+    out.cats[cat].c++;
+    if (same) out.cats[cat].a++;
+  });
+  await ref.set(out);
+  return out;
+}
+
+const pctOf = (a, c) => Math.round((a * 100) / c);
+
+async function compatCore(uid, data, now = Date.now()) {
+  const meSnap = await db().collection("users").doc(uid).get();
+  const me = meSnap.data() || {};
+  if (me.shareAnswers === false) return { sharing: false, friends: [] };  // il faut partager pour comparer
+  let ids = uniq(me.friendUids).filter((f) => f !== uid).slice(0, CFG.COMPAT.MAX_FRIENDS);
+  const only = data && data.friendUid;
+  if (only) {
+    if (!ids.includes(only)) throw new HttpsError("permission-denied", "Cette personne n'est pas dans tes amis.");
+    ids = [only];
+  }
+  const fUsers = ids.length ? await db().getAll(...ids.map((f) => db().collection("users").doc(f))) : [];
+  const mine = await answersOf(uid);
+  const memo = new Map();
+  const list = [];
+  for (let i = 0; i < ids.length; i++) {
+    const fu = fUsers[i];
+    if (!fu.exists) continue;
+    const f = fu.data();
+    if (!(f.friendUids || []).includes(uid)) continue;               // amitié non réciproque
+    const row = { uid: ids[i], name: f.name || "Ami", photoUrl: f.photoUrl || null };
+    if (f.shareAnswers === false) { list.push({ ...row, state: "private" }); continue; }
+    const st = await pairStats(uid, ids[i], mine, memo, now);
+    if (st.common < CFG.COMPAT.MIN_COMMON) {
+      list.push({ ...row, state: "need", common: st.common, needed: CFG.COMPAT.MIN_COMMON - st.common });
+      continue;
+    }
+    const cats = Object.entries(st.cats)
+      .filter(([, v]) => v.c >= CFG.COMPAT.MIN_COMMON_PER_CATEGORY)
+      .map(([category, v]) => ({ category, common: v.c, pct: pctOf(v.a, v.c) }))
+      .sort((a, b) => b.pct - a.pct || b.common - a.common);
+    list.push({ ...row, state: "ok", pct: pctOf(st.agree, st.common), agree: st.agree, common: st.common, categories: cats });
+  }
+  const rank = { ok: 0, need: 1, private: 2 };
+  list.sort((a, b) => rank[a.state] - rank[b.state] || (b.pct || 0) - (a.pct || 0) || (b.common || 0) - (a.common || 0));
+  return { sharing: true, min: CFG.COMPAT.MIN_COMMON, friends: list };
+}
+
+const getCompat = onCall(async (request) => {
+  const uid = request.auth && request.auth.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi.");
+  return compatCore(uid, request.data || {});
+});
+
 module.exports = {
   getReveal,
-  _t: { revealCore, loadStats, friendsWhoAnswered, qDefOf, uniq },
+  getCompat,
+  _t: { compatCore, revealCore, loadStats, friendsWhoAnswered, qDefOf, uniq },
 };

@@ -144,6 +144,29 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .rv-foot{font-size:11.5px;color:var(--ink3);margin-top:6px}
 .rv-info{display:flex;gap:9px;align-items:center;background:var(--md);border-radius:12px;padding:9px 11px;font-size:11.5px;color:var(--ink2);line-height:1.45;margin-top:10px}
 .rv-info button{background:none;border:none;color:var(--ink);font-weight:800;text-decoration:underline;font-size:11.5px;cursor:pointer;font-family:var(--fb);padding:0;flex-shrink:0}
+.cp-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bg3);cursor:pointer;transition:opacity .13s}
+.cp-row:active{opacity:.6}
+.cp-mid{flex:1;min-width:0}
+.cp-name{font-size:13px;font-weight:600;color:var(--ink)}
+.cp-sub{font-size:11px;color:var(--ink2);margin-top:2px;line-height:1.4}
+.cp-pct{font-family:var(--fd);font-weight:800;font-size:18px;color:var(--ink);flex-shrink:0;letter-spacing:-.4px}
+.cp-pct.muted{font-size:13px;color:var(--ink3);font-weight:700}
+.cp-bar{height:6px;border-radius:99px;background:var(--bg2);overflow:hidden;margin-top:6px}
+.cp-bar>div{height:100%;background:var(--ink);border-radius:99px;transition:width .6s ease}
+.cp-off{background:var(--md);border-radius:14px;padding:12px 14px;font-size:12px;color:var(--ink2);line-height:1.5;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.cp-off button{background:var(--ink);color:var(--yellow);border:none;border-radius:99px;font-weight:800;font-size:12px;padding:8px 14px;cursor:pointer;font-family:var(--fd);flex-shrink:0}
+.fpr-wrap{padding:14px 18px 40px}
+.fpr-head{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:18px}
+.fi-av.fpr-av{width:84px;height:84px;font-size:32px;margin-bottom:10px}
+.fpr-name{font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:-.5px;color:var(--ink)}
+.fpr-meta{font-size:12.5px;color:var(--ink2);margin-top:3px;display:flex;align-items:center;gap:8px;justify-content:center}
+.fpr-card{background:var(--surface);border-radius:var(--r-card);padding:18px 16px;box-shadow:var(--shadow-card);margin-bottom:12px}
+.fpr-big{font-family:var(--fd);font-weight:800;font-size:44px;letter-spacing:-1.5px;color:var(--ink);line-height:1}
+.fpr-lbl{font-size:12.5px;color:var(--ink2);margin-top:6px;line-height:1.5}
+.fpr-cat{margin-top:14px}
+.fpr-cat-top{display:flex;justify-content:space-between;font-size:13px;color:var(--ink);margin-bottom:5px}
+.fpr-cat-top b{font-family:var(--fd);font-weight:800}
+.fpr-btn{width:100%;padding:15px;border:none;border-radius:var(--r-pill);background:var(--yellow);color:var(--ink);font-family:var(--fd);font-weight:800;font-size:15px;cursor:pointer}
 .rv-skel .rv-bar{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
 #lock-bar{height:6px;border-radius:99px;overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
 #lock-bar.on{opacity:1}
@@ -1216,6 +1239,14 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   </div>
 </div>
 
+<!-- PROFIL D'UN AMI -->
+<div id="fprofile" class="screen">
+  <div class="fpr-wrap">
+    <div class="back-btn" onclick="goTo('social')">←</div>
+    <div id="fp-body"></div>
+  </div>
+</div>
+
 <!-- CHAT -->
 <div id="chat" class="screen">
   <div class="chat-hdr">
@@ -2191,21 +2222,22 @@ async function loadFriendAnswers() {
   S._friendAnswers = {};
   if (!S._friendUids || !S._friendUids.length) return;
   if (!S.qs || !S.qs.length) return;
-  const uids = S._friendUids.slice(0, 30);
+  const uids = S._friendUids.slice(0, 30)
+    .filter(u => { const f = (S.friends || []).find(x => x.uid === u); return !f || f.share !== false; });
   const campSet = new Set(S.qs.map(q => q._firestoreId).filter(Boolean));
   if (!campSet.size) return;
-  try {
-    const snap = await db.collection('answers')
-      .where('userId', 'in', uids)
-      .limit(200)
-      .get();
-    snap.forEach(doc => {
+  // Une requête par ami : si l'un d'eux a coupé le partage de ses réponses (règle refusée), les autres
+  // continuent de s'afficher.
+  const results = await Promise.allSettled(uids.map(u => db.collection('answers').where('userId', '==', u).limit(40).get()));
+  results.forEach(r => {
+    if (r.status !== 'fulfilled') return;
+    r.value.forEach(doc => {
       const d = doc.data();
       if (!campSet.has(d.campaignId)) return;
       if (!S._friendAnswers[d.campaignId]) S._friendAnswers[d.campaignId] = [];
       S._friendAnswers[d.campaignId].push({ uid: d.userId, answer: d.answer || '' });
     });
-  } catch(e) { console.warn('loadFriendAnswers:', e); }
+  });
 }
 
 function getFriendName(uid) {
@@ -2299,6 +2331,10 @@ function initFriendsPanel(){
       </div>
       <div id="fi-err" style="font-size:12px;color:var(--danger);min-height:18px;margin-top:6px"></div>
     </div>
+    <div style="padding:0 18px 14px;display:none" id="compat-wrap">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px">Mes compatibilités</div>
+      <div id="compat-list"></div>
+    </div>
     <div style="padding:0 18px">
       <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Mes amis <span id="friends-count" style="color:var(--ink);font-weight:800"></span></div>
       <div id="friends-list"></div>
@@ -2338,6 +2374,7 @@ function renderFriends(){
   const countEl=document.getElementById('friends-count');
   if(countEl)countEl.textContent=S.friends.length?'('+S.friends.length+')':'';
   el.innerHTML='';
+  renderCompatList();
   if(!S.friends.length){
     el.innerHTML=`<div style="text-align:center;padding:28px 16px 8px"><div style="margin-bottom:10px;color:var(--ink3);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;vertical-align:-2px"><path d="M2 12l4-3 4 3 3-3 2 2"/><path d="M22 12l-4-3-3.5 3-2.5-1"/><path d="M9 12l3 3 2-2"/><path d="M12 15l2 2 2-2"/></svg></div><div style="color:var(--ink2);font-size:13px;line-height:1.6">Aucun ami pour l'instant.<br>Partage ton code pour commencer !</div></div>`;
     return;
@@ -2347,11 +2384,72 @@ function renderFriends(){
     const c=AVC[i%AVC.length];
     const d=document.createElement('div');
     d.className='fi';
-    d.onclick=()=>openChatFor(f);
+    d.onclick=()=>openFriendProfile(f);
     d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${avInner(f.photoUrl,f.n)}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.xp} xp · <span style="color:var(--ink2);font-weight:700;display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c1 1 2 2.5 2 4.5A5.5 5.5 0 0 1 6.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0 0 12 22a8 8 0 0 0 7-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg> ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
     el.appendChild(d);
   });
   applyStagger(el);
+}
+
+// ─── Compatibilité entre amis ────────────────────────────────
+// Le serveur (getCompat) ne renvoie que des pourcentages : jamais une réponse individuelle. Il applique
+// le seuil (5 questions en commun) et le réglage « Montrer mes réponses à mes amis » des deux côtés.
+const COMPAT_TTL_MS = 2 * 60 * 1000;
+async function fetchCompat(force){
+  if(!force && S._compat && Date.now()-S._compat.t<COMPAT_TTL_MS) return S._compat.data;
+  if(S._compatBusy) return S._compatBusy;
+  S._compatBusy = fx.httpsCallable('getCompat')({}).then(r=>{S._compat={t:Date.now(),data:r.data};return r.data;}).finally(()=>{S._compatBusy=null;});
+  return S._compatBusy;
+}
+function compatSubText(c){
+  if(c.state==='ok') return c.common+' question'+(c.common>1?'s':'')+' en commun';
+  if(c.state==='need') return 'Répondez à '+c.needed+' question'+(c.needed>1?'s':'')+' de plus pour découvrir votre compatibilité';
+  return 'Ne partage pas ses réponses';
+}
+function renderCompatList(){
+  const wrap=document.getElementById('compat-wrap'),el=document.getElementById('compat-list');
+  if(!wrap||!el)return;
+  if(!S.friends||!S.friends.length){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  fetchCompat().then(data=>{
+    const el2=document.getElementById('compat-list');if(!el2)return;
+    if(data.sharing===false){
+      el2.innerHTML=`<div class="cp-off"><span>Pour comparer vos réponses, active « Montrer mes réponses à mes amis ».</span><button onclick="enableCompatSharing()">Activer</button></div>`;
+      return;
+    }
+    const byUid=new Map((S.friends||[]).map(f=>[f.uid,f]));
+    el2.innerHTML=(data.friends||[]).filter(c=>byUid.has(c.uid)).map(c=>{
+      const f=byUid.get(c.uid),i=S.friends.indexOf(f),col=AVC[i%AVC.length];
+      const right=c.state==='ok'?`<div class="cp-pct">${c.pct} %</div>`:`<div class="cp-pct muted">—</div>`;
+      const bar=c.state==='ok'?`<div class="cp-bar"><div style="width:${c.pct}%"></div></div>`:'';
+      return `<div class="cp-row" onclick="openFriendProfile(S.friends.find(x=>x.uid==='${esc(c.uid)}'))"><div class="fi-av" style="background:${col}18;color:${col}">${avInner(c.photoUrl,c.name)}</div><div class="cp-mid"><div class="cp-name">${esc(c.name)}</div><div class="cp-sub">${esc(compatSubText(c))}</div>${bar}</div>${right}</div>`;
+    }).join('');
+  }).catch(e=>{console.warn('compat:',e);const el2=document.getElementById('compat-wrap');if(el2)el2.style.display='none';});
+}
+async function enableCompatSharing(){
+  await setShareAnswers(true);
+  const i=document.getElementById('share-answers-inp');if(i)i.checked=S._shareAnswers!==false;
+  S._compat=null;renderCompatList();
+}
+async function openFriendProfile(f){
+  if(!f)return;
+  const idx=(S.friends||[]).findIndex(x=>x.uid===f.uid),col=AVC[(idx<0?0:idx)%AVC.length];
+  const body=document.getElementById('fp-body');
+  body.innerHTML=`<div class="fpr-head"><div class="fi-av fpr-av" style="background:${col}18;color:${col}">${avInner(f.photoUrl,f.n)}</div><div class="fpr-name">${esc(f.n)}</div><div class="fpr-meta"><span>${f.xp||0} xp</span><span>·</span><span style="display:inline-flex;align-items:center;gap:3px">${icon('fire',{size:13})} ${f.str||0} j</span></div></div>
+    <div class="fpr-card" id="fp-compat"><div class="rv-skel"><div class="rv-bar" style="height:44px"></div></div></div>
+    <button class="fpr-btn" onclick="openChatFor(S.friends.find(x=>x.uid==='${esc(f.uid)}'))">Envoyer un message</button>`;
+  goTo('fprofile');
+  const card=()=>document.getElementById('fp-compat');
+  try{
+    const data=await fetchCompat();
+    if(!card())return;
+    if(data.sharing===false){card().innerHTML=`<div class="cp-off" style="padding:0;background:none"><span>Pour comparer vos réponses, active « Montrer mes réponses à mes amis ».</span><button onclick="enableCompatSharing().then(()=>openFriendProfile(S.friends.find(x=>x.uid==='${esc(f.uid)}')))">Activer</button></div>`;return;}
+    const c=(data.friends||[]).find(x=>x.uid===f.uid);
+    if(!c){card().style.display='none';return;}
+    if(c.state!=='ok'){card().innerHTML=`<div class="fpr-lbl" style="margin-top:0">${esc(compatSubText(c))}.</div>`;return;}
+    const cats=(c.categories||[]).map(k=>`<div class="fpr-cat"><div class="fpr-cat-top"><span>${esc(CAT_LABELS[k.category]||k.category)}</span><b>${k.pct} %</b></div><div class="cp-bar"><div style="width:${k.pct}%"></div></div></div>`).join('');
+    card().innerHTML=`<div class="fpr-big">${c.pct} %</div><div class="fpr-lbl">de compatibilité avec ${esc(f.n)} · d'accord sur ${c.agree} des ${c.common} questions que vous avez en commun.</div>${cats}`;
+  }catch(e){console.warn('friend profile compat:',e);if(card())card().style.display='none';}
 }
 // Classement entre amis (comme sur la maquette : "Toi" + tes amis, triés par xp).
 // Basé sur S.friends, déjà chargé en direct depuis Firestore (voir loadFriendsFromFirestore) —
@@ -4843,7 +4941,7 @@ async function loadFriendsFromFirestore(uids) {
       // Classement/liste d'amis basés sur l'XP (à vie, ne descend jamais) et non le solde
       // de points (dépensable, baisse à chaque échange) — sinon un ami qui vient d'échanger
       // une récompense semble "redescendre", ce qui n'est pas cohérent pour un classement.
-      return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, online, photoUrl: d.photoUrl || null };
+      return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, online, photoUrl: d.photoUrl || null, share: d.shareAnswers !== false };
     });
     renderFriends();
     if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }

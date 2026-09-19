@@ -46,6 +46,9 @@ module.exports = {
     MIN_COMMON: 5,               // questions en commun avant d'afficher un score
     MIN_COMMON_PER_CATEGORY: 3,  // idem pour le détail d'une catégorie de commerce
     CACHE_MINUTES: 10,
+    FORMATS: ["mcq"],            // formats comparables (un accord n'a de sens que sur un choix fermé)
+    MAX_ANSWERS_SCAN: 500,       // réponses les plus récentes lues par personne
+    MAX_FRIENDS: 30,
   },
 
   // ─── Impact visible ─── (étape 4)
