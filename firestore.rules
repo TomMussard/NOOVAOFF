@@ -12,9 +12,20 @@ service cloud.firestore {
     function getMerchant(merchantId) {
       return get(/databases/$(database)/documents/merchants/$(merchantId)).data;
     }
+    // Amitié RÉCIPROQUE : chacun doit avoir l'autre dans sa liste. Sinon n'importe qui pourrait
+    // s'ajouter unilatéralement (friendUids est écrit par son propriétaire) et lire le profil d'un inconnu.
     function isFriendOf(otherUid) {
       return isAuth() &&
-        otherUid in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('friendUids', []);
+        otherUid in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('friendUids', []) &&
+        request.auth.uid in get(/databases/$(database)/documents/users/$(otherUid)).data.get('friendUids', []);
+    }
+    // Une photo (avatar, logo, couverture) ne peut pointer que vers un fichier du compte lui-même :
+    // /users/{uid}/... ou /merchants/{uid}/... dans le Storage. Impossible d'afficher la photo d'un autre.
+    function ownFile(url, folder, id) {
+      // Jeu de caractères restreint (pas de guillemets, chevrons ni espaces) : l'URL est ensuite
+      // insérée dans des attributs HTML, elle ne doit jamais pouvoir en sortir.
+      return url == null ||
+        (url is string && url.matches('https://firebasestorage\\.googleapis\\.com/[A-Za-z0-9%._~:/?&=+-]*/o/' + folder + '%2F' + id + '%2F[A-Za-z0-9%._~:/?&=+-]*'));
     }
     function isAdmin() {
       return isAuth() && request.auth.token.email in ['noovaoffr@gmail.com', 'tomussproduction@gmail.com'];
@@ -31,12 +42,13 @@ service cloud.firestore {
         isFriendOf(uid) ||
         isAdmin() ||
         (isAuth() && myCity() != null && resource.data.get('city', null) == myCity());
-      allow create: if isOwner(uid);
+      allow create: if isOwner(uid) && ownFile(request.resource.data.get('photoUrl', null), 'users', uid);
       // Le crédit de points (points/xp/dailyEarned/streak/ans/lastAnswerDate/answeredCampaigns)
       // passe uniquement par la Cloud Function submitAnswer (SDK Admin, hors règles) — le
       // client ne peut plus jamais écrire librement ces champs. Seule exception tolérée : le
       // DÉBIT de points lors d'un échange de récompense (points ne peut alors que baisser).
-      allow update: if isAdmin() || (isOwner(uid) && (
+      allow update: if isAdmin() || (isOwner(uid) &&
+        ownFile(request.resource.data.get('photoUrl', null), 'users', uid) && (
         !request.resource.data.diff(resource.data).affectedKeys().hasAny(
           ['points','xp','dailyEarned','dailyEarnedDate','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns']
         )
@@ -48,10 +60,17 @@ service cloud.firestore {
       allow delete: if isOwner(uid) || isAdmin();
 
       // Notifications subcollection
+      // Les seules notifications créées par un autre habitant sont les demandes d'ami et leurs
+      // acceptations, avec un identifiant DÉTERMINISTE (un seul doc par expéditeur) : un doublon
+      // est structurellement impossible (le second envoi serait une mise à jour, refusée).
       match /notifications/{notifId} {
         allow read: if isOwner(uid) || isAdmin();
         allow update: if isOwner(uid);
-        allow create: if isAuth();
+        allow create: if isAdmin() || (isAuth() &&
+          request.resource.data.fromUid == request.auth.uid &&
+          request.auth.uid != uid &&
+          ((request.resource.data.type == 'friend_request' && notifId == 'friendreq_' + request.auth.uid) ||
+           (request.resource.data.type == 'friend_accepted' && notifId == 'friendacc_' + request.auth.uid)));
         allow delete: if isOwner(uid) || isAdmin();
       }
     }
@@ -70,7 +89,9 @@ service cloud.firestore {
       allow create: if isAuth() && (
         request.resource.data.ownerUid == request.auth.uid ||
         request.auth.uid == merchantId
-      ) && request.resource.data.get('status', null) == 'pending';
+      ) && request.resource.data.get('status', null) == 'pending' &&
+        ownFile(request.resource.data.get('logoUrl', null), 'merchants', merchantId) &&
+        ownFile(request.resource.data.get('coverUrl', null), 'merchants', merchantId);
       // Le commerçant peut modifier son profil (nom, secteur, ville, description...)
       // mais jamais son propre statut de vérification ni son ownerUid/role — seul
       // l'admin peut faire passer un compte pending -> verified/rejected.
@@ -78,6 +99,8 @@ service cloud.firestore {
         isAdmin() ||
         (
           (resource.data.ownerUid == request.auth.uid || merchantId == request.auth.uid) &&
+          ownFile(request.resource.data.get('logoUrl', null), 'merchants', merchantId) &&
+          ownFile(request.resource.data.get('coverUrl', null), 'merchants', merchantId) &&
           (
             !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'verifiedAt', 'submittedAt', 'ownerUid', 'role'])
             ||
@@ -94,7 +117,7 @@ service cloud.firestore {
       match /notifications/{notifId} {
         allow read: if isOwner(merchantId) || isAdmin();
         allow update: if isOwner(merchantId);
-        allow create: if isAuth();
+        allow create: if isAdmin() || isOwner(merchantId);
         allow delete: if isOwner(merchantId) || isAdmin();
       }
     }
@@ -214,6 +237,17 @@ service cloud.firestore {
         allow read: if isAuth();
         allow create: if isAuth() && uid == request.auth.uid;
         allow delete: if isAuth() && uid == request.auth.uid;
+      }
+
+      // Commentaires : un par auteur identifié (userId == uid), texte court, supprimables par leur auteur.
+      match /comments/{commentId} {
+        allow read: if isAuth();
+        allow create: if isAuth() &&
+          request.resource.data.userId == request.auth.uid &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 200;
+        allow update: if false;
+        allow delete: if isAuth() && (resource.data.userId == request.auth.uid || isAdmin());
       }
     }
 

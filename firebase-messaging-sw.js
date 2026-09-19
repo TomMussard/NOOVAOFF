@@ -14,14 +14,18 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+// Les messages avec un bloc "notification" sont déjà affichés par le navigateur/SDK :
+// les afficher aussi ici produisait deux notifications identiques. On ne gère donc que
+// les messages « data seule ».
 messaging.onBackgroundMessage((payload) => {
-  const n = payload.notification || {};
-  self.registration.showNotification(n.title || 'Noova', {
-    body: n.body || '',
+  if (payload.notification) return;
+  const d = payload.data || {};
+  self.registration.showNotification(d.title || 'Noova', {
+    body: d.body || '',
     icon: '/icon-192.png',
     badge: '/icon-192.png',
-    data: payload.data || {},
-    tag: (payload.data && payload.data.tag) || 'noova-generic'
+    data: d,
+    tag: d.tag || 'noova-generic'
   });
 });
 

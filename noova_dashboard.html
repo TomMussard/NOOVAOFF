@@ -2241,7 +2241,7 @@ window.addEventListener('load',()=>{
     <div style="background:var(--vd);border:1.5px solid rgba(161,78,8,.15);border-radius:14px;padding:16px 18px;text-align:left;margin-bottom:24px">
       <div style="font-size:12px;color:var(--ink2);line-height:2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Inscription enregistrée<br><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg> Vérification manuelle en cours (≤ 24h)<br><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Accès au dashboard après validation</div>
     </div>
-    <button onclick="auth.signOut()" style="padding:12px 24px;border-radius:11px;background:var(--bg2);border:1.5px solid var(--bg3);color:var(--ink2);font-size:13px;font-weight:600;font-family:var(--fb);cursor:pointer">Se déconnecter</button>
+    <button onclick="logout()" style="padding:12px 24px;border-radius:11px;background:var(--bg2);border:1.5px solid var(--bg3);color:var(--ink2);font-size:13px;font-weight:600;font-family:var(--fb);cursor:pointer">Se déconnecter</button>
     <div style="margin-top:12px;font-size:11px;color:var(--ink3)">Reviens dans quelques heures — tu recevras un email de confirmation.</div>
   </div>
 </div>
@@ -2799,10 +2799,12 @@ async function loadMerchantAndStart(uid) {
     if(el) el.textContent = _mData[setFields[domId]] || '—';
   });
   const logoPreview = document.getElementById('set-logo-preview');
-  if(logoPreview && _mData.logoUrl) logoPreview.innerHTML = `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`;
-  document.querySelectorAll('.sb-brand-av').forEach(el => { if(_mData.logoUrl) el.innerHTML = `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`; });
+  // Chaque compte a SA photo : on réécrit toujours l'affichage (image du compte OU icône par défaut),
+  // jamais « seulement si présent », sinon la photo du compte précédent restait à l'écran.
+  if(logoPreview) logoPreview.innerHTML = _mData.logoUrl ? `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">` : merchantLogoFallbackHTML();
+  document.querySelectorAll('.sb-brand-av').forEach(el => { el.innerHTML = _mData.logoUrl ? `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">` : merchantLogoFallbackHTML(); });
   const coverPreview = document.getElementById('set-cover-preview');
-  if(coverPreview && _mData.coverUrl) coverPreview.innerHTML = `<img src="${_mData.coverUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()" onload="this.decode?this.decode().catch(()=>this.parentElement.innerHTML=merchantCoverFallbackHTML()):0">`;
+  if(coverPreview) coverPreview.innerHTML = _mData.coverUrl ? `<img src="${_mData.coverUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()" onload="this.decode?this.decode().catch(()=>this.parentElement.innerHTML=merchantCoverFallbackHTML()):0">` : merchantCoverFallbackHTML();
   const setIddoc = document.getElementById('set-iddoc');
   if(setIddoc && _mData.idDocumentPath) setIddoc.textContent = 'Envoyé — en cours de vérification';
   // Update wizard preview brand names
@@ -3219,7 +3221,7 @@ function showRejectedScreen(data) {
           <strong style="color:var(--ink)">Contactez-nous</strong> pour en savoir plus ou soumettre une nouvelle demande.
         </div>
         <a href="mailto:noovaoffr@gmail.com?subject=Refus%20commerçant%20—%20${encodeURIComponent(data&&data.brandName||'')}" style="display:inline-block;background:var(--coral);color:white;padding:13px 28px;border-radius:var(--rx);font-weight:700;text-decoration:none;font-family:var(--fd);font-size:14px;margin-bottom:12px">Contacter le support</a>
-        <div><button onclick="auth.signOut()" style="background:none;border:none;color:var(--ink3);font-size:12px;cursor:pointer;padding:8px">Se déconnecter</button></div>
+        <div><button onclick="logout()" style="background:none;border:none;color:var(--ink3);font-size:12px;cursor:pointer;padding:8px">Se déconnecter</button></div>
       </div>`;
     document.body.appendChild(sc);
   }
@@ -3653,12 +3655,9 @@ function exportConsentJournal() {
 
 // ─── Déconnexion ─────────────────────────────────────────────
 function logout() {
-  auth.signOut().then(()=>{
-    const aw = document.getElementById('auth-wall');
-    aw.style.display='flex'; aw.style.opacity='1';
-    const pending = document.getElementById('pending-screen');
-    if(pending) pending.style.display = 'none';
-  });
+  // Rechargement complet après déconnexion : aucun état (logo, nom, campagnes, écouteurs) du
+  // commerçant précédent ne peut subsister à l'écran d'un autre compte sur le même navigateur.
+  auth.signOut().finally(() => { location.reload(); });
 }
 
 // ─── Google Sign-In ───────────────────────────────────────────

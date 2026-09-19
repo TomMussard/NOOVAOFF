@@ -373,6 +373,16 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .fp-foot{padding:8px 14px 10px;display:flex;gap:18px;border-top:1px solid var(--line)}
 .fp-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:0;border-radius:8px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;background:none;border:none;font-family:var(--fb);transition:all .13s}
 .fp-btn:active{opacity:.6}.fp-btn.liked{color:var(--ink);font-weight:800}
+.fp-comments{padding:4px 14px 14px;border-top:1px solid var(--bg3)}
+.fpc-row{display:flex;gap:9px;padding:9px 0}
+.fpc-av{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--yellow);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fpc-bd{flex:1;min-width:0}.fpc-nm{font-size:12px;font-weight:800;color:var(--ink);display:flex;justify-content:space-between;gap:8px}
+.fpc-tx{font-size:13px;color:var(--ink2);line-height:1.5;word-break:break-word}
+.fpc-del{background:none;border:none;color:var(--ink3);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fb)}
+.fpc-empty{font-size:12px;color:var(--ink3);padding:10px 0;text-align:center}
+.fpc-form{display:flex;gap:8px;margin-top:6px}
+.fpc-inp{flex:1;min-width:0;padding:11px 14px;border-radius:99px;border:1.5px solid var(--line-strong);background:var(--surface);font-size:13px;outline:none;font-family:var(--fb);color:var(--ink)}
+.fpc-send{padding:0 16px;border-radius:99px;border:none;background:var(--ink);color:#fff;font-weight:800;font-size:12.5px;cursor:pointer;font-family:var(--fd)}
 .wq-card{margin:0 18px 14px;background:var(--nv-black);border-radius:var(--r-card);padding:16px 17px;color:#fff;position:relative;overflow:hidden}
 .wq-tag{font-family:var(--fd);font-weight:700;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--coral)}
 .wq-text{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.22;letter-spacing:-.4px;margin:9px 0 13px}
@@ -459,6 +469,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .stat-l{font-size:10px;color:var(--ink2);margin-top:2px}
 .sec-card{background:var(--surface);border-radius:var(--r-card);margin-bottom:11px;overflow:hidden;box-shadow:var(--shadow-card)}
 .sc-hdr{padding:12px 13px;border-bottom:1px solid var(--bg3);display:flex;align-items:center;gap:8px}
+.sec-card.acc .sc-hdr{cursor:pointer;border-bottom:none;padding:15px 14px;user-select:none}
+.sec-card.acc.open .sc-hdr{border-bottom:1px solid var(--bg3)}
+.acc-chev{display:inline-flex;color:var(--ink3);transition:transform .2s;margin-left:6px}
+.sec-card.acc.open .acc-chev{transform:rotate(90deg)}
+.acc-body{display:none;padding:2px 0 4px}
+.sec-card.acc.open .acc-body{display:block}
 .sc-title{font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink);flex:1}
 .consent-it{padding:11px 13px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bg3)}
 .consent-it:last-child{border-bottom:none}
@@ -698,7 +714,33 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .mf-hdr{position:absolute;top:0;left:0;right:0;z-index:500;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 0;display:flex;align-items:center;gap:10px;pointer-events:none}
 .mf-hdr .back-btn{pointer-events:all;margin-bottom:0;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.15)}
 .mf-hdr .mf-title{pointer-events:all;font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink);background:var(--card);padding:10px 16px;border-radius:99px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
-#nv-full-map-wrap{position:absolute;inset:0}
+ #nv-full-map-wrap{position:absolute;inset:0}
+#mf-nomap{position:absolute;inset:0;background:var(--bg2);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--ink2);font-size:13px;line-height:1.6}
+#mf-filters{position:absolute;top:calc(64px + env(safe-area-inset-top,0px));left:0;right:0;z-index:500;display:flex;gap:8px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+#mf-filters::-webkit-scrollbar{display:none}
+.mf-chip{flex-shrink:0;padding:8px 14px;border-radius:99px;border:none;background:var(--card);color:var(--ink2);font-size:12px;font-weight:700;box-shadow:0 3px 10px rgba(0,0,0,.15);cursor:pointer;font-family:var(--fb);white-space:nowrap}
+.mf-chip.on{background:var(--nv-black);color:var(--nv-yellow)}
+#mf-locate{position:absolute;right:16px;bottom:calc(46% + 14px);z-index:550;width:44px;height:44px;border-radius:50%;border:none;background:var(--card);color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:bottom .25s}
+#mf-sheet{position:absolute;left:0;right:0;bottom:0;height:46%;z-index:600;background:var(--card);border-radius:24px 24px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;transition:height .25s;padding-bottom:env(safe-area-inset-bottom,0px)}
+#map-full.collapsed #mf-sheet{height:96px}
+#map-full.collapsed #mf-locate{bottom:110px}
+#mf-handle{padding:10px 0 4px;display:flex;justify-content:center;cursor:pointer}
+#mf-handle div{width:36px;height:4px;border-radius:99px;background:var(--bg3)}
+#mf-sheet-title{padding:2px 18px 8px;font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)}
+#mf-list{flex:1;overflow-y:auto;padding:0 14px 14px}
+.mf-row{display:flex;gap:11px;align-items:center;padding:10px;border-radius:16px;background:var(--surface);margin-bottom:8px;box-shadow:var(--shadow-card);cursor:pointer;border:2px solid transparent}
+.mf-row.sel{border-color:var(--nv-black)}
+.mf-row .mf-bd{flex:1;min-width:0}
+.mf-row .mf-nm{font-family:var(--fd);font-weight:800;font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mf-row .mf-mt{font-size:11.5px;color:var(--ink2);margin-top:1px}
+.mf-tag{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;margin-top:5px;background:var(--bg2);color:var(--ink2)}
+.mf-tag.q{background:var(--nv-yellow);color:var(--ink)}
+.mf-act{display:flex;flex-direction:column;gap:6px}
+.mf-act button{border:none;border-radius:99px;padding:7px 12px;font-size:11.5px;font-weight:800;cursor:pointer;font-family:var(--fb);background:var(--nv-black);color:#fff}
+.mf-act button.alt{background:var(--bg2);color:var(--ink)}
+.mf-empty{text-align:center;padding:18px 12px;color:var(--ink2);font-size:13px;line-height:1.6}
+.nv-pin.sel{width:26px;height:26px;background:var(--nv-yellow);border-color:var(--nv-black)}
+.leaflet-top.leaflet-right{margin-top:112px}
 .mf-popup{min-width:150px}
 .mf-popup .mfp-name{font-family:var(--fd);font-weight:800;font-size:13px;color:var(--ink)}
 .mf-popup .mfp-meta{font-size:11px;color:var(--ink2);margin:2px 0 8px}
@@ -1198,8 +1240,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="dimpact-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
       <div class="dimpact-txt" id="dimpact-txt">Réponds à quelques questions pour commencer à aider les commerces de ton quartier.</div>
     </div>
-    <div class="sec-card">
-      <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span><div class="sc-title">Mes informations</div></div>
+    <div class="sec-card acc">
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span><div class="sc-title">Mes informations</div><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="acc-body">
       <div class="consent-it" style="cursor:pointer" onclick="document.getElementById('avatar-file-inp').click()">
         <div class="dprof-av" id="settings-av-thumb" style="width:34px;height:34px;font-size:13px;border-width:1.5px;cursor:pointer"><span id="settings-av-thumb-letter">A</span></div>
         <div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Photo de profil</div>
@@ -1229,25 +1272,34 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
         <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
         <div style="flex:1;min-width:0"><div class="dconsent-name">Email</div><div class="dconsent-sub" id="set-u-email" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div>
       </div>
+      </div>
     </div>
-    <div class="sec-card">
-      <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="openManageMerchants()">Gérer</span></div>
+    <div class="sec-card acc">
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="openManageMerchants()">Gérer</span><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="acc-body">
       <div id="consent-mgmt"></div>
+      </div>
     </div>
-    <div class="sec-card">
-      <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div></div>
+    <div class="sec-card acc">
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="acc-body">
       <div class="consent-it" style="cursor:pointer" onclick="goTo('manage-merchants');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
       <div class="consent-it" style="cursor:pointer" onclick="goTo('how-it-works');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Comment ça marche</div><span style="color:var(--ink3);font-size:17px">›</span></div>
       <div class="consent-it" style="cursor:pointer;border-bottom:none" onclick="toggleNotifications()"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Notifications</div><span style="color:var(--ink3);font-size:12px" id="notif-settings-state">Activer ›</span></div>
       <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Conforme RGPD — révoque ou supprime tes données ci-dessous.</div></div>
+      </div>
     </div>
-    <div class="sec-card">
-      <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span><div class="sc-title">Badges</div><span style="font-size:11px;color:var(--ink2);font-weight:700" id="badges-count"></span></div>
+    <div class="sec-card acc">
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span><div class="sc-title">Badges</div><span style="font-size:11px;color:var(--ink2);font-weight:700" id="badges-count"></span><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="acc-body">
       <div class="badge-list" id="badges-list"></div>
+      </div>
     </div>
-    <div class="sec-card">
-      <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg></span><div class="sc-title">Historique des réponses</div></div>
+    <div class="sec-card acc">
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg></span><div class="sc-title">Historique des réponses</div><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="acc-body">
       <div id="hist-list"></div>
+      </div>
     </div>
     <div style="padding:0 0 12px">
       <button onclick="logout()" class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fd)"><span style="display:inline-flex;width:16px;height:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M20 12H10"/><path d="M16 8l4 4-4 4"/></svg></span> Se déconnecter</button>
@@ -1348,9 +1400,16 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <div id="map-full" class="screen">
   <div class="mf-hdr">
     <div class="back-btn" onclick="closeFullMap()">←</div>
-    <div class="mf-title">Commerces près de toi</div>
+    <div class="mf-title" id="mf-title">Commerces près de toi</div>
   </div>
-  <div id="nv-full-map-wrap"><div id="nv-full-map"></div></div>
+  <div id="nv-full-map-wrap"><div id="nv-full-map"></div><div id="mf-nomap" style="display:none"></div></div>
+  <div id="mf-filters"></div>
+  <button id="mf-locate" onclick="mapLocateMe()" aria-label="Ma position"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/><circle cx="12" cy="12" r="7.5"/></svg></button>
+  <div id="mf-sheet">
+    <div id="mf-handle" onclick="mapToggleSheet()"><div></div></div>
+    <div id="mf-sheet-title"></div>
+    <div id="mf-list"></div>
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -1400,11 +1459,18 @@ function fileIsDecodableImage(file){
 }
 // Affiche la photo de profil de l'utilisateur dans un avatar rond existant (home/profil),
 // ou la repasse en lettre d'initiale si aucune photo n'est définie.
+// Avatar d'un autre habitant : photo si elle charge, sinon initiale (jamais d'icône d'image cassée).
+function avInner(photoUrl, name){
+  const l=((name||'?')[0]||'?').toUpperCase();
+  const ea=esc(l).replace(/"/g,'&quot;');
+  return photoUrl?`<img src="${esc(photoUrl)}" alt="" data-l="${ea}" onerror="this.replaceWith(this.dataset.l)">`:esc(l);
+}
 function renderUserAvatar(avEl, letterEl, name, photoUrl){
   if(!avEl) return;
   let img = avEl.querySelector('img');
   if(photoUrl){
     if(!img){ img=document.createElement('img'); img.alt=''; avEl.insertBefore(img, avEl.firstChild); }
+    img.onerror = () => { img.remove(); if(letterEl) letterEl.style.visibility='visible'; };
     img.src = photoUrl;
     if(letterEl) letterEl.style.visibility='hidden';
   } else {
@@ -1873,12 +1939,13 @@ async function loadCommunityFeed() {
     // Likes : compte + "déjà liké par moi" pour chaque post, en parallèle (sous-collection likes/{uid}).
     const likeInfo = await Promise.all(docs.map(async doc => {
       try {
-        const [countSnap, mineSnap] = await Promise.all([
-          doc.ref.collection('likes').count().get(),
-          myUid ? doc.ref.collection('likes').doc(myUid).get() : Promise.resolve(null)
+        const [likesSnap, mineSnap, comSnap] = await Promise.all([
+          doc.ref.collection('likes').get(),
+          myUid ? doc.ref.collection('likes').doc(myUid).get() : Promise.resolve(null),
+          doc.ref.collection('comments').get().catch(() => null)
         ]);
-        return { count: countSnap.data().count, liked: !!(mineSnap && mineSnap.exists) };
-      } catch(e) { return { count: 0, liked: false }; }
+        return { count: likesSnap.size, liked: !!(mineSnap && mineSnap.exists), comments: comSnap ? comSnap.size : 0 };
+      } catch(e) { return { count: 0, liked: false, comments: 0 }; }
     }));
 
     el.innerHTML = '';
@@ -1896,18 +1963,20 @@ async function loadCommunityFeed() {
       const name = ev.displayName || 'Quelqu\'un';
       const c = colors[name.charCodeAt(0) % colors.length];
       const ts = ev.createdAt ? timeAgo(ev.createdAt.toDate()) : '';
-      const { count: likeCount, liked } = likeInfo[i];
+      const { count: likeCount, liked, comments: commentCount } = likeInfo[i];
       const isMe = ev.userId && myUid && ev.userId === myUid;
       const d = document.createElement('div');
       d.className = 'feed-post';
       d.innerHTML = `<div class="fp-hdr"><div class="fp-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fp-name">${esc(name)}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body"><div class="fp-action">${esc(ev.text||'a répondu à une question')}${ev.brand?` <strong>${esc(ev.brand)}</strong>`:''}</div></div><div class="fp-foot">
         <button class="fp-btn fp-like-btn${liked?' liked':''}" data-post-id="${escAttr(doc.id)}" data-liked="${liked}" onclick="toggleFeedLike(this)">${icon(liked?'heart-filled':'heart',{size:13})} <span class="fp-like-count">${likeCount>0?likeCount:''}</span> J'aime</button>
-        ${isMe?'':`<button class="fp-btn" data-uid="${escAttr(ev.userId)}" data-name="${escAttr(name)}" onclick="openChatFor({uid:this.dataset.uid,n:this.dataset.name,online:false})">${icon('chat',{size:13})} Commenter</button>`}
+        <button class="fp-btn" data-post-id="${escAttr(doc.id)}" onclick="toggleComments(this.dataset.postId)">${icon('chat',{size:13})} <span class="fp-com-count">${commentCount>0?commentCount:''}</span> Commenter</button>
         <button class="fp-btn" data-name="${escAttr(name)}" data-text="${escAttr(ev.text||'')}" data-brand="${escAttr(ev.brand||'')}" onclick="shareFeedPost(this.dataset.name,this.dataset.text,this.dataset.brand)">${icon('broadcast',{size:13})} Partager</button>
-      </div>`;
+      </div><div class="fp-comments" id="cm-${escAttr(doc.id)}" style="display:none"></div>`;
       el.appendChild(d);
     });
     applyStagger(el);
+    // Les commentaires ouverts restent ouverts quand le fil se rafraîchit.
+    _openComments.forEach(id => { const box = document.getElementById('cm-' + id); if(box){ box.style.display = 'block'; loadComments(id); } });
   }, e => {
     console.warn('Feed error:', e);
     el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink3);font-size:12px">Impossible de charger le feed.</div>';
@@ -1940,9 +2009,53 @@ async function toggleFeedLike(btn) {
 }
 
 function shareFeedPost(name, text, brand) {
-  const msg = `${name} ${text}${brand?' '+brand:''} — sur Noova`;
-  if (navigator.share) { navigator.share({ title: 'Noova', text: msg }).catch(()=>{}); }
-  else if (navigator.clipboard) { navigator.clipboard.writeText(msg); }
+  const msg = `${name} ${text}${brand?' '+brand:''} : sur NOOVA, réponds aux commerces de ton quartier.`;
+  const data = { title: 'NOOVA', text: msg, url: 'https://noovaoff.fr/app-v2' };
+  if (navigator.share) { navigator.share(data).catch(()=>{}); }
+  else if (navigator.clipboard) { navigator.clipboard.writeText(msg + ' ' + data.url).then(() => showToast('Lien copié.', 'success')).catch(() => showToast('Copie impossible sur ce navigateur.', 'warning')); }
+  else showToast('Partage indisponible sur ce navigateur.', 'warning');
+}
+
+// ─── Commentaires du feed ─────────────────────────────────────
+const _openComments = new Set();
+function toggleComments(postId) {
+  const box = document.getElementById('cm-' + postId);
+  if(!box) return;
+  if(box.style.display === 'block') { box.style.display = 'none'; _openComments.delete(postId); return; }
+  box.style.display = 'block'; _openComments.add(postId);
+  loadComments(postId);
+}
+async function loadComments(postId) {
+  const box = document.getElementById('cm-' + postId);
+  if(!box) return;
+  const myUid = auth.currentUser && auth.currentUser.uid;
+  let items = [];
+  try {
+    const snap = await db.collection('communityEvents').doc(postId).collection('comments').orderBy('createdAt', 'asc').limit(30).get();
+    items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { console.warn('comments:', e); box.innerHTML = '<div class="fpc-empty">Impossible de charger les commentaires.</div>'; return; }
+  const list = items.length ? items.map(c => `<div class="fpc-row"><div class="fpc-av">${esc((c.name || '?')[0].toUpperCase())}</div><div class="fpc-bd"><div class="fpc-nm">${esc(c.name || 'Quelqu\'un')}${c.userId === myUid ? `<button class="fpc-del" onclick="deleteComment('${postId}','${c.id}')" aria-label="Supprimer">Supprimer</button>` : ''}</div><div class="fpc-tx">${esc(c.text || '')}</div></div></div>`).join('') : '<div class="fpc-empty">Aucun commentaire. Lance la conversation.</div>';
+  box.innerHTML = `${list}<div class="fpc-form"><input class="fpc-inp" id="cmi-${postId}" maxlength="200" placeholder="Ajoute un commentaire" onkeydown="if(event.key==='Enter')sendComment('${postId}')"><button class="fpc-send" onclick="sendComment('${postId}')">Envoyer</button></div>`;
+  const cnt = document.querySelector(`[data-post-id="${postId}"] .fp-com-count`);
+  if(cnt) cnt.textContent = items.length > 0 ? items.length : '';
+}
+async function sendComment(postId) {
+  const inp = document.getElementById('cmi-' + postId), uid = auth.currentUser && auth.currentUser.uid;
+  const text = inp && inp.value.trim();
+  if(!text || !uid) return;
+  inp.disabled = true;
+  try {
+    await db.collection('communityEvents').doc(postId).collection('comments').add({
+      userId: uid, name: (S.user && S.user.name) || 'Quelqu\'un', text: text.substring(0, 200),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    trackEvent('feed_comment');
+    await loadComments(postId);
+  } catch(e) { console.warn('sendComment:', e); inp.disabled = false; showToast("Impossible d'envoyer le commentaire.", 'error'); }
+}
+async function deleteComment(postId, commentId) {
+  try { await db.collection('communityEvents').doc(postId).collection('comments').doc(commentId).delete(); await loadComments(postId); }
+  catch(e) { showToast('Suppression impossible.', 'error'); }
 }
 
 function timeAgo(date) {
@@ -1954,7 +2067,7 @@ function timeAgo(date) {
 }
 
 function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ─── Micro-interactions : entrée en cascade + compteurs animés ────────────
@@ -2069,7 +2182,8 @@ function initFriendsPanel(){
   fp.innerHTML='';
   const myCode=S._friendCode||'—';
   // Demandes reçues en attente
-  const pending=(_notifs||[]).filter(n=>n.type==='friend_request'&&!n.read);
+  const _seenReq=new Set();
+  const pending=(_notifs||[]).filter(n=>n.type==='friend_request'&&!n.read&&n.fromUid&&!(S._friendUids||[]).includes(n.fromUid)&&!_seenReq.has(n.fromUid)&&_seenReq.add(n.fromUid));
   const pendingHTML=pending.length?`
     <div style="margin:0 18px 14px;background:var(--surface);border:none;border-radius:var(--r-card);padding:14px 15px;box-shadow:var(--shadow-card)">
       <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg> Demandes reçues (${pending.length})</div>
@@ -2143,12 +2257,13 @@ function renderFriends(){
     el.innerHTML=`<div style="text-align:center;padding:28px 16px 8px"><div style="margin-bottom:10px;color:var(--ink3);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;vertical-align:-2px"><path d="M2 12l4-3 4 3 3-3 2 2"/><path d="M22 12l-4-3-3.5 3-2.5-1"/><path d="M9 12l3 3 2-2"/><path d="M12 15l2 2 2-2"/></svg></div><div style="color:var(--ink2);font-size:13px;line-height:1.6">Aucun ami pour l'instant.<br>Partage ton code pour commencer !</div></div>`;
     return;
   }
-  S.friends.forEach((f,i)=>{
+  const _seenFi=new Set();
+  S.friends.filter(f=>f&&f.uid&&!_seenFi.has(f.uid)&&_seenFi.add(f.uid)).forEach((f,i)=>{
     const c=AVC[i%AVC.length];
     const d=document.createElement('div');
     d.className='fi';
     d.onclick=()=>openChatFor(f);
-    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${f.photoUrl?`<img src="${f.photoUrl}" alt="">`:esc((f.n||'?')[0])}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.xp} xp · <span style="color:var(--ink2);font-weight:700;display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c1 1 2 2.5 2 4.5A5.5 5.5 0 0 1 6.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0 0 12 22a8 8 0 0 0 7-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg> ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
+    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${avInner(f.photoUrl,f.n)}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.xp} xp · <span style="color:var(--ink2);font-weight:700;display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c1 1 2 2.5 2 4.5A5.5 5.5 0 0 1 6.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0 0 12 22a8 8 0 0 0 7-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg> ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
     el.appendChild(d);
   });
   applyStagger(el);
@@ -2162,10 +2277,13 @@ function renderRanking(){
   const podiumEl=document.getElementById('drank-podium');
   const countEl=document.getElementById('drank-count');
   if(!el)return;
+  const _myUid=auth.currentUser&&auth.currentUser.uid;
+  const _seenF=new Set();
+  const _uniqFriends=(S.friends||[]).filter(f=>f&&f.uid&&f.uid!==_myUid&&!_seenF.has(f.uid)&&_seenF.add(f.uid));
   const all=[{uid:'__me',n:S.user?S.user.name:'Toi',xp:S.xp||0,str:S.streak||0,me:true,photoUrl:S.user&&S.user.photoUrl}]
-    .concat((S.friends||[]).map(f=>({uid:f.uid,n:f.n,xp:f.xp||0,str:f.str||0,me:false,photoUrl:f.photoUrl})));
+    .concat(_uniqFriends.map(f=>({uid:f.uid,n:f.n,xp:f.xp||0,str:f.str||0,me:false,photoUrl:f.photoUrl})));
   all.sort((a,b)=>b.xp-a.xp);
-  if(countEl)countEl.textContent=(S.friends||[]).length+' ami'+((S.friends||[]).length>1?'s':'');
+  if(countEl)countEl.textContent=_uniqFriends.length+' ami'+(_uniqFriends.length>1?'s':'');
   const myPos=all.findIndex(u=>u.me)+1;
 
   // Podium visuel — dès 2 participants (toi + 1 ami) : 1er/2e, la case 3e n'apparaît
@@ -2184,7 +2302,7 @@ function renderRanking(){
         const label=u.me?'Toi':esc(u.n||'Ami');
         return `<div class="podium-slot ${cls}${u.me?' me':''}">
           <div class="podium-crown">${crownByRank[rank]}</div>
-          <div class="podium-av" style="background:rgba(255,255,255,.16);color:#fff">${u.photoUrl?`<img src="${u.photoUrl}" alt="">`:esc((u.n||'?')[0].toUpperCase())}</div>
+          <div class="podium-av" style="background:rgba(255,255,255,.16);color:#fff">${avInner(u.photoUrl,u.n)}</div>
           <div class="podium-name">${label}</div>
           <div class="podium-pts">${u.xp} xp</div>
           <div class="podium-bar">${rank}</div>
@@ -2197,7 +2315,7 @@ function renderRanking(){
     if(myPos<=podiumCount){ meSlot.innerHTML=''; }
     else{
       const me=all.find(u=>u.me);
-      meSlot.innerHTML=`<div class="drank-me"><div class="mark">?!</div><div class="drank-num">${myPos}</div><div class="drank-av">${me.photoUrl?`<img src="${me.photoUrl}" alt="">`:esc((me.n||'?')[0].toUpperCase())}</div><div style="flex:1;min-width:0"><div class="drank-name">Toi</div><div class="drank-sub">${me.str} jour${me.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${me.xp}</div></div>`;
+      meSlot.innerHTML=`<div class="drank-me"><div class="mark">?!</div><div class="drank-num">${myPos}</div><div class="drank-av">${avInner(me.photoUrl,me.n)}</div><div style="flex:1;min-width:0"><div class="drank-name">Toi</div><div class="drank-sub">${me.str} jour${me.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${me.xp}</div></div>`;
     }
   }
   el.innerHTML='';
@@ -2210,7 +2328,7 @@ function renderRanking(){
     const rank=all.indexOf(u)+1;
     const c=AVC[i%AVC.length];
     const d=document.createElement('div');d.className='drank-row';
-    d.innerHTML=`<div class="drank-num" style="background:var(--bg2);color:var(--ink2)">${rank}</div><div class="drank-av" style="background:${c}18;color:${c}">${u.photoUrl?`<img src="${u.photoUrl}" alt="">`:esc((u.n||'?')[0].toUpperCase())}</div><div style="flex:1;min-width:0"><div class="drank-name">${esc(u.n||'Ami')}</div><div class="drank-sub">${u.str} jour${u.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${u.xp}</div>`;
+    d.innerHTML=`<div class="drank-num" style="background:var(--bg2);color:var(--ink2)">${rank}</div><div class="drank-av" style="background:${c}18;color:${c}">${avInner(u.photoUrl,u.n)}</div><div style="flex:1;min-width:0"><div class="drank-name">${esc(u.n||'Ami')}</div><div class="drank-sub">${u.str} jour${u.str>1?'s':''} d'affilée</div></div><div class="drank-pts">${u.xp}</div>`;
     el.appendChild(d);
   });
   applyStagger(el);
@@ -2277,7 +2395,7 @@ async function loadGroupMembers(g){
     top.forEach((u,i)=>{
       const isMe=u.uid===myUid;const name=u.name||'Anonyme';const c=isMe?'#E07D0A':AVC[i%AVC.length];
       const d=document.createElement('div');d.className='fi';
-      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${u.photoUrl?`<img src="${u.photoUrl}" alt="">`:esc(name[0].toUpperCase())}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--ink);font-weight:800':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.xp || u.points || 0} xp</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)">${i<3?medals[i]:'#'+(i+1)}</div>`;
+      d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${avInner(u.photoUrl,name)}</div><div style="flex:1"><div class="fi-name" style="${isMe?'color:var(--ink);font-weight:800':''}">${esc(name)}${isMe?' (moi)':''}</div><div class="fi-pts">${u.xp || u.points || 0} xp</div></div><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)">${i<3?medals[i]:'#'+(i+1)}</div>`;
       el.appendChild(d);
     });
   }catch(e){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Impossible de charger les membres.</div>';}
@@ -2300,15 +2418,21 @@ async function addFriend(){
     const friendUid=codeDoc.data().uid;
     if(friendUid===uid){if(errEl)errEl.textContent='Tu ne peux pas t\'ajouter toi-même !';return;}
     if((S._friendUids||[]).includes(friendUid)){if(errEl)errEl.textContent='Déjà ami !';return;}
-    // Envoie la demande d\'ami via notification (le seul write autorisé sur les notifs d\'autrui)
-    await db.collection('users').doc(friendUid).collection('notifications').add({
-      type:'friend_request',
-      fromUid:uid,
-      fromName:(S.user&&S.user.name)||'Un utilisateur',
-      fromCode:S._friendCode||'',
-      read:false,
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
+    // Identifiant de notification DÉTERMINISTE (un seul par expéditeur) : renvoyer une demande
+    // ne crée jamais de doublon chez le destinataire (le second envoi est refusé par les règles).
+    try{
+      await db.collection('users').doc(friendUid).collection('notifications').doc('friendreq_'+uid).set({
+        type:'friend_request',
+        fromUid:uid,
+        fromName:(S.user&&S.user.name)||'Un utilisateur',
+        fromCode:S._friendCode||'',
+        read:false,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }catch(e){
+      if(e&&e.code==='permission-denied'){if(errEl)errEl.textContent='Demande déjà envoyée.';return;}
+      throw e;
+    }
     inp.value='';
     if(errEl){errEl.style.color='var(--ink)';errEl.textContent='Demande envoyée !';}
     setTimeout(()=>{if(errEl){errEl.style.color='var(--danger)';errEl.textContent=''}},3000);
@@ -2382,7 +2506,8 @@ function renderNotifications(){
     return;
   }
   el.innerHTML='';
-  _notifs.forEach(n=>{
+  const _seenN=new Set();
+  _notifs.filter(n=>{const k=(n.type==='friend_request'||n.type==='friend_accepted')?n.type+'|'+n.fromUid:n.id;return !_seenN.has(k)&&_seenN.add(k);}).forEach(n=>{
     const d=document.createElement('div');
     d.className='notif-item'+(n.read?'':' unread');
     const ts=fmtNotifTime(n.createdAt);
@@ -2408,30 +2533,40 @@ function renderNotifications(){
   });
 }
 
+const _friendBusy=new Set();
+function addFriendLocal(uid){
+  if(!uid)return false;
+  const cur=S._friendUids||[];
+  if(cur.includes(uid))return false;
+  S._friendUids=[...cur,uid];
+  return true;
+}
 async function acceptFriendRequest(notifId,fromUid,fromName){
   const uid=auth.currentUser&&auth.currentUser.uid;
-  if(!uid)return;
+  if(!uid||!fromUid||fromUid===uid||_friendBusy.has('acc_'+fromUid))return;
+  _friendBusy.add('acc_'+fromUid);
   try{
-    // On s'ajoute l'ami dans notre propre doc (seul write autorisé sur notre doc)
+    // On s'ajoute l'ami dans notre propre doc (arrayUnion : jamais deux fois le même uid)
     await db.collection('users').doc(uid).update({friendUids:firebase.firestore.FieldValue.arrayUnion(fromUid)});
-    // On marque la notif comme lue
     await db.collection('users').doc(uid).collection('notifications').doc(notifId).update({read:true});
-    // On envoie une notif friend_accepted au demandeur — il s'auto-ajoutera nous à la prochaine ouverture
-    await db.collection('users').doc(fromUid).collection('notifications').add({
-      type:'friend_accepted',
-      fromUid:uid,
-      fromName:(S.user&&S.user.name)||'Quelqu\'un',
-      read:false,
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    // Mise à jour locale
-    if(!(S._friendUids||[]).includes(fromUid)){
-      S._friendUids=[...(S._friendUids||[]),fromUid];
-      await loadFriendsFromFirestore(S._friendUids);
-    }
-    trackEvent('friend_added');
+    // Notification d'acceptation à identifiant déterministe : un seul doc par accepteur.
+    try{
+      await db.collection('users').doc(fromUid).collection('notifications').doc('friendacc_'+uid).set({
+        type:'friend_accepted',
+        fromUid:uid,
+        fromName:(S.user&&S.user.name)||'Quelqu\'un',
+        read:false,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }catch(e){ if(!(e&&e.code==='permission-denied'))throw e; }
+    // Le snapshot du profil a pu mettre S._friendUids à jour AVANT nous : on recharge donc toujours la liste.
+    const wasFriend=(S._friendUids||[]).includes(fromUid);
+    addFriendLocal(fromUid);
+    await loadFriendsFromFirestore(S._friendUids);
+    if(!wasFriend)trackEvent('friend_added');
     checkTierAndBadgeCelebrations();
   }catch(e){console.warn('acceptFriend:',e);}
+  finally{_friendBusy.delete('acc_'+fromUid);}
 }
 
 async function declineFriendRequest(notifId){
@@ -2442,21 +2577,29 @@ async function declineFriendRequest(notifId){
   }catch(e){console.warn('declineFriend:',e);}
 }
 
-// Appelé quand on reçoit une notif friend_accepted : on s'ajoute l'ami dans notre doc
+// Appelé quand on reçoit une notif friend_accepted : on s'ajoute l'ami dans notre doc.
+// Le snapshot des notifications peut se redéclencher pendant l'écriture : la garde
+// _friendBusy évite d'ajouter deux fois le même ami (cause des doublons dans la liste).
 async function autoAddFriend(notif,uid){
-  if(!notif.fromUid||(S._friendUids||[]).includes(notif.fromUid))return;
+  if(!notif.fromUid||notif.fromUid===uid||_friendBusy.has('auto_'+notif.fromUid))return;
+  if((S._friendUids||[]).includes(notif.fromUid)&&(S.friends||[]).some(f=>f.uid===notif.fromUid)){
+    db.collection('users').doc(uid).collection('notifications').doc(notif.id).update({read:true}).catch(()=>{});
+    return;
+  }
+  _friendBusy.add('auto_'+notif.fromUid);
   try{
     await db.collection('users').doc(uid).update({friendUids:firebase.firestore.FieldValue.arrayUnion(notif.fromUid)});
     await db.collection('users').doc(uid).collection('notifications').doc(notif.id).update({read:true});
-    S._friendUids=[...(S._friendUids||[]),notif.fromUid];
+    addFriendLocal(notif.fromUid);
     await loadFriendsFromFirestore(S._friendUids);
   }catch(e){console.warn('autoAddFriend:',e);}
+  finally{_friendBusy.delete('auto_'+notif.fromUid);}
 }
 function openChatFor(friend){
   const friendUid=friend.uid,friendName=friend.n;
   _chatFriendUid=friendUid;_chatFriendName=friendName;
   const idx=S.friends.findIndex(f=>f.uid===friendUid);const c=idx>=0?AVC[idx%AVC.length]:'#A14E08';
-  const av=document.getElementById('ch-av');av.innerHTML=friend.photoUrl?`<img src="${friend.photoUrl}" alt="">`:esc((friendName[0]||'?').toUpperCase());av.style.background=c+'18';av.style.color=c;
+  const av=document.getElementById('ch-av');av.innerHTML=avInner(friend.photoUrl,friendName||'?');av.style.background=c+'18';av.style.color=c;
   document.getElementById('ch-name').textContent=friendName;
   const st=document.getElementById('ch-status');if(st){st.textContent=friend.online?'En ligne':'Ami Noova';st.style.color=friend.online?'#22C55E':'var(--ink3)';}
   if(_chatUnsub){_chatUnsub();_chatUnsub=null;}
@@ -2570,6 +2713,10 @@ function refreshWallet(){
   loadActiveRedemptions();
   const tl=document.getElementById('tiers-list');tl.innerHTML='';
   TIERS.forEach((t)=>{const reached=S.xp>=t.min;const d=document.createElement('div');d.style.cssText=`background:var(--card);border-radius:18px;padding:12px 13px;margin-bottom:8px;box-shadow:0 3px 12px rgba(0,0,0,.04)`;d.innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:11px;background:${reached?'var(--coral)':'var(--bg2)'};color:${reached?'var(--ink)':'var(--ink3)'};display:flex;align-items:center;justify-content:center">${icon(t.ico,{size:22})}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)">${t.n}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${t.min===0?'Dès le départ':t.min+' xp requis'}</div></div><div style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:${reached?'var(--ink)':'var(--ink3)'}">${reached?icon('success',{size:14})+' Atteint':icon('lock',{size:14})}</div></div>`;tl.appendChild(d)});
+}
+function toggleAcc(hdr){
+  const card=hdr.closest('.sec-card');if(!card)return;
+  card.classList.toggle('open');
 }
 function refreshProfile(){
   if(!S.user)return;
@@ -2884,26 +3031,28 @@ async function loadNearbyMerchants(merchantIds) {
 // Liste des commerces à proximité (autorisés + campagnes actives), avec indicateur
 // "a une question active" — source commune pour le rail (legacy), la grille de
 // l'accueil et les pins de la carte.
+const CAT_LABELS={restauration:'Restauration',boulangerie:'Boulangerie',sport:'Sport',beaute:'Beauté',culture:'Culture',commerce:'Commerce',services:'Ville et services'};
+// Tous les commerces vérifiés de la ville (pas seulement les autorisés) : la carte est un outil de
+// découverte, chaque commerce porte son état (question active, autorisé, demande, à venir).
+function mapMerchants(){
+  const map=new Map();
+  Object.entries(_verifiedMerchantsCache||{}).forEach(([id,m])=>map.set(id,Object.assign({id},m)));
+  (S._nearbyMerchants||[]).forEach(m=>{if(m&&m.id&&!map.has(m.id))map.set(m.id,m);});
+  const auth_=S._authorizedMerchants||[],reqs=(S._requests||[]).map(r=>r.id);
+  return [...map.values()].map(m=>({
+    id:m.id,name:m.brandName||m.name||'Commerce',sector:m.sector||'Commerce local',cat:sectorCat(m.sector||m.theme),
+    address:m.address||'',city:m.cityLabel||m.city||S._cityLabel||S._city||'',logoUrl:m.logoUrl||null,photoUrl:m.coverUrl||null,
+    authorized:auth_.includes(m.id),request:reqs.includes(m.id),hasQ:(S.qs||[]).some(q=>q._merchantId===m.id)
+  }));
+}
 function getNearbyCards(){
-  const seen=new Set();const cards=[];
-  (S._nearbyMerchants||[]).forEach(m=>{
-    if(!seen.has(m.id)){
-      seen.add(m.id);
-      const hasQ=(S.qs||[]).some(q=>q._merchantId===m.id);
-      cards.push({name:m.brandName||m.name||'Commerce',ico:'🏪',sector:m.sector||'Commerce local',hasQ,_merchantId:m.id,logoUrl:m.logoUrl||null,photoUrl:m.coverUrl||null,address:m.address||'',city:m.city||''});
-    }
-  });
-  (S.qs||[]).forEach(q=>{
-    const key=q._merchantId||q.brand;
-    if(!seen.has(key)){seen.add(key);cards.push({name:q.brand,ico:q.ico||'🏪',sector:q.theme||'Commerce local',hasQ:true,_merchantId:q._merchantId||null,address:'',city:''});}
-  });
-  return cards;
+  return mapMerchants().map(m=>({name:m.name,ico:'🏪',sector:m.sector,hasQ:m.hasQ,request:m.request,_merchantId:m.id,logoUrl:m.logoUrl,photoUrl:m.photoUrl,address:m.address,city:m.city}));
 }
 function renderBrandRail(){
   const el=document.getElementById('br-rail');if(!el)return;el.innerHTML='';
   const cards=getNearbyCards();
   if(!cards.length){
-    el.innerHTML='<div style="padding:4px;color:var(--ink3);font-size:12px">Aucun commerce autorisé pour l\'instant.</div>';
+    el.innerHTML='<div style="padding:4px;color:var(--ink3);font-size:12px">Aucun commerce dans ta ville pour l\'instant.</div>';
     return;
   }
   cards.forEach(c=>{
@@ -3038,7 +3187,7 @@ async function renderNearbyGrid(){
     <div class="dnb-card" ${c._merchantId?`onclick="openBrandById('${c._merchantId}','${esc(c.name).replace(/'/g,"\\'")}')"`:''}>
       <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}</div>
       <div class="dnb-scrim"></div>
-      <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':'Bientôt'}</div>
+      <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':(c.request?'Demande':'Bientôt')}</div>
       <div class="dnb-body"><div class="dnb-name">${esc(c.name)}</div><div class="dnb-meta">${esc(c.sector)}${c._dist!=null?' · '+fmtDist(c._dist):''}</div></div>
     </div>`).join('');
 }
@@ -3048,51 +3197,136 @@ async function renderNearbyMap(){
   const emptyEl=document.getElementById('dmap-empty');
   if(!cardEl || !emptyEl) return;
   renderNearbyGrid();
-  const cards=getNearbyCards();
-  if(!cards.length){
+  const list=mapMerchants();
+  const lbl=document.getElementById('dmap-label');
+  if(!list.length){
     emptyEl.style.display='flex';
-    emptyEl.innerHTML='Autorise des commerces pour voir la carte de ton quartier.';
-    return;
-  }
-  const loc=geoAllowed()?await ensureUserLocation():null;
-  if(!loc){
-    emptyEl.style.display='flex';
-    emptyEl.innerHTML='Active ta position pour voir les commerces autour de toi.<button onclick="askGeo()">Activer ma position</button>';
+    emptyEl.innerHTML='Aucun commerce dans ta ville pour l\'instant.';
+    if(lbl) lbl.textContent='';
     return;
   }
   emptyEl.style.display='none';
-  const geo=await getGeocodedNearbyCards();
-  renderNearbyGrid(); // ré-affiche la grille avec les distances désormais connues
-  const lbl=document.getElementById('dmap-label'); // vignette illustrée (statique) : seul le décompte est réel
-  if(lbl){ const n=geo.length||cards.length; lbl.textContent=n+' commerce'+(n>1?'s':'')+' autour de toi'; }
+  if(lbl) lbl.textContent=list.length+' commerce'+(list.length>1?'s':'')+(S._cityLabel?' '+cityPhrase(S._cityLabel):'');
+  if(geoAllowed()) ensureUserLocation().then(loc=>{ if(loc) renderNearbyGrid(); });
 }
 
+let _mapSt={filter:'all',list:[],markers:{},sel:null,loc:null,token:0,userMarker:null};
+function mapDist(m){return (_mapSt.loc&&m.lat!=null)?distMeters(_mapSt.loc,m):null;}
+function mapDirections(id){
+  const m=_mapSt.list.find(x=>x.id===id);if(!m||m.lat==null)return;
+  const url=NV_IS_IOS?`https://maps.apple.com/?daddr=${m.lat},${m.lng}&dirflg=w`:`https://www.google.com/maps/dir/?api=1&destination=${m.lat},${m.lng}&travelmode=walking`;
+  trackEvent('map_directions');
+  window.open(url,'_blank','noopener');
+}
+function mapToggleSheet(){document.getElementById('map-full').classList.toggle('collapsed');setTimeout(()=>{if(_fullMap)_fullMap.invalidateSize();},280);}
+function mapSetFilter(f){_mapSt.filter=f;mapRenderFilters();mapRenderList();mapApplyMarkers();}
+function mapVisible(){return _mapSt.list.filter(m=>_mapSt.filter==='all'||m.cat===_mapSt.filter);}
+function mapRenderFilters(){
+  const cats={};_mapSt.list.forEach(m=>{cats[m.cat]=(cats[m.cat]||0)+1;});
+  const keys=Object.keys(cats);
+  const el=document.getElementById('mf-filters');
+  el.style.display=keys.length>1?'flex':'none';
+  el.innerHTML=`<button class="mf-chip${_mapSt.filter==='all'?' on':''}" onclick="mapSetFilter('all')">Tous · ${_mapSt.list.length}</button>`+keys.map(k=>`<button class="mf-chip${_mapSt.filter===k?' on':''}" onclick="mapSetFilter('${k}')">${esc(CAT_LABELS[k]||k)} · ${cats[k]}</button>`).join('');
+}
+function mapRenderList(){
+  const el=document.getElementById('mf-list'),title=document.getElementById('mf-sheet-title');
+  let vis=mapVisible();
+  if(_mapSt.loc)vis=vis.slice().sort((a,b)=>(mapDist(a)??1e12)-(mapDist(b)??1e12));
+  title.textContent=vis.length?(vis.length+' commerce'+(vis.length>1?'s':'')+(_mapSt.loc?' autour de toi':' '+(S._cityLabel?cityPhrase(S._cityLabel):''))):'';
+  if(!_mapSt.list.length){
+    el.innerHTML='<div class="mf-empty">Aucun commerce dans ta ville pour l\'instant.<br>NOOVA arrive bientôt : invite les commerces que tu aimes.<br><button class="mf-chip on" style="margin-top:10px" onclick="shareNoova()">Partager NOOVA</button></div>';
+    return;
+  }
+  if(!vis.length){el.innerHTML='<div class="mf-empty">Aucun commerce dans cette catégorie.</div>';return;}
+  el.innerHTML=vis.map(m=>{
+    const d=mapDist(m);
+    const tag=m.hasQ?'<span class="mf-tag q">Question active</span>':m.request?'<span class="mf-tag q">Veut te poser des questions</span>':m.authorized?'<span class="mf-tag">Autorisé</span>':'<span class="mf-tag">Bientôt</span>';
+    const meta=esc(m.sector)+(d!=null?' · '+fmtDist(d):(m.lat==null&&m._geoDone?' · adresse introuvable':''));
+    return `<div class="mf-row${_mapSt.sel===m.id?' sel':''}" data-id="${m.id}" onclick="mapSelect('${m.id}',true)">${logoHTML(m.name,46,m.logoUrl)}<div class="mf-bd"><div class="mf-nm">${esc(m.name)}</div><div class="mf-mt">${meta}</div>${tag}</div><div class="mf-act"><button onclick="event.stopPropagation();openBrandById('${m.id}','${esc(m.name).replace(/'/g,"\\'")}')">Voir</button>${m.lat!=null?`<button class="alt" onclick="event.stopPropagation();mapDirections('${m.id}')">Y aller</button>`:''}</div></div>`;
+  }).join('');
+}
+function mapApplyMarkers(){
+  if(!_fullMap)return;
+  const vis=new Set(mapVisible().map(m=>m.id));
+  _fullMapMarkers.clearLayers();
+  _mapSt.list.forEach(m=>{
+    if(m.lat==null||!vis.has(m.id))return;
+    const mk=L.marker([m.lat,m.lng],{icon:nvPinIcon(false)});
+    mk.on('click',()=>mapSelect(m.id,false));
+    mk.addTo(_fullMapMarkers);_mapSt.markers[m.id]=mk;
+  });
+}
+function mapSelect(id,fromList){
+  _mapSt.sel=id;
+  const m=_mapSt.list.find(x=>x.id===id);
+  document.querySelectorAll('#mf-list .mf-row').forEach(r=>r.classList.toggle('sel',r.dataset.id===id));
+  if(!fromList){const row=document.querySelector(`#mf-list .mf-row[data-id="${id}"]`);if(row)row.scrollIntoView({block:'nearest',behavior:'smooth'});}
+  document.querySelectorAll('.nv-pin').forEach(p=>p.classList.remove('sel'));
+  const mk=_mapSt.markers[id];
+  if(mk&&_fullMap){const el=mk.getElement&&mk.getElement();if(el){const pin=el.querySelector('.nv-pin');if(pin)pin.classList.add('sel');}_fullMap.flyTo(mk.getLatLng(),Math.max(_fullMap.getZoom(),16),{duration:.5});}
+}
+async function mapLocateMe(){
+  if(!geoAllowed()){askGeo();return;}
+  S._geoDenied=false;S._geoPromise=null;
+  const loc=await ensureUserLocation();
+  if(!loc){showToast('Position indisponible. Vérifie les réglages de ton téléphone.','warning');return;}
+  _mapSt.loc=loc;mapDrawUser();mapRenderList();
+  if(_fullMap)_fullMap.flyTo([loc.lat,loc.lng],15,{duration:.6});
+}
+function mapDrawUser(){
+  if(!_fullMap||!_mapSt.loc)return;
+  if(_mapSt.userMarker)_mapSt.userMarker.remove();
+  _mapSt.userMarker=L.marker([_mapSt.loc.lat,_mapSt.loc.lng],{icon:nvPinIcon(true),zIndexOffset:900}).addTo(_fullMap).bindPopup('Toi');
+}
+function mapFit(){
+  if(!_fullMap)return;
+  const pts=_mapSt.list.filter(m=>m.lat!=null).map(m=>[m.lat,m.lng]);
+  if(_mapSt.loc)pts.push([_mapSt.loc.lat,_mapSt.loc.lng]);
+  if(pts.length)_fullMap.fitBounds(pts,{padding:[50,50],maxZoom:16});
+}
 async function openFullMap(){
   goTo('map-full');
-  if(!geoAllowed()) setTimeout(askGeo,400);
-  const loc=geoAllowed()?await ensureUserLocation():null;
-  const geo=await getGeocodedNearbyCards();
+  const screen=document.getElementById('map-full');screen.classList.remove('collapsed');
+  const token=++_mapSt.token;
+  document.getElementById('mf-title').textContent=S._cityLabel?('Commerces '+cityPhrase(S._cityLabel)):'Commerces près de toi';
+  _mapSt.list=mapMerchants();_mapSt.filter='all';_mapSt.sel=null;_mapSt.markers={};
+  mapRenderFilters();mapRenderList();
+  const nomap=document.getElementById('mf-nomap');
+  if(typeof L==='undefined'){
+    nomap.style.display='flex';nomap.textContent='La carte est indisponible hors connexion. La liste des commerces reste consultable ci-dessous.';
+    return;
+  }
+  nomap.style.display='none';
   if(!_fullMap){
-    _fullMap=L.map('nv-full-map',{zoomControl:true});
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(_fullMap);
+    _fullMap=L.map('nv-full-map',{zoomControl:false});
+    L.control.zoom({position:'topright'}).addTo(_fullMap);
+    const tiles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(_fullMap);
+    let tileErr=0;tiles.on('tileerror',()=>{if(++tileErr===6){nomap.style.display='none';showToast('Le fond de carte ne se charge pas : vérifie ta connexion.','warning');}});
     _fullMapMarkers=L.layerGroup().addTo(_fullMap);
+    _fullMap.setView([46.6,2.5],5);
   }
   _fullMapMarkers.clearLayers();
-  const pts=[];
-  if(loc){ L.marker([loc.lat,loc.lng],{icon:nvPinIcon(true)}).addTo(_fullMapMarkers).bindPopup('Toi'); pts.push([loc.lat,loc.lng]); }
-  geo.forEach(m => {
-    const dist = loc ? fmtDist(distMeters(loc,m)) : '';
-    const popup = `<div class="mf-popup"><div class="mfp-name">${esc(m.name)}</div><div class="mfp-meta">${esc(m.sector)}${dist?' · '+dist:''}</div><button onclick="closeFullMap();openBrandById('${m._merchantId}','${esc(m.name).replace(/'/g,"\\'")}')">Voir</button></div>`;
-    L.marker([m.lat,m.lng],{icon:nvPinIcon(false)}).addTo(_fullMapMarkers).bindPopup(popup);
-    pts.push([m.lat,m.lng]);
+  setTimeout(()=>{if(_fullMap)_fullMap.invalidateSize();},80);
+  // Centrage immédiat : position réelle si autorisée, sinon centre de la ville (jamais un point codé en dur).
+  if(geoAllowed()){ensureUserLocation().then(loc=>{if(token!==_mapSt.token||!loc)return;_mapSt.loc=loc;mapDrawUser();mapRenderList();});}
+  else{setTimeout(()=>{if(token===_mapSt.token&&!_mapSt.loc&&!S._mapAsked){S._mapAsked=true;askGeo();}},900);}
+  const cityLoc=await geocodeCityOnly(S._cityLabel||S._city);
+  if(token!==_mapSt.token)return;
+  if(cityLoc&&!_mapSt.loc)_fullMap.setView([cityLoc.lat,cityLoc.lng],13);
+  // Adresses géocodées une à une : chaque pin et chaque distance apparaissent dès qu'ils sont connus.
+  let pending=_mapSt.list.length;
+  if(!pending)return;
+  _mapSt.list.forEach(m=>{
+    geocodeAddress(m.address,m.city||S._city).then(loc=>{
+      if(token!==_mapSt.token)return;
+      m._geoDone=true;
+      if(loc){m.lat=loc.lat;m.lng=loc.lng;}
+      mapApplyMarkers();mapRenderList();
+      if(--pending===0){ mapFit(); }
+    }).catch(()=>{ if(token===_mapSt.token){m._geoDone=true;if(--pending===0)mapFit();} });
   });
-  setTimeout(() => {
-    _fullMap.invalidateSize();
-    if(pts.length) _fullMap.fitBounds(pts,{padding:[40,40],maxZoom:16});
-    else _fullMap.setView([47.9989,0.1997],13); // Le Mans par défaut si rien à afficher
-  }, 60);
 }
-function closeFullMap(){ goTo('home'); }
+function closeFullMap(){ _mapSt.token++; goTo('home'); }
 
 /* --- Brancher le rail sur refreshHome sans la réécrire --- */
 (function(){const _rh=refreshHome;refreshHome=function(){_rh.apply(this,arguments);renderBrandRail();};})();
@@ -3247,6 +3481,20 @@ let _fcmMessaging = null;
   } catch(e) { _fcmMessaging = null; }
   refreshNotifSettingsUI();
 })();
+// Au login : si CE compte avait activé les notifications sur cet appareil, on rattache le jeton
+// (retiré à la déconnexion précédente) ; un compte qui n'a jamais opté ne reçoit rien.
+async function restorePushForUser(uid) {
+  try {
+    if(!_fcmMessaging || !FCM_VAPID_KEY || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+    if(localStorage.getItem('nv_fcm_optin_' + uid) !== '1') return;
+    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    const token = await _fcmMessaging.getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg });
+    if(!token) return;
+    await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayUnion(token) });
+    localStorage.setItem('nv_fcm_token_' + uid, token);
+    refreshNotifSettingsUI();
+  } catch(e) { console.warn('restorePush:', e); }
+}
 function notifSupportReason() {
   if (!_fcmMessaging || !FCM_VAPID_KEY) return 'unsupported';
   if (NV_IS_IOS && !nvIsStandalone()) return 'needs-install';
@@ -3258,7 +3506,7 @@ async function toggleNotifications() {
   if (reason === 'needs-install') { showToast("Installe d'abord Noova sur ton écran d'accueil (Partager > Sur l'écran d'accueil) pour activer les notifications.", 'warning'); return; }
   const uid = auth.currentUser && auth.currentUser.uid;
   if (!uid) return;
-  if (Notification.permission === 'granted' && localStorage.getItem('nv_fcm_token')) await disableNotifications(uid);
+  if (Notification.permission === 'granted' && localStorage.getItem('nv_fcm_token_'+uid)) await disableNotifications(uid);
   else await enableNotifications(uid);
 }
 async function enableNotifications(uid) {
@@ -3272,8 +3520,12 @@ async function enableNotifications(uid) {
     const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
     const token = await _fcmMessaging.getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg });
     if (!token) throw new Error('no-token');
+    // Un seul jeton par appareil ET par compte : on retire l'ancien jeton de cet appareil s'il a changé.
+    const old = localStorage.getItem('nv_fcm_token_' + uid);
+    if(old && old !== token) await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayRemove(old) }).catch(()=>{});
     await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayUnion(token) });
-    localStorage.setItem('nv_fcm_token', token);
+    localStorage.setItem('nv_fcm_token_' + uid, token);
+    localStorage.setItem('nv_fcm_optin_' + uid, '1');
     trackEvent('push_enabled');
     showToast('Notifications activées !', 'success');
   } catch(e) {
@@ -3283,10 +3535,11 @@ async function enableNotifications(uid) {
   refreshNotifSettingsUI();
 }
 async function disableNotifications(uid) {
-  const token = localStorage.getItem('nv_fcm_token');
+  const token = localStorage.getItem('nv_fcm_token_' + uid);
   try {
     if (token) await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayRemove(token) });
-    localStorage.removeItem('nv_fcm_token');
+    localStorage.removeItem('nv_fcm_token_' + uid);
+    localStorage.removeItem('nv_fcm_optin_' + uid);
     trackEvent('push_disabled');
     showToast('Notifications désactivées.', 'success');
   } catch(e) { console.warn('disableNotifications:', e); }
@@ -3298,7 +3551,8 @@ function refreshNotifSettingsUI() {
   const reason = notifSupportReason();
   if (reason === 'unsupported') { el.textContent = 'Indisponible'; return; }
   if (reason === 'needs-install') { el.textContent = "Installer l'app ›"; return; }
-  const on = typeof Notification !== 'undefined' && Notification.permission === 'granted' && !!localStorage.getItem('nv_fcm_token');
+  const _u = auth.currentUser && auth.currentUser.uid;
+  const on = typeof Notification !== 'undefined' && Notification.permission === 'granted' && !!(_u && localStorage.getItem('nv_fcm_token_' + _u));
   el.textContent = on ? 'Activées ✓' : 'Activer ›';
 }
 const callSubmitAnswer = fx.httpsCallable('submitAnswer');
@@ -3687,7 +3941,7 @@ function maybeAskNotifications(){
 }
 function geoAllowed(){try{return localStorage.getItem('nv_geo_ok')==='1';}catch(e){return false;}}
 function askGeo(){
-  askPerm({key:'geo',title:'Voir les commerces à deux pas',text:'NOOVA utilise ta position uniquement pour afficher les commerces autour de toi. Elle n\'est pas enregistrée.',cta:'Autoriser la position',onAccept:()=>{try{localStorage.setItem('nv_geo_ok','1');}catch(e){}retryUserLocation();}});
+  askPerm({key:'geo',title:'Voir les commerces à deux pas',text:'NOOVA utilise ta position uniquement pour afficher les commerces autour de toi. Elle n\'est pas enregistrée.',cta:'Autoriser la position',onAccept:()=>{try{localStorage.setItem('nv_geo_ok','1');}catch(e){}retryUserLocation();if(cur==='map-full')mapLocateMe();}});
 }
 
 // ─── Récompenses Firestore — groupées par commerce ────────────
@@ -4259,13 +4513,16 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   S._answered        = data.answeredCampaigns || [];
   S._authorizedMerchants = data.authorizedMerchants || [];
   S._declinedMerchants = data.declinedMerchants || [];
-  S._friendUids      = data.friendUids || [];
+  const _prevFriendKey = JSON.stringify([...(S._friendUids||[])].sort());
+  S._friendUids      = [...new Set(data.friendUids || [])];
+  const _friendsChanged = JSON.stringify([...S._friendUids].sort()) !== _prevFriendKey;
   S._groups          = data.groups || [];
   S._seenHomeTour    = !!data.seenHomeTour;
 
   if (!isFirstLoad) {
     // Mises à jour en direct (points/xp/streak déjà crédités par la Cloud Function submitAnswer) :
     // on rafraîchit juste les écrans concernés, sans rejouer l'initialisation complète.
+    if (_friendsChanged) loadFriendsFromFirestore(S._friendUids);
     checkTierAndBadgeCelebrations();
     refreshHome();
     if (document.getElementById('rewards-tab').classList.contains('active')) refreshWallet();
@@ -4277,23 +4534,14 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   startPresenceHeartbeat(uid);
   // Charger les infos complètes des commerçants autorisés (rail + récompenses)
   if(S._authorizedMerchants.length) loadNearbyMerchants(S._authorizedMerchants);
-  if(data.friendCode && data.friendCode.startsWith('NOOVA-')) {
-    S._friendCode = data.friendCode;
-    // S'assure que le code existe dans friendCodes
-    db.collection('friendCodes').doc(data.friendCode)
-      .set({ uid, name: resolvedName }, { merge: true }).catch(()=>{});
-  } else {
-    // Génère un nouveau code NOOVA- (6 chars alphanumériques)
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = 'NOOVA-';
-    for(let i=0;i<6;i++) code += chars[Math.floor(Math.random()*chars.length)];
-    S._friendCode = code;
-    db.collection('users').doc(uid).update({ friendCode: code, friendUids: data.friendUids||[] }).catch(()=>{});
-    db.collection('friendCodes').doc(code).set({ uid, name: resolvedName }).catch(()=>{});
-  }
+  S._friendCode = (data.friendCode && data.friendCode.startsWith('NOOVA-')) ? data.friendCode : '';
+  ensureFriendCode(uid, resolvedName, data.friendCode).then(c => {
+    if(c && c !== S._friendCode){ S._friendCode = c; const fp=document.getElementById('panel-friends'); if(fp && fp.style.display!=='none') initFriendsPanel(); }
+  });
   if(S._friendUids.length) loadFriendsFromFirestore(S._friendUids);
   else if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }
   initNotifications(uid);
+  restorePushForUser(uid);
   loadHistFromFirestore(uid);
 
   if(data.onboardingStep === 'categories') {
@@ -4314,6 +4562,31 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   if(!window._claimTried){ window._claimTried = true; claimPendingDemo().then(pts => { if(pts > 0) showClaimSplash(pts); }); }
 }
 
+// Chaque habitant a UN code ami unique, réservé de façon atomique : si le code enregistré est déjà
+// pris par un autre compte (collision), on en génère un nouveau plutôt que de partager le code de
+// quelqu'un d'autre. friendCodes/{code} pointe toujours vers un seul uid.
+async function ensureFriendCode(uid, name, current) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  try {
+    if(current && current.startsWith('NOOVA-')) {
+      const ref = db.collection('friendCodes').doc(current);
+      const snap = await ref.get();
+      if(!snap.exists) { await ref.set({ uid, name }); return current; }
+      if(snap.data().uid === uid) { if(snap.data().name !== name) ref.update({ name }).catch(()=>{}); return current; }
+    }
+    for(let i = 0; i < 8; i++) {
+      let code = 'NOOVA-';
+      for(let k = 0; k < 6; k++) code += chars[Math.floor(Math.random()*chars.length)];
+      const ref = db.collection('friendCodes').doc(code);
+      try {
+        await db.runTransaction(async tx => { if((await tx.get(ref)).exists) throw new Error('taken'); tx.set(ref, { uid, name }); });
+      } catch(e) { continue; }
+      await db.collection('users').doc(uid).update({ friendCode: code });
+      return code;
+    }
+  } catch(e) { console.warn('ensureFriendCode:', e); }
+  return (current && current.startsWith('NOOVA-')) ? current : '';
+}
 async function loadFriendsFromFirestore(uids) {
   if (!uids || !uids.length) {
     S.friends = []; renderFriends();
@@ -4322,11 +4595,13 @@ async function loadFriendsFromFirestore(uids) {
   }
   try {
     // Promise.allSettled : un ami inaccessible (règle refusée) ne doit pas faire échouer tous les autres
-    const capped = uids.slice(0, 30);
+    const myUid = auth.currentUser && auth.currentUser.uid;
+    const capped = [...new Set(uids)].filter(u => u && u !== myUid).slice(0, 30);
     const results = await Promise.allSettled(capped.map(uid => db.collection('users').doc(uid).get()));
     const allSnaps = results.filter(r => r.status === 'fulfilled').map(r => r.value);
     const twoMinAgo = Date.now() - 2 * 60 * 1000;
-    S.friends = allSnaps.filter(s => s.exists).map(s => {
+    const seenUids = new Set();
+    S.friends = allSnaps.filter(s => s.exists && !seenUids.has(s.id) && seenUids.add(s.id)).map(s => {
       const d = s.data();
       const online = d.online === true && d.lastSeen && (d.lastSeen.seconds * 1000 > twoMinAgo);
       // Classement/liste d'amis basés sur l'XP (à vie, ne descend jamais) et non le solde
@@ -4780,12 +5055,14 @@ function logout() {
   if(_presenceInterval) { clearInterval(_presenceInterval); _presenceInterval = null; }
   if(_redemptionsUnsub) { _redemptionsUnsub(); _redemptionsUnsub = null; }
   const uid = auth.currentUser && auth.currentUser.uid;
-  if(uid) db.collection('users').doc(uid).update({ online: false }).catch(() => {});
-  auth.signOut().then(() => {
-    S.user = null; S.pts = 0; S.xp = 0; S.qs = [];
-    document.getElementById('bnav').classList.remove('show');
-    // onAuthStateChanged will fire → #onboard slides
-  });
+  const done = () => { auth.signOut().finally(() => { location.reload(); }); };
+  if(uid) {
+    // Le jeton de notification appartient à l'APPAREIL : on le retire de ce compte pour qu'un
+    // autre compte connecté ensuite ici ne reçoive jamais les notifications du précédent.
+    const tok = (() => { try { return localStorage.getItem('nv_fcm_token_' + uid); } catch(e) { return null; } })();
+    const ops = [db.collection('users').doc(uid).update(Object.assign({ online: false }, tok ? { fcmTokens: firebase.firestore.FieldValue.arrayRemove(tok) } : {})).catch(() => {})];
+    Promise.all(ops).then(done);
+  } else done();
 }
 
 // ─── Google Sign-In ───────────────────────────────────────────

@@ -188,13 +188,22 @@ exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (e
   // Deux populations : ceux qui ont déjà autorisé le commerce (« a une question pour toi »)
   // et ceux à qui il s'adresse pour la première fois (« veut te poser des questions »).
   // Ceux qui ont refusé ne sont jamais notifiés.
-  const groups = { known: { tokens: [], owners: [] }, request: { tokens: [], owners: [] } };
+  // Un même appareil ne doit recevoir qu'UNE notification : les tokens sont dédoublonnés sur
+  // l'ensemble des comptes (un téléphone partagé peut figurer dans plusieurs fiches), et la
+  // variante « déjà autorisé » l'emporte sur « demande ».
+  const byToken = new Map();
   usersSnap.forEach((doc) => {
     const u = doc.data();
     if ((u.declinedMerchants || []).includes(camp.merchantId)) return;
-    const g = (u.authorizedMerchants || []).includes(camp.merchantId) ? groups.known : groups.request;
-    if (Array.isArray(u.fcmTokens)) u.fcmTokens.forEach((tok) => { g.tokens.push(tok); g.owners.push(doc.ref); });
+    const group = (u.authorizedMerchants || []).includes(camp.merchantId) ? "known" : "request";
+    if (!Array.isArray(u.fcmTokens)) return;
+    u.fcmTokens.forEach((tok) => {
+      const prev = byToken.get(tok);
+      if (!prev || (prev.group === "request" && group === "known")) byToken.set(tok, { group, ref: doc.ref });
+    });
   });
+  const groups = { known: { tokens: [], owners: [] }, request: { tokens: [], owners: [] } };
+  byToken.forEach((v, tok) => { groups[v.group].tokens.push(tok); groups[v.group].owners.push(v.ref); });
   logger.info("notifyNewCampaign: ciblage", { city, users: usersSnap.size, known: groups.known.tokens.length, request: groups.request.tokens.length });
 
   const name = camp.merchantName || "Un commerce";
@@ -217,7 +226,7 @@ exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (e
           tokens: chunkTokens,
           notification: messages[key],
           webpush: {
-            notification: { icon: "/icon-192.png" },
+            notification: { icon: "/icon-192.png", tag: `camp-${event.params.campaignId}` },
             fcmOptions: { link: "https://noovaoff.fr/app-v2" },
           },
         });
