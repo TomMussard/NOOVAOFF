@@ -20,7 +20,10 @@ function buildSite() {
    ["noova_admin.html", "admin.html", "const db = firebase.firestore();", emuAdmin]].forEach(([src, dst, marker, add]) => {
     const html = fs.readFileSync(path.join(ROOT, src), "utf8");
     if (html.split(marker).length !== 2) throw new Error(`${src} : repère d'injection introuvable (${marker})`);
-    fs.writeFileSync(path.join(SITE, dst), html.replace(marker, marker + add));
+    let out = html.replace(marker, marker + add);
+    // Le back-office déclare ses fonctions plus bas : on les branche aussi sur l'émulateur.
+    if (dst === "admin.html") out = out.replace("const fx  = firebase.app().functions('europe-west1');", "const fx  = firebase.app().functions('europe-west1');fx.useEmulator('127.0.0.1',5001);");
+    fs.writeFileSync(path.join(SITE, dst), out);
   });
 }
 
@@ -38,7 +41,7 @@ function serve(port) {
   });
 }
 
-const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "notif_server", "notif_ui", "mobile_audit"];
+const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "notif_server", "notif_ui", "mobile_audit"];
 
 function runSuite(name) {
   return new Promise((resolve) => {

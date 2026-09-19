@@ -12,6 +12,7 @@ const { getFirestore } = require("firebase-admin/firestore");
 const CFG = require("./engagementConfig");
 const crypto = require("crypto");
 const { sectorCategory, parisDay } = require("./lib");
+const { applyOverrides } = require("./configStore")._t;
 
 const db = () => getFirestore();
 const uniq = (a) => [...new Set((a || []).filter(Boolean))];
@@ -72,6 +73,7 @@ async function friendsWhoAnswered(uid, user, campaignId, qIdx, options) {
 
 // ─────────────────────────── Reveal ───────────────────────────
 async function revealCore(uid, data, opts = {}) {
+  await applyOverrides();
   const campaignId = data && data.campaignId;
   if (!campaignId || typeof campaignId !== "string") throw new HttpsError("invalid-argument", "Question invalide.");
   const qIdx = clampIdx(data.questionIdx);
@@ -147,6 +149,7 @@ async function maybeOfferPrediction(uid, key, opts = {}) {
 
 // guessIdx = null → « Passer » : la série n'est pas touchée.
 async function predictCore(uid, data, opts = {}) {
+  await applyOverrides();
   const campaignId = data && data.campaignId;
   if (!campaignId || typeof campaignId !== "string") throw new HttpsError("invalid-argument", "Question invalide.");
   const qIdx = clampIdx(data.questionIdx), key = keyOf(campaignId, qIdx);
@@ -241,6 +244,7 @@ async function pairStats(uid, fid, mine, memo, now) {
 const pctOf = (a, c) => Math.round((a * 100) / c);
 
 async function compatCore(uid, data, now = Date.now()) {
+  await applyOverrides();
   const meSnap = await db().collection("users").doc(uid).get();
   const me = meSnap.data() || {};
   if (me.shareAnswers === false) return { sharing: false, friends: [] };  // il faut partager pour comparer

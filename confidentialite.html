@@ -40,48 +40,63 @@
 <div class="wrap">
   <div class="top"><img src="favicon.svg" alt=""><span>Noova</span></div>
   <h1>Politique de confidentialité</h1>
-  <div class="updated">Dernière mise à jour : 12 août 2026</div>
+  <div class="updated">Dernière mise à jour : 20 septembre 2026</div>
 
   <div class="draft-note">
     <strong>Note interne (à retirer avant publication) :</strong> ce document est un brouillon rédigé à partir du fonctionnement réel de l'application — collecte, finalités, partage avec les commerçants, droits déjà implémentés (suppression de compte, révocation de consentement). Il couvre les bases du RGPD mais <strong>doit être relu et validé par un avocat ou un DPO</strong> avant d'être présenté comme définitif à des utilisateurs ou des commerçants, en particulier parce que le dashboard commerçant revendique explicitement une conformité RGPD. Les champs <span class="placeholder">en surbrillance</span> sont à compléter avec les vraies informations légales de la société.
-  </div>
+   <br><br><strong>Mise à jour du 20 septembre 2026 :</strong> ajout des fonctions récentes (partage des réponses entre amis, résultats globaux, compatibilité, mode prédiction, fil de la communauté, notifications, actualités des commerçants, mesure du temps de réponse, sauvegardes). Points à faire trancher par un juriste : (1) le partage des réponses aux amis est <em>activé par défaut</em> (désactivable) — faut-il un consentement explicite à l'inscription ? (2) durée de conservation des journaux de notifications et des sauvegardes ; (3) transferts hors UE liés à Google/Vercel ; (4) mineurs de 16-17 ans.</div>
 
   <h2>1. Qui sommes-nous</h2>
   <p>Noova est éditée par <span class="placeholder">[Raison sociale à compléter]</span>, <span class="placeholder">[forme juridique, SIRET, adresse du siège]</span>. Pour toute question relative à vos données, vous pouvez nous contacter à <a href="mailto:noovaoffr@gmail.com">noovaoffr@gmail.com</a>.</p>
 
   <h2>2. Les données que nous collectons</h2>
   <p>Selon que vous utilisez Noova en tant qu'habitant ou en tant que commerçant :</p>
-  <div class="card"><b>Compte habitant</b> — email, prénom, mot de passe (ou identifiant Google/Apple), ville, tranche d'âge, centres d'intérêt, réponses aux questions des commerces, solde de points et statut, connexions d'amis, présence en ligne (pour la fonctionnalité amis).</div>
-  <div class="card"><b>Compte commerçant</b> — email, nom de l'enseigne, secteur d'activité, ville, adresse, informations de vérification du compte.</div>
+  <div class="card"><b>Compte habitant</b> — email, prénom, mot de passe (ou identifiant Google/Apple), photo de profil (facultative), ville, âge ou tranche d'âge, centres d'intérêt, réponses aux questions des commerces et <b>temps mis pour répondre</b>, soldes de points et de NOOVS, série de jours, connexions d'amis, présence en ligne, résultats de vos prédictions (série, record), réglages de confidentialité et de notifications, et — si vous activez les notifications — un identifiant technique de votre appareil (jeton de notification) ainsi que l'historique des notifications envoyées (type, date, ouverte ou non).</div>
+  <div class="card"><b>Compte commerçant</b> — email, nom de l'enseigne, secteur d'activité, ville, adresse, téléphone, SIRET, logo et photos, informations de vérification du compte, questions, récompenses et actualités publiées.</div>
   <p>Nous ne collectons pas votre position GPS précise — uniquement la ville que vous renseignez vous-même, qui détermine les commerces et questions qui vous sont proposés.</p>
 
   <h2>3. Pourquoi nous les utilisons</h2>
   <ul>
-    <li>Vous proposer les questions des commerces de votre ville et calculer vos points ;</li>
+    <li>Vous proposer les questions des commerces de votre ville et calculer vos points et vos NOOVS ;</li>
     <li>Permettre l'échange de points contre des récompenses réelles chez les commerçants ;</li>
-    <li>Faire fonctionner les fonctionnalités sociales (amis, comparaison de réponses) que vous activez volontairement ;</li>
+    <li>Faire fonctionner les fonctionnalités sociales que vous utilisez : amis, fil de la communauté, comparaison de réponses, compatibilité, mode prédiction (voir le point 5) ;</li>
+    <li>Vous montrer, après avoir répondu, comment les autres habitants ont répondu ;</li>
     <li>Fournir aux commerçants des réponses agrégées à leurs questions, uniquement pour les profils qui les ont explicitement autorisés ;</li>
-    <li>Sécuriser les comptes et prévenir la fraude sur le système de points.</li>
+    <li>Vous envoyer des notifications, si vous les avez activées (voir le point 6) ;</li>
+    <li>Sécuriser les comptes et prévenir la fraude sur le système de points, notamment en mesurant le temps de réponse : une réponse donnée trop vite pour avoir été lue ne rapporte pas de points et peut être examinée par l'équipe Noova.</li>
   </ul>
 
   <h2>4. Ce qui est partagé avec les commerçants</h2>
-  <p>Un commerçant ne voit jamais l'ensemble de vos données. Il accède uniquement : à vos réponses à ses propres questions, à des statistiques agrégées, et aux profils (ville, tranche d'âge, centres d'intérêt) des utilisateurs qui l'ont <b>explicitement autorisé</b> depuis leur profil. Cette autorisation est révocable à tout moment, en un geste, depuis l'app (Profil → Gérer les commerces).</p>
+  <p>Un commerçant ne voit jamais l'ensemble de vos données. Il accède uniquement : à vos réponses à ses propres questions, à des statistiques agrégées, et aux profils (ville, tranche d'âge, centres d'intérêt) des utilisateurs qui l'ont <b>explicitement autorisé</b> depuis leur profil. Cette autorisation est révocable à tout moment, en un geste, depuis l'app (Profil → Gérer les commerces). Un commerçant peut publier de courtes actualités : elles sont relues par l'équipe Noova avant publication et n'exposent aucune donnée personnelle d'habitant.</p>
 
-  <h2>5. Combien de temps nous les gardons</h2>
-  <p>Vos données sont conservées tant que votre compte est actif. Si vous supprimez votre compte, vos réponses, votre historique, vos échanges de récompenses et vos données de profil sont effacés de façon permanente — cette suppression est disponible directement dans l'app (Profil → Zone de danger).</p>
+  <h2>5. Ce qui est visible par vos amis et par les autres habitants</h2>
+  <ul>
+    <li><b>Vos amis</b> (uniquement lorsque l'amitié est réciproque) voient votre prénom et votre photo, votre niveau et votre série, votre activité dans le fil (« a répondu à une question de… », sans le contenu de votre réponse), et — pour une question à laquelle ils ont eux-mêmes répondu — l'option que vous avez choisie. Ils voient aussi votre pourcentage de compatibilité avec eux, calculé sur les questions à choix auxquelles vous avez tous deux répondu (à partir de 5 questions en commun).</li>
+    <li><b>Réglage « Montrer mes réponses à mes amis »</b> — activé par défaut, désactivable à tout moment dans Profil → Réglages. Désactivé, vos réponses ne sont plus nommées auprès de vos amis et votre compatibilité n'est plus calculée ; elles comptent toujours, de façon anonyme, dans les résultats globaux.</li>
+    <li><b>Les autres habitants</b> ne voient jamais qui vous êtes : les résultats globaux d'une question sont des pourcentages, affichés seulement à partir de 5 réponses. Les personnes qui ne sont pas vos amis ne voient ni votre activité, ni vos réponses.</li>
+  </ul>
 
-  <h2>6. Vos droits</h2>
-  <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation et de portabilité de vos données, ainsi que du droit de retirer votre consentement à tout moment. Plusieurs de ces droits sont directement disponibles dans l'app :</p>
+  <h2>6. Notifications</h2>
+  <p>Les notifications sont envoyées uniquement si vous les avez activées sur votre appareil. Vous choisissez les types de notifications (question du jour, nouveaux commerces, résultats, série, récompenses, amis, actualités des commerces) depuis Profil → Réglages → Notifications, et vous pouvez tout désactiver à tout moment. Nous limitons l'envoi à une notification par jour (deux dans les cas exceptionnels), jamais entre 21 h et 9 h, et nous espaçons puis arrêtons les notifications que vous n'ouvrez pas. Les commerçants ne peuvent pas vous envoyer de notification. Nous mesurons si une notification est ouverte afin d'améliorer ce service. Les commerçants reçoivent, eux, des notifications dans leur espace et par email (statut de vérification, récompenses réclamées, réponses reçues, actualités publiées).</p>
+
+  <h2>7. Combien de temps nous les gardons</h2>
+  <p>Vos données sont conservées tant que votre compte est actif. Si vous supprimez votre compte, vos réponses, votre historique, vos échanges de récompenses et vos données de profil sont effacés de façon permanente — cette suppression est disponible directement dans l'app (Profil → Zone de danger). Par sécurité, nous conservons des sauvegardes chiffrées de la base : les données supprimées y disparaissent au plus tard <b>14 jours</b> plus tard (les sauvegardes quotidiennes sont conservées 14 jours, et la restauration à la minute est possible sur les 7 derniers jours).</p>
+
+  <h2>8. Vos droits</h2>
+  <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité de vos données, ainsi que du droit de retirer votre consentement à tout moment. Plusieurs de ces droits sont directement disponibles dans l'app :</p>
   <ul>
     <li><b>Révoquer l'accès d'un ou tous les commerçants</b> — Profil → Gérer les commerces / Zone de danger ;</li>
+    <li><b>Ne plus montrer vos réponses à vos amis</b> — Profil → Réglages → « Montrer mes réponses à mes amis » ;</li>
+    <li><b>Gérer ou couper les notifications</b> — Profil → Réglages → Notifications ;</li>
     <li><b>Supprimer définitivement votre compte et vos données</b> — Profil → Zone de danger ;</li>
     <li><b>Demander une copie de vos données</b> — par email à <a href="mailto:noovaoffr@gmail.com">noovaoffr@gmail.com</a>, réponse sous 30 jours.</li>
   </ul>
+  <p>Vous pouvez aussi introduire une réclamation auprès de la CNIL (cnil.fr).</p>
 
-  <h2>7. Sous-traitants et hébergement</h2>
-  <p>Vos données sont hébergées sur <b>Google Firebase</b> (Firestore, Authentication), et le site est servi via <b>Vercel</b>. <span class="placeholder">[Préciser ici la localisation des données Firestore (région Europe eur3 recommandée) et tout autre sous-traitant utilisé]</span>.</p>
+  <h2>9. Sous-traitants et hébergement</h2>
+  <p>Vos données sont hébergées sur <b>Google Firebase</b> : base de données Firestore en Europe (multi-région « eur3 »), authentification, stockage des photos, fonctions serveur (Belgique, et France pour l'envoi d'emails) et service de notifications (Firebase Cloud Messaging). Les emails aux commerçants sont envoyés via <b>Gmail</b> (Google). Le site est servi via <b>Vercel</b>. <span class="placeholder">[À valider : encadrement juridique des éventuels transferts hors Union européenne (clauses contractuelles types de Google et Vercel)]</span>.</p>
 
-  <h2>8. Contact</h2>
+  <h2>10. Contact</h2>
   <p>Pour toute question ou exercice de vos droits : <a href="mailto:noovaoffr@gmail.com">noovaoffr@gmail.com</a>. <span class="placeholder">[Ajouter le contact du DPO si désigné, comme référencé dans le dashboard commerçant]</span>.</p>
 
   <a class="back" href="javascript:history.back()">← Retour</a>

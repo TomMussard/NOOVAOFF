@@ -395,6 +395,8 @@ service cloud.firestore {
     // Compteurs de réponses par option (reveal) : serveur uniquement, jamais lisibles avant d'avoir répondu.
     match /campaignStats/{id}  { allow read, write: if false; }
     match /compatCache/{id}    { allow read, write: if false; }
+    // Réglages d'engagement : lus/écrits uniquement par les fonctions (l'admin passe par getEngagementConfig).
+    match /appConfig/{id}      { allow read, write: if false; }
     match /mail/{id}           { allow read, write: if false; }
   }
 }

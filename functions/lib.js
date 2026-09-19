@@ -14,4 +14,6 @@ function sectorCategory(sec) {
 function parisDay(ms) {
   return new Date(ms).toLocaleDateString("sv-SE", { timeZone: "Europe/Paris" });
 }
-module.exports = { sectorCategory, parisDay };
+// Comptes autorisés dans le back-office (doit rester aligné sur isAdmin() de firestore.rules).
+const ADMIN_EMAILS = ["noovaoffr@gmail.com", "tomussproduction@gmail.com"];
+module.exports = { sectorCategory, parisDay, ADMIN_EMAILS };

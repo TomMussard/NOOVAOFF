@@ -19,11 +19,12 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./notifications")));
 // Reveal, compatibilité, prédiction, actualités : voir engagement.js.
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./engagement")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./impact")));
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./configStore")));
 
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.
 const CFG = require("./engagementConfig");
-const { sectorCategory, parisDay } = require("./lib");
+const { sectorCategory, parisDay, ADMIN_EMAILS } = require("./lib");
 const NOOVS_PER_ANSWER = CFG.POINTS.NOOVS_PER_ANSWER;
 const MAX_POINT_ANSWERS_PER_DAY = CFG.POINTS.MAX_ANSWERS_PER_DAY;
 const MIN_ANSWER_MS = CFG.RESPONSE_TIME.MIN_FOR_GAIN_MS;
@@ -293,7 +294,6 @@ exports.estimateReach = onCall(async (request) => {
   return { city: m.cityLabel || m.city || "", total, matching, category };
 });
 
-const ADMIN_EMAILS = ["noovaoffr@gmail.com", "tomussproduction@gmail.com"];
 
 /**
  * adminResetAllData — remise à zéro complète avant lancement (réservé admin).

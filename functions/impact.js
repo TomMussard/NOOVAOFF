@@ -16,6 +16,7 @@ const { FieldValue, Timestamp, getFirestore } = require("firebase-admin/firestor
 const logger = require("firebase-functions/logger");
 const CFG = require("./engagementConfig");
 const N = require("./notifications")._t;
+const { applyOverrides } = require("./configStore")._t;
 
 const db = () => getFirestore();
 const DAY = 86400000;
@@ -47,6 +48,7 @@ async function takeNotifySlot(merchantId, now) {
 }
 
 async function publishCore(postId, post) {
+  await applyOverrides();
   const now = await N.nowMs();
   const mid = post.merchantId;
   const mSnap = await db().collection("merchants").doc(mid).get();

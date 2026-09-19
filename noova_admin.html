@@ -462,6 +462,15 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <div id="tab-moderation" style="display:none">
     <div class="sec-hdr"><h2>Modération</h2><p>Réponses signalées par le score qualité (soumises trop vite pour être un vrai choix humain) — 0 point crédité automatiquement. Tu peux lever le signalement si c'est un faux positif.</p></div>
     <div class="card" style="margin-bottom:20px">
+      <div class="card-title">Réglages de l'engagement (seuils)</div>
+      <div style="padding:0 18px 10px;font-size:12px;color:var(--ink3);line-height:1.5">Appliqués en moins d'une minute, sans redéploiement. Au lancement, avec peu d'utilisateurs, tu peux baisser les seuils (les pourcentages sur très peu de réponses sont moins fiables et un ami est plus facilement identifiable). Le barème de points et les seuils anti-fraude ne se règlent pas ici.</div>
+      <div id="eng-cfg-rows" style="padding:0 18px 4px"><div class="loading">Chargement</div></div>
+      <div style="padding:8px 18px 16px;display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="saveEngagementConfig()" style="padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:700;border:none;background:var(--coral);color:#fff;cursor:pointer">Enregistrer</button>
+        <button onclick="resetEngagementConfig()" style="padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:700;border:1.5px solid var(--border);background:transparent;color:var(--ink2);cursor:pointer">Revenir aux valeurs par défaut</button>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:20px">
       <div class="card-title">Actualités à valider <span class="badge badge-pending" id="post-mod-count">0</span></div>
       <div style="padding:0 18px 10px;font-size:12px;color:var(--ink3);line-height:1.5">« Ton avis a compté » : une fois publiée, l'actualité apparaît dans la communauté et les habitants qui ont répondu au commerce sont prévenus (1 actualité notifiée par commerce tous les 14 jours). Vérifie que le texte parle bien de ce qui a changé grâce aux avis, sans promotion déguisée.</div>
       <div id="post-mod-list"><div class="loading">Chargement</div></div>
@@ -892,6 +901,35 @@ async function rejectReward(rewardId, btn) {
   }
 }
 
+// ── Réglages de l'engagement (seuils modifiables sans redéploiement) ─────────
+let _engCfg = null;
+async function loadEngagementConfig() {
+  const el = document.getElementById('eng-cfg-rows');
+  if (!el) return;
+  try {
+    _engCfg = (await fx.httpsCallable('getEngagementConfig')()).data;
+    el.innerHTML = Object.keys(_engCfg.bounds).map(k => {
+      const b = _engCfg.bounds[k], v = _engCfg.values[k], d = _engCfg.defaults[k];
+      return `<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1;font-size:13px;color:var(--ink)">${esc(b.label)}<div style="font-size:11px;color:var(--ink3)">Défaut ${d} · entre ${b.min} et ${b.max}</div></div>
+        <input data-k="${esc(k)}" type="number" step="${b.int ? 1 : 0.05}" min="${b.min}" max="${b.max}" value="${v}" style="width:84px;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;text-align:right;background:var(--bg3);color:var(--ink)">
+      </div>`;
+    }).join('');
+  } catch (e) { el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`; }
+}
+async function saveEngagementConfig() {
+  const values = {};
+  document.querySelectorAll('#eng-cfg-rows input[data-k]').forEach(i => { values[i.dataset.k] = i.value === '' ? null : Number(i.value); });
+  try { await fx.httpsCallable('setEngagementConfig')({ values }); showToast('Réglages enregistrés', 'success'); loadEngagementConfig(); }
+  catch (e) { showToast(e.message || 'Enregistrement impossible', 'error'); }
+}
+async function resetEngagementConfig() {
+  if (!confirm('Revenir à toutes les valeurs par défaut ?')) return;
+  const values = {}; Object.keys((_engCfg && _engCfg.bounds) || {}).forEach(k => { values[k] = null; });
+  try { await fx.httpsCallable('setEngagementConfig')({ values }); showToast('Valeurs par défaut rétablies', 'success'); loadEngagementConfig(); }
+  catch (e) { showToast(e.message || 'Impossible', 'error'); }
+}
+
 // ── Modération : actualités « Ton avis a compté » ────────────────────────────
 let _postModUnsub = null;
 function loadPostModeration() {
@@ -934,6 +972,7 @@ let _flaggedModUnsub = null;
 function loadModeration() {
   loadRewardModeration();
   loadPostModeration();
+  loadEngagementConfig();
   const el = document.getElementById('mod-list');
   if (!el) return;
   el.innerHTML = '<div class="loading">Chargement</div>';
