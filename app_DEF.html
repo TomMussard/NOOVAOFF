@@ -121,6 +121,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 /* SPLASH — empty screen covered by #app-loader */
 #splash{position:relative;overflow:hidden;background:var(--bg)}
 /* ONBOARDING */
+.how-row{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow-card)}
+.how-n{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.how-t{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink);letter-spacing:-.3px}
+.how-d{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:2px}
 .ob-wrap{height:100%;display:flex;flex-direction:column}
 .ob-topbar{padding:56px 22px 0;display:flex;justify-content:flex-end}
 .ob-skip{font-size:13px;font-weight:600;color:var(--ink3);background:none;border:none;cursor:pointer;font-family:var(--fb)}
@@ -930,6 +934,22 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   </div>
 </div>
 
+<!-- COMMENT ÇA MARCHE -->
+<div id="how-it-works" class="screen">
+  <div class="qw">
+    <div class="q-nav"><div class="q-close" onclick="goNav('profile')">←</div><div style="flex:1"></div></div>
+    <div class="q-text" style="margin-bottom:6px">Comment ça marche</div>
+    <div class="q-hint">Quatre étapes, aucune obligation.</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
+      <div class="how-row"><div class="how-n">1</div><div><div class="how-t">Un commerce te pose une question</div><div class="how-d">Seulement s'il a ton accord. Tu réponds en 30 secondes.</div></div></div>
+      <div class="how-row"><div class="how-n">2</div><div><div class="how-t">Tu gagnes des points</div><div class="how-d">10 points pour la première question du jour, un peu plus pour les suivantes.</div></div></div>
+      <div class="how-row"><div class="how-n">3</div><div><div class="how-t">Tu échanges tes points</div><div class="how-d">Contre une récompense choisie par le commerce, à récupérer chez lui.</div></div></div>
+      <div class="how-row"><div class="how-n">4</div><div><div class="how-t">Tu montres ton code en caisse</div><div class="how-d">Il est valable 24 h et ne sert qu'une fois.</div></div></div>
+    </div>
+    <div style="background:var(--md);border-radius:14px;padding:12px 14px;font-size:12px;color:var(--ink2);line-height:1.6;margin-top:18px"><strong style="color:var(--ink)">Tu gardes le contrôle.</strong> Les commerces ne voient jamais qui a répondu, seulement des résultats regroupés. Tu peux retirer ton accord à un commerce à tout moment depuis ton profil.</div>
+  </div>
+</div>
+
 <!-- BRANDS CONSENT -->
 <div id="brands" class="screen">
   <div class="brands-body">
@@ -1217,6 +1237,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="sec-card">
       <div class="sc-hdr"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div></div>
       <div class="consent-it" style="cursor:pointer" onclick="goTo('manage-merchants');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
+      <div class="consent-it" style="cursor:pointer" onclick="goTo('how-it-works');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Comment ça marche</div><span style="color:var(--ink3);font-size:17px">›</span></div>
       <div class="consent-it" style="cursor:pointer;border-bottom:none" onclick="toggleNotifications()"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Notifications</div><span style="color:var(--ink3);font-size:12px" id="notif-settings-state">Activer ›</span></div>
       <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Conforme RGPD — révoque ou supprime tes données ci-dessous.</div></div>
     </div>
@@ -3852,7 +3873,7 @@ function loadActiveRedemptions(){
       <div class="dcode-name">${esc(r.label||'Récompense')}</div>
       <div class="dcode-sub">${esc(r.merchantName||'')}${exp?' · expire le '+exp:''}</div>
       <div class="dcode-box"><div class="dcode-lbl">Code à montrer en caisse</div><div class="dcode-val">${esc((r.code||'').split('').join(' '))}</div></div>
-      <button class="dcode-btn" onclick="showVoucherModal({code:'${(r.code||'').replace(/'/g,"\\'")}',label:'${(r.label||'').replace(/'/g,"\\'")}',merchantName:'${(r.merchantName||'').replace(/'/g,"\\'")}',cost:${r.cost||0},purchaseCondition:${r.purchaseCondition?`'${r.purchaseCondition.replace(/'/g,"\\'")}'`:'null'},expiresAt:${r._expMs?`new Date(${r._expMs})`:'null'}})">Utiliser maintenant</button>
+      <button class="dcode-btn" onclick="showVoucherModal({id:'${r.id}',code:'${(r.code||'').replace(/'/g,"\\'")}',label:'${(r.label||'').replace(/'/g,"\\'")}',merchantName:'${(r.merchantName||'').replace(/'/g,"\\'")}',cost:${r.cost||0},purchaseCondition:${r.purchaseCondition?`'${r.purchaseCondition.replace(/'/g,"\\'")}'`:'null'},expiresAt:${r._expMs?`new Date(${r._expMs})`:'null'}})">Utiliser maintenant</button>
     </div>
     ${active.length>1?`<div class="dcode-more" onclick="showToast('${active.length-1} autre${active.length>2?'s':''} code${active.length>2?'s':''} disponible${active.length>2?'s':''}','success')">+${active.length-1} autre${active.length>2?'s':''} code${active.length>2?'s':''} actif${active.length>2?'s':''}</div>`:''}`;
   }, e => { console.warn('loadActiveRedemptions:', e); wrap.innerHTML=''; });
@@ -3884,12 +3905,11 @@ async function redeemReward(reward) {
     }
   }
 
-  if(!confirm(`Échanger ${reward.cost} pts contre "${reward.label}" chez ${reward.merchantName||'ce commerce'} ?`)) return;
+  if(!(await askRedeemConfirm(reward))) return;
 
+  // Code à 4 caractères, sans caractères ambigus (0/O, 1/I) : il se lit et se saisit en caisse.
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = 'NVA-';
-  for(let i=0;i<3;i++) code += chars[Math.floor(Math.random()*chars.length)];
-  code += '-';
+  let code = '';
   for(let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
 
   const expiresAt = new Date(Date.now() + 24*60*60*1000); // 24h
@@ -3931,38 +3951,94 @@ async function redeemReward(reward) {
     setTimeout(maybeShowInstallInvite, 2500);
     refreshWallet();
     trackEvent('spend_virtual_currency', { virtual_currency_name: 'points', value: reward.cost||0, item_name: reward.label||'Récompense' });
-    showVoucherModal({ code, label: reward.label, merchantName: reward.merchantName, cost: reward.cost, purchaseCondition: reward.purchaseCondition, expiresAt });
+    showVoucherModal({ id: redemRef.id, code, label: reward.label, merchantName: reward.merchantName, cost: reward.cost, purchaseCondition: reward.purchaseCondition, expiresAt });
   } catch(e) {
     showVoucherError(e.message || ('Erreur : ' + e));
   }
 }
 
-function showVoucherModal({ code, label, merchantName, cost, purchaseCondition, expiresAt }) {
-  const exp = expiresAt ? expiresAt.toLocaleDateString('fr-FR',{day:'numeric',month:'long'}) : 'demain';
-  let ov = document.getElementById('voucher-overlay');
-  if(!ov) {
+// Confirmation explicite avant l'échange : ce qui est débité, ce qu'il reste, la durée de validité.
+function askRedeemConfirm(reward) {
+  return new Promise(resolve => {
+    let ov = document.getElementById('redeem-confirm');
+    if(ov) ov.remove();
     ov = document.createElement('div');
-    ov.id = 'voucher-overlay';
-    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
-    ov.onclick = e => { if(e.target === ov) ov.remove(); };
-    document.body.appendChild(ov);
-  }
-  ov.innerHTML = `<div class="conf-layer" id="voucher-conf-layer"></div><div style="background:var(--card);border-radius:26px 26px 0 0;padding:10px 20px calc(28px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px;position:relative">
-    <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
-    <div style="text-align:center;margin-bottom:14px"><span style="display:inline-flex;width:52px;height:52px;border-radius:50%;background:var(--coral);color:var(--ink);align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M4 12.5 9.5 18 20 6"/></svg></span></div>
-    <div style="font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:-.5px;text-align:center;color:var(--ink);margin-bottom:4px">${esc(label||'Récompense')}</div>
-    <div style="text-align:center;font-size:13px;color:var(--ink2);margin-bottom:18px">${esc(merchantName||'')}</div>
-    <div style="background:var(--nv-black);border-radius:20px;padding:18px;color:#fff;margin-bottom:14px">
-      <div style="background:rgba(255,255,255,.06);border:1.5px dashed rgba(255,255,255,.28);border-radius:16px;padding:15px;text-align:center">
-        <div style="font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.42);margin-bottom:8px">Code à montrer en caisse</div>
-        <div style="font-family:monospace;font-size:26px;font-weight:800;letter-spacing:5px;color:var(--coral)">${esc(code.split('').join(' '))}</div>
+    ov.id = 'redeem-confirm';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center';
+    const left = Math.max(0, (S.pts||0) - (reward.cost||0));
+    ov.innerHTML = `<div style="background:var(--card);border-radius:24px 24px 0 0;max-width:430px;width:100%;padding:22px 22px calc(24px + env(safe-area-inset-bottom,0px))">
+      <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
+      <div style="font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:-.5px;color:var(--ink);margin-bottom:4px">${esc(reward.label||'Récompense')}</div>
+      <div style="font-size:13px;color:var(--ink2);margin-bottom:16px">${esc(reward.merchantName||'')}</div>
+      <div style="background:var(--bg2);border-radius:14px;padding:12px 14px;font-size:13.5px;color:var(--ink);line-height:1.9;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between"><span>Débité</span><strong>${reward.cost||0} pts</strong></div>
+        <div style="display:flex;justify-content:space-between"><span>Il te restera</span><strong>${left} pts</strong></div>
+        <div style="display:flex;justify-content:space-between"><span>Valable</span><strong>24 h</strong></div>
       </div>
+      <div style="font-size:11.5px;color:var(--ink3);margin-bottom:16px">Cette action est irréversible. Montre le code en caisse pour récupérer ta récompense.</div>
+      <button class="btn-p" id="rc-yes">Échanger contre ${reward.cost||0} pts</button>
+      <button class="btn-s" id="rc-no" style="margin-top:8px">Annuler</button>
+    </div>`;
+    document.body.appendChild(ov);
+    const done = v => { ov.remove(); resolve(v); };
+    ov.querySelector('#rc-yes').onclick = () => done(true);
+    ov.querySelector('#rc-no').onclick = () => done(false);
+    ov.onclick = e => { if(e.target === ov) done(false); };
+  });
+}
+
+// Écran code plein écran : fond blanc (luminosité maximale à l'œil), code très grand,
+// compte à rebours de validité, et « C'est validé » à presser en caisse.
+let _voucherTimer = null, _voucherLock = null;
+function closeVoucherFull() {
+  const ov = document.getElementById('voucher-full');
+  if(ov) ov.remove();
+  if(_voucherTimer) { clearInterval(_voucherTimer); _voucherTimer = null; }
+  try { if(_voucherLock) { _voucherLock.release(); _voucherLock = null; } } catch(e) {}
+}
+function showVoucherModal({ id, code, label, merchantName, cost, purchaseCondition, expiresAt }) {
+  closeVoucherFull();
+  const ov = document.createElement('div');
+  ov.id = 'voucher-full';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#fff;display:flex;flex-direction:column;padding:calc(20px + env(safe-area-inset-top,0px)) 22px calc(22px + env(safe-area-inset-bottom,0px));overflow-y:auto';
+  const cond = purchaseCondition ? `<div style="font-size:13px;color:var(--ink2);text-align:center;margin-top:14px">Condition : ${esc(purchaseCondition)}</div>` : '';
+  ov.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div class="q-close" onclick="closeVoucherFull()">✕</div><div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3)">Ton code</div><div style="width:38px"></div></div>
+    <div id="vf-body" style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+      <div style="font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:-.5px;color:var(--ink)">${esc(label||'Récompense')}</div>
+      <div style="font-size:14px;color:var(--ink2);margin:4px 0 26px">${esc(merchantName||'')}</div>
+      <div style="font-family:var(--fd);font-weight:800;font-size:92px;line-height:1;letter-spacing:14px;padding-left:14px;color:var(--ink);background:var(--yellow);border-radius:28px;padding-top:24px;padding-bottom:24px;width:100%;max-width:340px">${esc(code)}</div>
+      <div id="vf-timer" style="font-size:14px;font-weight:700;color:var(--ink);margin-top:20px"></div>
+      ${cond}
     </div>
-    ${purchaseCondition ? `<div style="background:var(--bg2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--ink2);margin-bottom:12px;display:flex;align-items:center;gap:6px">${icon('document',{size:13})} Condition : ${esc(purchaseCondition)}</div>` : ''}
-    <div style="font-size:11px;color:var(--ink3);text-align:center;margin-bottom:18px">Valable jusqu'au ${exp} · -${cost} pts de ton solde</div>
-    <button onclick="document.getElementById('voucher-overlay').remove()" style="width:100%;padding:14px;border-radius:99px;background:var(--coral);border:none;color:var(--ink);font-family:var(--fd);font-weight:800;font-size:15px;cursor:pointer">Fermer</button>
-  </div>`;
-  spawnConfetti('voucher-conf-layer');
+    <button id="vf-ok" class="btn-p" style="background:var(--ink);color:#fff;box-shadow:none">C'est validé</button>
+    <div style="font-size:11.5px;color:var(--ink3);text-align:center;margin-top:8px">À presser devant le commerçant, quand tu as reçu ta récompense.</div>`;
+  document.body.appendChild(ov);
+  try { if(navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { _voucherLock = l; }).catch(() => {}); } catch(e) {}
+  const tick = () => {
+    const t = document.getElementById('vf-timer'); if(!t) return;
+    const ms = expiresAt ? expiresAt.getTime() - Date.now() : 0;
+    if(ms <= 0) { t.textContent = 'Ce code a expiré.'; return; }
+    const h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000), sec = Math.floor(ms % 60000 / 1000);
+    t.textContent = `Valable encore ${h} h ${String(m).padStart(2,'0')} min ${String(sec).padStart(2,'0')} s`;
+  };
+  tick(); _voucherTimer = setInterval(tick, 1000);
+  let armed = false;
+  ov.querySelector('#vf-ok').onclick = async function() {
+    if(!armed) { armed = true; this.textContent = 'Appuie encore pour confirmer'; setTimeout(() => { armed = false; if(this.isConnected) this.textContent = "C'est validé"; }, 4000); return; }
+    this.disabled = true; this.textContent = '…';
+    try {
+      if(id) await db.collection('redemptions').doc(id).update({ status: 'used', usedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      trackEvent('voucher_used');
+      if(_voucherTimer) { clearInterval(_voucherTimer); _voucherTimer = null; }
+      document.getElementById('vf-body').innerHTML = `<div class="rw-circle" style="display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px"><path d="M4 12.5 9.5 18 20 6"/></svg></div>
+        <div style="font-family:var(--fd);font-weight:800;font-size:26px;letter-spacing:-.8px;color:var(--ink);margin-top:14px">Récompense validée</div>
+        <div style="font-size:14px;color:var(--ink2);margin-top:6px;line-height:1.6">Profites-en bien. Ça te dit d'en parler autour de toi ?</div>`;
+      this.remove();
+      const foot = document.createElement('div'); foot.style.cssText = 'display:flex;flex-direction:column;gap:8px';
+      foot.innerHTML = '<button class="btn-p" onclick="shareNoova()">Partager NOOVA</button><button class="btn-s" onclick="closeVoucherFull()">Fermer</button>';
+      ov.appendChild(foot);
+    } catch(e) { console.warn('voucher used:', e); this.disabled = false; this.textContent = "C'est validé"; showToast('Impossible de valider pour le moment. Montre simplement le code en caisse.', 'error'); }
+  };
 }
 
 function showToast(msg, ico = 'error') {

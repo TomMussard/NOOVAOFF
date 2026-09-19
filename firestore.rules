@@ -189,8 +189,10 @@ service cloud.firestore {
         isAdmin()
       );
       // Le commerçant peut passer le bon à "used" (validation au comptoir)
+      // L'habitant peut aussi presser « C'est validé » sur son propre bon en attente.
       allow update: if isAuth() &&
-        resource.data.merchantId == request.auth.uid &&
+        (resource.data.merchantId == request.auth.uid ||
+         (resource.data.userId == request.auth.uid && resource.data.status == 'pending')) &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','usedAt']) &&
         request.resource.data.status == 'used';
       // delete : uniquement par l'utilisateur concerné (suppression de compte / droit à l'effacement)

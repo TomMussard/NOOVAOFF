@@ -1406,14 +1406,14 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div style="max-width:520px">
           <div style="margin-bottom:28px">
             <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Valider un bon</div>
-            <div style="font-size:13px;color:var(--ink2);margin-top:4px">Scannez ou saisissez le code que le client vous présente.</div>
+            <div style="font-size:13px;color:var(--ink2);margin-top:4px">Saisissez le code à 4 caractères que le client vous montre sur son téléphone.</div>
           </div>
           <div class="card" style="padding:28px">
             <div style="margin-bottom:20px">
-              <label style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:8px">Code du bon</label>
-              <input class="field-inp" id="voucher-code-inp" placeholder="NVA-ABC-1234" style="font-family:monospace;font-size:18px;letter-spacing:3px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')validateVoucher()">
+              <label style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:8px">Code du client</label>
+              <input class="field-inp" id="voucher-code-inp" placeholder="A7K2" maxlength="14" autocomplete="off" autocapitalize="characters" style="font-family:monospace;font-size:36px;font-weight:800;text-align:center;letter-spacing:10px;text-transform:uppercase;padding:16px" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')validateVoucher()">
             </div>
-            <button class="tb-btn tb-btn-primary" style="width:100%;padding:13px;font-size:15px" onclick="validateVoucher()">Valider le bon</button>
+            <button class="tb-btn tb-btn-primary" style="width:100%;padding:13px;font-size:15px" onclick="validateVoucher()">Valider le code</button>
           </div>
           <div id="voucher-result" style="margin-top:20px"></div>
           <div style="margin-top:28px">
