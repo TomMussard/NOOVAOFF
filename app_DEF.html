@@ -495,6 +495,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .acc-chev{display:inline-flex;color:var(--ink3);transition:transform .2s;margin-left:6px}
 .sec-card.acc.open .acc-chev{transform:rotate(90deg)}
 .acc-body{display:none;padding:2px 0 4px}
+.nf-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--bg3)}
+.nf-row .nf-t{font-size:13.5px;font-weight:700;color:var(--ink)}
+.nf-row .nf-d{font-size:11.5px;color:var(--ink2);margin-top:1px;line-height:1.4}
+.nf-dev{margin:10px 14px 4px;background:var(--bg2);border-radius:14px;padding:12px 14px;font-size:12.5px;color:var(--ink);line-height:1.55}
+.nf-dev.ok{background:var(--md)}
+.nf-dev button{margin-top:9px;padding:9px 16px;border-radius:99px;border:none;background:var(--ink);color:#fff;font-family:var(--fd);font-weight:800;font-size:12.5px;cursor:pointer}
 .sec-card.acc.open .acc-body{display:block}
 .sc-title{font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink);flex:1}
 .consent-it{padding:11px 13px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bg3)}
@@ -1315,8 +1321,15 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="acc-body">
       <div class="consent-it" style="cursor:pointer" onclick="goTo('manage-merchants');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
       <div class="consent-it" style="cursor:pointer" onclick="goTo('how-it-works');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Comment ça marche</div><span style="color:var(--ink3);font-size:17px">›</span></div>
-      <div class="consent-it" style="cursor:pointer;border-bottom:none" onclick="toggleNotifications()"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Notifications</div><span style="color:var(--ink3);font-size:12px" id="notif-settings-state">Activer ›</span></div>
       <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Conforme RGPD — révoque ou supprime tes données ci-dessous.</div></div>
+      </div>
+    </div>
+    <div class="sec-card acc" id="notif-section">
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div class="sc-title">Notifications</div><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="acc-body">
+        <div id="notif-device"></div>
+        <div id="notif-switches"></div>
+        <div style="font-size:11px;color:var(--ink3);line-height:1.55;padding:2px 14px 12px">Au maximum une notification par jour, jamais entre 21h et 9h. Tu peux couper chaque type séparément.</div>
       </div>
     </div>
     <div class="sec-card acc">
@@ -2920,7 +2933,6 @@ function openReward(o){
   if(o.brandName)mk('btn-s','Voir la page de '+o.brandName, o.merchantId ? ()=>openBrandById(o.merchantId,o.brandName) : ()=>openBrand(o.brandName,'home'));
   if(S.qs&&S.qs.length>0)mk('btn-s','Revenir à l’accueil',()=>goNav('home'));
   spawnConfetti();goTo('reward');
-  setTimeout(maybeAskNotifications,1600);
 }
 
 /* --- Sortie écran question (✕ / Terminer) --- */
@@ -3515,8 +3527,11 @@ let _fcmMessaging = null;
     if ('Notification' in window && 'serviceWorker' in navigator && firebase.messaging && (await firebase.messaging.isSupported())) {
       _fcmMessaging = firebase.messaging();
       _fcmMessaging.onMessage((payload) => {
-        const t = (payload.data && payload.data.title) || (payload.notification && payload.notification.title);
+        const d = payload.data || {};
+        const t = d.title || (payload.notification && payload.notification.title);
         if (t) showToast(t, 'success');
+        // Reçue app ouverte : ni ouverture ni non-ouverture (n'entre pas dans la décroissance).
+        if (d.nid && auth.currentUser) callTrackNotifOpen({ nid: d.nid, foreground: true }).catch(() => {});
       });
       // Enregistre le service worker à CHAQUE ouverture (et pas seulement à l'activation) : sans ça,
       // un appareil déjà abonné garde indéfiniment l'ancien script (source des notifications en double).
@@ -3534,7 +3549,7 @@ async function restorePushForUser(uid) {
     const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
     const token = await _fcmMessaging.getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg });
     if(!token) return;
-    await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayUnion(token) });
+    await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayUnion(token), pushEnabled: true });
     localStorage.setItem('nv_fcm_token_' + uid, token);
     refreshNotifSettingsUI();
   } catch(e) { console.warn('restorePush:', e); }
@@ -3544,20 +3559,13 @@ function notifSupportReason() {
   if (NV_IS_IOS && !nvIsStandalone()) return 'needs-install';
   return 'ok';
 }
-async function toggleNotifications() {
-  const reason = notifSupportReason();
-  if (reason === 'unsupported') { showToast('Notifications indisponibles sur ce navigateur pour le moment.', 'warning'); return; }
-  if (reason === 'needs-install') { showToast("Installe d'abord Noova sur ton écran d'accueil (Partager > Sur l'écran d'accueil) pour activer les notifications.", 'warning'); return; }
-  const uid = auth.currentUser && auth.currentUser.uid;
-  if (!uid) return;
-  if (Notification.permission === 'granted' && localStorage.getItem('nv_fcm_token_'+uid)) await disableNotifications(uid);
-  else await enableNotifications(uid);
-}
 async function enableNotifications(uid) {
   try {
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') {
-      showToast('Notifications refusées — tu peux les activer dans les réglages du téléphone.', 'warning');
+      // Refus : on ne redemande pas avant 7 jours (et jamais si le système a bloqué définitivement).
+      try{ localStorage.setItem('nv_perm_notif', String(Date.now())); }catch(e){}
+      showToast('Notifications refusées. Tu pourras les activer dans les réglages du téléphone.', 'warning');
       refreshNotifSettingsUI();
       return;
     }
@@ -3567,7 +3575,7 @@ async function enableNotifications(uid) {
     // Un seul jeton par appareil ET par compte : on retire l'ancien jeton de cet appareil s'il a changé.
     const old = localStorage.getItem('nv_fcm_token_' + uid);
     if(old && old !== token) await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayRemove(old) }).catch(()=>{});
-    await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayUnion(token) });
+    await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayUnion(token), pushEnabled: true });
     localStorage.setItem('nv_fcm_token_' + uid, token);
     localStorage.setItem('nv_fcm_optin_' + uid, '1');
     trackEvent('push_enabled');
@@ -3578,28 +3586,55 @@ async function enableNotifications(uid) {
   }
   refreshNotifSettingsUI();
 }
-async function disableNotifications(uid) {
-  const token = localStorage.getItem('nv_fcm_token_' + uid);
-  try {
-    if (token) await db.collection('users').doc(uid).update({ fcmTokens: firebase.firestore.FieldValue.arrayRemove(token) });
-    localStorage.removeItem('nv_fcm_token_' + uid);
-    localStorage.removeItem('nv_fcm_optin_' + uid);
-    trackEvent('push_disabled');
-    showToast('Notifications désactivées.', 'success');
-  } catch(e) { console.warn('disableNotifications:', e); }
-  refreshNotifSettingsUI();
-}
+const NOTIF_GROUPS=[
+  {g:'question',t:'Ma question du jour',d:"Une notification à ton heure habituelle de réponse"},
+  {g:'commerces',t:'Nouveaux commerces',d:'Quand un commerce près de toi veut ton avis'},
+  {g:'resultats',t:'Résultats',d:'Quand les résultats de ta réponse sont prêts'},
+  {g:'serie',t:'Ma série',d:'Un rappel le soir si ta série est en jeu'},
+  {g:'recompenses',t:'Mes récompenses',d:'Récompense débloquée, code bientôt expiré'},
+  {g:'amis',t:'Mes amis',d:"Demandes d'ami et réponses en commun"}
+];
+function notifPrefOn(g){return (S._notifPrefs||{})[g]!==false;}
 function refreshNotifSettingsUI() {
-  const el = document.getElementById('notif-settings-state');
-  if (!el) return;
-  const reason = notifSupportReason();
-  if (reason === 'unsupported') { el.textContent = 'Indisponible'; return; }
-  if (reason === 'needs-install') { el.textContent = "Installer l'app ›"; return; }
-  const _u = auth.currentUser && auth.currentUser.uid;
-  const on = typeof Notification !== 'undefined' && Notification.permission === 'granted' && !!(_u && localStorage.getItem('nv_fcm_token_' + _u));
-  el.textContent = on ? 'Activées ✓' : 'Activer ›';
+  const sw=document.getElementById('notif-switches'), dev=document.getElementById('notif-device');
+  if(!sw||!dev) return;
+  // Un interrupteur par type (jamais un interrupteur global) : l'état de l'appareil est seulement un statut.
+  sw.innerHTML=NOTIF_GROUPS.map(x=>`<div class="nf-row"><div style="flex:1;min-width:0"><div class="nf-t">${x.t}</div><div class="nf-d">${x.d}</div></div><label class="tgl"><input type="checkbox" data-g="${x.g}" ${notifPrefOn(x.g)?'checked':''} onchange="setNotifPref('${x.g}',this.checked,this)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>`).join('');
+  const reason=notifSupportReason();
+  const _u=auth.currentUser&&auth.currentUser.uid;
+  const perm=typeof Notification!=='undefined'?Notification.permission:'unsupported';
+  const on=perm==='granted'&&!!(_u&&localStorage.getItem('nv_fcm_token_'+_u));
+  let html='';
+  if(NV_IS_IOS&&!nvIsStandalone()) html='<div class="nf-dev">Sur iPhone, les notifications marchent une fois NOOVA ajoutée à ton écran d\'accueil.<br><button onclick="showIOSInstallSheet()">Voir comment faire</button></div>';
+  else if(reason==='unsupported') html='<div class="nf-dev">Ton navigateur ne permet pas encore les notifications.</div>';
+  else if(perm==='denied') html='<div class="nf-dev">Les notifications sont bloquées pour NOOVA. Réactive-les dans les réglages de ton téléphone.</div>';
+  else if(!on) html='<div class="nf-dev">Active les notifications sur cet appareil pour recevoir celles que tu choisis ci-dessous.<br><button onclick="askNotifFlow(true)">Activer sur cet appareil</button></div>';
+  else html='<div class="nf-dev ok">Activées sur cet appareil.</div>';
+  dev.innerHTML=html;
 }
+async function setNotifPref(g,on,el){
+  const prev=notifPrefOn(g);
+  S._notifPrefs=Object.assign({},S._notifPrefs,{[g]:!!on});
+  try{ await callSetNotifPref({group:g,enabled:!!on}); trackEvent('notif_pref',{group:g,enabled:!!on}); }
+  catch(e){ console.warn('setNotifPref:',e); S._notifPrefs[g]=prev; if(el)el.checked=prev; showToast("Impossible d'enregistrer ce réglage.",'error'); }
+}
+
+// Ouverture depuis une notification : ?n=<id>&go=<écran>. L'ouverture est comptée une fois connecté.
+(function(){ try{ const u=new URLSearchParams(location.search); const n=u.get('n'); if(n){ sessionStorage.setItem('nv_open',JSON.stringify({nid:n,go:u.get('go')||'home'})); history.replaceState(null,'',location.pathname); } }catch(e){} })();
+async function flushNotifOpen(){
+  let o=null; try{ o=JSON.parse(sessionStorage.getItem('nv_open')||'null'); }catch(e){}
+  if(!o||!auth.currentUser) return;
+  try{ sessionStorage.removeItem('nv_open'); }catch(e){}
+  try{ await callTrackNotifOpen({nid:o.nid}); trackEvent('notif_open'); }catch(e){ console.warn('trackNotifOpen:',e); }
+  if(o.go&&o.go!=='home'&&document.getElementById(o.go)) goNav(o.go);
+}
+if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message',e=>{
+  const d=e.data||{};
+  if(d.type==='notif-open'&&d.nid){ try{ sessionStorage.setItem('nv_open',JSON.stringify({nid:d.nid,go:d.go||'home'})); }catch(x){} flushNotifOpen(); }
+});
 const callSubmitAnswer = fx.httpsCallable('submitAnswer');
+const callSetNotifPref = fx.httpsCallable('setNotifPref');
+const callTrackNotifOpen = fx.httpsCallable('trackNotifOpen');
 const callBeginQuestion = fx.httpsCallable('beginQuestion');
 // Délai de lecture : « Valider » reste verrouillé 3 s après l'affichage d'une question (barre jaune
 // qui se vide). Le serveur mesure lui-même ce temps depuis beginQuestion : impossible à contourner.
@@ -3999,7 +4034,7 @@ async function shareNoova(){
 // Refus ou « pas maintenant » : on ne redemande pas avant 7 jours.
 let _permCb=null,_permKey=null;
 function askPerm(o){
-  try{const t=+localStorage.getItem('nv_perm_'+o.key)||0;if(Date.now()-t<7*86400000)return false;}catch(e){}
+  try{const t=+localStorage.getItem('nv_perm_'+o.key)||0;if(!o.force&&Date.now()-t<7*86400000)return false;}catch(e){}
   _permCb=o.onAccept;_permKey=o.key;
   document.getElementById('perm-title').textContent=o.title;
   document.getElementById('perm-text').textContent=o.text;
@@ -4016,11 +4051,21 @@ function permLater(){
   try{localStorage.setItem('nv_perm_'+_permKey,String(Date.now()));}catch(e){}
   _permCb=null;
 }
-function maybeAskNotifications(){
-  if(!auth.currentUser||typeof Notification==='undefined'||Notification.permission!=='default')return;
-  if(notifSupportReason()!=='ok')return;
-  askPerm({key:'notif',title:'Une notification par jour',text:'Une notification par jour, quand un commerce a besoin de ton avis. Tu peux l\'arrêter à tout moment depuis ton profil.',cta:'Activer les notifications',onAccept:()=>enableNotifications(auth.currentUser.uid)});
+// Demande de permission : JAMAIS à l'ouverture. Après la première réponse validée (puis au plus une
+// fois tous les 7 jours si l'habitant repousse), précédée d'un écran d'explication maison : on n'a
+// qu'une chance, un refus iOS est définitif. Sur iPhone hors écran d'accueil le push n'existe pas
+// encore : on propose d'abord d'ajouter l'app (instructions iOS uniquement), sans jamais afficher
+// les instructions Android, et inversement.
+function askNotifFlow(force){
+  if(!auth.currentUser) return;
+  if(NV_IS_IOS && !nvIsStandalone()){
+    askPerm({key:'notif_install',force,title:'Reçois tes notifications',text:"Sur iPhone, les notifications fonctionnent une fois NOOVA ajoutée à ton écran d'accueil : appuie sur Partager, puis sur « Sur l'écran d'accueil ».",cta:'Voir comment faire',onAccept:showIOSInstallSheet});
+    return;
+  }
+  if(typeof Notification==='undefined'||Notification.permission!=='default'||notifSupportReason()!=='ok') return;
+  askPerm({key:'notif',force,title:'Une notification par jour, pas plus',text:"NOOVA te prévient au maximum une fois par jour, quand un commerce a besoin de ton avis, jamais la nuit. Tu choisis lesquelles dans ton profil.",cta:'Activer les notifications',onAccept:()=>enableNotifications(auth.currentUser.uid)});
 }
+function maybeAskNotifications(){ askNotifFlow(false); }
 function geoAllowed(){try{return localStorage.getItem('nv_geo_ok')==='1';}catch(e){return false;}}
 function askGeo(){
   askPerm({key:'geo',title:'Voir les commerces à deux pas',text:'NOOVA utilise ta position uniquement pour afficher les commerces autour de toi. Elle n\'est pas enregistrée.',cta:'Autoriser la position',onAccept:()=>{try{localStorage.setItem('nv_geo_ok','1');}catch(e){}retryUserLocation();if(cur==='map-full')mapLocateMe();}});
@@ -4412,6 +4457,7 @@ function handleUserLoadError(uid, e) {
   finishAuthTransition();
 }
 function finishAuthTransition() {
+  setTimeout(flushNotifOpen, 900);
   const aw = document.getElementById('auth-wall');
   aw.style.transition = 'opacity .3s';
   aw.style.opacity = '0';
@@ -4508,6 +4554,7 @@ function endHomeTour(){
 // d'accueil") est possible, d'où le mode d'emploi affiché à la place du prompt natif.
 let _deferredInstallPrompt=null;
 const NV_IS_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+const NV_IS_ANDROID=/Android/i.test(navigator.userAgent);
 function nvIsStandalone(){ return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true; }
 window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); _deferredInstallPrompt=e; });
 function maybeShowInstallInvite(){
@@ -4515,7 +4562,7 @@ function maybeShowInstallInvite(){
   if(!((S.streak||0) >= 2 || S._everRedeemed)) return;
   if(document.getElementById('install-banner')) return;
   try{ if(localStorage.getItem('nv_install_dismissed')) return; }catch(e){}
-  if(!NV_IS_IOS && !_deferredInstallPrompt) return; // navigateur sans support d'installation connu
+  if(!NV_IS_IOS && !NV_IS_ANDROID && !_deferredInstallPrompt) return; // navigateur sans support d'installation connu
   const b=document.createElement('div');
   b.className='install-banner';
   b.id='install-banner';
@@ -4536,9 +4583,26 @@ function dismissInstallInvite(){
 function triggerInstall(){
   trackEvent('pwa_install_accepted', { platform: NV_IS_IOS?'ios':'android' });
   if(NV_IS_IOS){ showIOSInstallSheet(); return; }
-  if(!_deferredInstallPrompt) return;
+  if(!_deferredInstallPrompt){ if(NV_IS_ANDROID) showAndroidInstallSheet(); return; }
   _deferredInstallPrompt.prompt();
   _deferredInstallPrompt.userChoice.finally(()=>{ _deferredInstallPrompt=null; dismissInstallInvite(); });
+}
+function showAndroidInstallSheet(){
+  let ov=document.getElementById('android-install-sheet');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='android-install-sheet';
+    ov.style.cssText='position:fixed;inset:0;z-index:10060;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center';
+    ov.onclick=e=>{ if(e.target===ov){ ov.remove(); dismissInstallInvite(); } };
+    document.body.appendChild(ov);
+  }
+  const n=(k,t)=>`<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:30px;height:30px;border-radius:50%;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:13px;flex-shrink:0">${k}</div><div style="font-size:13.5px;color:var(--ink);line-height:1.5">${t}</div></div>`;
+  ov.innerHTML=`<div style="background:var(--card);border-radius:24px 24px 0 0;padding:22px 22px calc(30px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px">
+    <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
+    <div style="font-family:var(--fd);font-weight:800;font-size:18px;color:var(--ink);margin-bottom:16px;text-align:center">Installer Noova</div>
+    ${n(1,'Ouvre le menu <strong>⋮</strong> en haut à droite de Chrome')}${n(2,'Choisis <strong>« Installer l\'application »</strong>')}
+    <button class="btn-p" style="margin-top:6px" onclick="document.getElementById('android-install-sheet').remove();dismissInstallInvite()">Compris</button>
+  </div>`;
 }
 function showIOSInstallSheet(){
   let ov=document.getElementById('ios-install-sheet');
@@ -4578,6 +4642,8 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
     if (S._lastAnswerDate !== _today && S._lastAnswerDate !== _yesterday) S.streak = 0;
   }
   S.noovs            = data.noovs || 0;
+  S._notifPrefs      = data.notifPrefs || {};
+  if ((data.fcmTokens || []).length && !data.pushEnabled) db.collection('users').doc(uid).update({ pushEnabled: true }).catch(() => {});
   S._answersToday    = data.dailyAnswerCount || 0;
   S._answersDate     = data.dailyAnswerDate || null;
   S._city            = data.city || '';
@@ -4922,6 +4988,7 @@ function recomputeCampaignFeed(city) {
       if (city && merchantCity && merchantCity !== city) return;
       if (!merchantData) return;
       if (getCampaignTargetVolume(d) && (d.responsesCount || d.answersCount || 0) >= getCampaignTargetVolume(d)) return;
+      if (d.endsAt && d.endsAt.toMillis && d.endsAt.toMillis() < Date.now()) return; // campagne terminée
       const ageRanges = getCampaignAgeRanges(d).map(normalizeAgeRange);
       if (ageRanges.length && userAge && !ageRanges.includes(userAge)) return;
       if (d.merchantId && !authorized.includes(d.merchantId)) {
@@ -5042,6 +5109,7 @@ submitAns = function() {
         if (rwSub && left !== null) rwSub.textContent = left > 0 ? ('Encore ' + left + ' réponse' + (left > 1 ? 's' : '') + ' en points aujourd\'hui, puis des NOOVS.') : 'C\'était ta dernière réponse en points du jour. Les suivantes rapportent des NOOVS.';
       }
       renderDailyTrack();
+      if (!data.flagged) setTimeout(maybeAskNotifications, 1800);
     })
     .catch(e => {
       console.warn('submitAnswer:', e);

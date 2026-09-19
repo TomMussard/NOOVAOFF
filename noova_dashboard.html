@@ -3048,6 +3048,7 @@ launchCampaign = async function() {
       answersCount:    0,
       responsesCount:  0,
       status:          'active',
+      endsAt:          firebase.firestore.Timestamp.fromMillis(Date.now() + 30*86400000), // durée de campagne : 30 jours
       createdAt:       firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt:       firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -3176,6 +3177,7 @@ function loadMerchantNotifications(uid) {
       list.innerHTML = notifs.map(n => {
         const date = n.createdAt && n.createdAt.toDate ? n.createdAt.toDate().toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
         return `<div style="padding:12px 16px;border-bottom:1px solid var(--border);${n.read?'':'background:var(--ad)'}">
+          ${n.title?`<div style="font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:2px">${esc(n.title)}</div>`:''}
           <div style="font-size:12.5px;color:var(--ink);line-height:1.5">${esc(n.message||'')}</div>
           <div style="font-size:10.5px;color:var(--ink3);margin-top:4px">${date}</div>
         </div>`;

@@ -34,13 +34,19 @@ messaging.onBackgroundMessage((payload) => {
   });
 });
 
+// Clic : on ouvre (ou on ramène) l'app en transmettant l'identifiant de la notification, pour que
+// l'app compte l'ouverture une fois l'utilisateur connecté.
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = (event.notification.data && event.notification.data.url) || '/app-v2';
+  const d = event.notification.data || {};
+  const url = d.url || '/app-v2';
+  let go = 'home';
+  try { go = new URL(url, self.location.origin).searchParams.get('go') || 'home'; } catch (e) {}
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-      for (const c of list) { if ('focus' in c) return c.focus(); }
-      if (clients.openWindow) return clients.openWindow(url);
+      const c = list.find((x) => 'focus' in x);
+      if (c) { if (d.nid) c.postMessage({ type: 'notif-open', nid: d.nid, go }); return c.focus(); }
+      return clients.openWindow(url);
     })
   );
 });

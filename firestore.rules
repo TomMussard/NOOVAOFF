@@ -53,7 +53,7 @@ service cloud.firestore {
       allow update: if isAdmin() || (isOwner(uid) &&
         ownFile(request.resource.data.get('photoUrl', null), 'users', uid) && (
         !request.resource.data.diff(resource.data).affectedKeys().hasAny(
-          ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed']
+          ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','notifStats','notifPrefs','notifDaily','answerMinutes']
         )
         ||
         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']) &&
@@ -352,5 +352,12 @@ service cloud.firestore {
       );
       allow update, delete: if false;
     }
+
+    // ─── Notifications : journal, file d'attente et métriques écrits UNIQUEMENT par les Cloud Functions ───
+    // (SDK Admin hors règles). Les métriques par type alimentent le back-office (lecture admin).
+    match /notifMetrics/{type} { allow read: if isAdmin(); allow write: if false; }
+    match /notifLog/{id}       { allow read: if isAdmin(); allow write: if false; }
+    match /notifQueue/{id}     { allow read, write: if false; }
+    match /mail/{id}           { allow read, write: if false; }
   }
 }

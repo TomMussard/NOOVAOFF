@@ -255,6 +255,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <button class="tab-btn-main" onclick="switchTab('diffusion',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> Diffusion</button>
     <button class="tab-btn-main" onclick="switchTab('lancement',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Lancement</button>
     <button class="tab-btn-main" onclick="switchTab('moderation',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M6 21V4"/><path d="M6 4h12l-3 4.5L18 13H6"/></svg> Modération</button>
+    <button class="tab-btn-main" onclick="switchTab('notifications',this)">Notifications</button>
     <button class="tab-btn-main" onclick="switchTab('danger',this)" style="color:#EF4444;display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg> Zone de danger</button>
   </div>
 
@@ -470,6 +471,18 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     </div>
   </div>
 
+  <!-- ══════════════ TAB NOTIFICATIONS ══════════════ -->
+  <div id="tab-notifications" style="display:none">
+    <div class="sec-hdr"><h2>Notifications</h2><p>Envois, ouvertures et désactivations par type. Règle de décision : tout type sous 5 % d'ouverture après 200 envois est supprimé.</p></div>
+    <div class="card">
+      <div class="card-title">Performance par type <span class="ct-right" id="notif-total"></span></div>
+      <table class="age-table" style="width:100%">
+        <thead><tr><th style="text-align:left;padding:10px 18px">Type</th><th>Envois</th><th>Ouvertures</th><th>Taux</th><th>Désactivations</th><th>Décision</th></tr></thead>
+        <tbody id="notif-rows"><tr><td colspan="6" class="loading">Chargement</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- ══════════════ TAB ZONE DE DANGER ══════════════ -->
   <div id="tab-danger" style="display:none">
     <div class="sec-hdr"><h2 style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg> Zone de danger</h2><p>Supprime des comptes de test avant un vrai lancement. Efface <strong>tout</strong> : données Firestore (campagnes, récompenses, réponses, échanges, notifications, chats liés) <strong>ET le compte de connexion (Auth)</strong> — plus rien ne reste. Irréversible.</p>
@@ -624,16 +637,42 @@ function showGoogleLogin() {
 function doLogout() { auth.signOut().then(() => location.reload()); }
 
 // ── Tabs ───────────────────────────────────────────────────────────────────
+// ─── Notifications : métriques par type (envois, ouvertures, désactivations) ───
+const NOTIF_LABELS = {
+  question_du_jour: 'Question du jour', nouveau_commerce: 'Nouveau commerce', resultat_dispo: 'Résultat disponible',
+  recompense_debloquee: 'Récompense débloquée', serie_en_danger: 'Série en danger', code_expire: 'Code bientôt expiré', ami: 'Ami'
+};
+async function loadNotifMetrics() {
+  const body = document.getElementById('notif-rows');
+  try {
+    const snap = await db.collection('notifMetrics').get();
+    const m = {}; snap.forEach(d => { m[d.id] = d.data(); });
+    let tot = 0;
+    body.innerHTML = Object.keys(NOTIF_LABELS).map(t => {
+      const x = m[t] || {}, sent = Math.max(0, x.sent || 0), opened = x.opened || 0;
+      const off = (x.deactivated || 0) + (x.autoDisabled || 0);
+      tot += sent;
+      const rate = sent ? opened / sent : 0;
+      const verdict = sent >= 200
+        ? (rate < 0.05 ? '<span style="color:#EF4444;font-weight:800">À supprimer</span>' : '<span style="color:#0BAB84;font-weight:700">À garder</span>')
+        : '<span style="color:var(--ink3)">En observation (' + sent + '/200)</span>';
+      return '<tr><td style="text-align:left;padding:10px 18px;font-weight:600">' + esc(NOTIF_LABELS[t]) + '</td><td>' + sent + '</td><td>' + opened + '</td><td>' + (sent ? (rate * 100).toFixed(1) + ' %' : '—') + '</td><td>' + off + (x.autoDisabled ? ' <small style="color:var(--ink3)">(dont ' + x.autoDisabled + ' auto)</small>' : '') + '</td><td>' + verdict + '</td></tr>';
+    }).join('');
+    document.getElementById('notif-total').textContent = tot + ' envois au total';
+  } catch (e) { body.innerHTML = '<tr><td colspan="6" class="loading">Erreur : ' + esc(e.message) + '</td></tr>'; }
+}
+
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn-main').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  ['entreprises','utilisateurs','diffusion','lancement','moderation','danger'].forEach(t => {
+  ['entreprises','utilisateurs','diffusion','lancement','moderation','notifications','danger'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
   if (tab === 'diffusion') initDiffusion();
   if (tab === 'lancement') loadReadiness();
   if (tab === 'moderation') loadModeration();
+  if (tab === 'notifications') loadNotifMetrics();
   if (tab === 'danger') loadDangerZone();
 }
 

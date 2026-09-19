@@ -10,6 +10,9 @@ const db = admin.firestore();
 
 setGlobalOptions({ region: "europe-west1", maxInstances: 10 });
 
+// Système de notifications (web push habitant, email + in-app commerçant) : voir notifications.js.
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./notifications")));
+
 // Économie NOOVA : seules les 3 premières réponses de la journée rapportent des POINTS
 // échangeables ; au-delà, chaque réponse rapporte 1 NOOV (monnaie virtuelle : concours, retrait
 // des pubs, cash, bons cadeaux — à venir), sans bonus de série. Une réponse trop rapide est non lue.
@@ -82,7 +85,7 @@ exports.submitAnswer = onCall(async (request) => {
     const camp = campSnap.data();
 
     // ── Re-vérification serveur de l'éligibilité (jamais confiance au client) ──
-    if (camp.status !== "active") {
+    if (camp.status !== "active" || (camp.endsAt && camp.endsAt.toMillis && camp.endsAt.toMillis() < Date.now())) {
       throw new HttpsError("failed-precondition", "Cette campagne n'est plus active.");
     }
     const userCity = (user.city || "").toLowerCase();
@@ -167,6 +170,12 @@ exports.submitAnswer = onCall(async (request) => {
       streak: newStreak,
       updatedAt: FieldValue.serverTimestamp(),
     };
+    if (!flagged) {
+      // Sert à envoyer la question du jour à l'heure habituelle de réponse (médiane des 5 dernières).
+      const hh = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date());
+      const minutes = +hh.find((x) => x.type === "hour").value * 60 + +hh.find((x) => x.type === "minute").value;
+      userUpdate.answerMinutes = [...(user.answerMinutes || []), minutes].slice(-5);
+    }
     if (totalEarned > 0) { userUpdate.points = FieldValue.increment(totalEarned); userUpdate.xp = FieldValue.increment(totalEarned); }
     if (noovsEarned > 0) userUpdate.noovs = FieldValue.increment(noovsEarned);
     if (qIdx === 0) userUpdate.answeredCampaigns = FieldValue.arrayUnion(campaignId);
@@ -202,83 +211,6 @@ exports.submitAnswer = onCall(async (request) => {
       flagged,
     };
   });
-});
-
-/**
- * notifyNewCampaign — push aux habitants de la ville ciblée quand un commerçant lance
- * une nouvelle campagne (déclenché à la création du doc, toujours status "active" dès
- * la création côté dashboard — cf. launchCampaign dans noova_dashboard.html).
- */
-exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (event) => {
-  // Les triggers Firestore sont « au moins une fois » : un même événement peut être livré deux fois.
-  // On réserve l'identifiant d'événement ; si le journal existe déjà, cette livraison est ignorée.
-  try { await db.collection("_notifLog").doc(event.id).create({ campaignId: event.params.campaignId, at: FieldValue.serverTimestamp() }); }
-  catch (e) { logger.info("notifyNewCampaign: événement déjà traité", { id: event.id }); return; }
-  const camp = event.data && event.data.data();
-  if (!camp || camp.status !== "active") { logger.info("notifyNewCampaign: ignorée (statut)", { status: camp && camp.status }); return; }
-  const city = (camp.targetCity || camp.city || "").toLowerCase();
-  if (!city) { logger.info("notifyNewCampaign: campagne sans ville"); return; }
-
-  const usersSnap = await db.collection("users").where("city", "==", city).get();
-  // Deux populations : ceux qui ont déjà autorisé le commerce (« a une question pour toi »)
-  // et ceux à qui il s'adresse pour la première fois (« veut te poser des questions »).
-  // Ceux qui ont refusé ne sont jamais notifiés.
-  // Un même appareil ne doit recevoir qu'UNE notification : les tokens sont dédoublonnés sur
-  // l'ensemble des comptes (un téléphone partagé peut figurer dans plusieurs fiches), et la
-  // variante « déjà autorisé » l'emporte sur « demande ».
-  const byToken = new Map();
-  usersSnap.forEach((doc) => {
-    const u = doc.data();
-    if ((u.declinedMerchants || []).includes(camp.merchantId)) return;
-    const group = (u.authorizedMerchants || []).includes(camp.merchantId) ? "known" : "request";
-    if (!Array.isArray(u.fcmTokens)) return;
-    u.fcmTokens.forEach((tok) => {
-      const prev = byToken.get(tok);
-      if (!prev || (prev.group === "request" && group === "known")) byToken.set(tok, { group, ref: doc.ref });
-    });
-  });
-  const groups = { known: { tokens: [], owners: [] }, request: { tokens: [], owners: [] } };
-  byToken.forEach((v, tok) => { groups[v.group].tokens.push(tok); groups[v.group].owners.push(v.ref); });
-  logger.info("notifyNewCampaign: ciblage", { city, users: usersSnap.size, known: groups.known.tokens.length, request: groups.request.tokens.length });
-
-  const name = camp.merchantName || "Un commerce";
-  const question = (camp.question || "Réponds en 30 secondes et gagne des points.").toString().substring(0, 120);
-  const messages = {
-    known: { title: `${name} a une question pour toi`, body: question },
-    request: { title: `${name} veut te poser des questions`, body: "Ouvre NOOVA pour l'autoriser et répondre en 30 secondes." },
-  };
-  const deadCodes = ["messaging/registration-token-not-registered", "messaging/invalid-registration-token"];
-
-  for (const key of ["known", "request"]) {
-    const { tokens, owners } = groups[key];
-    // FCM limite sendEachForMulticast à 500 tokens par appel.
-    for (let i = 0; i < tokens.length; i += 500) {
-      const chunkTokens = tokens.slice(i, i + 500);
-      const chunkOwners = owners.slice(i, i + 500);
-      let res;
-      try {
-        // Message « data » SEUL : une seule voie d'affichage (le service worker), avec un `tag` par
-        // campagne. Ainsi même deux envois vers le même appareil (deux jetons, relivraison) se
-        // fondent en UNE notification visible. Un bloc `notification` était en plus affiché par le
-        // navigateur en parallèle du service worker (double notification).
-        res = await admin.messaging().sendEachForMulticast({
-          tokens: chunkTokens,
-          data: { title: messages[key].title, body: messages[key].body, tag: `camp-${event.params.campaignId}`, url: "/app-v2" },
-          webpush: { headers: { Urgency: "high", TTL: "86400" } },
-        });
-      } catch (e) {
-        logger.error("notifyNewCampaign: échec d'envoi", { message: e.message });
-        continue;
-      }
-      logger.info("notifyNewCampaign: envoi", { group: key, success: res.successCount, failure: res.failureCount, errors: res.responses.filter((r) => !r.success).map((r) => r.error && r.error.code) });
-      // Purge les tokens qui ne sont plus valides (désinstallation, permission révoquée...).
-      res.responses.forEach((r, idx) => {
-        if (!r.success && r.error && deadCodes.includes(r.error.code)) {
-          chunkOwners[idx].update({ fcmTokens: FieldValue.arrayRemove(chunkTokens[idx]) }).catch(() => {});
-        }
-      });
-    }
-  }
 });
 
 /**
