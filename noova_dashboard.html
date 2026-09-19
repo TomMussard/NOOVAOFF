@@ -634,6 +634,58 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   #topbar-new-camp-btn { display: none; }
   #mob-camp-fab { display: flex !important; }
 }
+
+/* ═══ MOBILE : dashboard commerçant ═════════════════════════ */
+@media (max-width: 840px) {
+  #sidebar { background: var(--bg); height: 100vh; height: 100dvh; padding-bottom: env(safe-area-inset-bottom); overflow-y: auto; }
+  #sidebar:not(.open) { box-shadow: none; }
+  #sidebar-overlay { background: rgba(23,20,26,.45); }
+  .topbar { padding-top: env(safe-area-inset-top); }
+  .topbar-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  #content { padding: 14px 14px calc(96px + env(safe-area-inset-bottom)); }
+  .wizard-wrap { padding: 0 !important; }
+  .tb-btn, .st-action, .camp-act-btn { min-height: 36px; }
+  .tb-btn { display: inline-flex; align-items: center; justify-content: center; }
+  input, select, textarea { font-size: 16px !important; }          /* évite le zoom automatique d'iOS au focus */
+
+  /* Tableau des campagnes → cartes */
+  .camp-thead { display: none; }
+  .camp-row { grid-template-columns: 1fr auto !important; gap: 10px 12px; padding: 14px; }
+  .camp-row > :nth-child(1) { grid-column: 1; grid-row: 1; min-width: 0; }
+  .camp-row > :nth-child(2) { grid-column: 2; grid-row: 1; justify-self: end; }
+  .camp-row > :nth-child(3) { display: block !important; grid-column: 1; grid-row: 2; }
+  .camp-row > :nth-child(4) { grid-column: 2; grid-row: 2; justify-self: end; min-width: 96px; }
+  .camp-row > :nth-child(5) { grid-column: 1 / -1; grid-row: 3; }
+  .camp-row .camp-metric, .camp-row .camp-metric-sub { display: inline; }
+  .camp-row .camp-metric-sub { margin-left: 4px; }
+  .camp-actions { justify-content: flex-start !important; flex-wrap: wrap; }
+  .camp-act-btn { flex: 1 1 0; padding: 9px 10px; font-size: 12px; text-align: center; }
+  .status-pill { white-space: nowrap; }
+
+  /* Récompenses */
+  .rw-head { flex-wrap: wrap; }
+  .rw-main { min-width: 0; flex: 1 1 0; }
+  .rw-actions { flex: 1 1 100%; flex-wrap: wrap; gap: 8px !important; }
+  .rw-actions .tb-btn { flex: 1 1 auto; }
+
+  /* Journal de consentements : une carte par événement */
+  .cj-banner { flex-direction: column; align-items: stretch !important; }
+  .cj-head { display: none !important; }
+  .cj-row { grid-template-columns: 1fr 1fr !important; gap: 6px 12px !important; }
+  .cj-row > :nth-child(1) { grid-column: 1 / -1; }
+
+  /* Formules */
+  .plans-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  #news-camps label { padding: 6px 0; }
+  #news-camps input { width: 20px; height: 20px; flex-shrink: 0; }
+}
+@media (max-width: 560px) {
+  .plans-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 480px) {
+  #topbar-new-camp-btn { display: none !important; }
+  #mob-camp-fab { bottom: calc(20px + env(safe-area-inset-bottom)); }
+}
 /* Mini didacticiel commerçant (première connexion validée) */
 #dash-tour{position:fixed;inset:0;z-index:10050;display:none;opacity:0;transition:opacity .25s ease}
 #dash-tour.show{display:block;opacity:1}
@@ -658,7 +710,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 <div id="sidebar-overlay" onclick="toggleMobMenu()"></div>
 
 <!-- Mobile FAB for new campaign -->
-<button id="mob-camp-fab" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])" style="display:none;position:fixed;bottom:24px;right:20px;z-index:200;width:56px;height:56px;border-radius:50%;background:var(--grad);border:none;box-shadow:0 8px 24px rgba(242,151,21,.45);cursor:pointer;align-items:center;justify-content:center;color:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></button>
+<button id="mob-camp-fab" aria-label="Nouvelle campagne" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])" style="display:none;position:fixed;bottom:24px;right:20px;z-index:200;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#F5A623,#F29715);border:none;box-shadow:0 8px 24px rgba(242,151,21,.45);cursor:pointer;align-items:center;justify-content:center;color:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><path d="M12 5v14M5 12h14"/></svg></button>
 
   <!-- SIDEBAR -->
   <aside id="sidebar">
@@ -1209,14 +1261,14 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 
       <!-- ═══ CONSENTS ═══ -->
       <div class="page" id="page-consents">
-        <div style="background:var(--md);border:1px solid rgba(11,171,132,.2);border-radius:var(--rs);padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:12px">
+        <div class="cj-banner" style="background:var(--md);border:1px solid rgba(11,171,132,.2);border-radius:var(--rs);padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:12px">
           <span style="color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span>
           <div style="font-size:13px;color:var(--ink2);line-height:1.65;flex:1"><strong style="color:var(--mint)">Conformité RGPD totale.</strong> Chaque profil a consenti explicitement à votre commerce via l'application Noova. Les consentements sont horodatés, granulaires et révocables en 1 tap par l'utilisateur. Vous ne pouvez pas modifier ces paramètres — seul l'utilisateur en a le contrôle.</div>
           <button class="tb-btn tb-btn-ghost" style="font-size:12px" id="export-rgpd-btn" onclick="exportConsentJournal()" style="display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3v11"/><path d="M8 7l4-4 4 4"/><path d="M5 15v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></svg> Export RGPD</button>
         </div>
         <div class="section-title">Journal des consentements (50 derniers événements)</div>
         <div class="card">
-          <div style="display:grid;grid-template-columns:160px 1fr 1fr 120px 100px;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
+          <div class="cj-head" style="display:grid;grid-template-columns:160px 1fr 1fr 120px 100px;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Date</div>
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Profil (anonymisé)</div>
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink4)">Action</div>
@@ -1304,7 +1356,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div style="font-family:var(--fd);font-weight:900;font-size:26px;color:var(--ink);letter-spacing:-1px;margin-bottom:6px">Choisissez votre formule</div>
             <div style="font-size:13px;color:var(--ink3)">Le prix par réponse reste le même quelle que soit la formule. L'abonnement déverrouille des fonctionnalités supplémentaires.</div>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px">
+          <div class="plans-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px">
 
             <!-- FREE -->
             <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;gap:10px">
@@ -1582,8 +1634,10 @@ function renderCampModal(c, answers) {
   const respondentsWithAge = answers.filter(a => a.respondentAge);
   if(respondentsWithAge.length >= RESULTS_MIN) {
     const ageCounts = {};
-    respondentsWithAge.forEach(a => { ageCounts[a.respondentAge] = (ageCounts[a.respondentAge]||0) + 1; });
-    const ageOrder = ['16-17','18-24','25-34','35-49','50-64','65+'];
+    // L'âge est stocké en nombre : on le regroupe en tranches (sinon une ligne par âge, illisible).
+    const ageBucket = v => { const n = Number(v); if(!isFinite(n)) return String(v); return n<16?'-16':n<=17?'16-17':n<=24?'18-24':n<=34?'25-34':n<=49?'35-49':n<=64?'50-64':'65+'; };
+    respondentsWithAge.forEach(a => { const k = ageBucket(a.respondentAge); ageCounts[k] = (ageCounts[k]||0) + 1; });
+    const ageOrder = ['-16','16-17','18-24','25-34','35-49','50-64','65+'];
     const sortedAge = Object.entries(ageCounts).sort((x,y) => ageOrder.indexOf(x[0]) - ageOrder.indexOf(y[0]));
     const maxAge = Math.max(...sortedAge.map(e=>e[1]));
     const intCounts = {};
@@ -1744,7 +1798,7 @@ async function navTo(page, btn){
   closeMobMenu();
   curPage=page;
   const brandName = (_mData && _mData.brandName) || 'votre espace';
-  const titles={dashboard:['Dashboard','Bienvenue — '+brandName],create:['Créer une campagne','Moins de 5 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet de vos campagnes'],consents:['Consentements RGPD','Journal complet · Conforme RGPD Art. 6 et 7'],settings:['Paramètres','Configuration de votre espace marque'],billing:['Facturation','Historique et gestion de votre plan']};
+  const titles={dashboard:['Dashboard','Bienvenue — '+brandName],create:['Créer une campagne','Moins de 5 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet de vos campagnes'],consents:['Consentements RGPD','Journal complet · Conforme RGPD Art. 6 et 7'],settings:['Paramètres','Configuration de votre espace marque'],billing:['Facturation','Historique et gestion de votre plan'],news:['Actualités','Montrez ce que vos clients ont changé chez vous'],rewards:['Mes récompenses','Ce que vos clients peuvent gagner chez vous'],validate:['Valider un code','Le code à 4 caractères montré par le client'],plans:['Formules','Choisissez votre abonnement']};
   const t=titles[page]||[page,''];
   document.getElementById('topbar-title').textContent=t[0];
   document.getElementById('topbar-sub').textContent=t[1];
@@ -3409,15 +3463,17 @@ function renderRewardCard(r, i) {
     rejected: { bg: 'rgba(239,68,68,.1)', c: '#EF4444', txt: icon('error',{size:11})+' Refusée par Noova' }
   }[d.status || 'pending'];
   card.innerHTML = `
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+    <div class="rw-head" style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
       <div style="font-size:28px">${d.icon||'🎁'}</div>
-      <div style="flex:1">
+      <div class="rw-main" style="flex:1">
         <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink)">${esc(d.label||'Récompense')}</div>
         <div style="font-size:12px;color:var(--ink3);margin-top:2px">${(d.valueEuros||0).toFixed(2)} € · ${d.cost||0} pts · Stock : ${d.stock===null||d.stock===undefined?'Illimité':d.stock} · Échangés : ${d.redeemedCount||0}</div>
       </div>
+      <div class="rw-actions" style="display:flex;align-items:center;gap:12px">
       <span style="padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${statusBadge.bg};color:${statusBadge.c};white-space:nowrap;display:inline-flex;align-items:center;gap:4px">${statusBadge.txt}</span>
       ${d.status==='approved' ? `<button class="tb-btn" style="font-size:11px;padding:4px 10px" onclick="toggleRewardActive('${r.id}',${!d.active})">${d.active?'Désactiver':'Activer'}</button>` : ''}
       <button class="tb-btn" style="font-size:11px;padding:4px 10px;color:var(--coral)" onclick="deleteReward('${r.id}')">Supprimer</button>
+      </div>
     </div>
     ${d.status==='rejected' && d.rejectionReason ? `<div style="font-size:11px;color:#EF4444;margin-top:-6px;margin-bottom:8px">Motif : ${esc(d.rejectionReason)}</div>` : ''}
     ${d.purchaseCondition ? `<div style="font-size:11px;color:var(--ink2);margin-top:-6px;margin-bottom:8px;display:flex;align-items:center;gap:4px">${icon('document',{size:11})} Condition : ${esc(d.purchaseCondition)}</div>` : ''}
@@ -3734,7 +3790,7 @@ async function loadConsentJournal() {
       const seg = r.segment || {};
       const segStr = [seg.city, seg.ageRange].filter(Boolean).join(' · ') || '—';
       const granted = r.action === 'granted';
-      return `<div style="display:grid;grid-template-columns:160px 1fr 1fr 120px 100px;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center"><div style="font-size:11px;color:var(--ink3)">${esc(dateStr)}</div><div style="font-size:12px;font-weight:600;color:var(--ink);font-family:monospace">${esc(profil)}</div><div style="font-size:12px;color:var(--ink2)">${esc(action)}</div><div style="font-size:11px;color:var(--ink3)">${esc(segStr)}</div><div><span class="status-pill ${granted?'live':'paused'}">${granted?'Accordé':'Révoqué'}</span></div></div>`;
+      return `<div class="cj-row" style="display:grid;grid-template-columns:160px 1fr 1fr 120px 100px;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center"><div style="font-size:11px;color:var(--ink3)">${esc(dateStr)}</div><div style="font-size:12px;font-weight:600;color:var(--ink);font-family:monospace">${esc(profil)}</div><div style="font-size:12px;color:var(--ink2)">${esc(action)}</div><div style="font-size:11px;color:var(--ink3)">${esc(segStr)}</div><div><span class="status-pill ${granted?'live':'paused'}">${granted?'Accordé':'Révoqué'}</span></div></div>`;
     }).join('');
   } catch(e) {
     el.innerHTML = `<div style="padding:24px 16px;text-align:center;color:var(--ink3);font-size:13px">Erreur de chargement : ${esc(e.message)}</div>`;
