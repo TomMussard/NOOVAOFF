@@ -11,6 +11,7 @@ setGlobalOptions({ region: "europe-west1", maxInstances: 10 });
 
 const DAILY_CAP = 300;
 const MIN_ANSWER_MS = 900;
+const DEMO_POINTS = 10;
 const POINTS_BY_INDEX = [10, 15, 20]; // Q1/Q2/Q3, barème fixé par NOOVA (§2 NOOVA_POINTS_SYSTEM.md)
 
 function todayStr() {
@@ -221,6 +222,29 @@ exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (e
       }
     });
   }
+});
+
+/**
+ * claimDemoPoints — crédite une seule fois les 10 points de la question d'essai
+ * (répondue avant la création du compte). Idempotent : le drapeau demoClaimed
+ * empêche tout second crédit, même si le client rappelle la fonction.
+ */
+exports.claimDemoPoints = onCall(async (request) => {
+  const uid = request.auth && request.auth.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi pour récupérer tes points.");
+  const userRef = db.collection("users").doc(uid);
+  return db.runTransaction(async (tx) => {
+    const snap = await tx.get(userRef);
+    if (!snap.exists) throw new HttpsError("failed-precondition", "Profil introuvable.");
+    if (snap.data().demoClaimed) return { claimed: false, points: 0 };
+    tx.update(userRef, {
+      points: admin.firestore.FieldValue.increment(DEMO_POINTS),
+      xp: admin.firestore.FieldValue.increment(DEMO_POINTS),
+      demoClaimed: true,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    return { claimed: true, points: DEMO_POINTS };
+  });
 });
 
 const ADMIN_EMAILS = ["noovaoffr@gmail.com", "tomussproduction@gmail.com"];

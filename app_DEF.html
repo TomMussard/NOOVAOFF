@@ -819,59 +819,104 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- ONBOARDING -->
 <div id="onboard" class="screen">
   <div class="ob-wrap">
-    <div class="ob-topbar"><button class="ob-skip" onclick="showAuthWall('register')">Passer</button></div>
+    <div class="ob-topbar"><button class="ob-skip" onclick="startDemo()">Passer</button></div>
     <div class="ob-slides">
       <div class="ob-slide active" id="ob0">
-        <div class="ob-illo" style="background:var(--yellow-soft)">
-          <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:9px;padding:16px">
-            <div style="color:var(--icon-gray);background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg></div>
-            <div style="color:var(--icon-gray);background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg></div>
-            <div style="color:var(--icon-gray);background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.3 3.6 5.6 3.6 9s-1.2 6.7-3.6 9c-2.4-2.3-3.6-5.6-3.6-9S9.6 5.3 12 3z"/></svg></div>
-            <div style="color:var(--icon-gray);background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M12 20s-7-4.4-7-9.8A4.2 4.2 0 0 1 12 7.5a4.2 4.2 0 0 1 7 2.7C19 15.6 12 20 12 20z"/></svg></div>
-            <div style="color:var(--icon-gray);background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg></div>
-            <div style="color:var(--icon-gray);background:#fff;width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></div>
-          </div>
-        </div>
-        <h1 class="ob-title">Comment ça<br>marche en<br><em>10 secondes</em></h1>
-        <div class="ob-steps">
-          <div class="ob-step"><div class="ob-step-n">1</div><span style="font-size:13px;font-weight:500">Choisis ta ville & tes intérêts</span></div>
-          <div class="ob-step"><div class="ob-step-n">2</div><span style="font-size:13px;font-weight:500">Autorise les commerces près de toi</span></div>
-          <div class="ob-step"><div class="ob-step-n">3</div><span style="font-size:13px;font-weight:500">Réponds à leurs questions (30 s)</span></div>
-          <div class="ob-step"><div class="ob-step-n">4</div><span style="font-size:13px;font-weight:500">Gagne café, kebab, pizza offerts</span></div>
-        </div>
-      </div>
-      <div class="ob-slide" id="ob1">
         <div class="ob-illo" style="background:var(--yellow-soft);flex-direction:column;gap:9px;padding:16px">
           <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:7px">
             <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">B</span>Ta boulangerie</div>
             <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">R</span>Ton restaurant</div>
             <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">S</span>Ton salon</div>
-            <div style="font-size:13px;font-weight:800;letter-spacing:1.5px;color:var(--ink3);background:#fff;border-radius:11px;padding:8px 14px;display:flex;align-items:center">•••</div>
           </div>
-          <div style="font-size:11px;color:var(--gold-text);font-weight:600;text-align:center">Consentement révocable en 1 tap</div>
+          <div style="font-family:var(--fd);font-weight:800;font-size:20px;color:var(--ink);letter-spacing:-.5px;background:#fff;border-radius:14px;padding:10px 16px">Une question, 30 secondes ?</div>
         </div>
-        <h1 class="ob-title">Tu choisis<br>qui te<br><em>contacte.</em></h1>
-        <p class="ob-desc">Tu décides, commerce par commerce, qui peut te poser des questions. Seuls ceux que tu acceptes te contactent, et tu peux en retirer un quand tu veux.</p>
+        <h1 class="ob-title">Les commerces<br>du Mans te posent<br><em>une question.</em></h1>
+        <p class="ob-desc">Tu réponds en 30 secondes, depuis ton téléphone.</p>
       </div>
-      <div class="ob-slide" id="ob2">
+      <div class="ob-slide" id="ob1">
         <div class="ob-illo" style="background:var(--yellow-soft);flex-direction:column;align-items:center;justify-content:center;gap:12px">
-          <div style="font-family:var(--fd);font-weight:800;font-size:58px;color:var(--ink);line-height:1;letter-spacing:-2px">+25</div>
-          <div style="font-size:13px;color:var(--gold-text);font-weight:600">points gagnés</div>
+          <div style="font-family:var(--fd);font-weight:800;font-size:58px;color:var(--ink);line-height:1;letter-spacing:-2px">+10</div>
+          <div style="font-size:13px;color:var(--gold-text);font-weight:600">points par réponse</div>
           <div style="display:flex;gap:7px;margin-top:4px">
             <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:var(--ink);display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg> Café offert</div>
-            <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:var(--ink);display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Kebab offert</div>
+            <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:var(--ink);display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Viennoiserie</div>
           </div>
         </div>
-        <h1 class="ob-title">Réponds.<br><em>Gagne.</em><br>Régale-toi.</h1>
-        <p class="ob-desc">Chaque réponse rapporte des points. Échange-les contre un café, un kebab, une pizza, chez les commerces de ton quartier, par paliers comme une carte de fidélité.</p>
+        <h1 class="ob-title">Tes réponses<br>te rapportent<br><em>des points.</em></h1>
+        <p class="ob-desc">Échangeables chez ces mêmes commerces, par paliers, comme une carte de fidélité.</p>
       </div>
     </div>
-    <div class="ob-dots"><div class="ob-dot on" id="d0"></div><div class="ob-dot" id="d1"></div><div class="ob-dot" id="d2"></div></div>
+    <div class="ob-dots"><div class="ob-dot on" id="d0"></div><div class="ob-dot" id="d1"></div></div>
     <div class="ob-bottom">
       <button class="btn-p" id="ob-btn" onclick="obNext()">Suivant →</button>
       <button class="btn-s" onclick="showAuthWall('login')">Déjà un compte ? Se connecter</button>
     </div>
   </div>
+</div>
+
+<!-- DEMO : question d'essai sans compte (U2) -->
+<div id="demo-q" class="screen">
+  <div class="qw">
+    <div class="q-nav">
+      <div class="q-close" onclick="goTo('onboard')">✕</div>
+      <div class="q-prog"><div class="q-seg cur"></div></div>
+      <div class="q-pts">+10 pts</div>
+    </div>
+    <div class="brand-hdr">
+      <div class="bh-logo" id="demo-logo" style="background:transparent;padding:0"></div>
+      <div style="flex:1;min-width:0">
+        <div class="bh-name" id="demo-brand">Commerce</div>
+        <div class="bh-usage">Commerce du Mans</div>
+      </div>
+      <div class="bh-tag" style="background:var(--cd);color:var(--ink)">Exemple</div>
+    </div>
+    <div class="q-text" id="demo-q-text">Question</div>
+    <div class="q-hint">Choisis une réponse.</div>
+    <div class="ans-area"><div class="mcq-list" id="demo-opts"></div></div>
+    <div class="q-actions"><button class="btn-sub" id="demo-sub" onclick="submitDemo()" disabled>Valider →</button></div>
+  </div>
+</div>
+
+<!-- DEMO : résultat + points en attente (U3) -->
+<div id="demo-result" class="screen">
+  <div class="qw" style="justify-content:center">
+    <div class="rw-title" style="text-align:left;margin-bottom:4px">Merci, ta voix compte.</div>
+    <div class="rw-sub" style="text-align:left;margin-bottom:16px" id="demo-res-sub">Voilà ce que répondent les autres habitants.</div>
+    <div id="demo-bars" style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px"></div>
+    <div class="pts-earned" style="margin-bottom:14px"><div class="pe-plus">+</div><div class="pe-num">10</div><div class="pe-right"><div class="pe-lbl">Points en attente</div><div class="pe-tot" style="font-size:13px">Crée ton compte pour les garder</div></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn-p" style="background:var(--ink);color:#fff;box-shadow:none" onclick="showAuthWall('register')">Récupérer mes 10 points</button>
+      <button class="btn-s" id="demo-later-btn" onclick="demoLater()">Plus tard</button>
+    </div>
+    <div style="font-size:11px;color:var(--ink3);text-align:center;margin-top:12px;line-height:1.6">Résultats d'exemple. Les vraies questions arrivent dès que ton commerce de quartier rejoint NOOVA.</div>
+  </div>
+</div>
+
+<!-- U5 : catégories qui intéressent l'habitant -->
+<div id="cat-wall" style="position:fixed;inset:0;z-index:10001;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;overflow-y:auto">
+  <div style="width:100%;max-width:340px">
+    <div style="font-family:var(--fd);font-weight:800;font-size:28px;color:var(--ink);letter-spacing:-.8px;margin-bottom:8px">Ce qui t'intéresse</div>
+    <div style="font-size:14px;color:var(--ink2);margin-bottom:22px;line-height:1.7">On te proposera en priorité les questions de ces commerces.</div>
+    <div id="cat-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+      <button type="button" class="int-chip" data-cat="restauration" onclick="toggleCat(this)">Restauration</button>
+      <button type="button" class="int-chip" data-cat="boulangerie" onclick="toggleCat(this)">Boulangerie</button>
+      <button type="button" class="int-chip" data-cat="sport" onclick="toggleCat(this)">Sport</button>
+      <button type="button" class="int-chip" data-cat="beaute" onclick="toggleCat(this)">Beauté</button>
+      <button type="button" class="int-chip" data-cat="culture" onclick="toggleCat(this)">Culture</button>
+      <button type="button" class="int-chip" data-cat="commerce" onclick="toggleCat(this)">Commerce de proximité</button>
+      <button type="button" class="int-chip" data-cat="services" onclick="toggleCat(this)">Ville et services</button>
+      <button type="button" class="int-chip" data-cat="all" onclick="toggleCat(this)">Tout m'intéresse</button>
+    </div>
+    <div id="cat-err" style="color:#EF4444;font-size:12px;display:none;margin-bottom:10px">Choisis au moins une catégorie.</div>
+    <button id="cat-submit" onclick="saveCategories()" style="width:100%;padding:16px;border-radius:14px;background:var(--coral);border:none;color:var(--ink);font-size:16px;font-weight:800;font-family:var(--fd);cursor:pointer">Continuer</button>
+  </div>
+</div>
+
+<!-- Compteur de points crédités après création du compte (U4) -->
+<div id="claim-splash" style="position:fixed;inset:0;z-index:10002;background:var(--yellow);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px">
+  <div style="font-family:var(--fd);font-weight:800;font-size:96px;line-height:1;letter-spacing:-4px;color:var(--ink)">+<span id="claim-num">0</span></div>
+  <div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink);margin-top:6px">points crédités</div>
+  <div style="font-size:13px;color:var(--ink2);margin-top:8px">Bienvenue sur NOOVA.</div>
 </div>
 
 <!-- BRANDS CONSENT -->
@@ -1253,16 +1298,13 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
     <div style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink);margin-bottom:14px;text-align:center">Tes centres d'intérêt</div>
     <div id="interests-edit-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'restauration')">🍔 Restauration</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'sport')">⚽ Sport</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'gaming')">🎮 Gaming</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'musique')">🎵 Musique</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'voyage')">✈️ Voyage</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'mode')">👗 Mode</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'tech')">💻 Tech</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'culture')">🎭 Culture</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'cafe')">☕ Café</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'shopping')">🛍️ Shopping</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'restauration')">Restauration</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'boulangerie')">Boulangerie</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'sport')">Sport</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'beaute')">Beauté</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'culture')">Culture</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'commerce')">Commerce de proximité</button>
+      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'services')">Ville et services</button>
     </div>
     <button class="btn-p" onclick="confirmInterestsEditSheet()">Enregistrer</button>
   </div>
@@ -1368,7 +1410,7 @@ function refreshSettingsDisplay(){
   const cEl=document.getElementById('set-u-city'); if(cEl) cEl.textContent=S._cityLabel||'\u2014';
   const AGE_LABELS={'16-17':'16\u201317 ans','18-24':'18\u201324 ans','25-34':'25\u201334 ans','35-49':'35\u201349 ans','50-64':'50\u201364 ans','65+':'65+ ans'};
   const aEl=document.getElementById('set-u-age'); if(aEl) aEl.textContent=AGE_LABELS[S._age]||'\u2014';
-  const INT_LABELS={restauration:'Restauration',sport:'Sport',gaming:'Gaming',musique:'Musique',voyage:'Voyage',mode:'Mode',tech:'Tech',culture:'Culture',cafe:'Caf\u00e9',shopping:'Shopping'};
+  const INT_LABELS={boulangerie:'Boulangerie',beaute:'Beaut\u00e9',commerce:'Commerce de proximit\u00e9',services:'Ville et services',restauration:'Restauration',sport:'Sport',gaming:'Gaming',musique:'Musique',voyage:'Voyage',mode:'Mode',tech:'Tech',culture:'Culture',cafe:'Caf\u00e9',shopping:'Shopping'};
   const iEl=document.getElementById('set-u-interests'); if(iEl) iEl.textContent=(S._interests&&S._interests.length)?S._interests.map(i=>INT_LABELS[i]||i).join(', '):'\u2014';
   const eEl=document.getElementById('set-u-email'); if(eEl) eEl.textContent=(S.user&&S.user.email)||(auth.currentUser&&auth.currentUser.email)||'\u2014';
 }
@@ -1518,12 +1560,12 @@ function goTo(id){
 function goNav(id){goTo(id);if(id==='rewards-tab')refreshWallet();if(id==='profile')refreshProfile();if(id==='home'){refreshHome();applyStagger(document.querySelector('#home .si'));}if(id==='social'){renderSocial();const b=document.querySelector('#nav-social .nav-badge');if(b)b.style.display='none';}}
 
 function obNext(){
-  if(obIdx<2){
+  if(obIdx<1){
     document.getElementById('ob'+obIdx).classList.remove('active');document.getElementById('ob'+obIdx).classList.add('done');
     document.getElementById('d'+obIdx).classList.remove('on');obIdx++;
     document.getElementById('ob'+obIdx).classList.add('active');document.getElementById('d'+obIdx).classList.add('on');
-    if(obIdx===2)document.getElementById('ob-btn').textContent='Commencer →';
-  }else showAuthWall('register')
+    document.getElementById('ob-btn').textContent='Essayer une question →';
+  }else startDemo();
 }
 function showAuthWall(mode){
   if(mode) awTab(mode);
@@ -1900,7 +1942,7 @@ function animateNumber(el, to, suffix) {
   if (from === to) { el.textContent = to + (suffix||''); return; }
   const dur = 500, start = performance.now();
   function step(now) {
-    const p = Math.min(1, (now - start) / dur);
+    const p = Math.max(0, Math.min(1, (now - start) / dur));
     const eased = 1 - Math.pow(1 - p, 3);
     el.textContent = Math.round(from + (to - from) * eased) + (suffix||'');
     if (p < 1) requestAnimationFrame(step);
@@ -3043,7 +3085,7 @@ function closeFullMap(){ goTo('home'); }
 
   <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:11px">
     <input id="aw-name" type="text" placeholder="Ton prénom" autocomplete="name" style="display:none;width:100%;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
-    <input id="aw-city" type="text" placeholder="Ta ville (ex: Paris, Lyon…)" autocomplete="address-level2" style="display:none;width:100%;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
+    <input id="aw-city" type="text" placeholder="Ta ville" list="aw-city-list" value="Le Mans" autocomplete="address-level2" style="display:none;width:100%;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
 
     <div id="aw-age-wrap" style="display:none">
       <div style="font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink2);margin-bottom:7px">Ton âge</div>
@@ -3073,6 +3115,7 @@ function closeFullMap(){ goTo('home'); }
       </div>
     </div>
 
+    <datalist id="aw-city-list"><option value="Le Mans"><option value="Angers"></datalist>
     <input id="aw-email" type="email" placeholder="Email" autocomplete="email" style="width:100%;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
     <div>
       <div style="position:relative">
@@ -3115,37 +3158,9 @@ function closeFullMap(){ goTo('home'); }
 <div id="google-city-wall" style="position:fixed;inset:0;z-index:10000;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;overflow-y:auto">
   <div style="width:100%;max-width:340px">
     <div style="font-family:var(--fd);font-weight:800;font-size:28px;color:var(--ink);letter-spacing:-.8px;margin-bottom:8px">Dernière étape</div>
-    <div style="font-size:14px;color:var(--ink2);margin-bottom:24px;line-height:1.7">Pour te montrer les questions des commerces près de toi,<br>dis-nous un peu qui tu es.</div>
+    <div style="font-size:14px;color:var(--ink2);margin-bottom:24px;line-height:1.7">Pour te montrer les questions des commerces près de toi,<br>dis-nous dans quelle ville tu es.</div>
     <div style="display:flex;flex-direction:column;gap:14px">
       <input id="gcw-city" type="text" placeholder="Ta ville (ex: Paris, Lyon…)" autocomplete="address-level2" style="width:100%;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:15px;outline:none;font-family:var(--fb);box-sizing:border-box">
-
-      <div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink2);margin-bottom:7px">Ton âge</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
-          <button type="button" class="age-opt" onclick="gcwSelAge(this,'16-17')">16–17 ans</button>
-          <button type="button" class="age-opt" onclick="gcwSelAge(this,'18-24')">18–24 ans</button>
-          <button type="button" class="age-opt" onclick="gcwSelAge(this,'25-34')">25–34 ans</button>
-          <button type="button" class="age-opt" onclick="gcwSelAge(this,'35-49')">35–49 ans</button>
-          <button type="button" class="age-opt" onclick="gcwSelAge(this,'50-64')">50–64 ans</button>
-          <button type="button" class="age-opt" onclick="gcwSelAge(this,'65+')">65+ ans</button>
-        </div>
-      </div>
-
-      <div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink2);margin-bottom:7px">Centres d'intérêt <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px">(1 min.)</span></div>
-        <div style="display:flex;flex-wrap:wrap;gap:7px">
-          <button type="button" class="int-chip" onclick="gcwToggleInt(this,'restauration')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg></span> Restauration</button>
-          <button type="button" class="int-chip" onclick="gcwToggleInt(this,'sport')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.3 3.6 5.6 3.6 9s-1.2 6.7-3.6 9c-2.4-2.3-3.6-5.6-3.6-9S9.6 5.3 12 3z"/></svg></span> Sport</button>
-          <button type="button" class="int-chip" onclick="gcwToggleInt(this,'gaming')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg></span> Gaming</button>
-          <button type="button" class="int-chip" onclick="gcwToggleInt(this,'musique')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/><path d="M9 17.5V5.5l10-2v10"/></svg></span> Musique</button>
-          <button type="button" class="int-chip" onclick="gcwToggleInt(this,'voyage')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l7-2-3-6 2.5-.7L14 10l6-1.6a1.6 1.6 0 0 1 2 1.5c0 .7-.4 1.3-1 1.5L4.5 17z"/><path d="M9 17.5 7 21M13 17.5l1 3.5"/></svg></span> Voyage</button>
-          <button type="button" class="int-chip" onclick="gcwToggleInt(this,'mode')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l1 3-3 2-3-2z"/><path d="M9 4 4 7l2.5 3L8 9v11h8V9l1.5-2L20 7l-5-3"/></svg></span> Mode</button>
-          <button type="button" class="int-chip" onclick="gcwToggleInt(this,'tech')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="11" rx="1.4"/><path d="M9 20h6M12 16v4"/><path d="M8 9l2 2-2 2M13 13h3"/></svg></span> Tech</button>
-          <button type="button" class="int-chip" onclick="gcwToggleInt(this,'culture')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l8-4.5L20 8l-8 4.5z"/><path d="M6.5 9.5v6L12 18l5.5-2.5v-6"/><path d="M20 8v6.5"/></svg></span> Culture</button>
-          <button type="button" class="int-chip" onclick="gcwToggleInt(this,'cafe')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg></span> Café</button>
-          <button type="button" class="int-chip" onclick="gcwToggleInt(this,'shopping')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span> Shopping</button>
-        </div>
-      </div>
 
       <div id="gcw-err" style="color:#EF4444;font-size:12px;display:none;padding:9px 12px;background:rgba(239,68,68,.08);border-radius:8px;text-align:center"></div>
       <button id="gcw-submit-btn" onclick="saveGoogleCity()" style="width:100%;padding:16px;border-radius:14px;background:var(--coral);border:none;color:var(--ink);font-size:16px;font-weight:800;font-family:var(--fd);cursor:pointer">C'est parti →</button>
@@ -3299,8 +3314,8 @@ function awTab(mode) {
   const isReg = mode === 'register';
   document.getElementById('aw-name').style.display = isReg ? 'block' : 'none';
   document.getElementById('aw-city').style.display = isReg ? 'block' : 'none';
-  document.getElementById('aw-age-wrap').style.display = isReg ? 'block' : 'none';
-  document.getElementById('aw-interests-wrap').style.display = isReg ? 'block' : 'none';
+  document.getElementById('aw-age-wrap').style.display = 'none';
+  document.getElementById('aw-interests-wrap').style.display = 'none';
   const aStyle = 'flex:1;padding:11px;border-radius:10px;font-size:13px;font-weight:700;border:none;background:white;color:var(--ink);font-family:var(--fb);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.08)';
   const iStyle = 'flex:1;padding:11px;border-radius:10px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--ink3);font-family:var(--fb);cursor:pointer';
   document.getElementById('aw-tab-login').style.cssText = !isReg ? aStyle : iStyle;
@@ -3342,8 +3357,6 @@ async function awSubmit() {
       const name = document.getElementById('aw-name').value.trim();
       const city = document.getElementById('aw-city').value.trim();
       if(!name || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
-      if(!_awAge) { awShowErr("Sélectionne ta tranche d'âge."); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
-      if(!_awInterests.length) { awShowErr('Sélectionne au moins un centre d\'intérêt.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       const cityNorm = normalizeCity(city);
       if(!(await isCityOpen(cityNorm))) { awShowErr('Noova n\'est pas encore ouvert dans ta ville — reviens bientôt !'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       _skipNextAuth = true;
@@ -3352,14 +3365,14 @@ async function awSubmit() {
       await db.collection('users').doc(cred.user.uid).set({
         role: 'user',
         name, email, city: cityNorm, cityLabel: city,
-        ageRange: _awAge,
-        age: _awAge,
-        interests: _awInterests,
+        ageRange: '',
+        age: '',
+        interests: [],
         points: 0, xp: 0, streak: 0,
         lastDailyDate: null, lastAnswerDate: null, dailyEarned: 0, dailyEarnedDate: null,
         answeredCampaigns: [],
         authorizedMerchants: [],
-        onboardingStep: 'merchants',
+        onboardingStep: 'categories',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -3374,7 +3387,7 @@ async function awSubmit() {
       // direct du solde de points démarre dès cette première session (sinon aucun
       // listener n'existe tant que l'utilisateur n'a pas rechargé/relogué).
       document.getElementById('auth-wall').style.display = 'none';
-      loadUserAndStart(cred.user.uid);
+      await afterAccountCreated(cred.user.uid);
       return;
     }
   } catch(e) {
@@ -3403,6 +3416,102 @@ async function awForgotPassword() {
   document.getElementById('aw-err').style.display = 'none';
   const wrap = document.getElementById('aw-forgot');
   if(wrap) wrap.innerHTML = '<span style="font-size:12px;color:var(--ink2)">✅ Si ce compte existe, un email a été envoyé.</span>';
+}
+
+// ─── Parcours d'entrée : question d'essai sans compte (U2/U3) ────────────────
+// Exemples fictifs, marqués « Exemple » à l'écran : aucun commerce partenaire n'est
+// lisible sans compte. La réponse est gardée en local puis rattachée au compte à la création.
+const DEMO_QS=[
+  {id:'demo-1',brand:'Boulangerie du Centre',q:"Vous aimeriez qu'on ouvre le dimanche matin ?",opts:['Oui, dès 7h','Oui, mais plus tard','Non, ça me va comme ça','Peu importe'],dist:[46,27,14,13]},
+  {id:'demo-2',brand:'Café des Halles',q:"À quel moment passez-vous le plus volontiers prendre un café ?",opts:['Le matin','Après le déjeuner','En fin d\u2019après-midi','En soirée'],dist:[38,22,27,13]}
+];
+let _demoIdx=0,_demoSeen=0,_demoSel=-1;
+function startDemo(){_demoSeen=0;trackEvent('demo_start');openDemoQ(0);}
+function openDemoQ(i){
+  _demoIdx=i;_demoSel=-1;const q=DEMO_QS[i];
+  document.getElementById('demo-logo').innerHTML=logoHTML(q.brand,50);
+  document.getElementById('demo-brand').textContent=q.brand;
+  document.getElementById('demo-q-text').textContent=q.q;
+  document.getElementById('demo-sub').disabled=true;
+  const list=document.getElementById('demo-opts');list.innerHTML='';
+  q.opts.forEach((o,idx)=>{
+    const d=document.createElement('div');d.className='mcq-opt';
+    d.innerHTML='<div class="mcq-ck"></div><span></span>';d.querySelector('span').textContent=o;
+    d.onclick=function(){list.querySelectorAll('.mcq-opt').forEach(x=>{x.classList.remove('sel');x.querySelector('.mcq-ck').textContent=''});this.classList.add('sel');this.querySelector('.mcq-ck').textContent='\u2713';_demoSel=idx;document.getElementById('demo-sub').disabled=false;};
+    list.appendChild(d);
+  });
+  goTo('demo-q');
+}
+function submitDemo(){
+  if(_demoSel<0)return;
+  const q=DEMO_QS[_demoIdx];
+  try{ if(!localStorage.getItem('nv_demo')) localStorage.setItem('nv_demo',JSON.stringify({id:q.id,answer:q.opts[_demoSel],ts:Date.now()})); }catch(e){}
+  _demoSeen++;trackEvent('demo_answer',{question_id:q.id});
+  const dist=q.dist.slice();dist[_demoSel]+=1;const total=dist.reduce((a,b)=>a+b,0);
+  const bars=document.getElementById('demo-bars');bars.innerHTML='';
+  q.opts.forEach((o,idx)=>{
+    const pct=Math.round(dist[idx]/total*100),mine=idx===_demoSel;
+    const row=document.createElement('div');
+    row.innerHTML='<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:'+(mine?'800':'600')+';color:var(--ink);margin-bottom:4px"><span></span><span>'+pct+' %</span></div><div style="height:10px;border-radius:99px;background:var(--bg2);overflow:hidden"><div style="height:100%;width:'+pct+'%;border-radius:99px;background:'+(mine?'var(--ink)':'#C9C3B5')+'"></div></div>';
+    row.querySelector('span').textContent=o+(mine?' (ta réponse)':'');
+    bars.appendChild(row);
+  });
+  document.getElementById('demo-later-btn').style.display=_demoSeen>=2?'none':'block';
+  goTo('demo-result');
+}
+function demoLater(){openDemoQ((_demoIdx+1)%DEMO_QS.length);}
+
+// Points en attente : crédités côté serveur à la création du compte (une seule fois).
+async function claimPendingDemo(){
+  let demo=null;
+  try{demo=JSON.parse(localStorage.getItem('nv_demo')||'null');}catch(e){}
+  if(!demo||!auth.currentUser)return 0;
+  try{
+    const r=await fx.httpsCallable('claimDemoPoints')({questionId:demo.id,answer:demo.answer});
+    try{localStorage.removeItem('nv_demo');}catch(e){}
+    return (r.data&&r.data.claimed)?(r.data.points||10):0;
+  }catch(e){console.warn('claimDemoPoints:',e);return 0;}
+}
+function showClaimSplash(pts){
+  return new Promise(resolve=>{
+    const el=document.getElementById('claim-splash');document.getElementById('claim-num').textContent='0';
+    el.style.display='flex';el.style.opacity='1';
+    animateNumber(document.getElementById('claim-num'),pts);
+    setTimeout(()=>{el.style.transition='opacity .3s';el.style.opacity='0';setTimeout(()=>{el.style.display='none';el.style.transition='';resolve();},320);},1700);
+  });
+}
+async function afterAccountCreated(uid){
+  const pts=await claimPendingDemo();
+  if(pts>0)await showClaimSplash(pts);
+  showCategoryWall(uid);
+}
+
+// ─── U5 : catégories ─────────────────────────────────────────
+function showCategoryWall(uid){
+  const w=document.getElementById('cat-wall');w._uid=uid;
+  const have=S._interests||[];
+  w.querySelectorAll('.int-chip').forEach(c=>c.classList.toggle('sel',have.includes(c.dataset.cat)));
+  document.getElementById('cat-err').style.display='none';
+  w.style.display='flex';
+}
+function toggleCat(el){
+  const grid=document.getElementById('cat-grid');
+  if(el.dataset.cat==='all'){const on=!el.classList.contains('sel');grid.querySelectorAll('.int-chip').forEach(c=>c.classList.toggle('sel',on));}
+  else{el.classList.toggle('sel');grid.querySelector('[data-cat="all"]').classList.remove('sel');}
+  document.getElementById('cat-err').style.display='none';
+}
+async function saveCategories(){
+  const w=document.getElementById('cat-wall');const uid=w._uid||(auth.currentUser&&auth.currentUser.uid);
+  const cats=[...w.querySelectorAll('.int-chip.sel')].map(c=>c.dataset.cat).filter(c=>c!=='all');
+  if(!cats.length){document.getElementById('cat-err').style.display='block';return;}
+  if(!uid)return;
+  const btn=document.getElementById('cat-submit');btn.disabled=true;btn.textContent='…';
+  try{
+    await db.collection('users').doc(uid).update({interests:cats,onboardingStep:'done',updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    S._interests=cats;w.style.display='none';
+    loadUserAndStart(uid);
+  }catch(e){console.warn('saveCategories:',e);document.getElementById('cat-err').textContent='Erreur, réessaie.';document.getElementById('cat-err').style.display='block';}
+  btn.disabled=false;btn.textContent='Continuer';
 }
 
 // ─── Récompenses Firestore — groupées par commerce ────────────
@@ -3951,6 +4060,12 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   initNotifications(uid);
   loadHistFromFirestore(uid);
 
+  if(data.onboardingStep === 'categories') {
+    document.getElementById('auth-wall').style.display = 'none';
+    const cw = document.getElementById('cat-wall');
+    if(cw.style.display !== 'flex') showCategoryWall(uid);
+    return;
+  }
   if(data.onboardingStep === 'merchants') {
     document.getElementById('auth-wall').style.display = 'none';
     await loadMerchantsForOnboarding(data);
@@ -3960,6 +4075,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   await loadCampaignsFromFirestore(data);
   loadFriendAnswers().then(() => { renderQueue(); }).catch(() => {});
   finishAuthTransition();
+  if(!window._claimTried){ window._claimTried = true; claimPendingDemo().then(pts => { if(pts > 0) showClaimSplash(pts); }); }
 }
 
 async function loadFriendsFromFirestore(uids) {
@@ -4521,19 +4637,17 @@ async function saveGoogleCity() {
   const errEl = document.getElementById('gcw-err');
   if(!uid) return;
   if(!city) { errEl.textContent = 'Indique ta ville.'; errEl.style.display='block'; return; }
-  if(!_gcwAge) { errEl.textContent = "Sélectionne ta tranche d'âge."; errEl.style.display='block'; return; }
-  if(!_gcwInterests.length) { errEl.textContent = 'Sélectionne au moins un centre d\'intérêt.'; errEl.style.display='block'; return; }
   const cityNormG = normalizeCity(city);
   if(!(await isCityOpen(cityNormG))) { errEl.textContent = 'Noova n\'est pas encore ouvert dans ta ville — reviens bientôt !'; errEl.style.display='block'; return; }
   const btn = document.getElementById('gcw-submit-btn');
   errEl.style.display = 'none';
   if(btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
-    await db.collection('users').doc(uid).update({ city: cityNormG, cityLabel: city, ageRange: _gcwAge, age: _gcwAge, interests: _gcwInterests, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('users').doc(uid).update({ city: cityNormG, cityLabel: city, onboardingStep: 'categories', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     // Update city registry for merchant audience targeting
     db.collection('cities').doc(cityNormG).set({ label: city.charAt(0).toUpperCase()+city.slice(1), count: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(()=>{});
     document.getElementById('google-city-wall').style.display = 'none';
-    loadUserAndStart(uid);
+    await afterAccountCreated(uid);
   } catch(e) {
     console.warn('saveGoogleCity:', e);
     errEl.textContent = 'Erreur lors de l\'enregistrement. Réessaie.';
