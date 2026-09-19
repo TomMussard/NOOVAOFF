@@ -1027,11 +1027,14 @@ async function approveMerchant(id, name) {
   } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 async function rejectMerchant(id, name) {
-  if (!confirm(`Rejeter "${name}" ?`)) return;
+  // Le motif est affiché tel quel au commerçant (« SIRET introuvable », « photo illisible »…) :
+  // jamais de refus sans explication précise, et le compte n'est jamais supprimé.
+  const reason = (prompt(`Points à corriger pour "${name}" (affichés tels quels au commerçant) :`) || '').trim();
+  if (!reason) { showToast('Un motif précis est obligatoire', 'error'); return; }
   try {
-    await db.collection('merchants').doc(id).update({ status: 'rejected' });
+    await db.collection('merchants').doc(id).update({ status: 'rejected', rejectionReason: reason.substring(0, 500) });
     const idx = allMerchants.findIndex(m => m.id === id);
-    if (idx !== -1) allMerchants[idx].status = 'rejected';
+    if (idx !== -1) { allMerchants[idx].status = 'rejected'; allMerchants[idx].rejectionReason = reason; }
     renderMerchants();
     showToast(`${name} rejeté`, 'error');
     if (modalMerchant && modalMerchant.id === id) openModal(id);
