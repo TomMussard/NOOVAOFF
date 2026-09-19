@@ -2278,7 +2278,7 @@ window.addEventListener('load',()=>{
       <datalist id="aw-city-list"><option value="Le Mans"><option value="Angers"></datalist>
       <input id="aw-brand"  type="text"     placeholder="Nom commercial"           autocomplete="organization"    style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-sector" type="text" list="aw-sector-list" placeholder="Catégorie (ex: Restauration)"                                  style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
-      <datalist id="aw-sector-list"><option value="Restauration"><option value="Café"><option value="Beauté"><option value="Sport"><option value="Mode"><option value="Commerce"></datalist>
+      <datalist id="aw-sector-list"><option value="Restauration"><option value="Boulangerie"><option value="Café"><option value="Beauté"><option value="Sport"><option value="Culture"><option value="Commerce"><option value="Ville et services"></datalist>
       <input id="aw-city"   type="text"     list="aw-city-list" placeholder="Ville"      autocomplete="address-level2"  style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <div id="aw-name-row" style="display:none;gap:10px">
         <input id="aw-firstname" type="text" placeholder="Prénom" autocomplete="given-name" style="flex:1;min-width:0;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
@@ -3156,6 +3156,11 @@ const REWARD_SUGGESTIONS = {
     { icon: '🍰', label: 'Dessert offert' },
     { icon: '💸', label: "-20% sur l'addition" },
     { icon: '🍽️', label: 'Menu offert', condition: "pour un plat acheté" },
+  ],
+  'Boulangerie': [
+    { icon: '🥐', label: 'Viennoiserie offerte' },
+    { icon: '🥖', label: 'Baguette offerte' },
+    { icon: '🍰', label: 'Pâtisserie offerte' },
   ],
   'Café': [
     { icon: '☕', label: 'Expresso offert' },

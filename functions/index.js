@@ -65,8 +65,9 @@ exports.submitAnswer = onCall(async (request) => {
     if (!userCity || userCity !== campCity) {
       throw new HttpsError("permission-denied", "Cette campagne n'est pas disponible dans ta ville.");
     }
+    // Modèle « demande d'ami » : aucune question d'un commerce sans autorisation explicite.
     const authorized = user.authorizedMerchants || [];
-    if (camp.merchantId && authorized.length && !authorized.includes(camp.merchantId)) {
+    if (camp.merchantId && !authorized.includes(camp.merchantId)) {
       throw new HttpsError("permission-denied", "Tu n'as pas autorisé ce commerce.");
     }
     const ageRanges = camp.ageRanges || [];
@@ -183,45 +184,69 @@ exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (e
   if (!city) { logger.info("notifyNewCampaign: campagne sans ville"); return; }
 
   const usersSnap = await db.collection("users").where("city", "==", city).get();
-  const tokens = [];
-  const tokenOwnerRefs = [];
+  // Deux populations : ceux qui ont déjà autorisé le commerce (« a une question pour toi »)
+  // et ceux à qui il s'adresse pour la première fois (« veut te poser des questions »).
+  // Ceux qui ont refusé ne sont jamais notifiés.
+  const groups = { known: { tokens: [], owners: [] }, request: { tokens: [], owners: [] } };
   usersSnap.forEach((doc) => {
-    const t = doc.data().fcmTokens;
-    if (Array.isArray(t)) t.forEach((tok) => { tokens.push(tok); tokenOwnerRefs.push(doc.ref); });
+    const u = doc.data();
+    if ((u.declinedMerchants || []).includes(camp.merchantId)) return;
+    const g = (u.authorizedMerchants || []).includes(camp.merchantId) ? groups.known : groups.request;
+    if (Array.isArray(u.fcmTokens)) u.fcmTokens.forEach((tok) => { g.tokens.push(tok); g.owners.push(doc.ref); });
   });
-  logger.info("notifyNewCampaign: ciblage", { city, users: usersSnap.size, tokens: tokens.length });
-  if (!tokens.length) return;
+  logger.info("notifyNewCampaign: ciblage", { city, users: usersSnap.size, known: groups.known.tokens.length, request: groups.request.tokens.length });
 
-  const title = `${camp.merchantName || "Un commerce"} a une question pour toi`;
-  const body = (camp.question || "Réponds en 30 secondes et gagne des points.").toString().substring(0, 120);
+  const name = camp.merchantName || "Un commerce";
+  const question = (camp.question || "Réponds en 30 secondes et gagne des points.").toString().substring(0, 120);
+  const messages = {
+    known: { title: `${name} a une question pour toi`, body: question },
+    request: { title: `${name} veut te poser des questions`, body: "Ouvre NOOVA pour l'autoriser et répondre en 30 secondes." },
+  };
+  const deadCodes = ["messaging/registration-token-not-registered", "messaging/invalid-registration-token"];
 
-  // FCM limite sendEachForMulticast à 500 tokens par appel.
-  for (let i = 0; i < tokens.length; i += 500) {
-    const chunkTokens = tokens.slice(i, i + 500);
-    const chunkOwners = tokenOwnerRefs.slice(i, i + 500);
-    let res;
-    try {
-      res = await admin.messaging().sendEachForMulticast({
-        tokens: chunkTokens,
-        notification: { title, body },
-        webpush: {
-          notification: { icon: "/icon-192.png" },
-          fcmOptions: { link: "https://noovaoff.fr/app-v2" },
-        },
-      });
-    } catch (e) {
-      logger.error("notifyNewCampaign: échec d'envoi", { message: e.message });
-      continue;
-    }
-    logger.info("notifyNewCampaign: envoi", { success: res.successCount, failure: res.failureCount, errors: res.responses.filter((r) => !r.success).map((r) => r.error && r.error.code) });
-    // Purge les tokens qui ne sont plus valides (désinstallation, permission révoquée...).
-    const deadCodes = ["messaging/registration-token-not-registered", "messaging/invalid-registration-token"];
-    res.responses.forEach((r, idx) => {
-      if (!r.success && r.error && deadCodes.includes(r.error.code)) {
-        chunkOwners[idx].update({ fcmTokens: admin.firestore.FieldValue.arrayRemove(chunkTokens[idx]) }).catch(() => {});
+  for (const key of ["known", "request"]) {
+    const { tokens, owners } = groups[key];
+    // FCM limite sendEachForMulticast à 500 tokens par appel.
+    for (let i = 0; i < tokens.length; i += 500) {
+      const chunkTokens = tokens.slice(i, i + 500);
+      const chunkOwners = owners.slice(i, i + 500);
+      let res;
+      try {
+        res = await admin.messaging().sendEachForMulticast({
+          tokens: chunkTokens,
+          notification: messages[key],
+          webpush: {
+            notification: { icon: "/icon-192.png" },
+            fcmOptions: { link: "https://noovaoff.fr/app-v2" },
+          },
+        });
+      } catch (e) {
+        logger.error("notifyNewCampaign: échec d'envoi", { message: e.message });
+        continue;
       }
-    });
+      logger.info("notifyNewCampaign: envoi", { group: key, success: res.successCount, failure: res.failureCount, errors: res.responses.filter((r) => !r.success).map((r) => r.error && r.error.code) });
+      // Purge les tokens qui ne sont plus valides (désinstallation, permission révoquée...).
+      res.responses.forEach((r, idx) => {
+        if (!r.success && r.error && deadCodes.includes(r.error.code)) {
+          chunkOwners[idx].update({ fcmTokens: admin.firestore.FieldValue.arrayRemove(chunkTokens[idx]) }).catch(() => {});
+        }
+      });
+    }
   }
+});
+
+/**
+ * countConsent — tient à jour merchants/{id}.consentCount (audience affichée dans le
+ * dashboard) à chaque événement de consentement. Faite côté serveur : les règles
+ * interdisent à un habitant d'écrire sur le document d'un commerçant.
+ */
+exports.countConsent = onDocumentCreated("consentEvents/{eventId}", async (event) => {
+  const e = event.data && event.data.data();
+  if (!e || !e.merchantId || !["granted", "revoked"].includes(e.action)) return;
+  const ref = db.collection("merchants").doc(e.merchantId);
+  const snap = await ref.get();
+  if (!snap.exists) return;
+  await ref.update({ consentCount: admin.firestore.FieldValue.increment(e.action === "granted" ? 1 : -1) });
 });
 
 /**

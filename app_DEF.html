@@ -995,6 +995,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       </div>
     </div>
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
+    <div id="home-requests"></div>
     <div class="dstreak-card">
       <div class="dstreak-top">
         <div class="dstreak-fire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 2c1 3-2 4-2 7a2 2 0 004 0c1 1 2 2.5 2 4.5A5.5 5.5 0 016.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0012 22a8 8 0 007-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg></div>
@@ -1672,6 +1673,7 @@ function refreshHome(){
     const tcImg=document.getElementById('dtoday-photo').querySelector('img'); if(tcImg) tcImg.remove();
   }
   renderHomeState();
+  renderRequests();
   renderQueue();
   renderAlmostReward();
   renderNearbyMap();
@@ -2566,8 +2568,8 @@ function refreshProfile(){
   }
   const cm=document.getElementById('consent-mgmt');cm.innerHTML='';
   const _cm=S._nearbyMerchants||[];
-  if(!_cm.length){cm.innerHTML='<div style="font-size:12px;color:var(--ink2);text-align:center;padding:8px 0">Aucun commerce autorisé · Appuie sur "Gérer" pour en ajouter.</div>';}
-  else{_cm.slice(0,6).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='dconsent-row';d.innerHTML=`${logoHTML(label,40,m.logoUrl)}<div style="flex:1;min-width:0"><div class="dconsent-name">${esc(label)}</div><div class="dconsent-sub">${esc(m.sector||m.address||'')}</div></div><label class="tgl"><input type="checkbox" checked onchange="toggleMerchantConsentQuick('${m.id}',this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label>`;cm.appendChild(d)});if(_cm.length>6){const more=document.createElement('div');more.style.cssText='font-size:11px;color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`+${_cm.length-6} autres · Gérer`;more.onclick=openManageMerchants;more.style.cursor='pointer';cm.appendChild(more);}}
+  if(!_cm.length){cm.innerHTML='<div style="font-size:12px;color:var(--ink2);text-align:center;padding:8px 0">Aucun commerce autorisé. Les demandes des commerces arrivent sur ton accueil.</div>';}
+  else{_cm.slice(0,6).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='dconsent-row';d.innerHTML=`${logoHTML(label,40,m.logoUrl)}<div style="flex:1;min-width:0"><div class="dconsent-name">${esc(label)}</div><div class="dconsent-sub">${esc(m.sector||m.address||'')} · ${questionsAsked(label)} question${questionsAsked(label)>1?'s':''} posée${questionsAsked(label)>1?'s':''}</div></div><label class="tgl"><input type="checkbox" checked onchange="toggleMerchantConsentQuick('${m.id}',this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label>`;cm.appendChild(d)});if(_cm.length>6){const more=document.createElement('div');more.style.cssText='font-size:11px;color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`+${_cm.length-6} autres · Gérer`;more.onclick=openManageMerchants;more.style.cursor='pointer';cm.appendChild(more);}}
   const bl=document.getElementById('badges-list');bl.innerHTML='';
   checkTierAndBadgeCelebrations();
   const earned=S._lastEarnedBadges||[];
@@ -3529,6 +3531,69 @@ async function saveCategories(){
   btn.disabled=false;btn.textContent='Continuer';
 }
 
+// ─── Demandes des commerces (modèle « demande d'ami ») ────────
+const CAT_KEYS=['restauration','boulangerie','sport','beaute','culture','commerce','services'];
+function sectorCat(sec){
+  const s=(sec||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(/boulang|patiss|viennois/.test(s))return 'boulangerie';
+  if(/restau|cafe|\bbar\b|traiteur|pizz|kebab|snack/.test(s))return 'restauration';
+  if(/sport|fitness|gym/.test(s))return 'sport';
+  if(/beaut|coiff|esthet|\bspa\b|barbier/.test(s))return 'beaute';
+  if(/cultur|librair|cinema|musee|musique/.test(s))return 'culture';
+  if(/service|mairie|ville/.test(s))return 'services';
+  return 'commerce';
+}
+// Les catégories choisies à l'inscription filtrent les demandes affichées. Un profil
+// ancien (sans catégorie reconnue) ou « Tout m'intéresse » voit tout.
+function matchesCats(m){
+  const ints=(S._interests||[]).filter(i=>CAT_KEYS.includes(i));
+  if(!ints.length||ints.length===CAT_KEYS.length)return true;
+  return ints.includes(sectorCat(m.sector||m.theme));
+}
+function questionsAsked(label){return (S.hist||[]).filter(h=>h.brand===label).length;}
+function renderRequests(){
+  const el=document.getElementById('home-requests');if(!el)return;
+  const reqs=S._requests||[];
+  if(!reqs.length){el.innerHTML='';return;}
+  el.innerHTML='<div class="sec-lbl">Demandes</div>'+reqs.slice(0,3).map(m=>{
+    const label=m.brandName||m.name||'Commerce';
+    const photo=m.coverUrl?`<img src="${esc(m.coverUrl)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">`:'';
+    return `<div style="margin:0 22px 14px;background:var(--surface);border-radius:var(--r-card);box-shadow:var(--shadow-card);overflow:hidden">
+      <div style="position:relative;height:96px;background:var(--nv-photo)">${photo}<div style="position:absolute;left:14px;bottom:-22px;z-index:1">${logoHTML(label,46,m.logoUrl)}</div></div>
+      <div style="padding:30px 16px 16px">
+        <div style="font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink);letter-spacing:-.4px">${esc(label)}</div>
+        <div style="font-size:12px;color:var(--ink2);margin:2px 0 12px">${esc(m.sector||'Commerce')}${m.cityLabel?' · '+esc(m.cityLabel):''} · veut te poser des questions</div>
+        <div style="display:flex;gap:8px"><button class="btn-p" style="flex:1" onclick="authorizeMerchant('${m.id}')">Autoriser</button><button class="btn-s" style="flex:1" onclick="declineMerchant('${m.id}')">Non merci</button></div>
+      </div></div>`;}).join('')+(reqs.length>3?`<div style="text-align:center;font-size:12px;color:var(--ink3);margin-bottom:12px">+${reqs.length-3} autre${reqs.length>4?'s':''} demande${reqs.length>4?'s':''}</div>`:'');
+}
+async function authorizeMerchant(mid){
+  const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
+  const prev=new Set(S._authorizedMerchants||[]),next=new Set(prev);next.add(mid);
+  try{
+    const batch=db.batch();
+    batch.update(db.collection('users').doc(uid),{authorizedMerchants:firebase.firestore.FieldValue.arrayUnion(mid),declinedMerchants:firebase.firestore.FieldValue.arrayRemove(mid)});
+    logConsentEvents(batch,uid,prev,next);
+    await batch.commit();
+    S._authorizedMerchants=Array.from(next);
+    S._declinedMerchants=(S._declinedMerchants||[]).filter(x=>x!==mid);
+    trackEvent('merchant_authorized');
+    loadNearbyMerchants(S._authorizedMerchants);
+    recomputeCampaignFeed(normalizeCity(S._city||''));
+    refreshHome();
+    showToast('Autorisé : tu recevras ses questions.','success');
+  }catch(e){console.warn('authorizeMerchant:',e);showToast("Impossible d'enregistrer ton choix.",'error');}
+}
+async function declineMerchant(mid){
+  const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
+  try{
+    await db.collection('users').doc(uid).update({declinedMerchants:firebase.firestore.FieldValue.arrayUnion(mid)});
+    S._declinedMerchants=[...(S._declinedMerchants||[]),mid];
+    trackEvent('merchant_declined');
+    recomputeCampaignFeed(normalizeCity(S._city||''));
+    refreshHome();
+  }catch(e){console.warn('declineMerchant:',e);showToast("Impossible d'enregistrer ton choix.",'error');}
+}
+
 // ─── États de l'accueil (U6) ─────────────────────────────────
 function cityPhrase(label){
   label=(label||'').trim();
@@ -3547,6 +3612,8 @@ function renderHomeState(){
     el.innerHTML='<div style="'+box+'"><div style="'+h+'">NOOVA arrive '+esc(cityPhrase(S._cityLabel))+'.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Aucun commerce de ta ville n\'a encore lancé de question. Dis-nous lesquels tu aimerais voir ici.</div></div>'
       +'<div style="display:flex;gap:8px;margin-bottom:10px"><input id="suggest-inp" type="text" maxlength="80" placeholder="Un commerce à suggérer" style="flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb)"><button onclick="suggestMerchant()" style="padding:0 18px;border-radius:16px;border:none;background:var(--ink);color:#fff;font-family:var(--fd);font-weight:800;font-size:14px;cursor:pointer">Suggérer</button></div>'
       +'<button class="btn-s" onclick="shareNoova()">Inviter mes amis</button>';
+  }else if((S._requests||[]).length){
+    el.innerHTML='<div style="'+box+'"><div style="'+h+'">Un commerce veut te poser des questions.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Autorise-le ci-dessous pour recevoir ses questions.</div></div>';
   }else if((S.ans||0)>0){
     el.innerHTML='<div style="'+box+'"><div style="'+h+'">C\'est fait pour aujourd\'hui.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Merci pour tes réponses. Reviens demain pour de nouvelles questions.</div></div>';
   }else{
@@ -4115,6 +4182,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   S._interests       = data.interests || [];
   S._answered        = data.answeredCampaigns || [];
   S._authorizedMerchants = data.authorizedMerchants || [];
+  S._declinedMerchants = data.declinedMerchants || [];
   S._friendUids      = data.friendUids || [];
   S._groups          = data.groups || [];
   S._seenHomeTour    = !!data.seenHomeTour;
@@ -4159,9 +4227,9 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
     return;
   }
   if(data.onboardingStep === 'merchants') {
-    document.getElementById('auth-wall').style.display = 'none';
-    await loadMerchantsForOnboarding(data);
-    return;
+    // Ancien écran « Autorise tes commerces » (tout coché par défaut) supprimé : les
+    // commerces arrivent désormais un par un sous forme de demande sur l'accueil.
+    db.collection('users').doc(uid).update({ onboardingStep: 'done' }).catch(() => {});
   }
 
   await loadCampaignsFromFirestore(data);
@@ -4234,7 +4302,7 @@ async function openManageMerchants() {
     function mmRenderItem(m, container) {
       const checked = !!_mmConsents[m.id];
       const label = m.brandName || m.name || 'Commerce';
-      const sub   = m.sector || m.address || m.city || '';
+      const sub   = (m.sector || m.address || m.city || '') + (checked ? ' · ' + questionsAsked(label) + ' question' + (questionsAsked(label) > 1 ? 's' : '') + ' posée' + (questionsAsked(label) > 1 ? 's' : '') : '');
       const d = document.createElement('div');
       d.className = 'brand-item' + (checked ? ' on' : '');
       d.innerHTML = `${logoHTML(label,44,m.logoUrl)}<div style="flex:1;min-width:0"><div class="bi-name">${esc(label)}</div><div class="bi-use">${esc(sub)}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} data-mid="${m.id}"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
@@ -4275,7 +4343,6 @@ async function toggleMerchantConsentQuick(mid, enabled){
     batch.update(db.collection('users').doc(uid), {
       authorizedMerchants: enabled ? firebase.firestore.FieldValue.arrayUnion(mid) : firebase.firestore.FieldValue.arrayRemove(mid)
     });
-    batch.update(db.collection('merchants').doc(mid), { consentCount: firebase.firestore.FieldValue.increment(enabled?1:-1) });
     const newAuthorized = new Set(prevAuthorized);
     enabled ? newAuthorized.add(mid) : newAuthorized.delete(mid);
     logConsentEvents(batch, uid, prevAuthorized, newAuthorized);
@@ -4300,9 +4367,6 @@ async function saveMerchantConsents() {
     const prevAuthorized = new Set(S._authorizedMerchants || []);
     const batch = db.batch();
     batch.update(db.collection('users').doc(uid), { authorizedMerchants: newAuthorized });
-    // Update consentCount on merchant docs for audience estimation in dashboard
-    newAuthorized.forEach(mid => { if(!prevAuthorized.has(mid)) batch.update(db.collection('merchants').doc(mid), { consentCount: firebase.firestore.FieldValue.increment(1) }); });
-    prevAuthorized.forEach(mid => { if(!newAuthorized.includes(mid)) batch.update(db.collection('merchants').doc(mid), { consentCount: firebase.firestore.FieldValue.increment(-1) }); });
     logConsentEvents(batch, uid, prevAuthorized, newAuthorized);
     await batch.commit();
     S._authorizedMerchants = newAuthorized;
@@ -4406,6 +4470,8 @@ function recomputeCampaignFeed(city) {
     const wasFirstRender = !window._campaignFeedRenderedOnce;
 
     const campaigns = [];
+    const declined = S._declinedMerchants || [];
+    const requests = {};
     _campaignsCache.forEach(({ id, data: d }) => {
       if (answered.includes(id)) return;
       const campaignCity = getCampaignCity(d);
@@ -4417,7 +4483,11 @@ function recomputeCampaignFeed(city) {
       if (getCampaignTargetVolume(d) && (d.responsesCount || d.answersCount || 0) >= getCampaignTargetVolume(d)) return;
       const ageRanges = getCampaignAgeRanges(d).map(normalizeAgeRange);
       if (ageRanges.length && userAge && !ageRanges.includes(userAge)) return;
-      if (authorized.length && d.merchantId && !authorized.includes(d.merchantId)) return;
+      if (d.merchantId && !authorized.includes(d.merchantId)) {
+        // Modèle « demande d'ami » : aucune question sans autorisation explicite.
+        if (!declined.includes(d.merchantId) && matchesCats(merchantData)) requests[d.merchantId] = { id: d.merchantId, ...merchantData };
+        return;
+      }
 
       const allQs = getCampaignQuestions(d);
       const SCALE = [10, 15, 20];
@@ -4443,6 +4513,7 @@ function recomputeCampaignFeed(city) {
       });
     });
     S.qs = campaigns;
+    S._requests = Object.values(requests);
     if (S.qIdx === undefined) S.qIdx = 0;
     // Rafraîchit l'écran uniquement pour les mises à jour en direct (le premier
     // rendu est déjà déclenché par handleUserSnapshot juste après ce chargement).
@@ -4549,7 +4620,7 @@ async function revokeAllConsents() {
   const uid = auth.currentUser && auth.currentUser.uid;
   if(!uid) return;
   const batch = db.batch();
-  batch.update(db.collection('users').doc(uid), { authorizedMerchants: [], onboardingStep: 'merchants' });
+  batch.update(db.collection('users').doc(uid), { authorizedMerchants: [], declinedMerchants: [], onboardingStep: 'done' });
   logConsentEvents(batch, uid, S._authorizedMerchants || [], []);
   try {
     await batch.commit();
@@ -4559,7 +4630,10 @@ async function revokeAllConsents() {
     return;
   }
   S._authorizedMerchants = [];
+  S._declinedMerchants = [];
   S._nearbyMerchants = [];
+  recomputeCampaignFeed(normalizeCity(S._city || ''));
+  refreshHome();
   showToast('Tous les consentements ont été révoqués.','success');
   refreshProfile();
 }
