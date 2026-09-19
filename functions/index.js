@@ -2,6 +2,7 @@ const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
+const { FieldValue } = require("firebase-admin/firestore");
 const logger = require("firebase-functions/logger");
 
 admin.initializeApp();
@@ -127,26 +128,26 @@ exports.submitAnswer = onCall(async (request) => {
       respondentAge: userAge,
       respondentCity: user.city || "",
       respondentInterests: user.interests || [],
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     const userUpdate = {
-      points: admin.firestore.FieldValue.increment(totalEarned),
-      xp: admin.firestore.FieldValue.increment(totalEarned),
-      ans: admin.firestore.FieldValue.increment(1),
+      points: FieldValue.increment(totalEarned),
+      xp: FieldValue.increment(totalEarned),
+      ans: FieldValue.increment(1),
       dailyEarned,
       dailyEarnedDate: today,
       lastDailyDate: today,
       lastAnswerDate: newLastAnswerDate,
       streak: newStreak,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     };
-    if (qIdx === 0) userUpdate.answeredCampaigns = admin.firestore.FieldValue.arrayUnion(campaignId);
+    if (qIdx === 0) userUpdate.answeredCampaigns = FieldValue.arrayUnion(campaignId);
     tx.update(userRef, userUpdate);
 
     tx.update(campaignRef, {
-      answersCount: admin.firestore.FieldValue.increment(1),
-      responsesCount: admin.firestore.FieldValue.increment(1),
+      answersCount: FieldValue.increment(1),
+      responsesCount: FieldValue.increment(1),
     });
 
     if (user.city) {
@@ -158,7 +159,7 @@ exports.submitAnswer = onCall(async (request) => {
         merchantId: camp.merchantId || null,
         brand: camp.merchantName || "",
         text: `a répondu à une question de ${camp.merchantName || "un commerce"}`,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
       });
     }
 
@@ -228,7 +229,7 @@ exports.notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (e
       // Purge les tokens qui ne sont plus valides (désinstallation, permission révoquée...).
       res.responses.forEach((r, idx) => {
         if (!r.success && r.error && deadCodes.includes(r.error.code)) {
-          chunkOwners[idx].update({ fcmTokens: admin.firestore.FieldValue.arrayRemove(chunkTokens[idx]) }).catch(() => {});
+          chunkOwners[idx].update({ fcmTokens: FieldValue.arrayRemove(chunkTokens[idx]) }).catch(() => {});
         }
       });
     }
@@ -246,7 +247,7 @@ exports.countConsent = onDocumentCreated("consentEvents/{eventId}", async (event
   const ref = db.collection("merchants").doc(e.merchantId);
   const snap = await ref.get();
   if (!snap.exists) return;
-  await ref.update({ consentCount: admin.firestore.FieldValue.increment(e.action === "granted" ? 1 : -1) });
+  await ref.update({ consentCount: FieldValue.increment(e.action === "granted" ? 1 : -1) });
 });
 
 /**
@@ -263,13 +264,44 @@ exports.claimDemoPoints = onCall(async (request) => {
     if (!snap.exists) throw new HttpsError("failed-precondition", "Profil introuvable.");
     if (snap.data().demoClaimed) return { claimed: false, points: 0 };
     tx.update(userRef, {
-      points: admin.firestore.FieldValue.increment(DEMO_POINTS),
-      xp: admin.firestore.FieldValue.increment(DEMO_POINTS),
+      points: FieldValue.increment(DEMO_POINTS),
+      xp: FieldValue.increment(DEMO_POINTS),
       demoClaimed: true,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     });
     return { claimed: true, points: DEMO_POINTS };
   });
+});
+
+/**
+ * estimateReach — portée estimée d'une campagne : nombre d'habitants de la ville du
+ * commerçant, dont ceux intéressés par sa catégorie. Passe par une fonction car les
+ * règles interdisent au commerçant de lire les comptes habitants ; seuls des nombres
+ * agrégés sont renvoyés, jamais d'identité.
+ */
+function sectorCategory(sec) {
+  const s = String(sec || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (/boulang|patiss|viennois/.test(s)) return "boulangerie";
+  if (/restau|cafe|\bbar\b|traiteur|pizz|kebab|snack/.test(s)) return "restauration";
+  if (/sport|fitness|gym/.test(s)) return "sport";
+  if (/beaut|coiff|esthet|\bspa\b|barbier/.test(s)) return "beaute";
+  if (/cultur|librair|cinema|musee|musique/.test(s)) return "culture";
+  if (/service|mairie|ville/.test(s)) return "services";
+  return "commerce";
+}
+exports.estimateReach = onCall(async (request) => {
+  const uid = request.auth && request.auth.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi.");
+  const mSnap = await db.collection("merchants").doc(uid).get();
+  if (!mSnap.exists) throw new HttpsError("permission-denied", "Réservé aux commerçants.");
+  const m = mSnap.data();
+  const city = String(m.city || "").toLowerCase();
+  const category = sectorCategory(m.sector);
+  const base = db.collection("users").where("city", "==", city);
+  const total = (await base.count().get()).data().count;
+  let matching = null;
+  try { matching = (await base.where("interests", "array-contains", category).count().get()).data().count; } catch (e) { logger.warn("estimateReach: matching", { message: e.message }); }
+  return { city: m.cityLabel || m.city || "", total, matching, category };
 });
 
 const ADMIN_EMAILS = ["noovaoffr@gmail.com", "tomussproduction@gmail.com"];

@@ -44,6 +44,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <style>
 :root {
@@ -1126,7 +1127,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div class="recap-item"><div class="recap-lbl">Audience</div><div class="recap-val" id="recap-aud">Sport + Bien-être · 18–49 ans</div></div>
                     <div class="recap-item"><div class="recap-lbl">Volume</div><div class="recap-val big" id="recap-vol">500</div></div>
                     <div class="recap-item"><div class="recap-lbl">Nom campagne</div><div class="recap-val" id="recap-name">Test équipement sportif — Été 2025</div></div>
-                    <div class="recap-item" style="grid-column:span 2"><div class="recap-lbl">Livraison</div><div class="recap-val">Rapport complet sous 48–72h après clôture de la collecte · Clustering IA · Export CSV inclus</div></div>
+                    <div class="recap-item" style="grid-column:span 2"><div class="recap-lbl">Portée estimée</div><div class="recap-val" id="recap-reach">Calcul en cours…</div></div>
                   </div>
                   <div class="risk-box">
                     <div class="risk-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg> Points d'attention documentés</div>
@@ -1734,6 +1735,10 @@ function wzGo(n){
     document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple · '+document.querySelectorAll('.mcq-opt-inp').length+' options',scale:'Échelle 1–10',rank:'Classement'}[curFmt];
     document.getElementById('recap-vol').textContent=document.getElementById('vol-num').textContent;
     document.getElementById('recap-name').textContent=document.getElementById('camp-name-inp').value;
+    const ages=[...document.querySelectorAll('.age-chip.sel')].map(e=>e.textContent.trim()).filter(Boolean);
+    const audEl=document.getElementById('recap-aud');
+    if(audEl) audEl.textContent=((_mData&&(_mData.cityLabel||_mData.city))||'Ma ville')+' · '+(ages.length?ages.join(', '):'Tous les âges');
+    loadReachEstimate();
   }
 }
 function wzSync(){ wzGo(wzCur); }
@@ -2286,7 +2291,8 @@ window.addEventListener('load',()=>{
       </div>
       <input id="aw-phone"   type="tel"  placeholder="Téléphone professionnel"     autocomplete="tel"    style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-address" type="text"  placeholder="Adresse professionnelle"     autocomplete="street-address" style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
-      <input id="aw-siret"   type="text"  placeholder="SIRET (14 chiffres)"  inputmode="numeric" maxlength="17" style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <input id="aw-siret"   type="text"  placeholder="SIRET (14 chiffres)"  inputmode="numeric" maxlength="17" oninput="awLookupSiret()" style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <div id="aw-siret-note" style="display:none;font-size:11.5px;color:var(--ink3);line-height:1.5;margin-top:-4px"></div>
       <textarea id="aw-desc" placeholder="Décris ton établissement en quelques mots…" maxlength="300" style="display:none;width:100%;height:70px;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);resize:none;box-sizing:border-box"></textarea>
       <input id="aw-site" type="url" placeholder="Site ou page sociale (facultatif)" autocomplete="url" style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <label id="aw-cover-wrap" style="display:none;border:1.5px dashed var(--border);border-radius:10px;padding:12px 14px;background:var(--bg2);cursor:pointer">
@@ -2354,6 +2360,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
+const fx   = firebase.app().functions('europe-west1');
 
 let _mData      = null;
 let _mCampaigns = [];
@@ -2373,6 +2380,7 @@ function awSetStep(n) {
   document.getElementById('aw-p2').style.background = n === 2 ? 'var(--coral)' : 'var(--bg3)';
   document.getElementById('aw-p-lbl').textContent = n === 1 ? 'Étape 1 sur 2 · Vous' : 'Étape 2 sur 2 · Votre établissement';
   document.getElementById('aw-back').style.display = n === 2 ? 'block' : 'none';
+  document.getElementById('aw-siret-note').style.display = 'none';
   document.getElementById('aw-submit').textContent = n === 1 ? 'Continuer' : 'Créer mon compte';
   document.getElementById('aw-err').style.display = 'none';
 }
@@ -2607,8 +2615,78 @@ function renderAcqCard(camps) {
   if(!active.length) { el.style.display = 'none'; return; }
   const total = active.reduce((a, c) => a + (c.answersCount || 0), 0);
   const title = total === 0 ? 'Votre campagne est en ligne. Voici comment faire venir les premières réponses.' : 'Faites venir plus de réponses.';
-  el.innerHTML = `<div class="card" style="margin-bottom:18px;padding:20px 22px;border:1.5px solid rgba(242,151,21,.35)"><div style="font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink);margin-bottom:6px">${title}</div><div style="font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:14px">Tant que la communauté est petite, vos propres clients sont vos premiers répondants : une affiche en vitrine et en caisse est le moyen le plus efficace.</div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="tb-btn tb-btn-primary" onclick="printPoster()">Télécharger l'affiche A4 (PDF)</button><button class="tb-btn tb-btn-ghost" onclick="copySocialText()">Copier le texte pour Instagram ou Facebook</button></div></div>`;
+  el.innerHTML = `<div class="card" style="margin-bottom:18px;padding:20px 22px;border:1.5px solid rgba(242,151,21,.35)"><div style="font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink);margin-bottom:6px">${title}</div><div style="font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:14px">Tant que la communauté est petite, vos propres clients sont vos premiers répondants : une affiche en vitrine et en caisse est le moyen le plus efficace.</div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="tb-btn tb-btn-primary" onclick="printPoster()">Télécharger l'affiche A4 (PDF)</button><button class="tb-btn tb-btn-ghost" onclick="downloadVisual(\'square\')">Visuel carré (PNG)</button><button class="tb-btn tb-btn-ghost" onclick="downloadVisual(\'story\')">Visuel story (PNG)</button><button class="tb-btn tb-btn-ghost" onclick="copySocialText()">Copier le texte pour Instagram ou Facebook</button></div></div>`;
   el.style.display = 'block';
+}
+
+// ═══ Portée estimée, visuels réseaux sociaux, recherche SIRET ═══
+async function loadReachEstimate() {
+  const el = document.getElementById('recap-reach');
+  if(!el) return;
+  el.textContent = 'Calcul en cours…';
+  try {
+    const r = (await fx.httpsCallable('estimateReach')()).data;
+    const cat = { restauration: 'la restauration', boulangerie: 'la boulangerie', sport: 'le sport', beaute: 'la beauté', culture: 'la culture', commerce: 'le commerce de proximité', services: 'la ville et les services' }[r.category] || 'votre secteur';
+    el.textContent = r.total === 0
+      ? `Aucun habitant inscrit à ${r.city} pour l'instant : votre affiche en vitrine fera venir les premiers.`
+      : `${r.total} habitant${r.total > 1 ? 's' : ''} à ${r.city}` + (r.matching != null ? ` dont ${r.matching} intéressé${r.matching > 1 ? 's' : ''} par ${cat}` : '') + '.';
+  } catch(e) { el.textContent = 'Estimation indisponible pour le moment.'; }
+}
+function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function downloadVisual(kind) {
+  if(typeof qrcode === 'undefined') { showToast('QR code indisponible, réessayez dans un instant.', 'warning'); return; }
+  const story = kind === 'story', W = 1080, H = story ? 1920 : 1080;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.fillStyle = '#FFC300'; g.fillRect(0, 0, W, H);
+  g.textAlign = 'center'; g.fillStyle = '#1C1917';
+  const brand = (_mData && _mData.brandName) || 'notre commerce';
+  const top = story ? 250 : 90;
+  g.fillStyle = '#1C1917'; roundRect(g, W / 2 - 110, top, 220, 64, 32); g.fill();
+  g.fillStyle = '#FFC300'; g.font = '800 34px Helvetica, Arial, sans-serif'; g.fillText('NOOVA', W / 2, top + 44);
+  g.fillStyle = '#1C1917'; g.font = '800 ' + (story ? 96 : 84) + 'px Helvetica, Arial, sans-serif';
+  g.fillText('Donnez votre avis', W / 2, top + (story ? 200 : 180));
+  g.fillText('en 30 secondes', W / 2, top + (story ? 310 : 275));
+  g.font = '500 ' + (story ? 42 : 36) + 'px Helvetica, Arial, sans-serif';
+  const sub = 'Une question de ' + brand + ', des points à gagner.';
+  g.fillText(sub.length > 44 ? 'Une question, des points à gagner.' : sub, W / 2, top + (story ? 400 : 345));
+  const qr = qrcode(0, 'M'); qr.addData(noovaAppUrl()); qr.make();
+  const img = new Image();
+  img.onload = () => {
+    const size = story ? 620 : 470, x = (W - size) / 2, y = story ? 760 : 470;
+    g.fillStyle = '#fff'; roundRect(g, x - 34, y - 34, size + 68, size + 68, 44); g.fill();
+    g.imageSmoothingEnabled = false; g.drawImage(img, x, y, size, size);
+    g.fillStyle = '#1C1917'; g.font = '700 ' + (story ? 40 : 34) + 'px Helvetica, Arial, sans-serif';
+    g.fillText('Scannez, répondez, cumulez des points.', W / 2, y + size + (story ? 130 : 105));
+    c.toBlob(b => {
+      const url = URL.createObjectURL(b), a = document.createElement('a');
+      a.href = url; a.download = `noova-visuel-${story ? 'story' : 'carre'}.png`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }, 'image/png');
+  };
+  img.src = qr.createDataURL(10, 0);
+}
+// Pré-remplissage depuis le répertoire officiel des entreprises (gratuit, sans clé) :
+// le commerçant corrige ensuite ; une erreur réseau n'empêche jamais l'inscription.
+let _siretLooked = '';
+async function awLookupSiret() {
+  const siret = document.getElementById('aw-siret').value.replace(/\s+/g, '');
+  const note = document.getElementById('aw-siret-note');
+  if(!siretValid(siret) || siret === _siretLooked) return;
+  _siretLooked = siret;
+  note.style.display = 'block'; note.textContent = "Recherche de l'établissement…";
+  try {
+    const d = await (await fetch('https://recherche-entreprises.api.gouv.fr/search?per_page=1&q=' + siret)).json();
+    const e = d.results && d.results[0];
+    if(!e) { note.textContent = 'SIRET introuvable dans le répertoire officiel : vérifie-le.'; return; }
+    const et = (e.matching_etablissements && e.matching_etablissements[0]) || e.siege || {};
+    const fill = (id, v) => { const el = document.getElementById(id); if(el && !el.value.trim() && v) el.value = v; };
+    fill('aw-brand', et.nom_commercial || e.nom_complet);
+    fill('aw-address', et.adresse);
+    const com = et.libelle_commune || (e.siege && e.siege.libelle_commune);
+    fill('aw-city', com ? com.charAt(0) + com.slice(1).toLowerCase() : '');
+    note.textContent = 'Établissement trouvé : ' + (e.nom_complet || '') + '. Vérifie les champs préremplis.';
+  } catch(err) { note.style.display = 'none'; }
 }
 
 // ═══ RÉSULTATS : seuil d'anonymat et export CSV ═══
