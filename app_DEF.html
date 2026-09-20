@@ -45,7 +45,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Données structurées JSON-LD -->
 <script type="application/ld+json">
@@ -67,8 +67,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <!-- Leaflet — carte "commerces près de toi" (OpenStreetMap, gratuit, sans clé API) -->
@@ -321,7 +319,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .q-prev{font-size:12px;color:var(--ink2);line-height:1.4}
 .q-meta{display:flex;gap:6px;margin-top:5px}
 .q-pts-t{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--vd);color:var(--violet)}
-.q-type-t{font-size:10px;font-weight:600;color:var(--ink3);padding:2px 7px;border-radius:99px;background:var(--bg2)}
+.q-type-t{font-size:10px;font-weight:600;color:var(--ink2);padding:2px 7px;border-radius:99px;background:rgba(24,20,16,.08)}
 /* QUESTION */
 .qw{padding:52px 20px 22px;min-height:100%;display:flex;flex-direction:column}
 .q-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
@@ -929,7 +927,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dprof-av{width:56px;height:56px;border-radius:50%;background:rgba(28,25,23,.88);border:2.5px solid rgba(255,255,255,.5);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:21px;color:var(--nv-yellow);position:relative;overflow:hidden;cursor:pointer}
 .dprof-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .dprof-av-edit{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;background:rgba(28,25,23,.92);color:var(--nv-yellow);border:2px solid var(--nv-yellow);display:flex;align-items:center;justify-content:center;z-index:2}
-.dprof-city{font-size:12.5px;color:rgba(24,20,16,.7);margin-bottom:5px}
+.dprof-city{font-family:var(--fd);font-weight:800;font-size:21px;letter-spacing:-.5px;color:var(--ink);margin-bottom:5px}
 .dprof-lvl{display:inline-block;font-size:10.5px;font-weight:700;background:rgba(24,20,16,.12);color:var(--nv-yellow-ink);padding:4px 10px;border-radius:99px}
 .dprof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:-18px 18px 14px;position:relative;z-index:2}
 .dprof-stat{background:var(--card);border-radius:16px;padding:12px 6px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.08)}
@@ -1165,11 +1163,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="dstreak-card">
       <div class="dstreak-top">
         <div class="dstreak-fire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 2c1 3-2 4-2 7a2 2 0 004 0c1 1 2 2.5 2 4.5A5.5 5.5 0 016.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0012 22a8 8 0 007-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg></div>
-        <div style="flex:1"><div class="dstreak-title"><span id="streak-num">1</span> jour(s) d'affilée</div><div class="dstreak-sub" id="streak-sub">Continue pour débloquer un bonus</div></div>
+        <div style="flex:1"><div class="dstreak-title" id="streak-title">Lance ta série aujourd'hui</div><div class="dstreak-sub" id="streak-sub">Continue pour débloquer un bonus</div></div>
       </div>
       <div class="dstreak-dots" id="streak-dots"></div>
     </div>
-    <div class="sec-lbl">En attente</div>
+    <div class="sec-lbl">À répondre</div>
     <div class="q-list" id="queue-list"></div>
     <div style="height:6px"></div>
     <div id="dpat-wrap"></div>
@@ -1296,7 +1294,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div id="dcode-wrap"></div>
     <div class="noov-card">
       <div class="noov-ico">N</div>
-      <div style="flex:1;min-width:0"><div class="noov-t"><span id="noov-num">0</span> NOOVS</div><div class="noov-d">Tes réponses au-delà des 3 du jour rapportent des NOOVS, la monnaie de NOOVA. Bientôt : concours, retrait des pubs, cash et bons cadeaux.</div></div>
+      <div style="flex:1;min-width:0"><div class="noov-t"><span id="noov-num">0</span> NOOVS</div><div class="noov-d">Tes réponses au-delà des 3 du jour rapportent des NOOVS, la monnaie de NOOVA. Bientôt : bons chez les commerçants, retrait des pubs, concours et, plus tard, cash.</div></div>
     </div>
     <!-- Solde détaillé + progression de palier — conservés pour le calcul, visuels sur le Profil -->
     <div class="wallet-card" style="display:none">
@@ -1630,6 +1628,7 @@ async function changeMyAvatar(file){
   const avEl = document.getElementById('prof-av');
   try {
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    await loadFirebaseSdk('storage');                   // chargé à la demande (rarement utilisé)
     const ref = firebase.storage().ref().child(`users/${uid}/avatar.${ext}`);
     await ref.put(file);
     const url = await ref.getDownloadURL();
@@ -1868,9 +1867,9 @@ function refreshHome(){
   const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour':hr<18?'Bon après-midi':'Bonsoir';
   document.getElementById('home-name').textContent=S.user.name;animateNumber(document.getElementById('home-pts'),S.pts);
   {const av=document.getElementById('home-av');const n=S.user.name||'?';const c=AVC[n.charCodeAt(0)%AVC.length];av.style.background=c+'22';av.style.color=c;renderUserAvatar(av,document.getElementById('home-av-letter'),n,S.user.photoUrl);}
-  document.getElementById('streak-num').textContent=S.streak;
+  {const st=document.getElementById('streak-title');if(st)st.innerHTML=S.streak>0?`<span id="streak-num">${S.streak}</span> jour${S.streak>1?'s':''} d'affilée`:'Lance ta série aujourd\'hui';}
   const streakSub=document.getElementById('streak-sub');
-  if(streakSub) streakSub.textContent = S.streak>=10 ? 'Bonus débloqué !' : `Encore ${10-S.streak} jour${10-S.streak>1?'s':''} pour +50 pts bonus`;
+  if(streakSub) streakSub.textContent = S.streak>=10 ? 'Bonus débloqué !' : S.streak===0 ? 'Réponds chaque jour : +50 pts bonus au bout de 10 jours' : `Encore ${10-S.streak} jour${10-S.streak>1?'s':''} pour +50 pts bonus`;
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<10;i++){const d=document.createElement('div');d.className='dstreak-dot'+(i<S.streak?' on':'');sd.appendChild(d)}
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector(':scope > img');
@@ -1930,6 +1929,8 @@ function renderQueue(){
     if(cnt%3===0){const sc=buildSocialCard();if(sc)el.appendChild(sc);}
   });
 }
+// Consigne courte selon le format de la question (au lieu d'un « Donne ton avis » générique).
+function defaultHint(type){return {mcq:'Choisis la réponse qui te ressemble.',text:'Écris ce que tu en penses, en une ou deux phrases.',scale:'Place le curseur là où tu te situes.',rank:'Classe du plus au moins important.'}[type]||'';}
 function openQ(idx){
   S.qIdx=idx;S.curQ=S.qs[idx];if(!S.curQ)return;const q=S.curQ;
   const pg=document.getElementById('q-prog');pg.innerHTML='';
@@ -1937,7 +1938,7 @@ function openQ(idx){
   setQPtsTag(q);
   {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||'Ta réponse aidera '+q.brand+'.';
-  document.getElementById('bh-tag').textContent=q.theme;document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint;
+  document.getElementById('bh-tag').textContent=q.theme;document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||defaultHint(q.type);
   document.getElementById('sub-btn').disabled=true;buildAns(q);goTo('question');
 }
 function buildAns(q){
@@ -2554,7 +2555,8 @@ function renderRanking(){
   el.innerHTML='';
   const others=all.filter((u,i)=>!u.me && i>=podiumCount);
   if(!others.length){
-    el.innerHTML=all.length>1?'':'<div style="text-align:center;padding:24px 16px;color:var(--ink3);font-size:13px;line-height:1.6">Invite des amis pour voir un classement !</div>';
+    // Tout le monde tient sur le podium : plutôt qu'une zone vide sous « Classement », une invitation à élargir la course.
+    el.innerHTML='<div style="text-align:center;padding:22px 16px;color:var(--ink2);font-size:13px;line-height:1.6">'+(all.length>1?'Tout le monde est sur le podium. Invite d\'autres amis pour agrandir la course !':'Invite des amis pour voir un classement !')+'<br><button onclick="shareInvite()" style="margin-top:12px;padding:10px 20px;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12.5px;border:none;border-radius:99px;cursor:pointer">Inviter un ami</button></div>';
     return;
   }
   others.forEach((u,i)=>{
@@ -3011,7 +3013,7 @@ function refreshProfile(){
   refreshNotifSettingsUI();
   {const si=document.getElementById('share-answers-inp');if(si)si.checked=S._shareAnswers!==false;}
   renderPredCard();
-  document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.email||S._city||'';
+  document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.name||S.user.email||S._city||'';
   document.getElementById('s-pts').textContent=S.pts;document.getElementById('s-ans').textContent=S.ans;document.getElementById('s-str').textContent=S.streak;
   const friendsEl=document.getElementById('s-friends');if(friendsEl)friendsEl.textContent=(S.friends||[]).length;
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(2,((S.xp-l.min)/(l.max-l.min))*100));
@@ -3073,7 +3075,7 @@ function fillQuestion(q,opts){
   document.getElementById('bh-name').textContent=q.brand;
   document.getElementById('bh-usage').textContent=q.usage||('Ta réponse aide '+q.brand+'.');
   document.getElementById('bh-tag').textContent=q.theme||'';
-  document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||'';
+  document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||defaultHint(q.type);
   const sk=document.getElementById('skip-btn');if(sk){sk.textContent=opts.skipLabel;sk.setAttribute('onclick',opts.skipFn);}
   document.getElementById('sub-btn').disabled=true;buildAns(q);
 }
@@ -3284,7 +3286,7 @@ function startCampaignById(campId) {
   db.collection('campaigns').doc(campId).get().then(doc=>{
     if(!doc.exists)return;
     const d=doc.data();
-    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:d.pointsPerAnswer||20,type:d.format||'text',q:d.question,hint:'Donne ton avis',opts:d.options||[],items:d.options||[],usage:(d.merchantName||'Ce commerce')+' veut ton avis'};
+    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:d.pointsPerAnswer||20,type:d.format||'text',q:d.question,hint:'',opts:d.options||[],items:d.options||[],usage:(d.merchantName||'Ce commerce')+' veut ton avis'};
     S.mode='hook';S.curQ=q;
     const pg=document.getElementById('q-prog');pg.innerHTML='';
     const seg=document.createElement('div');seg.className='q-seg cur';pg.appendChild(seg);
@@ -3757,10 +3759,28 @@ const fx  = firebase.app().functions('europe-west1');
 // Analytics : peut échouer silencieusement (bloqueur de pub, ITP Safari...) sans jamais
 // casser l'app — trackEvent() encapsule cette tolérance pour tous les appels du fichier.
 let analytics = null;
-try { analytics = firebase.analytics(); } catch(e) { console.warn('analytics init:', e); }
-function trackEvent(name, params) {
-  try { if(analytics) analytics.logEvent(name, params||{}); } catch(e) {}
+const _trackQueue = [];
+// Bibliothèques Firebase non indispensables au premier affichage : chargées à la demande / après le chargement.
+function loadFirebaseSdk(name) {
+  window._sdk = window._sdk || {};
+  if(!window._sdk[name]) window._sdk[name] = new Promise((res, rej) => {
+    const el = document.createElement('script');
+    el.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-' + name + '-compat.js';
+    el.onload = res; el.onerror = () => { delete window._sdk[name]; rej(new Error('SDK ' + name)); };
+    document.head.appendChild(el);
+  });
+  return window._sdk[name];
 }
+function trackEvent(name, params) {
+  try { if(analytics) analytics.logEvent(name, params||{}); else if(_trackQueue.length < 50) _trackQueue.push([name, params]); } catch(e) {}
+}
+(function initAnalyticsLater() {
+  const go = () => loadFirebaseSdk('analytics').then(() => {
+    try { analytics = firebase.analytics(); } catch(e) { console.warn('analytics init:', e); return; }
+    _trackQueue.splice(0).forEach(([n, p]) => { try { analytics.logEvent(n, p || {}); } catch(e) {} });
+  }).catch(() => {});
+  if(document.readyState === 'complete') setTimeout(go, 1500); else addEventListener('load', () => setTimeout(go, 1500));
+})();
 
 // ─── Notifications push (FCM) ───────────────────────────────
 // Sur iPhone, les notifications web n'existent qu'à partir d'iOS 16.4+ ET seulement
@@ -3893,8 +3913,11 @@ function startAnswerLock(){
   if(!bar || !btn) return;
   bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on');
   btn.classList.add('locked');
+  const LOCK_LABEL = 'Prends le temps de lire…';
+  if(!/Prends le temps/.test(btn.textContent)) btn.dataset.label = btn.textContent;
+  btn.textContent = LOCK_LABEL;
   clearTimeout(S._qLockTimer);
-  S._qLockTimer = setTimeout(() => { btn.classList.remove('locked'); bar.classList.remove('on'); }, ANSWER_LOCK_MS);
+  S._qLockTimer = setTimeout(() => { btn.classList.remove('locked'); bar.classList.remove('on'); if(btn.textContent === LOCK_LABEL) btn.textContent = btn.dataset.label || 'Valider →'; }, ANSWER_LOCK_MS);
 }
 function beginQuestionOnServer(q){
   S._qBegin = null;
@@ -4483,7 +4506,7 @@ function renderFeaturedReward(){
   if(!all.length){ wrap.innerHTML=''; if(labelEl) labelEl.innerHTML=''; S._featuredRewardId=null; return; }
   const redeemable = all.filter(r => (r.cost||0) <= S.pts).sort((a,b)=>(b.cost||0)-(a.cost||0));
   if(labelEl) labelEl.innerHTML = redeemable.length
-    ? '🎉 Disponible maintenant'
+    ? icon('gift-generic',{size:18})+' Disponible maintenant'
     : 'Ta prochaine récompense';
   if(redeemable.length){
     const r = redeemable[0];
@@ -5389,7 +5412,7 @@ function recomputeCampaignFeed(city) {
         theme: d.sector || 'Commerce local', pts: SCALE[idx + 1] || 20,
         type: sq.format || 'text', q: sq.q, hint: '',
         opts: sq.options || [], items: sq.options || [],
-        usage: (d.merchantName || 'Ce commerce') + ' veut ton avis'
+        usage: 'Ta réponse aide ' + (d.merchantName || 'ce commerce')
       }));
       campaigns.push({
         _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: 0,
@@ -5398,9 +5421,9 @@ function recomputeCampaignFeed(city) {
         photoUrl: merchantData.coverUrl || null, logoUrl: merchantData.logoUrl || null,
         theme: d.sector || 'Commerce local', pts: 10,
         type: allQs[0].format || d.format || 'text',
-        q: allQs[0].q || d.question, hint: 'Donne ton avis',
+        q: allQs[0].q || d.question, hint: '',
         opts: allQs[0].options || d.options || [], items: allQs[0].options || d.options || [],
-        usage: (d.merchantName || 'Ce commerce') + ' veut ton avis',
+        usage: 'Ta réponse aide ' + (d.merchantName || 'ce commerce'),
         survey: surveyList
       });
     });
