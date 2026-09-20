@@ -1,3 +1,5 @@
+> ⚠ **Document historique** (août 2026) : certaines parties (abonnements, plans, facturation) ne correspondent plus au produit. Voir `docs/README.md`.
+
 # NOOVA — Brief technique pour Claude Code
 
 > **Comment utiliser ce fichier :** place-le à la racine de ton repo, ouvre Claude Code dans VS Code et écris :

@@ -1,3 +1,5 @@
+> ⚠ **Document historique** (août 2026). Le barème et l'économie actuels (3 réponses en points par jour, NOOVS ensuite, quotas, plafonds) sont dans `functions/engagementConfig.js` ; le modèle commercial (pas d'abonnement, quota mensuel offert par la ville) est décrit dans `SECURITE.md` et `docs/README.md`.
+
 # NOOVA — Système de points & récompenses (à rendre FONCTIONNEL)
 
 > **Pour Claude Code.** Ce fichier **complète** `NOOVA_SPEC.md` (même stack, même arborescence, même approche Firestore/règles de sécurité). Lis d'abord `NOOVA_SPEC.md`, puis implémente ce système de points **dans l'app utilisateur ET dans le dashboard commerçant**. On n'est plus en démo : **aucune fausse donnée**, tout passe par Firestore. **Ne change pas le design** (voir la capture de l'écran Récompenses qui existe déjà), tu ne fais que le brancher sur les bonnes valeurs.

@@ -1,8 +1,15 @@
 {
+  "redirects": [
+    {
+      "source": "/demo",
+      "destination": "/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/app",
-      "destination": "/app.html"
+      "destination": "/app_DEF.html"
     },
     {
       "source": "/app-v2",
@@ -11,10 +18,6 @@
     {
       "source": "/dashboard",
       "destination": "/noova_dashboard.html"
-    },
-    {
-      "source": "/demo",
-      "destination": "/noova_dashboard_v2.html"
     }
   ],
   "headers": [
