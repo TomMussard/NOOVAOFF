@@ -5508,10 +5508,14 @@ submitAns = function() {
   const q = curQuestion();
   if(!q || S._submitting) return;
   if(Date.now() < (S._qLockUntil || 0)) return; // délai de lecture de 3 s
-  if(q._firestoreId && (S._answered||[]).includes(q._firestoreId)) return; // déjà répondu, coupe court
+  const qIdx = q._questionIdx || 0;
+  // « Déjà répondu » se juge PAR QUESTION : avant, la campagne entière était marquée dès la question 1, ce qui rendait
+  // les questions 2 et 3 impossibles à valider.
+  const qKey = q._firestoreId + '#' + qIdx;
+  S._answeredQ = S._answeredQ || [];
+  if(q._firestoreId && (S._answeredQ.includes(qKey) || (qIdx === 0 && (S._answered||[]).includes(q._firestoreId)))) return;
 
   const answerValue = getAnswerValue();
-  const qIdx = q._questionIdx || 0;
 
   if(!q._firestoreId) { _origSubmitAns(); return; } // question locale sans campagne réelle (aucun cas connu), pas de crédit serveur possible
 
@@ -5525,6 +5529,7 @@ submitAns = function() {
       // Marque la campagne répondue localement AVANT d'afficher l'écran de récompense :
       // même sans recharger l'app, elle n'est plus proposable (fiche commerce, file du jour…).
       S._answered = S._answered || [];
+      S._answeredQ.push(qKey);
       if(qIdx === 0) S._answered.push(q._firestoreId);
       S.streak = typeof data.streak === 'number' ? data.streak : S.streak;
 
@@ -5584,12 +5589,15 @@ submitAns = function() {
       alert(msg);
       if(e && e.code === 'already-exists' && q._firestoreId) {
         S._answered = S._answered || [];
-        if(!S._answered.includes(q._firestoreId)) S._answered.push(q._firestoreId);
+        if(!S._answeredQ.includes(qKey)) S._answeredQ.push(qKey);
+        if(qIdx === 0 && !S._answered.includes(q._firestoreId)) S._answered.push(q._firestoreId);
       }
     })
     .finally(() => {
       S._submitting = false;
-      if(btn) btn.disabled = false;
+      // Ne réactive « Valider » que si on est toujours sur la même question (échec) : sinon la question suivante vient
+      // d'être affichée, avec son propre état (bouton inactif tant qu'aucune réponse n'est choisie).
+      if(btn && curQuestion() === q) btn.disabled = false;
     });
 };
 

@@ -111,6 +111,18 @@ exports.submitAnswer = onCall(async (request) => {
     if (ageRanges.length && userAge && !ageRanges.includes(userAge)) {
       throw new HttpsError("permission-denied", "Cette campagne ne cible pas ta tranche d'âge.");
     }
+    // Réponse valide pour le format de la question (jamais confiance au client : réponse vide ou hors liste refusée).
+    {
+      const qd = campaignQuestions(camp)[qIdx] || {};
+      const val = answerValue == null ? "" : String(answerValue);
+      const opts = Array.isArray(qd.options) ? qd.options.map(String) : [];
+      let ok = true;
+      if (qd.format === "mcq") ok = opts.includes(val);
+      else if (qd.format === "scale") ok = /^([1-9]|10)$/.test(val);
+      else if (qd.format === "rank") { const parts = val.split(" > "); ok = parts.length === opts.length && [...parts].sort().join("\u0000") === [...opts].sort().join("\u0000"); }
+      else if (qd.format === "text") ok = val.trim().length >= 5;
+      if (!ok) throw new HttpsError("invalid-argument", "Réponse invalide pour cette question.");
+    }
     const targetVolume = Number(camp.targetVolume ?? camp.volumeTarget ?? 100) || 100;
     const currentVolume = camp.answersCount || camp.responsesCount || 0;
     if (currentVolume >= targetVolume) {
