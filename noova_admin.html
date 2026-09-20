@@ -576,7 +576,12 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+<script>
+// App Check (anti-abus) : inactif tant que cette clé reCAPTCHA v3 est vide (voir SECURITE.md). Quand elle est renseignée,
+// la bibliothèque est chargée ici, de façon synchrone, avant toute requête.
+var APP_CHECK_SITE_KEY = '';
+if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"><\/script>');
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
@@ -592,8 +597,7 @@ const app = firebase.initializeApp({
   messagingSenderId: "710589257687",
   appId: "1:710589257687:web:946b5d1efffabff14d9d92"
 });
-// App Check (protection anti-abus) : inactif tant qu'aucune clé reCAPTCHA v3 n'est renseignée ici.
-const APP_CHECK_SITE_KEY = '';
+// App Check : activé si la clé est renseignée (déclarée plus haut, avant les bibliothèques).
 if (APP_CHECK_SITE_KEY) { try { firebase.appCheck().activate(APP_CHECK_SITE_KEY, true); } catch (e) { console.warn('AppCheck:', e); } }
 const auth = firebase.auth();
 const db = firebase.firestore();

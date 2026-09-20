@@ -46,6 +46,7 @@ const ADMIN='http://localhost:8950/admin.html';
     await wf(p,()=>typeof firebase.analytics==='function',null,15000);
     check('Statistiques chargées après le démarrage, événements mis en file puis envoyés',await p.evaluate(()=>typeof analytics!=='undefined'&&analytics!==null&&_trackQueue.length===0));
     check('Photo de profil : la bibliothèque de stockage se charge à la demande',await p.evaluate(async()=>{await loadFirebaseSdk('storage');return typeof firebase.storage==='function';}));
+    check('Police auto-hébergée : aucune requête vers Google Fonts, la police est bien appliquée',await p.evaluate(async()=>{await document.fonts.ready;const f=[...document.fonts].filter(x=>x.family.replace(/["']/g,'')==='Plus Jakarta Sans'&&x.status==='loaded').length;return f>=1&&!document.querySelector('link[href*="fonts.googleapis"]')&&getComputedStyle(document.body).fontFamily.includes('Jakarta');}));
     // accueil
     const h=await p.evaluate(()=>({sec:[...document.querySelectorAll('#home .sec-lbl')].map(e=>e.textContent),streak:document.getElementById('streak-title').textContent,sub:document.getElementById('streak-sub').textContent}));
     check('Accueil : section « À répondre » (plus « En attente »)',h.sec.includes('À répondre')&&!h.sec.includes('En attente'),h.sec);
@@ -73,6 +74,7 @@ const ADMIN='http://localhost:8950/admin.html';
     const rk=await p.$eval('#ranking-list',e=>e.textContent);
     check('Classement : quand tout le monde est sur le podium, une invitation remplace la zone vide',/Tout le monde est sur le podium/.test(rk)&&/Inviter un ami/.test(rk),rk);
     await p.evaluate(()=>{goNav('profile');refreshProfile();});await sleep(500);
+    check('Carte : Leaflet absent au démarrage, chargé à la première ouverture de la carte',await p.evaluate(async()=>{const before=typeof window.L;const had=!!document.querySelector('script[src*="leaflet"]');await loadLeaflet();return before==='undefined'&&!had&&typeof L==='object'&&typeof L.map==='function';}));
     const pr=await p.$eval('#prof-email',e=>e.textContent);
     check('Profil : le prénom s\'affiche (plus l\'adresse e-mail)',pr==='Alex Martin',pr);
     await p.screenshot({path:'/tmp/shots/polish_profile.png'});

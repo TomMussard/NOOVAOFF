@@ -1,0 +1,1 @@
+Plus Jakarta Sans (police variable, sous-ensembles latin et latin-ext), © The Plus Jakarta Sans Project Authors, licence SIL Open Font License 1.1 (https://openfontlicense.org). Auto-hébergée pour ne plus dépendre de Google Fonts au démarrage.

@@ -9,7 +9,7 @@
 ### App Check (bloque les appels qui ne viennent pas de l'app)
 1. https://www.google.com/recaptcha/admin : créer une clé reCAPTCHA **v3** pour le domaine `noovaoff.fr` (et `www.`).
 2. Console Firebase > App Check > applications > enregistrer l'app web avec cette clé (secret).
-3. Coller la clé publique dans `APP_CHECK_SITE_KEY` des trois pages (`app_DEF.html`, `noova_dashboard.html`, `noova_admin.html`), pousser.
+3. Coller la clé publique dans `APP_CHECK_SITE_KEY` (variable en tête de chaque page, avant les bibliothèques Firebase) des trois pages (`app_DEF.html`, `noova_dashboard.html`, `noova_admin.html`), pousser.
 4. Attendre 1 à 2 jours : Console > App Check > Metrics doit montrer ~100 % de requêtes « vérifiées » (Firestore, Functions, Storage).
 5. Puis activer l'application (« Enforce ») pour Firestore et Storage dans la console, et passer `ENFORCE_APP_CHECK = true` dans `functions/index.js`, déployer les fonctions.
 > Ne PAS activer l'application avant l'étape 4 : les utilisateurs dont la page est encore en cache seraient bloqués.

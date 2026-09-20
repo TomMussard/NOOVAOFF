@@ -13,6 +13,7 @@ function buildSite() {
   fs.mkdirSync(SITE, { recursive: true });
   fs.readdirSync(ROOT).filter((f) => /\.(png|svg)$/.test(f)).concat(["icons.js", "firebase-messaging-sw.js", "manifest.json"])
     .forEach((f) => fs.copyFileSync(path.join(ROOT, f), path.join(SITE, f)));
+  fs.cpSync(path.join(ROOT, "fonts"), path.join(SITE, "fonts"), { recursive: true });
   const emu = "auth.useEmulator('http://127.0.0.1:9099');db.useEmulator('127.0.0.1',8080);fx.useEmulator('127.0.0.1',5001);";
   const emuAdmin = "\nauth.useEmulator('http://127.0.0.1:9099');db.useEmulator('127.0.0.1',8080);";
   [["app_DEF.html", "app.html", "const fx  = firebase.app().functions('europe-west1');", emu],
@@ -28,20 +29,23 @@ function buildSite() {
 }
 
 function serve(port) {
-  const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".png": "image/png", ".svg": "image/svg+xml", ".json": "application/json" };
+  const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".png": "image/png", ".svg": "image/svg+xml", ".json": "application/json", ".woff2": "font/woff2" };
   return new Promise((resolve) => {
     const srv = http.createServer((req, res) => {
       const f = path.join(SITE, decodeURIComponent(req.url.split("?")[0]).replace(/\.\./g, ""));
       fs.readFile(f, (e, data) => {
         if (e) { res.writeHead(404); return res.end("not found"); }
-        res.writeHead(200, { "Content-Type": types[path.extname(f)] || "application/octet-stream", "Cache-Control": "no-store" });
+        const h = { "Content-Type": types[path.extname(f)] || "application/octet-stream", "Cache-Control": "no-store" };
+        // Comme l'hébergement réel : compression Brotli des pages et scripts.
+        if (/\.(html|js|json|svg)$/.test(f) && /\bbr\b/.test(req.headers["accept-encoding"] || "")) { h["Content-Encoding"] = "br"; res.writeHead(200, h); return res.end(require("zlib").brotliCompressSync(data)); }
+        res.writeHead(200, h);
         res.end(data);
       });
     }).listen(port, () => resolve(srv));
   });
 }
 
-const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "eng8", "eng9", "eng10", "notif_server", "notif_ui", "mobile_audit", "a11y_audit", "tour_audit"];
+const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "eng8", "eng9", "eng10", "notif_server", "notif_ui", "mobile_audit", "a11y_audit", "tour_audit", "perf_audit"];
 
 function runSuite(name) {
   return new Promise((resolve) => {

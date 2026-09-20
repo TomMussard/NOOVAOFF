@@ -43,9 +43,15 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0F0D12">
 <link rel="manifest" href="manifest.json">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<!-- Police auto-hébergée (Plus Jakarta Sans, licence SIL OFL, police variable) : plus de feuille de style externe bloquant l'affichage -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/plus-jakarta-sans-latin.woff2" crossorigin>
+<style>
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:400 800;font-display:swap;src:url(/fonts/plus-jakarta-sans-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:400 800;font-display:swap;src:url(/fonts/plus-jakarta-sans-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+</style>
 
 <!-- Données structurées JSON-LD -->
 <script type="application/ld+json">
@@ -64,14 +70,17 @@
 </script>
 <!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+<script>
+// App Check (anti-abus) : inactif tant que cette clé reCAPTCHA v3 est vide (voir SECURITE.md). Quand elle est renseignée,
+// la bibliothèque est chargée ici, de façon synchrone, avant toute requête.
+var APP_CHECK_SITE_KEY = '';
+if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"><\/script>');
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-<!-- Leaflet — carte "commerces près de toi" (OpenStreetMap, gratuit, sans clé API) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<!-- Leaflet (carte) : chargé à la demande, à la première ouverture de la carte (voir loadLeaflet) -->
 <style>
 :root{
   /* Palette "NOOVA_DESIGN" : crème + noir + jaune plat, alignée sur la
@@ -3582,6 +3591,23 @@ function mapFit(){
   if(_mapSt.loc)pts.push([_mapSt.loc.lat,_mapSt.loc.lng]);
   if(pts.length)_fullMap.fitBounds(pts,{padding:[50,50],maxZoom:16});
 }
+// Leaflet (carte) n'est chargé qu'à la première ouverture de la carte : il bloquait le démarrage de toute l'app.
+function loadLeaflet(){
+  if(window.L) return Promise.resolve();
+  if(window._leafletP) return window._leafletP;
+  window._leafletP = new Promise((res, rej) => {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='; css.crossOrigin = '';
+    document.head.appendChild(css);
+    const js = document.createElement('script');
+    js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    js.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='; js.crossOrigin = '';
+    js.onload = res; js.onerror = () => { window._leafletP = null; rej(new Error('leaflet')); };
+    document.head.appendChild(js);
+  });
+  return window._leafletP;
+}
 async function openFullMap(){
   goTo('map-full');
   const screen=document.getElementById('map-full');screen.classList.remove('collapsed');
@@ -3590,6 +3616,7 @@ async function openFullMap(){
   _mapSt.list=mapMerchants();_mapSt.filter='all';_mapSt.sel=null;_mapSt.markers={};
   mapRenderFilters();mapRenderList();
   const nomap=document.getElementById('mf-nomap');
+  if(typeof L==='undefined'){ try{ await loadLeaflet(); }catch(e){} if(token!==_mapSt.token) return; }
   if(typeof L==='undefined'){
     nomap.style.display='flex';nomap.textContent='La carte est indisponible hors connexion. La liste des commerces reste consultable ci-dessous.';
     return;
@@ -3750,8 +3777,7 @@ const firebaseConfig = {
   measurementId: "G-3E6ZPKLY64"
 };
 firebase.initializeApp(firebaseConfig);
-// App Check (protection anti-abus) : inactif tant qu'aucune clé reCAPTCHA v3 n'est renseignée ici.
-const APP_CHECK_SITE_KEY = '';
+// App Check : activé si la clé est renseignée (déclarée plus haut, avant les bibliothèques).
 if (APP_CHECK_SITE_KEY) { try { firebase.appCheck().activate(APP_CHECK_SITE_KEY, true); } catch (e) { console.warn('AppCheck:', e); } }
 const auth = firebase.auth();
 const db = firebase.firestore();
