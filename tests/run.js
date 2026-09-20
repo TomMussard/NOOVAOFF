@@ -41,7 +41,7 @@ function serve(port) {
   });
 }
 
-const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "notif_server", "notif_ui", "mobile_audit"];
+const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "notif_server", "notif_ui", "mobile_audit", "a11y_audit"];
 
 function runSuite(name) {
   return new Promise((resolve) => {
@@ -70,7 +70,8 @@ function runSuite(name) {
     const r = await runSuite(s);
     results.push(r);
     console.log(`${r.fail || r.code ? "✗" : "✓"} ${s.padEnd(14)} ${r.pass} ok, ${r.fail} échec(s)  (${Math.round((Date.now() - t0) / 1000)} s)`);
-    if (r.fail || r.code) console.log(r.out.split("\n").filter((l) => l.startsWith("FAIL") || /Error|exception/i.test(l)).slice(0, 12).map((l) => "    " + l.slice(0, 300)).join("\n") || r.out.slice(-800));
+    if (process.env.VERBOSE) console.log(r.out);
+    else if (r.fail || r.code) console.log(r.out.split("\n").filter((l) => l.startsWith("FAIL") || /Error|exception/i.test(l)).slice(0, 12).map((l) => "    " + l.slice(0, 300)).join("\n") || r.out.slice(-800));
   }
   srv.close();
   const bad = results.filter((r) => r.fail || r.code || !r.pass);

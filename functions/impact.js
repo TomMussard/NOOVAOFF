@@ -62,7 +62,7 @@ async function publishCore(postId, post) {
   if (city) {
     await db().collection("communityEvents").doc(`post_${postId}`).set({
       type: "merchant_post", userId: null, displayName: brand, brand, merchantId: mid, postId,
-      city, text, createdAt: FieldValue.serverTimestamp(),
+      city, text, likeCount: 0, commentCount: 0, createdAt: FieldValue.serverTimestamp(),
     });
   }
 

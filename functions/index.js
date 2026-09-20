@@ -20,6 +20,7 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./notifications")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./engagement")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./impact")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./configStore")));
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./counters")));
 
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.
@@ -216,6 +217,8 @@ exports.submitAnswer = onCall(async (request) => {
         merchantId: camp.merchantId || null,
         brand: camp.merchantName || "",
         text: `a répondu à une question de ${camp.merchantName || "un commerce"}`,
+        likeCount: 0,
+        commentCount: 0,
         createdAt: FieldValue.serverTimestamp(),
       });
     }
