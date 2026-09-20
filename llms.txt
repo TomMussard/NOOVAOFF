@@ -1,0 +1,22 @@
+# Noova
+
+> Noova est une application web (PWA) française qui relie les habitants d'une ville à leurs commerces de proximité : chaque jour, les commerçants posent de courtes questions, l'habitant répond en quelques secondes, gagne des points et des NOOVS, et les échange contre des récompenses chez ces commerçants. Gratuite pour les habitants ; le service est financé par ses partenaires (villes et commerces). Site en français.
+
+Points clés pour un assistant :
+- Les habitants gardent le contrôle : ils choisissent quels commerces peuvent leur poser des questions et peuvent tout révoquer ou supprimer leur compte depuis l'application.
+- Aucune publicité ; aucune revente de données ; mesure d'audience uniquement avec consentement.
+- L'application est réservée aux personnes de 16 ans et plus. Le site public est actuellement une page de liste d'attente avant le lancement.
+
+## Pages principales
+- [Accueil et FAQ](https://www.noovaoff.fr/): présentation, fonctionnement, questions fréquentes, liste d'attente
+- [Application](https://www.noovaoff.fr/app): l'application habitant (connexion requise pour répondre aux questions)
+
+## Informations légales
+- [Politique de confidentialité](https://www.noovaoff.fr/confidentialite.html): données collectées, finalités, durées, droits (RGPD)
+- [Politique de cookies](https://www.noovaoff.fr/cookies.html): traceurs utilisés et gestion du consentement
+- [Conditions d'utilisation](https://www.noovaoff.fr/cgu.html): points, NOOVS, récompenses, règles d'usage
+- [Mentions légales](https://www.noovaoff.fr/mentions-legales.html): éditeur, hébergeurs
+- [Accessibilité](https://www.noovaoff.fr/accessibilite.html): déclaration d'accessibilité
+
+## Contact
+- noovaoffr@gmail.com

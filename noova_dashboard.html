@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Noova Pro — Espace Commerçant">
 <meta property="og:description" content="Collectez des avis qualifiés de vos clients locaux et fidélisez votre clientèle avec Noova Pro.">
-<meta property="og:image" content="https://noova.fr/og-pro.jpg">
+<meta property="og:image" content="https://www.noovaoff.fr/icon-512.png">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Noova">
 
@@ -28,17 +28,15 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Noova Pro",
-  "url": "https://noova.fr",
+  "url": "https://www.noovaoff.fr/dashboard",
   "description": "Espace commerçant Noova — collectez des avis qualifiés de vos clients locaux et fidélisez votre clientèle.",
   "applicationCategory": "BusinessApplication",
   "inLanguage": "fr-FR",
-  "publisher": {"@type": "Organization","name": "Noova","url": "https://noova.fr"}
+  "publisher": {"@type": "Organization","name": "Noova","url": "https://www.noovaoff.fr/"}
 }
 </script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/noova-fonts.css">
 <!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script>
@@ -51,7 +49,7 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script defer src="/vendor/qrcode.min.js"></script>
 <style>
 :root {
   --bg: #F7F6F2;
@@ -62,11 +60,14 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
   --border: rgba(23,20,26,.08);
   --border2: rgba(23,20,26,.14);
   --ink: #17141A;
-  --ink2: rgba(23,20,26,.62);
+  --ink2: rgba(23,20,26,.72);
   --icon-gray: #6A6470;
-  --ink3: rgba(23,20,26,.42);
+  --ink3: rgba(23,20,26,.64);
   --ink4: rgba(23,20,26,.26);
   --coral: #f29715;
+  --coral-text: #8F5400;   /* texte accentué sur fond clair : contraste ≥ 4,5:1 (le --coral clair reste réservé aux fonds, bordures et grands éléments) */
+  --mint-text: #087355;
+  --red-text: #B91C1C;
   --cd: rgba(242,151,21,.12);
   --cg: rgba(242,151,21,.28);
   --violet: #A14E08;
@@ -123,7 +124,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .sb-logo-mark {
   width: 36px; height: 36px; border-radius: 10px;
   background: var(--coral); display: flex; align-items: center; justify-content: center;
-  font-family: var(--fd); font-weight: 800; font-size: 17px; color: #fff;
+  font-family: var(--fd); font-weight: 800; font-size: 17px; color:var(--ink);
   box-shadow: 0 6px 16px var(--cg); flex-shrink: 0;
 }
 .sb-logo-text { font-family: var(--fd); font-weight: 900; font-size: 17px; color: var(--ink); letter-spacing: -.5px; }
@@ -138,7 +139,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   justify-content: center; font-size: 18px; background: rgba(255,255,255,.06); flex-shrink: 0;
 }
 .sb-brand-name { font-size: 13px; font-weight: 700; color: var(--ink); }
-.sb-brand-plan { font-size: 10px; color: var(--coral); font-weight: 600; margin-top: 1px; }
+.sb-brand-plan { font-size: 10px; color: var(--coral-text); font-weight: 600; margin-top: 1px; }
 .sb-online { width: 7px; height: 7px; background: var(--mint); border-radius: 50%; margin-left: auto; flex-shrink: 0; }
 .sb-nav { flex: 1; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
 .sb-section { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink4); padding: 14px 10px 6px; }
@@ -149,7 +150,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   cursor: pointer; transition: all .15s; text-decoration: none; border: none; background: none; width: 100%; text-align: left;
 }
 .sb-item:hover { background: var(--card); color: var(--ink2); }
-.sb-item.active { background: var(--cd); color: var(--coral); font-weight: 700; }
+.sb-item.active { background: var(--cd); color: var(--coral-text); font-weight: 700; }
 .sb-item.active .sb-ico { background: var(--coral); }
 .sb-ico { width: 26px; height: 26px; border-radius: 8px; background: var(--icon-gray); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sb-ico svg { width: 15px; height: 15px; }
@@ -190,7 +191,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   font-size: 13px; font-weight: 700; cursor: pointer;
   border: none; transition: all .15s; font-family: var(--fd);
 }
-.tb-btn-primary { background: var(--coral); color: #fff; box-shadow: 0 4px 16px var(--cg); }
+.tb-btn-primary { background: var(--coral); color: var(--ink); box-shadow: 0 4px 16px var(--cg); }
 .tb-btn-primary:active { transform: scale(.97); }
 .tb-btn-ghost { background: var(--card); color: var(--ink2); border: 1.5px solid var(--border2); }
 .tb-btn-ghost:active { background: var(--bg3); }
@@ -214,13 +215,13 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .kpi-icon { width: 34px; height: 34px; border-radius: 10px; background: var(--icon-gray); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .kpi-icon svg { width: 18px; height: 18px; }
 .kpi-delta { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 99px; }
-.kpi-delta.up { background: rgba(11,171,132,.15); color: var(--mint); }
+.kpi-delta.up { background: rgba(11,171,132,.15); color: var(--mint-text); }
 .kpi-delta.dn { background: rgba(239,68,68,.12); color: #F87171; }
 .kpi-delta.neu { background: var(--ad); color: var(--amber); }
 .kpi-val { font-family: var(--fd); font-weight: 800; font-size: 30px; color: var(--ink); line-height: 1; letter-spacing: -1px; margin-bottom: 4px; }
 .kpi-lbl { font-size: 12px; color: var(--ink3); }
 .section-title { font-family: var(--fd); font-weight: 700; font-size: 17px; color: var(--ink); letter-spacing: -.4px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
-.st-action { font-size: 12px; font-weight: 700; color: var(--coral); cursor: pointer; background: none; border: none; font-family: var(--fb); }
+.st-action { font-size: 12px; font-weight: 700; color: var(--coral-text); cursor: pointer; background: none; border: none; font-family: var(--fb); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
 .grid-3 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
@@ -242,7 +243,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .camp-date { font-size: 11px; color: var(--ink3); margin-top: 2px; }
 .status-pill { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 9px; border-radius: 99px; display: inline-flex; align-items: center; gap: 5px; }
 .status-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
-.status-pill.live { background: rgba(11,171,132,.15); color: var(--mint); }
+.status-pill.live { background: rgba(11,171,132,.15); color: var(--mint-text); }
 .status-pill.live::before { background: var(--mint); }
 .status-pill.draft { background: rgba(245,166,35,.12); color: var(--amber); }
 .status-pill.draft::before { background: var(--amber); }
@@ -283,8 +284,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   transition: all .25s; border: 2px solid var(--border);
   background: var(--bg2); color: var(--ink3);
 }
-.wiz-step-btn.done .wiz-circle { background: var(--coral); border-color: var(--coral); color: #fff; box-shadow: 0 4px 14px var(--cg); }
-.wiz-step-btn.active .wiz-circle { background: var(--bg2); border-color: var(--coral); color: var(--coral); }
+.wiz-step-btn.done .wiz-circle { background: var(--coral); border-color: var(--coral); color:var(--ink); box-shadow: 0 4px 14px var(--cg); }
+.wiz-step-btn.active .wiz-circle { background: var(--bg2); border-color: var(--coral); color: var(--coral-text); }
 .wiz-step-lbl { font-size: 11px; font-weight: 600; color: var(--ink4); transition: color .25s; white-space: nowrap; }
 .wiz-step-btn.done .wiz-step-lbl,
 .wiz-step-btn.active .wiz-step-lbl { color: var(--ink2); }
@@ -324,7 +325,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   display: flex; align-items: center; gap: 6px;
 }
 .tmpl-chip:hover { border-color: var(--border2); color: var(--ink2); }
-.tmpl-chip.sel { border-color: var(--coral); background: var(--cd); color: var(--coral); }
+.tmpl-chip.sel { border-color: var(--coral); background: var(--cd); color: var(--coral-text); }
 /* Format selector */
 .fmt-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; }
 .fmt-card {
@@ -339,7 +340,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .fmt-card.sel .fmt-ico { background: var(--coral); }
 .fmt-name { font-size: 12px; font-weight: 700; color: var(--ink2); margin-bottom: 3px; }
 .fmt-desc { font-size: 10px; color: var(--ink3); line-height: 1.5; }
-.fmt-card.sel .fmt-name { color: var(--coral); }
+.fmt-card.sel .fmt-name { color: var(--coral-text); }
 /* MCQ builder */
 .mcq-option-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
 .mcq-opt-inp { flex: 1; padding: 10px 12px; background: var(--bg3); border: 1.5px solid var(--border); border-radius: var(--rx); color: var(--ink); font-size: 13px; outline: none; font-family: var(--fb); }
@@ -358,7 +359,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px;
 }
 .th-chip:hover { border-color: var(--border2); color: var(--ink2); }
-.th-chip.sel { border-color: var(--coral); background: var(--cd); color: var(--coral); }
+.th-chip.sel { border-color: var(--coral); background: var(--cd); color: var(--coral-text); }
 /* Age grid */
 .age-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .age-chip {
@@ -382,7 +383,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 /* Une question = un bloc : rédaction, format de réponse et options réunis */
 .qb { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; margin-bottom: 14px; }
 .qb-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.qb-num { font-family: var(--fd); font-weight: 800; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--coral); }
+.qb-num { font-family: var(--fd); font-weight: 800; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--coral-text); }
 .qb-remove { background: none; border: none; color: var(--ink3); font-size: 12px; cursor: pointer; padding: 4px 6px; font-family: var(--fb); }
 .qb-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--ink3); margin: 14px 0 7px; }
 .qb-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
@@ -403,7 +404,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .budget-amount { font-family: var(--fd); font-weight: 800; font-size: 36px; color: var(--ink); letter-spacing: -1.5px; }
 .budget-breakdown { font-size: 11px; color: var(--ink3); line-height: 2; }
 .budget-inc { background: var(--md); border: 1px solid rgba(11,171,132,.2); border-radius: var(--rs); padding: 13px 16px; margin-top: 13px; }
-.budget-inc-title { font-size: 12px; font-weight: 700; color: var(--mint); margin-bottom: 8px; }
+.budget-inc-title { font-size: 12px; font-weight: 700; color: var(--mint-text); margin-bottom: 8px; }
 .budget-inc-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink2); margin-bottom: 6px; }
 .budget-inc-item:last-child { margin-bottom: 0; }
 /* Recap */
@@ -411,7 +412,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .recap-item { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--rs); padding: 14px; }
 .recap-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ink4); margin-bottom: 5px; }
 .recap-val { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.5; }
-.recap-val.big { font-family: var(--fd); font-weight: 800; font-size: 20px; color: var(--coral); }
+.recap-val.big { font-family: var(--fd); font-weight: 800; font-size: 20px; color: var(--coral-text); }
 .risk-box {
   background: rgba(245,166,35,.07); border: 1px solid rgba(245,166,35,.2);
   border-radius: var(--rs); padding: 14px 16px; margin-bottom: 14px;
@@ -423,7 +424,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 /* Wizard actions */
 .wizard-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
 .wiz-btn-back { padding: 12px 20px; border-radius: var(--rs); background: var(--card); border: 1.5px solid var(--border2); color: var(--ink2); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .13s; font-family: var(--fb); }
-.wiz-btn-next { padding: 12px 24px; border-radius: var(--rs); background: var(--coral); border: none; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .13s; font-family: var(--fd); box-shadow: 0 5px 18px var(--cg); display: flex; align-items: center; gap: 7px; }
+.wiz-btn-next { padding: 12px 24px; border-radius: var(--rs); background: var(--coral); border: none; color:var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; transition: all .13s; font-family: var(--fd); box-shadow: 0 5px 18px var(--cg); display: flex; align-items: center; gap: 7px; }
 .wiz-btn-next:hover { box-shadow: 0 7px 22px var(--cg); transform: translateY(-1px); }
 .wiz-btn-next:active { transform: scale(.97); }
 .wiz-btn-launch { padding: 13px 28px; border-radius: var(--rs); background: linear-gradient(135deg, var(--coral), #7A3C06); border: none; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .13s; font-family: var(--fd); box-shadow: 0 6px 24px var(--cg); display: flex; align-items: center; gap: 9px; }
@@ -489,13 +490,13 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .sent-val { font-size: 11px; font-weight: 700; width: 28px; text-align: right; flex-shrink: 0; }
 /* NPS */
 .nps-display { text-align: center; }
-.nps-score { font-family: var(--fd); font-weight: 800; font-size: 52px; color: var(--mint); line-height: 1; letter-spacing: -2px; }
+.nps-score { font-family: var(--fd); font-weight: 800; font-size: 52px; color: var(--mint-text); line-height: 1; letter-spacing: -2px; }
 .nps-max { font-size: 16px; color: var(--ink3); }
 .nps-lbl { font-size: 11px; color: var(--ink3); margin-top: 4px; }
 .nps-bar { display: flex; height: 8px; border-radius: 99px; overflow: hidden; gap: 1px; margin-top: 12px; }
-.nps-det { font-size: 11px; color: var(--red); flex: 1; }
+.nps-det { font-size: 11px; color: var(--red-text); flex: 1; }
 .nps-pas { font-size: 11px; color: var(--amber); flex: 1; text-align: center; }
-.nps-pro { font-size: 11px; color: var(--mint); flex: 1; text-align: right; }
+.nps-pro { font-size: 11px; color: var(--mint-text); flex: 1; text-align: right; }
 /* Bar chart */
 .bar-chart-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .bar-chart-item:last-child { margin-bottom: 0; }
@@ -506,7 +507,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 /* Verbatims */
 .verbatim-filters { display: flex; gap: 7px; margin-bottom: 16px; flex-wrap: wrap; }
 .vf-chip { padding: 6px 12px; border-radius: 99px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: var(--bg3); color: var(--ink3); transition: all .13s; }
-.vf-chip.active { border-color: var(--coral); background: var(--cd); color: var(--coral); }
+.vf-chip.active { border-color: var(--coral); background: var(--cd); color: var(--coral-text); }
 .verbatim-grid { display: flex; flex-direction: column; gap: 10px; }
 .verbatim-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--rs); padding: 14px 16px; transition: border-color .15s; }
 .verbatim-card:hover { border-color: var(--border2); }
@@ -717,6 +718,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .dtour-skip{font-size:11.5px;color:var(--ink3);font-weight:600;cursor:pointer;background:none;border:none;font-family:inherit;padding:8px 6px}
 .dtour-skip:focus-visible,.dtour-next:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .dtour-next{background:var(--ink);color:#fff;font-family:var(--fd);font-weight:800;font-size:12.5px;padding:9px 16px;border-radius:99px;border:none;cursor:pointer}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 <script src="icons.js"></script>
 </head>
@@ -753,7 +755,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <div class="sb-section">Principal</div>
       <button class="sb-item active" id="nav-dashboard" onclick="navTo('dashboard',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>Dashboard</button>
       <button class="sb-item" id="nav-create" onclick="navTo('create',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span>Créer une campagne</button>
-      <button class="sb-item" id="nav-campaigns" onclick="navTo('campaigns',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span>Mes campagnes<span class="sb-badge" id="camp-badge" style="background:rgba(224,125,10,.15);color:var(--coral);display:none"></span></button>
+      <button class="sb-item" id="nav-campaigns" onclick="navTo('campaigns',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span>Mes campagnes<span class="sb-badge" id="camp-badge" style="background:rgba(224,125,10,.15);color:var(--coral-text);display:none"></span></button>
       <button class="sb-item" id="nav-results" onclick="navTo('results',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>Résultats</button>
       <button class="sb-item" onclick="navTo('consents',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>Consentements RGPD</button>
       <button class="sb-item" id="nav-news" onclick="navTo('news',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2V5z"/><path d="M19 9h1a1 1 0 0 1 1 1v7a2 2 0 0 1-2 2"/><path d="M8 9h6M8 13h6"/></svg></span>Actualités</button>
@@ -885,7 +887,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   </div>
                   
                   <div class="field">
-                    <label class="field-lbl">Votre question <span style="color:var(--coral)">*</span></label>
+                    <label class="field-lbl">Votre question <span style="color:var(--coral-text)">*</span></label>
                     <textarea class="field-ta" id="q-text-inp" placeholder="Ex : Quel est votre critère n°1 lors de l'achat d'un vélo ?" rows="3" oninput="updatePreview()"></textarea>
                     <div style="display:flex;justify-content:space-between;margin-top:6px"><div style="font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg> Conseil : une question courte obtient 34% de réponses en plus.</div><div style="font-size:11px;color:var(--ink3)" id="q-char-ct">65 / 150</div></div>
                   </div>
@@ -981,7 +983,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div class="step-card-title">Ciblez votre audience</div>
                   <div class="step-card-sub" id="aud-subtitle">Chaque filtre affine les profils éligibles. C'est la <strong>localisation de la question</strong> (pas de l'entreprise) qui détermine le bassin de répondants.</div>
                   <div class="field">
-                    <label class="field-lbl" style="display:flex;align-items:center;justify-content:space-between">Thèmes d'intérêt <span style="color:var(--ink3);font-weight:400">(laisser vide = tous)</span><button type="button" onclick="toggleAllThemes()" style="background:none;border:none;padding:0;font-size:11px;font-weight:700;color:var(--coral);cursor:pointer;text-transform:none;letter-spacing:0">Tout sélectionner</button></label>
+                    <label class="field-lbl" style="display:flex;align-items:center;justify-content:space-between">Thèmes d'intérêt <span style="color:var(--ink3);font-weight:400">(laisser vide = tous)</span><button type="button" onclick="toggleAllThemes()" style="background:none;border:none;padding:0;font-size:11px;font-weight:700;color:var(--coral-text);cursor:pointer;text-transform:none;letter-spacing:0">Tout sélectionner</button></label>
                     <div class="theme-grid" id="theme-grid">
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.3 3.6 5.6 3.6 9s-1.2 6.7-3.6 9c-2.4-2.3-3.6-5.6-3.6-9S9.6 5.3 12 3z"/></svg> Sport</div>
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 20s-7-4.4-7-9.8A4.2 4.2 0 0 1 12 7.5a4.2 4.2 0 0 1 7 2.7C19 15.6 12 20 12 20z"/></svg> Bien-être</div>
@@ -1045,7 +1047,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div style="color:var(--icon-gray)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg></div>
                     <div>
                       <div style="font-family:var(--fd);font-weight:800;font-size:26px;color:var(--ink);letter-spacing:-1px"><span id="aud-count">—</span> <span style="font-size:14px;color:rgba(23,20,26,.55);font-weight:600">profils éligibles</span></div>
-                      <div style="font-size:12px;color:var(--coral);margin-top:3px" id="aud-footer">Profils consentants · conforme RGPD</div>
+                      <div style="font-size:12px;color:var(--coral-text);margin-top:3px" id="aud-footer">Profils ayant donné leur consentement</div>
                     </div>
                   </div>
                 </div>
@@ -1062,7 +1064,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div class="aud-row"><div class="aud-lbl">35–49 ans</div><div class="aud-bar"><div class="aud-fill" style="width:31%;background:var(--violet)"></div></div><div class="aud-val">31%</div></div>
                     <div class="aud-row"><div class="aud-lbl">50+ ans</div><div class="aud-bar"><div class="aud-fill" style="width:11%;background:var(--ink3)"></div></div><div class="aud-val">11%</div></div>
                   </div>
-                  <div style="background:var(--md);border-radius:var(--rx);padding:10px 12px;font-size:11px;color:var(--mint);line-height:1.6"><strong style="display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg> Conforme RGPD</strong><br>Chaque profil a consenti explicitement à votre commerce. Révocable à tout moment depuis l'app.</div>
+                  <div style="background:var(--md);border-radius:var(--rx);padding:10px 12px;font-size:11px;color:var(--mint-text);line-height:1.6"><strong style="display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg> Consentement explicite</strong><br>Chaque profil a consenti explicitement à votre commerce. Révocable à tout moment depuis l'app.</div>
                 </div>
               </div>
             </div>
@@ -1119,7 +1121,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink3)" id="sim-delay">~6h</div></div>
                     <div style="background:var(--md);border-radius:var(--rx);padding:11px 12px;border:1px solid rgba(11,171,132,.2)">
-                      <div style="font-size:10px;color:var(--mint);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Collecte</div>
+                      <div style="font-size:10px;color:var(--mint-text);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Collecte</div>
                       <div style="font-size:12px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> <span id="sim-vol">200</span> réponses atteintes</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink3)">+48–72h</div></div>
@@ -1227,8 +1229,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <!-- ═══ CONSENTS ═══ -->
       <div class="page" id="page-consents">
         <div class="cj-banner" style="background:var(--md);border:1px solid rgba(11,171,132,.2);border-radius:var(--rs);padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:12px">
-          <span style="color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span>
-          <div style="font-size:13px;color:var(--ink2);line-height:1.65;flex:1"><strong style="color:var(--mint)">Conformité RGPD totale.</strong> Chaque profil a consenti explicitement à votre commerce via l'application Noova. Les consentements sont horodatés, granulaires et révocables en 1 tap par l'utilisateur. Vous ne pouvez pas modifier ces paramètres — seul l'utilisateur en a le contrôle.</div>
+          <span style="color:var(--mint-text)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span>
+          <div style="font-size:13px;color:var(--ink2);line-height:1.65;flex:1"><strong style="color:var(--mint-text)">Consentement explicite.</strong> Chaque profil a consenti explicitement à votre commerce via l'application Noova. Les consentements sont horodatés, granulaires et révocables en 1 tap par l'utilisateur. Vous ne pouvez pas modifier ces paramètres — seul l'utilisateur en a le contrôle.</div>
           <button class="tb-btn tb-btn-ghost" style="font-size:12px" id="export-rgpd-btn" onclick="exportConsentJournal()" style="display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3v11"/><path d="M8 7l4-4 4 4"/><path d="M5 15v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></svg> Export RGPD</button>
         </div>
         <div class="section-title">Journal des consentements (50 derniers événements)</div>
@@ -1287,7 +1289,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
           </div>
           <div class="settings-section">
             <div class="settings-section-title">RGPD & données</div>
-            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z"/></svg></div><div class="setting-info"><div class="setting-name">DPO désigné</div><div class="setting-desc" id="set-dpo">— · Conforme RGPD Art. 37</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('dpo','DPO désigné (email)',document.getElementById('set-dpo').textContent.split(' · ')[0])">Gérer</button></div>
+            <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z"/></svg></div><div class="setting-info"><div class="setting-name">DPO désigné</div><div class="setting-desc" id="set-dpo">—</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('dpo','DPO désigné (email)',document.getElementById('set-dpo').textContent.split(' · ')[0])">Gérer</button></div>
             <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><div class="setting-info"><div class="setting-name">Registre de traitement</div><div class="setting-desc" id="set-registry-date">Export automatique disponible</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="exportRegistry()">Exporter</button></div>
             <div class="setting-row"><div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M9 7V4h6v3"/></svg></div><div class="setting-info"><div class="setting-name">Rétention des données</div><div class="setting-desc" id="set-retention">Données réponses conservées 24 mois</div></div><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editSetting('retentionMonths','Rétention (mois)',24)">Configurer</button></div>
           </div>
@@ -1373,10 +1375,10 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 <!-- Popup affiché une fois, à la reconnexion suivant la validation admin -->
 <div id="verified-modal" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:24px">
   <div style="background:var(--card);border-radius:20px;max-width:400px;width:100%;padding:32px 28px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.25)">
-    <div style="width:64px;height:64px;border-radius:50%;background:rgba(11,171,132,.12);border:2px solid rgba(11,171,132,.3);color:#0BAB84;display:flex;align-items:center;justify-content:center;margin:0 auto 18px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg></div>
+    <div style="width:64px;height:64px;border-radius:50%;background:rgba(11,171,132,.12);border:2px solid rgba(11,171,132,.3);color:var(--mint-text);display:flex;align-items:center;justify-content:center;margin:0 auto 18px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg></div>
     <div style="font-family:var(--fd);font-weight:800;font-size:21px;color:var(--ink);letter-spacing:-.5px;margin-bottom:8px">Ton espace est vérifié !</div>
     <div style="font-size:13.5px;color:var(--ink2);line-height:1.7;margin-bottom:24px">Bienvenue sur Noova, <strong id="verified-modal-brand"></strong>. Tu peux maintenant créer ta première campagne et configurer tes récompenses.</div>
-    <button onclick="closeVerifiedModal()" style="width:100%;padding:13px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:14px;font-weight:700;font-family:var(--fd);cursor:pointer">C'est parti <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
+    <button onclick="closeVerifiedModal()" style="width:100%;padding:13px;border-radius:11px;background:var(--coral);border:none;color:var(--ink);font-size:14px;font-weight:700;font-family:var(--fd);cursor:pointer">C'est parti <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
   </div>
 </div>
 
@@ -1387,7 +1389,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
     <textarea id="efm-input" rows="1" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;font-family:var(--fb);outline:none;resize:vertical;box-sizing:border-box" onkeydown="if(event.key==='Enter'&&!event.shiftKey&&this.rows===1){event.preventDefault();confirmEditField();}"></textarea>
     <div style="display:flex;gap:10px;margin-top:18px">
       <button onclick="closeEditFieldModal()" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-weight:700;font-family:var(--fb);cursor:pointer">Annuler</button>
-      <button onclick="confirmEditField()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:#fff;font-weight:700;font-family:var(--fd);cursor:pointer">Enregistrer</button>
+      <button onclick="confirmEditField()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:var(--ink);font-weight:700;font-family:var(--fd);cursor:pointer">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -1436,17 +1438,17 @@ function viewCampaign(campaignId) {
   if (_campModalAnswersUnsub) _campModalAnswersUnsub();
   _campModalCache = { c: null, answers: null };
   _campModalCampUnsub = db.collection('campaigns').doc(campaignId).onSnapshot(campDoc => {
-    if(!campDoc.exists){ document.getElementById('camp-modal-body').innerHTML='<div style="padding:20px;color:var(--red)">Campagne introuvable.</div>'; return; }
+    if(!campDoc.exists){ document.getElementById('camp-modal-body').innerHTML='<div style="padding:20px;color:var(--red-text)">Campagne introuvable.</div>'; return; }
     _campModalCache.c = { id: campDoc.id, ...campDoc.data() };
     if (_campModalCache.answers) renderCampModal(_campModalCache.c, _campModalCache.answers);
   }, e => {
-    document.getElementById('camp-modal-body').innerHTML = `<div style="padding:20px;color:var(--red)">Erreur : ${e.message}</div>`;
+    document.getElementById('camp-modal-body').innerHTML = `<div style="padding:20px;color:var(--red-text)">Erreur : ${e.message}</div>`;
   });
   _campModalAnswersUnsub = db.collection('answers').where('campaignId','==',campaignId).where('merchantId','==',auth.currentUser.uid).onSnapshot(answersSnap => {
     _campModalCache.answers = answersSnap.docs.map(d => d.data());
     if (_campModalCache.c) renderCampModal(_campModalCache.c, _campModalCache.answers);
   }, e => {
-    document.getElementById('camp-modal-body').innerHTML = `<div style="padding:20px;color:var(--red)">Erreur : ${e.message}</div>`;
+    document.getElementById('camp-modal-body').innerHTML = `<div style="padding:20px;color:var(--red-text)">Erreur : ${e.message}</div>`;
   });
 }
 
@@ -1479,7 +1481,7 @@ function renderCampModal(c, answers) {
         body = !total ? '<div style="color:var(--ink3);font-size:12px;text-align:center;padding:12px">Aucune réponse pour l\'instant.</div>'
           : q.options.map(opt => {
               const n = counts[opt]||0; const p = total ? Math.round(n/total*100) : 0;
-              return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--ink2)">${esc(opt)}</span><span style="font-weight:700;color:var(--coral)">${p}% <span style="font-weight:400;color:var(--ink4)">(${n})</span></span></div><div style="background:var(--bg3);border-radius:4px;height:7px;overflow:hidden"><div style="background:linear-gradient(90deg,var(--coral),var(--violet));height:100%;width:${p}%;border-radius:4px"></div></div></div>`;
+              return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--ink2)">${esc(opt)}</span><span style="font-weight:700;color:var(--coral-text)">${p}% <span style="font-weight:400;color:var(--ink4)">(${n})</span></span></div><div style="background:var(--bg3);border-radius:4px;height:7px;overflow:hidden"><div style="background:linear-gradient(90deg,var(--coral),var(--violet));height:100%;width:${p}%;border-radius:4px"></div></div></div>`;
             }).join('');
       } else if(qAnswers.length) {
         body = `<div style="font-size:11px;color:var(--ink3);margin-bottom:8px">${qAnswers.length} réponse${qAnswers.length>1?'s':''}</div>${qAnswers.slice(0,5).map(a=>`<div style="background:var(--bg2);border-radius:var(--rx);padding:10px 12px;margin-bottom:8px;font-size:12px;color:var(--ink2)">"${esc(String(a.answer ?? '—'))}"</div>`).join('')}`;
@@ -1522,7 +1524,7 @@ function renderCampModal(c, answers) {
   const toggleBtn = c.status === 'active'
     ? `<button onclick="toggleCampStatus('${c.id}','paused')" style="background:var(--ad);color:var(--amber);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">⏸ Suspendre</button>`
     : c.status === 'paused'
-    ? `<button onclick="toggleCampStatus('${c.id}','active')" style="background:var(--md);color:var(--mint);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">▶ Relancer</button>`
+    ? `<button onclick="toggleCampStatus('${c.id}','active')" style="background:var(--md);color:var(--mint-text);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">▶ Relancer</button>`
     : '';
 
   const qList = (c.questions||[]).length > 1
@@ -1553,7 +1555,7 @@ function renderCampModal(c, answers) {
       ${toggleBtn}
       <button onclick="exportCampCSV()" style="background:var(--bg2);color:var(--ink);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">Exporter en CSV</button>
       <button onclick="openEditCamp('${c.id}')" style="background:var(--vd);color:var(--violet);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">${icon('edit',{size:12})} Modifier</button>
-      <button onclick="deleteCampaign('${c.id}','${(c.name||c.question||'').replace(/'/g,'').substring(0,40)}')" style="background:rgba(239,68,68,.1);color:var(--red);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">${icon('delete',{size:12})} Supprimer</button>
+      <button onclick="deleteCampaign('${c.id}','${(c.name||c.question||'').replace(/'/g,'').substring(0,40)}')" style="background:rgba(239,68,68,.1);color:var(--red-text);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">${icon('delete',{size:12})} Supprimer</button>
       <button onclick="closeCampModal()" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto">Fermer</button>
     </div>`;
 }
@@ -1598,7 +1600,7 @@ function openEditCamp(id) {
       <strong style="color:var(--ink2)">Question :</strong> ${c.question||'—'}
     </div>
     <div style="display:flex;gap:9px">
-      <button onclick="saveEditCamp('${id}')" style="flex:1;background:var(--coral);color:#fff;border:none;border-radius:var(--rx);padding:11px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px var(--cg)">Enregistrer</button>
+      <button onclick="saveEditCamp('${id}')" style="flex:1;background:var(--coral);color:var(--ink);border:none;border-radius:var(--rx);padding:11px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px var(--cg)">Enregistrer</button>
       <button onclick="viewCampaign('${id}')" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer">Annuler</button>
     </div>`;
 }
@@ -1659,7 +1661,7 @@ async function navTo(page, btn){
   closeMobMenu();
   curPage=page;
   const brandName = (_mData && _mData.brandName) || 'votre espace';
-  const titles={dashboard:['Dashboard','Bienvenue — '+brandName],create:['Créer une campagne','Moins de 5 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet de vos campagnes'],consents:['Consentements RGPD','Journal complet · Conforme RGPD Art. 6 et 7'],settings:['Paramètres','Configuration de votre espace marque'],news:['Actualités','Montrez ce que vos clients ont changé chez vous'],rewards:['Mes récompenses','Ce que vos clients peuvent gagner chez vous'],validate:['Valider un code','Le code à 4 caractères montré par le client']};
+  const titles={dashboard:['Dashboard','Bienvenue — '+brandName],create:['Créer une campagne','Moins de 5 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet de vos campagnes'],consents:['Consentements RGPD','Journal des consentements (RGPD, art. 6 et 7)'],settings:['Paramètres','Configuration de votre espace marque'],news:['Actualités','Montrez ce que vos clients ont changé chez vous'],rewards:['Mes récompenses','Ce que vos clients peuvent gagner chez vous'],validate:['Valider un code','Le code à 4 caractères montré par le client']};
   const t=titles[page]||[page,''];
   document.getElementById('topbar-title').textContent=t[0];
   document.getElementById('topbar-sub').textContent=t[1];
@@ -1826,7 +1828,7 @@ function updAud(){
   const count=base?Math.max(1,Math.floor(base*(0.4+sel*0.08))):'-';
   document.getElementById('aud-count').textContent=count;
   const footer=document.getElementById('aud-footer');
-  if(footer&&base) footer.textContent=base+' profils consentants · conforme RGPD';
+  if(footer&&base) footer.textContent=base+' profils ayant donné leur consentement';
 }
 
 // ═══ VILLES DYNAMIQUES ═══════════════════════════════════════
@@ -1903,7 +1905,7 @@ function renderVerbatims(filter){
   filtered.forEach(v=>{
     const d=document.createElement('div');d.className='verbatim-card';
     const stars='⭐'.repeat(Math.round(v.score))+'☆'.repeat(5-Math.round(v.score));
-    d.innerHTML=`<div class="vc-header"><span class="vc-theme" style="background:${v.thc};color:${v.tc}">${v.theme}</span><div class="vc-score"><span style="font-size:12px">${stars}</span><span>${v.score}</span></div></div><div class="vc-text">${v.txt}</div><div class="vc-footer"><div class="vc-meta">${v.seg}</div><div class="vc-actions"><button class="vc-btn" style="background:var(--cd);color:var(--coral);display:inline-flex;align-items:center;gap:5px" onclick="showToast('Verbatim ajouté aux favoris','star')">${icon('star',{size:12})} Sauvegarder</button><button class="vc-btn" style="background:var(--md);color:var(--mint);display:inline-flex;align-items:center;gap:5px" onclick="showToast('Verbatim copié','document')">${icon('document',{size:12})} Copier</button></div></div>`;
+    d.innerHTML=`<div class="vc-header"><span class="vc-theme" style="background:${v.thc};color:${v.tc}">${v.theme}</span><div class="vc-score"><span style="font-size:12px">${stars}</span><span>${v.score}</span></div></div><div class="vc-text">${v.txt}</div><div class="vc-footer"><div class="vc-meta">${v.seg}</div><div class="vc-actions"><button class="vc-btn" style="background:var(--cd);color:var(--coral-text);display:inline-flex;align-items:center;gap:5px" onclick="showToast('Verbatim ajouté aux favoris','star')">${icon('star',{size:12})} Sauvegarder</button><button class="vc-btn" style="background:var(--md);color:var(--mint-text);display:inline-flex;align-items:center;gap:5px" onclick="showToast('Verbatim copié','document')">${icon('document',{size:12})} Copier</button></div></div>`;
     el.appendChild(d);
   });
 }
@@ -2014,7 +2016,7 @@ async function confirmEditField() {
   } else if(field === 'dpo') {
     upd.dpoEmail = trimmed;
     const el = document.getElementById('set-dpo');
-    if(el) el.textContent = trimmed + ' · Conforme RGPD Art. 37';
+    if(el) el.textContent = trimmed;
   } else if(field === 'cityLabel') {
     upd.cityLabel = trimmed;
     upd.city = normalizeCity(trimmed);
@@ -2047,8 +2049,8 @@ async function changeMerchantLogo(file) {
     const url = await ref.getDownloadURL();
     await db.collection('merchants').doc(uid).update({ logoUrl: url });
     const preview = document.getElementById('set-logo-preview');
-    if(preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`;
-    document.querySelectorAll('.sb-brand-av').forEach(el => el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`);
+    if(preview) preview.innerHTML = `<img src="${url}" alt="Logo de votre commerce" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`;
+    document.querySelectorAll('.sb-brand-av').forEach(el => el.innerHTML = `<img src="${url}" alt="Logo de votre commerce" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">`);
     showToast('Logo mis à jour.', 'image');
   } catch(e) {
     showToast('Erreur upload : ' + e.message, 'error');
@@ -2069,7 +2071,7 @@ async function changeMerchantCoverPhoto(file) {
     const url = await ref.getDownloadURL();
     await db.collection('merchants').doc(uid).update({ coverUrl: url });
     const preview = document.getElementById('set-cover-preview');
-    if(preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()" onload="this.decode?this.decode().catch(()=>this.parentElement.innerHTML=merchantCoverFallbackHTML()):0">`;
+    if(preview) preview.innerHTML = `<img src="${url}" alt="Photo de couverture de votre commerce" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()" onload="this.decode?this.decode().catch(()=>this.parentElement.innerHTML=merchantCoverFallbackHTML()):0">`;
     showToast('Photo de couverture mise à jour.', 'image');
   } catch(e) {
     showToast('Erreur upload : ' + e.message, 'error');
@@ -2130,7 +2132,7 @@ window.addEventListener('load',()=>{
   </div>
   <div style="max-width:460px;width:100%;margin:0 auto">
     <div style="display:flex;gap:6px;justify-content:center;margin-bottom:14px"><div class="pi-dot" style="width:22px;height:4px;border-radius:99px;background:var(--coral)"></div><div class="pi-dot" style="width:22px;height:4px;border-radius:99px;background:var(--bg3)"></div><div class="pi-dot" style="width:22px;height:4px;border-radius:99px;background:var(--bg3)"></div></div>
-    <button id="pi-btn" onclick="proIntroNext()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg)">Suivant</button>
+    <button id="pi-btn" onclick="proIntroNext()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:var(--ink);font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg)">Suivant</button>
     <button onclick="proIntroSkip('login')" style="width:100%;margin-top:8px;padding:12px;background:none;border:none;color:var(--ink3);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb)">J'ai déjà un compte</button>
   </div>
 </div>
@@ -2150,7 +2152,7 @@ window.addEventListener('load',()=>{
     </div>
     <div style="display:flex;gap:10px;margin-top:16px">
       <button onclick="document.getElementById('resubmit-modal').style.display='none'" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-weight:700;cursor:pointer">Annuler</button>
-      <button onclick="submitResubmit()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:#fff;font-weight:700;font-family:var(--fd);cursor:pointer">Renvoyer</button>
+      <button onclick="submitResubmit()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:var(--ink);font-weight:700;font-family:var(--fd);cursor:pointer">Renvoyer</button>
     </div>
   </div>
 </div>
@@ -2169,7 +2171,7 @@ window.addEventListener('load',()=>{
     <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink);line-height:1.5;cursor:pointer"><input type="checkbox" id="cashier-check" style="margin-top:3px;width:17px;height:17px;accent-color:var(--coral)" onchange="document.getElementById('cashier-ok').disabled=!this.checked"> J'ai compris et j'ai informé mon équipe.</label>
     <div style="display:flex;gap:10px;margin-top:18px">
       <button onclick="document.getElementById('cashier-modal').style.display='none'" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-weight:700;cursor:pointer">Annuler</button>
-      <button id="cashier-ok" disabled onclick="confirmCashierAck()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:#fff;font-weight:700;font-family:var(--fd);cursor:pointer;opacity:1">Continuer</button>
+      <button id="cashier-ok" disabled onclick="confirmCashierAck()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:var(--ink);font-weight:700;font-family:var(--fd);cursor:pointer;opacity:1">Continuer</button>
     </div>
   </div>
 </div>
@@ -2177,10 +2179,10 @@ window.addEventListener('load',()=>{
 <!-- Écran d'attente vérification commerçant -->
 <div id="pending-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);align-items:center;justify-content:center;padding:32px;flex-direction:column;text-align:center">
   <div style="max-width:380px">
-    <div style="margin-bottom:16px;color:var(--coral);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:52px;height:52px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg></div>
+    <div style="margin-bottom:16px;color:var(--coral-text);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:52px;height:52px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg></div>
     <div style="font-family:var(--fd);font-weight:800;font-size:26px;letter-spacing:-.8px;color:var(--ink);margin-bottom:8px">Vérification en cours</div>
     <div style="font-size:14px;color:var(--ink2);margin-bottom:6px;line-height:1.7">Ton espace commerçant pour <strong id="pending-brand"></strong> est en cours de validation.</div>
-    <div id="pending-eta" style="font-size:13px;color:var(--coral);font-weight:600;margin-bottom:28px"></div>
+    <div id="pending-eta" style="font-size:13px;color:var(--coral-text);font-weight:600;margin-bottom:28px"></div>
     <div style="background:var(--vd);border:1.5px solid rgba(161,78,8,.15);border-radius:14px;padding:16px 18px;text-align:left;margin-bottom:24px">
       <div style="font-size:12px;color:var(--ink2);line-height:2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Inscription enregistrée<br><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg> Vérification manuelle en cours (≤ 24h)<br><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Accès au dashboard après validation</div>
     </div>
@@ -2241,14 +2243,14 @@ window.addEventListener('load',()=>{
       <label id="aw-cover-wrap" style="display:none;border:1.5px dashed var(--border);border-radius:10px;padding:12px 14px;background:var(--bg2);cursor:pointer">
         <div style="font-size:13px;font-weight:700;color:var(--ink)">Photo de devanture (facultatif)</div>
         <div style="font-size:11.5px;color:var(--ink3);margin-top:3px;line-height:1.5">Les commerces avec photo reçoivent nettement plus de réponses.</div>
-        <div id="aw-cover-name" style="font-size:11.5px;color:var(--coral);font-weight:700;margin-top:4px"></div>
+        <div id="aw-cover-name" style="font-size:11.5px;color:var(--coral-text);font-weight:700;margin-top:4px"></div>
         <input id="aw-cover" type="file" accept="image/*" style="display:none" onchange="document.getElementById('aw-cover-name').textContent=this.files[0]?this.files[0].name:''">
       </label>
       <input id="aw-email"  type="email"    placeholder="Email professionnel"            autocomplete="email"           style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-pass"   type="password" placeholder="Mot de passe"                  autocomplete="current-password" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <div id="aw-forgot" style="text-align:right;margin-top:-3px"><button type="button" id="aw-forgot-link" onclick="awForgotPassword()" style="background:none;border:none;padding:0;font-size:12px;color:var(--ink3);cursor:pointer;font-family:var(--fb);text-decoration:underline">Mot de passe oublié ?</button></div>
       <div id="aw-err" style="color:#EF4444;font-size:12px;display:none;padding:9px 12px;background:rgba(239,68,68,.08);border-radius:8px"></div>
-      <button id="aw-submit" onclick="awSubmit()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg);margin-top:4px">Connexion</button>
+      <button id="aw-submit" onclick="awSubmit()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:var(--ink);font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg);margin-top:4px">Connexion</button>
       <button id="aw-back" type="button" onclick="awSetStep(1)" style="display:none;background:none;border:none;color:var(--ink3);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--fb);padding:2px">← Retour</button>
 
       <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
@@ -2263,7 +2265,7 @@ window.addEventListener('load',()=>{
       </button>
     </div>
 
-    <div style="margin-top:18px;font-size:11px;color:var(--ink3);text-align:center">En continuant tu acceptes nos <a href="cgu.html" target="_blank" rel="noopener" style="color:var(--coral)">CGU</a> et notre <a href="confidentialite.html" target="_blank" rel="noopener" style="color:var(--coral)">Politique de confidentialité</a></div>
+    <div style="margin-top:18px;font-size:12px;color:var(--ink2);text-align:center;line-height:1.8">En continuant, tu acceptes les <a href="/cgu.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">CGU</a> et tu reconnais avoir pris connaissance de la <a href="/confidentialite.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">Politique de confidentialité</a>. <a href="/mentions-legales.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">Mentions légales</a> · <a href="/accessibilite.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">Accessibilité</a></div>
   </div>
 </div>
 
@@ -2285,7 +2287,7 @@ window.addEventListener('load',()=>{
       <input id="gmw-siret"   type="text" placeholder="SIRET (14 chiffres)" inputmode="numeric" maxlength="17" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <textarea id="gmw-desc" placeholder="Décris ton établissement en quelques mots…" maxlength="300" style="width:100%;height:70px;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);resize:none;box-sizing:border-box"></textarea>
       <div id="gmw-err" style="color:#EF4444;font-size:12px;display:none;padding:8px 12px;background:rgba(239,68,68,.08);border-radius:8px"></div>
-      <button id="gmw-submit-btn" onclick="saveGoogleMerchant()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:#fff;font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg)">Créer mon espace <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
+      <button id="gmw-submit-btn" onclick="saveGoogleMerchant()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:var(--ink);font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg)">Créer mon espace <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
     </div>
   </div>
 </div>
@@ -2659,7 +2661,7 @@ const PRO_INTRO = [
   { t: 'Sachez ce que vos clients veulent vraiment.', d: 'Une question posée à vos clients, une répartition claire des réponses. Voici un vrai résultat.',
     ill: () => '<div style="font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:10px">Ouvrir le dimanche matin ?</div>' + [['Oui, dès 7h', 46], ['Oui, plus tard', 28], ['Non', 14], ['Peu importe', 12]].map(([l, p]) => `<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink);margin-bottom:3px"><span>${l}</span><span style="font-weight:700">${p} %</span></div><div style="height:8px;border-radius:99px;background:var(--bg3)"><div style="height:100%;width:${p}%;border-radius:99px;background:var(--coral)"></div></div></div>`).join('') },
   { t: 'Vous fixez vous-même la récompense. Elle ramène le client chez vous.', d: 'Chaque réponse rapporte des points à l\'habitant. Il les échange contre la récompense que vous avez choisie, en passant en caisse.',
-    ill: () => '<div style="display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap"><div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;font-size:13.5px;font-weight:700;color:var(--ink)">1 chocolat acheté</div><div style="font-size:22px;color:var(--coral);font-weight:800">→</div><div style="background:var(--coral);border-radius:14px;padding:14px 16px;font-size:13.5px;font-weight:800;color:#fff">-15 % sur un café</div></div>' },
+    ill: () => '<div style="display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap"><div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;font-size:13.5px;font-weight:700;color:var(--ink)">1 chocolat acheté</div><div style="font-size:22px;color:var(--coral-text);font-weight:800">→</div><div style="background:var(--coral);border-radius:14px;padding:14px 16px;font-size:13.5px;font-weight:800;color:var(--ink)">-15 % sur un café</div></div>' },
   { t: 'Et vous êtes visible auprès de Manceaux qui ne vous connaissent pas encore.', d: 'Votre commerce apparaît sur l\'accueil des habitants de votre ville, avec votre photo et votre récompense.',
     ill: () => '<div style="display:flex;flex-direction:column;gap:9px">' + ['Votre commerce', 'Boulangerie voisine', 'Café du quartier'].map((n, i) => `<div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid ${i === 0 ? 'var(--coral)' : 'var(--border)'};border-radius:12px;padding:10px 12px"><div style="width:32px;height:32px;border-radius:9px;background:var(--ink);color:#FFC300;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:var(--fd)">${n[0]}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${n}</div></div>`).join('') + '</div>' }
 ];
@@ -2736,7 +2738,7 @@ async function loadMerchantAndStart(uid) {
   const setDpo = document.getElementById('set-dpo');
   if(setBrand) setBrand.textContent = _mData.brandName || '—';
   if(setContact) setContact.textContent = _mData.email || '—';
-  if(setDpo) setDpo.textContent = (_mData.email||'—') + ' · Conforme RGPD Art. 37';
+  if(setDpo) setDpo.textContent = (_mData.email||'—');
   const setFields = { 'set-firstname':'firstName', 'set-lastname':'lastName', 'set-phone':'phone', 'set-address':'address', 'set-sector':'sector', 'set-siret':'siret', 'set-desc':'description', 'set-city':'cityLabel' };
   Object.keys(setFields).forEach(domId => {
     const el = document.getElementById(domId);
@@ -2745,10 +2747,10 @@ async function loadMerchantAndStart(uid) {
   const logoPreview = document.getElementById('set-logo-preview');
   // Chaque compte a SA photo : on réécrit toujours l'affichage (image du compte OU icône par défaut),
   // jamais « seulement si présent », sinon la photo du compte précédent restait à l'écran.
-  if(logoPreview) logoPreview.innerHTML = _mData.logoUrl ? `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">` : merchantLogoFallbackHTML();
-  document.querySelectorAll('.sb-brand-av').forEach(el => { el.innerHTML = _mData.logoUrl ? `<img src="${_mData.logoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">` : merchantLogoFallbackHTML(); });
+  if(logoPreview) logoPreview.innerHTML = _mData.logoUrl ? `<img src="${_mData.logoUrl}" alt="Logo de votre commerce" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">` : merchantLogoFallbackHTML();
+  document.querySelectorAll('.sb-brand-av').forEach(el => { el.innerHTML = _mData.logoUrl ? `<img src="${_mData.logoUrl}" alt="Logo de votre commerce" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">` : merchantLogoFallbackHTML(); });
   const coverPreview = document.getElementById('set-cover-preview');
-  if(coverPreview) coverPreview.innerHTML = _mData.coverUrl ? `<img src="${_mData.coverUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()" onload="this.decode?this.decode().catch(()=>this.parentElement.innerHTML=merchantCoverFallbackHTML()):0">` : merchantCoverFallbackHTML();
+  if(coverPreview) coverPreview.innerHTML = _mData.coverUrl ? `<img src="${_mData.coverUrl}" alt="Photo de couverture de votre commerce" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()" onload="this.decode?this.decode().catch(()=>this.parentElement.innerHTML=merchantCoverFallbackHTML()):0">` : merchantCoverFallbackHTML();
   const setIddoc = document.getElementById('set-iddoc');
   if(setIddoc && _mData.idDocumentPath) setIddoc.textContent = 'Envoyé — en cours de vérification';
   // Update wizard preview brand names
@@ -2869,9 +2871,9 @@ function renderFirestoreCampaigns(camps) {
         <div><div class="camp-metric">${c.answersCount||0}</div><div class="camp-metric-sub">/ ${c.volumeTarget||100} obj.</div></div>
         <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:${pct}%;background:var(--mint)"></div></div><div class="cprog-lbl">${pct}%</div></div>
         <div class="camp-actions" style="display:flex;gap:6px;justify-content:flex-end">
-          <button class="camp-act-btn" style="background:var(--md);color:var(--mint)" onclick="event.stopPropagation();viewCampaign('${c.id}')">Voir</button>
+          <button class="camp-act-btn" style="background:var(--md);color:var(--mint-text)" onclick="event.stopPropagation();viewCampaign('${c.id}')">Voir</button>
           <button class="camp-act-btn" style="background:var(--vd);color:var(--violet)" onclick="event.stopPropagation();openEditCamp('${c.id}')">Modifier</button>
-          <button class="camp-act-btn" style="background:rgba(239,68,68,.1);color:var(--red)" onclick="event.stopPropagation();deleteCampaign('${c.id}','${(c.name||c.question||'').replace(/'/g,'')}')">Supprimer</button>
+          <button class="camp-act-btn" style="background:rgba(239,68,68,.1);color:var(--red-text)" onclick="event.stopPropagation();deleteCampaign('${c.id}','${(c.name||c.question||'').replace(/'/g,'')}')">Supprimer</button>
         </div>`;
       card.appendChild(row);
     });
@@ -3369,9 +3371,9 @@ function renderRewardCard(r, i) {
   card.className = 'card';
   card.style.marginBottom = '14px';
   const statusBadge = {
-    pending:  { bg: 'rgba(59,130,246,.12)', c: '#3B82F6', txt: icon('clock',{size:11})+' En attente de validation' },
-    approved: { bg: d.active ? 'rgba(11,171,132,.12)' : 'var(--bg3)', c: d.active ? '#0BAB84' : 'var(--ink3)', txt: d.active ? icon('success',{size:11})+' Actif' : icon('pause',{size:11})+' Inactif' },
-    rejected: { bg: 'rgba(239,68,68,.1)', c: '#EF4444', txt: icon('error',{size:11})+' Refusée par Noova' }
+    pending:  { bg: 'rgba(59,130,246,.12)', c: '#1D4ED8', txt: icon('clock',{size:11})+' En attente de validation' },
+    approved: { bg: d.active ? 'rgba(11,171,132,.12)' : 'var(--bg3)', c: d.active ? '#087355' : 'var(--ink3)', txt: d.active ? icon('success',{size:11})+' Actif' : icon('pause',{size:11})+' Inactif' },
+    rejected: { bg: 'rgba(239,68,68,.1)', c: '#B91C1C', txt: icon('error',{size:11})+' Refusée par Noova' }
   }[d.status || 'pending'];
   card.innerHTML = `
     <div class="rw-head" style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
@@ -3383,10 +3385,10 @@ function renderRewardCard(r, i) {
       <div class="rw-actions" style="display:flex;align-items:center;gap:12px">
       <span style="padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${statusBadge.bg};color:${statusBadge.c};white-space:nowrap;display:inline-flex;align-items:center;gap:4px">${statusBadge.txt}</span>
       ${d.status==='approved' ? `<button class="tb-btn" style="font-size:11px;padding:4px 10px" onclick="toggleRewardActive('${r.id}',${!d.active})">${d.active?'Désactiver':'Activer'}</button>` : ''}
-      <button class="tb-btn" style="font-size:11px;padding:4px 10px;color:var(--coral)" onclick="deleteReward('${r.id}')">Supprimer</button>
+      <button class="tb-btn" style="font-size:11px;padding:4px 10px;color:var(--coral-text)" onclick="deleteReward('${r.id}')">Supprimer</button>
       </div>
     </div>
-    ${d.status==='rejected' && d.rejectionReason ? `<div style="font-size:11px;color:#EF4444;margin-top:-6px;margin-bottom:8px">Motif : ${esc(d.rejectionReason)}</div>` : ''}
+    ${d.status==='rejected' && d.rejectionReason ? `<div style="font-size:11px;color:#B91C1C;margin-top:-6px;margin-bottom:8px">Motif : ${esc(d.rejectionReason)}</div>` : ''}
     ${d.purchaseCondition ? `<div style="font-size:11px;color:var(--ink2);margin-top:-6px;margin-bottom:8px;display:flex;align-items:center;gap:4px">${icon('document',{size:11})} Condition : ${esc(d.purchaseCondition)}</div>` : ''}
   `;
   el.appendChild(card);
@@ -3403,7 +3405,7 @@ function addRewardSlot() {
   form.style.marginBottom = '14px';
   form.style.border = '2px dashed var(--coral)';
   form.innerHTML = `
-    <div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--coral);margin-bottom:4px">Nouvelle récompense (palier ${slot}/5)</div>
+    <div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--coral-text);margin-bottom:4px">Nouvelle récompense (palier ${slot}/5)</div>
     <div style="font-size:11.5px;color:var(--ink3);margin-bottom:14px">Idée pour ce palier : ${hint}${prevValue?` · doit valoir plus que le palier ${slot-1} (${prevValue.toFixed(2)} €)`:''}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
       <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Emoji icône</label>
@@ -3533,11 +3535,11 @@ async function validateVoucher() {
     }
     // Bon valide — afficher et proposer de valider
     el.innerHTML = `<div style="background:rgba(11,171,132,.08);border:1.5px solid rgba(11,171,132,.25);border-radius:var(--rs);padding:20px 22px">
-      <div style="font-weight:800;font-size:16px;font-family:var(--fd);color:#0BAB84;margin-bottom:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Bon valide</div>
+      <div style="font-weight:800;font-size:16px;font-family:var(--fd);color:var(--mint-text);margin-bottom:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Bon valide</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--ink2);margin-bottom:16px">
         <div style="display:flex;align-items:center;gap:5px">${icon('gift-generic',{size:13})} <strong style="color:var(--ink)">${esc(d.label||'Récompense')}</strong></div>
         <div style="display:flex;align-items:center;gap:5px">${icon('credit-card',{size:13})} <strong style="color:var(--ink)">${d.cost||0} pts déduits</strong></div>
-        <div style="display:flex;align-items:center;gap:5px">${icon('key',{size:13})} Code : <code style="font-size:13px;font-weight:700;color:var(--coral)">${esc(d.code)}</code></div>
+        <div style="display:flex;align-items:center;gap:5px">${icon('key',{size:13})} Code : <code style="font-size:13px;font-weight:700;color:var(--coral-text)">${esc(d.code)}</code></div>
         ${d.purchaseCondition ? `<div style="display:flex;align-items:center;gap:5px">${icon('document',{size:13})} Condition : ${esc(d.purchaseCondition)}</div>` : '<div></div>'}
       </div>
       <button class="tb-btn tb-btn-primary" style="width:100%;padding:12px" onclick="confirmValidateVoucher('${doc.id}',this)">Confirmer l'utilisation</button>
@@ -3554,7 +3556,7 @@ async function confirmValidateVoucher(redemId, btn) {
       usedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     document.getElementById('voucher-code-inp').value = '';
-    document.getElementById('voucher-result').innerHTML = `<div style="background:rgba(11,171,132,.1);border-radius:var(--rs);padding:16px;text-align:center;color:#0BAB84;font-weight:700;font-family:var(--fd);font-size:16px;display:flex;align-items:center;justify-content:center;gap:6px">${icon('success',{size:18})} Bon validé avec succès !</div>`;
+    document.getElementById('voucher-result').innerHTML = `<div style="background:rgba(11,171,132,.1);border-radius:var(--rs);padding:16px;text-align:center;color:var(--mint-text);font-weight:700;font-family:var(--fd);font-size:16px;display:flex;align-items:center;justify-content:center;gap:6px">${icon('success',{size:18})} Bon validé avec succès !</div>`;
     showToast('Bon validé !','success');
     loadRecentRedemptions();
   } catch(e) { showToast('Erreur : ' + e.message,'error'); btn.disabled = false; btn.textContent = 'Confirmer l\'utilisation'; }
@@ -3574,10 +3576,10 @@ function loadRecentRedemptions() {
     el.innerHTML = '';
     snap.forEach(doc => {
       const d = doc.data();
-      const st = d.status==='used' ? {c:'#0BAB84',t:'Validé'} : d.status==='expired' ? {c:'#EF4444',t:'Expiré'} : {c:'#F5A623',t:'En attente'};
+      const st = d.status==='used' ? {c:'#087355',t:'Validé'} : d.status==='expired' ? {c:'#B91C1C',t:'Expiré'} : {c:'#8F5400',t:'En attente'};
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)';
-      row.innerHTML = `<code style="font-size:12px;font-weight:700;color:var(--coral);flex-shrink:0">${esc(d.code)}</code>
+      row.innerHTML = `<code style="font-size:12px;font-weight:700;color:var(--coral-text);flex-shrink:0">${esc(d.code)}</code>
         <div style="flex:1;font-size:12px;color:var(--ink2)">${esc(d.label||'Récompense')} · ${d.cost||0} pts</div>
         <span style="padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;background:${st.c}18;color:${st.c}">${st.t}</span>`;
       el.appendChild(row);
@@ -3681,11 +3683,12 @@ function renderQuotaCard(){
   const q = _quota, pct = q.quota ? Math.min(100, Math.round(q.used / q.quota * 100)) : 100;
   const left = q.remaining;
   const col = left === 0 ? 'var(--red)' : left <= 2 ? 'var(--amber)' : 'var(--mint)';
+  const colTxt = left === 0 ? 'var(--red-text)' : left <= 2 ? 'var(--coral-text)' : 'var(--mint-text)';
   el.style.display = 'block';
   el.innerHTML = `<div class="card" style="padding:16px 18px;margin-bottom:16px">
     <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap">
       <div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)">Questions de ce mois</div>
-      <div style="font-family:var(--fd);font-weight:800;font-size:18px;color:${col}">${q.used} / ${q.quota}</div>
+      <div style="font-family:var(--fd);font-weight:800;font-size:18px;color:${colTxt}">${q.used} / ${q.quota}</div>
     </div>
     <div style="height:8px;border-radius:99px;background:var(--bg3);overflow:hidden;margin:10px 0 8px"><div style="height:100%;width:${pct}%;background:${col};border-radius:99px;transition:width .5s"></div></div>
     <div style="font-size:12px;color:var(--ink3);line-height:1.5">${left > 0 ? `Il vous reste ${left} question${left > 1 ? 's' : ''} à poser ce mois-ci.` : 'Vous avez utilisé toutes vos questions du mois.'} Offertes par votre ville, elles se renouvellent le ${esc(fmtDateFr(q.resetsOn))}.</div>

@@ -33,10 +33,10 @@ const DASH='http://localhost:8950/dash.html';
 const AXE=fs.readFileSync(path.join(__dirname,'node_modules/axe-core/axe.min.js'),'utf8');
 const SEE=process.env.A11Y_REPORT==='1';       // A11Y_REPORT=1 : affiche le détail de tout ce qui reste
 const BLOCK=['critical','serious'];             // ces niveaux font échouer la suite (sauf exceptions ci-dessous)
-const SKIP_RULES=(process.env.A11Y_SKIP||'color-contrast').split(',');   // contraste : audité à part (charte graphique)
+const SKIP_RULES=(process.env.A11Y_SKIP||'').split(',').filter(Boolean);   // règles à ignorer (aucune par défaut : le contraste des couleurs est audité aussi)
 const run=async(p,name)=>{
   await p.evaluate(AXE);
-  const r=await p.evaluate(async(skip)=>{const res=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa']},rules:Object.fromEntries(skip.map(s=>[s,{enabled:false}]))});return res.violations.map(v=>({id:v.id,impact:v.impact,help:v.help,n:v.nodes.length,ex:v.nodes.slice(0,3).map(n=>n.target.join(' ')+' :: '+(n.html||'').slice(0,90))}));},SKIP_RULES);
+  const r=await p.evaluate(async(skip)=>{const res=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa']},rules:Object.fromEntries(skip.map(s=>[s,{enabled:false}]))});return res.violations.map(v=>({id:v.id,impact:v.impact,help:v.help,n:v.nodes.length,ex:v.nodes.slice(0,v.id==='color-contrast'?60:3).map(n=>{const d=(n.any[0]&&n.any[0].data)||{};return n.target.join(' ')+' :: '+(n.html||'').slice(0,70)+(d.fgColor?'  ['+d.fgColor+' sur '+d.bgColor+' = '+d.contrastRatio+' (min '+d.expectedContrastRatio+', '+d.fontSize+')]':'');})}));},SKIP_RULES);
   const bad=r.filter(v=>BLOCK.includes(v.impact));
   console.log((bad.length?'FAIL ':'PASS ')+'Accessibilité '+name+' : '+(bad.length?bad.map(v=>v.id+' ×'+v.n).join(', '):'aucune violation critique/sérieuse')+(r.length-bad.length?'  (+'+(r.length-bad.length)+' mineures)':''));
   if(SEE||bad.length)r.forEach(v=>console.log('   ['+v.impact+'] '+v.id+' ×'+v.n+' — '+v.help+'\n      '+v.ex.join('\n      ')));
@@ -72,8 +72,15 @@ const run=async(p,name)=>{
   await p.evaluate(()=>awTab('login'));await run(p,'dashboard : connexion');
   await setVal(p,'#aw-email','m1@shop.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());
   await wf(p,()=>typeof _mData!=='undefined'&&_mData&&_mData.brandName==='Le Fournil',null,25000);await sleep(1500);
-  for(const pg of ['dashboard','campaigns','news','rewards','settings']){
+  for(const pg of ['dashboard','create','campaigns','results','consents','validate','news','rewards','settings']){
     await p.evaluate(pg=>{const b=[...document.querySelectorAll('.sb-item')].find(x=>(x.getAttribute('onclick')||'').includes("'"+pg+"'"));navTo(pg,b);},pg);await sleep(700);await run(p,'dashboard : '+pg);
+  }
+  // ── Site vitrine et pages légales (bandeau de cookies affiché : il est audité avec la page)
+  for(const [file,name] of [['index.html','site vitrine'],['cookies.html','cookies'],['confidentialite.html','confidentialité'],['cgu.html','CGU'],['mentions-legales.html','mentions légales'],['accessibilite.html','accessibilité']]){
+    p=await browser.newPage();await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
+    await p.goto('http://localhost:8950/'+file,{waitUntil:'load'});
+    if(file==='index.html'){await sleep(3200);await p.evaluate(()=>document.querySelectorAll('.reveal').forEach(e=>e.classList.add('in')));}
+    await sleep(400);await run(p,name+' (avec bandeau cookies)');await p.close();
   }
   await browser.close();process.exit(0);
 })();

@@ -1,15 +1,18 @@
 ﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6M20ZMJBX8"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-6M20ZMJBX8');
-</script>
 <meta charset="UTF-8">
+<!-- Consentement aux traceurs : Google Analytics n'est chargé qu'après un « Accepter » explicite (voir consent.js et /cookies.html) -->
+<script src="/consent.js"></script>
+<script>
+NVConsent.whenGranted(function(){
+  window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;
+  var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-6M20ZMJBX8';document.head.appendChild(s);
+  gtag('js',new Date());gtag('config','G-6M20ZMJBX8',{allow_google_signals:false,allow_ad_personalization_signals:false,cookie_expires:34128000});
+});
+NVConsent.onChange(function(ok){window['ga-disable-G-6M20ZMJBX8']=!ok;});
+</script>
+<noscript><style>.reveal{opacity:1!important;transform:none!important}#intro-overlay{display:none!important}</style></noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Noova · Tes avis valent de l'argent</title>
 <meta name="description" content="30 secondes par jour. Une question. Des points. Des récompenses. Rejoins la liste d'attente de Noova, l'app où tes avis te rapportent enfin quelque chose.">
@@ -19,14 +22,14 @@
 <link rel="apple-touch-icon" href="Plan%20de%20travail%208LOGO_NOOVAV2.png">
 
 <!-- Canonical -->
-<link rel="canonical" href="https://noovaoff.vercel.app/">
+<link rel="canonical" href="https://www.noovaoff.fr/">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://noovaoff.vercel.app/">
+<meta property="og:url" content="https://www.noovaoff.fr/">
 <meta property="og:title" content="Noova, Là où tes avis ont de la valeur">
 <meta property="og:description" content="30 secondes par jour. Une question. Des points. Des récompenses. L'app où tes avis te rapportent enfin quelque chose.">
-<meta property="og:image" content="https://noovaoff.vercel.app/Plan%20de%20travail%208LOGO_NOOVAV2.png">
+<meta property="og:image" content="https://www.noovaoff.fr/Plan%20de%20travail%208LOGO_NOOVAV2.png">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Noova">
 
@@ -34,26 +37,25 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Noova, Là où tes avis ont de la valeur">
 <meta name="twitter:description" content="30 secondes par jour. Une question. Des points. Des récompenses.">
-<meta name="twitter:image" content="https://noovaoff.vercel.app/Plan%20de%20travail%208LOGO_NOOVAV2.png">
+<meta name="twitter:image" content="https://www.noovaoff.fr/Plan%20de%20travail%208LOGO_NOOVAV2.png">
 
 <!-- Misc -->
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#f9a716">
 
 <!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,400;100,500;100,600;100,700;125,700;125,800;125,900&display=swap" rel="stylesheet">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/archivo-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/noova-fonts.css">
 
 <!-- Structured data -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"MobileApplication","name":"Noova","description":"L'application mobile où tes avis te rapportent des points et des récompenses.","applicationCategory":"Lifestyle","operatingSystem":"iOS, Android","url":"https://noovaoff.vercel.app/","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@type":"Organization","name":"Noova","url":"https://noovaoff.vercel.app/"}}
+{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://www.noovaoff.fr/#site", "url": "https://www.noovaoff.fr/", "name": "Noova", "inLanguage": "fr-FR", "description": "Noova : les commerces de ta ville te posent une question par jour, tu gagnes des points et des récompenses."}, {"@type": "Organization", "@id": "https://www.noovaoff.fr/#org", "name": "Noova", "url": "https://www.noovaoff.fr/", "logo": "https://www.noovaoff.fr/icon-512.png", "email": "noovaoffr@gmail.com"}, {"@type": "WebApplication", "name": "Noova", "url": "https://www.noovaoff.fr/app", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web", "inLanguage": "fr-FR", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@id": "https://www.noovaoff.fr/#org"}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Quand l'application sera-t-elle disponible ?", "acceptedAnswer": {"@type": "Answer", "text": "Très bientôt. En t'inscrivant sur la liste d'attente, tu es parmi les premiers avertis au lancement. Tu reçois aussi un bonus de bienvenue si tu fais partie des 500 premiers inscrits."}}, {"@type": "Question", "name": "Est-ce vraiment gratuit ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui, totalement. Noova est gratuit pour les utilisateurs. Ce sont les partenaires de Noova (villes et commerces) qui financent l'app, pas toi. Sauf qu'ici, c'est toi qui es récompensé pour tes réponses."}}, {"@type": "Question", "name": "Comment mes réponses sont-elles utilisées ?", "acceptedAnswer": {"@type": "Answer", "text": "Tes réponses sont transmises de façon anonyme uniquement aux marques que tu as expressément autorisées. Tu sais toujours pourquoi une question t'est posée et ce qu'une marque cherche à comprendre. Aucune donnée n'est revendue à des tiers sans ton accord."}}, {"@type": "Question", "name": "Quelles récompenses puis-je gagner ?", "acceptedAnswer": {"@type": "Answer", "text": "Produits offerts, réductions, accès exclusifs, et un peu de cashback si tu préfères. À utiliser directement chez les enseignes près de chez toi. Les récompenses varient selon les commerces partenaires. Tes points n'expirent pas."}}, {"@type": "Question", "name": "Puis-je me désinscrire à tout moment ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui, sans aucune contrainte. Tu peux à tout moment bloquer une marque, supprimer tes données ou fermer ton compte. Aucun abonnement, aucun engagement. Tu restes libre."}}]}]}
 </script>
 <style>
 :root{
   --bg:#F7F6F2;--bg2:#EFEDE8;--bg3:#E6E3DC;--card:#FFFFFF;
   --ink:#17141A;--ink2:#605A68;--ink3:#A9A4B0;
-  --coral:#f9a716;--coral-d:#d4900f;--coral-soft:rgba(249,167,22,.10);
+  --coral:#f9a716;--coral-d:#d4900f;--coral-soft:rgba(249,167,22,.10);--coral-text:#8F5400;
   --amber:#f9a716;--gold:#fce1a7;
   --grad:linear-gradient(135deg,#f9a716 0%,#fcc86a 50%,#fce1a7 100%);
   --grad-warm:linear-gradient(135deg,#f9a716,#fcc86a);
@@ -73,7 +75,7 @@ a{color:inherit;text-decoration:none}
 body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
 /* ---------- typography (impact) ---------- */
-.eyebrow{font-family:var(--fd);font-weight:800;font-stretch:125%;font-size:12.5px;letter-spacing:2px;text-transform:uppercase;color:var(--coral)}
+.eyebrow{font-family:var(--fd);font-weight:800;font-stretch:125%;font-size:12.5px;letter-spacing:2px;text-transform:uppercase;color:var(--coral-text)}
 h1,h2{font-family:var(--fd);font-weight:900;font-stretch:125%;text-transform:uppercase;line-height:.98;letter-spacing:-.5px}
 h1{font-size:clamp(30px,5.4vw,52px)}
 h2{font-size:clamp(25px,4vw,40px)}
@@ -162,7 +164,7 @@ p{color:var(--ink2)}
 .how-head h2{margin-bottom:13px}
 .how-head p{font-size:16px}
 .phone-stage{position:relative;display:flex;flex-direction:column;align-items:center;justify-self:center}
-.phone-hint{display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;font-size:12.5px;font-weight:800;font-family:var(--fd);font-stretch:110%;letter-spacing:.3px;color:var(--coral-d);background:#fff;border:1px solid rgba(249,167,22,.2);border-radius:100px;padding:8px 14px;box-shadow:var(--shadow-sm)}
+.phone-hint{display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;font-size:12.5px;font-weight:800;font-family:var(--fd);font-stretch:110%;letter-spacing:.3px;color:var(--coral-text);background:#fff;border:1px solid rgba(249,167,22,.2);border-radius:100px;padding:8px 14px;box-shadow:var(--shadow-sm)}
 .phone-hint .tap{animation:tap 1.8s ease-in-out infinite;display:inline-block}
 @keyframes tap{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .phone-halo{position:absolute;width:115%;height:80%;top:14%;left:-7.5%;border-radius:50%;background:radial-gradient(circle,rgba(249,167,22,.26),transparent 68%);filter:blur(34px);z-index:0;animation:halo 5s ease-in-out infinite}
@@ -179,7 +181,7 @@ p{color:var(--ink2)}
 .hw-step:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(249,167,22,.3)}
 .hw-ico{flex:none;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(249,167,22,.12);color:var(--amber)}
 .hw-txt{flex:1}
-.hw-lbl{display:block;font-family:var(--fd);font-weight:800;font-stretch:125%;font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--coral);margin-bottom:5px}
+.hw-lbl{display:block;font-family:var(--fd);font-weight:800;font-stretch:125%;font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--coral-text);margin-bottom:5px}
 .hw-txt h3{margin-bottom:5px}
 .hw-txt p{font-size:14px;line-height:1.5;color:var(--ink2)}
 
@@ -221,7 +223,7 @@ p{color:var(--ink2)}
 .footer-col h4{font-family:var(--fd);font-weight:800;font-stretch:110%;text-transform:uppercase;letter-spacing:1.2px;font-size:11.5px;color:rgba(255,255,255,.45);margin-bottom:14px}
 .footer-col a{display:block;color:rgba(255,255,255,.75);font-size:14px;font-weight:500;margin-bottom:10px;transition:color .18s}
 .footer-col a:hover{color:var(--amber)}
-.footer-bottom{margin-top:42px;padding-top:22px;border-top:1px solid rgba(255,255,255,.07);font-size:12.5px;color:rgba(255,255,255,.4)}
+.footer-bottom{margin-top:42px;padding-top:22px;border-top:1px solid rgba(255,255,255,.07);font-size:12.5px;color:rgba(255,255,255,.72)}
 
 /* reveal */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.2,.8,.3,1),transform .7s cubic-bezier(.2,.8,.3,1)}
@@ -254,7 +256,7 @@ p{color:var(--ink2)}
 .stat+.stat::before{content:'';position:absolute;left:0;top:20%;height:60%;width:1px;background:rgba(255,255,255,.1)}
 .stat-n{display:block;font-family:var(--fd);font-weight:900;font-stretch:125%;font-size:clamp(24px,3vw,34px);color:#fff;letter-spacing:-.5px;line-height:1}
 .stat-n em{color:var(--amber);font-style:normal}
-.stat-l{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.6px;color:rgba(255,255,255,.42);margin-top:5px}
+.stat-l{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.6px;color:rgba(255,255,255,.72);margin-top:5px}
 @media(max-width:540px){.stat{min-width:50%;padding:16px 12px}.stat:nth-child(3)::before,.stat:nth-child(4)::before{display:none}}
 
 /* ---------- FAQ ---------- */
@@ -337,6 +339,11 @@ html{scroll-padding-top:76px}
 }
 
 /* ---------- INTRO OVERLAY ---------- */
+.skip-link{position:absolute;left:12px;top:-60px;z-index:100000;background:#fff;color:#17141A;padding:10px 16px;border-radius:10px;font-weight:700;text-decoration:none}
+.skip-link:focus{top:12px;outline:3px solid #f9a716}
+.wl-legal{max-width:520px;margin:14px auto 0;font-size:12.5px;line-height:1.55;color:rgba(255,255,255,.72);text-align:center}
+.wl-legal a{color:#fce1a7;text-decoration:underline}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #f9a716;outline-offset:2px}
 #intro-overlay{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(130% 120% at 55% -5%,#241F2B 0%,#0F0D12 60%);transition:opacity .7s ease}
 #intro-overlay.out{opacity:0;pointer-events:none}
 #intro-logo{height:118px;width:auto;animation:introPop .65s cubic-bezier(.34,1.56,.64,1) .2s both}
@@ -347,10 +354,11 @@ html{scroll-padding-top:76px}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
 
 <!-- INTRO OVERLAY -->
-<div id="intro-overlay">
-  <img id="intro-logo" src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Noova">
+<div id="intro-overlay" aria-hidden="true">
+  <img id="intro-logo" src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="">
   <div id="intro-sep"></div>
   <div id="intro-tagline">Là où tes avis ont de la valeur</div>
 </div>
@@ -363,10 +371,10 @@ html{scroll-padding-top:76px}
     </div>
     <div class="waitlist-wrap header-waitlist">
       <form class="waitlist-form" onsubmit="submitWaitlist(event)">
-        <input type="email" placeholder="ton@email.com" autocomplete="email" required>
+        <input type="email" placeholder="ton@email.com" autocomplete="email" aria-label="Ton adresse e-mail" required>
         <button type="submit" class="btn">Rejoindre</button>
       </form>
-      <div class="waitlist-error"></div>
+      <div class="waitlist-error" role="alert"></div>
       <div class="waitlist-done">
         <div class="chk">✓</div>
         <span>Tu es sur la liste !</span>
@@ -376,6 +384,7 @@ html{scroll-padding-top:76px}
   </div>
 </header>
 
+<main id="contenu">
 <!-- HERO (deux colonnes : texte gauche + téléphone droite) -->
 <section class="hero">
   <div class="blob a"></div>
@@ -411,7 +420,7 @@ html{scroll-padding-top:76px}
         <span class="phone-hint"><span class="tap">↗</span>Démo interactive · touche l'écran</span>
         <div class="phone-halo"></div>
         <div class="phone-scaler">
-          <div class="phone-wrap"><iframe id="demoFrame" title="Démo interactive de l'application Noova" scrolling="no"></iframe></div>
+          <div class="phone-wrap"><iframe id="demoFrame" title="Démo interactive de l'application Noova : réponds à une question pour voir comment ça marche" scrolling="no"></iframe></div>
         </div>
       </div>
     </div>
@@ -475,7 +484,7 @@ html{scroll-padding-top:76px}
     <div class="faq-list">
 
       <div class="faq-item reveal">
-        <button class="faq-btn" onclick="toggleFaq(this)">
+        <button type="button" class="faq-btn" aria-expanded="false" onclick="toggleFaq(this)">
           <span>Quand l'application sera-t-elle disponible ?</span>
           <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
         </button>
@@ -483,15 +492,15 @@ html{scroll-padding-top:76px}
       </div>
 
       <div class="faq-item reveal d1">
-        <button class="faq-btn" onclick="toggleFaq(this)">
+        <button type="button" class="faq-btn" aria-expanded="false" onclick="toggleFaq(this)">
           <span>Est-ce vraiment gratuit ?</span>
           <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
         </button>
-        <div class="faq-a"><p>Oui, totalement. Noova est gratuit pour les utilisateurs. Ce sont les commerces et enseignes partenaires qui financent l'app, exactement comme sur les réseaux sociaux. Sauf qu'ici, c'est toi qui es récompensé pour tes réponses.</p></div>
+        <div class="faq-a"><p>Oui, totalement. Noova est gratuit pour les utilisateurs. Ce sont les partenaires de Noova (villes et commerces) qui financent l'app, pas toi. Sauf qu'ici, c'est toi qui es récompensé pour tes réponses.</p></div>
       </div>
 
       <div class="faq-item reveal d2">
-        <button class="faq-btn" onclick="toggleFaq(this)">
+        <button type="button" class="faq-btn" aria-expanded="false" onclick="toggleFaq(this)">
           <span>Comment mes réponses sont-elles utilisées ?</span>
           <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
         </button>
@@ -499,7 +508,7 @@ html{scroll-padding-top:76px}
       </div>
 
       <div class="faq-item reveal d3">
-        <button class="faq-btn" onclick="toggleFaq(this)">
+        <button type="button" class="faq-btn" aria-expanded="false" onclick="toggleFaq(this)">
           <span>Quelles récompenses puis-je gagner ?</span>
           <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
         </button>
@@ -507,7 +516,7 @@ html{scroll-padding-top:76px}
       </div>
 
       <div class="faq-item reveal d4">
-        <button class="faq-btn" onclick="toggleFaq(this)">
+        <button type="button" class="faq-btn" aria-expanded="false" onclick="toggleFaq(this)">
           <span>Puis-je me désinscrire à tout moment ?</span>
           <div class="faq-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
         </button>
@@ -527,17 +536,18 @@ html{scroll-padding-top:76px}
     <p class="final-sub reveal">L'application arrive bientôt. Inscris-toi pour être prévenu au lancement et recevoir ton bonus de bienvenue si tu fais partie des 500 premiers inscrits.</p>
     <div class="waitlist-wrap reveal" style="max-width:520px;margin:0 auto;">
       <form class="waitlist-form" id="waitlist-form" onsubmit="submitWaitlist(event)">
-        <input type="email" id="waitlist-email" placeholder="ton@email.com" autocomplete="email" required>
+        <input type="email" id="waitlist-email" placeholder="ton@email.com" autocomplete="email" aria-label="Ton adresse e-mail" required>
         <button type="submit" class="btn">Rejoindre
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </button>
       </form>
-      <div class="waitlist-error" id="waitlist-error"></div>
+      <div class="waitlist-error" id="waitlist-error" role="alert"></div>
       <div class="waitlist-done" id="waitlist-done">
         <div class="chk">✓</div>
         <span>Tu es sur la liste ! On te prévient au lancement 🎉</span>
       </div>
     </div>
+    <p class="wl-legal">Ton adresse e-mail sert uniquement à te prévenir du lancement de Noova. Tu peux demander sa suppression à tout moment. <a href="/confidentialite.html#liste-attente">Comment sont utilisées tes données</a></p>
     <div class="reassure dark">
       <span><span class="tick">✓</span>Gratuit</span>
       <span><span class="tick">✓</span>Pas de spam</span>
@@ -547,11 +557,13 @@ html{scroll-padding-top:76px}
   </div>
 </section>
 
+</main>
+
 <!-- FOOTER -->
 <footer class="footer">
   <div class="wrap footer-in">
     <div class="footer-brand">
-      <img class="logo-img" src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Noova">
+      <img class="logo-img" src="Plan%20de%20travail%208LOGO_NOOVAV2.png" alt="Logo Noova">
       <p>L'app où ton avis te rapporte, près de chez toi. Tu réponds, tu gagnes des points, tu gardes le contrôle.</p>
       <span class="pill"><span class="dot"></span>Bientôt sur iOS &amp; Android</span>
     </div>
@@ -564,8 +576,12 @@ html{scroll-padding-top:76px}
       </div>
       <div class="footer-col">
         <h4>Légal</h4>
-        <a href="#">Mentions légales</a>
-        <a href="#">Confidentialité</a>
+        <a href="/mentions-legales.html">Mentions légales</a>
+        <a href="/confidentialite.html">Politique de confidentialité</a>
+        <a href="/cgu.html">Conditions d'utilisation</a>
+        <a href="/cookies.html">Cookies</a>
+        <a href="#" data-nv-cookies>Gérer mes cookies</a>
+        <a href="/accessibilite.html">Accessibilité</a>
       </div>
     </nav>
   </div>
@@ -580,13 +596,11 @@ html{scroll-padding-top:76px}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Noova</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/noova-fonts.css">
 <style>
 :root{
   --bg:#F7F6F2;--bg2:#EEECEA;--bg3:#E0DDD8;--card:#FFFFFF;
-  --ink:#17141A;--ink2:#6A6470;--ink3:#B2ADB9;
+  --ink:#17141A;--ink2:#5A5462;--ink3:#6B6570;
   --coral:#E07D0A;--cd:rgba(224,125,10,.09);--cg:rgba(224,125,10,.22);
   --violet:#A14E08;--vd:rgba(161,78,8,.09);--vg:rgba(161,78,8,.2);
   --amber:#F5A623;--mint:#0BAB84;--md:rgba(11,171,132,.1);--mg:rgba(11,171,132,.2);
@@ -1301,7 +1315,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="stat-c"><div class="stat-n" style="color:var(--coral)" id="s-ans">0</div><div class="stat-l">Réponses</div></div>
       <div class="stat-c"><div class="stat-n" style="color:var(--amber)" id="s-str">1</div><div class="stat-l">🔥 Streak</div></div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;background:var(--md);border:1.5px solid var(--mg);border-radius:12px;padding:11px 13px;margin-bottom:11px"><span style="font-size:20px">🛡️</span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Révoque chaque consentement ou supprime ton compte ci-dessous. Conforme RGPD.</div></div>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--md);border:1.5px solid var(--mg);border-radius:12px;padding:11px 13px;margin-bottom:11px"><span style="font-size:20px">🛡️</span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Révoque chaque consentement ou supprime ton compte ci-dessous.</div></div>
     <div class="sec-card">
       <div class="sc-hdr"><span style="font-size:18px">🔐</span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--coral);font-weight:700;cursor:pointer" onclick="goNav('brands')">Gérer</span></div>
       <div id="consent-mgmt"></div>
@@ -2061,8 +2075,7 @@ function shareGame(b){const t=b.textContent;b.textContent='✓ Partagé en story
    WAITLIST — Supabase
    Supabase Dashboard > Settings > API
    SUPABASE_URL  : Project URL (https://xxxx.supabase.co)
-   SUPABASE_ANON_KEY : anon public key — JWT commençant par "eyJ..."
-   eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjeHllbWhwdmhla2pwenloaWNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMTE1ODQsImV4cCI6MjA5Nzc4NzU4NH0.PJFLJ0-h427GGrl45m1tLfALJNDO_mRXwyeFo8Aa9XQ
+   SUPABASE_ANON_KEY : clé publique « anon » (protégée par les règles RLS de la table)
    ============================================================ */
 var SUPABASE_URL = 'https://xcxyemhpvhekjpzyhici.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjeHllbWhwdmhla2pwenloaWNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMTE1ODQsImV4cCI6MjA5Nzc4NzU4NH0.PJFLJ0-h427GGrl45m1tLfALJNDO_mRXwyeFo8Aa9XQ';
@@ -2072,32 +2085,6 @@ function isValidEmail(email) {
     email.length >= 6 &&
     !email.includes('..') &&
     email.split('@')[1].includes('.');
-}
-
-/* Vérifie que le domaine accepte des emails via Google DNS-over-HTTPS.
-   Retourne true si OK ou si la vérification échoue (fail open). */
-async function checkEmailDomain(email) {
-  var domain = email.split('@')[1];
-  if (!domain) return false;
-  try {
-    var res = await fetch('https://dns.google/resolve?name=' + encodeURIComponent(domain) + '&type=MX', { mode: 'cors' });
-    if (!res.ok) return true;
-    var data = await res.json();
-    /* Status 3 = NXDOMAIN : le domaine n'existe pas */
-    if (data.Status === 3) return false;
-    /* Status 0 avec MX records = domaine mail valide */
-    if (data.Status === 0 && data.Answer && data.Answer.length > 0) return true;
-    /* Status 0 sans MX mais domaine existant : on vérifie l'enregistrement A */
-    if (data.Status === 0) {
-      var a = await fetch('https://dns.google/resolve?name=' + encodeURIComponent(domain) + '&type=A', { mode: 'cors' });
-      if (!a.ok) return true;
-      var ad = await a.json();
-      return ad.Status !== 3;
-    }
-    return true;
-  } catch (err) {
-    return true; /* En cas d'erreur réseau, on laisse passer */
-  }
 }
 
 async function submitWaitlist(e) {
@@ -2119,16 +2106,6 @@ async function submitWaitlist(e) {
   }
 
   btn.disabled = true;
-  btn.textContent = 'Vérification…';
-
-  var domainOk = await checkEmailDomain(email);
-  if (!domainOk) {
-    if (errorEl) errorEl.textContent = 'Ce domaine email n\'existe pas. Vérifie l\'adresse (ex : gmail.com, outlook.fr…)';
-    btn.disabled = false;
-    btn.innerHTML = origBtn;
-    return;
-  }
-
   btn.textContent = '…';
 
   try {
@@ -2220,7 +2197,8 @@ function toggleFaq(btn) {
   var item = btn.closest('.faq-item');
   var isOpen = item.classList.contains('open');
   document.querySelectorAll('.faq-item.open').forEach(function(el){ el.classList.remove('open'); });
-  if (!isOpen) item.classList.add('open');
+  document.querySelectorAll('.faq-btn').forEach(function(b){ b.setAttribute('aria-expanded','false'); });
+  if (!isOpen) { item.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
 }
 
 /* Reveal au scroll + counter trigger */

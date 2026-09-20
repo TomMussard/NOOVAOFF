@@ -1,0 +1,4 @@
+Bibliothèques tierces auto-hébergées (aucune requête vers un CDN externe) :
+- Leaflet 1.9.4 — licence BSD 2-Clause — © 2010-2023 Vladimir Agafonkin, © 2010-2011 CloudMade — https://leafletjs.com
+- qrcode-generator 1.4.4 — licence MIT — © Kazuhiko Arase — https://github.com/kazuhikoarase/qrcode-generator
+Polices (dossier /fonts) : Plus Jakarta Sans, Bricolage Grotesque, Archivo — licence SIL Open Font License 1.1 (https://openfontlicense.org).

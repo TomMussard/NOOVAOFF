@@ -1,0 +1,23 @@
+# Noova — le site et les pages légales sont publics et bienvenus pour les moteurs de recherche et les assistants IA.
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /noova_dashboard.html
+Disallow: /noova_admin.html
+
+# Robots d'assistants et de moteurs IA : accès explicitement autorisé aux pages publiques
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /dashboard
+Disallow: /noova_dashboard.html
+Disallow: /noova_admin.html
+
+Sitemap: https://www.noovaoff.fr/sitemap.xml

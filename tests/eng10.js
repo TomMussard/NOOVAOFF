@@ -43,8 +43,8 @@ const ADMIN='http://localhost:8950/admin.html';
     await p.evaluate(()=>showAuthWall('login'));await setVal(p,'#aw-email','alex@t.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());
     await wf(p,()=>document.getElementById('home').classList.contains('active')&&S.user&&S.qs.length>=2,null,30000);
     await p.addStyleTag({content:'body>div[style*="emulator"]{display:none!important}'});
-    await wf(p,()=>typeof firebase.analytics==='function',null,15000);
-    check('Statistiques chargées après le démarrage, événements mis en file puis envoyés',await p.evaluate(()=>typeof analytics!=='undefined'&&analytics!==null&&_trackQueue.length===0));
+    await sleep(2500);
+    check('Statistiques : le choix « refusé » est respecté — bibliothèque jamais chargée, aucun événement en file (le cas « accepté » est testé dans eng14)',await p.evaluate(()=>typeof firebase.analytics!=='function'&&analytics===null&&_trackQueue.length===0));
     check('Photo de profil : la bibliothèque de stockage se charge à la demande',await p.evaluate(async()=>{await loadFirebaseSdk('storage');return typeof firebase.storage==='function';}));
     check('Police auto-hébergée : aucune requête vers Google Fonts, la police est bien appliquée',await p.evaluate(async()=>{await document.fonts.ready;const f=[...document.fonts].filter(x=>x.family.replace(/["']/g,'')==='Plus Jakarta Sans'&&x.status==='loaded').length;return f>=1&&!document.querySelector('link[href*="fonts.googleapis"]')&&getComputedStyle(document.body).fontFamily.includes('Jakarta');}));
     // accueil

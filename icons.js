@@ -104,7 +104,7 @@
     const size = opts.size || 18;
     const markup = NOOVA_ICONS[name] || NOOVA_ICONS['warning'];
     const cls = 'ic ic-' + name + (opts.class ? ' ' + opts.class : '');
-    return '<span class="' + cls + '" style="display:inline-flex;width:' + size + 'px;height:' + size + 'px;flex-shrink:0">' + markup + '</span>';
+    return '<span class="' + cls + '" aria-hidden="true" style="display:inline-flex;width:' + size + 'px;height:' + size + 'px;flex-shrink:0">' + markup + '</span>';
   }
 
   window.NOOVA_ICONS = NOOVA_ICONS;

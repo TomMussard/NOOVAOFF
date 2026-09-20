@@ -1,1 +1,2 @@
 Plus Jakarta Sans (police variable, sous-ensembles latin et latin-ext), © The Plus Jakarta Sans Project Authors, licence SIL Open Font License 1.1 (https://openfontlicense.org). Auto-hébergée pour ne plus dépendre de Google Fonts au démarrage.
+Bricolage Grotesque (© The Bricolage Grotesque Project Authors) et Archivo (© The Archivo Project Authors), licence SIL Open Font License 1.1, auto-hébergées ; feuille commune : noova-fonts.css.

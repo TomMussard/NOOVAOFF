@@ -11,9 +11,11 @@ const ROOT = path.join(__dirname, ".."), SITE = path.join(__dirname, ".site");
 function buildSite() {
   fs.rmSync(SITE, { recursive: true, force: true });
   fs.mkdirSync(SITE, { recursive: true });
-  fs.readdirSync(ROOT).filter((f) => /\.(png|svg)$/.test(f)).concat(["icons.js", "firebase-messaging-sw.js", "manifest.json"])
+  fs.readdirSync(ROOT).filter((f) => /\.(png|svg)$/.test(f)).concat(["icons.js", "firebase-messaging-sw.js", "manifest.json", "consent.js", "legal.css", "robots.txt", "sitemap.xml", "llms.txt", "index.html"])
+    .concat(fs.readdirSync(ROOT).filter((f) => /\.html$/.test(f) && !/^(app_DEF|noova_dashboard|noova_admin|index)\.html$/.test(f)))
     .forEach((f) => fs.copyFileSync(path.join(ROOT, f), path.join(SITE, f)));
   fs.cpSync(path.join(ROOT, "fonts"), path.join(SITE, "fonts"), { recursive: true });
+  fs.cpSync(path.join(ROOT, "vendor"), path.join(SITE, "vendor"), { recursive: true });
   const emu = "auth.useEmulator('http://127.0.0.1:9099');db.useEmulator('127.0.0.1',8080);fx.useEmulator('127.0.0.1',5001);";
   const emuAdmin = "\nauth.useEmulator('http://127.0.0.1:9099');db.useEmulator('127.0.0.1',8080);";
   [["app_DEF.html", "app.html", "const fx  = firebase.app().functions('europe-west1');", emu],
@@ -22,6 +24,8 @@ function buildSite() {
     const html = fs.readFileSync(path.join(ROOT, src), "utf8");
     if (html.split(marker).length !== 2) throw new Error(`${src} : repère d'injection introuvable (${marker})`);
     let out = html.replace(marker, marker + add);
+    // Les tests ne doivent pas être gênés par le bandeau de cookies : le choix « refusé » est pré-enregistré (sauf avec ?noconsent, utilisé par eng14).
+    if (dst === "app.html") out = out.replace("<head>", "<head>\n<script>try{if(!/[?&]noconsent/.test(location.search))localStorage.setItem('nv_consent',JSON.stringify({v:1,analytics:false,ts:Date.now()}))}catch(e){}</script>");
     // Le back-office déclare ses fonctions plus bas : on les branche aussi sur l'émulateur.
     if (dst === "admin.html") out = out.replace("const fx  = firebase.app().functions('europe-west1');", "const fx  = firebase.app().functions('europe-west1');fx.useEmulator('127.0.0.1',5001);");
     fs.writeFileSync(path.join(SITE, dst), out);
@@ -29,7 +33,7 @@ function buildSite() {
 }
 
 function serve(port) {
-  const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".png": "image/png", ".svg": "image/svg+xml", ".json": "application/json", ".woff2": "font/woff2" };
+  const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".png": "image/png", ".svg": "image/svg+xml", ".json": "application/json", ".woff2": "font/woff2", ".css": "text/css; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".xml": "application/xml" };
   return new Promise((resolve) => {
     const srv = http.createServer((req, res) => {
       const f = path.join(SITE, decodeURIComponent(req.url.split("?")[0]).replace(/\.\./g, ""));
@@ -45,7 +49,7 @@ function serve(port) {
   });
 }
 
-const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "eng8", "eng9", "eng10", "eng11", "eng12", "eng13", "notif_server", "notif_ui", "mobile_audit", "a11y_audit", "tour_audit", "perf_audit"];
+const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "eng8", "eng9", "eng10", "eng11", "eng12", "eng13", "eng14", "notif_server", "notif_ui", "mobile_audit", "a11y_audit", "tour_audit", "perf_audit"];
 
 function runSuite(name) {
   return new Promise((resolve) => {

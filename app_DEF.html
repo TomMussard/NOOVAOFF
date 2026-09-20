@@ -1,33 +1,31 @@
 ﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6M20ZMJBX8"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-6M20ZMJBX8');</script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<!-- Consentement aux traceurs : aucune mesure d'audience ne démarre avant un choix explicite (voir consent.js) -->
+<script src="/consent.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Noova — Là où vos avis ont de la valeur</title>
 <meta name="description" content="Répondez aux sondages de commerces près de chez vous et gagnez des récompenses exclusives. Votre avis vaut quelque chose sur Noova.">
 <meta name="keywords" content="noova, avis consommateurs, sondage rémunéré, récompenses, points fidélité, commerces de proximité, quartier, bons de réduction">
 <meta name="robots" content="index, follow">
 <meta name="author" content="Noova">
-<link rel="canonical" href="https://noova.fr">
+<link rel="canonical" href="https://www.noovaoff.fr/app">
 
 <!-- Open Graph / Réseaux sociaux -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://noova.fr">
+<meta property="og:url" content="https://www.noovaoff.fr/app">
 <meta property="og:title" content="Noova — Là où vos avis ont de la valeur">
 <meta property="og:description" content="Répondez aux sondages de commerces près de chez vous et gagnez des récompenses exclusives.">
-<meta property="og:image" content="https://noova.fr/og-image.jpg">
+<meta property="og:image" content="https://www.noovaoff.fr/icon-512.png">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Noova">
 
 <!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Noova — Là où vos avis ont de la valeur">
 <meta name="twitter:description" content="Répondez aux sondages de commerces près de chez vous et gagnez des récompenses exclusives.">
-<meta name="twitter:image" content="https://noova.fr/og-image.jpg">
-<meta name="twitter:site" content="@NoovaApp">
+<meta name="twitter:image" content="https://www.noovaoff.fr/icon-512.png">
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -59,13 +57,13 @@
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "Noova",
-  "url": "https://noova.fr",
+  "url": "https://www.noovaoff.fr/app",
   "description": "Répondez aux sondages de commerces près de chez vous et gagnez des récompenses exclusives. Votre avis vaut quelque chose.",
   "applicationCategory": "LifestyleApplication",
   "operatingSystem": "Web",
   "inLanguage": "fr-FR",
   "offers": {"@type": "Offer","price": "0","priceCurrency": "EUR"},
-  "publisher": {"@type": "Organization","name": "Noova","url": "https://noova.fr"}
+  "publisher": {"@type": "Organization","name": "Noova","url": "https://www.noovaoff.fr/"}
 }
 </script>
 <!-- Firebase compat SDK -->
@@ -88,7 +86,7 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
      les anciens noms sont conservés en alias pour ne pas casser les usages
      existants, mais pointent tous vers les mêmes valeurs de référence. */
   --bg:#FFFBD7;--bg2:#FFF6B8;--bg3:#FFEC96;--card:#FFFFFF;
-  --ink:#1C1917;--ink2:#6B6559;--ink3:#B0A89A;--icon-gray:#6B6559;
+  --ink:#1C1917;--ink2:#5F594E;--ink3:#71695D;--icon-gray:#5F594E;
   --coral:#FFC300;--cd:rgba(255,195,0,.16);--cg:rgba(255,195,0,.4);
   --violet:#1C1917;--vd:rgba(28,25,23,.06);--vg:rgba(28,25,23,.14);
   --amber:#FFC300;--mint:#264F3C;--md:#E7F0E9;--mg:rgba(38,79,60,.18);
@@ -242,6 +240,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .cp-pill.ok{background:var(--ink);color:var(--yellow)}
 .cp-pill.need,.cp-pill.private,.cp-pill.pending{font-size:11px;font-weight:700}
 .cp-pill.pending{background:transparent;border:1.5px dashed var(--line-strong)}
+.legal-links{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 16px;padding:4px 14px 14px;font-size:12.5px}
+.legal-links a{color:var(--ink2);text-decoration:underline;padding:8px 2px;min-height:24px}
+@supports (-webkit-touch-callout:none){input,select,textarea{font-size:16px!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 .rv-skel .rv-bar{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
 #lock-bar{height:6px;border-radius:99px;overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
 #lock-bar.on{opacity:1}
@@ -540,7 +542,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .fi:last-child{border-bottom:none}.fi:active{opacity:.6}
 .fi-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:16px;flex-shrink:0;position:relative}
 .fi-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
-.fi-online{position:absolute;bottom:1px;right:1px;width:10px;height:10px;background:#22C55E;border-radius:50%;border:2px solid var(--bg)}
 .fi-name{font-size:13px;font-weight:600;color:var(--ink)}
 .fi-pts{font-size:11px;color:var(--ink2);margin-top:1px}
 .group-c{background:var(--card);border:1.5px solid var(--bg3);border-radius:var(--r);padding:12px 13px;margin:0 18px 8px;display:flex;gap:11px;align-items:center;cursor:pointer}
@@ -1032,8 +1033,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
           <div style="font-family:var(--fd);font-weight:800;font-size:58px;color:var(--ink);line-height:1;letter-spacing:-2px">+10</div>
           <div style="font-size:13px;color:var(--gold-text);font-weight:600">points par réponse</div>
           <div style="display:flex;gap:7px;margin-top:4px">
-            <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:var(--ink);display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg> Café offert</div>
-            <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:var(--ink);display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Viennoiserie</div>
+            <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:var(--ink);display:inline-flex;align-items:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg> Café offert</div>
+            <div style="font-size:11px;font-weight:700;background:#fff;padding:5px 11px;border-radius:99px;color:var(--ink);display:inline-flex;align-items:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Viennoiserie</div>
           </div>
         </div>
         <h1 class="ob-title">Tes réponses<br>te rapportent<br><em>des points.</em></h1>
@@ -1174,11 +1175,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <p class="auth-sub" style="margin-bottom:4px">Active ou désactive chaque commerce en un tap. Seuls ceux que tu acceptes peuvent te poser des questions.</p>
     </div>
     <div id="mm-authorized-section">
-      <div class="brand-cat-hdr" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Autorisés</div>
+      <div class="brand-cat-hdr" style="display:flex;align-items:center;gap:6px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Autorisés</div>
       <div id="mm-authorized-list"></div>
     </div>
     <div id="mm-available-section" style="margin-top:8px">
-      <div class="brand-cat-hdr" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 5v14M5 12h14"/></svg> Autres commerces près de toi</div>
+      <div class="brand-cat-hdr" style="display:flex;align-items:center;gap:6px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 5v14M5 12h14"/></svg> Autres commerces près de toi</div>
       <div id="mm-available-list"></div>
     </div>
     <div class="consent-note" style="margin:14px 18px"><strong style="color:var(--violet)">Tu gardes le contrôle.</strong> Un commerce retiré ne pourra plus te contacter. Aucune revente à des tiers.</div>
@@ -1218,7 +1219,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div id="daily-track"></div>
     <div class="dstreak-card">
       <div class="dstreak-top">
-        <div class="dstreak-fire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 2c1 3-2 4-2 7a2 2 0 004 0c1 1 2 2.5 2 4.5A5.5 5.5 0 016.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0012 22a8 8 0 007-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg></div>
+        <div class="dstreak-fire"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 2c1 3-2 4-2 7a2 2 0 004 0c1 1 2 2.5 2 4.5A5.5 5.5 0 016.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0012 22a8 8 0 007-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg></div>
         <div style="flex:1"><div class="dstreak-title" id="streak-title">Lance ta série aujourd'hui</div><div class="dstreak-sub" id="streak-sub">Continue pour débloquer un bonus</div></div>
       </div>
       <div class="dstreak-dots" id="streak-dots"></div>
@@ -1259,7 +1260,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="q-pts" id="q-pts-tag">+25 pts</div>
     </div>
     <div class="brand-hdr" onclick="openBrandFromQ()" style="cursor:pointer" title="Voir la page du commerce">
-      <div class="bh-logo" id="bh-logo" style="display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
+      <div class="bh-logo" id="bh-logo" style="display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
       <div style="flex:1;min-width:0">
         <div class="bh-name" id="bh-name">Commerce</div>
         <div class="bh-usage" id="bh-usage"></div>
@@ -1281,12 +1282,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- REWARD -->
 <div id="reward" class="screen">
   <div class="conf-layer" id="conf-layer"></div>
-  <div class="rw-circle" style="display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg></div>
+  <div class="rw-circle" style="display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg></div>
   <div class="rw-title">Bien joué !</div>
   <div class="rw-sub">Ta réponse a été envoyée</div>
   <div class="pts-earned"><div class="pe-plus">+</div><div class="pe-num" id="rw-pts">25</div><div class="pe-right"><div class="pe-lbl">Total cumulé</div><div class="pe-tot" id="rw-total">25 pts</div></div></div>
-  <div class="usage-card"><span style="flex-shrink:0;margin-top:1px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6" id="rw-usage">Ta réponse aide <strong>les commerces de ton quartier</strong> à mieux servir le coin.</div></div>
-  <div class="share-row" onclick="shareReward()"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:19px;height:19px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg></span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">Partager ma réponse</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">Montre-la à tes amis</div></div><span style="color:var(--ink3)">→</span></div>
+  <div class="usage-card"><span style="flex-shrink:0;margin-top:1px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6" id="rw-usage">Ta réponse aide <strong>les commerces de ton quartier</strong> à mieux servir le coin.</div></div>
+  <div class="share-row" onclick="shareReward()"><span style="display:inline-flex"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:19px;height:19px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg></span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">Partager ma réponse</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">Montre-la à tes amis</div></div><span style="color:var(--ink3)">→</span></div>
   <div id="rw-reveal" style="width:100%;position:relative;z-index:1"></div>
   <div id="rw-news" style="width:100%;position:relative;z-index:1"></div>
   <div id="rw-invite" style="width:100%;position:relative;z-index:1"></div>
@@ -1299,7 +1300,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="social-wrap">
     <div class="soc-hdr">
       <div class="soc-title">Communauté</div>
-      <div class="soc-bell" id="soc-bell" onclick="toggleNotifPanel(event)"><div class="bell-dot" id="bell-dot"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></div>
+      <div class="soc-bell" id="soc-bell" onclick="toggleNotifPanel(event)"><div class="bell-dot" id="bell-dot"></div><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></div>
     </div>
     <div class="notif-panel" id="notif-panel">
       <div class="notif-hdr"><span>Notifications</span><span class="notif-close" onclick="closeNotifPanel()">✕</span></div>
@@ -1362,7 +1363,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
           <div class="wc-level"><span id="wc-level">Niveau 1 · Curieux</span><span id="wc-next">1000 pts</span></div>
         </div>
         <div class="wc-ring-wrap">
-          <svg viewBox="0 0 80 80" class="wc-ring">
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 80 80" class="wc-ring">
             <circle cx="40" cy="40" r="34" class="wc-ring-track"/>
             <circle cx="40" cy="40" r="34" class="wc-ring-fill" id="wc-ring-fill"/>
           </svg>
@@ -1376,7 +1377,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div id="dprog-list" class="dprog-scroller"></div>
     <div id="tier-track-wrap"></div>
     <div class="dprog-row" id="rewards-all-btn" onclick="openRewardsSheet()" style="cursor:pointer">
-      <div style="width:52px;height:52px;border-radius:14px;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg></div>
+      <div style="width:52px;height:52px;border-radius:14px;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg></div>
       <div style="flex:1;min-width:0"><div class="dprog-name">Toutes les récompenses</div><div class="dprog-sub" id="rewards-all-count">Voir le catalogue et les paliers</div></div>
       <span style="color:#A9A296;font-size:18px">›</span>
     </div>
@@ -1394,7 +1395,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="dprof-id">
         <div class="dprof-av" id="prof-av" onclick="document.getElementById('avatar-file-inp').click()">
           <span id="prof-av-letter">A</span>
-          <div class="dprof-av-edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><circle cx="12" cy="13.5" r="3.2"/></svg></div>
+          <div class="dprof-av-edit"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><circle cx="12" cy="13.5" r="3.2"/></svg></div>
         </div>
         <input type="file" id="avatar-file-inp" accept="image/*" style="display:none" onchange="changeMyAvatar(this.files[0])">
         <div>
@@ -1413,12 +1414,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     </div>
     <div style="display:none" id="s-pts">0</div>
     <div class="dimpact">
-      <div class="dimpact-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
+      <div class="dimpact-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
       <div class="dimpact-txt" id="dimpact-txt">Réponds à quelques questions pour commencer à aider les commerces de ton quartier.</div>
     </div>
     <div class="dimpact" id="dpred" style="display:none"><div class="dimpact-ico" id="dpred-ico"></div><div class="dimpact-txt" id="dpred-txt"></div></div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span><div class="sc-title">Mes informations</div><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span><div class="sc-title">Mes informations</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div class="consent-it" style="cursor:pointer" onclick="document.getElementById('avatar-file-inp').click()">
         <div class="dprof-av" id="settings-av-thumb" style="width:34px;height:34px;font-size:13px;border-width:1.5px;cursor:pointer"><span id="settings-av-thumb-letter">A</span></div>
@@ -1426,48 +1427,48 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
         <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
       </div>
       <div class="consent-it" style="cursor:pointer" onclick="editUserField('name','Prénom',S.user.name)">
-        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span>
+        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span>
         <div style="flex:1"><div class="dconsent-name">Prénom</div><div class="dconsent-sub" id="set-u-name">—</div></div>
         <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
       </div>
       <div class="consent-it" style="cursor:pointer" onclick="editUserCity()">
-        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg></span>
+        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg></span>
         <div style="flex:1"><div class="dconsent-name">Ville</div><div class="dconsent-sub" id="set-u-city">—</div></div>
         <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
       </div>
       <div class="consent-it" style="cursor:pointer" onclick="openAgeEditSheet()">
-        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
+        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
         <div style="flex:1"><div class="dconsent-name">Tranche d'âge</div><div class="dconsent-sub" id="set-u-age">—</div></div>
         <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
       </div>
       <div class="consent-it" style="cursor:pointer" onclick="openInterestsEditSheet()">
-        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span>
+        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span>
         <div style="flex:1;min-width:0"><div class="dconsent-name">Centres d'intérêt</div><div class="dconsent-sub" id="set-u-interests" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div>
         <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;flex-shrink:0">Modifier</span>
       </div>
       <div class="consent-it" style="border-bottom:none">
-        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
         <div style="flex:1;min-width:0"><div class="dconsent-name">Email</div><div class="dconsent-sub" id="set-u-email" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div>
       </div>
       </div>
     </div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="openManageMerchants()">Gérer</span><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="openManageMerchants()">Gérer</span><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div id="consent-mgmt"></div>
       </div>
     </div>
     <div class="sec-card acc" id="share-answers-card">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
-      <div class="consent-it" style="cursor:pointer" onclick="goTo('manage-merchants');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
+      <div class="consent-it" style="cursor:pointer" onclick="goTo('manage-merchants');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
       <div class="consent-it"><div style="flex:1;min-width:0"><div class="dconsent-name">Montrer mes réponses à mes amis</div><div class="dconsent-sub" style="white-space:normal">Tes amis voient ce que tu as répondu. Tu comptes toujours dans les résultats.</div></div><label class="tgl"><input type="checkbox" id="share-answers-inp" checked onchange="setShareAnswers(this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>
-      <div class="consent-it" style="cursor:pointer" onclick="goTo('how-it-works');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Comment ça marche</div><span style="color:var(--ink3);font-size:17px">›</span></div>
-      <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Conforme RGPD — révoque ou supprime tes données ci-dessous.</div></div>
+      <div class="consent-it" style="cursor:pointer" onclick="goTo('how-it-works');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Comment ça marche</div><span style="color:var(--ink3);font-size:17px">›</span></div>
+      <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Tu peux révoquer ou supprimer tes données à tout moment ci-dessous.</div></div>
       </div>
     </div>
     <div class="sec-card acc" id="notif-section">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div class="sc-title">Notifications</div><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div class="sc-title">Notifications</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
         <div id="notif-device"></div>
         <div id="notif-switches"></div>
@@ -1475,22 +1476,30 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       </div>
     </div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span><div class="sc-title">Badges</div><span style="font-size:11px;color:var(--ink2);font-weight:700" id="badges-count"></span><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span><div class="sc-title">Badges</div><span style="font-size:11px;color:var(--ink2);font-weight:700" id="badges-count"></span><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div class="badge-list" id="badges-list"></div>
       </div>
     </div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg></span><div class="sc-title">Historique des réponses</div><span class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg></span><div class="sc-title">Historique des réponses</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div id="hist-list"></div>
       </div>
     </div>
+    <nav class="legal-links" aria-label="Informations légales">
+      <a href="/confidentialite.html" target="_blank" rel="noopener">Confidentialité</a>
+      <a href="/cookies.html" target="_blank" rel="noopener">Cookies</a>
+      <a href="#" data-nv-cookies>Gérer mes cookies</a>
+      <a href="/cgu.html" target="_blank" rel="noopener">CGU</a>
+      <a href="/mentions-legales.html" target="_blank" rel="noopener">Mentions légales</a>
+      <a href="/accessibilite.html" target="_blank" rel="noopener">Accessibilité</a>
+    </nav>
     <div style="padding:0 0 12px">
-      <button onclick="logout()" class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fd)"><span style="display:inline-flex;width:16px;height:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M20 12H10"/><path d="M16 8l4 4-4 4"/></svg></span> Se déconnecter</button>
+      <button onclick="logout()" class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fd)"><span style="display:inline-flex;width:16px;height:16px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M20 12H10"/><path d="M16 8l4 4-4 4"/></svg></span> Se déconnecter</button>
     </div>
     <div class="danger-c">
-      <div style="font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:15px;height:15px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg></span> Zone danger</div>
+      <div style="font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:15px;height:15px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg></span> Zone danger</div>
       <button class="dbtn" onclick="revokeAllConsents()">Révoquer tous les consentements</button>
       <button class="dbtn" onclick="deleteMyAccount()">Supprimer mon compte et mes données</button>
     </div>
@@ -1501,17 +1510,17 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- SURVEY OFFER -->
 <div id="survey-offer" class="screen">
   <div class="so-top">
-    <div class="so-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><path d="M4 12.5 9.5 18 20 6"/></svg></div>
+    <div class="so-check"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><path d="M4 12.5 9.5 18 20 6"/></svg></div>
     <div class="so-earned">Réponse envoyée · <b id="so-earned-pts">+25 pts</b> crédités</div>
   </div>
   <div class="so-card">
-    <div class="so-brand"><div id="so-logo"></div><div><div class="so-bname" id="so-bname">Commerce</div><div class="so-verif" style="display:flex;align-items:center;gap:4px"><span style="display:inline-flex;width:12px;height:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6"/></svg></span> Commerce du quartier</div></div></div>
+    <div class="so-brand"><div id="so-logo"></div><div><div class="so-bname" id="so-bname">Commerce</div><div class="so-verif" style="display:flex;align-items:center;gap:4px"><span style="display:inline-flex;width:12px;height:12px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6"/></svg></span> Commerce du quartier</div></div></div>
     <div class="so-title" id="so-title">Ce commerce aimerait creuser le sujet</div>
     <div class="so-desc" id="so-desc"></div>
     <div class="so-steps" id="so-steps"></div>
-    <div class="so-gain" style="display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:16px;height:16px;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg></span> <span>À gagner si tu continues :</span> <b id="so-gain-pts">+80 pts</b></div>
+    <div class="so-gain" style="display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:16px;height:16px;flex-shrink:0"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg></span> <span>À gagner si tu continues :</span> <b id="so-gain-pts">+80 pts</b></div>
   </div>
-  <div class="so-note"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><span>Aucune obligation : tes points sont déjà acquis, et tu sais exactement pour quel commerce tu réponds.</span></div>
+  <div class="so-note"><span style="display:inline-flex"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><span>Aucune obligation : tes points sont déjà acquis, et tu sais exactement pour quel commerce tu réponds.</span></div>
   <div class="so-actions">
     <button class="btn-p" onclick="startSurvey()">Continuer le questionnaire →</button>
     <button class="btn-s" onclick="endSurveyEarly()">Garder mes points et m'arrêter</button>
@@ -1589,7 +1598,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   </div>
   <div id="nv-full-map-wrap"><div id="nv-full-map"></div><div id="mf-nomap" style="display:none"></div></div>
   <div id="mf-filters"></div>
-  <button id="mf-locate" onclick="mapLocateMe()" aria-label="Ma position"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/><circle cx="12" cy="12" r="7.5"/></svg></button>
+  <button id="mf-locate" onclick="mapLocateMe()" aria-label="Ma position"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/><circle cx="12" cy="12" r="7.5"/></svg></button>
   <div id="mf-sheet">
     <div id="mf-handle" onclick="mapToggleSheet()"><div></div></div>
     <div id="mf-sheet-title"></div>
@@ -1599,10 +1608,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 <!-- BOTTOM NAV -->
 <nav class="bnav" id="bnav">
-  <div class="nav-it" id="nav-home" onclick="goNav('home')"><div class="nav-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nav-lbl">Accueil</div></div>
-  <div class="nav-it" id="nav-social" onclick="goNav('social')"><div class="nav-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="nav-lbl">Communauté</div><div class="nav-badge"></div></div>
-  <div class="nav-it" id="nav-rewards-tab" onclick="goNav('rewards-tab')"><div class="nav-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M20 6h-2.18c.07-.43.18-.84.18-1.25 0-2.07-1.68-3.75-3.75-3.75-1.03 0-1.96.43-2.63 1.12L10 3.87 8.38 2.12C7.71 1.43 6.78 1 5.75 1 3.68 1 2 2.68 2 4.75c0 .41.11.82.18 1.25H2v2h2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8h2V6h-2zm-7.63-2.38c.35-.36.83-.62 1.63-.62 1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H12.5l-.13-2.38zm-5.12-.25c1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H4.8c-.43-.31-.8-.71-.8-1.25C4 5.07 4.72 4.12 5.75 4.12zM4 19V8h7v11H4zm9 0V8h7v11h-7z"/></svg></div><div class="nav-lbl">Récompenses</div></div>
-  <div class="nav-it" id="nav-profile" onclick="goNav('profile')"><div class="nav-ico"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="nav-lbl">Profil</div></div>
+  <div class="nav-it" id="nav-home" onclick="goNav('home')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nav-lbl">Accueil</div></div>
+  <div class="nav-it" id="nav-social" onclick="goNav('social')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="nav-lbl">Communauté</div><div class="nav-badge"></div></div>
+  <div class="nav-it" id="nav-rewards-tab" onclick="goNav('rewards-tab')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M20 6h-2.18c.07-.43.18-.84.18-1.25 0-2.07-1.68-3.75-3.75-3.75-1.03 0-1.96.43-2.63 1.12L10 3.87 8.38 2.12C7.71 1.43 6.78 1 5.75 1 3.68 1 2 2.68 2 4.75c0 .41.11.82.18 1.25H2v2h2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8h2V6h-2zm-7.63-2.38c.35-.36.83-.62 1.63-.62 1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H12.5l-.13-2.38zm-5.12-.25c1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H4.8c-.43-.31-.8-.71-.8-1.25C4 5.07 4.72 4.12 5.75 4.12zM4 19V8h7v11H4zm9 0V8h7v11h-7z"/></svg></div><div class="nav-lbl">Récompenses</div></div>
+  <div class="nav-it" id="nav-profile" onclick="goNav('profile')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="nav-lbl">Profil</div></div>
 </nav>
 
 </div>
@@ -1635,7 +1644,7 @@ function logoHTML(name,size,logoUrl){
     // Échappement à deux niveaux : \' pour rester une chaîne JS valide dans l'attribut
     // onerror, &quot; pour ne pas casser l'attribut HTML lui-même (double-quoté).
     const safeName=esc(name).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-    return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.14);overflow:hidden;background:#1C1917"><img src="${logoUrl}" style="width:100%;height:100%;object-fit:cover;display:block" alt="" onerror="this.closest('div').outerHTML=logoFallbackHTML('${safeName}',${s})"></div>`;
+    return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.14);overflow:hidden;background:#1C1917"><img src="${logoUrl}" style="width:100%;height:100%;object-fit:cover;display:block" alt="Logo de ${esc(name)}" onerror="this.closest('div').outerHTML=logoFallbackHTML('${safeName}',${s})"></div>`;
   }
   return logoFallbackHTML(name,size);
 }
@@ -1658,13 +1667,13 @@ function fileIsDecodableImage(file){
 function avInner(photoUrl, name){
   const l=((name||'?')[0]||'?').toUpperCase();
   const ea=esc(l).replace(/"/g,'&quot;');
-  return photoUrl?`<img src="${esc(photoUrl)}" alt="" data-l="${ea}" onerror="this.replaceWith(this.dataset.l)">`:esc(l);
+  return photoUrl?`<img src="${esc(photoUrl)}" alt="Photo de ${esc(name||'profil')}" data-l="${ea}" onerror="this.replaceWith(this.dataset.l)">`:esc(l);
 }
 function renderUserAvatar(avEl, letterEl, name, photoUrl){
   if(!avEl) return;
   let img = avEl.querySelector('img');
   if(photoUrl){
-    if(!img){ img=document.createElement('img'); img.alt=''; avEl.insertBefore(img, avEl.firstChild); }
+    if(!img){ img=document.createElement('img'); img.alt='Ma photo de profil'; avEl.insertBefore(img, avEl.firstChild); }
     img.onerror = () => { img.remove(); if(letterEl) letterEl.style.visibility='visible'; };
     img.src = photoUrl;
     if(letterEl) letterEl.style.visibility='hidden';
@@ -1953,15 +1962,15 @@ function refreshHome(){
       const dropPhoto=()=>{ if(existingImg) existingImg.remove(); };
       if(window.Image && Image.prototype.decode){
         // On réutilise l'image déjà décodée par la sonde (pas de second fetch) plutôt que
-        // de recréer un <img> qui redemanderait le même fichier au réseau.
-        const probe=new Image(); probe.alt=''; probe.src=url;
+        // de recréer une image qui redemanderait le même fichier au réseau.
+        const probe=new Image(); probe.alt='Photo de '+(q.brand||'la question'); probe.src=url;
         probe.decode().then(()=>{
           if(existingImg){ existingImg.onerror=dropPhoto; existingImg.src=url; }
           else { probe.onerror=()=>probe.remove(); tcPhoto.insertBefore(probe, tcPhoto.firstChild); }
         }).catch(dropPhoto);
       } else {
         if(existingImg){ existingImg.onerror=dropPhoto; existingImg.src=url; }
-        else { const img=document.createElement('img'); img.alt=''; img.onerror=()=>img.remove(); img.src=url; tcPhoto.insertBefore(img, tcPhoto.firstChild); }
+        else { const img=document.createElement('img'); img.alt='Photo de '+(q.brand||'la question'); img.onerror=()=>img.remove(); img.src=url; tcPhoto.insertBefore(img, tcPhoto.firstChild); }
       }
     }
     else if(existingImg){ existingImg.remove(); }
@@ -2091,7 +2100,7 @@ function renderWeeklyQuestionVote(q) {
   if(!slot) return;
   const opts = (q.options||[]).map((o,i)=>`<button class="wq-opt-btn" onclick="voteWeeklyQuestion('${q.id}',${i})">${esc(o)}</button>`).join('');
   slot.innerHTML = `<div class="wq-card">
-    <div class="wq-tag" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> QUESTION DE LA SEMAINE</div>
+    <div class="wq-tag" style="display:flex;align-items:center;gap:6px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> QUESTION DE LA SEMAINE</div>
     <div class="wq-text">${esc(q.text||'')}</div>
     <div class="wq-opts">${opts}</div>
   </div>`;
@@ -2119,7 +2128,7 @@ async function renderWeeklyQuestionResults(q, myOptionIndex) {
     return `<div class="wq-result-row${mine?' mine':''}"><div class="wq-result-lbl">${mine?'✓ ':''}${esc(o)}</div><div class="wq-result-bar"><div class="wq-result-fill" style="width:${pct}%"></div></div><div class="wq-result-pct">${pct}%</div></div>`;
   }).join('');
   slot.innerHTML = `<div class="wq-card">
-    <div class="wq-tag" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> QUESTION DE LA SEMAINE</div>
+    <div class="wq-tag" style="display:flex;align-items:center;gap:6px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> QUESTION DE LA SEMAINE</div>
     <div class="wq-text">${esc(q.text||'')}</div>
     <div class="wq-results">${bars}</div>
     <div class="wq-total">${total} réponse${total>1?'s':''}</div>
@@ -2448,7 +2457,7 @@ function buildSocialCard() {
   window._scPool[key] = { campId, friendName, friendAnswer: shortAns, qIdx: S.qs.indexOf(q) };
   const d = document.createElement('div');
   d.className = 'social-card';
-  d.innerHTML = `<div class="sc-label" style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> Même avis ?</div><div class="sc-friend"><div class="sc-fav" style="background:${c}20;color:${c}">${(friendName||'?')[0].toUpperCase()}</div><div><div class="sc-fname">${esc(friendName)}</div><div class="sc-brand">a répondu à ${esc(q.brand)}</div></div></div><div class="sc-q">${esc((q.q||'').substring(0,60))}…</div><div class="sc-answer">${shortAns ? '&ldquo;' + esc(shortAns) + '&rdquo;' : '…'}</div><div class="sc-actions"><button class="sc-btn p" onclick="openCompare('${key}')">Comparer →</button><button class="sc-btn g" onclick="this.closest('.social-card').remove()">Passer</button></div>`;
+  d.innerHTML = `<div class="sc-label" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> Même avis ?</div><div class="sc-friend"><div class="sc-fav" style="background:${c}20;color:${c}">${(friendName||'?')[0].toUpperCase()}</div><div><div class="sc-fname">${esc(friendName)}</div><div class="sc-brand">a répondu à ${esc(q.brand)}</div></div></div><div class="sc-q">${esc((q.q||'').substring(0,60))}…</div><div class="sc-answer">${shortAns ? '&ldquo;' + esc(shortAns) + '&rdquo;' : '…'}</div><div class="sc-actions"><button class="sc-btn p" onclick="openCompare('${key}')">Comparer →</button><button class="sc-btn g" onclick="this.closest('.social-card').remove()">Passer</button></div>`;
   return d;
 }
 
@@ -2489,7 +2498,7 @@ function initFriendsPanel(){
   const pending=(_notifs||[]).filter(n=>n.type==='friend_request'&&!n.read&&n.fromUid&&!(S._friendUids||[]).includes(n.fromUid)&&!_seenReq.has(n.fromUid)&&_seenReq.add(n.fromUid));
   const pendingHTML=pending.length?`
     <div style="margin:0 18px 14px;background:var(--surface);border:none;border-radius:var(--r-card);padding:14px 15px;box-shadow:var(--shadow-card)">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg> Demandes reçues (${pending.length})</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg> Demandes reçues (${pending.length})</div>
       <div id="pending-requests-list">${pending.map(n=>`
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
           <div style="width:36px;height:36px;border-radius:10px;background:var(--ink);color:var(--coral);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:15px;flex-shrink:0">${(n.fromName||'?')[0].toUpperCase()}</div>
@@ -2560,7 +2569,7 @@ function renderFriends(){
   if(countEl)countEl.textContent=S.friends.length?'('+S.friends.length+')':'';
   el.innerHTML='';
   if(!S.friends.length){
-    el.innerHTML=`<div style="text-align:center;padding:26px 16px 8px"><div style="margin-bottom:10px;color:var(--ink3);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px"><path d="M2 12l4-3 4 3 3-3 2 2"/><path d="M22 12l-4-3-3.5 3-2.5-1"/><path d="M9 12l3 3 2-2"/><path d="M12 15l2 2 2-2"/></svg></div><div style="color:var(--ink2);font-size:13px;line-height:1.6">Aucun ami pour l'instant.<br>Invite quelqu'un pour comparer vos réponses !</div><button onclick="shareInvite()" style="margin-top:14px;padding:12px 22px;background:var(--yellow);color:var(--ink);font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:99px;cursor:pointer">Inviter un ami</button></div>`;
+    el.innerHTML=`<div style="text-align:center;padding:26px 16px 8px"><div style="margin-bottom:10px;color:var(--ink3);display:flex;justify-content:center"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px"><path d="M2 12l4-3 4 3 3-3 2 2"/><path d="M22 12l-4-3-3.5 3-2.5-1"/><path d="M9 12l3 3 2-2"/><path d="M12 15l2 2 2-2"/></svg></div><div style="color:var(--ink2);font-size:13px;line-height:1.6">Aucun ami pour l'instant.<br>Invite quelqu'un pour comparer vos réponses !</div><button onclick="shareInvite()" style="margin-top:14px;padding:12px 22px;background:var(--yellow);color:var(--ink);font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:99px;cursor:pointer">Inviter un ami</button></div>`;
     return;
   }
   const _seenFi=new Set();
@@ -2569,7 +2578,7 @@ function renderFriends(){
     const d=document.createElement('div');
     d.className='cp-row';d.dataset.uid=f.uid;
     d.onclick=()=>openFriendProfile(f);
-    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${avInner(f.photoUrl,f.n)}${f.online?'<div class="fi-online"></div>':''}</div><div class="cp-mid"><div class="cp-name">${esc(f.n)}</div><div class="cp-sub">${f.xp} xp · <span style="display:inline-flex;align-items:center;gap:3px">${icon('fire',{size:12})} ${f.str} j</span></div></div><div class="cp-pill" data-uid="${esc(f.uid)}"></div>`;
+    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${avInner(f.photoUrl,f.n)}</div><div class="cp-mid"><div class="cp-name">${esc(f.n)}</div><div class="cp-sub">${f.xp} xp · <span style="display:inline-flex;align-items:center;gap:3px">${icon('fire',{size:12})} ${f.str} j</span></div></div><div class="cp-pill" data-uid="${esc(f.uid)}"></div>`;
     el.appendChild(d);
   });
   applyStagger(el);
@@ -2937,17 +2946,17 @@ function renderNotifications(){
     const ts=fmtNotifTime(n.createdAt);
     let inner='';
     if(n.type==='friend_request'){
-      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> <strong>${esc(n.fromName)}</strong> veut être ton ami !</div>
+      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> <strong>${esc(n.fromName)}</strong> veut être ton ami !</div>
         <div class="notif-meta">${ts}</div>
         ${!n.read?`<div class="notif-actions">
           <button class="notif-btn accept" onclick="acceptFriendRequest('${n.id}','${n.fromUid}','${esc(n.fromName)}')">Accepter</button>
           <button class="notif-btn decline" onclick="declineFriendRequest('${n.id}')">Refuser</button>
         </div>`:'<div class="notif-done">Traitée</div>'}`;
     }else if(n.type==='friend_accepted'){
-      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> <strong>${esc(n.fromName)}</strong> a accepté ta demande d'ami !</div>
+      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> <strong>${esc(n.fromName)}</strong> a accepté ta demande d'ami !</div>
         <div class="notif-meta">${ts}</div>`;
     }else if(n.type==='noova_message'){
-      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> <strong>Noova</strong> · ${esc(n.message||'')}</div>
+      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> <strong>Noova</strong> · ${esc(n.message||'')}</div>
         <div class="notif-meta">${ts}</div>`;
     }else{
       inner=`<div class="notif-txt">${esc(n.message||'Notification')}</div><div class="notif-meta">${ts}</div>`;
@@ -3025,7 +3034,7 @@ function openChatFor(friend){
   const idx=S.friends.findIndex(f=>f.uid===friendUid);const c=idx>=0?AVC[idx%AVC.length]:'#A14E08';
   const av=document.getElementById('ch-av');av.innerHTML=avInner(friend.photoUrl,friendName||'?');av.style.background=c+'18';av.style.color=c;
   document.getElementById('ch-name').textContent=friendName;
-  const st=document.getElementById('ch-status');if(st){st.textContent=friend.online?'En ligne':'Ami Noova';st.style.color=friend.online?'#22C55E':'var(--ink3)';}
+  const st=document.getElementById('ch-status');if(st){st.textContent='Ami Noova';st.style.color='var(--ink3)';}
   if(_chatUnsub){_chatUnsub();_chatUnsub=null;}
   _chatMessages=[];renderChat();
   const myUid=auth.currentUser&&auth.currentUser.uid;if(!myUid){goTo('chat');return;}
@@ -3173,7 +3182,7 @@ function refreshProfile(){
   BDGS.forEach(b=>{const e=earned.includes(b.id);const d=document.createElement('div');d.className='bp '+(e?'earned':'locked');d.innerHTML=`<div class="bp-ico">${icon(e?b.e:'lock',{size:18})}</div><div class="bp-lbl">${esc(b.n)}</div>`;bl.appendChild(d)});
   const hl=document.getElementById('hist-list');hl.innerHTML='';
   if(!S.hist||!S.hist.length){hl.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:13px">Aucune réponse pour l\'instant.</div>';return}
-  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?h.ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:12px;font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">${h.noovs?'+'+h.noovs+' NOOV'+(h.noovs>1?'S':''):'+'+h.pts+' pts'}</div>`;hl.appendChild(d)});
+  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?h.ico:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:12px;font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">${h.noovs?'+'+h.noovs+' NOOV'+(h.noovs>1?'S':''):'+'+h.pts+' pts'}</div>`;hl.appendChild(d)});
 }
 function boTab(tab,btn){document.querySelectorAll('.bo-tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');['dashboard','create','results'].forEach(t=>document.getElementById('bo-'+t).style.display=t===tab?'block':'none');if(tab==='create')wzStep(0)}
 function renderCampaigns(){
@@ -3327,7 +3336,7 @@ function brandSurveys(name){
 }
 function statusBadge(s){
   if(s==='active')return '<span class="bp-sv-badge" style="background:var(--ink);color:var(--yellow)">● Actif</span>';
-  if(s==='done')return '<span class="bp-sv-badge" style="background:var(--green-bg);color:var(--green-ink);display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Répondu</span>';
+  if(s==='done')return '<span class="bp-sv-badge" style="background:var(--green-bg);color:var(--green-ink);display:inline-flex;align-items:center;gap:3px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Répondu</span>';
   if(s==='soon')return `<span class="bp-sv-badge" style="background:var(--bg2);color:var(--ink2)">${icon('clock',{size:11})} Bientôt</span>`;
   return '<span class="bp-sv-badge" style="background:var(--bg2);color:var(--ink3)">Clôturé</span>';
 }
@@ -3342,7 +3351,7 @@ function openBrand(name,back){
   surveys.forEach(s=>{
     const active=s.status==='active';
     const isdone=s.status==='done';
-    sv+=`<div class="bp-survey${active?' active':''}">${active?'<div class="mark">?!</div>':''}<div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
+    sv+=`<div class="bp-survey${active?' active':''}">${active?'<div class="mark">?!</div>':''}<div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:11px;font-weight:700;color:var(--violet);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>📝 ${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire →</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
   });
   if(!surveys.length)sv='<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>';
   document.getElementById('bp-wrap').innerHTML=`
@@ -3356,7 +3365,7 @@ function openBrand(name,back){
       <div class="bp-block"><div class="bp-sec">À propos</div><div class="bp-text">${p.about||''}</div></div>
       <div class="bp-block"><div class="bp-sec">En bref</div><div class="bp-info">${info.map(i=>`<div class="bp-info-it"><div class="bp-info-l">${i[0]}</div><div class="bp-info-v">${i[1]}</div></div>`).join('')}</div></div>
       <div class="bp-block"><div class="bp-sec">Leurs sondages</div>${sv}</div>
-      <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di" style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="bp-text" style="font-size:12.5px">${p.why||'Données agrégées et anonymes.'}</div></div></div>
+      <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di" style="display:inline-flex"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="bp-text" style="font-size:12.5px">${p.why||'Données agrégées et anonymes.'}</div></div></div>
     </div>`;
   goTo('brand-page');
 }
@@ -3386,12 +3395,12 @@ async function openBrandById(mid, fallbackName) {
       :camps.map(c=>{
           const done=answered.includes(c.id);
           return done
-            ?`<div class="bp-survey"><div class="bp-sv-q">${c.question}</div><div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div></div>`
+            ?`<div class="bp-survey"><div class="bp-sv-q">${c.question}</div><div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div></div>`
             :`<div class="bp-survey active">
                 <div class="mark">?!</div>
                 <div class="bp-sv-top"><span class="bp-sv-badge" style="background:var(--ink);color:var(--yellow)">● Actif</span><span style="font-size:11px;font-weight:700;color:var(--ink);font-family:var(--fd)">jusqu'à +${(c.questions&&c.questions.length||1)*(c.pointsPerAnswer||20)} pts</span></div>
                 <div class="bp-sv-q">${c.question}</div>
-                <div class="bp-sv-meta"><span style="display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg> ${c.questions&&c.questions.length||1} question(s)</span><span>⏱️ ~${(c.questions&&c.questions.length||1)*15}s</span></div>
+                <div class="bp-sv-meta"><span style="display:inline-flex;align-items:center;gap:3px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg> ${c.questions&&c.questions.length||1} question(s)</span><span>⏱️ ~${(c.questions&&c.questions.length||1)*15}s</span></div>
                 <button class="btn-p" onclick="startCampaignById('${c.id}')">Répondre au questionnaire →</button>
               </div>`;
         }).join('');
@@ -3403,7 +3412,7 @@ async function openBrandById(mid, fallbackName) {
       </div>
       <div class="bp-stats">
         <div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center;gap:4px">${icon('document',{size:14})} ${camps.length}</div><div class="bp-stat-l">Sondage${camps.length>1?'s':''}</div></div>
-        <div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><path d="M6 4h12l3 5-9 11L3 9z"/><path d="M3 9h18"/><path d="M9 4l3 5 3-5"/><path d="M12 9l-2 11M12 9l2 11"/></svg> ${camps[0]&&camps[0].pointsPerAnswer||20}</div><div class="bp-stat-l">Pts / quest.</div></div>
+        <div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><path d="M6 4h12l3 5-9 11L3 9z"/><path d="M3 9h18"/><path d="M9 4l3 5 3-5"/><path d="M12 9l-2 11M12 9l2 11"/></svg> ${camps[0]&&camps[0].pointsPerAnswer||20}</div><div class="bp-stat-l">Pts / quest.</div></div>
         <div class="bp-stat"><div class="bp-stat-n">⏱️ ~30s</div><div class="bp-stat-l">Par question</div></div>
         <div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center">${icon('lock',{size:16})}</div><div class="bp-stat-l">Données protégées</div></div>
       </div>
@@ -3411,7 +3420,7 @@ async function openBrandById(mid, fallbackName) {
         <div class="bp-block"><div class="bp-sec">À propos</div><div class="bp-text">${m.description||m.about||'Commerce local vérifié sur Noova. Réponds à leurs questions pour gagner des points !'}</div></div>
         ${newsHTML}
         <div class="bp-block"><div class="bp-sec">Leurs sondages</div>${sv}</div>
-        <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di" style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="bp-text" style="font-size:12.5px">Tes réponses sont agrégées et anonymes. Ce commerçant ne voit jamais ton identité.</div></div></div>
+        <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di" style="display:inline-flex"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="bp-text" style="font-size:12.5px">Tes réponses sont agrégées et anonymes. Ce commerçant ne voit jamais ton identité.</div></div></div>
       </div>`;
   } catch(e) {
     document.getElementById('bp-wrap').innerHTML=`<div style="text-align:center;padding:40px;color:var(--danger)">Impossible de charger ce commerce.<br><button class="btn-p" style="margin-top:16px" onclick="goTo('home')">Retour</button></div>`;
@@ -3626,7 +3635,7 @@ async function renderNearbyGrid(){
   }
   el.innerHTML = withDist.slice(0,4).map(c => `
     <div class="dnb-card" ${c._merchantId?`onclick="openBrandById('${c._merchantId}','${esc(c.name).replace(/'/g,"\\'")}')"`:''}>
-      <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}</div>
+      <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="Photo de ${esc(c.name)}" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}</div>
       <div class="dnb-scrim"></div>
       <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':(c.request?'Demande':'Bientôt')}</div>
       <div class="dnb-body"><div class="dnb-name">${esc(c.name)}</div><div class="dnb-meta">${esc(c.sector)}${c._dist!=null?' · '+fmtDist(c._dist):''}</div></div>
@@ -3731,11 +3740,11 @@ function loadLeaflet(){
   if(window._leafletP) return window._leafletP;
   window._leafletP = new Promise((res, rej) => {
     const css = document.createElement('link');
-    css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    css.rel = 'stylesheet'; css.href = '/vendor/leaflet/leaflet.css';
     css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='; css.crossOrigin = '';
     document.head.appendChild(css);
     const js = document.createElement('script');
-    js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    js.src = '/vendor/leaflet/leaflet.js';
     js.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='; js.crossOrigin = '';
     js.onload = res; js.onerror = () => { window._leafletP = null; rej(new Error('leaflet')); };
     document.head.appendChild(js);
@@ -3804,7 +3813,7 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
 <div id="auth-wall" style="position:fixed;inset:0;z-index:9999;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;overflow-y:auto;padding-top:calc(40px + env(safe-area-inset-top,0px));padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))">
 
   <div style="text-align:center;margin-bottom:36px">
-    <img src="favicon.svg" alt="Noova" style="height:64px;width:64px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.12);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
+    <img src="favicon.svg" alt="Logo Noova" style="height:64px;width:64px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.12);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
     <div style="font-family:var(--fd);font-weight:900;font-size:26px;letter-spacing:-1px;color:var(--ink);line-height:1">Noova</div>
     <div style="font-size:14px;color:var(--ink2);margin-top:8px;line-height:1.7">Tes avis valent de l'argent.<br>Réponds aux commerces de ton quartier.</div>
   </div>
@@ -3833,16 +3842,16 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
     <div id="aw-interests-wrap" style="display:none">
       <div style="font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink2);margin-bottom:7px">Centres d'intérêt <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px">(1 min.)</span></div>
       <div style="display:flex;flex-wrap:wrap;gap:7px">
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'restauration')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg></span> Restauration</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'sport')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.3 3.6 5.6 3.6 9s-1.2 6.7-3.6 9c-2.4-2.3-3.6-5.6-3.6-9S9.6 5.3 12 3z"/></svg></span> Sport</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'gaming')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg></span> Gaming</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'musique')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/><path d="M9 17.5V5.5l10-2v10"/></svg></span> Musique</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'voyage')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l7-2-3-6 2.5-.7L14 10l6-1.6a1.6 1.6 0 0 1 2 1.5c0 .7-.4 1.3-1 1.5L4.5 17z"/><path d="M9 17.5 7 21M13 17.5l1 3.5"/></svg></span> Voyage</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'mode')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l1 3-3 2-3-2z"/><path d="M9 4 4 7l2.5 3L8 9v11h8V9l1.5-2L20 7l-5-3"/></svg></span> Mode</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'tech')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="11" rx="1.4"/><path d="M9 20h6M12 16v4"/><path d="M8 9l2 2-2 2M13 13h3"/></svg></span> Tech</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'culture')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l8-4.5L20 8l-8 4.5z"/><path d="M6.5 9.5v6L12 18l5.5-2.5v-6"/><path d="M20 8v6.5"/></svg></span> Culture</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'cafe')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg></span> Café</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'shopping')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span> Shopping</button>
+        <button type="button" class="int-chip" onclick="toggleInterest(this,'restauration')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg></span> Restauration</button>
+        <button type="button" class="int-chip" onclick="toggleInterest(this,'sport')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.3 3.6 5.6 3.6 9s-1.2 6.7-3.6 9c-2.4-2.3-3.6-5.6-3.6-9S9.6 5.3 12 3z"/></svg></span> Sport</button>
+        <button type="button" class="int-chip" onclick="toggleInterest(this,'gaming')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg></span> Gaming</button>
+        <button type="button" class="int-chip" onclick="toggleInterest(this,'musique')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/><path d="M9 17.5V5.5l10-2v10"/></svg></span> Musique</button>
+        <button type="button" class="int-chip" onclick="toggleInterest(this,'voyage')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l7-2-3-6 2.5-.7L14 10l6-1.6a1.6 1.6 0 0 1 2 1.5c0 .7-.4 1.3-1 1.5L4.5 17z"/><path d="M9 17.5 7 21M13 17.5l1 3.5"/></svg></span> Voyage</button>
+        <button type="button" class="int-chip" onclick="toggleInterest(this,'mode')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l1 3-3 2-3-2z"/><path d="M9 4 4 7l2.5 3L8 9v11h8V9l1.5-2L20 7l-5-3"/></svg></span> Mode</button>
+        <button type="button" class="int-chip" onclick="toggleInterest(this,'tech')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="11" rx="1.4"/><path d="M9 20h6M12 16v4"/><path d="M8 9l2 2-2 2M13 13h3"/></svg></span> Tech</button>
+        <button type="button" class="int-chip" onclick="toggleInterest(this,'culture')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l8-4.5L20 8l-8 4.5z"/><path d="M6.5 9.5v6L12 18l5.5-2.5v-6"/><path d="M20 8v6.5"/></svg></span> Culture</button>
+        <button type="button" class="int-chip" onclick="toggleInterest(this,'cafe')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg></span> Café</button>
+        <button type="button" class="int-chip" onclick="toggleInterest(this,'shopping')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span> Shopping</button>
       </div>
     </div>
 
@@ -3869,7 +3878,7 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
     </div>
 
     <button onclick="signInWithGoogle()" class="sso-btn">
-      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+      <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
       Continuer avec Google
     </button>
 
@@ -3877,12 +3886,12 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
          Apple Developer et le provider Firebase ne sont pas configurés (signInWithApple()
          reste dans le code, prêt à réactiver — il suffit de retirer ce display:none). -->
     <button onclick="signInWithApple()" style="display:none;width:100%;padding:14px 16px;border-radius:14px;background:#000;border:none;color:#fff;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer;align-items:center;justify-content:center;gap:10px;margin-top:9px">
-      <svg width="16" height="18" viewBox="0 0 16 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path fill="#fff" d="M13.05 9.53c-.02-2.06 1.68-3.05 1.76-3.1-.96-1.4-2.45-1.6-2.98-1.62-1.27-.13-2.48.75-3.12.75-.65 0-1.63-.73-2.69-.71-1.38.02-2.66.8-3.37 2.03-1.44 2.5-.37 6.2 1.03 8.23.69.99 1.5 2.1 2.58 2.06 1.03-.04 1.42-.67 2.67-.67 1.24 0 1.6.67 2.69.65 1.11-.02 1.82-1 2.49-2 .79-1.14 1.11-2.25 1.13-2.31-.02-.01-2.17-.83-2.19-3.31zM11 3.34c.56-.68.94-1.62.83-2.56-.81.03-1.79.54-2.37 1.22-.52.6-.97 1.57-.85 2.49.91.07 1.83-.46 2.39-1.15z"/></svg>
+      <svg aria-hidden="true" focusable="false" width="16" height="18" viewBox="0 0 16 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path fill="#fff" d="M13.05 9.53c-.02-2.06 1.68-3.05 1.76-3.1-.96-1.4-2.45-1.6-2.98-1.62-1.27-.13-2.48.75-3.12.75-.65 0-1.63-.73-2.69-.71-1.38.02-2.66.8-3.37 2.03-1.44 2.5-.37 6.2 1.03 8.23.69.99 1.5 2.1 2.58 2.06 1.03-.04 1.42-.67 2.67-.67 1.24 0 1.6.67 2.69.65 1.11-.02 1.82-1 2.49-2 .79-1.14 1.11-2.25 1.13-2.31-.02-.01-2.17-.83-2.19-3.31zM11 3.34c.56-.68.94-1.62.83-2.56-.81.03-1.79.54-2.37 1.22-.52.6-.97 1.57-.85 2.49.91.07 1.83-.46 2.39-1.15z"/></svg>
       Continuer avec Apple
     </button>
   </div>
 
-  <div style="margin-top:24px;font-size:11px;color:var(--ink3);text-align:center;line-height:1.8">En continuant tu acceptes nos <a href="cgu.html" target="_blank" rel="noopener" style="color:var(--ink);font-weight:700;text-decoration:underline">CGU</a> et notre <a href="confidentialite.html" target="_blank" rel="noopener" style="color:var(--ink);font-weight:700;text-decoration:underline">Politique de confidentialité</a></div>
+  <div style="margin-top:24px;font-size:11px;color:var(--ink3);text-align:center;line-height:1.8">En continuant, tu acceptes les <a href="/cgu.html" target="_blank" rel="noopener" style="color:var(--ink);font-weight:700;text-decoration:underline">CGU</a> et tu reconnais avoir pris connaissance de la <a href="/confidentialite.html" target="_blank" rel="noopener" style="color:var(--ink);font-weight:700;text-decoration:underline">Politique de confidentialité</a>. <a href="/cookies.html" target="_blank" rel="noopener" style="color:var(--ink);font-weight:700;text-decoration:underline">Cookies</a> · <a href="#" data-nv-cookies style="color:var(--ink);font-weight:700;text-decoration:underline">Gérer mes cookies</a></div>
 </div>
 
 <!-- Complétion profil Google (profil manquant) -->
@@ -3931,15 +3940,28 @@ function loadFirebaseSdk(name) {
   });
   return window._sdk[name];
 }
+// Mesure d'audience : uniquement si l'utilisateur l'a acceptée (consent.js). Sans choix = refus :
+// rien n'est chargé, rien n'est mis en file, aucun événement n'est envoyé.
+function analyticsAllowed() { return !!(window.NVConsent && NVConsent.analytics()); }
 function trackEvent(name, params) {
-  try { if(analytics) analytics.logEvent(name, params||{}); else if(_trackQueue.length < 50) _trackQueue.push([name, params]); } catch(e) {}
+  try {
+    if(!analyticsAllowed()) return;
+    if(analytics) analytics.logEvent(name, params||{}); else if(_trackQueue.length < 50) _trackQueue.push([name, params]);
+  } catch(e) {}
 }
 (function initAnalyticsLater() {
   const go = () => loadFirebaseSdk('analytics').then(() => {
-    try { analytics = firebase.analytics(); } catch(e) { console.warn('analytics init:', e); return; }
+    if(!analyticsAllowed()) return; // refus survenu pendant le chargement
+    try { if(!analytics) analytics = firebase.analytics(); analytics.setAnalyticsCollectionEnabled(true); } catch(e) { console.warn('analytics init:', e); return; }
+    // Cookies de mesure limités à 13 mois, sans signaux publicitaires Google (recommandation CNIL).
+    try { if(typeof window.gtag === 'function') window.gtag('config', firebaseConfig.measurementId, { send_page_view: false, cookie_expires: 34128000, allow_google_signals: false, allow_ad_personalization_signals: false }); } catch(e) {}
     _trackQueue.splice(0).forEach(([n, p]) => { try { analytics.logEvent(n, p || {}); } catch(e) {} });
   }).catch(() => {});
-  if(document.readyState === 'complete') setTimeout(go, 1500); else addEventListener('load', () => setTimeout(go, 1500));
+  const onChoice = ok => {
+    if(ok) { if(document.readyState === 'complete') setTimeout(go, 1500); else addEventListener('load', () => setTimeout(go, 1500), { once: true }); }
+    else { _trackQueue.length = 0; if(analytics) { try { analytics.setAnalyticsCollectionEnabled(false); } catch(e) {} } }
+  };
+  if(window.NVConsent) NVConsent.onChange(onChoice);
 })();
 
 // ─── Notifications push (FCM) ───────────────────────────────
@@ -4360,7 +4382,7 @@ function renderRequests(){
   if(!reqs.length){el.innerHTML='';return;}
   el.innerHTML='<div class="sec-lbl">Demandes</div>'+reqs.slice(0,3).map(m=>{
     const label=m.brandName||m.name||'Commerce';
-    const photo=m.coverUrl?`<img src="${esc(m.coverUrl)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">`:'';
+    const photo=m.coverUrl?`<img src="${esc(m.coverUrl)}" alt="Photo de ${esc(label)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">`:'';
     return `<div style="margin:0 22px 14px;background:var(--surface);border-radius:var(--r-card);box-shadow:var(--shadow-card);overflow:hidden">
       <div style="position:relative;height:96px;background:var(--nv-photo)">${photo}<div style="position:absolute;left:14px;bottom:-22px;z-index:1">${logoHTML(label,46,m.logoUrl)}</div></div>
       <div style="padding:30px 16px 16px">
@@ -4645,7 +4667,7 @@ function renderAlmostReward(){
   const pct = Math.max(4, Math.min(96, (S.pts / (r.cost||1)) * 100));
   const missing = Math.max(0, (r.cost||0) - S.pts);
   wrap.innerHTML = `<div class="dsec-h">Ta prochaine récompense</div><div class="dpat-card" onclick="goNav('rewards-tab')">
-    <div class="dpat-photo">${r.photoUrl?`<img src="${r.photoUrl}" alt="" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}<div class="dpat-pct">${Math.round(pct)}%</div></div>
+    <div class="dpat-photo">${r.photoUrl?`<img src="${r.photoUrl}" alt="Photo de la récompense : ${esc(r.label||'')}" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}<div class="dpat-pct">${Math.round(pct)}%</div></div>
     <div class="dpat-body">
       <div class="mark">?!</div>
       <div class="dpat-name">${esc(r.label||'Récompense')}</div>
@@ -4689,7 +4711,7 @@ function renderFeaturedReward(){
       <div class="rf-top">
         ${logoHTML(r.merchantName||r.label,52,r.logoUrl)}
         <div style="flex:1;min-width:0"><div class="rf-name">${esc(r.label||'Récompense')}</div><div class="rf-sub">${esc(r.merchantName||'')} · encore ${missing} pts</div></div>
-        <div class="dprog-ring-wrap"><svg viewBox="0 0 48 48" class="dprog-ring"><circle cx="24" cy="24" r="20" class="dprog-ring-track"/><circle cx="24" cy="24" r="20" class="dprog-ring-fill" style="stroke-dasharray:${circ.toFixed(1)};stroke-dashoffset:${(circ*(1-pct/100)).toFixed(1)}"/></svg><div class="dprog-pct">${Math.round(pct)}%</div></div>
+        <div class="dprog-ring-wrap"><svg aria-hidden="true" focusable="false" viewBox="0 0 48 48" class="dprog-ring"><circle cx="24" cy="24" r="20" class="dprog-ring-track"/><circle cx="24" cy="24" r="20" class="dprog-ring-fill" style="stroke-dasharray:${circ.toFixed(1)};stroke-dashoffset:${(circ*(1-pct/100)).toFixed(1)}"/></svg><div class="dprog-pct">${Math.round(pct)}%</div></div>
       </div>
     </div>`;
   }
@@ -4729,7 +4751,7 @@ function renderInProgressRewards(){
     const pct = Math.max(0, Math.min(100, (S.pts / (r.cost||1)) * 100));
     const circ = 2*Math.PI*20;
     return `<div class="dprog-chipcard" onclick="openRewardsSheet()">
-      <div class="dprog-ring-wrap"><svg viewBox="0 0 48 48" class="dprog-ring"><circle cx="24" cy="24" r="20" class="dprog-ring-track"/><circle cx="24" cy="24" r="20" class="dprog-ring-fill" style="stroke-dasharray:${circ.toFixed(1)};stroke-dashoffset:${(circ*(1-pct/100)).toFixed(1)}"/></svg><div class="dprog-pct">${Math.round(pct)}%</div></div>
+      <div class="dprog-ring-wrap"><svg aria-hidden="true" focusable="false" viewBox="0 0 48 48" class="dprog-ring"><circle cx="24" cy="24" r="20" class="dprog-ring-track"/><circle cx="24" cy="24" r="20" class="dprog-ring-fill" style="stroke-dasharray:${circ.toFixed(1)};stroke-dashoffset:${(circ*(1-pct/100)).toFixed(1)}"/></svg><div class="dprog-pct">${Math.round(pct)}%</div></div>
       <div class="dprog-chip-name">${esc(r.label||'Récompense')}</div>
       <div class="dprog-chip-sub">${esc(r.merchantName||'')}</div>
     </div>`;
@@ -4921,7 +4943,7 @@ function showVoucherModal({ id, code, label, merchantName, cost, purchaseConditi
       if(id) await db.collection('redemptions').doc(id).update({ status: 'used', usedAt: firebase.firestore.FieldValue.serverTimestamp() });
       trackEvent('voucher_used');
       if(_voucherTimer) { clearInterval(_voucherTimer); _voucherTimer = null; }
-      document.getElementById('vf-body').innerHTML = `<div class="rw-circle" style="display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px"><path d="M4 12.5 9.5 18 20 6"/></svg></div>
+      document.getElementById('vf-body').innerHTML = `<div class="rw-circle" style="display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px"><path d="M4 12.5 9.5 18 20 6"/></svg></div>
         <div style="font-family:var(--fd);font-weight:800;font-size:26px;letter-spacing:-.8px;color:var(--ink);margin-top:14px">Récompense validée</div>
         <div style="font-size:14px;color:var(--ink2);margin-top:6px;line-height:1.6">Profites-en bien. Ça te dit d'en parler autour de toi ?</div>`;
       this.remove();
@@ -5129,7 +5151,7 @@ function maybeShowInstallInvite(){
   b.className='install-banner';
   b.id='install-banner';
   b.innerHTML=`<div class="install-banner-close" onclick="dismissInstallInvite()">✕</div>
-    <div class="install-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1C1917" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M9 7c1-.2 2 .3 2.2 1.5.2 1.3-1.6 1.8-1.6 3.3a1.6 1.6 0 0 0 3.2 0"/><circle cx="12" cy="16.3" r="1.3" fill="#1C1917" stroke="none"/></svg></div>
+    <div class="install-banner-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="#1C1917" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M9 7c1-.2 2 .3 2.2 1.5.2 1.3-1.6 1.8-1.6 3.3a1.6 1.6 0 0 0 3.2 0"/><circle cx="12" cy="16.3" r="1.3" fill="#1C1917" stroke="none"/></svg></div>
     <div class="install-banner-txt"><div class="install-banner-title">Installe Noova</div><div class="install-banner-sub">Sur ton écran d'accueil, pour ne rater aucune récompense.</div></div>
     <button class="install-banner-cta" onclick="triggerInstall()">${NV_IS_IOS?'Comment faire':'Installer'}</button>`;
   document.body.appendChild(b);
@@ -5178,7 +5200,7 @@ function showIOSInstallSheet(){
   ov.innerHTML=`<div style="background:var(--card);border-radius:24px 24px 0 0;padding:22px 22px calc(30px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px">
     <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
     <div style="font-family:var(--fd);font-weight:800;font-size:18px;color:var(--ink);margin-bottom:16px;text-align:center">Installer Noova</div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:30px;height:30px;border-radius:50%;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:13px;flex-shrink:0">1</div><div style="font-size:13.5px;color:var(--ink);line-height:1.5">Appuie sur <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><rect x="4" y="13" width="16" height="7" rx="1.5"/></svg> en bas de Safari</div></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:30px;height:30px;border-radius:50%;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:13px;flex-shrink:0">1</div><div style="font-size:13.5px;color:var(--ink);line-height:1.5">Appuie sur <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><rect x="4" y="13" width="16" height="7" rx="1.5"/></svg> en bas de Safari</div></div>
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><div style="width:30px;height:30px;border-radius:50%;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:13px;flex-shrink:0">2</div><div style="font-size:13.5px;color:var(--ink)">Choisis <strong>« Sur l'écran d'accueil »</strong></div></div>
     <button class="btn-p" onclick="document.getElementById('ios-install-sheet').remove();dismissInstallInvite()">Compris</button>
   </div>`;
@@ -5245,7 +5267,8 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   }
 
   S._nearbyMerchants = [];
-  startPresenceHeartbeat(uid);
+  // Anciennes données de présence (supprimées de l'app) : retirées du profil pour ne rien conserver d'inutile.
+  if(data && (data.online !== undefined || data.lastSeen !== undefined)) db.collection('users').doc(uid).update({ online: firebase.firestore.FieldValue.delete(), lastSeen: firebase.firestore.FieldValue.delete() }).catch(() => {});
   // Charger les infos complètes des commerçants autorisés (rail + récompenses)
   if(S._authorizedMerchants.length) loadNearbyMerchants(S._authorizedMerchants);
   // Migration : l'ancien jeton (clé globale) est rattaché au compte qui le possède réellement.
@@ -5322,15 +5345,13 @@ async function loadFriendsFromFirestore(uids) {
     const capped = [...new Set(uids)].filter(u => u && u !== myUid).slice(0, 30);
     const results = await Promise.allSettled(capped.map(uid => db.collection('users').doc(uid).get()));
     const allSnaps = results.filter(r => r.status === 'fulfilled').map(r => r.value);
-    const twoMinAgo = Date.now() - 2 * 60 * 1000;
     const seenUids = new Set();
     S.friends = allSnaps.filter(s => s.exists && !seenUids.has(s.id) && seenUids.add(s.id)).map(s => {
       const d = s.data();
-      const online = d.online === true && d.lastSeen && (d.lastSeen.seconds * 1000 > twoMinAgo);
       // Classement/liste d'amis basés sur l'XP (à vie, ne descend jamais) et non le solde
       // de points (dépensable, baisse à chaque échange) — sinon un ami qui vient d'échanger
       // une récompense semble "redescendre", ce qui n'est pas cohérent pour un classement.
-      return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, online, photoUrl: d.photoUrl || null, share: d.shareAnswers !== false, mutual: (d.friendUids || []).includes(myUid) };
+      return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, photoUrl: d.photoUrl || null, share: d.shareAnswers !== false, mutual: (d.friendUids || []).includes(myUid) };
     });
     renderFriends();
     if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }
@@ -5715,19 +5736,6 @@ submitAns = function() {
     });
 };
 
-// ─── Présence temps-réel ─────────────────────────────────────
-let _presenceInterval = null;
-function startPresenceHeartbeat(uid) {
-  if(_presenceInterval) clearInterval(_presenceInterval);
-  const markOnline = () => db.collection('users').doc(uid).update({ online: true, lastSeen: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
-  markOnline();
-  _presenceInterval = setInterval(markOnline, 60000);
-  document.addEventListener('visibilitychange', () => {
-    if(document.hidden) db.collection('users').doc(uid).update({ online: false }).catch(() => {});
-    else markOnline();
-  });
-}
-
 // ─── Zone danger ─────────────────────────────────────────────
 async function revokeAllConsents() {
   if(!S.user) return;
@@ -5816,7 +5824,6 @@ async function loadHistFromFirestore(uid) {
 
 // ─── Déconnexion ─────────────────────────────────────────────
 function logout() {
-  if(_presenceInterval) { clearInterval(_presenceInterval); _presenceInterval = null; }
   if(_redemptionsUnsub) { _redemptionsUnsub(); _redemptionsUnsub = null; }
   const uid = auth.currentUser && auth.currentUser.uid;
   const done = () => { auth.signOut().finally(() => { location.reload(); }); };
@@ -5824,7 +5831,7 @@ function logout() {
     // Le jeton de notification appartient à l'APPAREIL : on le retire de ce compte pour qu'un
     // autre compte connecté ensuite ici ne reçoive jamais les notifications du précédent.
     const tok = (() => { try { return localStorage.getItem('nv_fcm_token_' + uid); } catch(e) { return null; } })();
-    const ops = [db.collection('users').doc(uid).update(Object.assign({ online: false }, tok ? { fcmTokens: firebase.firestore.FieldValue.arrayRemove(tok) } : {})).catch(() => {})];
+    const ops = [db.collection('users').doc(uid).update(tok ? { fcmTokens: firebase.firestore.FieldValue.arrayRemove(tok) } : {}).catch(() => {})];
     Promise.all(ops).then(done);
   } else done();
 }
@@ -5993,7 +6000,7 @@ auth.onAuthStateChanged(user => {
     <div class="cs-close-bar"><div class="back-btn" onclick="closeRewardsSheet()">✕</div></div>
     <div class="dsec-h" style="padding:0">Récompenses près de toi</div>
     <div class="gift-grid" id="gift-grid"></div>
-    <div class="dsec-h" style="padding:0"><span style="display:inline-flex;width:16px;height:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 3.5"/><path d="M17 6h2.5A2.5 2.5 0 0 1 17 9.5"/><path d="M12 15v3"/><path d="M8.5 21h7l-1-3h-5z"/></svg></span> Paliers</div>
+    <div class="dsec-h" style="padding:0"><span style="display:inline-flex;width:16px;height:16px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 3.5"/><path d="M17 6h2.5A2.5 2.5 0 0 1 17 9.5"/><path d="M12 15v3"/><path d="M8.5 21h7l-1-3h-5z"/></svg></span> Paliers</div>
     <div id="tiers-list"></div>
   </div>
 </div>
@@ -6026,7 +6033,7 @@ function closeCelebration(){
 
 <!-- Loader initial — seul écran visible au démarrage -->
 <div id="app-loader" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:38px;background:radial-gradient(130% 120% at 55% -5%,#241F1C 0%,#1C1917 60%);transition:opacity .7s ease">
-  <img src="favicon.svg" alt="Noova" style="width:136px;height:136px;border-radius:31px;box-shadow:0 22px 54px rgba(0,0,0,.4);animation:pop .65s cubic-bezier(.34,1.56,.64,1) .2s both">
+  <img src="favicon.svg" alt="Logo Noova" style="width:136px;height:136px;border-radius:31px;box-shadow:0 22px 54px rgba(0,0,0,.4);animation:pop .65s cubic-bezier(.34,1.56,.64,1) .2s both">
   <div style="transform:skewX(-9deg);background:linear-gradient(100deg,#f29715 0%,#ffda09 100%);padding:12px 24px;border-radius:9px;box-shadow:0 10px 26px rgba(0,0,0,.3);animation:fadeUp .5s ease .95s both">
     <div style="transform:skewX(9deg);font-family:var(--fd);font-weight:800;font-style:italic;font-size:13px;letter-spacing:.3px;color:#1C1917;text-align:center;white-space:nowrap">LÀ OÙ TES AVIS ONT DE LA VALEUR.</div>
   </div>

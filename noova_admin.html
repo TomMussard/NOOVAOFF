@@ -9,15 +9,13 @@
 <title>Noova Admin</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="Plan%20de%20travail%208LOGO_NOOVAV2.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,700;12..96,75..100,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/noova-fonts.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#17141A;--ink2:rgba(23,20,26,.65);--ink3:rgba(23,20,26,.38);--icon-gray:#6A6470;
+  --ink:#17141A;--ink2:rgba(23,20,26,.72);--ink3:rgba(23,20,26,.64);--icon-gray:#6A6470;
   --bg:#F5F3EF;--bg2:#EEECEA;--card:#fff;--border:rgba(23,20,26,.09);
-  --coral:#f29715;--cd:rgba(242,151,21,.1);--cg:rgba(242,151,21,.25);
+  --coral:#f29715;--coral-text:#8F5400;--mint-text:#087355;--red-text:#B91C1C;--cd:rgba(242,151,21,.1);--cg:rgba(242,151,21,.25);
   --amber:#ffda09;--brown:#1c0e02;--cream:#fffbd7;
   --mint:#0BAB84;--red:#EF4444;--violet:#7C3AED;
   --grad:linear-gradient(135deg,#f29715 0%,#ffda09 79%);
@@ -34,7 +32,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 .aw-name{font-family:var(--fd);font-weight:900;font-size:26px;color:var(--ink);letter-spacing:-1px;line-height:1}
 .aw-sub{font-size:12px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:1.2px}
 .aw-form{display:flex;flex-direction:column;gap:16px}
-#auth-err{font-size:12px;color:var(--red);min-height:16px;text-align:center}
+#auth-err{font-size:12px;color:var(--red-text);min-height:16px;text-align:center}
 
 /* === TOPBAR === */
 .topbar{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
@@ -51,9 +49,9 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 /* === TABS === */
 .tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:28px}
 .tab-btn-main{padding:10px 22px;font-family:var(--fd);font-weight:700;font-size:14px;cursor:pointer;border:none;background:none;color:var(--ink3);position:relative;transition:color .15s}
-.tab-btn-main.active{color:var(--coral)}
+.tab-btn-main.active{color:var(--coral-text)}
 .tab-btn-main.active::after{content:"";position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--grad);border-radius:2px 2px 0 0}
-.tab-badge{display:inline-block;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:800;margin-left:6px;background:rgba(242,151,21,.15);color:var(--coral);vertical-align:middle}
+.tab-badge{display:inline-block;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:800;margin-left:6px;background:rgba(242,151,21,.15);color:var(--coral-text);vertical-align:middle}
 
 /* === SECTION HEADER === */
 .sec-hdr{margin-bottom:6px}
@@ -80,9 +78,9 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
 /* === BADGES === */
 .badge{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
-.badge-pending{background:rgba(242,151,21,.15);color:var(--coral)}
-.badge-verified{background:rgba(11,171,132,.12);color:var(--mint)}
-.badge-rejected{background:rgba(239,68,68,.1);color:var(--red)}
+.badge-pending{background:rgba(242,151,21,.15);color:var(--coral-text)}
+.badge-verified{background:rgba(11,171,132,.12);color:var(--mint-text)}
+.badge-rejected{background:rgba(239,68,68,.1);color:var(--red-text)}
 
 /* === MERCHANT ROWS === */
 .merchant-row{display:grid;grid-template-columns:1fr 130px 110px auto;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);transition:background .12s}
@@ -97,7 +95,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 /* === BUTTONS === */
 .btn-approve{padding:6px 13px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);background:var(--grad);color:var(--brown);box-shadow:0 2px 8px rgba(242,151,21,.3);transition:opacity .15s;white-space:nowrap}
 .btn-approve:hover{opacity:.88}
-.btn-reject{padding:6px 11px;background:rgba(239,68,68,.1);color:var(--red);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:background .15s;white-space:nowrap}
+.btn-reject{padding:6px 11px;background:rgba(239,68,68,.1);color:var(--red-text);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:background .15s;white-space:nowrap}
 .btn-reject:hover{background:rgba(239,68,68,.18)}
 .btn-detail{padding:6px 11px;background:var(--bg2);color:var(--ink2);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:background .15s;white-space:nowrap}
 .btn-detail:hover{background:var(--border);color:var(--ink)}
@@ -146,7 +144,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 /* === RECENT ACTIVITY === */
 .act-row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--border)}
 .act-row:last-child{border-bottom:none}
-.act-av{width:34px;height:34px;border-radius:50%;background:var(--cd);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:13px;color:var(--coral);flex-shrink:0}
+.act-av{width:34px;height:34px;border-radius:50%;background:var(--cd);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:13px;color:var(--coral-text);flex-shrink:0}
 .act-info{flex:1;min-width:0}
 .act-name{font-size:13px;font-weight:700;color:var(--ink)}
 .act-meta{font-size:11px;color:var(--ink3);margin-top:1px}
@@ -428,7 +426,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
               <input class="wq-opt-inp" placeholder="Option 1" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
               <input class="wq-opt-inp" placeholder="Option 2" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
             </div>
-            <button type="button" onclick="addWqOpt()" style="margin-top:8px;background:none;border:none;padding:0;font-size:12px;font-weight:700;color:var(--coral);cursor:pointer">+ Ajouter une option (4 max)</button>
+            <button type="button" onclick="addWqOpt()" style="margin-top:8px;background:none;border:none;padding:0;font-size:12px;font-weight:700;color:var(--coral-text);cursor:pointer">+ Ajouter une option (4 max)</button>
           </div>
           <button onclick="publishWeeklyQuestion()" style="width:100%;padding:12px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--cg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Publier dans le feed</button>
           <div id="wq-status" style="margin-top:12px;font-size:13px;font-weight:600;text-align:center;min-height:20px;color:var(--ink2)"></div>
@@ -466,7 +464,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div style="padding:0 18px 10px;font-size:12px;color:var(--ink3);line-height:1.5">Appliqués en moins d'une minute, sans redéploiement. Au lancement, avec peu d'utilisateurs, tu peux baisser les seuils (les pourcentages sur très peu de réponses sont moins fiables et un ami est plus facilement identifiable). Le barème de points et les seuils anti-fraude ne se règlent pas ici.</div>
       <div id="eng-cfg-rows" style="padding:0 18px 4px"><div class="loading">Chargement</div></div>
       <div style="padding:8px 18px 16px;display:flex;gap:10px;flex-wrap:wrap">
-        <button onclick="saveEngagementConfig()" style="padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:700;border:none;background:var(--coral);color:#fff;cursor:pointer">Enregistrer</button>
+        <button onclick="saveEngagementConfig()" style="padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:700;border:none;background:var(--coral);color:var(--ink);cursor:pointer">Enregistrer</button>
         <button onclick="resetEngagementConfig()" style="padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:700;border:1.5px solid var(--border);background:transparent;color:var(--ink2);cursor:pointer">Revenir aux valeurs par défaut</button>
       </div>
     </div>
@@ -913,7 +911,7 @@ async function renderMerchantQuota(m) {
   el.textContent = 'Chargement…';
   const own = Number.isInteger(m.monthlyQuestionQuota) ? m.monthlyQuestionQuota : '';
   el.innerHTML = `<input id="md-quota-inp" type="number" min="0" max="1000" value="${own}" placeholder="défaut" style="width:90px;padding:7px 9px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink)">
-    <button onclick="saveMerchantQuota('${esc(m.id)}')" style="padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;border:none;background:var(--coral);color:#fff;cursor:pointer">Enregistrer</button>
+    <button onclick="saveMerchantQuota('${esc(m.id)}')" style="padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;border:none;background:var(--coral);color:var(--ink);cursor:pointer">Enregistrer</button>
     <span style="font-size:11px;color:var(--ink3)">Vide = quota par défaut (réglable dans « Réglages de l'engagement »)</span>`;
 }
 async function saveMerchantQuota(id) {
@@ -1238,7 +1236,7 @@ function openModal(id) {
   if (m.idDocumentPath) {
     iddocEl.innerHTML = '<span style="color:var(--ink3)">Chargement…</span>';
     firebase.storage().ref(m.idDocumentPath).getDownloadURL()
-      .then(url => { iddocEl.innerHTML = `<a href="${url}" target="_blank" rel="noopener" style="color:var(--coral);font-weight:700;display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg> Voir le document</a>`; })
+      .then(url => { iddocEl.innerHTML = `<a href="${url}" target="_blank" rel="noopener" style="color:var(--coral-text);font-weight:700;display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg> Voir le document</a>`; })
       .catch(() => { iddocEl.textContent = 'Erreur de chargement'; });
   } else {
     iddocEl.textContent = 'Non fourni';
@@ -1518,7 +1516,7 @@ async function renderActiveWeeklyQuestion() {
       const q = d.data();
       const cityLbl = q.city === 'all' ? 'Toutes les villes' : q.city;
       return `<div style="padding:12px 14px;background:var(--bg);border-radius:10px;border:1.5px solid var(--border);margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:var(--coral);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${esc(cityLbl)}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--coral-text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${esc(cityLbl)}</div>
         <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px">${esc(q.text||'')}</div>
         <div style="font-size:12px;color:var(--ink3);margin-bottom:10px">${(q.options||[]).map(o=>esc(o)).join(' · ')}</div>
         <button onclick="stopWeeklyQuestion('${d.id}')" style="padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer">Arrêter</button>
@@ -1603,7 +1601,7 @@ function renderBroadcastHistory() {
     const ts = b.sentAt ? fmtDate(b.sentAt) : '—';
     const aud = b.audience === 'all' ? 'Tous les users' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>' + ' ' + b.audience;
     return `<div class="act-row">
-      <div class="act-av" style="background:var(--cd);color:var(--coral);display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg></div>
+      <div class="act-av" style="background:var(--cd);color:var(--coral-text);display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg></div>
       <div class="act-info">
         <div class="act-name" style="font-weight:600">${esc(b.message)}</div>
         <div class="act-meta">${b.recipientCount||'?'} destinataires · par ${esc(b.sentBy||'admin')}</div>
