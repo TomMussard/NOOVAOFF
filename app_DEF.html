@@ -1778,7 +1778,23 @@ async function isCityOpen(slug){
 function getCampaignCity(c){return normalizeCity(c?.city || c?.targetCity || c?.cityLabel || '');}
 function getCampaignTargetVolume(c){return Number(c?.targetVolume ?? c?.volumeTarget ?? 100) || 100;}
 function getCampaignAgeRanges(c){const raw = c?.ageRanges || (c?.ageRange ? [c.ageRange] : []); return (Array.isArray(raw) ? raw : [raw]).filter(Boolean);}
-function getCampaignQuestions(c){return Array.isArray(c?.questions) && c.questions.length ? c.questions : [{ q: c?.question || '', format: c?.format || 'text', options: c?.options || [] }];}
+// Questions d'une campagne. Les anciennes campagnes (sans questionsSchema: 2) avaient les options des questions 2 et 3
+// ajoutées au DÉBUT de celles de la question 1 ([Q2, Q3, Q1]) : on les retire.
+function getCampaignQuestions(c){
+  const base = Array.isArray(c?.questions) && c.questions.length ? c.questions : [{ q: c?.question || '', format: c?.format || 'text', options: c?.options || [] }];
+  if (c?.questionsSchema === 2 || base.length < 2) return base;
+  const qs = base.map(x => Object.assign({}, x, { options: Array.isArray(x.options) ? x.options.slice() : x.options }));
+  const first = qs[0];
+  if (!Array.isArray(first.options)) return qs;
+  let o = first.options;
+  for (let i = 1; i < qs.length; i++) {
+    const head = qs[i].options;
+    if (!Array.isArray(head) || !head.length) continue;
+    if (o.length - head.length >= 2 && head.every((v, k) => o[k] === v)) o = o.slice(head.length);
+  }
+  first.options = o;
+  return qs;
+}
 function normalizeAgeRange(v){return (v||'').toString().trim().toLowerCase().replace(/–|—/g,'-');}
 const GROUPS=[
   {id:'food',  ico:'food', n:'Restos & Gourmands',   interest:'restauration', meta:'Bons plans food dans ta ville',  color:'#E07D0A'},
@@ -3295,7 +3311,11 @@ function startCampaignById(campId) {
   db.collection('campaigns').doc(campId).get().then(doc=>{
     if(!doc.exists)return;
     const d=doc.data();
-    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:d.pointsPerAnswer||20,type:d.format||'text',q:d.question,hint:'',opts:d.options||[],items:d.options||[],usage:(d.merchantName||'Ce commerce')+' veut ton avis'};
+    // Mêmes données que sur l'accueil : options PROPRES à chaque question, et questions 2 et 3 à la suite (avant : options de la
+    // campagne entière et questions suivantes perdues quand on démarrait depuis la page du commerce).
+    const allQs=getCampaignQuestions(d), SCALE=[10,15,20];
+    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:10,type:allQs[0].format||d.format||'text',q:allQs[0].q||d.question,hint:'',opts:allQs[0].options||[],items:allQs[0].options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce'),_surveyCount:allQs.length,
+      survey:allQs.slice(1).map((sq,idx)=>({_firestoreId:doc.id,_merchantId:d.merchantId||null,_questionIdx:idx+1,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',theme:d.sector||'Commerce local',pts:SCALE[idx+1]||20,type:sq.format||'text',q:sq.q,hint:'',opts:sq.options||[],items:sq.options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce')}))};
     S.mode='hook';S.curQ=q;
     const pg=document.getElementById('q-prog');pg.innerHTML='';
     const seg=document.createElement('div');seg.className='q-seg cur';pg.appendChild(seg);

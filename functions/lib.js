@@ -16,4 +16,24 @@ function parisDay(ms) {
 }
 // Comptes autorisés dans le back-office (doit rester aligné sur isAdmin() de firestore.rules).
 const ADMIN_EMAILS = ["noovaoffr@gmail.com", "tomussproduction@gmail.com"];
-module.exports = { sectorCategory, parisDay, ADMIN_EMAILS };
+// Questions d'une campagne. Les campagnes créées avant la correction du 2026-09-20 (sans questionsSchema: 2) avaient les
+// champs d'options des questions 2 et 3 (placés AVANT ceux de la question 1 dans la page) ajoutés au DÉBUT de la liste
+// de la question 1 : [options Q2, options Q3, options Q1]. On retire ce début. Les index des options de Q1 sont alors
+// décalés par rapport aux anciennes statistiques (elles n'existent que pour des campagnes de test).
+function campaignQuestions(camp) {
+  const base = (camp && Array.isArray(camp.questions) && camp.questions.length)
+    ? camp.questions : [{ q: camp && camp.question, format: camp && camp.format, options: camp && camp.options }];
+  if (camp && camp.questionsSchema === 2 || base.length < 2) return base;
+  const qs = base.map((x) => ({ ...x, options: Array.isArray(x.options) ? [...x.options] : x.options }));
+  const first = qs[0];
+  if (!Array.isArray(first.options)) return qs;
+  let o = first.options;
+  for (let i = 1; i < qs.length; i++) {                       // Q2 puis Q3, dans l'ordre où elles s'étaient accumulées
+    const head = qs[i].options;
+    if (!Array.isArray(head) || !head.length) continue;
+    if (o.length - head.length >= 2 && head.every((v, k) => o[k] === v)) o = o.slice(head.length);
+  }
+  first.options = o;
+  return qs;
+}
+module.exports = { sectorCategory, parisDay, ADMIN_EMAILS, campaignQuestions };

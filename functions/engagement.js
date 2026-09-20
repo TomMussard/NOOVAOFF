@@ -11,14 +11,14 @@ const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { getFirestore } = require("firebase-admin/firestore");
 const CFG = require("./engagementConfig");
 const crypto = require("crypto");
-const { sectorCategory, parisDay } = require("./lib");
+const { sectorCategory, parisDay, campaignQuestions } = require("./lib");
 const { applyOverrides } = require("./configStore")._t;
 
 const db = () => getFirestore();
 const uniq = (a) => [...new Set((a || []).filter(Boolean))];
 
 // Définition d'une question d'une campagne (les anciennes campagnes n'ont pas de tableau `questions`).
-const qDefOf = (camp, idx) => (camp.questions && camp.questions[idx]) || { q: camp.question, format: camp.format, options: camp.options };
+const qDefOf = (camp, idx) => campaignQuestions(camp)[idx] || { q: camp.question, format: camp.format, options: camp.options };
 const clampIdx = (v) => Math.max(0, Math.min(2, Math.floor(Number(v) || 0)));
 
 // ─────────────────────────── Comptage des réponses ───────────────────────────

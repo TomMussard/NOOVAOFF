@@ -26,7 +26,7 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./quota")));
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.
 const CFG = require("./engagementConfig");
-const { sectorCategory, parisDay, ADMIN_EMAILS } = require("./lib");
+const { sectorCategory, parisDay, ADMIN_EMAILS, campaignQuestions } = require("./lib");
 const NOOVS_PER_ANSWER = CFG.POINTS.NOOVS_PER_ANSWER;
 const MAX_POINT_ANSWERS_PER_DAY = CFG.POINTS.MAX_ANSWERS_PER_DAY;
 const MIN_ANSWER_MS = CFG.RESPONSE_TIME.MIN_FOR_GAIN_MS;
@@ -158,7 +158,7 @@ exports.submitAnswer = onCall(async (request) => {
     const newAnswersToday = answersToday + (flagged ? 0 : 1);
 
     // Reveal : index de l'option choisie (question à choix) ; le texte reste la référence stockée.
-    const qDef = (camp.questions && camp.questions[qIdx]) || { format: camp.format, options: camp.options };
+    const qDef = campaignQuestions(camp)[qIdx] || { format: camp.format, options: camp.options };
     const optionIdx = (qDef.format === "mcq" && Array.isArray(qDef.options)) ? qDef.options.indexOf(answerValue != null ? String(answerValue) : "") : -1;
     const counted = optionIdx >= 0 && (CFG.REVEAL.COUNT_SUSPECT || !suspect) && (CFG.REVEAL.COUNT_FLAGGED || !flagged);
 

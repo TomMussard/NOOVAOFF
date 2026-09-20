@@ -890,6 +890,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <select class="field-inp" id="q2-fmt-sel" style="font-size:12px" onchange="showMcqForQ(2,this.value)">
                         <option value="mcq">Choix multiple</option>
                         <option value="scale">Échelle 1–10</option>
+                        <option value="rank">Classement</option>
                       </select>
                       <div id="q2-mcq-builder" style="margin-top:8px">
                         <div style="font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Options Q2</div>
@@ -909,6 +910,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <select class="field-inp" id="q3-fmt-sel" style="font-size:12px" onchange="showMcqForQ(3,this.value)">
                         <option value="mcq">Choix multiple</option>
                         <option value="scale">Échelle 1–10</option>
+                        <option value="rank">Classement</option>
                       </select>
                       <div id="q3-mcq-builder" style="margin-top:8px">
                         <div style="font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Options Q3</div>
@@ -1709,7 +1711,7 @@ function wzGo(n){
   if(n===2) loadCitiesForAudience();
   if(n===4){
     document.getElementById('recap-q').textContent=document.getElementById('q-text-inp').value.substring(0,80)||'—';
-    document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple · '+document.querySelectorAll('.mcq-opt-inp').length+' options',scale:'Échelle 1–10',rank:'Classement'}[curFmt];
+    document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple · '+document.querySelectorAll('#mcq-options .mcq-opt-inp').length+' options',scale:'Échelle 1–10',rank:'Classement'}[curFmt];
     document.getElementById('recap-vol').textContent=document.getElementById('vol-num').textContent;
     document.getElementById('recap-name').textContent=document.getElementById('camp-name-inp').value;
     const ages=[...document.querySelectorAll('.age-chip.sel')].map(e=>e.textContent.trim()).filter(Boolean);
@@ -1752,7 +1754,10 @@ function resetWizard(){
 function selFmt(el, fmt){
   document.querySelectorAll('.fmt-card').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel'); curFmt=fmt;
-  document.getElementById('mcq-builder').style.display=fmt==='mcq'?'block':'none';
+  document.getElementById('mcq-builder').style.display=needsOptions(fmt)?'block':'none';
+  const bt=document.querySelector('#mcq-builder .step-card-title'), bs=document.querySelector('#mcq-builder .step-card-sub');
+  if(bt) bt.textContent = fmt==='rank' ? 'Éléments à classer' : 'Options de réponse';
+  if(bs) bs.textContent = fmt==='rank' ? 'Ajoutez les éléments que les répondants classeront du plus au moins important (2 à 6).' : 'Ajoutez les choix proposés aux répondants (2 à 6 options).';
 }
 
 // ═══ MCQ BUILDER ═════════════════════════════════════════════
@@ -1766,9 +1771,22 @@ function addOpt(){
 function removeOpt(btn){ const opts=document.querySelectorAll('#mcq-options .mcq-option-row');if(opts.length>2)btn.closest('.mcq-option-row').remove() }
 
 // ═══ MCQ BUILDERS Q2 / Q3 ═════════════════════════════════════
+// Un choix multiple ET un classement ont besoin d'une liste d'éléments ; une échelle non.
+const needsOptions = (fmt) => fmt === 'mcq' || fmt === 'rank';
 function showMcqForQ(qNum, fmt) {
   const b = document.getElementById('q' + qNum + '-mcq-builder');
-  if(b) b.style.display = fmt === 'mcq' ? 'block' : 'none';
+  if(b) b.style.display = needsOptions(fmt) ? 'block' : 'none';
+  const t = document.querySelector('#q' + qNum + '-mcq-builder > div');
+  if(t) t.textContent = (fmt === 'rank' ? 'Éléments à classer Q' : 'Options Q') + qNum;
+}
+// Options d'UNE question : seulement les champs de SON bloc (jamais ceux des autres questions), sans vides ni doublons.
+function collectOptions(containerSel) {
+  const seen = new Set(), out = [];
+  document.querySelectorAll(containerSel + ' .mcq-opt-inp').forEach(i => {
+    const v = i.value.trim(), k = v.toLowerCase();
+    if(v && !seen.has(k)) { seen.add(k); out.push(v); }
+  });
+  return out;
 }
 function addQOpt(containerId) {
   const c = document.getElementById(containerId);
@@ -2932,7 +2950,8 @@ launchCampaign = async function() {
   if(!_mData.cashierAck) { openCashierModal(); return; }
   const q1 = document.getElementById('q-text-inp')?.value?.trim();
   if(!q1) { showToast('Saisis une question d\'abord','warning'); return; }
-  const options  = Array.from(document.querySelectorAll('.mcq-opt-inp')).map(i=>i.value.trim()).filter(Boolean);
+  const options  = needsOptions(curFmt) ? collectOptions('#mcq-options') : [];
+  if(needsOptions(curFmt) && options.length < 2) { showToast('Question 1 : ajoutez au moins 2 ' + (curFmt === 'rank' ? 'éléments à classer' : 'options de réponse') + ' différents.', 'warning'); return; }
   const volume   = parseInt(document.getElementById('vol-num')?.textContent)||100;
   const themes   = Array.from(document.querySelectorAll('.th-chip.sel')).map(el=>el.textContent.replace(/[^\w\s\-éèêàùç]/gi,'').trim());
   const city     = normalizeCity(_mData.city || _mData.cityLabel || '');
@@ -2947,10 +2966,10 @@ launchCampaign = async function() {
     if(block && block.style.display !== 'none') {
       const qText = document.getElementById('q' + i + '-text-inp')?.value?.trim();
       const qFmt  = document.getElementById('q' + i + '-fmt-sel')?.value || 'mcq';
-      const qOpts = qFmt === 'mcq'
-        ? Array.from(document.querySelectorAll('#q' + i + '-mcq-opts .mcq-opt-inp')).map(inp => inp.value.trim()).filter(Boolean)
-        : [];
-      if(qText) questions.push({ q: qText, format: qFmt, options: qOpts });
+      const qOpts = needsOptions(qFmt) ? collectOptions('#q' + i + '-mcq-opts') : [];
+      if(!qText) { showToast('Question ' + i + ' vide : rédigez-la ou retirez-la.', 'warning'); return; }
+      if(needsOptions(qFmt) && qOpts.length < 2) { showToast('Question ' + i + ' : ajoutez au moins 2 ' + (qFmt === 'rank' ? 'éléments à classer' : 'options de réponse') + ' différents.', 'warning'); return; }
+      questions.push({ q: qText, format: qFmt, options: qOpts });
     }
   }
 
@@ -2965,6 +2984,7 @@ launchCampaign = async function() {
       sector:          _mData.sector || 'Commerce',
       question:        q1,
       questions,
+      questionsSchema: 2,                 // options propres à chaque question (voir la correction du 2026-09-20)
       format:          curFmt,
       options,
       city:            city,

@@ -112,7 +112,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     await waitFn(mp, () => curPage === 'create', null, 8000);
     await mp.evaluate(() => {
       document.getElementById('q-text-inp').value = 'Voulez-vous une ouverture le dimanche ?';
-      const o = document.querySelectorAll('.mcq-opt-inp'); if (o[0]) o[0].value = 'Oui'; if (o[1]) o[1].value = 'Non';
+      const o = document.querySelectorAll('#mcq-options .mcq-opt-inp'); if (o[0]) o[0].value = 'Oui'; if (o[1]) o[1].value = 'Non';
       document.getElementById('camp-name-inp').value = 'Test dimanche';
       wzGo(4);
     });
