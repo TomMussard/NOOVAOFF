@@ -195,6 +195,53 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .bp-news:last-child{border-bottom:none}
 .bp-news-d{font-size:13px;line-height:1.55;color:var(--ink)}
 .bp-news-t{font-size:11px;color:var(--ink3);margin-top:3px}
+
+/* ─── Communauté ─── */
+.cm-sec{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin:18px 0 10px}
+.cm-link{background:none;border:none;color:var(--ink);font-weight:800;font-size:12px;cursor:pointer;font-family:var(--fb);padding:2px 0;text-decoration:underline}
+.cm-hero{margin:0 18px 14px;background:var(--yellow);border-radius:var(--r-card);padding:16px 18px;color:var(--ink)}
+.cm-hero-t{font-family:var(--fd);font-weight:800;font-size:15px;display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.cm-hero-d{font-size:13px;line-height:1.55;font-weight:600}
+.cm-stats{display:flex;gap:8px}
+.cm-stat{flex:1;background:rgba(255,255,255,.5);border-radius:14px;padding:10px 8px;text-align:center}
+.cm-stat-n{font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:-.6px;line-height:1.1}
+.cm-stat-l{font-size:10.5px;font-weight:600;color:rgba(24,20,16,.7);margin-top:2px;line-height:1.3}
+.cm-res-list{padding:0 18px}
+.cm-res{background:var(--surface);border-radius:var(--r-card);padding:14px 16px;box-shadow:var(--shadow-card);margin-bottom:10px;cursor:pointer}
+.cm-res-b{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)}
+.cm-res-q{font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink);margin:4px 0 10px;line-height:1.35}
+.cm-res-top{display:flex;justify-content:space-between;font-size:13px;color:var(--ink);margin-bottom:5px}
+.cm-res-top b{font-family:var(--fd);font-weight:800}
+.cm-res-bar{height:8px;border-radius:99px;background:var(--bg2);overflow:hidden}
+.cm-res-bar>div{height:100%;background:var(--ink);border-radius:99px}
+.cm-res-me{font-size:11.5px;color:var(--ink2);margin-top:7px}
+.cm-res-w{font-size:12px;color:var(--ink3)}
+.cm-res-all{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.cm-res.open .cm-res-all{display:block}
+.cm-res-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink2);padding:3px 0}
+.cm-res-row.mine{color:var(--ink);font-weight:700}
+.cm-brands{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.cm-brands span{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(24,20,16,.07);color:var(--ink2)}
+.feed-post.cm-news{background:var(--ink)}
+.cm-news .fp-name,.cm-news .cm-news-t{color:#fff}.cm-news .fp-time{color:rgba(255,255,255,.55)}
+.cm-news-t{font-size:14px;line-height:1.55;font-weight:600}
+.cm-news .fp-foot{border-top-color:rgba(255,255,255,.12)}.cm-news .fp-btn{color:rgba(255,255,255,.65)}.cm-news .fp-btn.liked{color:var(--yellow)}
+.cm-news .fp-tag{background:var(--yellow);color:var(--ink)}
+.cm-av-news{background:none;overflow:hidden}
+.cm-av-streak{background:var(--ink);color:var(--yellow)}
+.feed-post.cm-streak{background:var(--yellow-soft)}
+.cm-streak-t{font-size:14px;color:var(--ink);line-height:1.5}
+.cm-invite{margin:0 18px 8px;background:var(--yellow-soft);border-radius:var(--r-card);padding:16px}
+.cm-invite-t{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)}
+.cm-invite-d{font-size:12px;color:var(--ink2);line-height:1.55;margin:4px 0 12px}
+.cm-invite-row{display:flex;gap:8px;align-items:center}
+.cm-btn{flex:1;padding:12px;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:99px;cursor:pointer}
+.cm-code{padding:11px 13px;background:rgba(255,255,255,.6);color:var(--ink);font-family:var(--fd);font-weight:800;font-size:12px;letter-spacing:1px;border:1.5px dashed rgba(24,20,16,.25);border-radius:99px;cursor:pointer}
+.cp-pill{flex-shrink:0;font-family:var(--fd);font-weight:800;font-size:13px;padding:6px 11px;border-radius:99px;background:var(--bg2);color:var(--ink3);min-width:44px;text-align:center}
+.cp-pill:empty{display:none}
+.cp-pill.ok{background:var(--ink);color:var(--yellow)}
+.cp-pill.need,.cp-pill.private,.cp-pill.pending{font-size:11px;font-weight:700}
+.cp-pill.pending{background:transparent;border:1.5px dashed var(--line-strong)}
 .rv-skel .rv-bar{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
 #lock-bar{height:6px;border-radius:99px;overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
 #lock-bar.on{opacity:1}
@@ -451,7 +498,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .tab-bar{display:flex;margin:0 18px 16px;background:var(--bg2);border-radius:var(--r-pill);padding:4px;gap:2px}
 .tab-btn{flex:1;padding:9px 4px;border-radius:var(--r-pill);font-size:12px;font-weight:700;text-align:center;cursor:pointer;color:var(--muted);transition:all .16s;background:none;border:none;font-family:var(--fb)}
 .tab-btn.on{background:var(--ink);color:#fff;font-weight:700;box-shadow:none}
-.feed-post{margin:0 18px 10px;background:var(--surface);border:none;border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-card)}
+.feed-post{margin:0 0 10px;background:var(--surface);border:none;border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-card)}
 .fp-hdr{padding:14px 14px 10px;display:flex;align-items:center;gap:9px}
 .fp-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:14px;flex-shrink:0}
 .fp-name{font-size:15px;font-weight:700;color:var(--ink)}
@@ -2011,9 +2058,14 @@ function shareReward(){
 function renderSocial(){
   const fe=document.getElementById('panel-feed');
   fe.innerHTML='';
+  fe.insertAdjacentHTML('beforeend','<div id="community-pulse"></div>');
   fe.insertAdjacentHTML('beforeend','<div id="weekly-q-slot"></div>');
+  fe.insertAdjacentHTML('beforeend','<div id="community-results"></div>');
+  fe.insertAdjacentHTML('beforeend','<div class="cm-sec" style="padding:0 18px">Chez tes amis</div>');
   fe.insertAdjacentHTML('beforeend','<div id="feed-content" style="min-height:80px;padding:0 18px"><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div></div>');
+  loadCommunityPulse();
   loadWeeklyQuestion();
+  loadMyResults();
   loadCommunityFeed();
   initFriendsPanel();initRankingPanel();
 }
@@ -2120,8 +2172,9 @@ async function renderFeedDocs(el, docs) {
   const token = ++_feedRenderToken;
     if (!docs.length) {
       el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
-        Aucune activité de tes amis pour l'instant.<br>
-        <span style="color:var(--ink);font-weight:700">Ajoute des amis pour voir ce qu'ils répondent.</span>
+        Rien de neuf chez tes amis pour l'instant.<br>
+        <span style="color:var(--ink);font-weight:700">Invite-les : vous verrez qui répond quoi, et grimperez ensemble.</span><br>
+        <button onclick="shareInvite()" style="margin-top:14px;padding:11px 22px;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:99px;cursor:pointer">Inviter un ami</button>
       </div>`;
       return;
     }
@@ -2152,16 +2205,40 @@ async function renderFeedDocs(el, docs) {
     el.innerHTML = '';
 
     const escAttr = s => esc(s).replace(/"/g,'&quot;'); // esc() n'échappe pas les guillemets, nécessaire ici (valeurs insérées dans des attributs data-*)
+    // Une même personne qui répond à plusieurs questions le même jour = UNE carte (« a répondu à 3 questions »).
+    const dayOf = ev => ev.createdAt ? parisToday(ev.createdAt.toMillis()) : '';
+    const groups = [];
     docs.forEach((doc, i) => {
-      const ev = doc.data();
+      const ev = doc.data(), last = groups[groups.length - 1];
+      // On ne fusionne qu'un événement SANS j'aime ni commentaire (sinon ses interactions deviendraient inaccessibles).
+      const untouched = ev.likeCount === 0 && ev.commentCount === 0;
+      if (untouched && ev.type === 'answer' && last && last.ev.type === 'answer' && last.ev.userId === ev.userId && dayOf(last.ev) === dayOf(ev)) {
+        last.n++; if (ev.brand && !last.brands.includes(ev.brand)) last.brands.push(ev.brand);
+      } else groups.push({ doc, ev, i, n: 1, brands: ev.brand ? [ev.brand] : [] });
+    });
+    groups.forEach(g => {
+      const { doc, ev } = g;
       const name = ev.displayName || 'Quelqu\'un';
       const c = colors[name.charCodeAt(0) % colors.length];
       const ts = ev.createdAt ? timeAgo(ev.createdAt.toDate()) : '';
-      const { count: likeCount, liked, comments: commentCount } = likeInfo[i];
-      const isMe = ev.userId && myUid && ev.userId === myUid;
+      const { count: likeCount, liked, comments: commentCount } = likeInfo[g.i];
+      const isNews = ev.type === 'merchant_post', isStreak = ev.type === 'streak';
+      let avatar, action;
+      if (isNews) {
+        avatar = `<div class="fp-av cm-av-news">${logoHTML(name, 36, null)}</div>`;
+        action = `<div class="cm-news-t">${esc(ev.text || '')}</div>`;
+      } else if (isStreak) {
+        avatar = `<div class="fp-av cm-av-streak">${icon('fire', { size: 20 })}</div>`;
+        action = `<div class="cm-streak-t">${esc(ev.text || '')}</div>`;
+      } else {
+        avatar = `<div class="fp-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div>`;
+        action = g.n > 1
+          ? `<div class="fp-action">a répondu à <strong>${g.n} questions</strong> aujourd'hui</div><div class="cm-brands">${g.brands.slice(0, 3).map(b => `<span>${esc(b)}</span>`).join('')}${g.brands.length > 3 ? `<span>+${g.brands.length - 3}</span>` : ''}</div>`
+          : `<div class="fp-action">${esc(ev.text || 'a répondu à une question')}${ev.brand ? ` <strong>${esc(ev.brand)}</strong>` : ''}</div>`;
+      }
       const d = document.createElement('div');
-      d.className = 'feed-post';
-      d.innerHTML = `<div class="fp-hdr"><div class="fp-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div><div style="flex:1"><div class="fp-name">${esc(name)}${ev.type==='merchant_post'?' <span class="fp-tag">Actualité</span>':''}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body"><div class="fp-action">${esc(ev.text||'a répondu à une question')}${ev.brand&&ev.type!=='merchant_post'?` <strong>${esc(ev.brand)}</strong>`:''}</div></div><div class="fp-foot">
+      d.className = 'feed-post' + (isNews ? ' cm-news' : isStreak ? ' cm-streak' : '');
+      d.innerHTML = `<div class="fp-hdr">${avatar}<div style="flex:1;min-width:0"><div class="fp-name">${esc(name)}${isNews ? ' <span class="fp-tag">Actualité</span>' : ''}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body">${action}</div><div class="fp-foot">
         <button class="fp-btn fp-like-btn${liked?' liked':''}" data-post-id="${escAttr(doc.id)}" data-liked="${liked}" onclick="toggleFeedLike(this)">${icon(liked?'heart-filled':'heart',{size:13})} <span class="fp-like-count">${likeCount>0?likeCount:''}</span> J'aime</button>
         <button class="fp-btn" data-post-id="${escAttr(doc.id)}" onclick="toggleComments(this.dataset.postId)">${icon('chat',{size:13})} <span class="fp-com-count">${commentCount>0?commentCount:''}</span> Commenter</button>
         <button class="fp-btn" data-name="${escAttr(name)}" data-text="${escAttr(ev.text||'')}" data-brand="${escAttr(ev.brand||'')}" onclick="shareFeedPost(this.dataset.name,this.dataset.text,this.dataset.brand)">${icon('broadcast',{size:13})} Partager</button>
@@ -2171,6 +2248,39 @@ async function renderFeedDocs(el, docs) {
     applyStagger(el);
     // Les commentaires ouverts restent ouverts quand le fil se rafraîchit.
     _openComments.forEach(id => { const box = document.getElementById('cm-' + id); if(box){ box.style.display = 'block'; loadComments(id); } });
+}
+
+// ─── Chiffres de la ville (agrégés, sans aucun nom) ───────────
+async function loadCommunityPulse() {
+  const el = document.getElementById('community-pulse'); if(!el) return;
+  try {
+    const r = (await fx.httpsCallable('getCommunityPulse')()).data;
+    if(!r || !r.available) { el.innerHTML = ''; return; }
+    const city = S._cityLabel || r.city;
+    const stat = (n, l) => `<div class="cm-stat"><div class="cm-stat-n">${n}</div><div class="cm-stat-l">${l}</div></div>`;
+    el.innerHTML = r.enough
+      ? `<div class="cm-hero"><div class="cm-hero-t">${icon('pin',{size:14})} ${esc(city)} cette semaine</div><div class="cm-stats">${stat(r.weekAnswers, 'réponses de voisins')}${stat(r.activeMerchants, 'commerce' + (r.activeMerchants > 1 ? 's' : '') + ' actif' + (r.activeMerchants > 1 ? 's' : ''))}${stat(r.myWeekAnswers, 'de toi')}</div></div>`
+      : `<div class="cm-hero"><div class="cm-hero-t">${icon('pin',{size:14})} ${esc(city)} démarre</div><div class="cm-hero-d">${r.activeMerchants ? r.activeMerchants + ' commerce' + (r.activeMerchants > 1 ? 's te posent' : ' te pose') + ' des questions. Sois parmi les premiers à répondre : les résultats de la ville apparaîtront ici.' : 'Les commerces de ton quartier arrivent. Invite tes amis pour être prêts.'}</div></div>`;
+  } catch(e) { console.warn('pulse:', e); el.innerHTML = ''; }
+}
+
+// ─── « Comment la ville a répondu » : résultats globaux de mes dernières questions ───
+async function loadMyResults() {
+  const el = document.getElementById('community-results'); if(!el) return;
+  try {
+    const r = (await fx.httpsCallable('getMyResults')()).data;
+    const list = (r && r.results) || [];
+    if(!list.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `<div class="cm-sec" style="padding:0 18px">Comment la ville a répondu</div><div class="cm-res-list">${list.map((x, k) => {
+      if(x.belowThreshold) return `<div class="cm-res"><div class="cm-res-b">${esc(x.brand)}</div><div class="cm-res-q">${esc(x.question)}</div><div class="cm-res-w">Encore ${x.needed} réponse${x.needed > 1 ? 's' : ''} pour voir les résultats.</div></div>`;
+      const top = x.options.reduce((a, b) => (b.pct > a.pct ? b : a), x.options[0]);
+      const mine = x.options[x.myIdx];
+      return `<div class="cm-res" onclick="this.classList.toggle('open')"><div class="cm-res-b">${esc(x.brand)} · ${x.n} réponses</div><div class="cm-res-q">${esc(x.question)}</div>
+        <div class="cm-res-top"><span>${esc(top.text)}</span><b>${top.pct} %</b></div><div class="cm-res-bar"><div style="width:${top.pct}%"></div></div>
+        <div class="cm-res-me">${mine ? (mine === top ? 'Tu as répondu comme la majorité' : 'Toi : ' + esc(mine.text) + ' (' + mine.pct + ' %)') : ''}</div>
+        <div class="cm-res-all">${x.options.map((o, i) => `<div class="cm-res-row${i === x.myIdx ? ' mine' : ''}"><span>${i === x.myIdx ? icon('check',{size:12}) + ' ' : ''}${esc(o.text)}</span><b>${o.pct} %</b></div>`).join('')}</div></div>`;
+    }).join('')}</div>`;
+  } catch(e) { console.warn('myResults:', e); el.innerHTML = ''; }
 }
 
 async function toggleFeedLike(btn) {
@@ -2390,31 +2500,27 @@ function initFriendsPanel(){
     </div>`:'' ;
   fp.innerHTML=`
     ${pendingHTML}
-    <div class="inv-c">
-      <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink);margin-bottom:5px">Mon code ami</div>
-      <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;line-height:1.55">Envoie ce code à un ami pour qu'il puisse t'ajouter. Réciprocité obligatoire — tu dois aussi l'ajouter de ton côté.</div>
-      <div style="display:flex;align-items:center;gap:9px">
-        <div class="inv-code" id="inv-code" style="letter-spacing:2.5px;font-size:19px;font-weight:800">${myCode}</div>
-        <button class="copy-btn" id="share-btn" onclick="shareCode('${myCode}')">Partager</button>
+    <div class="cm-invite">
+      <div class="cm-invite-t">Invite tes amis</div>
+      <div class="cm-invite-d">Comparez vos réponses et grimpez au classement ensemble. Ton ami doit accepter ta demande (l'amitié est réciproque).</div>
+      <div class="cm-invite-row">
+        <button class="cm-btn" onclick="shareInvite()">Inviter un ami</button>
+        <button class="cm-code" id="inv-code" onclick="copyMyCode()" title="Copier mon code">${myCode}</button>
       </div>
     </div>
-    <div style="padding:0 18px 6px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Ajouter un ami</div>
-      <div style="font-size:12px;color:var(--ink2);margin-bottom:9px;line-height:1.5">Saisis le code de ton ami. Une fois qu'il accepte ta demande, vous serez connectés et verrez vos activités dans le feed.</div>
+    <div class="cm-sec" style="display:flex;align-items:center;justify-content:space-between;padding:0 18px">
+      <span>Mes amis <span id="friends-count" style="color:var(--ink);font-weight:800"></span></span>
+      <button class="cm-link" onclick="toggleAddFriend()">+ Ajouter avec un code</button>
+    </div>
+    <div id="add-friend-box" style="display:none;padding:0 18px 12px">
       <div style="display:flex;gap:8px">
-        <input style="flex:1;padding:12px 14px;background:var(--surface);border:1.5px solid var(--line-strong);border-radius:var(--r-media);font-family:var(--fb);font-size:14px;color:var(--ink);outline:none" placeholder="Code ami (ex: NOOVA-AB1234)" id="fi-inp" oninput="this.value=this.value.toUpperCase()">
-        <button style="padding:12px 16px;background:var(--yellow);color:var(--ink);font-size:12px;font-weight:800;border:none;border-radius:var(--r-media);cursor:pointer;font-family:var(--fd);box-shadow:none;white-space:nowrap" onclick="addFriend()">Envoyer →</button>
+        <input style="flex:1;min-width:0;padding:12px 14px;background:var(--surface);border:1.5px solid var(--line-strong);border-radius:var(--r-media);font-family:var(--fb);font-size:16px;color:var(--ink);outline:none" placeholder="Code ami (ex : NOOVA-AB1234)" id="fi-inp" oninput="this.value=this.value.toUpperCase()">
+        <button style="padding:12px 16px;background:var(--yellow);color:var(--ink);font-size:12px;font-weight:800;border:none;border-radius:var(--r-media);cursor:pointer;font-family:var(--fd);white-space:nowrap" onclick="addFriend()">Envoyer →</button>
       </div>
       <div id="fi-err" style="font-size:12px;color:var(--danger);min-height:18px;margin-top:6px"></div>
     </div>
-    <div style="padding:0 18px 14px;display:none" id="compat-wrap">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px">Mes compatibilités</div>
-      <div id="compat-list"></div>
-    </div>
-    <div style="padding:0 18px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Mes amis <span id="friends-count" style="color:var(--ink);font-weight:800"></span></div>
-      <div id="friends-list"></div>
-    </div>`;
+    <div id="compat-notice"></div>
+    <div style="padding:0 18px"><div id="friends-list"></div></div>`;
   renderFriends();
 }
 
@@ -2444,27 +2550,55 @@ function initRankingPanel(){
     <div id="ranking-list"></div>`;
   renderRanking();
 }
+function toggleAddFriend(){const b=document.getElementById('add-friend-box');if(!b)return;const open=b.style.display==='none';b.style.display=open?'block':'none';if(open){const i=document.getElementById('fi-inp');if(i)i.focus();}}
+function copyMyCode(){const c=S._friendCode;if(!c)return;try{navigator.clipboard.writeText(c);showToast('Code copié','success');}catch(e){showToast(c,'success');}}
+// Une seule liste : chaque ami avec sa compatibilité (78 %, « encore 2 », « privé ») ; toucher = son profil.
 function renderFriends(){
   const el=document.getElementById('friends-list');
   if(!el)return;
   const countEl=document.getElementById('friends-count');
   if(countEl)countEl.textContent=S.friends.length?'('+S.friends.length+')':'';
   el.innerHTML='';
-  renderCompatList();
   if(!S.friends.length){
-    el.innerHTML=`<div style="text-align:center;padding:28px 16px 8px"><div style="margin-bottom:10px;color:var(--ink3);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;vertical-align:-2px"><path d="M2 12l4-3 4 3 3-3 2 2"/><path d="M22 12l-4-3-3.5 3-2.5-1"/><path d="M9 12l3 3 2-2"/><path d="M12 15l2 2 2-2"/></svg></div><div style="color:var(--ink2);font-size:13px;line-height:1.6">Aucun ami pour l'instant.<br>Invite quelqu'un pour comparer vos réponses !</div><button onclick="shareInvite()" style="margin-top:14px;padding:12px 22px;background:var(--yellow);color:var(--ink);font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:99px;cursor:pointer">Inviter un ami</button></div>`;
+    el.innerHTML=`<div style="text-align:center;padding:26px 16px 8px"><div style="margin-bottom:10px;color:var(--ink3);display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px"><path d="M2 12l4-3 4 3 3-3 2 2"/><path d="M22 12l-4-3-3.5 3-2.5-1"/><path d="M9 12l3 3 2-2"/><path d="M12 15l2 2 2-2"/></svg></div><div style="color:var(--ink2);font-size:13px;line-height:1.6">Aucun ami pour l'instant.<br>Invite quelqu'un pour comparer vos réponses !</div><button onclick="shareInvite()" style="margin-top:14px;padding:12px 22px;background:var(--yellow);color:var(--ink);font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:99px;cursor:pointer">Inviter un ami</button></div>`;
     return;
   }
   const _seenFi=new Set();
   S.friends.filter(f=>f&&f.uid&&!_seenFi.has(f.uid)&&_seenFi.add(f.uid)).forEach((f,i)=>{
     const c=AVC[i%AVC.length];
     const d=document.createElement('div');
-    d.className='fi';
+    d.className='cp-row';d.dataset.uid=f.uid;
     d.onclick=()=>openFriendProfile(f);
-    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${avInner(f.photoUrl,f.n)}${f.online?'<div class="fi-online"></div>':''}</div><div style="flex:1"><div class="fi-name">${esc(f.n)}</div><div class="fi-pts">${f.xp} xp · <span style="color:var(--ink2);font-weight:700;display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c1 1 2 2.5 2 4.5A5.5 5.5 0 0 1 6.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0 0 12 22a8 8 0 0 0 7-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg> ${f.str} j</span></div></div><span style="color:var(--ink3);font-size:17px">›</span>`;
+    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${avInner(f.photoUrl,f.n)}${f.online?'<div class="fi-online"></div>':''}</div><div class="cp-mid"><div class="cp-name">${esc(f.n)}</div><div class="cp-sub">${f.xp} xp · <span style="display:inline-flex;align-items:center;gap:3px">${icon('fire',{size:12})} ${f.str} j</span></div></div><div class="cp-pill" data-uid="${esc(f.uid)}"></div>`;
     el.appendChild(d);
   });
   applyStagger(el);
+  fillFriendCompat();
+}
+async function fillFriendCompat(){
+  try{
+    const data=await fetchCompat();
+    const notice=document.getElementById('compat-notice');
+    if(data.sharing===false){
+      if(notice)notice.innerHTML=`<div class="cp-off" style="margin:0 18px 12px"><span>Pour comparer vos réponses, active « Montrer mes réponses à mes amis ».</span><button onclick="enableCompatSharing()">Activer</button></div>`;
+      return;
+    }
+    if(notice)notice.innerHTML='';
+    const list=document.getElementById('friends-list');if(!list)return;
+    const byUid=new Map((data.friends||[]).map(c=>[c.uid,c]));
+    const rows=[...list.querySelectorAll('.cp-row')];
+    rows.forEach(r=>{
+      const c=byUid.get(r.dataset.uid),pill=r.querySelector('.cp-pill');if(!pill)return;
+      if(!c){ r.dataset.state='pending';pill.className='cp-pill pending';pill.textContent='en attente';pill.title='Cette personne n\'a pas encore accepté ta demande';return; }
+      r.dataset.state=c.state;r.dataset.pct=c.pct||0;r.dataset.common=c.common||0;
+      pill.className='cp-pill '+c.state;
+      pill.textContent=c.state==='ok'?c.pct+' %':c.state==='need'?'encore '+c.needed:'privé';
+      pill.title=compatSubText(c);
+    });
+    // Les plus compatibles d'abord, puis ceux à comparer, puis les profils privés.
+    const rank={ok:0,need:1,private:2,pending:3};
+    rows.sort((a,b)=>(rank[a.dataset.state]??3)-(rank[b.dataset.state]??3)||(+b.dataset.pct)-(+a.dataset.pct)||(+b.dataset.common)-(+a.dataset.common)).forEach(r=>list.appendChild(r));
+  }catch(e){console.warn('compat:',e);}
 }
 
 // ─── Compatibilité entre amis ────────────────────────────────
@@ -2482,30 +2616,10 @@ function compatSubText(c){
   if(c.state==='need') return 'Répondez à '+c.needed+' question'+(c.needed>1?'s':'')+' de plus pour découvrir votre compatibilité';
   return 'Ne partage pas ses réponses';
 }
-function renderCompatList(){
-  const wrap=document.getElementById('compat-wrap'),el=document.getElementById('compat-list');
-  if(!wrap||!el)return;
-  if(!S.friends||!S.friends.length){wrap.style.display='none';return;}
-  wrap.style.display='block';
-  fetchCompat().then(data=>{
-    const el2=document.getElementById('compat-list');if(!el2)return;
-    if(data.sharing===false){
-      el2.innerHTML=`<div class="cp-off"><span>Pour comparer vos réponses, active « Montrer mes réponses à mes amis ».</span><button onclick="enableCompatSharing()">Activer</button></div>`;
-      return;
-    }
-    const byUid=new Map((S.friends||[]).map(f=>[f.uid,f]));
-    el2.innerHTML=(data.friends||[]).filter(c=>byUid.has(c.uid)).map(c=>{
-      const f=byUid.get(c.uid),i=S.friends.indexOf(f),col=AVC[i%AVC.length];
-      const right=c.state==='ok'?`<div class="cp-pct">${c.pct} %</div>`:`<div class="cp-pct muted">—</div>`;
-      const bar=c.state==='ok'?`<div class="cp-bar"><div style="width:${c.pct}%"></div></div>`:'';
-      return `<div class="cp-row" onclick="openFriendProfile(S.friends.find(x=>x.uid==='${esc(c.uid)}'))"><div class="fi-av" style="background:${col}18;color:${col}">${avInner(c.photoUrl,c.name)}</div><div class="cp-mid"><div class="cp-name">${esc(c.name)}</div><div class="cp-sub">${esc(compatSubText(c))}</div>${bar}</div>${right}</div>`;
-    }).join('');
-  }).catch(e=>{console.warn('compat:',e);const el2=document.getElementById('compat-wrap');if(el2)el2.style.display='none';});
-}
 async function enableCompatSharing(){
   await setShareAnswers(true);
   const i=document.getElementById('share-answers-inp');if(i)i.checked=S._shareAnswers!==false;
-  S._compat=null;renderCompatList();
+  S._compat=null;fillFriendCompat();
 }
 async function openFriendProfile(f){
   if(!f)return;

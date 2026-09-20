@@ -43,7 +43,7 @@ const callFn=async(name,data,token)=>{const r=await fetch('http://127.0.0.1:5001
     check('Réglages : refusés à un simple utilisateur (lecture et écriture)',(await callFn('getEngagementConfig',{},tokUser)).error==='PERMISSION_DENIED'&&(await callFn('setEngagementConfig',{values:{'REVEAL.MIN_ANSWERS':2}},tokUser)).error==='PERMISSION_DENIED');
     check('Réglages : refusés sans connexion',(await callFn('getEngagementConfig',{},null)).error==='PERMISSION_DENIED'||(await callFn('getEngagementConfig',{},null)).error==='UNAUTHENTICATED');
     let g=await callFn('getEngagementConfig',{},tokAdmin);
-    check('Réglages : l\'admin lit valeurs, défauts et bornes (reveal 5 par défaut)',g.values['REVEAL.MIN_ANSWERS']===5&&g.defaults['REVEAL.MIN_ANSWERS']===5&&g.bounds['REVEAL.MIN_ANSWERS'].min===2&&Object.keys(g.bounds).length===12,g);
+    check('Réglages : l\'admin lit valeurs, défauts et bornes (reveal 5 par défaut)',g.values['REVEAL.MIN_ANSWERS']===5&&g.defaults['REVEAL.MIN_ANSWERS']===5&&g.bounds['REVEAL.MIN_ANSWERS'].min===2&&Object.keys(g.bounds).length===13,g);
     check('Réglages : le barème de points et l\'anti-fraude ne sont pas réglables',!Object.keys(g.bounds).some(k=>/^POINTS|^RESPONSE_TIME/.test(k)));
     let r=await E.revealCore('me',{campaignId:'c1',questionIdx:0});
     check('Avant : 3 réponses < seuil 5 → pas de pourcentage',r.belowThreshold===true&&r.needed===2,r);
@@ -66,7 +66,7 @@ const callFn=async(name,data,token)=>{const r=await fetch('http://127.0.0.1:5001
     await p.goto(ADMIN,{waitUntil:'load'});await sleep(1500);
     await p.evaluate(async()=>{await auth.signInWithEmailAndPassword('tomussproduction@gmail.com','secret123');});
     await p.evaluate(()=>{document.getElementById('tab-moderation').style.display='block';loadEngagementConfig();});
-    await wf(p,()=>document.querySelectorAll('#eng-cfg-rows input').length===12,null,15000);
+    await wf(p,()=>document.querySelectorAll('#eng-cfg-rows input').length===13,null,15000);
     await p.screenshot({path:'/tmp/shots/admin_cfg.png'});
     await p.evaluate(()=>{document.querySelector('#eng-cfg-rows input[data-k="PREDICTION.MIN_ANSWERS"]').value='12';saveEngagementConfig();});
     await until(async()=>((await db.doc('appConfig/engagement').get()).data()||{}).PREDICTION&&(await db.doc('appConfig/engagement').get()).data().PREDICTION.MIN_ANSWERS===12);

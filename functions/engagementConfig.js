@@ -60,6 +60,13 @@ module.exports = {
     MIN_RESPONSE_MS: 0,          // temps minimum (mesuré serveur) pour gagner des NOOVS ; 0 = désactivé (à monter si des abus apparaissent)
   },
 
+  // ─── Onglet Communauté ───
+  COMMUNITY: {
+    MIN_PULSE: 5,                // réponses de la ville cette semaine avant d'afficher les chiffres (sinon message de démarrage)
+    RESULTS_LIMIT: 5,            // « Comment la ville a répondu » : dernières questions répondues
+    STREAK_MILESTONES: [3, 7, 14, 30, 60, 100],   // séries annoncées à tes amis dans le fil
+  },
+
   // ─── Quota de questions par commerçant ─── (pas d'abonnement : la ville offre une quantité fixe par mois)
   QUOTA: {
     DEFAULT_MONTHLY_QUESTIONS: 10,   // questions par mois et par commerçant, sauf quota propre fixé par l'admin

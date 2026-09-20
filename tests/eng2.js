@@ -92,16 +92,17 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     const shot=async n=>{await p.evaluate(()=>{try{closeCelebration()}catch(e){}});await sleep(600);await p.screenshot({path:'/tmp/shots/'+n+'.png'});};
     await p.evaluate(()=>goNav('social'));
     await p.evaluate(()=>socTab('friends',document.querySelector('.tab-btn[onclick*="friends"]')));
-    await wf(p,()=>document.querySelectorAll('#compat-list .cp-row').length>=4,null,20000);
-    const rows=await p.evaluate(()=>[...document.querySelectorAll('#compat-list .cp-row')].map(r=>({n:r.querySelector('.cp-name').textContent,p:r.querySelector('.cp-pct').textContent.trim(),s:r.querySelector('.cp-sub').textContent,bar:!!r.querySelector('.cp-bar')})));
+    await wf(p,()=>document.querySelectorAll('#friends-list .cp-pill.ok').length>=1&&document.querySelectorAll('#friends-list .cp-row').length>=4,null,20000);
+    const rows=await p.evaluate(()=>[...document.querySelectorAll('#friends-list .cp-row')].map(r=>({n:r.querySelector('.cp-name').textContent,p:r.querySelector('.cp-pill').textContent.trim(),t:r.querySelector('.cp-pill').title,s:r.querySelector('.cp-sub').textContent})));
     await shot('compat_list');
-    check('Liste « Mes compatibilités » : 4 amis triés (78 → 50 → encore N → privé)',rows.map(r=>r.n).join()==='User fA,User fE,User fB,User fC',rows);
-    check('Liste : pourcentage et barre pour les scores',rows[0].p==='78 %'&&rows[0].bar&&rows[1].p==='50 %',rows.slice(0,2));
-    check('Liste : « Répondez à 2 questions de plus… » sous le seuil, sans barre',/Répondez à 2 questions de plus/.test(rows[2].s)&&!rows[2].bar&&rows[2].p==='—',rows[2]);
-    check('Liste : « Ne partage pas ses réponses » pour l\'ami privé',/Ne partage pas/.test(rows[3].s),rows[3]);
-    check('Liste : l\'ami non réciproque n\'apparaît pas',!rows.some(r=>r.n==='User fD'));
+    check('Liste d\'amis unique : triée par compatibilité (78 → 50 → encore N → privé → en attente)',rows.map(r=>r.n).join()==='User fA,User fE,User fB,User fC,User fD',rows);
+    check('Liste : pastille de compatibilité (78 %, 50 %)',rows[0].p==='78 %'&&rows[1].p==='50 %',rows.slice(0,2));
+    check('Liste : « encore 2 » sous le seuil (détail dans l\'infobulle)',rows[2].p==='encore 2'&&/Répondez à 2 questions de plus/.test(rows[2].t),rows[2]);
+    check('Liste : « privé » pour l\'ami qui ne partage pas',rows[3].p==='privé'&&/Ne partage pas/.test(rows[3].t),rows[3]);
+    check('Chaque ligne affiche ses xp et sa série',rows.every(r=>/xp/.test(r.s)&&/ j/.test(r.s)),rows.map(r=>r.s));
+    check('Liste : l\'ami non réciproque apparaît « en attente » (jamais comparé)',rows.some(r=>r.n==='User fD'&&r.p==='en attente'),rows.filter(r=>r.n==='User fD'));
     // profil d'ami
-    await p.evaluate(()=>document.querySelector('#compat-list .cp-row').click());
+    await p.evaluate(()=>document.querySelector('#friends-list .cp-row').click());
     await wf(p,()=>document.getElementById('fprofile').classList.contains('active')&&document.querySelector('#fp-compat .fpr-big'),null,15000);
     const prof=await p.evaluate(()=>({name:document.querySelector('.fpr-name').textContent,big:document.querySelector('.fpr-big').textContent,lbl:document.querySelector('.fpr-lbl').textContent,cats:[...document.querySelectorAll('.fpr-cat')].map(c=>c.textContent.replace(/\s+/g,' ').trim()),nav:document.getElementById('bnav').classList.contains('show')}));
     await shot('compat_profile');
@@ -131,12 +132,12 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     // mon partage coupé : invitation à l'activer
     await p.evaluate(()=>{S._shareAnswers=false;});
     await p.evaluate(async()=>{await db.collection('users').doc(auth.currentUser.uid).update({shareAnswers:false});S._compat=null;});
-    await p.evaluate(()=>{socTab('friends',document.querySelector('.tab-btn[onclick*="friends"]'));renderCompatList();});
-    await wf(p,()=>document.querySelector('#compat-list .cp-off'),null,15000);
+    await p.evaluate(()=>{socTab('friends',document.querySelector('.tab-btn[onclick*="friends"]'));fillFriendCompat();});
+    await wf(p,()=>document.querySelector('#compat-notice .cp-off'),null,15000);
     await shot('compat_off');
-    check('Partage coupé : la liste propose de l\'activer',/Montrer mes réponses à mes amis/.test(await p.$eval('#compat-list .cp-off',e=>e.textContent)));
-    await p.evaluate(()=>document.querySelector('#compat-list .cp-off button').click());
-    await wf(p,()=>document.querySelectorAll('#compat-list .cp-row').length>=4,null,20000);
+    check('Partage coupé : la liste propose de l\'activer',/Montrer mes réponses à mes amis/.test(await p.$eval('#compat-notice .cp-off',e=>e.textContent)));
+    await p.evaluate(()=>document.querySelector('#compat-notice .cp-off button').click());
+    await wf(p,()=>document.querySelectorAll('#friends-list .cp-pill.ok').length>=1,null,20000);
     check('« Activer » réactive le partage et recharge la liste',(await db.doc('users/me').get()).data().shareAnswers===true);
     await browser.close();
     console.log('JS errors:',[...new Set(errs)].join(' | ')||'aucune');

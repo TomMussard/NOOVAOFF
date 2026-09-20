@@ -230,6 +230,13 @@ exports.submitAnswer = onCall(async (request) => {
       responsesCount: FieldValue.increment(1),
     });
 
+    // Jalon de série (3, 7, 14… jours d'affilée) : annoncé aux amis dans le fil, une seule fois, à la 1re réponse du jour.
+    if (user.city && newLastAnswerDate === today && CFG.COMMUNITY.STREAK_MILESTONES.includes(newStreak)) {
+      tx.set(db.collection("communityEvents").doc(), {
+        type: "streak", userId: uid, displayName: user.name || "—", city: user.city, brand: "", streak: newStreak,
+        text: `est à ${newStreak} jours d'affilée`, likeCount: 0, commentCount: 0, createdAt: FieldValue.serverTimestamp(),
+      });
+    }
     if (user.city) {
       tx.set(db.collection("communityEvents").doc(), {
         type: "answer",

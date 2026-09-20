@@ -8,7 +8,7 @@
  * confidentialité « Montrer mes réponses à mes amis » (users.shareAnswers, activé par défaut).
  */
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
-const { getFirestore } = require("firebase-admin/firestore");
+const { getFirestore, Timestamp } = require("firebase-admin/firestore");
 const CFG = require("./engagementConfig");
 const crypto = require("crypto");
 const { sectorCategory, parisDay, campaignQuestions } = require("./lib");
@@ -109,6 +109,77 @@ async function revealCore(uid, data, opts = {}) {
   out.friends = await friendsWhoAnswered(uid, uSnap.data() || {}, campaignId, qIdx, options);
   return out;
 }
+
+// ─────────────────────────── Communauté ───────────────────────────
+// Début de la semaine (lundi 0 h, heure de Paris, à une heure près : sans conséquence pour un compteur).
+function weekStartMs(now) {
+  const day = parisDay(now), [y, m, d] = day.split("-").map(Number);
+  const dow = (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7;        // lundi = 0
+  return Date.UTC(y, m - 1, d - dow) - 2 * 3600000;
+}
+
+// Chiffres agrégés de la ville : aucun nom, aucune réponse individuelle.
+async function pulseCore(uid, now = Date.now()) {
+  await applyOverrides();
+  const u = (await db().collection("users").doc(uid).get()).data() || {};
+  const city = String(u.city || "").toLowerCase();
+  if (!city) return { available: false };
+  const ws = Timestamp.fromMillis(weekStartMs(now));
+  const [weekAgg, camps, mine] = await Promise.all([
+    db().collection("answers").where("respondentCity", "==", city).where("flagged", "==", false).where("createdAt", ">=", ws).count().get(),
+    db().collection("campaigns").where("targetCity", "==", city).where("status", "==", "active").select("merchantId", "questions").limit(200).get(),
+    db().collection("answers").where("userId", "==", uid).where("createdAt", ">=", ws).select("flagged").get(),
+  ]);
+  const merchants = new Set(), qs = { n: 0 };
+  camps.forEach((d) => { const c = d.data(); if (c.merchantId) merchants.add(c.merchantId); qs.n += (c.questions && c.questions.length) || 1; });
+  const min = CFG.COMMUNITY.MIN_PULSE, weekAnswers = weekAgg.data().count;
+  return {
+    available: true, city, min, enough: weekAnswers >= min,
+    weekAnswers: weekAnswers >= min ? weekAnswers : null,
+    activeMerchants: merchants.size, activeQuestions: qs.n,
+    myWeekAnswers: mine.docs.filter((d) => !d.data().flagged).length,
+  };
+}
+
+// « Comment la ville a répondu » : pour mes dernières questions à choix, la répartition globale (seuil respecté).
+async function myResultsCore(uid) {
+  await applyOverrides();
+  const snap = await db().collection("answers").where("userId", "==", uid).orderBy("createdAt", "desc").limit(30).get();
+  const picked = [], seen = new Set();
+  snap.forEach((d) => {
+    const a = d.data(), k = `${a.campaignId}#${a.questionIdx || 0}`;
+    if (a.flagged || seen.has(k) || !(a.optionIdx >= 0)) return;
+    seen.add(k); picked.push(a);
+  });
+  const top = picked.slice(0, CFG.COMMUNITY.RESULTS_LIMIT);
+  const camps = top.length ? await db().getAll(...uniq(top.map((a) => a.campaignId)).map((id) => db().collection("campaigns").doc(id))) : [];
+  const byId = new Map(camps.filter((c) => c.exists).map((c) => [c.id, c.data()]));
+  const out = [];
+  for (const a of top) {
+    const camp = byId.get(a.campaignId); if (!camp) continue;
+    const idx = a.questionIdx || 0, def = qDefOf(camp, idx);
+    if (!CFG.REVEAL.FORMATS.includes(def.format)) continue;
+    const options = (def.options || []).map(String);
+    const st = ((await loadStats(a.campaignId, camp))[`q${idx}`]) || { n: 0, c: {} };
+    const n = st.n || 0, min = CFG.REVEAL.MIN_ANSWERS;
+    const row = { campaignId: a.campaignId, questionIdx: idx, question: String(def.q || camp.question || "").slice(0, 140), brand: camp.merchantName || "", myIdx: a.optionIdx, n };
+    if (n >= min) row.options = options.map((text, i) => ({ text, pct: Math.round((((st.c && st.c[i]) || 0) * 100) / n) }));
+    else { row.belowThreshold = true; row.needed = min - n; row.options = options.map((text) => ({ text })); }
+    out.push(row);
+  }
+  return { results: out };
+}
+
+const getCommunityPulse = onCall(async (request) => {
+  const uid = request.auth && request.auth.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi.");
+  return pulseCore(uid);
+});
+const getMyResults = onCall(async (request) => {
+  const uid = request.auth && request.auth.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi.");
+  return myResultsCore(uid);
+});
 
 const getReveal = onCall(async (request) => {
   const uid = request.auth && request.auth.uid;
@@ -291,5 +362,7 @@ module.exports = {
   getReveal,
   getCompat,
   submitPrediction,
-  _t: { predictCore, maybeOfferPrediction, rollOf, compatCore, revealCore, loadStats, friendsWhoAnswered, qDefOf, uniq },
+  getCommunityPulse,
+  getMyResults,
+  _t: { pulseCore, myResultsCore, weekStartMs, predictCore, maybeOfferPrediction, rollOf, compatCore, revealCore, loadStats, friendsWhoAnswered, qDefOf, uniq },
 };
