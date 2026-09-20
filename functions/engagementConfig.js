@@ -53,6 +53,13 @@ module.exports = {
     MAX_FRIENDS: 30,
   },
 
+  // ─── NOOVS (monnaie virtuelle) ─── bornent le coût et la fraude avant toute conversion (bons, argent…)
+  NOOVS: {
+    DAILY_CAP: 30,               // NOOVS maximum par jour et par habitant (les réponses restent enregistrées au-delà)
+    PENDING_DAYS: 3,             // délai de validation avant qu'un NOOV soit utilisable (enregistré sur la réponse)
+    MIN_RESPONSE_MS: 0,          // temps minimum (mesuré serveur) pour gagner des NOOVS ; 0 = désactivé (à monter si des abus apparaissent)
+  },
+
   // ─── Quota de questions par commerçant ─── (pas d'abonnement : la ville offre une quantité fixe par mois)
   QUOTA: {
     DEFAULT_MONTHLY_QUESTIONS: 10,   // questions par mois et par commerçant, sauf quota propre fixé par l'admin

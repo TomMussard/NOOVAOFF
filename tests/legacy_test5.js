@@ -84,7 +84,7 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
    await p.screenshot({path:'/tmp/shots/wallet_noov.png'});
    check('Portefeuille : solde de NOOVS affiché',await p.$eval('#noov-num',e=>e.textContent)==='2');
    const soon=await p.$eval('#noov-rewards',e=>e.textContent);
-   check('Récompenses NOOVS affichées « Arrive bientôt » (concours, sans pub, cash, bons cadeaux)',(soon.match(/Arrive bientôt/g)||[]).length===4&&/Concours/.test(soon)&&/Cash/.test(soon)&&/Bons cadeaux/.test(soon)&&/Sans publicité/.test(soon),soon.slice(0,80));
+   check('Récompenses NOOVS affichées « Arrive bientôt » (bons chez les commerçants, sans pub, concours, cash)',(soon.match(/Arrive bientôt/g)||[]).length===4&&/Concours/.test(soon)&&/Cash/.test(soon)&&/Bons chez les commerçants/.test(soon)&&/Sans publicité/.test(soon),soon.slice(0,80));
    await p.evaluate(()=>{document.querySelector('#rewards-tab').scrollTop=9999;});await sleep(400);
    await p.screenshot({path:'/tmp/shots/noov_soon.png'});
  });

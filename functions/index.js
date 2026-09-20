@@ -2,7 +2,7 @@ const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
-const { FieldValue, getFirestore } = require("firebase-admin/firestore");
+const { FieldValue, Timestamp, getFirestore } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
 const logger = require("firebase-functions/logger");
 
@@ -70,6 +70,8 @@ exports.submitAnswer = onCall(async (request) => {
     throw new HttpsError("invalid-argument", "Paramètres de réponse invalides.");
   }
   const qIdx = Math.max(0, Math.min(2, Math.floor(questionIdx)));
+  // Chargé ici et non en tête de fichier : configStore déclare des fonctions, qui doivent l'être APRÈS setGlobalOptions (région).
+  await require("./configStore")._t.applyOverrides();   // réglages modifiables depuis l'admin (plafond de NOOVS…)
   const answerRef = db.collection("answers").doc(`${uid}_${campaignId}_q${qIdx}`);
   const userRef = db.collection("users").doc(uid);
   const campaignRef = db.collection("campaigns").doc(campaignId);
@@ -130,7 +132,8 @@ exports.submitAnswer = onCall(async (request) => {
     const answersToday = user.dailyAnswerDate === today ? (user.dailyAnswerCount || 0) : 0;
     const pointsEligible = answersToday < MAX_POINT_ANSWERS_PER_DAY;
 
-    let earnedPts = 0, streakBonus = 0, serieBonus = 0, noovsEarned = 0;
+    let earnedPts = 0, streakBonus = 0, serieBonus = 0, noovsEarned = 0, noovsWithheld = null;
+    const noovsToday = user.dailyNoovsDate === today ? (user.dailyNoovs || 0) : 0;
     let newStreak = user.streak || 0;
     let newLastAnswerDate = user.lastAnswerDate || null;
     if (!flagged) {
@@ -142,8 +145,12 @@ exports.submitAnswer = onCall(async (request) => {
           newLastAnswerDate = today;
         }
         if (qIdx === 2) serieBonus = CFG.POINTS.SERIE_BONUS;
+      } else if (CFG.NOOVS.MIN_RESPONSE_MS > 0 && serverElapsed < CFG.NOOVS.MIN_RESPONSE_MS) {
+        noovsWithheld = "suspect";            // lue très vite : compte pour les résultats, pas de NOOVS
+      } else if (noovsToday >= CFG.NOOVS.DAILY_CAP) {
+        noovsWithheld = "cap";                // plafond du jour atteint
       } else {
-        noovsEarned = NOOVS_PER_ANSWER;
+        noovsEarned = Math.min(NOOVS_PER_ANSWER, CFG.NOOVS.DAILY_CAP - noovsToday);
       }
     }
     const totalEarned = earnedPts + streakBonus + serieBonus;
@@ -171,6 +178,8 @@ exports.submitAnswer = onCall(async (request) => {
       answer: answerValue != null ? String(answerValue).substring(0, 500) : "",
       pointsAwarded: totalEarned,
       noovsAwarded: noovsEarned,
+      noovsWithheld,
+      noovsAvailableAt: noovsEarned > 0 ? Timestamp.fromMillis(Date.now() + CFG.NOOVS.PENDING_DAYS * 86400000) : null,
       qualityScore,
       flagged,
       responseMs: serverElapsed,
@@ -200,7 +209,7 @@ exports.submitAnswer = onCall(async (request) => {
       userUpdate.answerMinutes = [...(user.answerMinutes || []), minutes].slice(-5);
     }
     if (totalEarned > 0) { userUpdate.points = FieldValue.increment(totalEarned); userUpdate.xp = FieldValue.increment(totalEarned); }
-    if (noovsEarned > 0) userUpdate.noovs = FieldValue.increment(noovsEarned);
+    if (noovsEarned > 0) { userUpdate.noovs = FieldValue.increment(noovsEarned); userUpdate.dailyNoovs = noovsToday + noovsEarned; userUpdate.dailyNoovsDate = today; }
     if (qIdx === 0) userUpdate.answeredCampaigns = FieldValue.arrayUnion(campaignId);
     tx.update(userRef, userUpdate);
 
@@ -227,6 +236,7 @@ exports.submitAnswer = onCall(async (request) => {
     return {
       pointsAwarded: totalEarned,
       noovsAwarded: noovsEarned,
+      noovsWithheld,
       totalPoints: (user.points || 0) + totalEarned,
       totalXp: (user.xp || 0) + totalEarned,
       totalNoovs: (user.noovs || 0) + noovsEarned,

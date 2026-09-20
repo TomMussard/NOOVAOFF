@@ -4303,10 +4303,10 @@ function cityPhrase(label){
 function renderNoovRewards(){
   const el=document.getElementById('noov-rewards');if(!el)return;
   const items=[
-    {ico:'trophy',t:'Concours',d:'Tente de gagner de gros lots en jouant tes NOOVS.'},
+    {ico:'gift-generic',t:'Bons chez les commerçants',d:'Transforme tes NOOVS en bons chez les commerces de ton quartier.'},
     {ico:'eye',t:'Sans publicité',d:'Retire les publicités de l\'app avec tes NOOVS.'},
-    {ico:'credit-card',t:'Cash',d:'Échange tes NOOVS contre de l\'argent.'},
-    {ico:'gift-generic',t:'Bons cadeaux',d:'Des bons chez tes enseignes préférées.'}
+    {ico:'trophy',t:'Concours',d:'Tente de gagner des lots en jouant tes NOOVS.'},
+    {ico:'credit-card',t:'Cash',d:'Retrait en argent, plus tard, avec vérification d\'identité.'}
   ];
   el.innerHTML=items.map(i=>`<div class="noov-soon"><div class="ns-ico">${icon(i.ico,{size:22})}</div><div style="flex:1;min-width:0"><div class="ns-t">${i.t}</div><div class="ns-d">${i.d}</div></div><div class="ns-tag">Arrive bientôt</div></div>`).join('');
 }
@@ -5482,6 +5482,11 @@ submitAns = function() {
       if (data.flagged) {
         if (rwPtsEl) rwPtsEl.textContent = 0;
         if (rwSub) rwSub.textContent = 'Réponse enregistrée. Prends le temps de lire : les réponses trop rapides ne rapportent rien.';
+      } else if (data.noovsWithheld) {
+        if (rwPtsEl) rwPtsEl.textContent = 0;
+        if (rwLbl) rwLbl.textContent = 'NOOVS · total';
+        if (rwTotalEl) rwTotalEl.textContent = S.noovs + ' NOOVS';
+        if (rwSub) rwSub.textContent = data.noovsWithheld === 'cap' ? 'Merci pour ton avis. Plafond de NOOVS du jour atteint : reviens demain.' : 'Merci pour ton avis. Les réponses lues très vite ne rapportent pas de NOOVS.';
       } else if (noovsGot > 0) {
         if (rwPtsEl) rwPtsEl.textContent = noovsGot;
         if (rwLbl) rwLbl.textContent = 'NOOVS · total';

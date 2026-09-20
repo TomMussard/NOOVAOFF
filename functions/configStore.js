@@ -21,6 +21,9 @@ const TUNABLE = {
   "PREDICTION.PROBABILITY":           { min: 0, max: 1, int: false, label: "Prédiction : probabilité d'être proposée (0 à 1)" },
   "PREDICTION.MAX_PER_ROLLING_WEEK":  { min: 0, max: 14, int: true, label: "Prédiction : maximum par semaine glissante" },
   "PREDICTION.MAX_PER_DAY":           { min: 0, max: 3, int: true, label: "Prédiction : maximum par jour" },
+  "NOOVS.DAILY_CAP":                  { min: 1, max: 500, int: true, label: "NOOVS : plafond par jour et par habitant" },
+  "NOOVS.MIN_RESPONSE_MS":            { min: 0, max: 15000, int: true, label: "NOOVS : temps de réponse minimum en ms (0 = désactivé)" },
+  "NOOVS.PENDING_DAYS":               { min: 0, max: 30, int: true, label: "NOOVS : jours de validation avant utilisation" },
   "QUOTA.DEFAULT_MONTHLY_QUESTIONS":  { min: 1, max: 500, int: true, label: "Quota par défaut : questions par mois et par commerçant" },
   "IMPACT.NOTIFY_GAP_DAYS":           { min: 1, max: 90, int: true, label: "Actualités : jours entre deux actualités notifiées d'un même commerce" },
 };
