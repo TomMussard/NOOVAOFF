@@ -91,7 +91,7 @@ async function login(browser,email,{ua,perm='default',standalone=false}={}){
     check('Réponse trop rapide : enregistrée sans gain',flagged.length===1&&flagged[0].flagged===true);
     check('Réponse non validée : aucune demande de notification',await pa.evaluate(()=>document.getElementById('perm-sheet').style.display!=='flex'));
     await adb.collection('answers').doc('u1_c1_q0').delete();await adb.doc('users/u1').update({answeredCampaigns:[]});
-    await pa.evaluate(()=>{S._answered=[];goNav('home');recomputeCampaignFeed('le-mans');});await sleep(800);
+    await pa.evaluate(()=>{S._answered=[];S._answeredQ=[];goNav('home');recomputeCampaignFeed('le-mans');});await sleep(800);
     // 2) réponse validée (>= 3 s) : demande d'explication maison
     await pa.evaluate(()=>{openQ(0);});await wf(pa,()=>document.querySelectorAll('#ans-area .mcq-opt').length>0);
     await pa.evaluate(()=>document.querySelector('#ans-area .mcq-opt').click());await sleep(3400);

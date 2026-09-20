@@ -89,7 +89,7 @@ const W=+(process.env.W||390),H=+(process.env.H||844);
     await p.evaluate(()=>openEditCamp('c1'));await audit('editcamp');await shot('editcamp');
     await p.evaluate(()=>{closeCampModal();});await sleep(300);
     await p.evaluate(()=>{navTo('create',document.getElementById('nav-create'));});await sleep(800);
-    for(let i=0;i<5;i++){await p.evaluate(i=>wzGo(i),i);await audit('wizard'+i);await shot('wizard'+i);}
+    for(let i=0;i<4;i++){await p.evaluate(i=>wzGo(i),i);await audit('wizard'+i);await shot('wizard'+i);}
   }
   await p.evaluate(()=>{navTo('dashboard',document.getElementById('nav-dashboard'));toggleMobMenu();});await sleep(500);await p.screenshot({path:'/tmp/shots/dm_menu.png'});await p.evaluate(()=>toggleMobMenu());
   await p.evaluate(()=>toggleNotifPanel());await sleep(500);await p.screenshot({path:'/tmp/shots/dm_notif.png'});

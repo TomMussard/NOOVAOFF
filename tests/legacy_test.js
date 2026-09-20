@@ -114,7 +114,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
       document.getElementById('q-text-inp').value = 'Voulez-vous une ouverture le dimanche ?';
       const o = document.querySelectorAll('#mcq-options .mcq-opt-inp'); if (o[0]) o[0].value = 'Oui'; if (o[1]) o[1].value = 'Non';
       document.getElementById('camp-name-inp').value = 'Test dimanche';
-      wzGo(4);
+      wzGo(3);
     });
     await waitFn(mp, () => !/Calcul/.test(document.getElementById('recap-reach').textContent), null, 15000);
     const reach = await mp.$eval('#recap-reach', e => e.textContent);

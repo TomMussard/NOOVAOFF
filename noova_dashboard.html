@@ -378,6 +378,22 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   outline: none; cursor: pointer;
 }
 .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--coral); box-shadow: 0 3px 10px var(--cg); cursor: pointer; }
+
+/* Une question = un bloc : rédaction, format de réponse et options réunis */
+.qb { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; margin-bottom: 14px; }
+.qb-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.qb-num { font-family: var(--fd); font-weight: 800; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--coral); }
+.qb-remove { background: none; border: none; color: var(--ink3); font-size: 12px; cursor: pointer; padding: 4px 6px; font-family: var(--fb); }
+.qb-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--ink3); margin: 14px 0 7px; }
+.qb-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.qb-sub { font-size: 12px; color: var(--ink3); line-height: 1.6; margin-bottom: 10px; }
+.qb-opts { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border2); }
+.qfmt { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.qfmt .fmt-card { padding: 10px 8px; }
+.qfmt .fmt-ico { width: 30px; height: 30px; border-radius: 9px; margin: 0 auto 6px; }
+.qfmt .fmt-ico svg { width: 16px; height: 16px; }
+@media (max-width: 480px) { .qfmt .fmt-name { font-size: 11px; } .qb { padding: 16px 14px; } }
+
 /* Budget */
 .budget-display {
   background: linear-gradient(135deg, var(--bg3), var(--bg4));
@@ -613,13 +629,11 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   #wz-panel-0 > div,
   #wz-panel-1 > div,
   #wz-panel-2 > div,
-  #wz-panel-3 > div,
-  #wz-panel-4 > div { grid-template-columns: 1fr !important; }
+  #wz-panel-3 > div { grid-template-columns: 1fr !important; }
   /* Hide preview on mobile */
   #wz-panel-0 > div > div:last-child,
   #wz-panel-1 > div > div:last-child,
-  #wz-panel-2 > div > div:last-child,
-  #wz-panel-3 > div > div:last-child { display: none; }
+  #wz-panel-2 > div > div:last-child { display: none; }
   /* Cards */
   .card { padding: 14px; }
   .step-card { padding: 14px; }
@@ -845,20 +859,19 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div class="wizard-wrap">
           <!-- Step indicator -->
           <div class="wizard-steps" id="wiz-steps">
-            <div class="wiz-step-btn active" data-step="0"><div class="wiz-circle">1</div><div class="wiz-step-lbl">Question</div></div>
-            <div class="wiz-step-btn" data-step="1"><div class="wiz-circle">2</div><div class="wiz-step-lbl">Format</div></div>
-            <div class="wiz-step-btn" data-step="2"><div class="wiz-circle">3</div><div class="wiz-step-lbl">Audience</div></div>
-            <div class="wiz-step-btn" data-step="3"><div class="wiz-circle">4</div><div class="wiz-step-lbl">Volume</div></div>
-            <div class="wiz-step-btn" data-step="4"><div class="wiz-circle">5</div><div class="wiz-step-lbl">Validation</div></div>
+            <div class="wiz-step-btn active" data-step="0"><div class="wiz-circle">1</div><div class="wiz-step-lbl">Questions</div></div>
+            <div class="wiz-step-btn" data-step="1"><div class="wiz-circle">2</div><div class="wiz-step-lbl">Audience</div></div>
+            <div class="wiz-step-btn" data-step="2"><div class="wiz-circle">3</div><div class="wiz-step-lbl">Volume</div></div>
+            <div class="wiz-step-btn" data-step="3"><div class="wiz-circle">4</div><div class="wiz-step-lbl">Validation</div></div>
           </div>
 
-          <!-- Step 0 : Question -->
+          <!-- Step 0 : Questions (rédaction + format + options, question par question) -->
           <div class="step-panel active" id="wz-panel-0">
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
-                <div class="step-card">
-                  <div class="step-card-title">Rédigez votre question</div>
-                  <div class="step-card-sub">Soyez direct et précis. Une bonne question = une réponse exploitable. Visez moins de 20 mots.</div>
+                <div class="qb" id="wz-q-1">
+                  <div class="qb-head"><div class="qb-num">Question 1</div></div>
+                  <div class="qb-sub" style="margin-bottom:12px">Soyez direct et précis. Une bonne question = une réponse exploitable. Visez moins de 20 mots.</div>
                   <div class="field">
                     <label class="field-lbl">Templates suggérés</label>
                     <div class="tmpl-grid">
@@ -870,62 +883,70 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <div class="tmpl-chip" onclick="useTmpl(this,&quot;Qu'est-ce qui vous ferait recommander notre marque à un proche ?&quot;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> NPS qualitatif</div>
                     </div>
                   </div>
+                  
                   <div class="field">
                     <label class="field-lbl">Votre question <span style="color:var(--coral)">*</span></label>
                     <textarea class="field-ta" id="q-text-inp" placeholder="Ex : Quel est votre critère n°1 lors de l'achat d'un vélo ?" rows="3" oninput="updatePreview()"></textarea>
                     <div style="display:flex;justify-content:space-between;margin-top:6px"><div style="font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg> Conseil : une question courte obtient 34% de réponses en plus.</div><div style="font-size:11px;color:var(--ink3)" id="q-char-ct">65 / 150</div></div>
                   </div>
+                  
+                  <div class="qb-lbl">Format de réponse</div>
+                  <div class="qfmt" id="fmt-grid">
+                      <div class="fmt-card sel" onclick="selFmt(this,'mcq')"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12l3 3 5-6"/></svg></div><div class="fmt-name">Choix multiple</div></div>
+                      <div class="fmt-card" onclick="selFmt(this,'scale')"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M6 8v8M10 9v6M14 9v6M18 8v8"/></svg></div><div class="fmt-name">Échelle 1–10</div></div>
+                      <div class="fmt-card" onclick="selFmt(this,'rank')"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h11M10 12h11M10 18h11"/><path d="M4 4h2v4H4z"/><path d="M4 14h2v4H4z"/></svg></div><div class="fmt-name">Classement</div></div>
+                  </div>
+                  <div class="qb-opts" id="mcq-builder">
+                      <div class="qb-title">Options de réponse</div>
+                      <div class="qb-sub">Les choix proposés aux répondants (2 à 6 options).</div>
+                      <div id="mcq-options"><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option C…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div></div>
+                      <button class="add-option-btn" onclick="addOpt()">+ Ajouter une option</button>
+                    </div>
+                </div>
+                <div class="qb" id="wz-q-extra-2" style="display:none">
+                    <div class="qb-head"><div class="qb-num">Question 2</div><button onclick="removeWizQ(2)" class="qb-remove">× Retirer</button></div>
+                    <textarea class="field-ta" id="q2-text-inp" placeholder="2e question pour les répondants…" rows="2"></textarea>
+                    <div class="qb-lbl">Format de réponse</div>
+                    <select id="q2-fmt-sel" style="display:none"><option value="mcq">Choix multiple</option><option value="scale">Échelle 1–10</option><option value="rank">Classement</option></select>
+                    <div class="qfmt" id="q2-fmt">
+                      <div class="fmt-card sel" onclick="setQFmt(2,'mcq',this)"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12l3 3 5-6"/></svg></div><div class="fmt-name">Choix multiple</div></div>
+                      <div class="fmt-card" onclick="setQFmt(2,'scale',this)"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M6 8v8M10 9v6M14 9v6M18 8v8"/></svg></div><div class="fmt-name">Échelle 1–10</div></div>
+                      <div class="fmt-card" onclick="setQFmt(2,'rank',this)"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h11M10 12h11M10 18h11"/><path d="M4 4h2v4H4z"/><path d="M4 14h2v4H4z"/></svg></div><div class="fmt-name">Classement</div></div>
+                    </div>
+                    <div class="qb-opts" id="q2-mcq-builder">
+                      <div class="qb-title">Options de réponse</div>
+                      <div class="qb-sub">Les choix proposés aux répondants (2 à 6 options).</div>
+                      <div id="q2-mcq-opts"><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div></div>
+                      <button class="add-option-btn" onclick="addQOpt('q2-mcq-opts')">+ Ajouter une option</button>
+                    </div>
+                  </div>
+                <div class="qb" id="wz-q-extra-3" style="display:none">
+                    <div class="qb-head"><div class="qb-num">Question 3</div><button onclick="removeWizQ(3)" class="qb-remove">× Retirer</button></div>
+                    <textarea class="field-ta" id="q3-text-inp" placeholder="3e question pour les répondants…" rows="2"></textarea>
+                    <div class="qb-lbl">Format de réponse</div>
+                    <select id="q3-fmt-sel" style="display:none"><option value="mcq">Choix multiple</option><option value="scale">Échelle 1–10</option><option value="rank">Classement</option></select>
+                    <div class="qfmt" id="q3-fmt">
+                      <div class="fmt-card sel" onclick="setQFmt(3,'mcq',this)"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12l3 3 5-6"/></svg></div><div class="fmt-name">Choix multiple</div></div>
+                      <div class="fmt-card" onclick="setQFmt(3,'scale',this)"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M6 8v8M10 9v6M14 9v6M18 8v8"/></svg></div><div class="fmt-name">Échelle 1–10</div></div>
+                      <div class="fmt-card" onclick="setQFmt(3,'rank',this)"><div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h11M10 12h11M10 18h11"/><path d="M4 4h2v4H4z"/><path d="M4 14h2v4H4z"/></svg></div><div class="fmt-name">Classement</div></div>
+                    </div>
+                    <div class="qb-opts" id="q3-mcq-builder">
+                      <div class="qb-title">Options de réponse</div>
+                      <div class="qb-sub">Les choix proposés aux répondants (2 à 6 options).</div>
+                      <div id="q3-mcq-opts"><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div></div>
+                      <button class="add-option-btn" onclick="addQOpt('q3-mcq-opts')">+ Ajouter une option</button>
+                    </div>
+                  </div>
+                <button id="wz-add-q-btn" onclick="addWizQ()" style="display:flex;align-items:center;gap:6px;background:none;border:1.5px dashed var(--border2);border-radius:var(--rx);padding:9px 14px;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;width:100%;justify-content:center">+ Ajouter une question <span style="font-size:10px;color:var(--ink4)">(max 3 au total)</span></button>
+                <div class="qb" style="margin-top:14px">
                   <div class="field" style="margin-bottom:0">
                     <label class="field-lbl">Contexte interne (non visible des répondants)</label>
                     <textarea class="field-ta" placeholder="Objectif de la question, contexte produit, contraintes particulières…" rows="2" style="min-height:60px"></textarea>
                   </div>
-                  <!-- Questions supplémentaires -->
-                  <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-                    <div id="wz-q-extra-2" style="display:none;background:var(--bg2);border-radius:var(--rs);padding:14px;margin-bottom:10px;border:1px solid var(--border)">
-                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)">Question 2</div>
-                        <button onclick="removeWizQ(2)" style="background:none;border:none;color:var(--ink3);font-size:12px;cursor:pointer;padding:2px 6px">× Retirer</button>
-                      </div>
-                      <textarea class="field-ta" id="q2-text-inp" placeholder="2e question pour les répondants…" rows="2" style="margin-bottom:8px"></textarea>
-                      <select class="field-inp" id="q2-fmt-sel" style="font-size:12px" onchange="showMcqForQ(2,this.value)">
-                        <option value="mcq">Choix multiple</option>
-                        <option value="scale">Échelle 1–10</option>
-                        <option value="rank">Classement</option>
-                      </select>
-                      <div id="q2-mcq-builder" style="margin-top:8px">
-                        <div style="font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Options Q2</div>
-                        <div id="q2-mcq-opts">
-                          <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div>
-                          <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div>
-                        </div>
-                        <button onclick="addQOpt('q2-mcq-opts')" style="display:flex;align-items:center;gap:4px;background:none;border:none;color:var(--violet);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;margin-top:4px">+ Option</button>
-                      </div>
-                    </div>
-                    <div id="wz-q-extra-3" style="display:none;background:var(--bg2);border-radius:var(--rs);padding:14px;margin-bottom:10px;border:1px solid var(--border)">
-                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)">Question 3</div>
-                        <button onclick="removeWizQ(3)" style="background:none;border:none;color:var(--ink3);font-size:12px;cursor:pointer;padding:2px 6px">× Retirer</button>
-                      </div>
-                      <textarea class="field-ta" id="q3-text-inp" placeholder="3e question pour les répondants…" rows="2" style="margin-bottom:8px"></textarea>
-                      <select class="field-inp" id="q3-fmt-sel" style="font-size:12px" onchange="showMcqForQ(3,this.value)">
-                        <option value="mcq">Choix multiple</option>
-                        <option value="scale">Échelle 1–10</option>
-                        <option value="rank">Classement</option>
-                      </select>
-                      <div id="q3-mcq-builder" style="margin-top:8px">
-                        <div style="font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Options Q3</div>
-                        <div id="q3-mcq-opts">
-                          <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div>
-                          <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div>
-                        </div>
-                        <button onclick="addQOpt('q3-mcq-opts')" style="display:flex;align-items:center;gap:4px;background:none;border:none;color:var(--violet);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;margin-top:4px">+ Option</button>
-                      </div>
-                    </div>
-                    <button id="wz-add-q-btn" onclick="addWizQ()" style="display:flex;align-items:center;gap:6px;background:none;border:1.5px dashed var(--border2);border-radius:var(--rx);padding:9px 14px;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;width:100%;justify-content:center">+ Ajouter une question <span style="font-size:10px;color:var(--ink4)">(max 3 au total)</span></button>
-                  </div>
+                  
                 </div>
-                <div class="wizard-actions">
-                  <button class="wiz-btn-next" onclick="wzGo(1)">Format de réponse <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
+<div class="wizard-actions">
+                  <button class="wiz-btn-next" onclick="wzGo(1)">Audience <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
                 </div>
               </div>
               <div>
@@ -952,71 +973,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             </div>
           </div>
 
-          <!-- Step 1 : Format -->
+          <!-- Step 1 : Audience -->
           <div class="step-panel" id="wz-panel-1">
-            <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
-              <div>
-                <div class="step-card">
-                  <div class="step-card-title">Format de réponse</div>
-                  <div class="step-card-sub">Choisissez le format le plus adapté à votre objectif d'étude.</div>
-                  <div class="fmt-grid" id="fmt-grid">
-                    <div class="fmt-card sel" onclick="selFmt(this,'mcq')">
-                      <div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12l3 3 5-6"/></svg></div><div class="fmt-name">Choix multiple</div>
-                      <div class="fmt-desc">Réponses structurées, comparaison facile entre options</div>
-                    </div>
-                    <div class="fmt-card" onclick="selFmt(this,'scale')">
-                      <div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M6 8v8M10 9v6M14 9v6M18 8v8"/></svg></div><div class="fmt-name">Échelle 1–10</div>
-                      <div class="fmt-desc">Mesure d'intensité, NPS, satisfaction — données quantifiables</div>
-                    </div>
-                    <div class="fmt-card" onclick="selFmt(this,'rank')">
-                      <div class="fmt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h11M10 12h11M10 18h11"/><path d="M4 4h2v4H4z"/><path d="M4 14h2v4H4z"/></svg></div><div class="fmt-name">Classement</div>
-                      <div class="fmt-desc">Priorisation d'attributs, choix entre alternatives</div>
-                    </div>
-                  </div>
-                </div>
-                <!-- MCQ builder (visible when mcq selected) -->
-                <div class="step-card" id="mcq-builder">
-                  <div class="step-card-title">Options de réponse</div>
-                  <div class="step-card-sub">Ajoutez les choix proposés aux répondants (2 à 6 options).</div>
-                  <div id="mcq-options">
-                    <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
-                    <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
-                    <div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option C…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div>
-                  </div>
-                  <button class="add-option-btn" onclick="addOpt()">+ Ajouter une option</button>
-                  <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-                    <label style="display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink2);cursor:pointer"><input type="checkbox" checked style="accent-color:var(--coral)"> Choix unique (une seule réponse possible)</label>
-                    <label style="display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink2);cursor:pointer;margin-top:8px"><input type="checkbox" style="accent-color:var(--coral)"> Ajouter "Autre (précisez)" automatiquement</label>
-                  </div>
-                </div>
-                <div class="wizard-actions">
-                  <button class="wiz-btn-back" onclick="wzGo(0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Retour</button>
-                  <button class="wiz-btn-next" onclick="wzGo(2)">Audience <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
-                </div>
-              </div>
-              <div>
-                <div class="preview-box">
-                  <div class="preview-title">Aperçu dans l'app</div>
-                  <div class="preview-phone">
-                    <div class="preview-phone-notch"></div>
-                    <div class="preview-phone-inner">
-                      <div class="preview-brand-row"><div class="preview-brand-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div><div><div class="preview-brand-name" id="preview-brand-nm-p1">Votre commerce</div><div class="preview-brand-theme" id="preview-brand-sec-p1">Commerce</div></div></div>
-                      <div class="preview-q" style="font-size:11px">Quel est votre critère principal lors de l'achat ?</div>
-                      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
-                        <div style="background:#EEECEA;border:1.5px solid #E0DDD8;border-radius:8px;padding:7px 10px;font-size:10px;color:#17141A;display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:50%;border:1.5px solid #B2ADB9;flex-shrink:0"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 19V9M10 19V5M16 19v-7M20 19V11"/><path d="M4 19h16"/></svg> Prix / rapport qualité-prix</div>
-                        <div style="background:#FFF4E6;border:1.5px solid #E07D0A;border-radius:8px;padding:7px 10px;font-size:10px;color:#E07D0A;display:flex;align-items:center;gap:7px;font-weight:700"><div style="width:14px;height:14px;border-radius:50%;background:#E07D0A;border:1.5px solid #E07D0A;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff">✓</div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg> Qualité et durabilité</div>
-                        <div style="background:#EEECEA;border:1.5px solid #E0DDD8;border-radius:8px;padding:7px 10px;font-size:10px;color:#17141A;display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:50%;border:1.5px solid #B2ADB9;flex-shrink:0"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 8l8-4.5L20 8l-8 4.5z"/><path d="M6.5 9.5v6L12 18l5.5-2.5v-6"/><path d="M20 8v6.5"/></svg> Design et esthétique</div>
-                      </div>
-                      <div class="preview-cta">Valider → +20 pts</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 2 : Audience -->
-          <div class="step-panel" id="wz-panel-2">
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
                 <div class="step-card">
@@ -1092,8 +1050,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   </div>
                 </div>
                 <div class="wizard-actions">
-                  <button class="wiz-btn-back" onclick="wzGo(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Retour</button>
-                  <button class="wiz-btn-next" onclick="wzGo(3)">Volume <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
+                  <button class="wiz-btn-back" onclick="wzGo(0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Retour</button>
+                  <button class="wiz-btn-next" onclick="wzGo(2)">Volume <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
                 </div>
               </div>
               <div>
@@ -1110,8 +1068,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             </div>
           </div>
 
-          <!-- Step 3 : Budget -->
-          <div class="step-panel" id="wz-panel-3">
+          <!-- Step 2 : Budget -->
+          <div class="step-panel" id="wz-panel-2">
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
                 <div class="step-card">
@@ -1147,8 +1105,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   </div>
                 </div>
                 <div class="wizard-actions">
-                  <button class="wiz-btn-back" onclick="wzGo(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Retour</button>
-                  <button class="wiz-btn-next" onclick="wzGo(4)">Vérifier <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
+                  <button class="wiz-btn-back" onclick="wzGo(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Retour</button>
+                  <button class="wiz-btn-next" onclick="wzGo(3)">Vérifier <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
                 </div>
               </div>
               <div>
@@ -1174,8 +1132,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               </div>
             </div>
           </div>
-<!-- Step 4 : Validation -->
-          <div class="step-panel" id="wz-panel-4">
+<!-- Step 3 : Validation -->
+          <div class="step-panel" id="wz-panel-3">
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
                 <div class="step-card">
@@ -1197,7 +1155,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   </div>
                 </div>
                 <div class="wizard-actions" style="justify-content:space-between">
-                  <button class="wiz-btn-back" onclick="wzGo(3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Modifier</button>
+                  <button class="wiz-btn-back" onclick="wzGo(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Modifier</button>
                   <button class="wiz-btn-launch" onclick="launchCampaign()" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Lancer la campagne</button>
                 </div>
               </div>
@@ -1453,7 +1411,13 @@ function addWizQ() {
 function removeWizQ(n) {
   for(let i = n; i <= 3; i++) {
     const b = document.getElementById('wz-q-extra-' + i);
-    if(b) { b.style.display = 'none'; const ta = b.querySelector('textarea'); if(ta) ta.value = ''; }
+    if(b) {
+      b.style.display = 'none'; const ta = b.querySelector('textarea'); if(ta) ta.value = '';
+      const sel = document.getElementById('q' + i + '-fmt-sel'); if(sel) sel.value = 'mcq';
+      document.querySelectorAll('#q' + i + '-fmt .fmt-card').forEach((c, k) => c.classList.toggle('sel', k === 0));
+      showMcqForQ(i, 'mcq');
+      const box = document.getElementById('q' + i + '-mcq-opts'); if(box) box.querySelectorAll('.mcq-opt-inp').forEach(x => x.value = '');
+    }
   }
   _wzQCount = n - 1;
   const btn = document.getElementById('wz-add-q-btn');
@@ -1708,10 +1672,11 @@ function wzGo(n){
   document.querySelectorAll('.step-panel').forEach((p,i)=>{p.classList[i===n?'add':'remove']('active')});
   document.querySelectorAll('.wiz-step-btn').forEach((b,i)=>{b.classList.remove('active','done');if(i<n)b.classList.add('done');else if(i===n)b.classList.add('active')});
   wzCur=n;
-  if(n===2) loadCitiesForAudience();
-  if(n===4){
-    document.getElementById('recap-q').textContent=document.getElementById('q-text-inp').value.substring(0,80)||'—';
-    document.getElementById('recap-fmt').textContent={text:'Texte libre',mcq:'Choix multiple · '+document.querySelectorAll('#mcq-options .mcq-opt-inp').length+' options',scale:'Échelle 1–10',rank:'Classement'}[curFmt];
+  if(n===1) loadCitiesForAudience();
+  if(n===3){
+    const qs=wzQuestionsSummary();
+    document.getElementById('recap-q').textContent=qs.length?(qs[0].q.substring(0,80)+(qs.length>1?'  (+ '+(qs.length-1)+' autre'+(qs.length>2?'s':'')+' question'+(qs.length>2?'s':'')+')':'')):'—';
+    document.getElementById('recap-fmt').textContent=qs.map(x=>x.label).join(' · ')||'—';
     document.getElementById('recap-vol').textContent=document.getElementById('vol-num').textContent;
     document.getElementById('recap-name').textContent=document.getElementById('camp-name-inp').value;
     const ages=[...document.querySelectorAll('.age-chip.sel')].map(e=>e.textContent.trim()).filter(Boolean);
@@ -1721,6 +1686,14 @@ function wzGo(n){
   }
 }
 function wzSync(){ wzGo(wzCur); }
+// Résumé des questions en cours de rédaction (texte + format + nombre d'options), pour l'étape de validation.
+function wzQuestionsSummary(){
+  const names={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle 1–10',rank:'Classement'}, out=[];
+  const one=(q,fmt,text,box)=>{ if(!text) return; const n=needsOptions(fmt)?collectOptions(box).length:0; out.push({q:text,label:'Q'+q+' '+names[fmt]+(n?' ('+n+')':'')}); };
+  one(1,curFmt,(document.getElementById('q-text-inp')?.value||'').trim(),'#mcq-options');
+  [2,3].forEach(i=>{ const b=document.getElementById('wz-q-extra-'+i); if(b&&b.style.display!=='none') one(i,document.getElementById('q'+i+'-fmt-sel')?.value||'mcq',(document.getElementById('q'+i+'-text-inp')?.value||'').trim(),'#q'+i+'-mcq-opts'); });
+  return out;
+}
 
 function resetWizard(){
   const ta=document.getElementById('q-text-inp');if(ta)ta.value='';
@@ -1737,6 +1710,7 @@ function resetWizard(){
   // Reset Q2/Q3 format selects and MCQ builders
   [2,3].forEach(i=>{
     const sel=document.getElementById('q'+i+'-fmt-sel');if(sel)sel.value='mcq';
+    document.querySelectorAll('#q'+i+'-fmt .fmt-card').forEach((c,k)=>c.classList.toggle('sel',k===0));
     showMcqForQ(i,'mcq');
     const opts=document.getElementById('q'+i+'-mcq-opts');
     if(opts)opts.innerHTML='<div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div>';
@@ -1745,19 +1719,18 @@ function resetWizard(){
   const opts=document.getElementById('mcq-options');
   if(opts){opts.innerHTML='';for(let i=0;i<3;i++){const d=document.createElement('div');d.className='mcq-option-row';d.innerHTML='<input class="mcq-opt-inp" placeholder="Option…"><button class="mcq-remove" onclick="removeOpt(this)">×</button>';opts.appendChild(d);}}
   // Reset format to MCQ (index 0 = carte MCQ dans le fmt-grid, "texte libre" retiré — interdit en beta)
-  const mcqCard = document.querySelectorAll('.fmt-card')[0];
+  const mcqCard = document.querySelectorAll('#fmt-grid .fmt-card')[0];
   if(mcqCard) selFmt(mcqCard,'mcq');
   const mb = document.getElementById('mcq-builder'); if(mb) mb.style.display='block';
 }
 
 // ═══ FORMAT ══════════════════════════════════════════════════
 function selFmt(el, fmt){
-  document.querySelectorAll('.fmt-card').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('#fmt-grid .fmt-card').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel'); curFmt=fmt;
   document.getElementById('mcq-builder').style.display=needsOptions(fmt)?'block':'none';
-  const bt=document.querySelector('#mcq-builder .step-card-title'), bs=document.querySelector('#mcq-builder .step-card-sub');
-  if(bt) bt.textContent = fmt==='rank' ? 'Éléments à classer' : 'Options de réponse';
-  if(bs) bs.textContent = fmt==='rank' ? 'Ajoutez les éléments que les répondants classeront du plus au moins important (2 à 6).' : 'Ajoutez les choix proposés aux répondants (2 à 6 options).';
+  setTimeout(renderPreviewAnswer,0);
+  qbBuilderLabels('mcq-builder', fmt);
 }
 
 // ═══ MCQ BUILDER ═════════════════════════════════════════════
@@ -1773,11 +1746,22 @@ function removeOpt(btn){ const opts=document.querySelectorAll('#mcq-options .mcq
 // ═══ MCQ BUILDERS Q2 / Q3 ═════════════════════════════════════
 // Un choix multiple ET un classement ont besoin d'une liste d'éléments ; une échelle non.
 const needsOptions = (fmt) => fmt === 'mcq' || fmt === 'rank';
+function qbBuilderLabels(builderId, fmt) {
+  const t = document.querySelector('#' + builderId + ' .qb-title'), u = document.querySelector('#' + builderId + ' .qb-sub');
+  if(t) t.textContent = fmt === 'rank' ? 'Éléments à classer' : 'Options de réponse';
+  if(u) u.textContent = fmt === 'rank' ? 'Les éléments que les répondants classeront du plus au moins important (2 à 6).' : 'Les choix proposés aux répondants (2 à 6 options).';
+}
 function showMcqForQ(qNum, fmt) {
   const b = document.getElementById('q' + qNum + '-mcq-builder');
   if(b) b.style.display = needsOptions(fmt) ? 'block' : 'none';
-  const t = document.querySelector('#q' + qNum + '-mcq-builder > div');
-  if(t) t.textContent = (fmt === 'rank' ? 'Éléments à classer Q' : 'Options Q') + qNum;
+  qbBuilderLabels('q' + qNum + '-mcq-builder', fmt);
+}
+// Choix du format d'une question 2 ou 3 (la valeur reste portée par le <select> caché lu au lancement).
+function setQFmt(qNum, fmt, el) {
+  document.querySelectorAll('#q' + qNum + '-fmt .fmt-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  const sel = document.getElementById('q' + qNum + '-fmt-sel'); if(sel) sel.value = fmt;
+  showMcqForQ(qNum, fmt);
 }
 // Options d'UNE question : seulement les champs de SON bloc (jamais ceux des autres questions), sans vides ni doublons.
 function collectOptions(containerSel) {
@@ -1810,6 +1794,19 @@ function useTmpl(el, txt){
 }
 
 // ═══ PREVIEW ════════════════════════════════════════════════
+// Aperçu de la zone de réponse de la question 1 selon son format (liste d'options, échelle, éléments à classer).
+function renderPreviewAnswer(){
+  const box=document.querySelector('#wz-panel-0 .preview-ans-placeholder'); if(!box) return;
+  const opts=needsOptions(curFmt)?collectOptions('#mcq-options'):[];
+  box.style.minHeight='52px';
+  if(curFmt==='scale'){ box.innerHTML='<div style="display:flex;justify-content:space-between;font-size:9px;color:#8B8693;margin-bottom:6px"><span>Pas du tout</span><span>Extrêmement</span></div><div style="height:6px;border-radius:99px;background:#E0DDD8;position:relative"><div style="position:absolute;left:44%;top:-4px;width:14px;height:14px;border-radius:50%;background:#E07D0A"></div></div>'; return; }
+  if(!opts.length){ box.textContent=curFmt==='rank'?'Éléments à classer…':'Vos options de réponse…'; return; }
+  box.innerHTML=opts.slice(0,4).map((o,i)=>curFmt==='rank'
+    ?'<div style="display:flex;gap:6px;align-items:center;font-size:10px;color:#17141A;margin-bottom:4px"><b style="color:#E07D0A">'+(i+1)+'</b>'+esc(o)+'</div>'
+    :'<div style="display:flex;gap:6px;align-items:center;font-size:10px;color:#17141A;margin-bottom:4px"><span style="width:11px;height:11px;border-radius:50%;border:1.5px solid #B2ADB9;flex-shrink:0"></span>'+esc(o)+'</div>').join('')+(opts.length>4?'<div style="font-size:9px;color:#8B8693">+ '+(opts.length-4)+' autre'+(opts.length>5?'s':'')+'</div>':'');
+}
+document.addEventListener('input',e=>{ if(e.target.closest&&e.target.closest('#wz-q-1')) renderPreviewAnswer(); });
+document.addEventListener('click',e=>{ if(e.target.closest&&e.target.closest('#wz-q-1 .add-option-btn, #wz-q-1 .mcq-remove')) setTimeout(renderPreviewAnswer,0); });
 function updatePreview(){
   const q=document.getElementById('q-text-inp');
   const pq=document.getElementById('preview-q');
