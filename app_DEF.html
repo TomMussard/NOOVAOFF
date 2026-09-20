@@ -678,17 +678,19 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .nav-lbl{display:none}
 
 /* — Mini-didacticiel première connexion (info-bulles) — */
-#home-tour{position:fixed;inset:0;z-index:10050;display:none;opacity:0;transition:opacity .25s ease}
+#home-tour{position:fixed;inset:0;z-index:10050;display:none;opacity:0;transition:opacity .25s ease;touch-action:none}
 #home-tour.show{display:block;opacity:1}
-.tour-spot{position:fixed;border-radius:20px;box-shadow:0 0 0 9999px rgba(20,15,10,.78);transition:top .32s cubic-bezier(.4,0,.2,1),left .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1),height .32s cubic-bezier(.4,0,.2,1);pointer-events:none}
-.tour-card{position:fixed;width:264px;background:#fff;border-radius:18px;padding:16px 17px;box-shadow:0 16px 40px rgba(0,0,0,.32);transition:top .32s cubic-bezier(.4,0,.2,1),left .32s cubic-bezier(.4,0,.2,1);animation:tourPop .3s cubic-bezier(.34,1.56,.64,1)}
+.tour-dim{position:absolute;inset:0;width:100%;height:100%;display:block}
+.tour-spot{position:fixed;box-shadow:0 0 0 2px rgba(255,255,255,.9);pointer-events:none}
+.tour-card{position:fixed;width:264px;background:#fff;border-radius:18px;padding:16px 17px;box-shadow:0 16px 40px rgba(0,0,0,.32);animation:tourPop .3s cubic-bezier(.34,1.56,.64,1)}
 @keyframes tourPop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
 .tour-txt{font-size:13px;color:var(--ink);line-height:1.55;font-weight:600;margin-bottom:13px}
 .tour-foot{display:flex;align-items:center;justify-content:space-between}
 .tour-dots{display:flex;gap:5px}
 .tour-dot{width:6px;height:6px;border-radius:99px;background:var(--bg3);transition:all .2s}
 .tour-dot.on{background:var(--coral);width:16px}
-.tour-skip{font-size:11.5px;color:var(--ink3);font-weight:600;cursor:pointer}
+.tour-skip{font-size:11.5px;color:var(--ink3);font-weight:600;cursor:pointer;background:none;border:none;font-family:inherit;padding:8px 6px}
+.tour-skip:focus-visible,.tour-next:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .tour-next{background:var(--ink);color:var(--coral);font-family:var(--fd);font-weight:800;font-size:12.5px;padding:9px 16px;border-radius:99px;border:none;cursor:pointer}
 
 /* — Invite à installer l'app sur l'écran d'accueil — */
@@ -4827,52 +4829,103 @@ function maybeShowHomeTour(){
   trackEvent('tutorial_begin');
   setTimeout(()=>showTourStep(0), 550);
 }
-function showTourStep(i){
-  while(i<HOME_TOUR_STEPS.length){ const el=document.querySelector(HOME_TOUR_STEPS[i].sel); if(el && el.offsetParent!==null) break; i++; }
-  if(i>=HOME_TOUR_STEPS.length){ endHomeTour(); return; }
-  _tourIdx=i;
-  const step=HOME_TOUR_STEPS[i];
-  const target=document.querySelector(step.sel);
-  const r=target.getBoundingClientRect();
-  let overlay=document.getElementById('home-tour');
-  if(!overlay){
-    overlay=document.createElement('div');
-    overlay.id='home-tour';
-    overlay.innerHTML='<div class="tour-spot"></div><div class="tour-card"><div class="tour-txt"></div><div class="tour-foot"><span class="tour-skip" onclick="endHomeTour()">Passer</span><div style="display:flex;align-items:center;gap:10px"><div class="tour-dots"></div><button class="tour-next" onclick="nextTourStep()">Suivant</button></div></div></div>';
-    document.body.appendChild(overlay);
+// ─── Moteur du didacticiel ────────────────────────────────────────────────
+// Le halo est une découpe SVG (l'ancien box-shadow de 9999 px s'affichait mal sur iOS), la cible est remise
+// à l'écran si besoin, le halo SUIT la cible à chaque image (chargement tardif, défilement, menu qui glisse,
+// rotation) et le clavier reste dans la bulle (focus sur « Suivant », Échap = passer).
+function makeTour(cfg){
+  const P=cfg.prefix, PAD=8;
+  let idx=0, raf=0, cur=null, target=null, lastFocus=null, dirty=false;
+  const $ov=()=>document.getElementById(cfg.overlayId);
+  function ensure(){
+    let ov=$ov();
+    if(ov) return ov;
+    ov=document.createElement('div'); ov.id=cfg.overlayId;
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','Visite guidée');
+    ov.innerHTML='<svg class="'+P+'-dim" aria-hidden="true"><path fill="rgba(20,15,10,.78)" fill-rule="evenodd"></path></svg><div class="'+P+'-spot"></div><div class="'+P+'-card"><div class="'+P+'-txt" aria-live="polite"></div><div class="'+P+'-foot"><button type="button" class="'+P+'-skip">Passer</button><div style="display:flex;align-items:center;gap:10px"><div class="'+P+'-dots"></div><button type="button" class="'+P+'-next">Suivant</button></div></div></div>';
+    ov.querySelector('.'+P+'-skip').addEventListener('click',()=>end());
+    ov.querySelector('.'+P+'-next').addEventListener('click',()=>next());
+    ov.addEventListener('keydown',(e)=>{
+      if(e.key==='Escape'){ e.preventDefault(); end(); return; }
+      if(e.key==='Tab'){
+        const a=ov.querySelector('.'+P+'-skip'), b=ov.querySelector('.'+P+'-next');
+        if(e.shiftKey && document.activeElement===a){ e.preventDefault(); b.focus(); }
+        else if(!e.shiftKey && document.activeElement===b){ e.preventDefault(); a.focus(); }
+        else if(document.activeElement!==a && document.activeElement!==b){ e.preventDefault(); b.focus(); }
+      }
+    });
+    document.body.appendChild(ov);
+    return ov;
   }
-  overlay.classList.add('show');
-  const pad=8;
-  const spot=overlay.querySelector('.tour-spot');
-  spot.style.top=(r.top-pad)+'px'; spot.style.left=(r.left-pad)+'px';
-  spot.style.width=(r.width+pad*2)+'px'; spot.style.height=(r.height+pad*2)+'px';
-  const card=overlay.querySelector('.tour-card');
-  overlay.querySelector('.tour-txt').textContent=step.txt;
-  overlay.querySelector('.tour-dots').innerHTML=HOME_TOUR_STEPS.map((_,idx)=>`<div class="tour-dot${idx===i?' on':''}"></div>`).join('');
-  overlay.querySelector('.tour-next').textContent = i===HOME_TOUR_STEPS.length-1 ? 'Terminer' : 'Suivant';
-  requestAnimationFrame(()=>{
-    const ch=card.offsetHeight;
-    let top = r.bottom+pad+14;
-    if(top+ch>window.innerHeight-20){ top = r.top-pad-14-ch; }
-    top=Math.max(20,Math.min(top, window.innerHeight-ch-20));
-    let left = r.left+r.width/2-140;
-    left=Math.max(16,Math.min(left, window.innerWidth-296));
+  const rectOf=()=>{ const r=target.getBoundingClientRect(); return {x:r.left-PAD,y:r.top-PAD,w:r.width+PAD*2,h:r.height+PAD*2}; };
+  function draw(c){
+    const ov=$ov(); if(!ov||!target) return;
+    const W=innerWidth, H=innerHeight, r=Math.max(0,Math.min(cfg.radius||16,c.w/2,c.h/2));
+    const x=c.x,y=c.y,w=c.w,h=c.h;
+    const hole='M'+(x+r)+','+y+'h'+(w-2*r)+'a'+r+','+r+' 0 0 1 '+r+','+r+'v'+(h-2*r)+'a'+r+','+r+' 0 0 1 -'+r+','+r+'h-'+(w-2*r)+'a'+r+','+r+' 0 0 1 -'+r+',-'+r+'v-'+(h-2*r)+'a'+r+','+r+' 0 0 1 '+r+',-'+r+'z';
+    ov.querySelector('path').setAttribute('d','M0,0H'+W+'V'+H+'H0Z '+hole);
+    const sp=ov.querySelector('.'+P+'-spot');
+    sp.style.left=x+'px'; sp.style.top=y+'px'; sp.style.width=w+'px'; sp.style.height=h+'px'; sp.style.borderRadius=r+'px';
+    const card=ov.querySelector('.'+P+'-card'), ch=card.offsetHeight, cw=card.offsetWidth;
+    let top=y+h+14; if(top+ch>H-20) top=y-14-ch; top=Math.max(20,Math.min(top,H-ch-20));
+    let left;
+    if(cfg.side==='right'){ left=x+w+16; if(left+cw>W-16) left=Math.max(16,x-cw-16); }
+    else left=x+w/2-cw/2;
+    left=Math.max(16,Math.min(left,W-cw-16));
     card.style.top=top+'px'; card.style.left=left+'px';
-  });
+  }
+  function tick(){
+    const ov=$ov();
+    if(!target||!ov||!ov.classList.contains('show')){ raf=0; return; }
+    const t=rectOf();
+    if(!cur) cur={x:t.x,y:t.y,w:t.w,h:t.h};
+    let moving=false;
+    for(const k of ['x','y','w','h']){ const d=t[k]-cur[k]; if(Math.abs(d)>0.4){ cur[k]+=d*0.34; moving=true; } else cur[k]=t[k]; }
+    if(moving||dirty){ draw(cur); dirty=false; }
+    raf=requestAnimationFrame(tick);
+  }
+  const visible=(el)=>!!el && el.getClientRects().length>0;
+  function show(i){
+    while(i<cfg.steps.length && !visible(document.querySelector(cfg.steps[i].sel))) i++;
+    if(i>=cfg.steps.length){ end(); return; }
+    idx=i; if(cfg.setIdx) cfg.setIdx(i);
+    const step=cfg.steps[i]; target=document.querySelector(step.sel);
+    const ov=ensure();
+    if(!ov.classList.contains('show')){ lastFocus=document.activeElement; cur=null; }
+    ov.classList.add('show');
+    const r=target.getBoundingClientRect();
+    if(r.top<0||r.bottom>innerHeight||r.left<0||r.right>innerWidth){ try{ target.scrollIntoView({block:'center',inline:'nearest'}); }catch(e){} }
+    ov.querySelector('.'+P+'-txt').textContent=step.txt;
+    ov.querySelector('.'+P+'-dots').innerHTML=cfg.steps.map((_,k)=>'<div class="'+P+'-dot'+(k===i?' on':'')+'"></div>').join('');
+    ov.querySelector('.'+P+'-next').textContent=i===cfg.steps.length-1?'Terminer':'Suivant';
+    dirty=true;
+    if(!raf) raf=requestAnimationFrame(tick);
+    setTimeout(()=>{ try{ ov.querySelector('.'+P+'-next').focus({preventScroll:true}); }catch(e){} },80);
+  }
+  function next(){ if(idx>=cfg.steps.length-1) end(); else show(idx+1); }
+  function end(){
+    const ov=$ov(); if(ov) ov.classList.remove('show');
+    if(raf){ cancelAnimationFrame(raf); raf=0; }
+    target=null; cur=null;
+    try{ if(lastFocus && lastFocus.focus) lastFocus.focus({preventScroll:true}); }catch(e){}
+    if(cfg.onEnd) cfg.onEnd(idx);
+  }
+  return {show,next,end};
 }
-function nextTourStep(){
-  if(_tourIdx>=HOME_TOUR_STEPS.length-1){ endHomeTour(); return; }
-  showTourStep(_tourIdx+1);
-}
-function endHomeTour(){
-  const overlay=document.getElementById('home-tour');
-  if(overlay) overlay.classList.remove('show');
-  trackEvent('tutorial_complete', { last_step: _tourIdx });
-  S._seenHomeTour=true;
-  const uid=auth.currentUser&&auth.currentUser.uid;
-  if(uid) db.collection('users').doc(uid).update({seenHomeTour:true}).catch(()=>{});
-  setTimeout(maybeShowInstallInvite, 900);
-}
+const _homeTour=makeTour({
+  overlayId:'home-tour', prefix:'tour', steps:HOME_TOUR_STEPS, radius:20, side:'center',
+  setIdx:(i)=>{ _tourIdx=i; },
+  onEnd:()=>{
+    trackEvent('tutorial_complete', { last_step: _tourIdx });
+    S._seenHomeTour=true;
+    const uid=auth.currentUser&&auth.currentUser.uid;
+    if(uid) db.collection('users').doc(uid).update({seenHomeTour:true}).catch(()=>{});
+    setTimeout(maybeShowInstallInvite, 900);
+  }
+});
+function showTourStep(i){ _homeTour.show(i); }
+function nextTourStep(){ _homeTour.next(); }
+function endHomeTour(){ _homeTour.end(); }
 
 // ─── Invite à installer l'app (écran d'accueil) ────────────────────────────
 // Android/Chrome : déclenchement natif via beforeinstallprompt. iOS Safari n'expose

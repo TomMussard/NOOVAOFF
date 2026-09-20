@@ -21,6 +21,7 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./engagement")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./impact")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./configStore")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./counters")));
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./quota")));
 
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.

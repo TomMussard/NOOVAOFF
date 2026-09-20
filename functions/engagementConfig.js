@@ -53,6 +53,11 @@ module.exports = {
     MAX_FRIENDS: 30,
   },
 
+  // ─── Quota de questions par commerçant ─── (pas d'abonnement : la ville offre une quantité fixe par mois)
+  QUOTA: {
+    DEFAULT_MONTHLY_QUESTIONS: 10,   // questions par mois et par commerçant, sauf quota propre fixé par l'admin
+  },
+
   // ─── Impact visible ─── (étape 4)
   IMPACT: {
     MAX_TEXT: 200,               // longueur d'une actualité commerçant

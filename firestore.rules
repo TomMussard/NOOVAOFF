@@ -110,12 +110,12 @@ service cloud.firestore {
           ownFile(request.resource.data.get('logoUrl', null), 'merchants', merchantId) &&
           ownFile(request.resource.data.get('coverUrl', null), 'merchants', merchantId) &&
           (
-            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'verifiedAt', 'submittedAt', 'ownerUid', 'role'])
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'verifiedAt', 'submittedAt', 'ownerUid', 'role', 'monthlyQuestionQuota'])
             ||
             // « Corriger et renvoyer » : un dossier refusé (à corriger) repasse en attente,
             // sans jamais pouvoir se déclarer vérifié soi-même.
             (resource.data.status == 'rejected' && request.resource.data.status == 'pending' &&
-             !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verifiedAt', 'ownerUid', 'role']))
+             !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verifiedAt', 'ownerUid', 'role', 'monthlyQuestionQuota']))
           )
         )
       );
@@ -152,7 +152,10 @@ service cloud.firestore {
       allow update: if isAuth() && (
         isAdmin() ||
         (resource.data.merchantId == request.auth.uid &&
-         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['answersCount', 'responsesCount', 'merchantId']))
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['answersCount', 'responsesCount', 'merchantId', 'blockedReason']) &&
+         // Quota mensuel : une campagne bloquée le reste, et on ne peut pas ajouter de questions après coup.
+         resource.data.status != 'blocked' && request.resource.data.status != 'blocked' &&
+         request.resource.data.get('questions', []).size() <= resource.data.get('questions', []).size())
       );
       allow delete: if isAuth() && (resource.data.merchantId == request.auth.uid || isAdmin());
     }
@@ -355,22 +358,6 @@ service cloud.firestore {
       allow create: if isAuth() && request.resource.data.fromUid == request.auth.uid;
       allow update: if isAuth() && resource.data.toUid == request.auth.uid;
       allow delete: if isAdmin();
-    }
-
-    // ─── Plan requests ────────────────────────────────────────────────────────
-    match /planRequests/{reqId} {
-      allow create: if isAuth() && request.resource.data.merchantId == request.auth.uid;
-      allow read: if isAuth() && (
-        resource.data.merchantId == request.auth.uid ||
-        isAdmin()
-      );
-      allow update, delete: if false;
-    }
-
-    // ─── Invoices ─────────────────────────────────────────────────────────────
-    match /invoices/{invId} {
-      allow read: if isAuth() && resource.data.merchantId == request.auth.uid;
-      allow write: if false;
     }
 
     // ─── Consent events ──────────────────────────────────────────────────────

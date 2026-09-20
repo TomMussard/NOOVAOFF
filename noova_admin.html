@@ -551,6 +551,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
         <div class="modal-field"><div class="mf-lbl">Ville</div><div class="mf-val" id="md-city">—</div></div>
         <div class="modal-field"><div class="mf-lbl">Adresse</div><div class="mf-val" id="md-address">—</div></div>
         <div class="modal-field"><div class="mf-lbl">Téléphone</div><div class="mf-val" id="md-phone">—</div></div>
+        <div class="modal-field"><div class="mf-lbl">Questions par mois</div><div class="mf-val" id="md-quota" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">—</div></div>
       </div>
       <div class="modal-field" style="margin-top:14px"><div class="mf-lbl">Description</div><div class="mf-val muted" id="md-desc" style="font-size:13px;line-height:1.5">—</div></div>
       <div class="modal-field" style="margin-top:14px" id="md-iddoc-row"><div class="mf-lbl">Document d'identité</div><div class="mf-val" id="md-iddoc">—</div></div>
@@ -901,6 +902,24 @@ async function rejectReward(rewardId, btn) {
   }
 }
 
+// ── Quota de questions par mois d'un commerçant (la ville offre une quantité fixe, pas d'abonnement) ──
+async function renderMerchantQuota(m) {
+  const el = document.getElementById('md-quota');
+  if (!el) return;
+  el.textContent = 'Chargement…';
+  const own = Number.isInteger(m.monthlyQuestionQuota) ? m.monthlyQuestionQuota : '';
+  el.innerHTML = `<input id="md-quota-inp" type="number" min="0" max="1000" value="${own}" placeholder="défaut" style="width:90px;padding:7px 9px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink)">
+    <button onclick="saveMerchantQuota('${esc(m.id)}')" style="padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;border:none;background:var(--coral);color:#fff;cursor:pointer">Enregistrer</button>
+    <span style="font-size:11px;color:var(--ink3)">Vide = quota par défaut (réglable dans « Réglages de l'engagement »)</span>`;
+}
+async function saveMerchantQuota(id) {
+  const raw = document.getElementById('md-quota-inp').value.trim();
+  try {
+    await fx.httpsCallable('setMerchantQuota')({ merchantId: id, quota: raw === '' ? null : Number(raw) });
+    showToast(raw === '' ? 'Quota par défaut rétabli' : 'Quota enregistré', 'success');
+  } catch (e) { showToast(e.message || 'Enregistrement impossible', 'error'); }
+}
+
 // ── Réglages de l'engagement (seuils modifiables sans redéploiement) ─────────
 let _engCfg = null;
 async function loadEngagementConfig() {
@@ -1222,6 +1241,7 @@ function openModal(id) {
   }
   const statusMap = { verified: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg>'+' Vérifié', pending: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg>'+' En attente', rejected: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg>'+' Rejeté' };
   document.getElementById('md-status').innerHTML = `<span class="badge ${m.status==='verified'?'badge-verified':m.status==='pending'?'badge-pending':'badge-rejected'}">${statusMap[m.status]||m.status}</span>`;
+  renderMerchantQuota(m);
   const foot = document.getElementById('modal-foot');
   if (m.status === 'pending') {
     foot.innerHTML = `<button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Rejeter</button><button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>`;

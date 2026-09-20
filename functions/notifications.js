@@ -452,7 +452,10 @@ const notifTick = onSchedule({ schedule: "every 15 minutes", timeZone: "Europe/P
 // Un commerce lance une campagne → « nouveau commerce » pour les habitants de sa ville et de ses catégories.
 const notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (event) => {
   const camp = event.data && event.data.data();
-  if (!camp || camp.status !== "active") return;
+  if (!camp) return;
+  // Quota mensuel de questions : comptabilisé pour toute nouvelle campagne ; au-delà, elle est bloquée et jamais notifiée.
+  if (!(await require("./quota")._t.accountCampaign(event.params.campaignId, camp))) return;
+  if (camp.status !== "active") return;
   const city = String(camp.targetCity || camp.city || "").toLowerCase();
   if (!city) return;
   const m = await db().collection("merchants").doc(camp.merchantId).get();

@@ -80,7 +80,7 @@ const W=+(process.env.W||390),H=+(process.env.H||844);
     console.log('AUDIT',name,'scrollW='+r.sw+'/'+r.vw,r.sw>r.vw?'!! OVERFLOW':'ok','tinyText='+r.tiny,'\n   overflow:',r.over.join(' | ')||'-','\n   small targets:',r.small.join(' | ')||'-');
   };
   const shot=async n=>{await p.setViewport({width:W,height:1700,deviceScaleFactor:1,isMobile:true,hasTouch:true});await sleep(400);await p.screenshot({path:'/tmp/shots/dm_'+n+'.png'});await p.setViewport({width:W,height:H,deviceScaleFactor:1,isMobile:true,hasTouch:true});};
-  for(const pg of (process.env.PAGES||'dashboard,create,campaigns,results,consents,news,rewards,validate,settings,billing,plans').split(',')){
+  for(const pg of (process.env.PAGES||'dashboard,create,campaigns,results,consents,news,rewards,validate,settings').split(',')){
     await p.evaluate(pg=>{const b=[...document.querySelectorAll('.sb-item')].find(x=>(x.getAttribute('onclick')||'').includes("'"+pg+"'"));navTo(pg,b);},pg);
     await audit(pg);await shot(pg);
   }

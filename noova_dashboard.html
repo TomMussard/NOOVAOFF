@@ -676,21 +676,18 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   .cj-row > :nth-child(1) { grid-column: 1 / -1; }
 
   /* Formules */
-  .plans-grid { grid-template-columns: repeat(2, 1fr) !important; }
   #news-camps label { padding: 6px 0; }
   #news-camps input { width: 20px; height: 20px; flex-shrink: 0; }
-}
-@media (max-width: 560px) {
-  .plans-grid { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 480px) {
   #topbar-new-camp-btn { display: none !important; }
   #mob-camp-fab { bottom: calc(20px + env(safe-area-inset-bottom)); }
 }
 /* Mini didacticiel commerçant (première connexion validée) */
-#dash-tour{position:fixed;inset:0;z-index:10050;display:none;opacity:0;transition:opacity .25s ease}
+#dash-tour{position:fixed;inset:0;z-index:10050;display:none;opacity:0;transition:opacity .25s ease;touch-action:none}
 #dash-tour.show{display:block;opacity:1}
-.dtour-spot{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px rgba(20,15,10,.78);transition:top .32s cubic-bezier(.4,0,.2,1),left .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1),height .32s cubic-bezier(.4,0,.2,1);pointer-events:none}
+.dtour-dim{position:absolute;inset:0;width:100%;height:100%;display:block}
+.dtour-spot{position:fixed;box-shadow:0 0 0 2px rgba(255,255,255,.9);pointer-events:none}
 .dtour-card{position:fixed;width:280px;background:#fff;border-radius:16px;padding:16px 17px;box-shadow:0 16px 40px rgba(0,0,0,.32);animation:dtourPop .3s cubic-bezier(.34,1.56,.64,1)}
 @keyframes dtourPop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
 .dtour-txt{font-size:13px;color:var(--ink);line-height:1.55;font-weight:600;margin-bottom:13px}
@@ -698,7 +695,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .dtour-dots{display:flex;gap:5px}
 .dtour-dot{width:6px;height:6px;border-radius:99px;background:var(--bg3);transition:all .2s}
 .dtour-dot.on{background:var(--coral);width:16px}
-.dtour-skip{font-size:11.5px;color:var(--ink3);font-weight:600;cursor:pointer}
+.dtour-skip{font-size:11.5px;color:var(--ink3);font-weight:600;cursor:pointer;background:none;border:none;font-family:inherit;padding:8px 6px}
+.dtour-skip:focus-visible,.dtour-next:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .dtour-next{background:var(--ink);color:#fff;font-family:var(--fd);font-weight:800;font-size:12.5px;padding:9px 16px;border-radius:99px;border:none;cursor:pointer}
 </style>
 <script src="icons.js"></script>
@@ -784,6 +782,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 
       <!-- ═══ DASHBOARD ═══ -->
       <div class="page active" id="page-dashboard">
+        <div id="quota-card" style="display:none"></div>
         <div id="acq-card" style="display:none"></div>
         <!-- KPIs -->
         <div class="kpi-row">
@@ -1330,116 +1329,6 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         </div>
       </div>
 
-      <!-- ═══ BILLING ═══ -->
-      <div class="page" id="page-billing">
-        <div style="max-width:680px">
-          <div class="step-card" style="margin-bottom:16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-              <div><div class="step-card-title" id="bill-plan-title">Plan actuel · —</div><div style="font-size:12px;color:var(--ink3);margin-top:2px" id="bill-renewal">Chargement…</div></div>
-              <div style="background:var(--cd);border:1.5px solid rgba(224,125,10,.25);border-radius:var(--rs);padding:7px 14px;font-family:var(--fd);font-weight:700;font-size:13px;color:var(--coral)" id="bill-plan-badge">—</div>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-              <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">∞</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Campagnes</div></div>
-              <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">5k</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Rép. / campagne</div></div>
-              <div style="background:var(--bg3);border-radius:var(--rx);padding:12px;text-align:center"><div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--coral)">1.25€</div><div style="font-size:11px;color:var(--ink3);margin-top:2px">Par réponse</div></div>
-            </div>
-            <div style="display:flex;gap:9px"><button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="navTo('plans', document.querySelector('.sb-item[onclick*=plans]'))">Changer de plan</button><button class="tb-btn tb-btn-primary" style="font-size:12px" onclick="showToast('Contacte-nous à contact@noova.fr pour ajouter du crédit.','credit-card')">Ajouter du crédit</button></div>
-          </div>
-          <div class="section-title">Historique de facturation</div>
-          <div class="card" id="billing-history"><div style="padding:20px;text-align:center;color:var(--ink3);font-size:13px">Chargement…</div></div>
-        </div>
-      </div>
-
-      <!-- ═══ PLANS PAGE ═══ -->
-      <div class="page" id="page-plans">
-        <div style="max-width:800px">
-          <div style="text-align:center;margin-bottom:28px">
-            <div style="font-family:var(--fd);font-weight:900;font-size:26px;color:var(--ink);letter-spacing:-1px;margin-bottom:6px">Choisissez votre formule</div>
-            <div style="font-size:13px;color:var(--ink3)">Le prix par réponse reste le même quelle que soit la formule. L'abonnement déverrouille des fonctionnalités supplémentaires.</div>
-          </div>
-          <div class="plans-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px">
-
-            <!-- FREE -->
-            <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;gap:10px">
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3)">Free</div>
-              <div><span style="font-family:var(--fd);font-weight:900;font-size:28px;color:var(--ink)">0 €</span><span style="font-size:12px;color:var(--ink3)">/mois</span></div>
-              <div style="font-size:11px;color:var(--ink3);line-height:1.5">Pour tester Noova sans engagement.</div>
-              <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink2)">
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> 1 campagne active</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> 50 réponses max</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Analyse IA incluse</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Export CSV</div>
-                <div style="color:var(--ink3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg> Ciblage avancé</div>
-                <div style="color:var(--ink3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg> Questions ouvertes</div>
-              </div>
-              <button style="margin-top:auto;padding:9px;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--ink2)">Formule actuelle</button>
-            </div>
-
-            <!-- STARTER -->
-            <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;gap:10px">
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--coral)">Starter</div>
-              <div><span style="font-family:var(--fd);font-weight:900;font-size:28px;color:var(--ink)">29 €</span><span style="font-size:12px;color:var(--ink3)">/mois</span></div>
-              <div style="font-size:11px;color:var(--ink3);line-height:1.5">Idéal pour les indépendants et petits commerces.</div>
-              <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink2)">
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> 3 campagnes actives</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> 500 réponses / campagne</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Analyse IA incluse</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Export CSV + PDF</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Score qualité</div>
-                <div style="color:var(--ink3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg> Ciblage géographique fin</div>
-              </div>
-              <button style="margin-top:auto;padding:9px;background:rgba(242,151,21,.1);border:1.5px solid rgba(242,151,21,.4);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--coral)" onclick="choosePlan('Starter',29)">Choisir Starter</button>
-            </div>
-
-            <!-- PRO -->
-            <div style="background:linear-gradient(145deg,#1c0e02,#3a1e06);border:1.5px solid rgba(242,151,21,.5);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;gap:10px;position:relative;box-shadow:0 8px 24px rgba(242,151,21,.2)">
-              <div style="position:absolute;top:-1px;right:16px;background:linear-gradient(135deg,#f29715,#ffda09);color:#1c0e02;font-size:10px;font-weight:900;padding:3px 10px;border-radius:0 0 8px 8px;letter-spacing:.5px">POPULAIRE</div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#fcc61a">Pro</div>
-              <div><span style="font-family:var(--fd);font-weight:900;font-size:28px;color:#fff">99 €</span><span style="font-size:12px;color:rgba(255,255,255,.55)">/mois</span></div>
-              <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.5">Pour les enseignes et marques en croissance.</div>
-              <div style="border-top:1px solid rgba(255,255,255,.12);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:rgba(255,255,255,.85)">
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Campagnes illimitées</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> 5 000 réponses / campagne</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Analyse IA avancée</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Export CSV + PDF + slides</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Score qualité + verbatims</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Ciblage région &amp; ville</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Questions ouvertes + échelle</div>
-              </div>
-              <button style="margin-top:auto;padding:9px;background:linear-gradient(135deg,#f29715,#ffda09);border:none;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;color:#1c0e02" onclick="choosePlan('Pro',99)">Choisir Pro</button>
-            </div>
-
-            <!-- ENTERPRISE -->
-            <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;gap:10px">
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--violet)">Enterprise</div>
-              <div><span style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--ink)">Sur devis</span></div>
-              <div style="font-size:11px;color:var(--ink3);line-height:1.5">Grandes enseignes, études multi-sites, accès API.</div>
-              <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink2)">
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Tout ce qui est dans Pro</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Accès API Noova</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Multi-utilisateurs</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Intégration CRM/ERP</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> SLA &amp; support dédié</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> White-label disponible</div>
-              </div>
-              <button style="margin-top:auto;padding:9px;background:rgba(92,59,245,.1);border:1.5px solid rgba(92,59,245,.3);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--violet)" onclick="window.location.href='mailto:contact@noova.fr?subject=Offre Enterprise'">Nous contacter</button>
-            </div>
-
-          </div><!-- /grid -->
-
-          <!-- Pricing reminder -->
-          <div class="step-card" style="background:rgba(242,151,21,.06);border-color:rgba(242,151,21,.2)">
-            <div class="step-card-title" style="margin-bottom:10px;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg> Rappel : tarification à la réponse</div>
-            <div style="font-size:12px;color:var(--ink2);line-height:1.8">
-              Quel que soit votre abonnement, chaque campagne est facturée <strong>99 € de forfait de base</strong> (analyse IA, PDF, CSV inclus) + un coût par réponse selon la localisation ciblée :<br>
-              &nbsp;&nbsp;<strong>France entière</strong> → 0,80 € / réponse &nbsp;·&nbsp;
-              <strong>Région</strong> → 1,20 € / réponse &nbsp;·&nbsp;
-              <strong>Ville</strong> → 1,80 € / réponse
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- ═══ REWARDS MANAGEMENT ═══ -->
       <div class="page" id="page-rewards">
         <div style="max-width:700px">
@@ -1799,7 +1688,7 @@ async function navTo(page, btn){
   closeMobMenu();
   curPage=page;
   const brandName = (_mData && _mData.brandName) || 'votre espace';
-  const titles={dashboard:['Dashboard','Bienvenue — '+brandName],create:['Créer une campagne','Moins de 5 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet de vos campagnes'],consents:['Consentements RGPD','Journal complet · Conforme RGPD Art. 6 et 7'],settings:['Paramètres','Configuration de votre espace marque'],billing:['Facturation','Historique et gestion de votre plan'],news:['Actualités','Montrez ce que vos clients ont changé chez vous'],rewards:['Mes récompenses','Ce que vos clients peuvent gagner chez vous'],validate:['Valider un code','Le code à 4 caractères montré par le client'],plans:['Formules','Choisissez votre abonnement']};
+  const titles={dashboard:['Dashboard','Bienvenue — '+brandName],create:['Créer une campagne','Moins de 5 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet de vos campagnes'],consents:['Consentements RGPD','Journal complet · Conforme RGPD Art. 6 et 7'],settings:['Paramètres','Configuration de votre espace marque'],news:['Actualités','Montrez ce que vos clients ont changé chez vous'],rewards:['Mes récompenses','Ce que vos clients peuvent gagner chez vous'],validate:['Valider un code','Le code à 4 caractères montré par le client']};
   const t=titles[page]||[page,''];
   document.getElementById('topbar-title').textContent=t[0];
   document.getElementById('topbar-sub').textContent=t[1];
@@ -2203,55 +2092,6 @@ function exportRegistry() {
   setTimeout(() => showToast('Export disponible dans 2 minutes par email.', 'mail'), 2000);
 }
 
-async function choosePlan(planName, price) {
-  const uid = auth.currentUser && auth.currentUser.uid;
-  if(!uid) return;
-  const current = _mData && _mData.plan;
-  if(current === planName) { showToast(`Tu es déjà sur le plan ${planName}.`, 'info'); return; }
-  if(!confirm(`Passer au plan ${planName} (${price}€/mois) ? Tu seras contacté sous 24h pour finaliser.`)) return;
-  try {
-    await db.collection('planRequests').doc().set({
-      merchantId: uid,
-      brandName: (_mData && _mData.brandName) || '',
-      requestedPlan: planName,
-      price,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showToast(`Demande ${planName} enregistrée. On te contacte sous 24h !`, 'rocket');
-  } catch(e) {
-    showToast('Erreur lors de la demande : ' + e.message, 'error');
-  }
-}
-
-async function loadBillingData(uid) {
-  const planName = (_mData && _mData.plan) || 'Free';
-  const planEl = document.getElementById('bill-plan-title');
-  const badgeEl = document.getElementById('bill-plan-badge');
-  const renewEl = document.getElementById('bill-renewal');
-  if(planEl) planEl.textContent = `Plan actuel · ${planName}`;
-  if(badgeEl) badgeEl.textContent = planName;
-  if(renewEl) {
-    const rd = _mData && _mData.planRenewalDate;
-    renewEl.textContent = rd ? `Renouvellement le ${rd}` : 'Abonnement mensuel';
-  }
-  const histEl = document.getElementById('billing-history');
-  if(!histEl) return;
-  try {
-    const snap = await db.collection('invoices').where('merchantId','==',uid).orderBy('createdAt','desc').limit(10).get();
-    if(snap.empty) {
-      histEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink3);font-size:13px">Aucune facture pour le moment.</div>';
-      return;
-    }
-    histEl.innerHTML = snap.docs.map(d => {
-      const f = d.data();
-      const date = f.createdAt ? new Date(f.createdAt.seconds*1000).toLocaleDateString('fr-FR') : '—';
-      return `<div style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--border)"><div style="font-size:11px;color:var(--ink3);width:100px;flex-shrink:0">${date}</div><div style="flex:1;font-size:13px;color:var(--ink2)">${esc(f.label||'Facture')}</div><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap">${f.amount||'—'}</div><span class="status-pill done">${f.status||'Payée'}</span></div>`;
-    }).join('');
-  } catch(e) {
-    histEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink3);font-size:13px">Historique non disponible.</div>';
-  }
-}
-
 // ═══ INIT ════════════════════════════════════════════════════
 window.addEventListener('load',()=>{
   updVol(500);updAud();updatePreview();
@@ -2555,7 +2395,6 @@ async function awSubmit() {
         ownerUid: cred.user.uid,
         status: 'pending',
         submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        plan: 'starter',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -2868,7 +2707,7 @@ async function loadMerchantAndStart(uid) {
   const sun = document.querySelector('.sb-user-name');
   const sur = document.querySelector('.sb-user-role');
   if(sbn) sbn.textContent = _mData.brandName || '';
-  if(sbp) sbp.textContent = (_mData.plan||'Starter') + ' · ' + (_mData.city||'');
+  if(sbp) sbp.textContent = _mData.cityLabel || _mData.city || '';
   if(sun) sun.textContent = _mData.brandName || '';
   if(sur) sur.textContent = _mData.sector || 'Commerçant';
   document.getElementById('topbar-sub').textContent = 'Bienvenue — ' + (_mData.brandName||'');
@@ -2906,7 +2745,7 @@ async function loadMerchantAndStart(uid) {
   ['kpi-delta-0','kpi-delta-1','kpi-delta-2','kpi-delta-3'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=''; });
 
   loadMerchantCampaigns(uid);
-  loadBillingData(uid);
+  loadQuota();
   // Nb utilisateurs : stocké dans le doc merchant (consentCount) pour éviter les restrictions RGPD
   _totalConsentedUsers = _mData.consentCount || 0;
   updAud();
@@ -2989,8 +2828,8 @@ function renderFirestoreCampaigns(camps) {
     });
     return;
   }
-  const stMap = { active:'live', draft:'draft', paused:'paused', completed:'done' };
-  const stLbl = { active:'En cours', draft:'Brouillon', paused:'Pausée', completed:'Terminée' };
+  const stMap = { active:'live', draft:'draft', paused:'paused', completed:'done', blocked:'draft' };
+  const stLbl = { active:'En cours', draft:'Brouillon', paused:'Pausée', completed:'Terminée', blocked:'Quota atteint' };
   // Update the campaigns page table
   const pages = ['page-dashboard','page-campaigns'];
   pages.forEach(pageId => {
@@ -3111,6 +2950,7 @@ launchCampaign = async function() {
     }
   }
 
+  if(!(await ensureQuotaFor(questions.length))) return;
   try {
     await db.collection('campaigns').add({
       merchantId:      u.uid,
@@ -3195,57 +3035,103 @@ function maybeShowDashTour(uid){
   }
   setTimeout(()=>showDashTourStep(0), 550);
 }
-function showDashTourStep(i){
-  while(i<DASH_TOUR_STEPS.length){
-    const el=document.querySelector(DASH_TOUR_STEPS[i].sel);
-    if(el && el.offsetParent!==null) break;
-    i++;
+// ─── Moteur du didacticiel ────────────────────────────────────────────────
+// Le halo est une découpe SVG (l'ancien box-shadow de 9999 px s'affichait mal sur iOS), la cible est remise
+// à l'écran si besoin, le halo SUIT la cible à chaque image (chargement tardif, défilement, menu qui glisse,
+// rotation) et le clavier reste dans la bulle (focus sur « Suivant », Échap = passer).
+function makeTour(cfg){
+  const P=cfg.prefix, PAD=8;
+  let idx=0, raf=0, cur=null, target=null, lastFocus=null, dirty=false;
+  const $ov=()=>document.getElementById(cfg.overlayId);
+  function ensure(){
+    let ov=$ov();
+    if(ov) return ov;
+    ov=document.createElement('div'); ov.id=cfg.overlayId;
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','Visite guidée');
+    ov.innerHTML='<svg class="'+P+'-dim" aria-hidden="true"><path fill="rgba(20,15,10,.78)" fill-rule="evenodd"></path></svg><div class="'+P+'-spot"></div><div class="'+P+'-card"><div class="'+P+'-txt" aria-live="polite"></div><div class="'+P+'-foot"><button type="button" class="'+P+'-skip">Passer</button><div style="display:flex;align-items:center;gap:10px"><div class="'+P+'-dots"></div><button type="button" class="'+P+'-next">Suivant</button></div></div></div>';
+    ov.querySelector('.'+P+'-skip').addEventListener('click',()=>end());
+    ov.querySelector('.'+P+'-next').addEventListener('click',()=>next());
+    ov.addEventListener('keydown',(e)=>{
+      if(e.key==='Escape'){ e.preventDefault(); end(); return; }
+      if(e.key==='Tab'){
+        const a=ov.querySelector('.'+P+'-skip'), b=ov.querySelector('.'+P+'-next');
+        if(e.shiftKey && document.activeElement===a){ e.preventDefault(); b.focus(); }
+        else if(!e.shiftKey && document.activeElement===b){ e.preventDefault(); a.focus(); }
+        else if(document.activeElement!==a && document.activeElement!==b){ e.preventDefault(); b.focus(); }
+      }
+    });
+    document.body.appendChild(ov);
+    return ov;
   }
-  if(i>=DASH_TOUR_STEPS.length){ endDashTour(); return; }
-  _dTourIdx=i;
-  const step=DASH_TOUR_STEPS[i];
-  const target=document.querySelector(step.sel);
-  const r=target.getBoundingClientRect();
-  let overlay=document.getElementById('dash-tour');
-  if(!overlay){
-    overlay=document.createElement('div');
-    overlay.id='dash-tour';
-    overlay.innerHTML='<div class="dtour-spot"></div><div class="dtour-card"><div class="dtour-txt"></div><div class="dtour-foot"><span class="dtour-skip" onclick="endDashTour()">Passer</span><div style="display:flex;align-items:center;gap:10px"><div class="dtour-dots"></div><button class="dtour-next" onclick="nextDashTourStep()">Suivant</button></div></div></div>';
-    document.body.appendChild(overlay);
-  }
-  overlay.classList.add('show');
-  const pad=8;
-  const spot=overlay.querySelector('.dtour-spot');
-  spot.style.top=(r.top-pad)+'px'; spot.style.left=(r.left-pad)+'px';
-  spot.style.width=(r.width+pad*2)+'px'; spot.style.height=(r.height+pad*2)+'px';
-  const card=overlay.querySelector('.dtour-card');
-  overlay.querySelector('.dtour-txt').textContent=step.txt;
-  overlay.querySelector('.dtour-dots').innerHTML=DASH_TOUR_STEPS.map((_,idx)=>`<div class="dtour-dot${idx===i?' on':''}"></div>`).join('');
-  overlay.querySelector('.dtour-next').textContent = i===DASH_TOUR_STEPS.length-1 ? 'Terminer' : 'Suivant';
-  requestAnimationFrame(()=>{
-    const ch=card.offsetHeight;
-    let top = r.bottom+pad+14;
-    if(top+ch>window.innerHeight-20){ top = r.top-pad-14-ch; }
-    top=Math.max(20,Math.min(top, window.innerHeight-ch-20));
-    let left = r.right+16;
-    if(left+296>window.innerWidth){ left = Math.max(16, r.left-296-16); }
-    left=Math.max(16,Math.min(left, window.innerWidth-296));
+  const rectOf=()=>{ const r=target.getBoundingClientRect(); return {x:r.left-PAD,y:r.top-PAD,w:r.width+PAD*2,h:r.height+PAD*2}; };
+  function draw(c){
+    const ov=$ov(); if(!ov||!target) return;
+    const W=innerWidth, H=innerHeight, r=Math.max(0,Math.min(cfg.radius||16,c.w/2,c.h/2));
+    const x=c.x,y=c.y,w=c.w,h=c.h;
+    const hole='M'+(x+r)+','+y+'h'+(w-2*r)+'a'+r+','+r+' 0 0 1 '+r+','+r+'v'+(h-2*r)+'a'+r+','+r+' 0 0 1 -'+r+','+r+'h-'+(w-2*r)+'a'+r+','+r+' 0 0 1 -'+r+',-'+r+'v-'+(h-2*r)+'a'+r+','+r+' 0 0 1 '+r+',-'+r+'z';
+    ov.querySelector('path').setAttribute('d','M0,0H'+W+'V'+H+'H0Z '+hole);
+    const sp=ov.querySelector('.'+P+'-spot');
+    sp.style.left=x+'px'; sp.style.top=y+'px'; sp.style.width=w+'px'; sp.style.height=h+'px'; sp.style.borderRadius=r+'px';
+    const card=ov.querySelector('.'+P+'-card'), ch=card.offsetHeight, cw=card.offsetWidth;
+    let top=y+h+14; if(top+ch>H-20) top=y-14-ch; top=Math.max(20,Math.min(top,H-ch-20));
+    let left;
+    if(cfg.side==='right'){ left=x+w+16; if(left+cw>W-16) left=Math.max(16,x-cw-16); }
+    else left=x+w/2-cw/2;
+    left=Math.max(16,Math.min(left,W-cw-16));
     card.style.top=top+'px'; card.style.left=left+'px';
-  });
+  }
+  function tick(){
+    const ov=$ov();
+    if(!target||!ov||!ov.classList.contains('show')){ raf=0; return; }
+    const t=rectOf();
+    if(!cur) cur={x:t.x,y:t.y,w:t.w,h:t.h};
+    let moving=false;
+    for(const k of ['x','y','w','h']){ const d=t[k]-cur[k]; if(Math.abs(d)>0.4){ cur[k]+=d*0.34; moving=true; } else cur[k]=t[k]; }
+    if(moving||dirty){ draw(cur); dirty=false; }
+    raf=requestAnimationFrame(tick);
+  }
+  const visible=(el)=>!!el && el.getClientRects().length>0;
+  function show(i){
+    while(i<cfg.steps.length && !visible(document.querySelector(cfg.steps[i].sel))) i++;
+    if(i>=cfg.steps.length){ end(); return; }
+    idx=i; if(cfg.setIdx) cfg.setIdx(i);
+    const step=cfg.steps[i]; target=document.querySelector(step.sel);
+    const ov=ensure();
+    if(!ov.classList.contains('show')){ lastFocus=document.activeElement; cur=null; }
+    ov.classList.add('show');
+    const r=target.getBoundingClientRect();
+    if(r.top<0||r.bottom>innerHeight||r.left<0||r.right>innerWidth){ try{ target.scrollIntoView({block:'center',inline:'nearest'}); }catch(e){} }
+    ov.querySelector('.'+P+'-txt').textContent=step.txt;
+    ov.querySelector('.'+P+'-dots').innerHTML=cfg.steps.map((_,k)=>'<div class="'+P+'-dot'+(k===i?' on':'')+'"></div>').join('');
+    ov.querySelector('.'+P+'-next').textContent=i===cfg.steps.length-1?'Terminer':'Suivant';
+    dirty=true;
+    if(!raf) raf=requestAnimationFrame(tick);
+    setTimeout(()=>{ try{ ov.querySelector('.'+P+'-next').focus({preventScroll:true}); }catch(e){} },80);
+  }
+  function next(){ if(idx>=cfg.steps.length-1) end(); else show(idx+1); }
+  function end(){
+    const ov=$ov(); if(ov) ov.classList.remove('show');
+    if(raf){ cancelAnimationFrame(raf); raf=0; }
+    target=null; cur=null;
+    try{ if(lastFocus && lastFocus.focus) lastFocus.focus({preventScroll:true}); }catch(e){}
+    if(cfg.onEnd) cfg.onEnd(idx);
+  }
+  return {show,next,end};
 }
-function nextDashTourStep(){
-  if(_dTourIdx>=DASH_TOUR_STEPS.length-1){ endDashTour(); return; }
-  showDashTourStep(_dTourIdx+1);
-}
-function endDashTour(){
-  const overlay=document.getElementById('dash-tour');
-  if(overlay) overlay.classList.remove('show');
-  const mobBtn=document.getElementById('mob-menu-btn');
-  if(mobBtn && getComputedStyle(mobBtn).display!=='none') closeMobMenu();
-  if(_mData) _mData.seenDashTour=true;
-  const uid=auth.currentUser && auth.currentUser.uid;
-  if(uid) db.collection('merchants').doc(uid).update({seenDashTour:true}).catch(()=>{});
-}
+const _dashTour=makeTour({
+  overlayId:'dash-tour', prefix:'dtour', steps:DASH_TOUR_STEPS, radius:16, side:'right',
+  setIdx:(i)=>{ _dTourIdx=i; },
+  onEnd:()=>{
+    const mobBtn=document.getElementById('mob-menu-btn');
+    if(mobBtn && getComputedStyle(mobBtn).display!=='none') closeMobMenu();
+    if(_mData) _mData.seenDashTour=true;
+    const uid=auth.currentUser && auth.currentUser.uid;
+    if(uid) db.collection('merchants').doc(uid).update({seenDashTour:true}).catch(()=>{});
+  }
+});
+function showDashTourStep(i){ _dashTour.show(i); }
+function nextDashTourStep(){ _dashTour.next(); }
+function endDashTour(){ _dashTour.end(); }
 
 // ─── Notifications commerçant (annonces envoyées par l'admin) ─
 let _notifUnsub = null;
@@ -3758,6 +3644,41 @@ async function deleteNews(id){
   try{await db.collection('merchantPosts').doc(id).delete();if(_newsEditId===id)resetNewsForm();}catch(e){showToast('Suppression impossible.','warning');}
 }
 
+
+// ─── Quota de questions du mois ─────────────────────────────
+// Pas d'abonnement ni de facture : la ville offre une quantité fixe de questions chaque mois.
+let _quota = null;
+async function loadQuota(){
+  try{
+    _quota = (await fx.httpsCallable('getMyQuota')()).data;
+    renderQuotaCard();
+  }catch(e){ console.warn('quota:', e); }
+}
+function fmtDateFr(iso){ const d = new Date(iso + 'T12:00:00'); return d.toLocaleDateString('fr-FR', { day:'numeric', month:'long' }); }
+function renderQuotaCard(){
+  const el = document.getElementById('quota-card'); if(!el || !_quota) return;
+  const q = _quota, pct = q.quota ? Math.min(100, Math.round(q.used / q.quota * 100)) : 100;
+  const left = q.remaining;
+  const col = left === 0 ? 'var(--red)' : left <= 2 ? 'var(--amber)' : 'var(--mint)';
+  el.style.display = 'block';
+  el.innerHTML = `<div class="card" style="padding:16px 18px;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)">Questions de ce mois</div>
+      <div style="font-family:var(--fd);font-weight:800;font-size:18px;color:${col}">${q.used} / ${q.quota}</div>
+    </div>
+    <div style="height:8px;border-radius:99px;background:var(--bg3);overflow:hidden;margin:10px 0 8px"><div style="height:100%;width:${pct}%;background:${col};border-radius:99px;transition:width .5s"></div></div>
+    <div style="font-size:12px;color:var(--ink3);line-height:1.5">${left > 0 ? `Il vous reste ${left} question${left > 1 ? 's' : ''} à poser ce mois-ci.` : 'Vous avez utilisé toutes vos questions du mois.'} Offertes par votre ville, elles se renouvellent le ${esc(fmtDateFr(q.resetsOn))}.</div>
+  </div>`;
+}
+// Avant de lancer : la campagne consomme autant de questions qu'elle en contient.
+async function ensureQuotaFor(count){
+  try{ await loadQuota(); }catch(e){}
+  if(!_quota) return true;                                   // indisponible : le serveur tranchera
+  if(_quota.remaining >= count) return true;
+  showToast(_quota.remaining === 0 ? `Quota du mois atteint (${_quota.quota} questions). Il se renouvelle le ${fmtDateFr(_quota.resetsOn)}.` : `Il ne vous reste que ${_quota.remaining} question${_quota.remaining > 1 ? 's' : ''} ce mois-ci ; cette campagne en contient ${count}.`, 'warning');
+  return false;
+}
+
 // Intercepter navTo pour charger les données au besoin
 const _origNavTo = navTo;
 navTo = function(page, btn) {
@@ -3885,7 +3806,6 @@ async function saveGoogleMerchant() {
       ownerUid: uid,
       status: 'pending',
       submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      plan: 'starter',
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
