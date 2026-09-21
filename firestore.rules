@@ -143,6 +143,7 @@ service cloud.firestore {
         request.resource.data.merchantId == request.auth.uid &&
         request.resource.data.questions.size() <= 3 &&
         request.resource.data.status in ['active', 'draft', 'paused'] &&
+        request.resource.data.get('archived', false) == false &&
         getMerchant(request.auth.uid).get('status', null) == 'verified' &&
         (getMerchant(request.auth.uid).get('city', null) == null ||
          request.resource.data.get('targetCity', null) == getMerchant(request.auth.uid).get('city', null));
@@ -155,7 +156,9 @@ service cloud.firestore {
          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['answersCount', 'responsesCount', 'merchantId', 'blockedReason']) &&
          // Quota mensuel : une campagne bloquée le reste, et on ne peut pas ajouter de questions après coup.
          resource.data.status != 'blocked' && request.resource.data.status != 'blocked' &&
-         request.resource.data.get('questions', []).size() <= resource.data.get('questions', []).size())
+         request.resource.data.get('questions', []).size() <= resource.data.get('questions', []).size() &&
+         // Archivage : seulement une campagne terminée (jamais une campagne encore diffusée).
+         (request.resource.data.get('archived', false) != true || request.resource.data.status == 'completed'))
       );
       allow delete: if isAuth() && (resource.data.merchantId == request.auth.uid || isAdmin());
     }

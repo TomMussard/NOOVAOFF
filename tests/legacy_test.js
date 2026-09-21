@@ -232,10 +232,10 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
   });
   await step('results threshold + csv', async () => {
     await mp.evaluate(id => viewCampaign(id), campId);
-    await waitFn(mp, () => /Encore \d+ réponse/.test(document.getElementById('camp-modal-body').textContent), null, 10000);
-    const t = await mp.$eval('#camp-modal-body', e => e.textContent);
-    check('C7 seuil 5 réponses (résultats masqués sous le seuil)', /Encore 4 réponses avant les résultats/.test(t));
-    check('C7 bouton export CSV présent', /Exporter en CSV/.test(t));
+    await waitFn(mp, () => /Encore \d+ réponse/.test((document.getElementById('results-content') || {}).textContent || ''), null, 10000);
+    const t = await mp.$eval('#results-content', e => e.textContent);
+    check('C7 seuil 5 réponses (résultats masqués sous le seuil)', /Encore 4 réponses avant d'afficher les résultats/.test(t));
+    check('C7 boutons export CSV présents', /Résumé \(CSV\)/.test(t) && /Réponses \(CSV\)/.test(t));
   });
   await step('reject + resubmit', async () => {
     await adb.doc('merchants/' + muid).update({ status: 'rejected', rejectionReason: 'SIRET introuvable. Photo illisible.' });

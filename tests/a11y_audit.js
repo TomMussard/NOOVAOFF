@@ -52,6 +52,7 @@ const run=async(p,name)=>{
   // ── App habitant (mobile)
   let p=await browser.newPage();await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
   await p.goto(APP,{waitUntil:'load'});await wf(p,()=>document.getElementById('onboard').classList.contains('active'),null,30000);
+  await sleep(1800);   // laisse finir l'animation d'entrée (l'opacité en cours de fondu fausse le calcul de contraste)
   await run(p,'app : présentation');
   await p.evaluate(()=>showAuthWall('login'));await run(p,'app : connexion');
   await setVal(p,'#aw-email','me@t.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());

@@ -383,6 +383,64 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .dur-est-d { font-size: 12px; color: var(--ink2); line-height: 1.6; margin-top: 6px; }
 .loc-fixed { display: flex; align-items: center; gap: 10px; padding: 13px 15px; border-radius: 12px; background: var(--bg2); border: 1.5px solid var(--border); font-size: 13px; color: var(--ink2); }
 .loc-fixed b { color: var(--ink); font-size: 14px; }
+/* Résultats */
+.rs-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.rs-tab { padding: 9px 16px; border-radius: 99px; border: 1.5px solid var(--border); background: var(--card); color: var(--ink2); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--fb); }
+.rs-tab.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.rs-tab-n { display: inline-block; min-width: 20px; margin-left: 4px; padding: 1px 6px; border-radius: 99px; background: rgba(23,20,26,.1); font-size: 11px; text-align: center; }
+.rs-tab.on .rs-tab-n { background: rgba(255,255,255,.2); }
+.rs-back { padding: 9px 16px; border-radius: 99px; border: 1.5px solid var(--border); background: var(--card); color: var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--fb); }
+.rs-intro { font-size: 13px; color: var(--ink2); line-height: 1.6; margin: 0 0 16px; max-width: 720px; }
+.rs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+.rs-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; display: flex; flex-direction: column; gap: 6px; }
+.rs-card-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rs-card-d { font-size: 12px; color: var(--ink2); }
+.rs-card-t { font-family: var(--fd); font-weight: 800; font-size: 16px; color: var(--ink); line-height: 1.3; word-break: break-word; }
+.rs-card-s { font-size: 12px; color: var(--ink2); }
+.rs-card-n { font-size: 13px; color: var(--ink2); margin: 6px 0 8px; } .rs-card-n b { font-family: var(--fd); font-size: 24px; color: var(--ink); }
+.rs-card-a { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+.rs-pill { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: var(--bg3); color: var(--ink); }
+.rs-pill.done { background: rgba(11,171,132,.14); color: var(--mint-text); }
+.rs-pill.live { background: rgba(242,151,21,.16); color: var(--coral-text); }
+.rs-pill.archived { background: var(--bg3); color: var(--ink2); }
+.rs-empty { text-align: center; padding: 48px 20px; background: var(--card); border: 1px dashed var(--border); border-radius: var(--r); }
+.rs-empty-t { font-family: var(--fd); font-weight: 700; font-size: 17px; color: var(--ink); margin-bottom: 6px; }
+.rs-empty-d { font-size: 13px; color: var(--ink2); max-width: 420px; margin: 0 auto 16px; line-height: 1.6; }
+.rs-head { display: flex; gap: 18px; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; padding: 20px 22px; margin-bottom: 16px; }
+.rs-head-main { flex: 1; min-width: 240px; }
+.rs-h-t { font-family: var(--fd); font-weight: 800; font-size: 22px; color: var(--ink); margin: 8px 0 6px; line-height: 1.25; word-break: break-word; }
+.rs-h-q { font-size: 12.5px; color: var(--ink2); line-height: 1.6; }
+.rs-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.rs-hint { font-size: 12px; color: var(--ink2); }
+.rs-del { color: var(--red-text) !important; }
+.rs-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.rs-kpi { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; }
+.rs-kpi-v { font-family: var(--fd); font-weight: 800; font-size: 28px; color: var(--ink); letter-spacing: -.5px; line-height: 1.1; }
+.rs-kpi-l { font-size: 12px; font-weight: 700; color: var(--ink); margin-top: 4px; }
+.rs-kpi-s { font-size: 11.5px; color: var(--ink2); margin-top: 3px; line-height: 1.45; }
+.rs-hl { padding: 18px 22px; margin-bottom: 16px; } .rs-hl ul { margin: 8px 0 0; padding-left: 18px; font-size: 13.5px; color: var(--ink); line-height: 1.7; }
+.rs-sec { padding: 18px 22px; margin-bottom: 16px; }
+.rs-sec-t { font-family: var(--fd); font-weight: 800; font-size: 15px; color: var(--ink); margin-bottom: 12px; } .rs-sec-t span, .rs-sub span { font-weight: 500; font-size: 12px; color: var(--ink2); }
+.rs-sec-h { font-family: var(--fd); font-weight: 800; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink2); margin: 22px 0 10px; }
+.rs-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } @media (max-width: 800px) { .rs-two { grid-template-columns: 1fr; } }
+.rs-bar-row { display: grid; grid-template-columns: minmax(90px, 34%) 1fr auto; gap: 10px; align-items: center; margin-bottom: 8px; font-size: 12.5px; }
+.rs-bar-l { color: var(--ink); word-break: break-word; }
+.rs-bar { height: 10px; background: var(--bg3); border-radius: 99px; overflow: hidden; } .rs-bar-f { height: 100%; background: var(--coral); border-radius: 99px; }
+.rs-bar-v { font-weight: 700; color: var(--ink); white-space: nowrap; } .rs-bar-v span { font-weight: 500; color: var(--ink2); }
+.rs-q { padding: 18px 22px; margin-bottom: 14px; }
+.rs-q-h { display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; margin-bottom: 4px; }
+.rs-q-n { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--coral-text); } .rs-q-f { font-size: 12px; color: var(--ink2); }
+.rs-q-t { font-family: var(--fd); font-weight: 700; font-size: 16px; color: var(--ink); margin-bottom: 14px; line-height: 1.35; }
+.rs-sub { font-size: 12px; font-weight: 700; color: var(--ink); margin: 16px 0 8px; }
+.rs-masked { padding: 14px; background: var(--bg2); border-radius: var(--rx); font-size: 12.5px; color: var(--ink2); text-align: center; line-height: 1.6; }
+.rs-note { font-size: 12px; color: var(--ink2); margin: 0 0 16px; line-height: 1.6; }
+.rs-scale { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.rs-scale-v { font-family: var(--fd); font-weight: 800; font-size: 34px; color: var(--ink); } .rs-scale-v span { font-size: 16px; color: var(--ink2); }
+.rs-scale-d { font-size: 12.5px; color: var(--ink2); }
+.rs-tblwrap { overflow-x: auto; } .rs-tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.rs-tbl th, .rs-tbl td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--border); color: var(--ink2); } .rs-tbl th:first-child, .rs-tbl td:first-child { text-align: left; } .rs-tbl thead th { color: var(--ink); font-weight: 700; } .rs-tbl tbody th { color: var(--ink); font-weight: 600; }
+.rs-words { display: flex; flex-wrap: wrap; gap: 8px; } .rs-word { padding: 5px 11px; border-radius: 99px; background: var(--bg3); font-size: 12.5px; color: var(--ink); } .rs-word b { color: var(--coral-text); margin-left: 3px; }
+.rs-verb { background: var(--bg2); border-radius: var(--rx); padding: 10px 12px; margin-bottom: 8px; font-size: 13px; color: var(--ink); line-height: 1.55; } .rs-verb span { display: block; margin-top: 3px; font-size: 11px; color: var(--ink2); }
 /* Volume slider */
 .vol-wrap { display: flex; align-items: center; gap: 14px; }
 .vol-num { font-family: var(--fd); font-weight: 800; font-size: 32px; color: var(--ink); min-width: 80px; }
@@ -1168,7 +1226,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <div class="page" id="page-results">
         <!-- Dynamic campaign selector -->
         <div id="results-camp-selector" style="display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap">
-          <div style="font-size:13px;color:var(--ink3)">Sélectionne une campagne pour voir ses résultats détaillés.</div>
+          <div style="font-size:13px;color:var(--ink2)">Chargement des campagnes…</div>
         </div>
         <!-- Dynamic content area -->
         <div id="results-content">
@@ -1179,19 +1237,6 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <button class="tb-btn tb-btn-primary" onclick="navTo('campaigns',[...document.querySelectorAll('.sb-item')].find(b=>b.textContent.includes('campagnes')))">Voir mes campagnes <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
           </div>
         </div>
-        <!-- Legacy panels (hidden, kept for resTab() compatibility) -->
-        <div class="res-panel" id="res-synthesis" style="display:none"></div>
-        <div class="res-panel" id="res-verbatims" style="display:none">
-          <div class="verbatim-filters"></div>
-          <div class="verbatim-grid" id="verbatim-list"></div>
-        </div>
-        <div class="res-panel" id="res-clusters" style="display:none">
-          <div class="cluster-map" id="cluster-map"></div>
-          <div id="cluster-detail"></div>
-        </div>
-        <div class="res-panel" id="res-recos" style="display:none">
-          <div class="reco-list" id="reco-list"></div>
-        </div>
         <!-- REMOVED static fake data (Decathlon trail shoe content) -->
       </div>
 
@@ -1199,7 +1244,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <div class="page" id="page-campaigns">
         <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
           <input class="field-inp" id="camp-search-inp" aria-label="Rechercher une campagne" style="max-width:280px" placeholder="Rechercher une campagne…" oninput="filterCampaigns()">
-          <select class="field-inp" id="camp-status-sel" aria-label="Filtrer par statut" style="max-width:180px;cursor:pointer" onchange="filterCampaigns()"><option value="">Tous les statuts</option><option value="active">En cours</option><option value="ended">Terminée</option><option value="draft">Brouillon</option></select>
+          <select class="field-inp" id="camp-status-sel" aria-label="Filtrer par statut" style="max-width:180px;cursor:pointer" onchange="filterCampaigns()"><option value="">Tous les statuts</option><option value="active">En cours</option><option value="completed">Terminée</option><option value="draft">Brouillon</option><option value="archived">Archivée</option></select>
           <button class="tb-btn tb-btn-primary" style="margin-left:auto" onclick="navTo('create',document.querySelectorAll('.sb-item')[1])">+ Nouvelle campagne</button>
         </div>
         <div class="card">
@@ -1412,138 +1457,276 @@ function removeWizQ(n) {
   if(btn) btn.style.display = 'flex';
 }
 
-// ═══ CAMPAIGN MODAL ══════════════════════════════════════════
+// ═══ CAMPAIGN MODAL (modification seulement : les résultats sont dans la page « Résultats ») ═══
 let _campModalCampUnsub = null;
 let _campModalAnswersUnsub = null;
-let _campModalCache = { c: null, answers: null };
-function viewCampaign(campaignId) {
-  const modal = document.getElementById('camp-modal');
-  document.getElementById('camp-modal-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink3);font-size:13px">Chargement…</div>';
-  modal.style.display = 'flex';
-  if (_campModalCampUnsub) _campModalCampUnsub();
-  if (_campModalAnswersUnsub) _campModalAnswersUnsub();
-  _campModalCache = { c: null, answers: null };
-  _campModalCampUnsub = db.collection('campaigns').doc(campaignId).onSnapshot(campDoc => {
-    if(!campDoc.exists){ document.getElementById('camp-modal-body').innerHTML='<div style="padding:20px;color:var(--red-text)">Campagne introuvable.</div>'; return; }
-    _campModalCache.c = { id: campDoc.id, ...campDoc.data() };
-    if (_campModalCache.answers) renderCampModal(_campModalCache.c, _campModalCache.answers);
-  }, e => {
-    document.getElementById('camp-modal-body').innerHTML = `<div style="padding:20px;color:var(--red-text)">Erreur : ${e.message}</div>`;
-  });
-  _campModalAnswersUnsub = db.collection('answers').where('campaignId','==',campaignId).where('merchantId','==',auth.currentUser.uid).onSnapshot(answersSnap => {
-    _campModalCache.answers = answersSnap.docs.map(d => d.data());
-    if (_campModalCache.c) renderCampModal(_campModalCache.c, _campModalCache.answers);
-  }, e => {
-    document.getElementById('camp-modal-body').innerHTML = `<div style="padding:20px;color:var(--red-text)">Erreur : ${e.message}</div>`;
-  });
+// Ancien point d'entrée (bouton « Voir » des campagnes) : ouvre maintenant la page Résultats sur cette campagne.
+function viewCampaign(campaignId) { openResults(campaignId); }
+
+// ═══ RÉSULTATS ══════════════════════════════════════════════════════════════
+// Trois onglets : Terminées (résultats complets, archivables), En cours, Archivées. Le détail d'une campagne réunit la
+// participation, le calendrier des réponses, chaque question analysée selon son format, le profil des répondants et
+// ce que la campagne a rapporté au commerce. Seuil d'anonymat : rien n'est détaillé sous 5 réponses.
+const RES_MIN = 5;
+let _resTab = null, _resSel = null, _resAnswers = null, _resEvents = null, _resUnsub = null, _resTextOpen = {};
+const RES_STOP = new Set(('le la les un une des de du d l et ou à au aux en dans sur par pour avec sans que qui quoi est sont très plus pas ne ce cet cette ces mon ma mes ton ta tes son sa ses je tu il elle on nous vous ils elles y a ai as se si mais donc car comme aussi bien tout tous toute toutes fait faire être avoir c j m n s t qu ça cela ceci chez encore juste peu trop moins beaucoup vraiment souvent parfois toujours jamais aime aimerais serait sera être faut fois même autre autres'.split(' ')));
+const RES_AGES = ['-16','16-17','18-24','25-34','35-49','50-64','65+'];
+function resAgeBucket(v){ const s = String(v); if(RES_AGES.includes(s)) return s; const n = Number(v); if(!isFinite(n)) return s; return n<16?'-16':n<=17?'16-17':n<=24?'18-24':n<=34?'25-34':n<=49?'35-49':n<=64?'50-64':'65+'; }
+function resKind(c){ return c.archived ? 'archived' : (campStatus(c) === 'completed' ? 'done' : 'live'); }
+function resGroups(){ const g = { done: [], live: [], archived: [] }; (_mCampaigns || []).forEach(c => g[resKind(c)].push(c)); return g; }
+const fmtDayShort = ms => new Date(ms).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+const fmtDayLong = ms => new Date(ms).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+const parisDayKey = ms => new Date(ms).toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
+const rsPct = (n, t) => t ? Math.round(n / t * 100) : 0;
+function rsMedian(arr){ if(!arr.length) return null; const a = [...arr].sort((x, y) => x - y), m = Math.floor(a.length / 2); return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; }
+function campQuestions(c){ return (c.questions && c.questions.length) ? c.questions : [{ q: c.question, format: c.format, options: c.options }]; }
+
+function renderResultsPage(){
+  const sel = document.getElementById('results-camp-selector'), box = document.getElementById('results-content');
+  if(!sel || !box) return;
+  if(_resSel){ const c = (_mCampaigns || []).find(x => x.id === _resSel); if(c){ renderResultsDetail(c); return; } _resSel = null; }
+  renderResultsList();
 }
 
-function renderCampModal(c, answers) {
-  const pct = campProgress(c);
-  const stMap   = { active:'En cours', draft:'Brouillon', paused:'Suspendue', completed:'Terminée' };
-  const stColor = { active:'var(--coral)', draft:'var(--ink3)', paused:'var(--amber)', completed:'var(--mint)' };
-  const dateStr = c.createdAt?.toDate ? c.createdAt.toDate().toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : '';
+function renderResultsList(){
+  const sel = document.getElementById('results-camp-selector'), box = document.getElementById('results-content');
+  const g = resGroups();
+  if(!_resTab) _resTab = g.done.length ? 'done' : (g.live.length ? 'live' : (g.archived.length ? 'archived' : 'done'));
+  const tabs = [['done', 'Terminées'], ['live', 'En cours'], ['archived', 'Archivées']];
+  sel.innerHTML = `<div class="rs-tabs" role="tablist" aria-label="Campagnes">${tabs.map(([k, l]) => `<button type="button" role="tab" aria-selected="${_resTab === k}" class="rs-tab${_resTab === k ? ' on' : ''}" onclick="resTab('${k}')">${l} <span class="rs-tab-n">${g[k].length}</span></button>`).join('')}</div>`;
+  const list = [...g[_resTab]].sort((a, b) => (campMs(b.endsAt) || campMs(b.createdAt)) - (campMs(a.endsAt) || campMs(a.createdAt)));
+  const intro = { done: 'Les résultats complets des campagnes terminées. Une fois consultées, archivez-les pour garder cet écran lisible : l\'archivage est réversible et ne rend aucune question au quota.',
+    live: 'Les campagnes encore ouvertes : leurs résultats se mettent à jour en direct. Elles pourront être archivées une fois terminées.',
+    archived: 'Les campagnes archivées restent consultables et peuvent être désarchivées à tout moment.' }[_resTab];
+  if(!list.length){
+    const empty = { done: 'Aucune campagne terminée pour l\'instant.', live: 'Aucune campagne en cours.', archived: 'Aucune campagne archivée.' }[_resTab];
+    box.innerHTML = `<div class="rs-intro">${intro}</div><div class="rs-empty"><div class="rs-empty-t">${empty}</div><div class="rs-empty-d">Les campagnes de l'onglet « En cours » deviennent « Terminées » à la fin de leur durée, ou quand vous les arrêtez.</div><button class="tb-btn tb-btn-primary" onclick="navTo('campaigns',[...document.querySelectorAll('.sb-item')].find(b=>b.textContent.includes('campagnes')))">Voir mes campagnes</button></div>`;
+    return;
+  }
+  box.innerHTML = `<div class="rs-intro">${intro}</div><div class="rs-grid">${list.map(c => {
+    const end = campMs(c.endsAt) || campMs(c.completedAt), start = campMs(c.createdAt), kind = resKind(c);
+    const dates = start ? ('Du ' + fmtDayShort(start) + (end ? ' au ' + fmtDayLong(end) : ' · ' + (kind === 'live' ? 'en cours' : ''))) : '';
+    const nq = campQuestions(c).length;
+    return `<div class="rs-card">
+      <div class="rs-card-top"><span class="rs-pill ${kind}">${kind === 'done' ? 'Terminée' : kind === 'archived' ? 'Archivée' : (campStatus(c) === 'paused' ? 'Suspendue' : 'En cours')}</span><span class="rs-card-d">${dates}</span></div>
+      <div class="rs-card-t">${esc(c.name || c.question || '—')}</div>
+      <div class="rs-card-s">${nq} question${nq > 1 ? 's' : ''} · ${esc(c.cityLabel || c.targetCity || '')}</div>
+      <div class="rs-card-n"><b>${c.answersCount || 0}</b> réponse${(c.answersCount || 0) > 1 ? 's' : ''}</div>
+      <div class="rs-card-a"><button class="tb-btn tb-btn-primary" onclick="openResults('${c.id}')">Voir les résultats</button>${kind === 'done' ? `<button class="tb-btn tb-btn-ghost" onclick="archiveCampaign('${c.id}',true)">Archiver</button>` : kind === 'archived' ? `<button class="tb-btn tb-btn-ghost" onclick="archiveCampaign('${c.id}',false)">Désarchiver</button>` : ''}</div>
+    </div>`; }).join('')}</div>`;
+}
+function resTab(k){ _resTab = k; renderResultsList(); }
 
-  // Une campagne a jusqu'à 3 questions distinctes (c.questions[]) — chaque réponse porte
-  // un questionIdx. On casse la distribution par question pour ne pas mélanger les
-  // réponses à des questions différentes dans un seul graphique (bug corrigé : avant,
-  // tout était compté avec les seules options de la question 1).
-  const distQuestions = (c.questions && c.questions.length) ? c.questions : [{ q: c.question, format: c.format, options: c.options }];
-  if(!answers.length) {
-    distHTML = '<div style="margin-top:20px;text-align:center;padding:24px;background:var(--bg2);border-radius:var(--rx);color:var(--ink3);font-size:13px">Aucune réponse pour l\'instant. La campagne est en attente de répondants.</div>';
+function openResults(id){
+  _resSel = id; _resAnswers = null; _resEvents = null; _resTextOpen = {};
+  const c = (_mCampaigns || []).find(x => x.id === id);
+  if(c) _resTab = resKind(c);
+  navTo('results', [...document.querySelectorAll('.sb-item')].find(b => (b.getAttribute('onclick') || '').includes("'results'")));
+  if(_resUnsub) { _resUnsub(); _resUnsub = null; }
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if(!uid) return;
+  _resUnsub = db.collection('answers').where('campaignId', '==', id).where('merchantId', '==', uid).onSnapshot(snap => {
+    _resAnswers = snap.docs.map(d => d.data());
+    if(_resSel === id) renderResultsPage();
+  }, e => { const box = document.getElementById('results-content'); if(box) box.innerHTML = `<div class="rs-empty"><div class="rs-empty-t">Impossible de charger les réponses</div><div class="rs-empty-d">${esc(e.message)}</div></div>`; });
+  db.collection('consentEvents').where('merchantId', '==', uid).get().then(s => { _resEvents = s.docs.map(d => d.data()); if(_resSel === id && _resAnswers) renderResultsPage(); }).catch(() => { _resEvents = []; });
+}
+function closeResults(){
+  if(_resUnsub) { _resUnsub(); _resUnsub = null; }
+  _resSel = null; _resAnswers = null; _resEvents = null;
+  renderResultsPage();
+}
+async function archiveCampaign(id, flag){
+  const c = (_mCampaigns || []).find(x => x.id === id); if(!c) return;
+  try {
+    const upd = flag ? { archived: true, archivedAt: firebase.firestore.FieldValue.serverTimestamp(), status: 'completed' }
+                     : { archived: false, archivedAt: firebase.firestore.FieldValue.delete() };
+    await db.collection('campaigns').doc(id).update(upd);
+    showToast(flag ? 'Campagne archivée' : 'Campagne désarchivée', 'success');
+    if(_resSel === id) { _resTab = flag ? 'archived' : 'done'; closeResults(); } else renderResultsList();
+  } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
+}
+
+// ── Calcul des résultats (uniquement à partir des réponses valides : les réponses lues trop vite sont écartées) ──
+function computeResults(c, all, events){
+  const valid = all.filter(a => !a.flagged), excluded = all.length - valid.length;
+  const qs = campQuestions(c);
+  const perUser = {};
+  valid.forEach(a => { (perUser[a.userId] = perUser[a.userId] || new Set()).add(a.questionIdx || 0); });
+  const respondents = Object.keys(perUser).length;
+  const complete = Object.values(perUser).filter(s => s.size >= qs.length).length;
+  const medMs = rsMedian(valid.map(a => a.responseMs).filter(x => typeof x === 'number' && x > 0));
+  const discovery = valid.filter(a => a.discovery === true).length;
+  const points = valid.reduce((s, a) => s + (Number(a.pointsAwarded) || 0), 0);
+  const times = valid.map(a => campMs(a.createdAt)).filter(Boolean).sort((x, y) => x - y);
+  const start = campMs(c.createdAt) || times[0] || Date.now();
+  const rawEnd = campMs(c.endsAt) || campMs(c.completedAt) || 0;
+  const end = rawEnd && rawEnd < Date.now() ? rawEnd : Math.max(times[times.length - 1] || 0, Date.now());
+  // Calendrier : un point par jour (par semaine au-delà de 60 jours)
+  const byDay = {}; times.forEach(t => { const k = parisDayKey(t); byDay[k] = (byDay[k] || 0) + 1; });
+  const dayMs = 86400000, spanDays = Math.max(1, Math.min(400, Math.ceil((Math.max(end, times[times.length - 1] || 0) - start) / dayMs) + 1));
+  let days = [];
+  for(let i = 0; i < spanDays; i++){ const ms = start + i * dayMs, k = parisDayKey(ms); days.push({ key: k, ms, n: byDay[k] || 0 }); }
+  if(days.length > 60){ const w = []; for(let i = 0; i < days.length; i += 7){ const chunk = days.slice(i, i + 7); w.push({ key: chunk[0].key, ms: chunk[0].ms, n: chunk.reduce((s, d) => s + d.n, 0), week: true }); } days = w; }
+  const peak = days.reduce((b, d) => d.n > (b ? b.n : 0) ? d : b, null);
+  // Quand répondent-ils ? (heure et jour, à Paris)
+  const buckets = { 'Matin (6 h – 12 h)': 0, 'Après-midi (12 h – 18 h)': 0, 'Soirée (18 h – 23 h)': 0, 'Nuit (23 h – 6 h)': 0 };
+  const dow = { 'Lundi': 0, 'Mardi': 0, 'Mercredi': 0, 'Jeudi': 0, 'Vendredi': 0, 'Samedi': 0, 'Dimanche': 0 };
+  times.forEach(t => {
+    const h = +new Date(t).toLocaleString('en-GB', { timeZone: 'Europe/Paris', hour: '2-digit', hourCycle: 'h23' });
+    buckets[h >= 6 && h < 12 ? 'Matin (6 h – 12 h)' : h >= 12 && h < 18 ? 'Après-midi (12 h – 18 h)' : h >= 18 && h < 23 ? 'Soirée (18 h – 23 h)' : 'Nuit (23 h – 6 h)']++;
+    const d = new Date(t).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long' }); dow[d.charAt(0).toUpperCase() + d.slice(1)]++;
+  });
+  // Profil : une personne compte une seule fois, même si elle a répondu à plusieurs questions.
+  const prof = {}; valid.forEach(a => { const u = prof[a.userId] = prof[a.userId] || { age: '', ints: [] }; if(!u.age && a.respondentAge) u.age = a.respondentAge; if(!u.ints.length && (a.respondentInterests || []).length) u.ints = a.respondentInterests; });
+  const withAge = Object.values(prof).filter(u => u.age);
+  const ages = {}; withAge.forEach(u => { const k = resAgeBucket(u.age); ages[k] = (ages[k] || 0) + 1; });
+  const ints = {}; Object.values(prof).forEach(u => u.ints.forEach(t => { ints[t] = (ints[t] || 0) + 1; }));
+  const newFollowers = (events || []).filter(e => e.action === 'granted' && campMs(e.createdAt) >= start && campMs(e.createdAt) <= end + dayMs).length;
+  const others = (_mCampaigns || []).filter(x => x.id !== c.id && (x.answersCount || 0) > 0);
+  const avgOthers = others.length ? Math.round(others.reduce((s, x) => s + (x.answersCount || 0), 0) / others.length) : null;
+  return { valid, excluded, qs, respondents, complete, medMs, discovery, points, start, end, days, peak, buckets, dow, withAge, ages, ints, newFollowers, avgOthers };
+}
+
+// ── Petits composants d'affichage ──
+function rsBars(rows, opt){
+  opt = opt || {}; const max = Math.max(1, ...rows.map(r => r.n));
+  return rows.map(r => `<div class="rs-bar-row"><div class="rs-bar-l">${esc(r.label)}</div><div class="rs-bar"><div class="rs-bar-f" style="width:${Math.round(r.n / max * 100)}%;${opt.color ? 'background:' + opt.color : ''}"></div></div><div class="rs-bar-v">${opt.pct ? rsPct(r.n, opt.total) + ' % ' : ''}<span>(${r.n})</span></div></div>`).join('');
+}
+function rsTimeline(days){
+  const W = 640, H = 150, L = 28, B = 22, T = 10, max = Math.max(1, ...days.map(d => d.n)), bw = (W - L - 8) / days.length;
+  const bars = days.map((d, i) => { const h = Math.round((H - B - T) * d.n / max); return `<rect x="${(L + i * bw + bw * 0.12).toFixed(1)}" y="${H - B - h}" width="${Math.max(1.5, bw * 0.76).toFixed(1)}" height="${h}" rx="2" fill="var(--coral)"><title>${d.week ? 'Semaine du ' : ''}${fmtDayLong(d.ms)} : ${d.n} réponse${d.n > 1 ? 's' : ''}</title></rect>`; }).join('');
+  const mid = days[Math.floor(days.length / 2)];
+  const lab = (x, d, anchor) => `<text x="${x}" y="${H - 5}" font-size="10" fill="var(--ink2)" text-anchor="${anchor}">${fmtDayShort(d.ms)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Réponses par ${days[0] && days[0].week ? 'semaine' : 'jour'}"><line x1="${L}" y1="${H - B}" x2="${W - 8}" y2="${H - B}" stroke="var(--border)"/><text x="${L - 6}" y="${T + 8}" font-size="10" fill="var(--ink2)" text-anchor="end">${max}</text><text x="${L - 6}" y="${H - B}" font-size="10" fill="var(--ink2)" text-anchor="end">0</text>${bars}${lab(L, days[0], 'start')}${days.length > 2 ? lab(L + (W - L - 8) / 2, mid, 'middle') : ''}${lab(W - 8, days[days.length - 1], 'end')}</svg>`;
+}
+function rsKpi(v, l, s){ return `<div class="rs-kpi"><div class="rs-kpi-v">${v}</div><div class="rs-kpi-l">${l}</div>${s ? `<div class="rs-kpi-s">${s}</div>` : ''}</div>`; }
+const rsMasked = n => `<div class="rs-masked">Encore ${RES_MIN - n} réponse${RES_MIN - n > 1 ? 's' : ''} avant d'afficher les résultats de cette question. Ce seuil protège l'anonymat des répondants.</div>`;
+const fmtSec = ms => ms == null ? '—' : (ms / 1000 < 10 ? (ms / 1000).toFixed(1).replace('.', ',') : Math.round(ms / 1000)) + ' s';
+
+function rsQuestionHTML(q, idx, r, total){
+  const qa = r.valid.filter(a => (a.questionIdx || 0) === idx);
+  const head = `<div class="rs-q-h"><span class="rs-q-n">Question ${idx + 1}${total > 1 ? ' / ' + total : ''}</span><span class="rs-q-f">${{ mcq: 'Choix multiple', scale: 'Échelle 1–10', rank: 'Classement', text: 'Texte libre' }[q.format] || ''} · ${qa.length} réponse${qa.length > 1 ? 's' : ''}</span></div><div class="rs-q-t">${esc(q.q || '')}</div>`;
+  if(qa.length < RES_MIN) return `<div class="rs-q card">${head}${qa.length ? rsMasked(qa.length) : '<div class="rs-masked">Aucune réponse pour cette question.</div>'}</div>`;
+  let body = '';
+  if(q.format === 'mcq' && (q.options || []).length){
+    const counts = {}; q.options.forEach(o => counts[o] = 0); qa.forEach(a => { if(counts[a.answer] !== undefined) counts[a.answer]++; });
+    const rows = q.options.map(o => ({ label: o, n: counts[o] })).sort((x, y) => y.n - x.n), tot = rows.reduce((s, x) => s + x.n, 0);
+    body = rsBars(rows, { pct: true, total: tot });
+    // Réponse par tranche d'âge (abonnés seulement : les réponses de découverte n'ont pas d'âge)
+    const aged = qa.filter(a => a.respondentAge);
+    if(aged.length >= 10){
+      const groups = {}; aged.forEach(a => { const k = resAgeBucket(a.respondentAge); (groups[k] = groups[k] || []).push(a); });
+      const cols = RES_AGES.filter(k => (groups[k] || []).length >= 3);
+      if(cols.length >= 2) body += `<div class="rs-sub">Par tranche d'âge <span>(abonnés, tranches d'au moins 3 réponses)</span></div><div class="rs-tblwrap" tabindex="0" role="region" aria-label="Réponses par tranche d'âge"><table class="rs-tbl"><thead><tr><th scope="col">Réponse</th>${cols.map(k => `<th scope="col">${k}</th>`).join('')}</tr></thead><tbody>${rows.map(rw => `<tr><th scope="row">${esc(rw.label)}</th>${cols.map(k => { const g = groups[k]; return `<td>${rsPct(g.filter(a => a.answer === rw.label).length, g.length)} %</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`;
+    }
+  } else if(q.format === 'scale'){
+    const vals = qa.map(a => Number(a.answer)).filter(v => v >= 1 && v <= 10);
+    const avg = vals.reduce((s, v) => s + v, 0) / (vals.length || 1);
+    const dist = []; for(let i = 1; i <= 10; i++) dist.push({ label: String(i), n: vals.filter(v => v === i).length });
+    body = `<div class="rs-scale"><div class="rs-scale-v">${avg.toFixed(1).replace('.', ',')}<span>/10</span></div><div class="rs-scale-d">moyenne · médiane ${String(rsMedian(vals)).replace('.', ',')} · ${rsPct(vals.filter(v => v >= 8).length, vals.length)} % de notes ≥ 8 · ${rsPct(vals.filter(v => v <= 4).length, vals.length)} % de notes ≤ 4</div></div>` + rsBars(dist);
+  } else if(q.format === 'rank'){
+    const pos = {}, cnt = {};
+    qa.forEach(a => String(a.answer || '').split(' > ').forEach((it, i) => { pos[it] = (pos[it] || 0) + i + 1; cnt[it] = (cnt[it] || 0) + 1; }));
+    const rows = Object.keys(pos).map(k => ({ label: k, avg: pos[k] / cnt[k] })).sort((x, y) => x.avg - y.avg);
+    body = `<div class="rs-sub" style="margin-top:0">Rang moyen (1 = placé en premier)</div>` + rows.map((rw, i) => `<div class="rs-bar-row"><div class="rs-bar-l"><b>${i + 1}.</b> ${esc(rw.label)}</div><div class="rs-bar"><div class="rs-bar-f" style="width:${Math.round((1 - (rw.avg - 1) / Math.max(1, rows.length - 1)) * 100)}%"></div></div><div class="rs-bar-v">rang ${rw.avg.toFixed(1).replace('.', ',')}</div></div>`).join('');
   } else {
-    distHTML = distQuestions.map((q, idx) => {
-      const qAnswers = answers.filter(a => (a.questionIdx || 0) === idx);
-      const label = distQuestions.length > 1 ? `Q${idx+1} — ${esc(q.q || '')}` : 'Distribution des réponses';
-      let body;
-      if(qAnswers.length < RESULTS_MIN) {
-        const left = RESULTS_MIN - qAnswers.length;
-        body = `<div style="color:var(--ink3);font-size:12.5px;text-align:center;padding:14px;background:var(--bg2);border-radius:var(--rx)">Encore ${left} réponse${left>1?'s':''} avant les résultats. Ce seuil protège l'anonymat des répondants.</div>`;
-      } else if(q.format === 'mcq' && q.options?.length) {
-        const counts = {};
-        q.options.forEach(o => counts[o] = 0);
-        qAnswers.forEach(a => { if(counts[a.answer] !== undefined) counts[a.answer]++; });
-        const total = Object.values(counts).reduce((a,b) => a+b, 0);
-        body = !total ? '<div style="color:var(--ink3);font-size:12px;text-align:center;padding:12px">Aucune réponse pour l\'instant.</div>'
-          : q.options.map(opt => {
-              const n = counts[opt]||0; const p = total ? Math.round(n/total*100) : 0;
-              return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--ink2)">${esc(opt)}</span><span style="font-weight:700;color:var(--coral-text)">${p}% <span style="font-weight:400;color:var(--ink4)">(${n})</span></span></div><div style="background:var(--bg3);border-radius:4px;height:7px;overflow:hidden"><div style="background:linear-gradient(90deg,var(--coral),var(--violet));height:100%;width:${p}%;border-radius:4px"></div></div></div>`;
-            }).join('');
-      } else if(qAnswers.length) {
-        body = `<div style="font-size:11px;color:var(--ink3);margin-bottom:8px">${qAnswers.length} réponse${qAnswers.length>1?'s':''}</div>${qAnswers.slice(0,5).map(a=>`<div style="background:var(--bg2);border-radius:var(--rx);padding:10px 12px;margin-bottom:8px;font-size:12px;color:var(--ink2)">"${esc(String(a.answer ?? '—'))}"</div>`).join('')}`;
-      } else {
-        body = '<div style="color:var(--ink3);font-size:12px;text-align:center;padding:12px">Aucune réponse pour l\'instant.</div>';
-      }
-      return `<div style="margin-top:20px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">${label}</div>${body}</div>`;
-    }).join('');
+    const words = {}; qa.forEach(a => String(a.answer || '').toLowerCase().split(/[^a-zàâäçéèêëîïôöûùüÿœ]+/).forEach(w => { if(w.length >= 4 && !RES_STOP.has(w)) words[w] = (words[w] || 0) + 1; }));
+    const top = Object.entries(words).filter(([, n]) => n >= 2).sort((x, y) => y[1] - x[1]).slice(0, 8);
+    const sorted = [...qa].sort((x, y) => campMs(y.createdAt) - campMs(x.createdAt)), open = !!_resTextOpen[idx], shown = open ? sorted : sorted.slice(0, 8);
+    body = (top.length ? `<div class="rs-sub" style="margin-top:0">Mots qui reviennent</div><div class="rs-words">${top.map(([w, n]) => `<span class="rs-word">${esc(w)} <b>${n}</b></span>`).join('')}</div>` : '')
+      + `<div class="rs-sub">Réponses ${open ? '' : '(les plus récentes)'}</div>${shown.map(a => `<div class="rs-verb">« ${esc(String(a.answer || '').slice(0, 500))} »<span>${fmtDayShort(campMs(a.createdAt))}${a.respondentAge ? ' · ' + esc(resAgeBucket(a.respondentAge)) + ' ans' : ''}</span></div>`).join('')}`
+      + (sorted.length > 8 ? `<button class="tb-btn tb-btn-ghost" style="margin-top:6px" onclick="_resTextOpen[${idx}]=!_resTextOpen[${idx}];renderResultsPage()">${open ? 'Réduire' : 'Voir les ' + sorted.length + ' réponses'}</button>` : '');
   }
+  return `<div class="rs-q card">${head}${body}</div>`;
+}
 
-  // Profil des répondants (depuis les champs enrichis)
-  let profileHTML = '';
-  const respondentsWithAge = answers.filter(a => a.respondentAge);
-  if(respondentsWithAge.length >= RESULTS_MIN) {
-    const ageCounts = {};
-    // L'âge est stocké en nombre : on le regroupe en tranches (sinon une ligne par âge, illisible).
-    const ageBucket = v => { const n = Number(v); if(!isFinite(n)) return String(v); return n<16?'-16':n<=17?'16-17':n<=24?'18-24':n<=34?'25-34':n<=49?'35-49':n<=64?'50-64':'65+'; };
-    respondentsWithAge.forEach(a => { const k = ageBucket(a.respondentAge); ageCounts[k] = (ageCounts[k]||0) + 1; });
-    const ageOrder = ['-16','16-17','18-24','25-34','35-49','50-64','65+'];
-    const sortedAge = Object.entries(ageCounts).sort((x,y) => ageOrder.indexOf(x[0]) - ageOrder.indexOf(y[0]));
-    const maxAge = Math.max(...sortedAge.map(e=>e[1]));
-    const intCounts = {};
-    answers.forEach(a => (a.respondentInterests||[]).forEach(t => { intCounts[t] = (intCounts[t]||0)+1; }));
-    const sortedInt = Object.entries(intCounts).sort((a,b)=>b[1]-a[1]).slice(0,4);
-    const maxInt = sortedInt.length ? sortedInt[0][1] : 1;
-    profileHTML = `<div style="margin-top:20px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Profil des répondants (${respondentsWithAge.length})</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="background:var(--bg2);border-radius:var(--rx);padding:12px">
-          <div style="font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:8px">Âge</div>
-          ${sortedAge.map(([age,n])=>`<div class="aud-row"><div class="aud-lbl">${age}</div><div class="aud-bar"><div class="aud-fill" style="width:${Math.round(n/maxAge*100)}%;background:var(--coral)"></div></div><div class="aud-val">${n}</div></div>`).join('')}
-        </div>
-        <div style="background:var(--bg2);border-radius:var(--rx);padding:12px">
-          <div style="font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:8px">Intérêts</div>
-          ${sortedInt.length ? sortedInt.map(([t,n])=>`<div class="aud-row"><div class="aud-lbl">${t}</div><div class="aud-bar"><div class="aud-fill" style="width:${Math.round(n/maxInt*100)}%;background:var(--violet)"></div></div><div class="aud-val">${n}</div></div>`).join('') : '<div style="font-size:11px;color:var(--ink3)">Données insuffisantes</div>'}
-        </div>
-      </div>
-    </div>`;
-  }
+function rsHighlights(c, r){
+  const out = [];
+  r.qs.forEach((q, i) => {
+    const qa = r.valid.filter(a => (a.questionIdx || 0) === i);
+    if(qa.length < RES_MIN) return;
+    if(q.format === 'mcq' && (q.options || []).length){
+      const counts = {}; q.options.forEach(o => counts[o] = 0); qa.forEach(a => { if(counts[a.answer] !== undefined) counts[a.answer]++; });
+      const top = Object.entries(counts).sort((x, y) => y[1] - x[1])[0]; if(top && top[1]) out.push(`Question ${i + 1} : « ${esc(top[0])} » arrive en tête avec ${rsPct(top[1], qa.length)} % des réponses.`);
+    } else if(q.format === 'scale'){
+      const vals = qa.map(a => Number(a.answer)).filter(v => v >= 1 && v <= 10); if(vals.length) out.push(`Question ${i + 1} : note moyenne de ${(vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(1).replace('.', ',')}/10.`);
+    }
+  });
+  if(r.peak && r.peak.n >= 3 && r.days.length > 1) out.push(`Pic de participation ${r.peak.week ? 'la semaine du ' : 'le '}${fmtDayLong(r.peak.ms)} (${r.peak.n} réponses).`);
+  const bestB = Object.entries(r.buckets).sort((x, y) => y[1] - x[1])[0]; if(bestB && bestB[1] >= 5) out.push(`Le plus de réponses arrivent ${bestB[0].split(' (')[0].toLowerCase()} (${rsPct(bestB[1], r.valid.length)} %).`);
+  if(r.valid.length >= RES_MIN && r.discovery) out.push(`${rsPct(r.discovery, r.valid.length)} % des réponses viennent d'habitants qui ne vous suivaient pas encore : la campagne vous fait connaître.`);
+  if(r.newFollowers) out.push(r.newFollowers > 1 ? `${r.newFollowers} nouveaux abonnés pendant la campagne.` : '1 nouvel abonné pendant la campagne.');
+  if(r.avgOthers != null && r.valid.length >= RES_MIN) out.push(r.valid.length >= r.avgOthers ? `Meilleure participation que la moyenne de vos autres campagnes (${r.avgOthers} réponses).` : `Participation inférieure à la moyenne de vos autres campagnes (${r.avgOthers} réponses).`);
+  return out;
+}
 
-  const toggleBtn = c.status === 'active'
-    ? `<button onclick="toggleCampStatus('${c.id}','paused')" style="background:var(--ad);color:var(--amber);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">⏸ Suspendre</button>`
-    : c.status === 'paused'
-    ? `<button onclick="toggleCampStatus('${c.id}','active')" style="background:var(--md);color:var(--mint-text);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">▶ Relancer</button>`
-    : '';
+function renderResultsDetail(c){
+  const sel = document.getElementById('results-camp-selector'), box = document.getElementById('results-content');
+  const kind = resKind(c), stLbl = kind === 'done' ? 'Terminée' : kind === 'archived' ? 'Archivée' : (campStatus(c) === 'paused' ? 'Suspendue' : 'En cours');
+  sel.innerHTML = `<button type="button" class="rs-back" onclick="closeResults()">← Toutes les campagnes</button>`;
+  if(_resAnswers === null){ box.innerHTML = '<div class="rs-empty"><div class="rs-empty-t">Chargement des résultats…</div></div>'; return; }
+  const r = computeResults(c, _resAnswers, _resEvents);
+  const qs = r.qs, end = campMs(c.endsAt) || campMs(c.completedAt);
+  const head = `<div class="rs-head card"><div class="rs-head-main"><div class="rs-card-top"><span class="rs-pill ${kind}">${stLbl}</span><span class="rs-card-d">Du ${fmtDayLong(r.start)}${end ? ' au ' + fmtDayLong(end) : (kind === 'live' ? ' · en cours' : '')} · ${esc(c.cityLabel || c.targetCity || '')}${(c.ageRanges || []).length ? ' · ' + esc(c.ageRanges.join(', ')) + ' ans' : ''}</span></div>
+      <h2 class="rs-h-t">${esc(c.name || c.question || '—')}</h2>${qs.length > 1 || (c.name && c.question && c.name !== c.question) ? `<div class="rs-h-q">${qs.map((q, i) => `${i + 1}. ${esc(q.q)}`).join('<br>')}</div>` : ''}</div>
+    <div class="rs-actions">
+      ${kind === 'done' ? `<button class="tb-btn tb-btn-primary" onclick="archiveCampaign('${c.id}',true)">Archiver la campagne</button>` : kind === 'archived' ? `<button class="tb-btn tb-btn-primary" onclick="archiveCampaign('${c.id}',false)">Désarchiver</button>` : `<span class="rs-hint">Archivable une fois terminée</span>`}
+      <button class="tb-btn tb-btn-ghost" onclick="exportCampCSV()">Résumé (CSV)</button>
+      <button class="tb-btn tb-btn-ghost" onclick="exportCampRawCSV()">Réponses (CSV)</button>
+      <button class="tb-btn tb-btn-ghost" onclick="openEditCamp('${c.id}')">Modifier</button>
+      <button class="tb-btn tb-btn-ghost rs-del" onclick="deleteCampaign('${c.id}','${(c.name || c.question || '').replace(/['"\\]/g, '').substring(0, 40)}')">Supprimer</button>
+    </div></div>`;
+  if(!_resAnswers.length){ box.innerHTML = head + '<div class="rs-empty"><div class="rs-empty-t">Aucune réponse pour l\'instant</div><div class="rs-empty-d">Les résultats apparaîtront dès les premières réponses.</div></div>'; return; }
+  const kpis = `<div class="rs-kpis">
+    ${rsKpi(r.valid.length, 'réponses valides', r.excluded ? r.excluded + ' écartée' + (r.excluded > 1 ? 's' : '') + ' (lues trop vite)' : 'aucune écartée')}
+    ${rsKpi(r.respondents, 'répondants', qs.length > 1 ? rsPct(r.complete, r.respondents) + ' % ont répondu à toutes les questions' : 'habitants différents')}
+    ${rsKpi(fmtSec(r.medMs), 'temps de réponse médian', 'par question')}
+    ${rsKpi(rsPct(r.discovery, r.valid.length) + ' %', 'de découverte', r.discovery + ' réponse' + (r.discovery > 1 ? 's' : '') + ' d\'habitants qui ne vous suivaient pas')}
+    ${rsKpi(r.newFollowers, 'nouveaux abonnés', 'pendant la campagne')}
+    ${rsKpi(r.points.toLocaleString('fr-FR'), 'points offerts', 'aux répondants')}
+  </div>`;
+  const hl = rsHighlights(c, r);
+  const highlights = hl.length ? `<div class="card rs-hl"><div class="rs-sec-t">À retenir</div><ul>${hl.map(x => `<li>${x}</li>`).join('')}</ul></div>` : '';
+  const timeline = `<div class="card rs-sec"><div class="rs-sec-t">Réponses dans le temps</div>${rsTimeline(r.days)}</div>`;
+  const when = `<div class="rs-two"><div class="card rs-sec"><div class="rs-sec-t">Moment de la journée</div>${rsBars(Object.entries(r.buckets).map(([label, n]) => ({ label, n })), { pct: true, total: r.valid.length })}</div><div class="card rs-sec"><div class="rs-sec-t">Jour de la semaine</div>${rsBars(Object.entries(r.dow).map(([label, n]) => ({ label, n })), { pct: true, total: r.valid.length })}</div></div>`;
+  const questions = `<div class="rs-sec-h">Résultats par question</div>${qs.map((q, i) => rsQuestionHTML(q, i, r, qs.length)).join('')}`;
+  let profile;
+  if(r.withAge.length >= RES_MIN){
+    const ageRows = RES_AGES.filter(k => r.ages[k]).map(k => ({ label: k + ' ans', n: r.ages[k] })), intRows = Object.entries(r.ints).sort((x, y) => y[1] - x[1]).slice(0, 6).map(([label, n]) => ({ label, n }));
+    profile = `<div class="rs-sec-h">Qui a répondu</div><div class="rs-two"><div class="card rs-sec"><div class="rs-sec-t">Âge <span>(${r.withAge.length} abonnés)</span></div>${rsBars(ageRows, { pct: true, total: r.withAge.length })}</div><div class="card rs-sec"><div class="rs-sec-t">Centres d'intérêt</div>${intRows.length ? rsBars(intRows, { color: 'var(--mint-text)' }) : '<div class="rs-masked">Pas de donnée.</div>'}</div></div><div class="rs-note">L'âge et les centres d'intérêt ne sont transmis que pour les habitants qui vous suivent ; les réponses « découverte » n'en portent pas.</div>`;
+  } else profile = `<div class="rs-sec-h">Qui a répondu</div><div class="card rs-sec"><div class="rs-masked">Le profil (âge, centres d'intérêt) s'affiche à partir de ${RES_MIN} répondants qui vous suivent. Il ne provient jamais des réponses « découverte ».</div></div>`;
+  const compare = r.avgOthers != null ? `<div class="rs-note">Moyenne de vos autres campagnes : ${r.avgOthers} réponses.</div>` : '';
+  box.innerHTML = head + kpis + highlights + timeline + when + questions + profile + compare;
+}
 
-  const qList = (c.questions||[]).length > 1
-    ? `<div style="margin-top:20px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Questions de la campagne (${c.questions.length})</div>${c.questions.map((q,i)=>`<div style="background:var(--bg2);border-radius:var(--rx);padding:10px 12px;margin-bottom:8px"><div style="font-size:10px;color:var(--ink3);margin-bottom:3px">Q${i+1} · ${q.format||'text'}</div><div style="font-size:13px;color:var(--ink)">${q.q}</div></div>`).join('')}</div>` : '';
-
-  document.getElementById('camp-modal-body').innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
-      <div style="flex:1;min-width:0">
-        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:5px">Campagne · ${dateStr}</div>
-        <div style="font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink);line-height:1.3;word-break:break-word">${c.name||c.question||'—'}</div>
-        ${c.name&&c.question&&c.name!==c.question?`<div style="font-size:12px;color:var(--ink3);margin-top:5px">${c.question}</div>`:''}
-        <span style="display:inline-block;margin-top:7px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:${stColor[c.status]||'var(--bg3)'}18;color:${stColor[c.status]||'var(--ink3)'}">${stMap[c.status]||'—'}</span>
-      </div>
-      <button onclick="closeCampModal()" style="background:var(--bg3);border:none;border-radius:99px;width:30px;height:30px;cursor:pointer;font-size:16px;color:var(--ink3);flex-shrink:0;margin-left:12px;display:flex;align-items:center;justify-content:center">×</button>
-    </div>
-    <div style="background:var(--bg2);border-radius:var(--rx);padding:14px">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
-        <span style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">${c.answersCount||0} <span style="font-size:14px;font-weight:600;color:var(--ink3)">réponses</span></span>
-        <span style="font-size:12px;color:var(--ink2)">${campEndLabel(c)}</span>
-      </div>
-      ${pct===null?'':`<div style="background:var(--bg3);border-radius:4px;height:8px;overflow:hidden"><div style="background:linear-gradient(90deg,var(--coral),var(--violet));height:100%;width:${pct}%;border-radius:4px;transition:width .4s"></div></div>`}
-      <div style="font-size:11px;color:var(--ink2);margin-top:6px">${pct===null?'':pct+'% du temps écoulé · '}${c.cityLabel||c.targetCity||''}</div>
-    </div>
-    ${distHTML}
-    ${profileHTML}
-    ${qList}
-    <div style="display:flex;gap:9px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);flex-wrap:wrap">
-      ${toggleBtn}
-      <button onclick="exportCampCSV()" style="background:var(--bg2);color:var(--ink);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer">Exporter en CSV</button>
-      <button onclick="openEditCamp('${c.id}')" style="background:var(--vd);color:var(--violet);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">${icon('edit',{size:12})} Modifier</button>
-      <button onclick="deleteCampaign('${c.id}','${(c.name||c.question||'').replace(/'/g,'').substring(0,40)}')" style="background:rgba(239,68,68,.1);color:var(--red-text);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">${icon('delete',{size:12})} Supprimer</button>
-      <button onclick="closeCampModal()" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;margin-left:auto">Fermer</button>
-    </div>`;
+// ── Exports (jamais d'identifiant d'habitant) ──
+function csvDownload(rows, name){
+  const csv = '\ufeff' + rows.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(';')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+function exportCampCSV(){
+  const c = (_mCampaigns || []).find(x => x.id === _resSel); if(!c || !_resAnswers) return;
+  const r = computeResults(c, _resAnswers, _resEvents), rows = [['Question', 'Réponse', 'Nombre', 'Pourcentage']];
+  r.qs.forEach((q, idx) => {
+    const qa = r.valid.filter(a => (a.questionIdx || 0) === idx);
+    if(qa.length < RES_MIN){ rows.push([q.q, `Moins de ${RES_MIN} réponses, résultats masqués`, qa.length, '']); return; }
+    const counts = {}; qa.forEach(a => { const k = String(a.answer ?? ''); counts[k] = (counts[k] || 0) + 1; });
+    Object.entries(counts).sort((x, y) => y[1] - x[1]).forEach(([k, n]) => rows.push([q.q, k, n, Math.round(n / qa.length * 100) + ' %']));
+  });
+  csvDownload(rows, `noova-resume-${new Date().toISOString().slice(0, 10)}.csv`);
+}
+function exportCampRawCSV(){
+  const c = (_mCampaigns || []).find(x => x.id === _resSel); if(!c || !_resAnswers) return;
+  const r = computeResults(c, _resAnswers, _resEvents), rows = [['Date', 'Question n°', 'Question', 'Réponse', 'Tranche d\'âge', 'Origine', 'Temps de réponse (s)']];
+  r.qs.forEach((q, idx) => {
+    const qa = r.valid.filter(a => (a.questionIdx || 0) === idx);
+    if(qa.length < RES_MIN) return;                                   // même seuil d'anonymat que l'écran
+    qa.sort((x, y) => campMs(x.createdAt) - campMs(y.createdAt)).forEach(a => rows.push([new Date(campMs(a.createdAt)).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }), idx + 1, q.q, a.answer ?? '', a.respondentAge ? resAgeBucket(a.respondentAge) : '', a.discovery ? 'découverte' : 'abonné', typeof a.responseMs === 'number' ? Math.round(a.responseMs / 100) / 10 : '']));
+  });
+  csvDownload(rows, `noova-reponses-${new Date().toISOString().slice(0, 10)}.csv`);
 }
 
 function closeCampModal() {
@@ -1599,7 +1782,7 @@ function openEditCamp(id) {
     </div>
     <div style="display:flex;gap:9px">
       <button onclick="saveEditCamp('${id}')" style="flex:1;background:var(--coral);color:var(--ink);border:none;border-radius:var(--rx);padding:11px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px var(--cg)">Enregistrer</button>
-      <button onclick="viewCampaign('${id}')" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer">Annuler</button>
+      <button onclick="closeCampModal()" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer">Annuler</button>
     </div>`;
 }
 
@@ -1674,7 +1857,7 @@ async function navTo(page, btn){
   const t=titles[page]||[page,''];
   document.getElementById('topbar-title').textContent=t[0];
   document.getElementById('topbar-sub').textContent=t[1];
-  if(page==='results'){renderVerbatims('all');renderClusters();renderRecos()}
+  if(page==='results'){renderResultsPage()}
   if(page==='create'){wzCur=0;resetWizard();wzSync()}
 }
 
@@ -1942,43 +2125,6 @@ function launchCampaign(){
   setTimeout(()=>{navTo('campaigns',document.querySelectorAll('.sb-item')[2])},1500);
 }
 
-// ═══ RESULTS TABS ════════════════════════════════════════════
-function resTab(tab, btn){
-  document.querySelectorAll('.res-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-  document.querySelectorAll('.res-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('res-'+tab).classList.add('active');
-}
-
-// ═══ VERBATIMS ═══════════════════════════════════════════════
-const VERBS=[{theme:'Performance',thc:'rgba(161,78,8,.12)',tc:'var(--violet)',score:4.8,txt:'"Je veux un nom qui évoque la vitesse et l\'endurance sans être trop technique. Quelque chose comme KinetoRun aurait du sens pour moi."',seg:'25–34 · Sport'},{theme:'Légèreté',thc:'rgba(11,171,132,.12)',tc:'var(--mint)',score:4.6,txt:'"Le nom doit suggérer la légèreté. FeatherStep ou AirTrek — quelque chose qui donne envie de courir sans effort."',seg:'18–24 · Bien-être'},{theme:'Accessibilité',thc:'rgba(245,166,35,.12)',tc:'var(--amber)',score:4.2,txt:'"TrailEase ou EasyPath — il faut que ça reste accessible et pas trop intimidant pour les débutants en trail."',seg:'35–49 · Sport'},{theme:'Performance',thc:'rgba(161,78,8,.12)',tc:'var(--violet)',score:4.9,txt:'"Un nom comme PowerTrail ou KineticPro me parlerait davantage. La performance doit être au cœur du naming."',seg:'25–34 · Sport'},{theme:'Émotion',thc:'rgba(224,125,10,.12)',tc:'var(--coral)',score:4.4,txt:'"Je préfère quelque chose qui évoque une émotion, la liberté — type FreeStep ou OpenRun. Pas trop sportif dans les codes."',seg:'18–24 · Culture'},{theme:'Prix',thc:'rgba(239,68,68,.1)',tc:'#EF4444',score:3.1,txt:'"Le nom ne change pas grand chose si le prix reste élevé. Je suis plus sensible au rapport qualité-prix qu\'au branding."',seg:'35–49 · Finance'}];
-function renderVerbatims(filter){
-  const el=document.getElementById('verbatim-list');if(!el)return;el.innerHTML='';
-  const filtered=filter==='all'?VERBS:VERBS.filter(v=>v.theme.toLowerCase().includes(filter)||filter==='neg'&&v.score<3.5);
-  filtered.forEach(v=>{
-    const d=document.createElement('div');d.className='verbatim-card';
-    const stars='⭐'.repeat(Math.round(v.score))+'☆'.repeat(5-Math.round(v.score));
-    d.innerHTML=`<div class="vc-header"><span class="vc-theme" style="background:${v.thc};color:${v.tc}">${v.theme}</span><div class="vc-score"><span style="font-size:12px">${stars}</span><span>${v.score}</span></div></div><div class="vc-text">${v.txt}</div><div class="vc-footer"><div class="vc-meta">${v.seg}</div><div class="vc-actions"><button class="vc-btn" style="background:var(--cd);color:var(--coral-text);display:inline-flex;align-items:center;gap:5px" onclick="showToast('Verbatim ajouté aux favoris','star')">${icon('star',{size:12})} Sauvegarder</button><button class="vc-btn" style="background:var(--md);color:var(--mint-text);display:inline-flex;align-items:center;gap:5px" onclick="showToast('Verbatim copié','document')">${icon('document',{size:12})} Copier</button></div></div>`;
-    el.appendChild(d);
-  });
-}
-function filterVerb(el, f){document.querySelectorAll('.vf-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderVerbatims(f)}
-
-// ═══ CLUSTERS ════════════════════════════════════════════════
-const CLUSTERS=[{n:'Performance & vitesse',pct:74,c:'#E07D0A',bg:'rgba(224,125,10,.12)',size:48,desc:'Les répondants associent le trail à la performance physique et la vitesse. Le naming doit refléter cet ADN.',exs:['KinetoRun','PowerTrail','VelocityStep']},{n:'Légèreté & fluidité',pct:58,c:'#A14E08',bg:'rgba(161,78,8,.12)',size:42,desc:'La légèreté est un critère différenciant fort. Les noms évoquant l\'air, le vol ou la fluidité sont plébiscités.',exs:['FeatherStep','AirTrek','FloatRun']},{n:'Confort & durabilité',pct:49,c:'#0BAB84',bg:'rgba(11,171,132,.15)',size:38,desc:'Un segment de répondants prioritise le confort sur la performance pure. Profil 35-49 ans, trail loisir.',exs:['EasyTrail','ComfortRun','SteadyStep']},{n:'Accessibilité & entrée',pct:41,c:'#F5A623',bg:'rgba(245,166,35,.15)',size:34,desc:'Les débutants cherchent un nom rassurant, non intimidant. Potentiel pour une déclinaison gamme junior.',exs:['TrailEase','OpenRun','FirstStep']},{n:'Nature & liberté',pct:31,c:'#22C55E',bg:'rgba(34,197,94,.12)',size:28,desc:'L\'ancrage nature/outdoor ressort dans un tiers des réponses. Lié au thème éco-responsable.',exs:['WildStep','NatureRun','FreeTrail']},{n:'Sensibilité prix',pct:22,c:'#F87171',bg:'rgba(239,68,68,.1)',size:24,desc:'Un segment minoritaire mais à surveiller — l\'attractivité prix reste un frein à l\'adoption.',exs:[]},{n:'Émotionnel & identitaire',pct:18,c:'#60A5FA',bg:'rgba(96,165,250,.1)',size:20,desc:'Des réponses très personnalisées évoquant l\'identité, l\'appartenance à une communauté de coureurs.',exs:['TribTrail','RunClan','PackRun']}];
-function renderClusters(){
-  const cm=document.getElementById('cluster-map');if(!cm)return;cm.innerHTML='';
-  CLUSTERS.forEach(c=>{const d=document.createElement('div');d.className='cluster-bubble';d.style.cssText=`background:${c.bg};border:2px solid ${c.c}33;color:${c.c};font-size:${Math.max(11,Math.min(15,c.pct/6))}px;cursor:pointer;transition:all .15s`;d.textContent=c.n+' · '+c.pct+'%';d.onclick=()=>{document.getElementById('cluster-detail').scrollIntoView({behavior:'smooth'})};cm.appendChild(d)});
-  const cd=document.getElementById('cluster-detail');if(!cd)return;cd.innerHTML='';
-  CLUSTERS.forEach(c=>{const d=document.createElement('div');d.style.cssText=`background:var(--card);border:1px solid ${c.c}33;border-left:3px solid ${c.c};border-radius:var(--rs);padding:16px 18px;margin-bottom:11px`;d.innerHTML=`<div style="display:flex;align-items:center;gap:11px;margin-bottom:9px"><div style="font-family:var(--fd);font-weight:700;font-size:14px;color:${c.c}">${c.n}</div><div style="margin-left:auto;font-family:var(--fd);font-weight:800;font-size:18px;color:${c.c}">${c.pct}%</div></div><div style="font-size:12px;color:var(--ink2);line-height:1.65;margin-bottom:${c.exs.length?'10px':'0'}">${c.desc}</div>${c.exs.length?`<div style="display:flex;gap:7px;flex-wrap:wrap">${c.exs.map(e=>`<span style="padding:4px 11px;border-radius:99px;background:${c.bg};color:${c.c};font-size:12px;font-weight:700">${e}</span>`).join('')}</div>`:''}`; cd.appendChild(d)});
-}
-
-// ═══ RECOMMENDATIONS ════════════════════════════════════════
-const RECOS=[{priority:'Priorité haute',prio_c:'var(--coral)',border:'var(--coral)',title:'Privilégier la sémantique "Performance" dans le naming final',desc:'74% des répondants associent le trail à la performance et la vitesse. Les noms testés evoquant la cinétique (KinetoRun, VelocityStep) obtiennent les meilleures notes. Évitez les termes trop génériques.',action:'Tester 3 noms phase 2',action_c:'var(--coral)'},{priority:'Priorité haute',prio_c:'var(--coral)',border:'var(--coral)',title:'Segmenter la communication Légèreté vs Performance par âge',desc:'Les 18-24 ans plébiscitent la légèreté (AirTrek, FeatherStep) tandis que les 25-34 ans sont davantage attirés par la performance pure. Envisager deux déclinaisons selon le canal.',action:'Créer étude phase 2',action_c:'var(--coral)'},{priority:'Priorité moyenne',prio_c:'var(--amber)',border:'var(--amber)',title:'Traiter le frein prix dans la stratégie de lancement',desc:'22% des réponses mentionnent le prix comme facteur bloquant indépendamment du nom. Une communication sur le positionnement valeur/qualité est recommandée dès le lancement.',action:'Partager aux équipes',action_c:'var(--amber)'},{priority:'Opportunité',prio_c:'var(--mint)',border:'var(--mint)',title:'Explorer une déclinaison gamme débutants "TrailEase"',desc:'Un segment de 49% prioritise le confort et l\'accessibilité. Le profil 35-49 ans trail loisir est sous-adressé. Un nom rassurant type TrailEase ou OpenRun pourrait conquérir ce segment.',action:'Planifier étude complémentaire',action_c:'var(--mint)'}];
-function renderRecos(){
-  const el=document.getElementById('reco-list');if(!el)return;el.innerHTML='';
-  RECOS.forEach((r,i)=>{const d=document.createElement('div');d.className='reco-card';d.style.borderLeftColor=r.border;d.innerHTML=`<div class="reco-priority" style="color:${r.prio_c}">${r.priority}</div><div class="reco-title">${r.title}</div><div class="reco-desc">${r.desc}</div><div class="reco-action"><button class="reco-action-btn" style="background:${r.prio_c}18;color:${r.prio_c};border:none" onclick="showToast('Action enregistrée','success')">${r.action}</button><button class="reco-action-btn" style="background:var(--card);color:var(--ink3);border:1px solid var(--border);display:inline-flex;align-items:center;gap:5px" onclick="showToast('Copié dans le presse-papiers','document')">${icon('document',{size:12})} Copier</button></div>`;el.appendChild(d)});
-}
-
 // ═══ CONFETTI ════════════════════════════════════════════════
 function spawnConfetti(){
   const clrs=['#E07D0A','#A14E08','#F5A623','#0BAB84','#3B82F6','#FF69B4'];
@@ -2169,7 +2315,6 @@ function exportRegistry() {
 // ═══ INIT ════════════════════════════════════════════════════
 window.addEventListener('load',()=>{
   renderDuration();updatePreview();
-  renderVerbatims('all');renderClusters();renderRecos();
   const inp=document.getElementById('q-text-inp');if(inp)inp.addEventListener('input',updatePreview);
 });
 </script>
@@ -2715,27 +2860,6 @@ async function siretLookupFor(pre) {
 function awLookupSiret() { return siretLookupFor('aw'); }
 function gmwLookupSiret() { return siretLookupFor('gmw'); }
 
-// ═══ RÉSULTATS : seuil d'anonymat et export CSV ═══
-const RESULTS_MIN = 5;
-function exportCampCSV() {
-  const c = _campModalCache.c, answers = _campModalCache.answers || [];
-  if(!c) return;
-  const qs = (c.questions && c.questions.length) ? c.questions : [{ q: c.question, format: c.format, options: c.options }];
-  const rows = [['Question', 'Réponse', 'Nombre', 'Pourcentage']];
-  qs.forEach((q, idx) => {
-    const qa = answers.filter(a => (a.questionIdx || 0) === idx);
-    if(qa.length < RESULTS_MIN) { rows.push([q.q, `Moins de ${RESULTS_MIN} réponses, résultats masqués`, qa.length, '']); return; }
-    const counts = {};
-    qa.forEach(a => { const k = String(a.answer ?? ''); counts[k] = (counts[k] || 0) + 1; });
-    Object.entries(counts).sort((x, y) => y[1] - x[1]).forEach(([k, n]) => rows.push([q.q, k, n, Math.round(n / qa.length * 100) + ' %']));
-  });
-  const csv = '\ufeff' + rows.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(';')).join('\r\n');
-  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  const a = document.createElement('a');
-  a.href = url; a.download = `noova-resultats-${new Date().toISOString().slice(0,10)}.csv`;
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-}
-
 // ═══ PRÉSENTATION (C1) ═══
 const PRO_INTRO = [
   { t: 'Sachez ce que vos clients veulent vraiment.', d: 'Une question posée à vos clients, une répartition claire des réponses. Voici un vrai résultat.',
@@ -2876,9 +3000,10 @@ function loadMerchantCampaigns(uid) {
       snap.forEach(doc => { const c = { id:doc.id, ...doc.data() }; c.status = campStatus(c); _mCampaigns.push(c); });
       // Tri côté client pour éviter l'index composite Firestore
       _mCampaigns.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
-      renderFirestoreCampaigns(_mCampaigns);
+      renderFirestoreCampaigns(_mCampaigns.filter(c => !c.archived));   // les campagnes archivées ne restent visibles que dans Résultats › Archivées
       updateKPIFromCampaigns(_mCampaigns);
       renderAcqCard(_mCampaigns);
+      if(curPage === 'results') renderResultsPage();
     }, err => console.warn('campaigns listener:', err));
 }
 
@@ -2887,7 +3012,7 @@ function filterCampaigns() {
   const s = document.getElementById('camp-status-sel')?.value || '';
   const filtered = _mCampaigns.filter(c => {
     const matchName = !q || (c.name||c.question||'').toLowerCase().includes(q);
-    const matchStatus = !s || c.status === s;
+    const matchStatus = s === 'archived' ? !!c.archived : (!c.archived && (!s || c.status === s));
     return matchName && matchStatus;
   });
   renderFilteredCampaigns(filtered);
