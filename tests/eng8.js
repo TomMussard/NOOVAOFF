@@ -87,11 +87,10 @@ const used=async()=>((await db.doc('merchants/m1/quota/2026-09').get()).data()||
     check('Admin : quota propre à 12 → 2 questions restantes',s1.quota===12&&s1.remaining===2,s1);
     const s2=await callFn('setMerchantQuota',{merchantId:'m1',quota:null},tadm);
     check('Admin : quota vide → retour au défaut (10)',s2.quota===10,s2);
-    // défaut réglable
-    await callFn('setEngagementConfig',{values:{'QUOTA.DEFAULT_MONTHLY_QUESTIONS':20}},tadm);await sleep(800);
+    // le défaut n'est plus réglable depuis l'admin (réglage retiré) : il reste à 10 et l'ancien réglage est refusé
+    const old=await callFn('setEngagementConfig',{values:{'QUOTA.DEFAULT_MONTHLY_QUESTIONS':20}},tadm);
     g=await callFn('getMyQuota',{},tm1);
-    check('Défaut réglable depuis l\'admin (20)',g.quota===20,g);
-    await callFn('setEngagementConfig',{values:{'QUOTA.DEFAULT_MONTHLY_QUESTIONS':null}},tadm);
+    check('Le défaut n\'est plus modifiable depuis l\'admin : ancien réglage refusé, le quota par défaut reste 10',!!old.error&&g.quota===10,{old:old.error,g});
     // notifications : une campagne bloquée n'est jamais notifiée
     await db.doc('merchants/m3').set({role:'merchant',brandName:'Snack',sector:'Restauration',city:'le-mans',status:'verified',monthlyQuestionQuota:0});
     await db.doc('users/u1').update({authorizedMerchants:['m1','m3']});

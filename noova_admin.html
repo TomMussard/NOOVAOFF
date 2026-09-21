@@ -259,7 +259,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
   <!-- ══════════════ TAB ENTREPRISES ══════════════ -->
   <div id="tab-entreprises">
-    <div class="sec-hdr"><h2>Entreprises</h2><p>Gestion et validation des commerçants inscrits sur Noova.</p></div>
+    <div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2>Entreprises</h2><p>Gestion et validation des commerçants inscrits sur Noova. <span id="ent-updated" style="color:var(--ink3)"></span></p></div><button id="ent-refresh" onclick="refreshMerchants(this)" style="padding:8px 16px;background:var(--grad);color:var(--brown);border:none;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--fb);white-space:nowrap">↻ Actualiser</button></div>
 
     <div class="stats">
       <div class="stat-card hl"><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div><div class="stat-n" id="cnt-total">—</div><div class="stat-l">Total</div></div>
@@ -717,6 +717,7 @@ function switchTab(tab, btn) {
   ['entreprises','utilisateurs','diffusion','lancement','moderation','notifications','danger'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
   });
+  if (tab === 'entreprises') loadMerchants();
   if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
   if (tab === 'diffusion') initDiffusion();
   if (tab === 'lancement') loadReadiness();
@@ -733,9 +734,21 @@ async function loadMerchants() {
     snap.forEach(doc => allMerchants.push({ id: doc.id, ...doc.data() }));
     renderMerchants();
     document.getElementById('tb-ent').textContent = allMerchants.length;
+    const u = document.getElementById('ent-updated');
+    if (u) u.textContent = '· Mis à jour à ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    return true;
   } catch(e) {
     document.getElementById('list-pending').innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
+    return false;
   }
+}
+// Bouton « Actualiser » : recharge la liste depuis la base (nouvelles inscriptions, changements faits ailleurs).
+async function refreshMerchants(btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Actualisation…'; }
+  const ok = await loadMerchants();
+  if (btn) { btn.disabled = false; btn.textContent = '↻ Actualiser'; }
+  if (ok) showToast(allMerchants.length + ' entreprise' + (allMerchants.length > 1 ? 's' : '') + ' — liste à jour', 'success');
+  else showToast('Actualisation impossible', 'error');
 }
 
 // ── Gestion des villes (ouverture aux habitants) ────────────────────────────
@@ -912,7 +925,7 @@ async function renderMerchantQuota(m) {
   const own = Number.isInteger(m.monthlyQuestionQuota) ? m.monthlyQuestionQuota : '';
   el.innerHTML = `<input id="md-quota-inp" type="number" min="0" max="1000" value="${own}" placeholder="défaut" style="width:90px;padding:7px 9px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink)">
     <button onclick="saveMerchantQuota('${esc(m.id)}')" style="padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;border:none;background:var(--coral);color:var(--ink);cursor:pointer">Enregistrer</button>
-    <span style="font-size:11px;color:var(--ink3)">Vide = quota par défaut (réglable dans « Réglages de l'engagement »)</span>`;
+    <span style="font-size:11px;color:var(--ink3)">Vide = quota par défaut de la plateforme</span>`;
 }
 async function saveMerchantQuota(id) {
   const raw = document.getElementById('md-quota-inp').value.trim();
@@ -1179,7 +1192,7 @@ function renderAllMerchants() {
   }
   la.innerHTML = filtered.map(m => `
     <div class="merchant-row">
-      <div><div class="m-name">${esc(m.brandName||'—')}</div><div class="m-meta">${esc(m.email||'—')}</div></div>
+      <div><div class="m-name">${esc(m.brandName||'—')}</div><div class="m-meta">${esc(m.email||'—')}</div>${m.status==='rejected'&&m.rejectionReason?`<div class="m-meta" style="color:var(--red-text)">Motif : ${esc(m.rejectionReason)}</div>`:''}</div>
       <div class="m-cell">${esc(m.sector||'—')}</div>
       <div class="m-cell">${esc(m.city||'—')}</div>
       <div class="row-actions">
