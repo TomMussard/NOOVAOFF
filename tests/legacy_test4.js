@@ -47,7 +47,7 @@ async function loginApp(ctx, email) {
   await mkMerchant('mM2', 'm2@t.fr', 'Boulangerie Martin', 'Boulangerie', 'Rue Nationale');
   await mkMerchant('mM3', 'm3@t.fr', 'Salon Belle', 'Beauté', 'Rue Gambetta', { logoUrl: URL_OF('merchants', 'mM3') });
   const now = admin.firestore.FieldValue.serverTimestamp();
-  for (const t of ['a répondu à une question de', 'a répondu à une question de']) await adb.collection('communityEvents').add({ userId: 'uB', displayName: 'Bob', city: 'le-mans', text: t, brand: 'Le Bistrot', createdAt: now });
+  for (const lv of ['Actif', 'Expert']) await adb.collection('communityEvents').add({ type: 'levelup', level: lv, userId: 'uB', displayName: 'Bob', city: 'le-mans', text: 'a atteint le palier ' + lv, brand: '', likeCount: 0, commentCount: 0, createdAt: now });
 
   const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--no-sandbox'] });
   const ctxA = await browser.createBrowserContext(), ctxB = await browser.createBrowserContext(), ctxC = await browser.createBrowserContext();

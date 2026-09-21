@@ -32,59 +32,38 @@ const ADMIN='http://localhost:8950/admin.html';
 const AUTH3='http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=fake';
 const ansX=(u,cid,o={})=>db.doc(`answers/${u}_${cid}_q0`).set({userId:u,campaignId:cid,merchantId:'m1',questionIdx:0,answer:['Café','Thé','Chocolat'][o.opt||0],optionIdx:o.opt==null?0:o.opt,respondentCity:o.city||'le-mans',flagged:!!o.flagged,pointsAwarded:0,createdAt:o.at||Timestamp.now()});
 (async()=>{
-  await T('communauté serveur',async()=>{
+  await T('série et fil (serveur)',async()=>{
     await wipe();
     await db.doc('merchants/m1').set({brandName:'Le Fournil',sector:'Boulangerie',city:'le-mans',status:'verified'});
-    await db.doc('merchants/m2').set({brandName:'Café de la Place',sector:'Restauration',city:'le-mans',status:'verified'});
-    for(let i=1;i<=3;i++)await mkCampaign('c'+i,{merchantId:i===3?'m2':'m1',merchantName:i===3?'Café de la Place':'Le Fournil',question:'Question '+i+' ?',questions:[{q:'Question '+i+' ?',format:'mcq',options:['Café','Thé','Chocolat']}]});
-    await mkCampaign('ct',{question:'Texte ?',format:'text',questions:[{q:'Texte ?',format:'text'}]});
-    await mkCampaign('far',{targetCity:'angers',city:'angers'});
-    await mkUser('me',{name:'Alex',email:'me@t.fr'});
-    for(let i=1;i<=7;i++)await mkUser('s'+i,{name:'Voisin'+i});
-    const old=Timestamp.fromMillis(Date.now()-15*86400000);
-    // semaine en cours : 6 réponses de voisins (dont 1 signalée, 1 d'une autre ville, 1 de la semaine dernière → non comptées)
-    for(let i=1;i<=6;i++)await ansX('s'+i,'c1',{opt:i%3});
-    await ansX('s7','c1',{flagged:true});await ansX('s7','c2',{city:'angers'});await ansX('s7','c3',{at:old});
-    // mes réponses (plus récentes en dernier) : c1, c2 (mcq), ct (texte, exclue), c3
-    await ansX('me','c1',{opt:0,at:Timestamp.fromMillis(Date.now()-3000)});await ansX('me','c2',{opt:1,at:Timestamp.fromMillis(Date.now()-2000)});
-    await db.doc('answers/me_ct_q0').set({userId:'me',campaignId:'ct',questionIdx:0,answer:'un texte libre',optionIdx:-1,respondentCity:'le-mans',flagged:false,createdAt:Timestamp.fromMillis(Date.now()-1500)});
-    await ansX('me','c3',{opt:2,at:Timestamp.fromMillis(Date.now()-1000)});
-    await db.doc('campaignStats/c1').delete().catch(()=>{});
-    const r=await E.pulseCore('me');
-    check('Chiffres de la ville : 10 réponses de la semaine (6 voisins + 4 des miennes ; ni signalée à part, ni autre ville, ni ancienne)',r.available&&r.enough&&r.weekAnswers===10,r);
-    check('… 2 commerces et 4 questions actifs dans MA ville (pas celle d\'Angers)',r.activeMerchants===2&&r.activeQuestions===4,r);
-    check('… mes réponses de la semaine : 4',r.myWeekAnswers===4,r.myWeekAnswers);
-    check('Aucun nom ni identifiant dans les chiffres de la ville',!/Voisin|Alex|s[1-7]"/.test(JSON.stringify(r)),Object.keys(r));
-    // seuil : ville presque vide
-    await mkUser('lonely',{name:'Seul',city:'angers'});await ansX('lonely','far',{city:'angers'});
-    const r2=await E.pulseCore('lonely');
-    check('Ville quasi vide : chiffres masqués (seuil), message de démarrage possible',r2.available&&!r2.enough&&r2.weekAnswers===null,r2);
-    // « Comment la ville a répondu »
-    const m=await E.myResultsCore('me');
-    check('Résultats : mes questions à choix, la plus récente d\'abord ; la question texte est exclue',m.results.map(x=>x.campaignId).join()==='c3,c2,c1',m.results.map(x=>x.campaignId));
-    const c1=m.results.find(x=>x.campaignId==='c1');
-    check('Résultats c1 : répartition exacte (8 réponses : 4 Café / 2 Thé / 2 Chocolat = 50 / 25 / 25 %), ma réponse repérée',c1.n===8&&c1.options.map(o=>o.pct).join()==='50,25,25'&&c1.myIdx===0,c1);
-    const c2=m.results.find(x=>x.campaignId==='c2');
-    check('Résultats c2 : 1 seule réponse → sous le seuil, aucun pourcentage',c2.belowThreshold===true&&c2.options.every(o=>o.pct===undefined),c2);
-    check('Résultats : jamais de nom ni d\'identifiant d\'autres habitants',!/Voisin|s[1-7]/.test(JSON.stringify(m)));
-    // jalon de série
-    await db.doc('users/me').update({authorizedMerchants:['m1','m2'],streak:6,lastAnswerDate:new Date(Date.now()-86400000).toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'}),points:0});
-    await db.doc('answers/me_c1_q0').delete();await db.doc('answers/me_c2_q0').delete();
+    for(let i=1;i<=4;i++)await mkCampaign('c'+i,{question:'Question '+i+' ?',questions:[{q:'Question '+i+' ?',format:'mcq',options:['Café','Thé','Chocolat']}]});
+    const day=ms=>new Date(ms).toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});
+    await mkUser('me',{name:'Alex',email:'me@t.fr',streak:6,streakDate:day(Date.now()-86400000),lastAnswerDate:day(Date.now()-86400000),xp:990,points:990});
     await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});
     const tok=(await (await fetch(AUTH3,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'me@t.fr',password:'secret123',returnSecureToken:true})})).json()).idToken;
     const call=async(name,data)=>{const x=await fetch('http://127.0.0.1:5001/noova-366d0/europe-west1/'+name,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({data})});return x.json();};
-    await call('beginQuestion',{campaignId:'c1',questionIdx:0});await sleep(3300);
-    const sub=await call('submitAnswer',{campaignId:'c1',questionIdx:0,answerValue:'Café'});
+    const answer=async(cid)=>{await db.doc('users/me').update({lastQuestionStart:{key:cid+'_0',at:Date.now()-5000}});return call('submitAnswer',{campaignId:cid,questionIdx:0,answerValue:'Café'});};
+    const r1=await answer('c1'),u1=(await db.doc('users/me').get()).data();
+    check('1re réponse du jour : la série (6) ne bouge pas — se connecter / répondre une fois ne suffit pas',r1.result.streak===6&&r1.result.streakToday===false&&u1.streakDate===day(Date.now()-86400000),{r:r1.result,sd:u1.streakDate});
+    const r2=await answer('c2');
+    check('2e réponse du jour : toujours 6',r2.result.streak===6&&r2.result.streakToday===false,r2.result);
+    const evs0=(await db.collection('communityEvents').where('userId','==','me').get()).docs.map(d=>d.data());
+    check('Pas de jalon de série tant que la journée n\'est pas validée',!evs0.some(e=>e.type==='streak'));
+    const r3=await answer('c3'),u3=(await db.doc('users/me').get()).data();
+    check('3e réponse du jour : la journée est validée, série = 7, streakDate = aujourd\'hui',r3.result.streak===7&&r3.result.streakToday===true&&u3.streak===7&&u3.streakDate===day(Date.now()),{r:r3.result,u:[u3.streak,u3.streakDate]});
     const evs=(await db.collection('communityEvents').where('userId','==','me').get()).docs.map(d=>d.data());
     const st=evs.find(e=>e.type==='streak');
-    check('Série de 7 jours : jalon annoncé dans le fil (« est à 7 jours d\'affilée »)',sub.result&&sub.result.streak===7&&st&&/7 jours d'affilée/.test(st.text)&&st.likeCount===0,{streak:sub.result&&sub.result.streak,st});
-    check('… et l\'événement habituel « a répondu » est créé aussi',evs.some(e=>e.type==='answer'));
-    await db.doc('users/me').update({streak:4,lastAnswerDate:new Date(Date.now()-86400000).toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'})});
-    await db.doc('answers/me_c2_q0').delete().catch(()=>{});
-    await call('beginQuestion',{campaignId:'c2',questionIdx:0});await sleep(3300);
-    await call('submitAnswer',{campaignId:'c2',questionIdx:0,answerValue:'Thé'});
-    const evs2=(await db.collection('communityEvents').where('userId','==','me').get()).docs.map(d=>d.data());
-    check('Pas de jalon pour une série de 5 ou pour une 2e réponse du jour (un seul jalon)',evs2.filter(e=>e.type==='streak').length===1);
+    check('Série de 7 jours : jalon annoncé dans le fil (« est à 7 jours d\'affilée »), une seule fois',st&&st.streak===7&&evs.filter(e=>e.type==='streak').length===1,evs.map(e=>e.type));
+    const r4=await answer('c4');
+    check('4e réponse du jour : la série reste à 7 (un seul jour compté) et aucun 2e jalon',r4.result.streak===7&&(await db.collection('communityEvents').where('userId','==','me').where('type','==','streak').get()).size===1,r4.result);
+    check('Le fil ne reçoit plus d\'événement « a répondu » (on n\'y montre plus ce que les gens répondent)',!(await db.collection('communityEvents').where('type','==','answer').get()).size&&!evs.some(e=>e.type==='answer'));
+    const lv=evs.find(e=>e.type==='levelup');
+    check('Palier d\'xp franchi (990 → 1000 : Curieux → Actif) : événement « a atteint le palier Actif » pour les amis',lv&&lv.level==='Actif'&&/palier Actif/.test(lv.text)&&lv.userId==='me',evs.map(e=>e.type+':'+(e.level||'')));
+    // série cassée : dernier jour validé il y a 2 jours → repart à 1 à la 3e réponse
+    await db.doc('users/me').update({streak:9,streakDate:day(Date.now()-2*86400000),lastAnswerDate:day(Date.now()-2*86400000),dailyAnswerDate:'2020-01-01',dailyAnswerCount:0});
+    await db.doc('users/me').update({answeredCampaigns:[]});
+    for(const c of ['c1','c2','c3','c4']){await db.doc('answers/me_'+c+'_q0').delete().catch(()=>{});}
+    await answer('c1');await answer('c2');const r5=await answer('c3');
+    check('Série cassée (dernier jour validé il y a 2 jours) : repart à 1 à la 3e réponse',r5.result&&r5.result.streak===1,r5.result||r5);
   });
 
   await T('communauté interface',async()=>{
@@ -96,11 +75,12 @@ const ansX=(u,cid,o={})=>db.doc(`answers/${u}_${cid}_q0`).set({userId:u,campaign
     for(let i=1;i<=6;i++){await mkUser('s'+i,{name:'Inconnu'+i});await ansX('s'+i,'c1',{opt:i%3});}
     await ansX('me','c1',{opt:0});
     await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});
-    const now=Date.now(),ev=(id,o)=>db.doc('communityEvents/'+id).set({type:'answer',userId:'f1',displayName:'Léa',city:'le-mans',text:'a répondu à une question de',brand:'Le Fournil',likeCount:0,commentCount:0,createdAt:Timestamp.fromMillis(now-5000),...o});
-    await ev('a1',{createdAt:Timestamp.fromMillis(now-1000)});await ev('a2',{brand:'Café de la Place',createdAt:Timestamp.fromMillis(now-2000)});await ev('a3',{brand:'Studio Fit',createdAt:Timestamp.fromMillis(now-3000)});
-    await ev('t1',{userId:'f2',displayName:'Tom',brand:'Le Fournil',createdAt:Timestamp.fromMillis(now-4000)});
+    const now=Date.now(),ev=(id,o)=>db.doc('communityEvents/'+id).set({type:'levelup',level:'Actif',userId:'f1',displayName:'Léa',city:'le-mans',text:'a atteint le palier Actif',brand:'',likeCount:0,commentCount:0,createdAt:Timestamp.fromMillis(now-5000),...o});
+    await ev('a1',{level:'Expert',text:'a atteint le palier Expert',createdAt:Timestamp.fromMillis(now-1000)});
+    await ev('t1',{userId:'f2',displayName:'Tom',createdAt:Timestamp.fromMillis(now-4000)});
+    await ev('old1',{type:'answer',text:'a répondu à une question de',brand:'Le Fournil',createdAt:Timestamp.fromMillis(now-2000)});   // ancien événement : plus montré
     await ev('st1',{type:'streak',userId:'f1',brand:'',text:"est à 7 jours d'affilée",createdAt:Timestamp.fromMillis(now-500)});
-    await ev('n1',{type:'merchant_post',userId:null,displayName:'Le Fournil',brand:'Le Fournil',text:'Suite à vos avis : ouverture dès 6h30.',createdAt:Timestamp.fromMillis(now-6000)});
+    await ev('n1',{type:'merchant_post',kind:'top',merchantId:'m1',userId:null,displayName:'Le Fournil',brand:'Le Fournil',text:'Nouvelle fournée de pain aux céréales dès 6h30.',createdAt:Timestamp.fromMillis(now-6000)});
     await ev('x1',{userId:'s1',displayName:'Inconnu1'});                        // un inconnu : ne doit jamais apparaître
     const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
     const p=await browser.newPage();PG=p;await p.setViewport({width:390,height:900,isMobile:true,hasTouch:true,deviceScaleFactor:2});const errs=[];p.on('pageerror',e=>errs.push(e.message));
@@ -109,19 +89,17 @@ const ansX=(u,cid,o={})=>db.doc(`answers/${u}_${cid}_q0`).set({userId:u,campaign
     await wf(p,()=>document.getElementById('home').classList.contains('active')&&S.user&&S.friends&&S.friends.length>=2,null,30000);
     await p.addStyleTag({content:'body>div[style*="emulator"]{display:none!important}'});
     await p.evaluate(()=>goNav('social'));
-    await wf(p,()=>document.querySelectorAll('#feed-content .feed-post').length>=3&&document.querySelector('#community-pulse .cm-hero')&&document.querySelector('#community-results .cm-res'),null,25000);
+    await wf(p,()=>document.querySelectorAll('#feed-content .feed-post').length>=4,null,25000);
     await sleep(600);
-    const fd=await p.evaluate(()=>({cards:[...document.querySelectorAll('#feed-content .feed-post')].map(e=>({cls:e.className,txt:e.textContent.replace(/\s+/g,' ').trim()})),pulse:document.querySelector('#community-pulse').textContent.replace(/\s+/g,' '),res:document.querySelector('#community-results').textContent.replace(/\s+/g,' ')}));
+    const fd=await p.evaluate(()=>({cards:[...document.querySelectorAll('#feed-content .feed-post')].map(e=>({cls:e.className,txt:e.textContent.replace(/\s+/g,' ').trim()})),pulse:!!document.getElementById('community-pulse'),results:!!document.getElementById('community-results'),all:document.getElementById('panel-feed').innerText.replace(/\s+/g,' ')}));
     await p.screenshot({path:'/tmp/shots/cm_feed_new.png'});
-    check('Fil : les 3 réponses de Léa le même jour = UNE carte « a répondu à 3 questions » avec les 3 commerces',fd.cards.some(c=>/Léa/.test(c.txt)&&/3 questions/.test(c.txt)&&/Le Fournil/.test(c.txt)&&/Café de la Place/.test(c.txt)&&/Studio Fit/.test(c.txt)),fd.cards.map(c=>c.txt));
-    check('Fil : Tom (1 réponse) garde sa carte simple',fd.cards.some(c=>/Tom/.test(c.txt)&&/a répondu à une question de/.test(c.txt)));
-    check('Fil : carte « jalon de série » distincte (7 jours d\'affilée)',fd.cards.some(c=>/cm-streak/.test(c.cls)&&/Léa/.test(c.txt)&&/est à 7 jours d'affilée/.test(c.txt)),fd.cards.map(c=>c.cls));
-    check('Fil : actualité du commerce mise en avant (carte sombre « Actualité »)',fd.cards.some(c=>/cm-news/.test(c.cls)&&/Actualité/.test(c.txt)&&/6h30/.test(c.txt)));
-    check('Fil : un inconnu n\'apparaît jamais',!fd.cards.some(c=>/Inconnu/.test(c.txt))&&!/Inconnu/.test(fd.pulse+fd.res),fd.cards.map(c=>c.txt));
-    check('Chiffres de la ville affichés (7 réponses, 1 commerce, ta contribution)',/Le Mans cette semaine/.test(fd.pulse)&&/7\s*réponses de voisins/.test(fd.pulse)&&/1\s*commerce actif/.test(fd.pulse)&&/1\s*de toi/.test(fd.pulse),fd.pulse);
-    check('« Comment la ville a répondu » : question, réponse majoritaire, ma réponse',/Quelle boisson/.test(fd.res)&&/Le Fournil/.test(fd.res)&&/%/.test(fd.res)&&/(comme la majorité|Toi :)/.test(fd.res),fd.res);
-    await p.evaluate(()=>document.querySelector('#community-results .cm-res').click());
-    check('Toucher une carte de résultats : toutes les options avec leur pourcentage',await p.evaluate(()=>document.querySelectorAll('#community-results .cm-res.open .cm-res-row').length===3));
+    check('Fil : palier d\'xp d\'un ami (« Léa a atteint le palier Expert ») en carte distincte, avec l\'icône du palier',fd.cards.some(c=>/cm-level/.test(c.cls)&&/Léa/.test(c.txt)&&/palier Expert/.test(c.txt)),fd.cards.map(c=>c.txt));
+    check('Fil : palier d\'un 2e ami (Tom, Actif)',fd.cards.some(c=>/cm-level/.test(c.cls)&&/Tom/.test(c.txt)&&/palier Actif/.test(c.txt)));
+    check('Fil : carte « jalon de série » distincte (7 jours d\'affilée)',fd.cards.some(c=>/cm-streak/.test(c.cls)&&/Léa/.test(c.txt)&&/7 jours d'affilée/.test(c.txt)),fd.cards.map(c=>c.cls));
+    check('Fil : « À la une » d\'un commerce autorisé en jaune plein, avec son étiquette',fd.cards.some(c=>/cm-k-top/.test(c.cls)&&/À la une/.test(c.txt)&&/6h30/.test(c.txt)),fd.cards.map(c=>c.cls+' '+c.txt.slice(0,40)));
+    check('Fil : jamais ce que les gens ont répondu (ancien événement « a répondu » masqué)',!fd.cards.some(c=>/a répondu/.test(c.txt))&&!/a répondu/.test(fd.all),fd.all.slice(0,200));
+    check('Fil : plus de « chiffres de la ville » ni de « Comment la ville a répondu »',!fd.pulse&&!fd.results&&!/réponses de voisins|Comment la ville a répondu/.test(fd.all),fd.all.slice(0,200));
+    check('Fil : un inconnu n\'apparaît jamais',!fd.cards.some(c=>/Inconnu/.test(c.txt)),fd.cards.map(c=>c.txt));
     // onglet Amis
     await p.evaluate(()=>socTab('friends',document.querySelector('.tab-btn[onclick*="friends"]')));await sleep(1200);
     const fr=await p.evaluate(()=>({invite:!!document.querySelector('.cm-invite .cm-btn'),code:document.getElementById('inv-code').textContent,boxHidden:document.getElementById('add-friend-box').style.display==='none',rows:document.querySelectorAll('#friends-list .cp-row').length,compatList:!!document.getElementById('compat-list')}));

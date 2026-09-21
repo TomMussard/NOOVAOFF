@@ -20,6 +20,15 @@ module.exports = {
   // ─── Paliers de récompenses ─── (source unique : voir tiers.js)
   TIERS: require("./tiers"),
 
+  // ─── Série (streak) ───
+  // Un jour compte dans la série quand l'habitant a répondu à au moins ce nombre de questions ce jour-là (se connecter ne suffit pas).
+  STREAK: { MIN_ANSWERS_PER_DAY: 3 },
+
+  // ─── Statuts à vie (pilotés par l'xp) ─── mêmes seuils que l'app (TIERS) : sert au fil « un ami a atteint le palier… ».
+  STATUS: [
+    { n: "Curieux", min: 0 }, { n: "Actif", min: 1000 }, { n: "Expert", min: 3000 }, { n: "Ambassadeur", min: 6000 }, { n: "Légende", min: 10000 },
+  ],
+
   // ─── Échanges de récompenses ───
   REWARDS: {
     EXCHANGE_LIMIT_DAYS: 7,      // une récompense par commerçant et par utilisateur sur cette durée
@@ -73,8 +82,6 @@ module.exports = {
 
   // ─── Onglet Communauté ───
   COMMUNITY: {
-    MIN_PULSE: 5,                // réponses de la ville cette semaine avant d'afficher les chiffres (sinon message de démarrage)
-    RESULTS_LIMIT: 5,            // « Comment la ville a répondu » : dernières questions répondues
     STREAK_MILESTONES: [3, 7, 14, 30, 60, 100],   // séries annoncées à tes amis dans le fil
   },
 

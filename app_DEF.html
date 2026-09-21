@@ -230,6 +230,23 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .cm-av-streak{background:var(--ink);color:var(--yellow)}
 .feed-post.cm-streak{background:var(--yellow-soft)}
 .cm-streak-t{font-size:14px;color:var(--ink);line-height:1.5}
+/* Actualités des commerces : une couleur par nature (à la une = jaune plein, nouveauté = accent, actualité / avis = sombre) */
+.feed-post.cm-k-top{background:var(--nv-yellow)}
+.cm-k-top .fp-name,.cm-k-top .cm-news-t{color:var(--nv-black)}.cm-k-top .fp-time{color:rgba(28,25,23,.7)}
+.cm-k-top .fp-tag{background:var(--nv-black);color:var(--nv-yellow)}
+.cm-k-top .cm-news-t{font-family:var(--fd);font-weight:800;font-size:17px;line-height:1.3;letter-spacing:-.3px}
+.cm-k-top .fp-foot{border-top-color:rgba(28,25,23,.15)}.cm-k-top .fp-btn{color:rgba(28,25,23,.8)}.cm-k-top .fp-btn.liked{color:var(--nv-black)}
+.feed-post.cm-k-new{background:#fff;box-shadow:inset 0 0 0 2px var(--nv-yellow),var(--shadow-card)}
+.cm-k-new .fp-name,.cm-k-new .cm-news-t{color:var(--ink)}.cm-k-new .fp-time{color:var(--ink2)}
+.cm-k-new .fp-foot{border-top-color:rgba(28,25,23,.1)}.cm-k-new .fp-btn{color:var(--ink2)}.cm-k-new .fp-btn.liked{color:var(--ink)}
+.feed-post.cm-level{background:var(--surface)}
+.cm-av-level{color:#fff}
+.cm-level-t{font-size:14px;color:var(--ink);line-height:1.5}
+.feed-post.cm-compat{padding:16px 16px 14px;cursor:pointer;background:var(--nv-black);color:#fff}
+.cm-compat-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.cm-compat-big{font-family:var(--fd);font-weight:800;font-size:34px;letter-spacing:-1px;color:var(--nv-yellow);line-height:1}
+.cm-compat-t{font-size:13px;line-height:1.4;color:#fff}
+.cm-compat .cp-bar{background:rgba(255,255,255,.18)}.cm-compat .cp-bar>div{background:var(--nv-yellow)}
 .cm-invite{margin:0 18px 8px;background:var(--yellow-soft);border-radius:var(--r-card);padding:16px}
 .cm-invite-t{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)}
 .cm-invite-d{font-size:12px;color:var(--ink2);line-height:1.55;margin:4px 0 12px}
@@ -290,9 +307,29 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dt-dot{width:14px;height:14px;border-radius:50%;background:var(--bg3)}
 .dt-dot.on{background:var(--yellow);box-shadow:inset 0 0 0 2px var(--ink)}
 .dt-txt{flex:1;min-width:0;font-size:12.5px;color:var(--ink);font-weight:600;line-height:1.4}
-.dt-noov{flex-shrink:0;background:var(--nv-black);color:var(--nv-yellow);border-radius:99px;padding:6px 11px;font-family:var(--fd);font-weight:800;font-size:12px}
 .noov-card{margin:0 22px 14px;background:var(--nv-black);border-radius:var(--r-card);padding:15px 16px;display:flex;gap:14px;align-items:center}
 .noov-ico{width:44px;height:44px;border-radius:50%;background:var(--nv-yellow);color:var(--nv-black);font-family:var(--fd);font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 0 0 3px var(--nv-black),inset 0 0 0 5px rgba(0,0,0,.25)}
+.wpts-card{margin:0 18px 20px;background:var(--nv-yellow);border-radius:var(--r-card);padding:20px 20px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow-raised)}
+.wpts-ico{width:54px;height:54px;border-radius:16px;background:var(--nv-black);color:var(--nv-yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.wpts-ico img{width:100%;height:100%;object-fit:contain}
+.wpts-n{font-family:var(--fd);font-weight:800;font-size:44px;line-height:1;letter-spacing:-1.5px;color:var(--nv-black)}
+.wpts-l{font-size:12px;font-weight:700;color:var(--nv-black);margin-top:3px}
+.noov-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 22px 18px}
+.noov-tile{background:var(--surface);border-radius:16px;padding:12px 4px 10px;text-align:center;box-shadow:var(--shadow-card);opacity:.92}
+.noov-tile .ns-ico{width:40px;height:40px;border-radius:12px;background:var(--bg2);color:var(--ink2);display:flex;align-items:center;justify-content:center;margin:0 auto 7px;overflow:hidden}
+.noov-tile .ns-ico img{width:100%;height:100%;object-fit:contain}
+.noov-tile .ns-t{font-family:var(--fd);font-weight:800;font-size:11.5px;color:var(--ink);letter-spacing:-.2px}
+.noov-tile .ns-tag{font-size:9.5px;font-weight:800;color:var(--ink2);margin-top:2px}
+.dpat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 22px 22px}
+.dpat-mini{background:var(--nv-yellow);border-radius:20px;padding:12px 12px 13px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.08);transition:transform .13s;min-width:0}
+.dpat-mini:active{transform:scale(.97)}
+.dpat-mini.solo{grid-column:1/-1}
+.dpat-mini-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.dpat-mini-ph{width:34px;height:34px;border-radius:10px;background:rgba(28,25,23,.12);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--nv-black)}
+.dpat-mini-ph img{width:100%;height:100%;object-fit:cover}
+.dpat-mini-name{font-family:var(--fd);font-weight:800;font-size:13px;line-height:1.2;color:var(--nv-yellow-ink);letter-spacing:-.2px;min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.dpat-mini .dpat-bar{height:6px;margin-bottom:6px}
+.dpat-mini-txt{font-size:11.5px;color:var(--nv-black);font-weight:700}
 .noov-soon{margin:0 22px 10px;background:var(--surface);border-radius:var(--r-card);padding:13px 14px;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow-card);opacity:.92}
 .noov-soon .ns-ico{width:46px;height:46px;border-radius:14px;background:var(--bg2);color:var(--ink2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .noov-soon .ns-t{font-family:var(--fd);font-weight:800;font-size:14.5px;color:var(--ink);letter-spacing:-.3px}
@@ -454,6 +491,39 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .rank-arr:active{transform:scale(.85)}
 .rank-arr:disabled{opacity:.28;cursor:default}
 .q-actions{display:flex;gap:9px;margin-top:10px;flex-shrink:0}
+/* — Deux mises en page de question, en alternance : « bulle » (cartes arrondies, fond clair) et « plein écran » (fond jaune, grand texte, gros blocs).
+     Le choix est stable pour une question donnée (qMode) : rouvrir la même question la montre de la même façon. — */
+#question.qfull{background:var(--nv-yellow)}
+#question.qfull .q-close{background:#fff;box-shadow:none}
+#question.qfull .q-seg{background:rgba(28,25,23,.2)}
+#question.qfull .q-seg.done{background:var(--nv-black)}
+#question.qfull .q-pts{background:var(--nv-black);color:var(--nv-yellow)}
+#question.qfull .bh-name,#question.qfull .bh-usage,#question.qfull .q-hint{color:var(--nv-black)}
+#question.qfull .bh-tag{display:none}
+#question.qfull .q-text{font-size:34px;line-height:1.08;letter-spacing:-1.3px;margin:5vh 0 12px;color:var(--nv-black)}
+#question.qfull .q-hint{font-size:14px;margin-bottom:22px;font-weight:600}
+#question.qfull .disc-note{background:rgba(28,25,23,.08);border:none;color:var(--nv-black)}
+#question.qfull .disc-note b{color:var(--nv-black)}
+#question.qfull .mcq-list{counter-reset:qo;gap:10px}
+#question.qfull .mcq-opt{background:var(--nv-black);border:none;color:#fff;border-radius:22px;padding:19px 20px;font-size:17px;font-weight:700}
+#question.qfull .mcq-opt::before{counter-increment:qo;content:counter(qo,upper-alpha);width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.14);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#question.qfull .mcq-ck{display:none}
+#question.qfull .mcq-opt.sel{background:#fff;color:var(--nv-black);box-shadow:0 0 0 3px var(--nv-black)}
+#question.qfull .mcq-opt.sel::before{background:var(--nv-black);color:var(--nv-yellow)}
+#question.qfull .ans-ta{background:#fff;border:none;border-radius:24px;font-size:18px;padding:20px}
+#question.qfull .char-ct{color:var(--nv-black)}
+#question.qfull .scale-val{font-size:120px;color:var(--nv-black);margin:6vh 0 14px}
+#question.qfull .scale-labels{color:var(--nv-black);font-weight:700}
+#question.qfull .scale-inp{height:10px;background:rgba(28,25,23,.2)!important}
+#question.qfull .scale-inp::-webkit-slider-thumb{background:var(--nv-black);width:34px;height:34px;box-shadow:none}
+#question.qfull .rank-item{background:var(--nv-black);border:none;color:#fff;border-radius:22px;padding:15px}
+#question.qfull .rank-txt{color:#fff;font-size:15px;font-weight:700}
+#question.qfull .rank-num{background:var(--nv-yellow);color:var(--nv-black)}
+#question.qfull .rank-arr{background:rgba(255,255,255,.14);border:none;color:#fff}
+#question.qfull #lock-fill{background:var(--nv-black)}
+#question.qfull .skip-btn{background:rgba(28,25,23,.12);color:var(--nv-black)}
+#question.qfull .btn-sub{background:var(--nv-black);color:var(--nv-yellow);box-shadow:none}
+#question.qfull .btn-sub:disabled,#question.qfull .btn-sub.locked{opacity:1;background:rgba(28,25,23,.16);color:var(--nv-black)}
 .skip-btn{padding:15px 16px;border-radius:var(--r-pill);background:var(--cream);border:none;color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .13s}
 /* REWARD */
 #reward{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;position:relative}
@@ -804,6 +874,18 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dh-name{font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.8px;color:var(--ink)}
 .dh-pts{display:flex;align-items:center;gap:6px;background:var(--nv-black);color:var(--nv-yellow);padding:9px 15px;border-radius:99px;cursor:pointer;transition:transform .13s;border:none}
 .dh-pts:active{transform:scale(.94)}
+/* En-tête de l'accueil : NOOVS (pièce) à gauche, série (flamme) au centre, points à droite — uniquement des chiffres */
+.dh-noov{display:flex;align-items:center;gap:8px;background:var(--nv-black);color:var(--nv-yellow);padding:5px 15px 5px 5px;border-radius:99px;cursor:pointer;transition:transform .13s;border:none}
+.dh-noov:active{transform:scale(.94)}
+.dh-coin{width:30px;height:30px;border-radius:50%;background:var(--nv-yellow);color:var(--nv-black);font-family:var(--fd);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 3px rgba(28,25,23,.22);flex-shrink:0;overflow:hidden}
+.dh-coin img,.dh-flame img{width:100%;height:100%;object-fit:contain}
+.dh-noov-n{font-family:var(--fd);font-weight:800;font-size:15px}
+.dh-streak{display:flex;align-items:center;gap:3px;font-family:var(--fd);font-weight:800;font-size:19px;color:var(--ink);letter-spacing:-.4px}
+.dh-flame{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#B9B1A2}
+.dh-flame svg{width:100%;height:100%}
+.dh-streak.on .dh-flame{color:#E07D0A}
+.dh-flame .fo{fill:currentColor}.dh-flame .fi{fill:#FFF3D1}
+.dh-streak.on .dh-flame .fi{fill:#FFC300}
 .dh-pts-n{font-family:var(--fd);font-weight:800;font-size:15px}
 .dh-pts-l{font-size:10px;color:rgba(255,255,255,.55);font-weight:600}
 
@@ -830,14 +912,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .mark{position:absolute;right:-14px;bottom:-40px;font-size:128px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.3);pointer-events:none;z-index:0}
 
 /* — Streak (noir) — */
-.dstreak-card{margin:0 22px 30px;background:var(--nv-black);border-radius:22px;padding:20px 22px;color:#fff}
-.dstreak-top{display:flex;align-items:center;gap:11px;margin-bottom:12px}
-.dstreak-fire{width:36px;height:36px;border-radius:11px;background:rgba(255,212,0,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--nv-yellow)}
-.dstreak-title{font-family:var(--fd);font-weight:700;font-size:14px}
-.dstreak-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
-.dstreak-dots{display:flex;gap:5px}
-.dstreak-dot{flex:1;height:9px;border-radius:99px;background:rgba(255,255,255,.14)}
-.dstreak-dot.on{background:var(--nv-yellow)}
 
 /* — Presque à toi (même langage visuel que la carte question du jour : photo + bandeau) — */
 .dpat-card{margin:0 22px 22px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
@@ -1245,10 +1319,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="ptr-bar" id="ptr-home">↻ Actualisation…</div>
   <div class="si">
     <div class="dh-hdr">
-      <div style="display:flex;align-items:center;gap:11px">
-        <div class="dh-av" id="home-av"><span id="home-av-letter">A</span></div>
-        <div><div class="dh-greet" id="home-greet">Bonjour</div><div class="dh-name" id="home-name">Alex</div></div>
-      </div>
+      <button class="dh-noov" onclick="goNav('rewards-tab')" aria-label="Tes NOOVS"><span class="dh-coin" id="hdr-coin" aria-hidden="true">N</span><span class="dh-noov-n" id="home-noovs">0</span></button>
+      <div class="dh-streak" id="hdr-streak" role="img" aria-label="Série de 0 jour. Réponds à 3 questions par jour pour la faire grandir."><span class="dh-flame" id="hdr-flame"></span><span id="home-streak">0</span></div>
       <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
     </div>
     <div class="dtoday-card" id="today-card" onclick="openQ(0)">
@@ -1269,13 +1341,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
     <div id="home-requests"></div>
     <div id="daily-track"></div>
-    <div class="dstreak-card">
-      <div class="dstreak-top">
-        <div class="dstreak-fire"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 2c1 3-2 4-2 7a2 2 0 004 0c1 1 2 2.5 2 4.5A5.5 5.5 0 016.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0012 22a8 8 0 007-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg></div>
-        <div style="flex:1"><div class="dstreak-title" id="streak-title">Lance ta série aujourd'hui</div><div class="dstreak-sub" id="streak-sub">Continue, une réponse par jour suffit</div></div>
-      </div>
-      <div class="dstreak-dots" id="streak-dots"></div>
-    </div>
     <div class="sec-lbl">À répondre</div>
     <div class="q-list" id="queue-list"></div>
     <div style="height:6px"></div>
@@ -1400,12 +1465,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="wallet-wrap" style="padding-top:0">
     <div class="dwal-hdr">
       <div class="dwal-title">Tes cadeaux</div>
-      <div class="dh-pts"><span class="dh-pts-n" id="wc-pts-num-hdr">0</span><span class="dh-pts-l">PTS</span></div>
     </div>
-    <div id="dcode-wrap"></div>
-    <div class="noov-card">
-      <div class="noov-ico">N</div>
-      <div style="flex:1;min-width:0"><div class="noov-t"><span id="noov-num">0</span> NOOVS</div><div class="noov-d">Tes réponses au-delà des 3 du jour rapportent des NOOVS, la monnaie de NOOVA. Bientôt : bons chez les commerçants, retrait des pubs, concours et, plus tard, cash.</div></div>
+    <!-- 1 · Points -->
+    <div class="wpts-card">
+      <div class="wpts-ico" id="wpts-ico" aria-hidden="true"></div>
+      <div><div class="wpts-n" id="wc-pts-num-hdr">0</div><div class="wpts-l">points</div></div>
     </div>
     <!-- Solde détaillé + progression de palier — conservés pour le calcul, visuels sur le Profil -->
     <div class="wallet-card" style="display:none">
@@ -1425,18 +1489,25 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
         </div>
       </div>
     </div>
-    <div class="dsec-h" id="reward-featured-label"></div>
-    <div id="reward-featured-wrap"></div>
+    <!-- 2 · Récompenses en cours -->
     <div class="dsec-h">En cours <span id="dprog-count" style="font-weight:500;color:var(--ink2);font-size:12px;margin-left:2px"></span></div>
-    <div id="dprog-list" class="dprog-scroller"></div>
-    <div id="tier-track-wrap"></div>
+    <div id="dcode-wrap"></div>
+    <div class="dsec-h" id="reward-featured-label" style="display:none"></div>
+    <div id="reward-featured-wrap"></div>
+    <div id="dprog-list" class="dprog-scroller" role="region" aria-label="Récompenses en cours" tabindex="0"></div>
     <div class="dprog-row" id="rewards-all-btn" onclick="openRewardsSheet()" style="cursor:pointer">
-      <div style="width:52px;height:52px;border-radius:14px;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg></div>
-      <div style="flex:1;min-width:0"><div class="dprog-name">Toutes les récompenses</div><div class="dprog-sub" id="rewards-all-count">Voir le catalogue et les paliers</div></div>
-      <span style="color:#A9A296;font-size:18px">›</span>
+      <div id="rewards-all-ico" style="width:52px;height:52px;border-radius:14px;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"></div>
+      <div style="flex:1;min-width:0"><div class="dprog-name">Toutes les récompenses</div><div class="dprog-sub" id="rewards-all-count"></div></div>
+      <span style="color:#A9A296;font-size:18px" aria-hidden="true">›</span>
     </div>
-    <div class="dsec-h">Avec tes NOOVS</div>
+    <!-- 3 · NOOVS -->
+    <div class="noov-card">
+      <div class="noov-ico" id="wnoov-ico" aria-hidden="true">N</div>
+      <div class="noov-t"><span id="noov-num">0</span> NOOVS</div>
+    </div>
     <div id="noov-rewards"></div>
+    <!-- 4 · XP -->
+    <div id="tier-track-wrap"></div>
   </div>
 </div>
 
@@ -1759,7 +1830,6 @@ async function changeMyAvatar(file){
     await db.collection('users').doc(uid).update({ photoUrl: url });
     S.user.photoUrl = url;
     renderUserAvatar(avEl, document.getElementById('prof-av-letter'), S.user.name, url);
-    renderUserAvatar(document.getElementById('home-av'), document.getElementById('home-av-letter'), S.user.name, url);
     renderUserAvatar(document.getElementById('settings-av-thumb'), document.getElementById('settings-av-thumb-letter'), S.user.name, url);
     showToast('Photo de profil mise à jour.', 'image');
     trackEvent('avatar_updated');
@@ -1800,7 +1870,6 @@ async function confirmUserEditModal(){
     if(field==='name'){
       await db.collection('users').doc(uid).update({ name: val });
       S.user.name=val;
-      document.getElementById('home-name').textContent=val;
       document.getElementById('prof-name').textContent=val;
     } else if(field==='cityLabel'){
       const norm=normalizeCity(val);
@@ -2002,15 +2071,26 @@ async function doBrands(){
   document.getElementById('bnav').classList.add('show');
   refreshHome();renderSocial();goTo('home');
 }
+// Images et icônes personnalisées : renseigne l'URL d'un fichier pour remplacer l'icône par défaut (rien d'autre à changer).
+// Flamme pleine de l'en-tête (l'icône « fire » du jeu d'icônes est un simple contour).
+const FLAME_SVG='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path class="fo" d="M12.6 1.8c.5 3.4-1.3 5.2-2.9 7.1C8.2 10.6 6.8 12.3 6.8 14.9a5.3 5.3 0 0 0 5.2 5.4 5.3 5.3 0 0 0 5.2-5.5c0-2.4-1.1-4.1-2.3-5.5-.4 1.5-1.3 2.3-2.4 2.6.7-3.2 0-6.3.1-10.1z"/><path class="fi" d="M12 20.3a2.7 2.7 0 0 1-2.7-2.7c0-1.7 1.4-2.6 2.7-4.2 1.3 1.6 2.7 2.5 2.7 4.2a2.7 2.7 0 0 1-2.7 2.7z"/></svg>';
+const NV_ASSETS={coin:'',flame:'',points:'',noovs:'',xp:'',rewards:''};
+function nvImg(key,fallback,alt){const u=NV_ASSETS[key];return u?'<img src="'+esc(u)+'" alt="'+esc(alt||'')+'">':fallback;}
+// En-tête de l'accueil : pièce + NOOVS, flamme + série (allumée quand la journée est validée : 3 réponses), points.
+function renderHeaderStats(){
+  const nv=document.getElementById('home-noovs');if(nv)nv.textContent=S.noovs||0;
+  const coin=document.getElementById('hdr-coin');if(coin)coin.innerHTML=nvImg('coin','N','');
+  const st=document.getElementById('hdr-streak');if(!st)return;
+  const on=S._streakDate===parisToday()&&(S.streak||0)>0;
+  st.classList.toggle('on',on);
+  document.getElementById('home-streak').textContent=S.streak||0;
+  document.getElementById('hdr-flame').innerHTML=nvImg('flame',FLAME_SVG,'');
+  st.setAttribute('aria-label','Série de '+(S.streak||0)+' jour'+((S.streak||0)>1?'s':'')+(on?' : journée validée.':'. Réponds à 3 questions aujourd\'hui pour la faire grandir.'));
+}
 function refreshHome(){
   if(!S.user)return;
-  const hr=new Date().getHours();document.getElementById('home-greet').textContent=hr<12?'Bonjour':hr<18?'Bon après-midi':'Bonsoir';
-  document.getElementById('home-name').textContent=S.user.name;animateNumber(document.getElementById('home-pts'),S.pts);
-  {const av=document.getElementById('home-av');const n=S.user.name||'?';const c=AVC[n.charCodeAt(0)%AVC.length];av.style.background=c+'22';av.style.color=c;renderUserAvatar(av,document.getElementById('home-av-letter'),n,S.user.photoUrl);}
-  {const st=document.getElementById('streak-title');if(st)st.innerHTML=S.streak>0?`<span id="streak-num">${S.streak}</span> jour${S.streak>1?'s':''} d'affilée`:'Lance ta série aujourd\'hui';}
-  const streakSub=document.getElementById('streak-sub');
-  if(streakSub) streakSub.textContent = S.streak>=10 ? '10 jours d\'affilée, bravo !' : S.streak===0 ? 'Réponds chaque jour pour garder ta série' : `Encore ${10-S.streak} jour${10-S.streak>1?'s':''} pour atteindre 10 jours d\'affilée`;
-  const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<10;i++){const d=document.createElement('div');d.className='dstreak-dot'+(i<S.streak?' on':'');sd.appendChild(d)}
+  animateNumber(document.getElementById('home-pts'),S.pts);
+  renderHeaderStats();
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('today-card').classList.toggle('disc',!!q._discovery);document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector(':scope > img');
     if(q.photoUrl){
@@ -2071,8 +2151,11 @@ function renderQueue(){
 }
 // Consigne courte selon le format de la question (au lieu d'un « Donne ton avis » générique).
 function defaultHint(type){return {mcq:'Choisis la réponse qui te ressemble.',text:'Écris ce que tu en penses, en une ou deux phrases.',scale:'Place le curseur là où tu te situes.',rank:'Classe du plus au moins important.'}[type]||'';}
+// « bulle » ou « plein écran » : réparti à peu près moitié-moitié, mais toujours identique pour une même question.
+function qMode(q){return hash01(String((q&&(q._firestoreId||q.q))||'')+'|'+((q&&q._questionIdx)||0))<0.5?'full':'bubble';}
 function openQ(idx){
   S.qIdx=idx;S.curQ=S.qs[idx];if(!S.curQ)return;const q=S.curQ;
+  document.getElementById('question').classList.toggle('qfull',qMode(q)==='full');
   const pg=document.getElementById('q-prog');pg.innerHTML='';
   S.qs.forEach((_,i)=>{const s=document.createElement('div');s.className='q-seg'+(i<idx?' done':i===idx?' cur':'');pg.appendChild(s)});
   setQPtsTag(q);
@@ -2102,6 +2185,7 @@ function buildAns(q){
     const paintScale=v=>{const p=((v-1)/9)*100;inp.style.background=`linear-gradient(to right,var(--coral) ${p}%,var(--bg3) ${p}%)`};
     paintScale(5);
     inp.oninput=function(){document.getElementById('sv').textContent=this.value;paintScale(this.value);document.getElementById('sub-btn').disabled=false};
+    inp.setAttribute('aria-label','Ta note, de 1 à 10');
     el.appendChild(sv);el.appendChild(sl);el.appendChild(inp);document.getElementById('sub-btn').disabled=false;
   }else if(q.type==='rank'){
     let items=[...(q.items||[])];const rl=document.createElement('div');rl.className='rank-list';
@@ -2126,14 +2210,10 @@ function shareReward(){
 function renderSocial(){
   const fe=document.getElementById('panel-feed');
   fe.innerHTML='';
-  fe.insertAdjacentHTML('beforeend','<div id="community-pulse"></div>');
   fe.insertAdjacentHTML('beforeend','<div id="weekly-q-slot"></div>');
-  fe.insertAdjacentHTML('beforeend','<div id="community-results"></div>');
-  fe.insertAdjacentHTML('beforeend','<div class="cm-sec" style="padding:0 18px">Chez tes amis</div>');
+  fe.insertAdjacentHTML('beforeend','<div class="cm-sec" style="padding:0 18px">À la une chez toi</div>');
   fe.insertAdjacentHTML('beforeend','<div id="feed-content" style="min-height:80px;padding:0 18px"><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div></div>');
-  loadCommunityPulse();
   loadWeeklyQuestion();
-  loadMyResults();
   loadCommunityFeed();
   initFriendsPanel();initRankingPanel();
 }
@@ -2196,8 +2276,10 @@ async function renderWeeklyQuestionResults(q, myOptionIndex) {
 
 let _communityFeedUnsub = null;
 let _feedRenderToken = 0;
-// Le fil montre : moi, mes amis (amitié réciproque) et les actualités des commerces de ma ville.
-// Jamais l'activité d'un inconnu (les règles Firestore l'interdisent aussi).
+// Le fil est varié et tourné vers les commerces : actualités, nouveautés et « à la une » des commerces QUE J'AI AUTORISÉS, paliers d'xp et
+// séries de mes amis (amitié réciproque), cartes de compatibilité. Il ne montre JAMAIS ce que les gens ont répondu, ni « comment la ville répond ».
+// Les règles Firestore appliquent la même limite : rien d'un commerce non autorisé, rien d'un inconnu.
+const FEED_KINDS = { impact: 'Ton avis a compté', news: 'Actualité', new: 'Nouveauté', top: 'À la une' };
 async function loadCommunityFeed() {
   const el = document.getElementById('feed-content');
   if (!el) return;
@@ -2205,150 +2287,137 @@ async function loadCommunityFeed() {
   const city = normalizeCity(S._city || '');
   if (_communityFeedUnsub) { _communityFeedUnsub(); _communityFeedUnsub = null; }
   if (!city) {
-    el.innerHTML = '<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">Renseigne ta ville pour voir l’activité locale.</div>';
+    el.innerHTML = '<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">Renseigne ta ville pour voir le fil de ton quartier.</div>';
     return;
   }
   const myUid = auth.currentUser && auth.currentUser.uid;
   const ids = [...new Set([myUid, ...(S.friends || []).filter(f => f.mutual !== false).map(f => f.uid)])].filter(Boolean);
+  const merchants = [...new Set(S._authorizedMerchants || [])];
   const parts = new Map(), listeners = [];
   const paint = () => {
     if (parts.size < listeners.length) return;      // on attend que toutes les écoutes aient répondu (pas de faux « vide »)
     const seen = new Set();
-    const all = [...parts.values()].flat().filter(d => !seen.has(d.id) && seen.add(d.id));
+    const all = [...parts.values()].flat().filter(d => !seen.has(d.id) && seen.add(d.id))
+      .filter(d => ['merchant_post', 'levelup', 'streak'].includes(d.data().type));      // les anciens événements « a répondu » ne sont plus montrés
     all.sort((a, b) => ((b.data().createdAt && b.data().createdAt.seconds) || 0) - ((a.data().createdAt && a.data().createdAt.seconds) || 0));
-    renderFeedDocs(el, all.slice(0, 25));
+    renderFeedDocs(el, all.slice(0, 30));
   };
-  // Une écoute par tranche de 10 personnes. Si une tranche est refusée (un ancien ami a retiré l'amitié
-  // et notre liste n'est pas encore à jour), on la refait personne par personne : seul le refusé disparaît.
-  const feedQ = list => db.collection('communityEvents').where('userId', 'in', list).orderBy('createdAt', 'desc').limit(25);
+  // Une écoute par tranche de 10. Si une tranche est refusée (un ancien ami a retiré l'amitié, un commerce a été retiré des autorisations
+  // et notre liste n'est pas encore à jour), on la refait un par un : seul le refusé disparaît.
   const add = (key, q, onFail) => listeners.push(q.onSnapshot(snap => { parts.set(key, snap.docs); paint(); }, e => {
     console.warn('Feed error (' + key + '):', e);
     if (onFail) onFail(); else { parts.set(key, []); paint(); }
   }));
-  for (let i = 0; i < ids.length; i += 10) {
-    const chunk = ids.slice(i, i + 10), key = 'f' + i;
-    add(key, feedQ(chunk), () => {
-      chunk.forEach(id => add(key + '_' + id, feedQ([id]), null));
-      parts.set(key, []); paint();
-    });
-  }
-  add('news', db.collection('communityEvents').where('type', '==', 'merchant_post').where('city', '==', city).orderBy('createdAt', 'desc').limit(10));
+  const friendsQ = list => db.collection('communityEvents').where('userId', 'in', list).orderBy('createdAt', 'desc').limit(25);
+  const shopsQ = list => db.collection('communityEvents').where('type', '==', 'merchant_post').where('merchantId', 'in', list).orderBy('createdAt', 'desc').limit(15);
+  const chunks = (arr, mk, prefix) => {
+    for (let i = 0; i < arr.length; i += 10) {
+      const chunk = arr.slice(i, i + 10), key = prefix + i;
+      add(key, mk(chunk), () => { chunk.forEach(id => add(key + '_' + id, mk([id]), null)); parts.set(key, []); paint(); });
+    }
+  };
+  chunks(ids, friendsQ, 'f');
+  chunks(merchants, shopsQ, 'm');
+  if (!listeners.length) { renderFeedDocs(el, []); return; }
   _communityFeedUnsub = () => listeners.forEach(u => u());
+}
+
+// Cartes de compatibilité avec mes amis (pourcentages calculés côté serveur, jamais une réponse individuelle).
+async function feedCompatCards() {
+  try {
+    if (!(S.friends || []).length) return [];
+    const data = await fetchCompat();
+    if (!data || data.sharing === false) return [];
+    return (data.friends || []).filter(c => c.state === 'ok').sort((a, b) => b.pct - a.pct).slice(0, 2)
+      .map(c => ({ c, f: (S.friends || []).find(x => x.uid === c.uid) })).filter(x => x.f);
+  } catch (e) { return []; }
 }
 
 async function renderFeedDocs(el, docs) {
   const token = ++_feedRenderToken;
-    if (!docs.length) {
-      el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
-        Rien de neuf chez tes amis pour l'instant.<br>
-        <span style="color:var(--ink);font-weight:700">Invite-les : vous verrez qui répond quoi, et grimperez ensemble.</span><br>
+  const compat = await feedCompatCards();
+  if (token !== _feedRenderToken) return;
+  if (!docs.length && !compat.length) {
+    el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
+        Le fil s'anime avec les nouveautés des commerces que tu autorises et les progrès de tes amis.<br>
+        <span style="color:var(--ink);font-weight:700">Autorise des commerces ou invite des amis pour le remplir.</span><br>
         <button onclick="shareInvite()" style="margin-top:14px;padding:11px 22px;background:var(--ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:99px;cursor:pointer">Inviter un ami</button>
       </div>`;
-      return;
+    return;
+  }
+
+  const colors = ['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
+  const myUid = auth.currentUser && auth.currentUser.uid;
+
+  // Totaux portés par la publication (likeCount / commentCount, tenus à jour par le serveur) : plus qu'une lecture
+  // par publication (mon « j'aime », mis en cache). Les anciennes publications sans compteur gardent l'ancien calcul.
+  S._liked = S._liked || {};
+  const likeInfo = await Promise.all(docs.map(async doc => {
+    const d = doc.data();
+    const hasCounters = typeof d.likeCount === 'number' && typeof d.commentCount === 'number';
+    try {
+      const mineKnown = doc.id in S._liked;
+      const [likesSnap, mineSnap, comSnap] = await Promise.all([
+        hasCounters ? null : doc.ref.collection('likes').get(),
+        (myUid && !mineKnown) ? doc.ref.collection('likes').doc(myUid).get() : Promise.resolve(null),
+        hasCounters ? null : doc.ref.collection('comments').get().catch(() => null)
+      ]);
+      if (mineSnap) S._liked[doc.id] = mineSnap.exists;
+      else if (!hasCounters && likesSnap && myUid && !mineKnown) S._liked[doc.id] = false;
+      return { count: hasCounters ? d.likeCount : (likesSnap ? likesSnap.size : 0), liked: !!S._liked[doc.id], comments: hasCounters ? d.commentCount : (comSnap ? comSnap.size : 0) };
+    } catch(e) { return { count: d.likeCount || 0, liked: !!S._liked[doc.id], comments: d.commentCount || 0 }; }
+  }));
+
+  if (token !== _feedRenderToken) return;          // un affichage plus récent a pris le relais
+  const escAttr = s => esc(s).replace(/"/g,'&quot;'); // esc() n'échappe pas les guillemets, nécessaire ici (valeurs insérées dans des attributs data-*)
+  const cards = docs.map((doc, i) => {
+    const ev = doc.data();
+    const name = ev.displayName || 'Quelqu\'un';
+    const c = colors[name.charCodeAt(0) % colors.length];
+    const ts = ev.createdAt ? timeAgo(ev.createdAt.toDate()) : '';
+    const { count: likeCount, liked, comments: commentCount } = likeInfo[i];
+    const isNews = ev.type === 'merchant_post', isStreak = ev.type === 'streak', isLevel = ev.type === 'levelup';
+    const kind = isNews ? (FEED_KINDS[ev.kind] ? ev.kind : 'impact') : '';
+    const mine = ev.userId === myUid;
+    let avatar, action, cls = 'feed-post';
+    if (isNews) {
+      avatar = `<div class="fp-av cm-av-news">${logoHTML(name, 36, null)}</div>`;
+      action = `<div class="cm-news-t">${esc(ev.text || '')}</div>`;
+      cls += ' cm-news cm-k-' + kind;
+    } else if (isLevel) {
+      const tier = TIERS.find(t => t.n === ev.level) || TIERS[0];
+      avatar = `<div class="fp-av cm-av-level" style="background:${tier.c}">${icon(tier.ico, { size: 20 })}</div>`;
+      action = `<div class="cm-level-t">${mine ? 'Tu as atteint' : 'a atteint'} le palier <b>${esc(ev.level || '')}</b></div>`;
+      cls += ' cm-level';
+    } else {
+      avatar = `<div class="fp-av cm-av-streak">${icon('fire', { size: 20 })}</div>`;
+      action = `<div class="cm-streak-t">${esc(ev.text || '')}</div>`;
+      cls += ' cm-streak';
     }
-
-    const colors = ['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
-    const myUid = auth.currentUser && auth.currentUser.uid;
-    
-    // Totaux portés par la publication (likeCount / commentCount, tenus à jour par le serveur) : plus qu'une lecture
-    // par publication (mon « j'aime », mis en cache). Les anciennes publications sans compteur gardent l'ancien calcul.
-    S._liked = S._liked || {};
-    const likeInfo = await Promise.all(docs.map(async doc => {
-      const d = doc.data();
-      const hasCounters = typeof d.likeCount === 'number' && typeof d.commentCount === 'number';
-      try {
-        const mineKnown = doc.id in S._liked;
-        const [likesSnap, mineSnap, comSnap] = await Promise.all([
-          hasCounters ? null : doc.ref.collection('likes').get(),
-          (myUid && !mineKnown) ? doc.ref.collection('likes').doc(myUid).get() : Promise.resolve(null),
-          hasCounters ? null : doc.ref.collection('comments').get().catch(() => null)
-        ]);
-        if (mineSnap) S._liked[doc.id] = mineSnap.exists;
-        else if (!hasCounters && likesSnap && myUid && !mineKnown) S._liked[doc.id] = false;
-        return { count: hasCounters ? d.likeCount : (likesSnap ? likesSnap.size : 0), liked: !!S._liked[doc.id], comments: hasCounters ? d.commentCount : (comSnap ? comSnap.size : 0) };
-      } catch(e) { return { count: d.likeCount || 0, liked: !!S._liked[doc.id], comments: d.commentCount || 0 }; }
-    }));
-
-    if (token !== _feedRenderToken) return;          // un affichage plus récent a pris le relais
-    el.innerHTML = '';
-
-    const escAttr = s => esc(s).replace(/"/g,'&quot;'); // esc() n'échappe pas les guillemets, nécessaire ici (valeurs insérées dans des attributs data-*)
-    // Une même personne qui répond à plusieurs questions le même jour = UNE carte (« a répondu à 3 questions »).
-    const dayOf = ev => ev.createdAt ? parisToday(ev.createdAt.toMillis()) : '';
-    const groups = [];
-    docs.forEach((doc, i) => {
-      const ev = doc.data(), last = groups[groups.length - 1];
-      // On ne fusionne qu'un événement SANS j'aime ni commentaire (sinon ses interactions deviendraient inaccessibles).
-      const untouched = ev.likeCount === 0 && ev.commentCount === 0;
-      if (untouched && ev.type === 'answer' && last && last.ev.type === 'answer' && last.ev.userId === ev.userId && dayOf(last.ev) === dayOf(ev)) {
-        last.n++; if (ev.brand && !last.brands.includes(ev.brand)) last.brands.push(ev.brand);
-      } else groups.push({ doc, ev, i, n: 1, brands: ev.brand ? [ev.brand] : [] });
-    });
-    groups.forEach(g => {
-      const { doc, ev } = g;
-      const name = ev.displayName || 'Quelqu\'un';
-      const c = colors[name.charCodeAt(0) % colors.length];
-      const ts = ev.createdAt ? timeAgo(ev.createdAt.toDate()) : '';
-      const { count: likeCount, liked, comments: commentCount } = likeInfo[g.i];
-      const isNews = ev.type === 'merchant_post', isStreak = ev.type === 'streak';
-      let avatar, action;
-      if (isNews) {
-        avatar = `<div class="fp-av cm-av-news">${logoHTML(name, 36, null)}</div>`;
-        action = `<div class="cm-news-t">${esc(ev.text || '')}</div>`;
-      } else if (isStreak) {
-        avatar = `<div class="fp-av cm-av-streak">${icon('fire', { size: 20 })}</div>`;
-        action = `<div class="cm-streak-t">${esc(ev.text || '')}</div>`;
-      } else {
-        avatar = `<div class="fp-av" style="background:${c}18;color:${c}">${name[0].toUpperCase()}</div>`;
-        action = g.n > 1
-          ? `<div class="fp-action">a répondu à <strong>${g.n} questions</strong> aujourd'hui</div><div class="cm-brands">${g.brands.slice(0, 3).map(b => `<span>${esc(b)}</span>`).join('')}${g.brands.length > 3 ? `<span>+${g.brands.length - 3}</span>` : ''}</div>`
-          : `<div class="fp-action">${esc(ev.text || 'a répondu à une question')}${ev.brand ? ` <strong>${esc(ev.brand)}</strong>` : ''}</div>`;
-      }
-      const d = document.createElement('div');
-      d.className = 'feed-post' + (isNews ? ' cm-news' : isStreak ? ' cm-streak' : '');
-      d.innerHTML = `<div class="fp-hdr">${avatar}<div style="flex:1;min-width:0"><div class="fp-name">${esc(name)}${isNews ? ' <span class="fp-tag">Actualité</span>' : ''}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body">${action}</div><div class="fp-foot">
+    const d = document.createElement('div');
+    d.className = cls;
+    d.innerHTML = `<div class="fp-hdr">${avatar}<div style="flex:1;min-width:0"><div class="fp-name">${esc(isNews ? name : (mine ? 'Toi' : name))}${isNews ? ` <span class="fp-tag">${esc(FEED_KINDS[kind])}</span>` : ''}</div><div class="fp-time">${ts}</div></div></div><div class="fp-body">${action}</div><div class="fp-foot">
         <button class="fp-btn fp-like-btn${liked?' liked':''}" data-post-id="${escAttr(doc.id)}" data-liked="${liked}" onclick="toggleFeedLike(this)">${icon(liked?'heart-filled':'heart',{size:13})} <span class="fp-like-count">${likeCount>0?likeCount:''}</span> J'aime</button>
         <button class="fp-btn" data-post-id="${escAttr(doc.id)}" onclick="toggleComments(this.dataset.postId)">${icon('chat',{size:13})} <span class="fp-com-count">${commentCount>0?commentCount:''}</span> Commenter</button>
         <button class="fp-btn" data-name="${escAttr(name)}" data-text="${escAttr(ev.text||'')}" data-brand="${escAttr(ev.brand||'')}" onclick="shareFeedPost(this.dataset.name,this.dataset.text,this.dataset.brand)">${icon('broadcast',{size:13})} Partager</button>
       </div><div class="fp-comments" id="cm-${escAttr(doc.id)}" style="display:none"></div>`;
-      el.appendChild(d);
-    });
-    applyStagger(el);
-    // Les commentaires ouverts restent ouverts quand le fil se rafraîchit.
-    _openComments.forEach(id => { const box = document.getElementById('cm-' + id); if(box){ box.style.display = 'block'; loadComments(id); } });
-}
-
-// ─── Chiffres de la ville (agrégés, sans aucun nom) ───────────
-async function loadCommunityPulse() {
-  const el = document.getElementById('community-pulse'); if(!el) return;
-  try {
-    const r = (await fx.httpsCallable('getCommunityPulse')()).data;
-    if(!r || !r.available) { el.innerHTML = ''; return; }
-    const city = S._cityLabel || r.city;
-    const stat = (n, l) => `<div class="cm-stat"><div class="cm-stat-n">${n}</div><div class="cm-stat-l">${l}</div></div>`;
-    el.innerHTML = r.enough
-      ? `<div class="cm-hero"><div class="cm-hero-t">${icon('pin',{size:14})} ${esc(city)} cette semaine</div><div class="cm-stats">${stat(r.weekAnswers, 'réponses de voisins')}${stat(r.activeMerchants, 'commerce' + (r.activeMerchants > 1 ? 's' : '') + ' actif' + (r.activeMerchants > 1 ? 's' : ''))}${stat(r.myWeekAnswers, 'de toi')}</div></div>`
-      : `<div class="cm-hero"><div class="cm-hero-t">${icon('pin',{size:14})} ${esc(city)} démarre</div><div class="cm-hero-d">${r.activeMerchants ? r.activeMerchants + ' commerce' + (r.activeMerchants > 1 ? 's te posent' : ' te pose') + ' des questions. Sois parmi les premiers à répondre : les résultats de la ville apparaîtront ici.' : 'Les commerces de ton quartier arrivent. Invite tes amis pour être prêts.'}</div></div>`;
-  } catch(e) { console.warn('pulse:', e); el.innerHTML = ''; }
-}
-
-// ─── « Comment la ville a répondu » : résultats globaux de mes dernières questions ───
-async function loadMyResults() {
-  const el = document.getElementById('community-results'); if(!el) return;
-  try {
-    const r = (await fx.httpsCallable('getMyResults')()).data;
-    const list = (r && r.results) || [];
-    if(!list.length) { el.innerHTML = ''; return; }
-    el.innerHTML = `<div class="cm-sec" style="padding:0 18px">Comment la ville a répondu</div><div class="cm-res-list">${list.map((x, k) => {
-      if(x.belowThreshold) return `<div class="cm-res"><div class="cm-res-b">${esc(x.brand)}</div><div class="cm-res-q">${esc(x.question)}</div><div class="cm-res-w">Encore ${x.needed} réponse${x.needed > 1 ? 's' : ''} pour voir les résultats.</div></div>`;
-      const top = x.options.reduce((a, b) => (b.pct > a.pct ? b : a), x.options[0]);
-      const mine = x.options[x.myIdx];
-      return `<div class="cm-res" onclick="this.classList.toggle('open')"><div class="cm-res-b">${esc(x.brand)} · ${x.n} réponses</div><div class="cm-res-q">${esc(x.question)}</div>
-        <div class="cm-res-top"><span>${esc(top.text)}</span><b>${top.pct} %</b></div><div class="cm-res-bar"><div style="width:${top.pct}%"></div></div>
-        <div class="cm-res-me">${mine ? (mine === top ? 'Tu as répondu comme la majorité' : 'Toi : ' + esc(mine.text) + ' (' + mine.pct + ' %)') : ''}</div>
-        <div class="cm-res-all">${x.options.map((o, i) => `<div class="cm-res-row${i === x.myIdx ? ' mine' : ''}"><span>${i === x.myIdx ? icon('check',{size:12}) + ' ' : ''}${esc(o.text)}</span><b>${o.pct} %</b></div>`).join('')}</div></div>`;
-    }).join('')}</div>`;
-  } catch(e) { console.warn('myResults:', e); el.innerHTML = ''; }
+    return d;
+  });
+  // Cartes de compatibilité intercalées (2e et 5e place) pour varier le rythme du fil.
+  compat.forEach((x, k) => {
+    const d = document.createElement('div');
+    d.className = 'feed-post cm-compat';
+    d.setAttribute('role', 'button'); d.tabIndex = 0;
+    d.onclick = () => openFriendProfile(x.f);
+    d.onkeydown = e => { if (e.key === 'Enter') openFriendProfile(x.f); };
+    d.innerHTML = `<div class="cm-compat-top"><div class="cm-compat-big">${x.c.pct} %</div><div class="cm-compat-t">de compatibilité avec <strong>${esc(x.f.n)}</strong></div></div><div class="cp-bar"><div style="width:${x.c.pct}%"></div></div>`;
+    cards.splice(Math.min(1 + k * 3, cards.length), 0, d);
+  });
+  el.innerHTML = '';
+  cards.forEach(d => el.appendChild(d));
+  applyStagger(el);
+  // Les commentaires ouverts restent ouverts quand le fil se rafraîchit.
+  _openComments.forEach(id => { const box = document.getElementById('cm-' + id); if(box){ box.style.display = 'block'; loadComments(id); } });
 }
 
 async function toggleFeedLike(btn) {
@@ -3190,9 +3259,13 @@ function checkTierAndBadgeCelebrations(){
 }
 function refreshWallet(){
   checkTierAndBadgeCelebrations();
+  {const pi=document.getElementById('wpts-ico');if(pi)pi.innerHTML=nvImg('points',icon('star',{size:28}),'');
+   const ni=document.getElementById('wnoov-ico');if(ni)ni.innerHTML=nvImg('coin','N','');
+   const ri=document.getElementById('rewards-all-ico');if(ri)ri.innerHTML=nvImg('rewards',icon('gift-generic',{size:24}),'');}
   animateNumber(document.getElementById('wc-pts-num'),S.pts);
   const hdrPts=document.getElementById('wc-pts-num-hdr');if(hdrPts)animateNumber(hdrPts,S.pts);
   {const nn=document.getElementById('noov-num');if(nn)animateNumber(nn,S.noovs||0);}
+  renderHeaderStats();
   renderNoovRewards();
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(4,((S.xp-l.min)/(l.max-l.min))*100));
   document.getElementById('wc-fill').style.width=pct+'%';
@@ -3275,6 +3348,7 @@ S.mode=S.mode||'hook';S.sv=S.sv||null;S.brandBack=S.brandBack||'home';
 /* --- Rendu d'une question (commun hook + suivi) --- */
 function fillQuestion(q,opts){
   S._qShownAt = Date.now();
+  document.getElementById('question').classList.toggle('qfull',qMode(q)==='full');   // « bulle » ou « plein écran » (voir qMode)
   setQPtsTag(q);
   beginQuestionOnServer(q);
   startAnswerLock();
@@ -4592,13 +4666,9 @@ function cityPhrase(label){
 // Récompenses payables en NOOVS : annoncées, pas encore ouvertes.
 function renderNoovRewards(){
   const el=document.getElementById('noov-rewards');if(!el)return;
-  const items=[
-    {ico:'gift-generic',t:'Bons chez les commerçants',d:'Transforme tes NOOVS en bons chez les commerces de ton quartier.'},
-    {ico:'eye',t:'Sans publicité',d:'Retire les publicités de l\'app avec tes NOOVS.'},
-    {ico:'trophy',t:'Concours',d:'Tente de gagner des lots en jouant tes NOOVS.'},
-    {ico:'credit-card',t:'Cash',d:'Retrait en argent, plus tard, avec vérification d\'identité.'}
-  ];
-  el.innerHTML=items.map(i=>`<div class="noov-soon"><div class="ns-ico">${icon(i.ico,{size:22})}</div><div style="flex:1;min-width:0"><div class="ns-t">${i.t}</div><div class="ns-d">${i.d}</div></div><div class="ns-tag">Arrive bientôt</div></div>`).join('');
+  const items=[{ico:'gift-generic',t:'Bons'},{ico:'eye',t:'Sans pub'},{ico:'trophy',t:'Concours'},{ico:'credit-card',t:'Cash'}];
+  el.className='noov-tiles';
+  el.innerHTML=items.map(i=>`<div class="noov-tile"><div class="ns-ico">${icon(i.ico,{size:20})}</div><div class="ns-t">${i.t}</div><div class="ns-tag">Bientôt</div></div>`).join('');
 }
 function renderDailyTrack(){
   const el=document.getElementById('daily-track');if(!el)return;
@@ -4606,8 +4676,8 @@ function renderDailyTrack(){
   const left=MAX_POINT_ANSWERS-n;
   el.className='dtrack';
   el.innerHTML='<div class="dt-dots">'+[0,1,2].map(i=>'<div class="dt-dot'+(i<n?' on':'')+'"></div>').join('')+'</div><div class="dt-txt">'
-    +(left>0?left+' réponse'+(left>1?'s':'')+' en points aujourd\'hui':'Tes '+(S._pointsToday||0)+' pts du jour sont validés')
-    +'</div><div class="dt-noov">'+(S.noovs||0)+' NOOVS</div>';
+    +(left>0?'Encore '+left+' réponse'+(left>1?'s':'')+' pour tes points et ta série':'Tes '+(S._pointsToday||0)+' pts du jour sont validés')
+    +'</div>';
 }
 function renderHomeState(){
   const el=document.getElementById('home-state'),card=document.getElementById('today-card');
@@ -4746,19 +4816,16 @@ function renderAlmostReward(){
   const rewards = (S._rewardsCache||[]).filter(r => rewardCost(r) > S.pts);
   if(!rewards.length){ wrap.innerHTML=''; return; }
   rewards.sort((a,b) => (rewardCost(a)-S.pts) - (rewardCost(b)-S.pts));
-  const r = rewards[0];
-  const pct = Math.max(4, Math.min(96, (S.pts / rewardCost(r)) * 100));
-  const missing = Math.max(0, rewardCost(r) - S.pts);
-  wrap.innerHTML = `<div class="dsec-h">Ta prochaine récompense</div><div class="dpat-card" onclick="goNav('rewards-tab')">
-    <div class="dpat-photo">${r.photoUrl?`<img src="${r.photoUrl}" alt="Photo de la récompense : ${esc(r.label||'')}" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}<div class="dpat-pct">${Math.round(pct)}%</div></div>
-    <div class="dpat-body">
-      <div class="mark">?!</div>
-      <div class="dpat-name">${esc(r.label||'Récompense')}</div>
-      <div class="dpat-sub">${r.merchantName?'Chez '+esc(r.merchantName):'Chez un commerce de ton quartier'}</div>
+  const two = rewards.slice(0,2);
+  wrap.innerHTML = `<div class="dsec-h">Ta prochaine récompense</div><div class="dpat-row">${two.map(r => {
+    const pct = Math.max(4, Math.min(96, (S.pts / rewardCost(r)) * 100));
+    const missing = Math.max(0, rewardCost(r) - S.pts);
+    const ph = r.photoUrl ? `<img src="${esc(r.photoUrl)}" alt="Photo de la récompense : ${esc(r.label||'')}" onerror="this.remove()">` : icon('gift-generic',{size:18});
+    return `<div class="dpat-mini${two.length===1?' solo':''}" role="button" tabindex="0" onclick="goNav('rewards-tab')" onkeydown="if(event.key==='Enter')goNav('rewards-tab')" aria-label="${esc(r.label||'Récompense')}, encore ${missing} points">
+      <div class="dpat-mini-top"><div class="dpat-mini-ph">${ph}</div><div class="dpat-mini-name">${esc(r.label||'Récompense')}</div></div>
       <div class="dpat-bar"><div class="dpat-bar-fill" style="width:${pct}%"></div></div>
-      <div class="dpat-txt">Il te manque <strong>${missing} pts</strong> pour l'échanger</div>
-    </div>
-  </div>`;
+      <div class="dpat-mini-txt">encore ${missing} pts</div>
+    </div>`;}).join('')}</div>`;
 }
 // ─── Récompense mise en avant (écran Récompenses) — logique "appli de fidélité" :
 // une seule récompense à la fois (celle qu'on peut échanger, sinon la plus proche),
@@ -4771,7 +4838,7 @@ function renderFeaturedReward(){
   if(!all.length){ wrap.innerHTML=''; if(labelEl) labelEl.innerHTML=''; S._featuredRewardId=null; return; }
   const redeemable = all.filter(r => rewardCost(r) <= S.pts).sort((a,b)=>rewardCost(b)-rewardCost(a));
   if(labelEl) labelEl.innerHTML = redeemable.length
-    ? icon('gift-generic',{size:18})+' Disponible maintenant'
+    ? 'Disponible maintenant'
     : 'Ta prochaine récompense';
   if(redeemable.length){
     const r = redeemable[0];
@@ -4799,7 +4866,7 @@ function renderFeaturedReward(){
     </div>`;
   }
   const countEl = document.getElementById('rewards-all-count');
-  if(countEl) countEl.textContent = all.length+' récompense'+(all.length>1?'s':'')+' · paliers';
+  if(countEl) countEl.textContent = all.length+' récompense'+(all.length>1?'s':'');
 }
 function renderTierTrack(){
   const wrap = document.getElementById('tier-track-wrap');
@@ -5053,7 +5120,7 @@ function finishAuthTransition() {
 // ─── Mini-didacticiel de première connexion : info-bulles sur l'accueil ────
 const HOME_TOUR_STEPS=[
   {sel:'#today-card', txt:'La question du jour est ici — réponds en quelques secondes pour gagner des points.'},
-  {sel:'.dstreak-card', txt:'Réponds chaque jour pour construire ta série.'},
+  {sel:'.dh-streak', txt:'Ta série : réponds à 3 questions par jour pour la faire grandir. Se connecter ne suffit pas.'},
   {sel:'#nav-rewards-tab', txt:'Échange tes points contre de vraies récompenses chez les commerces du quartier.'},
   {sel:'#nav-social', txt:'Défie tes amis et grimpe dans le classement de la semaine.'}
 ];
@@ -5257,11 +5324,13 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   S.streak           = data.streak || 0;
   S.ans              = data.ans || 0;
   S._lastAnswerDate  = data.lastAnswerDate || null;
-  // Streak cassé si un jour a été manqué : ne pas attendre la prochaine réponse pour l'afficher à 0
+  // Un jour compte dans la série quand on a répondu à 3 questions (streakDate). Série cassée si hier n'a pas été validé :
+  // on l'affiche à 0 sans attendre la prochaine réponse.
+  S._streakDate      = data.streakDate !== undefined ? data.streakDate : (data.lastAnswerDate || null);
   {
     const _today = parisToday();
     const _yesterday = parisToday(Date.now() - 86400000);
-    if (S._lastAnswerDate !== _today && S._lastAnswerDate !== _yesterday) S.streak = 0;
+    if (S._streakDate !== _today && S._streakDate !== _yesterday) S.streak = 0;
   }
   S.noovs            = data.noovs || 0;
   S._pointsToday     = data.dailyPointsDate === parisToday() ? (data.dailyPoints || 0) : 0;
@@ -5744,6 +5813,8 @@ submitAns = function() {
       S._answeredQ.push(qKey);
       if(qIdx === 0) S._answered.push(q._firestoreId);
       S.streak = typeof data.streak === 'number' ? data.streak : S.streak;
+      if (data.streakToday) S._streakDate = parisToday();
+      renderHeaderStats();
 
       // Capturé avant _origSubmitAns() : détermine si cette soumission alimente S.sv.earned.
       const touchesSurvey = (S.mode === 'survey') || !!(q && q.survey && q.survey.length);
@@ -5756,6 +5827,7 @@ submitAns = function() {
       S.xp  = typeof data.totalXp === 'number' ? data.totalXp : (S.xp + totalEarned);
       const noovsGot = data.noovsAwarded || 0;
       S.noovs = typeof data.totalNoovs === 'number' ? data.totalNoovs : (S.noovs || 0);
+      renderHeaderStats();
       if (typeof data.answersToday === 'number') { S._answersToday = data.answersToday; S._answersDate = parisToday(); }
       if (typeof data.pointsToday === 'number') S._pointsToday = data.pointsToday;
       if (S.hist && S.hist[0]) { S.hist[0].pts = totalEarned; S.hist[0].noovs = noovsGot; }

@@ -1363,14 +1363,21 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
         <div style="max-width:700px">
           <div style="margin-bottom:22px">
             <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink)">Actualités</div>
-            <div style="font-size:13px;color:var(--ink2);margin-top:4px;line-height:1.6">Montrez à vos clients ce que leurs réponses ont changé chez vous. Après validation par l'équipe NOOVA, votre actualité apparaît dans la communauté de votre ville, et les habitants qui ont répondu à vos questions reçoivent « Ton avis a compté ».</div>
+            <div style="font-size:13px;color:var(--ink2);margin-top:4px;line-height:1.6">Mettez en avant une actualité, une nouveauté ou ce que les avis ont changé chez vous. Après validation par l'équipe NOOVA, votre publication apparaît dans le fil des habitants qui ont autorisé votre commerce. Pour « Suite à vos avis », les habitants qui ont répondu à vos questions sont aussi prévenus (« Ton avis a compté »).</div>
           </div>
           <div id="news-locked" style="display:none;background:var(--ad);border:1.5px solid rgba(242,151,21,.25);border-radius:var(--rs);padding:14px 18px;margin-bottom:18px;font-size:13px;color:var(--ink2)">Les actualités seront disponibles après la vérification de votre établissement.</div>
           <div class="card" style="padding:18px;margin-bottom:22px" id="news-form">
-            <label class="field-lbl" for="news-text">Votre actualité</label>
+            <label class="field-lbl" for="news-kind">Nature de la publication</label>
+            <select class="field-inp" id="news-kind" onchange="newsKindChanged()" style="margin-bottom:14px">
+              <option value="news">Actualité (ce qui se passe chez vous)</option>
+              <option value="new">Nouveauté (un nouveau produit, un nouveau service)</option>
+              <option value="top">À la une (à mettre en avant, en jaune dans le fil)</option>
+              <option value="impact">Suite à vos avis (les habitants qui ont répondu sont prévenus)</option>
+            </select>
+            <label class="field-lbl" for="news-text">Votre publication</label>
             <textarea class="field-inp" id="news-text" rows="4" maxlength="200" placeholder="Ex. : Suite à vos avis, notre boulangerie ouvre désormais dès 6h30 le samedi." oninput="newsCount()" style="resize:vertical;line-height:1.5"></textarea>
-            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink3);margin-top:6px"><span>Court et concret : ce qui a changé grâce aux avis. Pas de promotion.</span><span id="news-count">0 / 200</span></div>
-            <div style="margin-top:16px">
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink3);margin-top:6px"><span>Court et concret. Visible uniquement par les habitants qui ont autorisé votre commerce.</span><span id="news-count">0 / 200</span></div>
+            <div style="margin-top:16px" id="news-camps-wrap">
               <div class="field-lbl">Rattacher à des questions (facultatif, 3 maximum)</div>
               <div style="font-size:11.5px;color:var(--ink3);margin-bottom:8px">Sans rattachement, tous les habitants qui ont répondu à l'une de vos questions sont prévenus.</div>
               <div id="news-camps" style="display:flex;flex-direction:column;gap:6px;max-height:190px;overflow:auto"></div>
@@ -3893,8 +3900,9 @@ function limitNewsLinked(cb){
   const n=document.querySelectorAll('#news-camps input:checked').length;
   if(n>NEWS_MAX_LINKED){cb.checked=false;showToast('3 questions au maximum','warning');}
 }
+function newsKindChanged(){const k=document.getElementById('news-kind').value;const w=document.getElementById('news-camps-wrap');if(w)w.style.display=k==='impact'?'block':'none';}
 function resetNewsForm(){
-  _newsEditId=null;
+  _newsEditId=null;const nk=document.getElementById('news-kind');if(nk){nk.value='news';newsKindChanged();}
   const t=document.getElementById('news-text');if(t)t.value='';
   newsCount();renderNewsCamps([]);
   const b=document.getElementById('news-submit');if(b)b.textContent='Envoyer pour validation';
@@ -3905,7 +3913,7 @@ function loadMerchantNews(){
   const verified=_mData&&_mData.status==='verified';
   const lock=document.getElementById('news-locked');if(lock)lock.style.display=verified?'none':'block';
   const form=document.getElementById('news-form');if(form){form.style.opacity=verified?'1':'.5';form.style.pointerEvents=verified?'auto':'none';}
-  renderNewsCamps();newsCount();
+  renderNewsCamps();newsCount();newsKindChanged();
   if(_newsUnsub)_newsUnsub();
   _newsUnsub=db.collection('merchantPosts').where('merchantId','==',u.uid).onSnapshot(snap=>{
     _newsPosts=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
@@ -3921,7 +3929,7 @@ function renderNewsList(){
     let note='';
     if(p.status==='published'){
       const n=(p.notifySent||0)+(p.notifyQueued||0);
-      note=p.notifyNote==='sent'?`${n} habitant${n>1?'s':''} prévenu${n>1?'s':''}`:p.notifyNote==='gap'?'Visible dans la communauté (habitants non prévenus : une actualité notifiée tous les 14 jours)':p.notifyNote==='no_audience'?'Visible dans la communauté':'';
+      note=p.notifyNote==='feed_only'?'Visible dans le fil des habitants qui ont autorisé votre commerce':p.notifyNote==='sent'?`${n} habitant${n>1?'s':''} prévenu${n>1?'s':''}`:p.notifyNote==='gap'?'Visible dans la communauté (habitants non prévenus : une actualité notifiée tous les 14 jours)':p.notifyNote==='no_audience'?'Visible dans la communauté':'';
     }
     if(p.status==='rejected')note=p.rejectionReason?'Motif : '+p.rejectionReason:'';
     const acts=p.status==='published'?'':`<div style="display:flex;gap:8px;margin-top:10px">${p.status==='rejected'?`<button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editNews('${esc(p.id)}')">Corriger et renvoyer</button>`:''}<button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="deleteNews('${esc(p.id)}')">Supprimer</button></div>`;
@@ -3934,13 +3942,14 @@ async function submitNews(){
   const text=(document.getElementById('news-text').value||'').trim();
   if(text.length<10){showToast('Écrivez au moins une phrase (10 caractères).','warning');return;}
   if(text.length>200){showToast('200 caractères maximum.','warning');return;}
-  const campaignIds=[...document.querySelectorAll('#news-camps input:checked')].map(i=>i.value).slice(0,NEWS_MAX_LINKED);
+  const kind=document.getElementById('news-kind').value;
+  const campaignIds=kind==='impact'?[...document.querySelectorAll('#news-camps input:checked')].map(i=>i.value).slice(0,NEWS_MAX_LINKED):[];
   const btn=document.getElementById('news-submit');btn.disabled=true;
   try{
     if(_newsEditId){
-      await db.collection('merchantPosts').doc(_newsEditId).update({text,campaignIds,status:'pending',rejectionReason:firebase.firestore.FieldValue.delete()});
+      await db.collection('merchantPosts').doc(_newsEditId).update({text,campaignIds,kind,status:'pending',rejectionReason:firebase.firestore.FieldValue.delete()});
     }else{
-      await db.collection('merchantPosts').add({merchantId:u.uid,merchantName:_mData.brandName||_mData.name||'',text,campaignIds,status:'pending',city:String(_mData.city||'').toLowerCase(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      await db.collection('merchantPosts').add({merchantId:u.uid,merchantName:_mData.brandName||_mData.name||'',text,campaignIds,kind,status:'pending',city:String(_mData.city||'').toLowerCase(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     }
     resetNewsForm();showToast('Actualité envoyée : elle sera publiée après validation.','check');
   }catch(e){console.warn('submitNews:',e);showToast("Impossible d'envoyer l'actualité.",'warning');}
@@ -3948,7 +3957,7 @@ async function submitNews(){
 }
 function editNews(id){
   const p=_newsPosts.find(x=>x.id===id);if(!p)return;
-  _newsEditId=id;document.getElementById('news-text').value=p.text||'';newsCount();renderNewsCamps(p.campaignIds||[]);
+  _newsEditId=id;document.getElementById('news-kind').value=p.kind||'impact';newsKindChanged();document.getElementById('news-text').value=p.text||'';newsCount();renderNewsCamps(p.campaignIds||[]);
   document.getElementById('news-submit').textContent='Renvoyer pour validation';document.getElementById('news-cancel').style.display='inline-flex';
   document.getElementById('news-form').scrollIntoView({behavior:'smooth',block:'center'});
 }

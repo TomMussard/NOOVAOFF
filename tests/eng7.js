@@ -65,7 +65,7 @@ const ADMIN='http://localhost:8950/admin.html';
     await post('rej',{status:'rejected',text:'Refusée : ne doit pas apparaître.'});
     await post('other',{merchantId:'m2',merchantName:'Autre',text:'Autre commerce.'});
     // fil : publications avec compteurs / sans compteurs
-    const ev=(id,o)=>db.doc('communityEvents/'+id).set({type:'answer',userId:'f1',displayName:'Léa',city:'le-mans',text:'a répondu à une question de',brand:'Le Fournil',createdAt:Timestamp.now(),...o});
+    const ev=(id,o)=>db.doc('communityEvents/'+id).set({type:'levelup',level:'Actif',userId:'f1',displayName:'Léa',city:'le-mans',text:'a atteint le palier Actif',brand:'',createdAt:Timestamp.now(),...o});
     await ev('withc',{likeCount:5,commentCount:2});
     await ev('legacy',{createdAt:Timestamp.fromMillis(Date.now()-60000)});
     await db.doc('communityEvents/legacy/likes/x1').set({createdAt:Timestamp.now()});await db.doc('communityEvents/legacy/likes/x2').set({createdAt:Timestamp.now()});

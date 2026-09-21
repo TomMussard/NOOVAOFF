@@ -97,7 +97,7 @@ const copy = {
     ? finish({ title: `${pct} % de tes voisins pensent comme toi`, body: `Découvre le résultat de ${short(merchant, 30)}`, screen: "home" })
     : finish({ title: `Les résultats de ${short(merchant, 30)} sont là`, body: "Découvre ce qu'ont répondu tes voisins", screen: "home" }),
   recompense: ({ reward, merchant, cost }) => finish({ title: `Ton ${short(reward, 26)} chez ${short(merchant, 20)} est à toi`, body: `Échange-le contre tes ${cost} points`, screen: "rewards-tab" }),
-  serie: ({ n, merchant }) => finish({ title: `Ta série est à ${n} jours`, body: `${short(merchant, 30)} a une question : 30 secondes, +10 points`, screen: "home" }),
+  serie: ({ n, merchant }) => finish({ title: `Ta série est à ${n} jours`, body: `${short(merchant, 30)} a une question : réponds à 3 questions aujourd'hui pour la garder`, screen: "home" }),
   code: ({ reward, merchant, when, until }) => finish({ title: `Ton ${short(reward, 26)} expire ${when}`, body: `Chez ${short(merchant, 30)}, à utiliser avant ${until}`, screen: "rewards-tab" }),
   impact: ({ merchant, text }) => finish({ title: `Ton avis a compté chez ${short(merchant, 30)}`, body: short(text, 110), screen: "social" }),
   amiRequest: ({ name }) => finish({ title: `${short(name, 30)} veut être ton ami`, body: "Accepte sa demande dans NOOVA", screen: "social" }),
@@ -376,7 +376,7 @@ async function runTick(now = Date.now()) {
       if (r.status === "sent") out.qdj++;
     }
     // Série en danger : 20h, série >= 3 jours encore vivante (répondu hier), rien répondu aujourd'hui.
-    if (p.hour === 20 && (u.streak || 0) >= 3 && u.lastAnswerDate === yesterdayDay(now) && avail.length && !answeredToday(u, p.day)) {
+    if (p.hour === 20 && (u.streak || 0) >= 3 && (u.streakDate !== undefined ? u.streakDate : u.lastAnswerDate) === yesterdayDay(now) && avail.length && !answeredToday(u, p.day)) {
       const r = await deliver(uid, "serie_en_danger", copy.serie({ n: u.streak, merchant: avail[0].merchantName }), { key: p.day, now });
       if (r.status === "sent") out.serie++;
     }

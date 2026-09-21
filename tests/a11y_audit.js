@@ -45,7 +45,7 @@ const run=async(p,name)=>{
   await wipe();
   await db.doc('merchants/m1').set({role:'merchant',ownerUid:'m1',brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:'m1@shop.fr',seenDashTour:true,verifiedPopupShown:true});
   await mkCampaign('c1');await mkUser('me',{name:'Moi',email:'me@t.fr',friendUids:['f1']});await mkUser('f1',{name:'Léa',friendUids:['me']});
-  await db.doc('communityEvents/e1').set({type:'answer',userId:'f1',displayName:'Léa',city:'le-mans',text:'a répondu à une question de',brand:'Le Fournil',likeCount:1,commentCount:0,createdAt:Timestamp.now()});
+  await db.doc('communityEvents/e1').set({type:'levelup',level:'Actif',userId:'f1',displayName:'Léa',city:'le-mans',text:'a atteint le palier Actif',brand:'',likeCount:1,commentCount:0,createdAt:Timestamp.now()});
   for(let i=0;i<3;i++)await db.doc('rewards/m1_p'+(i+1)).set({merchantId:'m1',merchantName:'Le Fournil',city:'le-mans',label:'Café offert '+i,tier:(i+1),slot:(i+1),cost:[150,300,500,900,1500][(i+1)-1],priceConfirmed:true,monthlyQuota:20,timeSlots:[],withPurchase:false,minPurchase:null,status:'approved',active:true,approved:true,redeemedCount:0,createdAt:Timestamp.now()});
   await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});
   const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});

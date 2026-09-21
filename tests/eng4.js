@@ -194,8 +194,9 @@ const settle=async()=>{await sleep(4500);for(const c of ['_pushSink','notifLog',
     check('Dashboard : page « Actualités » (formulaire, 2 questions à rattacher, pas de verrou)',f0.title==='Actualités'&&f0.camps===2&&f0.locked==='none'&&/Aucune actualité/.test(f0.list),f0);
     await setVal(mp,'#news-text','court');await mp.evaluate(()=>submitNews());await sleep(600);
     check('Dashboard : texte trop court refusé (rien créé)',(await db.collection('merchantPosts').get()).empty);
-    await mp.evaluate(()=>{const t=document.getElementById('news-text');t.value='Suite à vos avis, nous ouvrons dès 6h30 le samedi.';newsCount();document.querySelector('#news-camps input').click();});
+    await mp.evaluate(()=>{const t=document.getElementById('news-text');t.value='Suite à vos avis, nous ouvrons dès 6h30 le samedi.';newsCount();});
     check('Dashboard : compteur de caractères',/^\d+ \/ 200$/.test(await mp.$eval('#news-count',e=>e.textContent)));
+    await mp.select('#news-kind','impact');await mp.evaluate(()=>{document.querySelector('#news-camps input').click();});   // « Suite à vos avis » : les questions rattachées reçoivent la notification
     await mp.evaluate(()=>submitNews());
     await until(async()=>!(await db.collection('merchantPosts').get()).empty);
     const d1=(await db.collection('merchantPosts').get()).docs[0];const pid=d1.id;
@@ -252,7 +253,7 @@ const settle=async()=>{await sleep(4500);for(const c of ['_pushSink','notifLog',
     await wf(up,()=>document.querySelector('#feed-content .feed-post'),null,20000);
     const feed=await up.evaluate(()=>({posts:[...document.querySelectorAll('#feed-content .feed-post')].map(p=>p.textContent.replace(/\s+/g,' ').trim()),tag:!!document.querySelector('#feed-content .fp-tag')}));
     await up.screenshot({path:'/tmp/shots/news_feed.png'});
-    check('Habitant : l\'actualité publiée apparaît dans la communauté avec l\'étiquette « Actualité »',feed.tag&&feed.posts.some(t=>/Le Fournil/.test(t)&&/Actualité/.test(t)&&/6h30/.test(t)&&!/a répondu/.test(t)),feed.posts);
+    check('Habitant : l\'actualité publiée apparaît dans le fil avec son étiquette (« Ton avis a compté » pour une actualité suite aux avis)',feed.tag&&feed.posts.some(t=>/Le Fournil/.test(t)&&/Ton avis a compté/.test(t)&&/6h30/.test(t)&&!/a répondu/.test(t)),feed.posts);
     check('Habitant : l\'actualité refusée / en attente n\'apparaît pas',!feed.posts.some(t=>/petit-déjeuner|baguettes/.test(t)),feed.posts);
     await up.evaluate(()=>{goNav('profile');refreshProfile();document.getElementById('notif-section').classList.add('open');});await sleep(500);
     const sw=await up.evaluate(()=>[...document.querySelectorAll('#notif-switches .nf-t')].map(e=>e.textContent));

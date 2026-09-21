@@ -32,7 +32,7 @@ Le solde est **universel** : utilisable chez tous les commerçants de la ville d
 | Bonus découverte | **+5** | La première fois qu'on répond à un commerçant donné, **une fois par jour au maximum** (`answeredMerchants`, `discoveryBonusDate`). |
 | Expiration | — | Les points expirent après **6 mois sans aucune activité** (§3). |
 
-Il n'y a **plus** de bonus « série complète » ni de bonus de série quotidienne : la série (`streak`) reste un simple compteur de jours d'affilée, sans points.
+Il n'y a **plus** de bonus « série complète » ni de bonus de série quotidienne. La série (`streak`) est un simple compteur de jours d'affilée, sans points : **un jour ne compte que si l'habitant a répondu à au moins 3 questions ce jour-là** (se connecter ne suffit pas ; `streakDate` = dernier jour validé). Elle s'affiche en haut de l'accueil (flamme + nombre).
 
 **Tout le crédit se fait côté serveur**, jamais côté client :
 

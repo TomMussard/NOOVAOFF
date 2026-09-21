@@ -112,7 +112,7 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await tick(D1, '20:00');
     let s = await sink('u');
     check('Plafond : QDJ 12h30 + série en danger 20h = 2 (cas exceptionnel)', s.length === 2 && s.map(x => x.ntype).join() === 'question_du_jour,serie_en_danger', s.map(x => x.ntype));
-    check('Série en danger : titre et gain, sans culpabilisation', s[1] && s[1].title === 'Ta série est à 5 jours' && /30 secondes, \+10 points/.test(s[1].body) && !/manqu|perds|derni/i.test(s[1].title + s[1].body), s[1] && [s[1].title, s[1].body]);
+    check('Série en danger : titre et consigne (3 réponses), sans culpabilisation', s[1] && s[1].title === 'Ta série est à 5 jours' && /réponds à 3 questions/.test(s[1].body) && !/manqu|perds|derni/i.test(s[1].title + s[1].body), s[1] && [s[1].title, s[1].body]);
     const now = at(D1, '20:30');
     const r1 = await N.deliver('u', 'ami', N.copy.amiRequest({ name: 'Zoé' }), { key: 'x1', now });
     check('Plafond : une 3e notification (non exceptionnelle) est refusée', r1.status === 'skip' && r1.reason === 'cap', r1);

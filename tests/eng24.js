@@ -21,10 +21,13 @@ async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/no
   await db.doc('answers/a3').set({userId:'u1',merchantId:'m2',campaignId:'c3',pointsAwarded:0,flagged:true});
   await db.doc('redemptions/r1').set({userId:'u1',merchantId:'m1',cost:150,status:'used'});await db.doc('redemptions/r2').set({userId:'u1',merchantId:'m1',cost:300,status:'pending'});
 
+  await db.doc('communityEvents/ea1').set({type:'answer',userId:'u1',displayName:'A',city:'le-mans',text:'a répondu',likeCount:0,commentCount:0,createdAt:Timestamp.now()});
+  await db.doc('communityEvents/ea1/likes/u2').set({createdAt:Timestamp.now()});
+  await db.doc('communityEvents/eb1').set({type:'merchant_post',userId:null,merchantId:'m1',city:'le-mans',text:'Nouveau',createdAt:Timestamp.now()});
   const logs=[];const log=(m)=>logs.push(m);
   const s0=await migrate(db,{apply:false,FieldValue,log});
   const ids0=(await db.collection('rewards').get()).docs.map(d=>d.id).sort().join();
-  check('Simulation : annonce 3 récompenses à migrer mais n\'écrit RIEN (mêmes documents, habitants et commerçants inchangés)',s0.rewardsMoved===3&&ids0==='m2_p1,oldA,oldB,oldC'&&(await db.doc('users/u1').get()).data().welcomeClaimed===undefined&&(await db.doc('merchants/m1').get()).data().pointsGenerated===undefined,{s0,ids0});
+  check('Simulation : annonce 3 récompenses à migrer mais n\'écrit RIEN (mêmes documents, habitants et commerçants inchangés, événement conservé)',s0.rewardsMoved===3&&s0.eventsDeleted===1&&(await db.doc('communityEvents/ea1').get()).exists&&ids0==='m2_p1,oldA,oldB,oldC'&&(await db.doc('users/u1').get()).data().welcomeClaimed===undefined&&(await db.doc('merchants/m1').get()).data().pointsGenerated===undefined,{s0,ids0});
   const s1=await migrate(db,{apply:true,FieldValue,log});
   const rw=Object.fromEntries((await db.collection('rewards').get()).docs.map(d=>[d.id,d.data()]));
   check('Récompenses : un document par palier {merchantId}_p{tier} (slot 1 → p1, slot 3 → p3, sans slot → 1er palier libre p2), anciens documents supprimés',Object.keys(rw).sort().join()==='m1_p1,m1_p2,m1_p3,m2_p1',Object.keys(rw));
@@ -37,6 +40,8 @@ async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/no
   check('Un compte déjà suivi garde son lastActivityAt (aucun écrasement)',Math.abs(u2.lastActivityAt.toMillis()-(Date.now()-400*86400000))<60000,u2.lastActivityAt);
   const m1=(await db.doc('merchants/m1').get()).data();
   check('Commerçants : pointsGenerated = somme des points des réponses (25), pointsSpent = somme des bons émis (450)',m1.pointsGenerated===25&&m1.pointsSpent===450,m1);
+  const evs=(await db.collection('communityEvents').get()).docs.map(d=>d.id);
+  check('Fil : les anciens événements « a répondu » (et leurs j\'aime) sont supprimés, les actualités des commerces restent',evs.join()==='eb1'&&(await db.collection('communityEvents/ea1/likes').get()).empty,evs);
   const s2=await migrate(db,{apply:true,FieldValue,log});
   check('Relancer la migration est sans danger (idempotente : 0 récompense à migrer)',s2.rewardsMoved===0&&(await db.collection('rewards').get()).size===4,s2);
   console.log('\n'+pass+' ok, '+fail+' échec(s)');process.exit(fail?1:0);

@@ -162,13 +162,12 @@ exports.submitAnswer = onCall(async (request) => {
     const noovsToday = user.dailyNoovsDate === today ? (user.dailyNoovs || 0) : 0;
     let newStreak = user.streak || 0;
     let newLastAnswerDate = user.lastAnswerDate || null;
+    // Dernier jour compté dans la série (comptes antérieurs : dernier jour répondu).
+    let newStreakDate = user.streakDate !== undefined ? user.streakDate : (user.lastAnswerDate || null);
     if (!flagged) {
+      newLastAnswerDate = today;
       if (pointsEligible) {
         earnedPts = CFG.POINTS.PER_ANSWER;               // 10 pts par réponse, quelle que soit la question
-        if (user.lastAnswerDate !== today) {              // la série reste un simple compteur de jours d'affilée (aucun point)
-          newStreak = user.lastAnswerDate === yesterdayStr() ? (user.streak || 0) + 1 : 1;
-          newLastAnswerDate = today;
-        }
       } else if (CFG.NOOVS.MIN_RESPONSE_MS > 0 && serverElapsed < CFG.NOOVS.MIN_RESPONSE_MS) {
         noovsWithheld = "suspect";            // lue très vite : compte pour les résultats, pas de NOOVS
       } else if (noovsToday >= CFG.NOOVS.DAILY_CAP) {
@@ -184,6 +183,16 @@ exports.submitAnswer = onCall(async (request) => {
     const totalEarned = earnedPts + discoveryBonus;
     // Une réponse trop rapide (non lue) ne consomme pas le quota du jour.
     const newAnswersToday = answersToday + (flagged ? 0 : 1);
+    // Série : un jour compte quand l'habitant a répondu à au moins 3 questions ce jour-là (se connecter ne suffit pas).
+    let streakValidatedNow = false;
+    if (!flagged && newAnswersToday >= CFG.STREAK.MIN_ANSWERS_PER_DAY && newStreakDate !== today) {
+      newStreak = newStreakDate === yesterdayStr() ? (user.streak || 0) + 1 : 1;
+      newStreakDate = today;
+      streakValidatedNow = true;
+    }
+    // Palier de statut atteint (fil des amis) : comparé avant / après ce gain d'xp.
+    const statusOf = (xp) => CFG.STATUS.filter((t) => xp >= t.min).pop();
+    const oldStatus = statusOf(user.xp || 0), newStatus = statusOf((user.xp || 0) + totalEarned);
 
     // Reveal : index de l'option choisie (question à choix) ; le texte reste la référence stockée.
     const qDef = campaignQuestions(camp)[qIdx] || { format: camp.format, options: camp.options };
@@ -229,6 +238,7 @@ exports.submitAnswer = onCall(async (request) => {
       dailyPoints: (user.dailyPointsDate === today ? (user.dailyPoints || 0) : 0) + totalEarned,
       lastAnswerDate: newLastAnswerDate,
       streak: newStreak,
+      streakDate: newStreakDate,
       updatedAt: FieldValue.serverTimestamp(),
     };
     if (!flagged) {
@@ -253,24 +263,17 @@ exports.submitAnswer = onCall(async (request) => {
     if (merchantSnap && merchantSnap.exists && totalEarned > 0) tx.update(merchantRef, { pointsGenerated: FieldValue.increment(totalEarned) });
 
     // Jalon de série (3, 7, 14… jours d'affilée) : annoncé aux amis dans le fil, une seule fois, à la 1re réponse du jour.
-    if (user.city && newLastAnswerDate === today && CFG.COMMUNITY.STREAK_MILESTONES.includes(newStreak)) {
+    if (user.city && streakValidatedNow && CFG.COMMUNITY.STREAK_MILESTONES.includes(newStreak)) {
       tx.set(db.collection("communityEvents").doc(), {
         type: "streak", userId: uid, displayName: user.name || "—", city: user.city, brand: "", streak: newStreak,
         text: `est à ${newStreak} jours d'affilée`, likeCount: 0, commentCount: 0, createdAt: FieldValue.serverTimestamp(),
       });
     }
-    if (user.city) {
+    // Palier de statut franchi : annoncé aux amis dans le fil (jamais la réponse elle-même : le fil ne montre plus ce que les gens répondent).
+    if (user.city && newStatus.n !== oldStatus.n) {
       tx.set(db.collection("communityEvents").doc(), {
-        type: "answer",
-        userId: uid,
-        displayName: user.name || "—",
-        city: user.city,
-        merchantId: camp.merchantId || null,
-        brand: camp.merchantName || "",
-        text: `a répondu à une question de ${camp.merchantName || "un commerce"}`,
-        likeCount: 0,
-        commentCount: 0,
-        createdAt: FieldValue.serverTimestamp(),
+        type: "levelup", userId: uid, displayName: user.name || "—", city: user.city, brand: "", level: newStatus.n,
+        text: `a atteint le palier ${newStatus.n}`, likeCount: 0, commentCount: 0, createdAt: FieldValue.serverTimestamp(),
       });
     }
 
@@ -287,6 +290,7 @@ exports.submitAnswer = onCall(async (request) => {
       answersToday: newAnswersToday,
       pointAnswersLeft: Math.max(0, MAX_POINT_ANSWERS_PER_DAY - newAnswersToday),
       streak: newStreak,
+      streakToday: newStreakDate === today,
       flagged,
     };
   });

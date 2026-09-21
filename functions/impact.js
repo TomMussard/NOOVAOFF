@@ -56,14 +56,22 @@ async function publishCore(postId, post) {
   const brand = m.brandName || m.name || post.merchantName || "Un commerce";
   const text = String(post.text || "").slice(0, CFG.IMPACT.MAX_TEXT);
   const campaignIds = (post.campaignIds || []).slice(0, CFG.IMPACT.MAX_CAMPAIGNS_LINKED);
+  // « impact » (suite à vos avis) : notifie les habitants qui ont répondu. Actualité, nouveauté, à la une : fil seulement, jamais de notification.
+  const kind = ["impact", "news", "new", "top"].includes(post.kind) ? post.kind : "impact";
 
   // 1. Communauté : identifiant déterministe → jamais deux fois.
   const city = String(m.city || post.city || "").toLowerCase();
   if (city) {
     await db().collection("communityEvents").doc(`post_${postId}`).set({
       type: "merchant_post", userId: null, displayName: brand, brand, merchantId: mid, postId,
-      city, text, likeCount: 0, commentCount: 0, createdAt: FieldValue.serverTimestamp(),
+      kind, city, text, likeCount: 0, commentCount: 0, createdAt: FieldValue.serverTimestamp(),
     });
+  }
+
+  if (kind !== "impact") {
+    await N.notifyMerchant(mid, `post_ok_${postId}`, { type: "actualite", title: "Votre publication est en ligne", message: "Elle apparaît dans le fil des habitants qui ont autorisé votre commerce." });
+    await db().collection("merchantPosts").doc(postId).update({ audience: 0, notified: false, notifyNote: "feed_only" });
+    return { audience: 0, notified: false, sent: 0, queued: 0, skipped: 0 };
   }
 
   // 2. Habitants concernés.

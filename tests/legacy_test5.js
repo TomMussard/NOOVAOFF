@@ -31,7 +31,7 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
  await T('daily tracker',async()=>{
    await p.evaluate(()=>{refreshHome();});
    const t=await p.$eval('#daily-track',e=>e.textContent);
-   check('Accueil : suivi « 3 réponses en points aujourd\'hui »',/3 réponses en points/.test(t)&&/0 NOOVS/.test(t),t);
+   check('Accueil : suivi « Encore 3 réponses pour tes points et ta série » (les NOOVS sont dans l\'en-tête)',/Encore 3 réponses pour tes points et ta série/.test(t)&&!/NOOVS/.test(t),t);
  });
  await T('lock ui',async()=>{
    await p.evaluate(()=>openQ(0));
@@ -84,7 +84,7 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
    await p.screenshot({path:'/tmp/shots/wallet_noov.png'});
    check('Portefeuille : solde de NOOVS affiché',await p.$eval('#noov-num',e=>e.textContent)==='2');
    const soon=await p.$eval('#noov-rewards',e=>e.textContent);
-   check('Récompenses NOOVS affichées « Arrive bientôt » (bons chez les commerçants, sans pub, concours, cash)',(soon.match(/Arrive bientôt/g)||[]).length===4&&/Concours/.test(soon)&&/Cash/.test(soon)&&/Bons chez les commerçants/.test(soon)&&/Sans publicité/.test(soon),soon.slice(0,80));
+   check('Récompenses NOOVS : 4 pastilles courtes « Bientôt » (bons, sans pub, concours, cash), sans phrase',(soon.match(/Bientôt/g)||[]).length===4&&/Concours/.test(soon)&&/Cash/.test(soon)&&/Bons/.test(soon)&&/Sans pub/.test(soon)&&soon.length<80,soon.slice(0,120));
    await p.evaluate(()=>{document.querySelector('#rewards-tab').scrollTop=9999;});await sleep(400);
    await p.screenshot({path:'/tmp/shots/noov_soon.png'});
  });

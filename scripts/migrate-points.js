@@ -18,6 +18,7 @@
  *     d'expiration démarrent à la migration, personne ne perd ses points le jour du déploiement), answeredMerchants reconstitué
  *     depuis les réponses (pas de bonus découverte pour un commerçant déjà répondu).
  *  3. Commerçants : pointsGenerated (somme des points des réponses reçues) et pointsSpent (somme des bons émis).
+ *  4. Fil : suppression des anciens événements « a répondu » (le fil ne montre plus ce que les gens répondent), avec leurs j'aime et commentaires.
  */
 const path = require("path");
 const TIERS = require("../functions/tiers");
@@ -30,7 +31,7 @@ function adminDeps() {
 }
 
 async function migrate(db, { apply = false, FieldValue, log = console.log } = {}) {
-  const stats = { rewardsMoved: 0, rewardsSkipped: 0, usersUpdated: 0, merchantsUpdated: 0 };
+  const stats = { rewardsMoved: 0, rewardsSkipped: 0, usersUpdated: 0, merchantsUpdated: 0, eventsDeleted: 0 };
   let batch = db.batch(), n = 0;
   const flush = async (force) => { if (apply && (force || n >= 400) && n > 0) { await batch.commit(); batch = db.batch(); n = 0; } };
   const write = async (fn) => { if (apply) { fn(batch); n++; await flush(false); } };
@@ -104,7 +105,11 @@ async function migrate(db, { apply = false, FieldValue, log = console.log } = {}
     stats.merchantsUpdated++;
   }
   await flush(true);
-  log(`${apply ? "APPLIQUÉ" : "SIMULATION (rien n'a été écrit)"} : ${stats.rewardsMoved} récompense(s) migrée(s), ${stats.rewardsSkipped} ignorée(s), ${stats.usersUpdated} habitant(s), ${stats.merchantsUpdated} commerçant(s).`);
+
+  // ── 4. Fil ──
+  const oldEvents = await db.collection("communityEvents").where("type", "==", "answer").get();
+  for (const d of oldEvents.docs) { if (apply) await db.recursiveDelete(d.ref); stats.eventsDeleted++; }
+  log(`${apply ? "APPLIQUÉ" : "SIMULATION (rien n'a été écrit)"} : ${stats.rewardsMoved} récompense(s) migrée(s), ${stats.rewardsSkipped} ignorée(s), ${stats.usersUpdated} habitant(s), ${stats.merchantsUpdated} commerçant(s), ${stats.eventsDeleted} ancien(s) événement(s) « a répondu » supprimé(s).`);
   return stats;
 }
 

@@ -409,7 +409,7 @@
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "city",
+          "fieldPath": "merchantId",
           "order": "ASCENDING"
         },
         {

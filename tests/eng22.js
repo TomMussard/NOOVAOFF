@@ -89,7 +89,7 @@ const reward=(mid,tier,o={})=>({merchantId:mid,merchantName:'Commerce '+mid,city
 
   await T('solde et compteurs',async()=>{
     check('Un habitant ne peut ni créditer, ni débiter ses points directement (les échanges passent par le serveur)',no(await patch(U1,'users/u1',{points:5000}))&&no(await patch(U1,'users/u1',{points:100}))&&no(await patch(U1,'users/u1',{points:-10})));
-    check('… ni toucher xp, welcomeClaimed, lastActivityAt, answeredMerchants, discoveryBonusDate',no(await patch(U1,'users/u1',{xp:9999}))&&no(await patch(U1,'users/u1',{welcomeClaimed:false}))&&no(await patch(U1,'users/u1',{lastActivityAt:now()}))&&no(await patch(U1,'users/u1',{answeredMerchants:[]}))&&no(await patch(U1,'users/u1',{discoveryBonusDate:'2020-01-01'})));
+    check('… ni toucher xp, welcomeClaimed, lastActivityAt, answeredMerchants, discoveryBonusDate',no(await patch(U1,'users/u1',{xp:9999}))&&no(await patch(U1,'users/u1',{welcomeClaimed:false}))&&no(await patch(U1,'users/u1',{lastActivityAt:now()}))&&no(await patch(U1,'users/u1',{answeredMerchants:[]}))&&no(await patch(U1,'users/u1',{discoveryBonusDate:'2020-01-01'}))&&no(await patch(U1,'users/u1',{streakDate:'2099-01-01'})));
     check('Il peut toujours modifier son profil (nom)',ok(await patch(U1,'users/u1',{name:'Alexandre'})));
     check('Inscription : avec 50 points de départ ou welcomeClaimed = true : refusé',no(await create(NU,'users','nu',{role:'user',name:'N',points:50,xp:0,noovs:0}))&&no(await create(NU,'users','nu',{role:'user',name:'N',points:0,xp:0,noovs:0,welcomeClaimed:true})));
     check('Inscription à zéro : acceptée',ok(await create(NU,'users','nu',{role:'user',name:'N',points:0,xp:0,noovs:0,welcomeClaimed:false})));

@@ -48,11 +48,11 @@ const ADMIN='http://localhost:8950/admin.html';
     check('Photo de profil : la bibliothèque de stockage se charge à la demande',await p.evaluate(async()=>{await loadFirebaseSdk('storage');return typeof firebase.storage==='function';}));
     check('Police auto-hébergée : aucune requête vers Google Fonts, la police est bien appliquée',await p.evaluate(async()=>{await document.fonts.ready;const f=[...document.fonts].filter(x=>x.family.replace(/["']/g,'')==='Plus Jakarta Sans'&&x.status==='loaded').length;return f>=1&&!document.querySelector('link[href*="fonts.googleapis"]')&&getComputedStyle(document.body).fontFamily.includes('Jakarta');}));
     // accueil
-    const h=await p.evaluate(()=>({sec:[...document.querySelectorAll('#home .sec-lbl')].map(e=>e.textContent),streak:document.getElementById('streak-title').textContent,sub:document.getElementById('streak-sub').textContent}));
+    const h=await p.evaluate(()=>({sec:[...document.querySelectorAll('#home .sec-lbl')].map(e=>e.textContent),streak:document.getElementById('home-streak').textContent,label:document.getElementById('hdr-streak').getAttribute('aria-label'),greet:!!document.getElementById('home-greet')||!!document.getElementById('home-name'),bar:[...document.querySelectorAll('#home .dh-hdr > *')].map(e=>e.className)}));
     check('Accueil : section « À répondre » (plus « En attente »)',h.sec.includes('À répondre')&&!h.sec.includes('En attente'),h.sec);
-    check('Série à 0 : « Lance ta série aujourd\'hui » (plus « 0 jour(s) »)',/Lance ta série/.test(h.streak)&&!/jour\(s\)/.test(h.streak)&&/garder ta série/.test(h.sub)&&!/bonus/.test(h.sub),h);
-    const st=await p.evaluate(()=>{const out=[];for(const n of [1,2,7]){S.streak=n;refreshHome();out.push(document.getElementById('streak-title').textContent.replace(/\s+/g,' ').trim());}return out;});
-    check('Série 1 / 2 / 7 : accord singulier-pluriel correct',st.join('|')==='1 jour d\'affilée|2 jours d\'affilée|7 jours d\'affilée',st);
+    check('En-tête : NOOVS à gauche, série (flamme) au centre, points à droite ; plus de « Bonjour » ni de prénom',h.bar.join('|')==='dh-noov|dh-streak|dh-pts'&&!h.greet&&h.streak==='0'&&/3 questions/.test(h.label),h);
+    const st=await p.evaluate(()=>{const out=[];for(const n of [1,2,7]){S.streak=n;refreshHome();out.push(document.getElementById('home-streak').textContent+'|'+document.getElementById('hdr-streak').getAttribute('aria-label').replace(/[.:].*$/,''));}return out;});
+    check('Série 1 / 2 / 7 : seul le nombre est affiché, accord singulier-pluriel correct pour les lecteurs d\'écran',st.join(';')==='1|Série de 1 jour;2|Série de 2 jours;7|Série de 7 jours',st);
     const chip=await p.evaluate(()=>{const e=document.querySelector('#home .q-type-t');return e?getComputedStyle(e).color:null;});
     check('Pastille de format plus lisible (texte foncé)',!!chip&&(chip.match(/\d+/g).map(Number)[0]<120),chip);
     // question : consigne et verrou de lecture
@@ -67,8 +67,8 @@ const ADMIN='http://localhost:8950/admin.html';
     check('Question texte : consigne « Écris ce que tu en penses »',/Écris ce que tu en penses/.test(await p.$eval('#q-hint',e=>e.textContent)));
     // cadeaux + profil
     await p.evaluate(()=>{goNav('rewards-tab');});await sleep(800);
-    const rw=await p.evaluate(()=>({noov:document.querySelector('.noov-d').textContent,lbl:(document.getElementById('reward-featured-label')||{}).textContent||''}));
-    check('Cadeaux : texte des NOOVS aligné sur le catalogue',/bons chez les commerçants/.test(rw.noov)&&!/cash et bons cadeaux/.test(rw.noov),rw.noov);
+    const rw=await p.evaluate(()=>({noov:document.querySelector('.noov-card').textContent.replace(/\s+/g,' ').trim(),lbl:(document.getElementById('reward-featured-label')||{}).textContent||''}));
+    check('Cadeaux : le bloc NOOVS ne contient que le nombre et « NOOVS » (plus de paragraphe)',/^\d+ NOOVS$/.test(rw.noov.replace(/^N\s*/,'')),rw.noov);
     check('Cadeaux : plus d\'emoji dans le titre de section',!/\p{Extended_Pictographic}/u.test(rw.lbl),rw.lbl);
     await p.evaluate(()=>{S.friends=[{uid:'f1',n:'Léa',xp:410,str:1},{uid:'f2',n:'Tom',xp:20,str:0}];goNav('social');socTab('ranking',document.querySelector('.tab-btn[onclick*="ranking"]'));renderRanking();});await sleep(600);
     const rk=await p.$eval('#ranking-list',e=>e.textContent);

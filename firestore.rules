@@ -83,7 +83,7 @@ service cloud.firestore {
       allow update: if isAdmin() || (isOwner(uid) &&
         ownFile(request.resource.data.get('photoUrl', null), 'users', uid) &&
         !request.resource.data.diff(resource.data).affectedKeys().hasAny(
-          ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','welcomeClaimed','lastActivityAt','answeredMerchants','discoveryBonusDate','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats']
+          ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','welcomeClaimed','streakDate','lastActivityAt','answeredMerchants','discoveryBonusDate','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats']
         ));
       allow delete: if isOwner(uid) || isAdmin();
 
@@ -221,7 +221,8 @@ service cloud.firestore {
         request.resource.data.merchantId == request.auth.uid &&
         getMerchant(request.auth.uid).get('status', null) == 'verified' &&
         request.resource.data.status == 'pending' &&
-        request.resource.data.keys().hasOnly(['merchantId', 'merchantName', 'text', 'campaignIds', 'status', 'city', 'createdAt']) &&
+        request.resource.data.keys().hasOnly(['merchantId', 'merchantName', 'text', 'campaignIds', 'kind', 'status', 'city', 'createdAt']) &&
+        request.resource.data.get('kind', 'impact') in ['impact', 'news', 'new', 'top'] &&
         request.resource.data.text is string && request.resource.data.text.size() >= 10 && request.resource.data.text.size() <= 200 &&
         request.resource.data.campaignIds is list && request.resource.data.campaignIds.size() <= 3;
       allow update: if isAuth() && (
@@ -229,7 +230,8 @@ service cloud.firestore {
         (resource.data.merchantId == request.auth.uid &&
          resource.data.status in ['pending', 'rejected'] &&
          request.resource.data.status == 'pending' &&
-         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'campaignIds', 'status', 'rejectionReason']) &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'campaignIds', 'kind', 'status', 'rejectionReason']) &&
+         request.resource.data.get('kind', 'impact') in ['impact', 'news', 'new', 'top'] &&
          request.resource.data.text is string && request.resource.data.text.size() >= 10 && request.resource.data.text.size() <= 200 &&
          request.resource.data.campaignIds is list && request.resource.data.campaignIds.size() <= 3)
       );
@@ -318,14 +320,16 @@ service cloud.firestore {
     // Création : uniquement pour soi-même
     match /communityEvents/{eventId} {
       // Le fil n'est visible que pour : ses propres événements, ceux de ses amis (réciproques) et les
-      // actualités de commerces de sa ville. Jamais l'activité d'un inconnu.
+      // actualités des commerces QU'IL A AUTORISÉS (déjà limités à sa ville par l'autorisation). Jamais l'activité d'un inconnu ni d'un commerce non autorisé.
       allow read: if isAuth() && (
         isAdmin() ||
         resource.data.get('userId', null) == request.auth.uid ||
-        (resource.data.get('type', null) == 'merchant_post' && resource.data.get('city', null) == myCity()) ||
+        (resource.data.get('type', null) == 'merchant_post' &&
+         resource.data.get('merchantId', null) in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('authorizedMerchants', [])) ||
         (resource.data.get('userId', null) != null && isFriendOf(resource.data.userId))
       );
-      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      // Les événements du fil (palier atteint, série, actualité publiée) sont créés par le serveur : un client ne peut pas en forger.
+      allow create: if false;
       allow update: if false;
       allow delete: if isAuth() && (resource.data.userId == request.auth.uid || isAdmin());
 

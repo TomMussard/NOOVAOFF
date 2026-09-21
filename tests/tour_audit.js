@@ -124,8 +124,8 @@ const verdict=(name,i)=>{
   check('Clavier : Tab revient sur « Suivant » (pas de fuite vers la page cachée)',await r.evaluate(()=>/tour-next/.test(document.activeElement.className)));
   await r.keyboard.press('Enter');await sleep(700);
   check('Clavier : Entrée passe à l\'étape suivante',await r.evaluate(()=>_tourIdx)===1,await r.evaluate(()=>_tourIdx));
-  // cible hors écran : on repousse la carte de série sous la ligne de flottaison
-  await r.evaluate(()=>{const el=document.querySelector('.dstreak-card');const sp=document.createElement('div');sp.style.cssText='height:1200px';el.parentNode.insertBefore(sp,el);_homeTour.show(1);});
+  // cible hors écran : on repousse l\'en-tête (série) sous la ligne de flottaison
+  await r.evaluate(()=>{const el=document.querySelector('#home .dh-hdr');const sp=document.createElement('div');sp.style.cssText='height:1200px';el.parentNode.insertBefore(sp,el);_homeTour.show(1);});
   await sleep(1200);
   const i2=await stepInfo(r,'app');
   check('Cible hors écran : elle est ramenée à l\'écran et le halo est dessus',i2.targetVisible&&near(i2.spot.t+8,i2.target.t),{t:i2.target,vh:i2.vh});

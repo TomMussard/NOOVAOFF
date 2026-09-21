@@ -23,7 +23,7 @@ const byName=(r,u)=>r.friends.find(f=>f.uid===u);
 const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(e);}};
 
 
-const ev=(id,o)=>db.doc('communityEvents/'+id).set({type:'answer',userId:null,displayName:'X',city:'le-mans',text:'a répondu à une question de',brand:'Le Fournil',createdAt:Timestamp.fromMillis(Date.now()-Math.random()*1000),...o});
+const ev=(id,o)=>db.doc('communityEvents/'+id).set({type:'levelup',level:'Actif',userId:null,displayName:'X',city:'le-mans',text:'a atteint le palier Actif',brand:'',createdAt:Timestamp.fromMillis(Date.now()-Math.random()*1000),...o});
 (async()=>{
   await T('feed amis',async()=>{
     await wipe();
@@ -39,8 +39,10 @@ const ev=(id,o)=>db.doc('communityEvents/'+id).set({type:'answer',userId:null,di
     await ev('e_nf',{userId:'nf',displayName:'Inconnu'});
     await ev('e_one',{userId:'one',displayName:'Unilatéral'});
     await ev('e_far',{userId:'nf',displayName:'Inconnu2',city:'angers'});
-    await ev('news1',{type:'merchant_post',userId:null,displayName:'Le Fournil',text:'Nouvelle carte de saison.',city:'le-mans',brand:'Le Fournil'});
-    await ev('news_angers',{type:'merchant_post',userId:null,displayName:'Le Bar',text:'Autre ville.',city:'angers'});
+    await ev('news1',{type:'merchant_post',kind:'new',merchantId:'m1',userId:null,displayName:'Le Fournil',text:'Nouvelle carte de saison.',city:'le-mans',brand:'Le Fournil'});
+    await ev('news_other',{type:'merchant_post',kind:'news',merchantId:'m2',userId:null,displayName:'Le Bar',text:'Happy hour.',city:'le-mans',brand:'Le Bar'});          // même ville, commerce NON autorisé
+    await ev('answer_old',{type:'answer',userId:'f1',displayName:'Ami f1',text:'a répondu à une question de',brand:'Le Fournil'});    // ancien événement : plus montré
+    await ev('news_angers',{type:'merchant_post',merchantId:'m9',userId:null,displayName:'Le Bar',text:'Autre ville.',city:'angers'});
     await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});
     const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
     const p=await browser.newPage();PG=p;await p.setViewport({width:430,height:900});
@@ -53,19 +55,21 @@ const ev=(id,o)=>db.doc('communityEvents/'+id).set({type:'answer',userId:null,di
     await p.evaluate(()=>goNav('social'));
     try{await wf(p,()=>document.querySelectorAll('#feed-content .feed-post').length>=15,null,20000);}catch(e){console.log('POSTS',await p.evaluate(()=>[document.querySelectorAll('#feed-content .feed-post').length,document.getElementById('feed-content').textContent.slice(0,200)]));throw e;}
     await sleep(800);
-    const names=await p.evaluate(()=>[...document.querySelectorAll('#feed-content .fp-name')].map(e=>e.textContent.replace('Actualité','').trim()));
+    const names=await p.evaluate(()=>[...document.querySelectorAll('#feed-content .fp-name')].map(e=>e.textContent.replace(/(Actualité|Nouveauté|À la une|Ton avis a compté)$/,'').trim()));
     await p.screenshot({path:'/tmp/shots/feed_friends.png'});
-    check('Fil : mes 13 amis (plusieurs tranches d\'écoute), moi et l\'actualité de mon commerce',friends.every(f=>names.includes('Ami'+f))&&names.includes('Moi')&&names.includes('Le Fournil'),names);
+    check('Fil : mes 13 amis (plusieurs tranches d\'écoute), moi et l\'actualité de mon commerce',friends.every(f=>names.includes('Ami'+f))&&names.includes('Toi')&&names.includes('Le Fournil'),names);
     check('Fil : aucun inconnu (même ville), aucun ami non réciproque, aucune actualité d\'une autre ville',!names.includes('Inconnu')&&!names.includes('Unilatéral')&&!names.includes('Inconnu2')&&!names.includes('Le Bar'),names);
+    check('Fil : l\'actualité d\'un commerce NON autorisé (même ville) n\'apparaît pas, ni l\'ancien événement « a répondu » d\'un ami',!names.some(n=>n==='Le Bar')&&await p.evaluate(()=>!/a répondu/.test(document.getElementById('feed-content').textContent)),names);
     check('Fil : 15 éléments exactement (13 amis + moi + 1 actualité)',names.length===15,names.length);
     const acc=await p.evaluate(async()=>{const t=async fn=>{try{await fn();return 'allowed';}catch(e){return e.code;}};const c=db.collection('communityEvents');
       return {city:await t(()=>c.where('city','==','le-mans').orderBy('createdAt','desc').limit(25).get()),
         stranger:await t(()=>c.doc('e_nf').get()),friend:await t(()=>c.doc('e_f1').get()),mine:await t(()=>c.doc('e_me').get()),
-        one:await t(()=>c.doc('e_one').get()),news:await t(()=>c.doc('news1').get()),newsFar:await t(()=>c.doc('news_angers').get()),
+        one:await t(()=>c.doc('e_one').get()),news:await t(()=>c.doc('news1').get()),newsFar:await t(()=>c.doc('news_angers').get()),newsOther:await t(()=>c.doc('news_other').get()),forge:await t(()=>c.add({type:'levelup',level:'Légende',userId:auth.currentUser.uid,displayName:'Moi',city:'le-mans',text:'a atteint le palier Légende',createdAt:firebase.firestore.FieldValue.serverTimestamp()})),
         strangersIn:await t(()=>c.where('userId','in',['nf','f1']).orderBy('createdAt','desc').get())};});
     check('Règles : la lecture « toute la ville » est refusée',acc.city==='permission-denied',acc);
     check('Règles : événement d\'un inconnu refusé, d\'un ami / le mien / actualité de ma ville autorisés',acc.stranger==='permission-denied'&&acc.friend==='allowed'&&acc.mine==='allowed'&&acc.news==='allowed',acc);
-    check('Règles : ami non réciproque et actualité d\'une autre ville refusés',acc.one==='permission-denied'&&acc.newsFar==='permission-denied'&&acc.strangersIn==='permission-denied',acc);
+    check('Règles : ami non réciproque, actualité d\'une autre ville et actualité d\'un commerce non autorisé refusés',acc.one==='permission-denied'&&acc.newsFar==='permission-denied'&&acc.newsOther==='permission-denied'&&acc.strangersIn==='permission-denied',acc);
+    check('Règles : un client ne peut pas fabriquer un événement du fil (palier, série) : créé par le serveur seulement',acc.forge==='permission-denied',acc.forge);
     // un ami retiré disparaît du fil
     await db.doc('users/me').update({friendUids:['f1']});
     await p.evaluate(()=>{loadFriendsFromFirestore(S._friendUids);});
