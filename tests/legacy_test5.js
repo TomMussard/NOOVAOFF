@@ -11,7 +11,7 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
  await fetch('http://127.0.0.1:8080/emulator/v1/projects/noova-366d0/databases/(default)/documents',{method:'DELETE'});
  await fetch('http://127.0.0.1:9099/emulator/v1/projects/noova-366d0/accounts',{method:'DELETE'});
  await aauth.createUser({uid:'uA',email:'a@t.fr',password:'secret123'});
- await adb.doc('users/uA').set({role:'user',name:'Alice',email:'a@t.fr',city:'le-mans',cityLabel:'Le Mans',points:0,xp:0,streak:0,ans:0,interests:['restauration'],authorizedMerchants:['mM1'],friendUids:[],answeredCampaigns:[],onboardingStep:'done',seenHomeTour:true});
+ await adb.doc('users/uA').set({role:'user',welcomeClaimed:true,name:'Alice',email:'a@t.fr',city:'le-mans',cityLabel:'Le Mans',points:0,xp:0,streak:0,ans:0,interests:['restauration'],authorizedMerchants:['mM1'],friendUids:[],answeredCampaigns:[],onboardingStep:'done',seenHomeTour:true});
  await adb.doc('merchants/mM1').set({role:'merchant',ownerUid:'mM1',brandName:'Le Bistrot',name:'Le Bistrot',sector:'Restauration',city:'le-mans',cityLabel:'Le Mans',address:'Place de la République',status:'verified'});
  const camps=[];for(let i=0;i<6;i++){const c=await adb.collection('campaigns').add({merchantId:'mM1',merchantName:'Le Bistrot',status:'active',targetCity:'le-mans',city:'le-mans',question:'Question '+i+' ?',questions:[{q:'Question '+i+' ?',format:'mcq',options:['Oui','Non']}],targetVolume:100,answersCount:0,createdAt:admin.firestore.FieldValue.serverTimestamp()});camps.push(c.id);}
  const browser=await puppeteer.launch({executablePath:(process.env.CHROME_PATH||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'),headless:'new',args:['--no-sandbox']});
@@ -51,7 +51,7 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
    await p.evaluate(()=>submitAns());
    await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);
    const u=(await adb.doc('users/uA').get()).data();
-   check('Réponse 1 : points crédités (10 + 5 série)',u.points===15&&!u.noovs&&u.dailyAnswerCount===1,'points='+u.points+' count='+u.dailyAnswerCount);
+   check('Réponse 1 : points crédités (10 + 5 bonus découverte)',u.points===15&&!u.noovs&&u.dailyAnswerCount===1,'points='+u.points+' count='+u.dailyAnswerCount);
    const sub=await p.$eval('#reward .rw-sub',e=>e.textContent);
    check('Écran de récompense : « encore 2 réponses en points »',/Encore 2 réponses/.test(sub),sub);
  });

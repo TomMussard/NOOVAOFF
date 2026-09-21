@@ -206,6 +206,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 <script src="icons.js"></script>
+<script src="/tiers.js"></script>
 </head>
 <body>
 
@@ -549,6 +550,8 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
         <div class="modal-field"><div class="mf-lbl">Ville</div><div class="mf-val" id="md-city">—</div></div>
         <div class="modal-field"><div class="mf-lbl">Adresse</div><div class="mf-val" id="md-address">—</div></div>
         <div class="modal-field"><div class="mf-lbl">Téléphone</div><div class="mf-val" id="md-phone">—</div></div>
+        <div class="modal-field"><div class="mf-lbl">Points générés par ses questions</div><div class="mf-val" id="md-pts-gen">—</div></div>
+        <div class="modal-field"><div class="mf-lbl">Points dépensés chez lui</div><div class="mf-val" id="md-pts-spent">—</div></div>
         <div class="modal-field"><div class="mf-lbl">Questions par mois</div><div class="mf-val" id="md-quota" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">—</div></div>
       </div>
       <div class="modal-field" style="margin-top:14px"><div class="mf-lbl">Description</div><div class="mf-val muted" id="md-desc" style="font-size:13px;line-height:1.5">—</div></div>
@@ -884,7 +887,7 @@ function loadRewardModeration() {
         <div style="font-size:26px;flex-shrink:0">${esc(r.icon||'🎁')}</div>
         <div style="flex:1;min-width:0">
           <div style="font-weight:700;font-size:13.5px;color:var(--ink)">${esc(r.label||'Récompense')}</div>
-          <div style="font-size:11.5px;color:var(--ink3);margin-top:2px">${esc(r.merchantName||'')} · ${esc(r.city||'')} · palier ${r.slot||'?'} · ${(r.valueEuros||0).toFixed(2)} € → ${r.cost||0} pts${r.purchaseCondition?' · '+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg>'+' '+esc(r.purchaseCondition):''}</div>
+          <div style="font-size:11.5px;color:var(--ink3);margin-top:2px">${esc(r.merchantName||'')} · ${esc(r.city||'')} · palier ${r.tier||'?'} · ${r.cost||0} pts · prix carte confirmé entre ${((window.NOOVA_TIERS||[]).find(t=>t.n===r.tier)||{}).min||'?'} et ${((window.NOOVA_TIERS||[]).find(t=>t.n===r.tier)||{}).max||'?'} € · quota ${r.monthlyQuota||'?'}/mois${r.withPurchase?' · avec achat (min. '+r.minPurchase+' €)':''}${r.purchaseCondition?' · '+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg>'+' '+esc(r.purchaseCondition):''}</div>
         </div>
         <button onclick="approveReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>
         <button onclick="rejectReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Refuser</button>
@@ -896,7 +899,7 @@ function loadRewardModeration() {
 async function approveReward(rewardId, btn) {
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
-    await db.collection('rewards').doc(rewardId).update({ status: 'approved', active: true, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('rewards').doc(rewardId).update({ status: 'approved', approved: true, active: true, approvedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     showToast('Récompense validée', 'success');
     loadRewardModeration();
   } catch (e) {
@@ -908,7 +911,7 @@ async function rejectReward(rewardId, btn) {
   const reason = (await textPromptModal('Motif du refus (visible par le commerçant, optionnel)')) || '';
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
-    await db.collection('rewards').doc(rewardId).update({ status: 'rejected', active: false, rejectionReason: reason, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('rewards').doc(rewardId).update({ status: 'rejected', approved: false, active: false, rejectionReason: reason, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     showToast('Récompense refusée', 'error');
     loadRewardModeration();
   } catch (e) {
@@ -919,6 +922,9 @@ async function rejectReward(rewardId, btn) {
 
 // ── Quota de questions par mois d'un commerçant (la ville offre une quantité fixe, pas d'abonnement) ──
 async function renderMerchantQuota(m) {
+  const g = document.getElementById('md-pts-gen'), sp = document.getElementById('md-pts-spent');
+  if (g) g.textContent = (m.pointsGenerated || 0) + ' pts';
+  if (sp) sp.textContent = (m.pointsSpent || 0) + ' pts';
   const el = document.getElementById('md-quota');
   if (!el) return;
   el.textContent = 'Chargement…';
@@ -1192,7 +1198,7 @@ function renderAllMerchants() {
   }
   la.innerHTML = filtered.map(m => `
     <div class="merchant-row">
-      <div><div class="m-name">${esc(m.brandName||'—')}</div><div class="m-meta">${esc(m.email||'—')}</div>${m.status==='rejected'&&m.rejectionReason?`<div class="m-meta" style="color:var(--red-text)">Motif : ${esc(m.rejectionReason)}</div>`:''}</div>
+      <div><div class="m-name">${esc(m.brandName||'—')}</div><div class="m-meta">${esc(m.email||'—')}</div>${m.status==='verified'?`<div class="m-meta">Points générés : ${m.pointsGenerated||0} · dépensés chez lui : ${m.pointsSpent||0}</div>`:''}${m.status==='rejected'&&m.rejectionReason?`<div class="m-meta" style="color:var(--red-text)">Motif : ${esc(m.rejectionReason)}</div>`:''}</div>
       <div class="m-cell">${esc(m.sector||'—')}</div>
       <div class="m-cell">${esc(m.city||'—')}</div>
       <div class="row-actions">

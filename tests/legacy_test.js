@@ -84,10 +84,10 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     await sleep(800);
     for (let i = 1; i <= 5; i++) {
       await mp.evaluate(async (i) => {
-        addRewardSlot();
-        document.getElementById('new-r-label').value = 'Récompense ' + i;
-        document.getElementById('new-r-value').value = String(i * 2);
-        await saveReward(_rewardSlots.length + 1, { disabled: false, textContent: '' });
+        openRewardForm(i);                                                   // « Ma vitrine récompenses » : suggestion pré-remplie
+        document.getElementById('rf-label-' + i).value = 'Récompense ' + i;
+        document.getElementById('rf-price-' + i).checked = true;
+        await saveReward(i, { disabled: false, textContent: '' });
       }, i);
       await waitFn(mp, n => _rewardSlots.length >= n, i, 8000).catch(() => {});
       if (i === 4) {
@@ -98,7 +98,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
       }
     }
     const rw = await adb.collection('rewards').where('merchantId', '==', muid).get();
-    check('C4 5 récompenses créées par un commerçant non vérifié (règles)', rw.size === 5, 'n=' + rw.size);
+    check('C4 5 paliers créés par un commerçant non vérifié (règles) : un document par palier, coût imposé par le palier', rw.size === 5 && rw.docs.every(d => d.id === muid + '_p' + d.data().tier && d.data().cost === [150, 300, 500, 900, 1500][d.data().tier - 1] && d.data().status === 'pending' && d.data().approved === false && d.data().priceConfirmed === true), rw.docs.map(d => d.id + ':' + d.data().cost).join());
     await mp.evaluate(() => navTo('create', document.getElementById('nav-create')));
     await waitFn(mp, () => curPage === 'create', null, 8000).catch(() => {});
     check('C4 création autorisée avec 5 récompenses', await mp.evaluate(() => curPage === 'create'));
@@ -111,7 +111,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
   await step('admin verifies', async () => {
     await adb.doc('merchants/' + muid).update({ status: 'verified' });
     const rw = await adb.collection('rewards').where('merchantId', '==', muid).get();
-    let i = 0; for (const d of rw.docs) { i++; await d.ref.update({ status: 'approved', active: true, cost: i === 1 ? 20 : i * 100 }); }
+    for (const d of rw.docs) await d.ref.update({ status: 'approved', active: true, approved: true });
     await mp.reload({ waitUntil: 'load' });
     await waitFn(mp, () => typeof _mData !== 'undefined' && _mData && _mData.status === 'verified' && document.getElementById('verif-banner').style.display === 'none', null, 20000);
     check('C5 compte vérifié : bandeau retiré', true);
@@ -167,7 +167,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     await waitFn(up, () => document.getElementById('cat-wall').style.display === 'flex', null, 15000);
     uuid = await up.evaluate(() => auth.currentUser.uid);
     const u = (await adb.doc('users/' + uuid).get()).data();
-    check('U4 +10 points crédités par claimDemoPoints', u.points === 10 && u.demoClaimed === true, 'points=' + u.points);
+    check('U4 +50 points de bienvenue crédités par le serveur (claimWelcomeBonus), une seule fois', u.points === 50 && u.welcomeClaimed === true && !!u.lastActivityAt, 'points=' + u.points);
     await up.evaluate(() => { document.querySelector('#cat-grid [data-cat=restauration]').click(); saveCategories(); });
     await waitFn(up, () => document.getElementById('home').classList.contains('active') && S.user, null, 25000);
     check('U5 catégories enregistrées puis accueil', (await adb.doc('users/' + uuid).get()).data().interests.includes('restauration'));
@@ -183,7 +183,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     await sleep(3500);
     const ans = await adb.collection('answers').where('userId', '==', uuid).get();
     const u = (await adb.doc('users/' + uuid).get()).data();
-    check('U6 réponse validée côté serveur (submitAnswer), sans profil pour un commerce non suivi', ans.size === 1 && u.points === 25 && ans.docs[0].data().discovery === true && ans.docs[0].data().respondentAge === '', 'answers=' + ans.size + ' points=' + u.points);
+    check('U6 réponse validée côté serveur (submitAnswer), sans profil pour un commerce non suivi', ans.size === 1 && u.points === 65 && ans.docs[0].data().discovery === true && ans.docs[0].data().respondentAge === '', 'answers=' + ans.size + ' points=' + u.points);
     await waitFn(up, () => document.querySelector('#rw-follow .follow-card'), null, 10000);
     check('U6 proposition de suivre le commerce après la réponse', true);
     await up.evaluate(() => document.querySelector('#rw-follow .btn-p').click());
@@ -199,12 +199,13 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     check('Serveur refuse un commerce non autorisé', /permission-denied/.test(res), res);
   });
   await step('redeem + voucher + merchant validate', async () => {
-    const rw = (await adb.collection('rewards').where('merchantId', '==', muid).get()).docs.find(d => d.data().cost === 20);
+    await adb.doc('users/' + uuid).update({ points: 400 });   // le solde ne s'écrit que côté serveur : on le pose ici en administrateur
+    const rw = (await adb.collection('rewards').where('merchantId', '==', muid).get()).docs.find(d => d.data().tier === 1);
     const rdata = { id: rw.id, ...rw.data() };
     await up.evaluate(r => { window.__p = redeemReward(r); }, rdata);
     await waitFn(up, () => document.getElementById('redeem-confirm'), null, 8000);
     const conf = await up.$eval('#redeem-confirm', e => e.textContent);
-    check('Confirmation d\'échange maison (débité, solde, validité)', /Débité/.test(conf) && /5 pts/.test(conf) && /24 h/.test(conf), conf.replace(/\s+/g, ' ').slice(0, 90));
+    check('Confirmation d\'échange maison (« Palier 1 · 150 pts », solde restant, validité), sans aucun euro', /Débité/.test(conf) && /Palier 1 · 150 pts/.test(conf) && /250 pts/.test(conf) && /24 h/.test(conf) && !/€/.test(conf), conf.replace(/\s+/g, ' ').slice(0, 120));
     await up.evaluate(() => document.getElementById('rc-yes').click());
     await waitFn(up, () => document.getElementById('voucher-full'), null, 10000);
     const red = await adb.collection('redemptions').where('userId', '==', uuid).get();
@@ -212,7 +213,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     const shown = await up.$eval('#voucher-full', e => e.textContent);
     check('Code à 4 caractères affiché plein écran', /^[A-Z2-9]{4}$/.test(code) && shown.includes(code) && /Valable encore/.test(shown), 'code=' + code);
     const u = (await adb.doc('users/' + uuid).get()).data();
-    check('Points débités à l\'échange', u.points === 5, 'points=' + u.points);
+    check('Points débités à l\'échange par le serveur (150 pts, palier 1)', u.points === 250 && red.docs[0].data().tier === 1 && red.docs[0].data().cost === 150, 'points=' + u.points);
     // marchand valide le code
     await mp.evaluate(() => { navTo('validate', document.getElementById('nav-validate')); });
     await setVal(mp, '#voucher-code-inp', code.toLowerCase());

@@ -35,7 +35,7 @@ async function login(browser,email,{ua,perm='default',standalone=false}={}){
   await fetch('http://127.0.0.1:8080/emulator/v1/projects/noova-366d0/databases/(default)/documents',{method:'DELETE'});
   await fetch('http://127.0.0.1:9099/emulator/v1/projects/noova-366d0/accounts',{method:'DELETE'});
   await aauth.createUser({uid:'u1',email:'u@t.fr',password:'secret123'});
-  await adb.doc('users/u1').set({role:'user',name:'Alice',email:'u@t.fr',city:'le-mans',cityLabel:'Le Mans',interests:['restauration'],authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,onboardingStep:'done',seenHomeTour:true,pushEnabled:true,fcmTokens:['tokA'],notifPrefs:{amis:false}});
+  await adb.doc('users/u1').set({role:'user',welcomeClaimed:true,name:'Alice',email:'u@t.fr',city:'le-mans',cityLabel:'Le Mans',interests:['restauration'],authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,onboardingStep:'done',seenHomeTour:true,pushEnabled:true,fcmTokens:['tokA'],notifPrefs:{amis:false}});
   await adb.doc('merchants/m1').set({brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:'m1@shop.fr',ownerUid:'m1',cashierAck:true,verifiedPopupShown:true});
   await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});
   await adb.doc('campaigns/c1').set({merchantId:'m1',merchantName:'Le Fournil',status:'active',targetCity:'le-mans',city:'le-mans',question:QUESTION,questions:[{q:QUESTION,format:'mcq',options:['Café','Thé']}],targetVolume:500,answersCount:0,createdAt:Timestamp.now()});

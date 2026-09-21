@@ -11,7 +11,7 @@ const ROOT = path.join(__dirname, ".."), SITE = path.join(__dirname, ".site");
 function buildSite() {
   fs.rmSync(SITE, { recursive: true, force: true });
   fs.mkdirSync(SITE, { recursive: true });
-  fs.readdirSync(ROOT).filter((f) => /\.(png|svg)$/.test(f)).concat(["icons.js", "firebase-messaging-sw.js", "manifest.json", "consent.js", "legal.css", "robots.txt", "sitemap.xml", "llms.txt", "index.html"])
+  fs.readdirSync(ROOT).filter((f) => /\.(png|svg)$/.test(f)).concat(["icons.js", "firebase-messaging-sw.js", "manifest.json", "consent.js", "tiers.js", "legal.css", "robots.txt", "sitemap.xml", "llms.txt", "index.html"])
     .concat(fs.readdirSync(ROOT).filter((f) => /\.html$/.test(f) && !/^(app_DEF|noova_dashboard|noova_admin|index)\.html$/.test(f)))
     .forEach((f) => fs.copyFileSync(path.join(ROOT, f), path.join(SITE, f)));
   fs.cpSync(path.join(ROOT, "fonts"), path.join(SITE, "fonts"), { recursive: true });
@@ -49,7 +49,7 @@ function serve(port) {
   });
 }
 
-const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "eng8", "eng9", "eng10", "eng11", "eng12", "eng13", "eng14", "eng15", "eng16", "eng17", "eng18", "eng19", "eng20", "notif_server", "notif_ui", "mobile_audit", "a11y_audit", "tour_audit", "perf_audit"];
+const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "eng8", "eng9", "eng10", "eng11", "eng12", "eng13", "eng14", "eng15", "eng16", "eng17", "eng18", "eng19", "eng20", "eng21", "eng22", "eng23", "eng24", "notif_server", "notif_ui", "mobile_audit", "a11y_audit", "tour_audit", "perf_audit"];
 
 function runSuite(name) {
   return new Promise((resolve) => {

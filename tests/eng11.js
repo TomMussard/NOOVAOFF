@@ -15,7 +15,7 @@ const APP='http://localhost:8950/app.html';
 const Q='Quelle est ta boisson préférée ?';
 const OPTS=['Café','Thé','Chocolat'];
 async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/noova-366d0/databases/(default)/documents',{method:'DELETE'});await fetch('http://127.0.0.1:9099/emulator/v1/projects/noova-366d0/accounts',{method:'DELETE'});await sleep(300);}
-async function mkUser(uid,o={}){await db.doc('users/'+uid).set({role:'user',name:'User '+uid,city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true,...o});}
+async function mkUser(uid,o={}){await db.doc('users/'+uid).set({role:'user',welcomeClaimed:true,name:'User '+uid,city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true,...o});}
 async function mkCampaign(id,o={}){await db.doc('campaigns/'+id).set({merchantId:'m1',merchantName:'Le Fournil',sector:'Boulangerie',status:'active',targetCity:'le-mans',city:'le-mans',question:Q,questions:[{q:Q,format:'mcq',options:OPTS}],targetVolume:500,answersCount:0,createdAt:Timestamp.now(),...o});}
 async function ans(uid,cid,answer,o={}){await db.doc(`answers/${uid}_${cid}_q${o.q||0}`).set({userId:uid,campaignId:cid,questionIdx:o.q||0,answer,flagged:!!o.flagged,suspect:!!o.suspect,pointsAwarded:0,createdAt:Timestamp.now()});}
 const compat=(uid,d={})=>E.compatCore(uid,d);
@@ -44,7 +44,7 @@ const camps=async()=>(await db.collection('campaigns').get()).docs.map(d=>({id:d
   await T('création multi-questions',async()=>{
     await wipe();
     await db.doc('merchants/m1').set({role:'merchant',ownerUid:'m1',brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:'m1@shop.fr',seenDashTour:true,verifiedPopupShown:true,cashierAck:true,monthlyQuestionQuota:50});
-    for(let i=1;i<=5;i++)await db.doc('rewards/r'+i).set({merchantId:'m1',merchantName:'Le Fournil',city:'le-mans',label:'Cadeau '+i,slot:i,cost:50*i,valueEuros:i,status:'approved',active:true,createdAt:Timestamp.now()});
+    for(let i=1;i<=5;i++)await db.doc('rewards/m1_p'+i).set({merchantId:'m1',merchantName:'Le Fournil',city:'le-mans',label:'Cadeau '+i,tier:i,slot:i,cost:[150,300,500,900,1500][i-1],priceConfirmed:true,monthlyQuota:20,timeSlots:[],withPurchase:false,minPurchase:null,status:'approved',active:true,approved:true,redeemedCount:0,createdAt:Timestamp.now()});
     await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});
     const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
     const p=await browser.newPage();PG=p;await p.setViewport({width:1280,height:1000});const errs=[];p.on('pageerror',e=>errs.push(e.message));
@@ -109,7 +109,7 @@ const camps=async()=>(await db.collection('campaigns').get()).docs.map(d=>({id:d
   await T('assistant : une question = un bloc',async()=>{
     await wipe();
     await db.doc('merchants/m1').set({role:'merchant',ownerUid:'m1',brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:'m1@shop.fr',seenDashTour:true,verifiedPopupShown:true,cashierAck:true});
-    for(let i=1;i<=5;i++)await db.doc('rewards/r'+i).set({merchantId:'m1',merchantName:'Le Fournil',city:'le-mans',label:'Cadeau '+i,slot:i,cost:50*i,valueEuros:i,status:'approved',active:true,createdAt:Timestamp.now()});
+    for(let i=1;i<=5;i++)await db.doc('rewards/m1_p'+i).set({merchantId:'m1',merchantName:'Le Fournil',city:'le-mans',label:'Cadeau '+i,tier:i,slot:i,cost:[150,300,500,900,1500][i-1],priceConfirmed:true,monthlyQuota:20,timeSlots:[],withPurchase:false,minPurchase:null,status:'approved',active:true,approved:true,redeemedCount:0,createdAt:Timestamp.now()});
     await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});
     const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
     const p=await browser.newPage();PG=p;await p.setViewport({width:1280,height:1100});const errs=[];p.on('pageerror',e=>errs.push(e.message));

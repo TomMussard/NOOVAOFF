@@ -106,7 +106,7 @@ cityLabel: "Le Mans"
 ageRange: "25-34"        // ex : 18-24 / 25-34 / 35-44 / 45-54 / 55+
 interests: ["restauration","cafe-boulangerie", ...]   // slugs de thèmes (étape 2)
 authorizedMerchants: ["merchantId1", ...]             // établissements autorisés (étape 3)
-points: 0
+points: 0                 // solde dépensable ; xp = statut à vie ; welcomeClaimed, lastActivityAt… : voir docs/NOOVA_POINTS_SYSTEM.md
 onboardingStep: "interests" | "merchants" | "done"
 streak: 0
 lastDailyDate: null      // date (YYYY-MM-DD) de la dernière "question du jour" répondue
@@ -157,13 +157,13 @@ answeredAt
 ### `rewards/{rewardId}`
 ```
 merchantId, merchantName, city
-label, cost (points), icon
-active: true
+tier (1..5), cost (= points du palier), label, icon
+status, active  // identifiant {merchantId}_p{tier} : 5 paliers fixes, voir docs/NOOVA_POINTS_SYSTEM.md
 ```
 
 ### `redemptions/{redemptionId}`
 ```
-userId, rewardId, merchantId, cost, code, status, redeemedAt
+userId, rewardId, merchantId, tier, cost, code, status, createdAt, expiresAt, usedAt, basketEuros?, newCustomer?
 ```
 
 ### `communityEvents/{eventId}`  (le feed communauté, généré à partir du réel)
@@ -229,13 +229,13 @@ Un campaign/question est **éligible** pour un utilisateur si **TOUTES** ces con
 - Un commerçant pose **au maximum 3 questions** (par campagne) : c'est déjà borné à la création, respecte-le côté affichage.
 
 ### 8.4 Répondre & points
-- À la soumission : créer le doc `responses/...` (id déterministe), **incrémenter `users.points` et `campaigns.responsesCount` dans une transaction Firestore** (atomique).
-- Mettre à jour `streak` / `lastDailyDate` si c'était la question du jour.
+- À la soumission : la Cloud Function `submitAnswer` crée la réponse et **crédite les points côté serveur dans une transaction** (jamais côté client) : 10 points par réponse, pour les 3 premières réponses du jour ; +5 de bonus découverte à la première réponse à un commerçant (1 fois par jour au maximum) ; +50 de bienvenue une seule fois, à l'inscription.
+- La série (`streak`) est un simple compteur de jours d'affilée, sans points.
 - Réutiliser l'écran de récompense/confettis existant, mais avec les **vrais** points.
 
 ### 8.5 Récompenses (wallet)
 - Le catalogue vient de `rewards` (commerçants de la ville). Garde l'UI actuelle.
-- Échange : vérifier `points >= cost`, **déduire les points + créer une `redemption` + générer un code**, le tout en transaction. Afficher le code.
+- Échange : Cloud Function `redeemReward` — vérifie le solde, le quota mensuel de la récompense, le créneau et la limite d'une récompense par commerçant et par semaine, **débite les points + crée une `redemption` + génère un code**, le tout en transaction. Afficher « Palier N · X pts » (jamais un montant en euros) et le code.
 
 ### 8.6 Communauté (finir le « static »)
 - Le feed communauté doit être **réel** : requête `communityEvents` où `city == user.city`, triés par date.
@@ -322,7 +322,7 @@ Formulaire (réutilise l'UI existante) qui renseigne :
 - [ ] App et dashboard **reliés** : une campagne créée dans le dashboard apparaît chez les utilisateurs de **la même ville** qui remplissent les critères.
 - [ ] **Cloisonnement par ville** strict, jamais de fuite.
 - [ ] Onboarding utilisateur (intérêts + établissements autorisés) fonctionnel.
-- [ ] Question du jour + file de réponses + points cumulés + récompenses fonctionnels.
+- [ ] Question du jour + file de réponses + points cumulés (10 pts, 3 réponses par jour) + récompenses (5 paliers fixes, échange côté serveur) fonctionnels.
 - [ ] Commerçant : signup → attente 24h → vérifié → dashboard vide → création campagne (≤3 questions) → analytics.
 - [ ] Communauté et classement pilotés par des données réelles.
 - [ ] États vides et de chargement partout.

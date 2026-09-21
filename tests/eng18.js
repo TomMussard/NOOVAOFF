@@ -15,7 +15,7 @@ const APP='http://localhost:8950/app.html';
 const Q='Quelle est ta boisson préférée ?';
 const OPTS=['Café','Thé','Chocolat'];
 async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/noova-366d0/databases/(default)/documents',{method:'DELETE'});await fetch('http://127.0.0.1:9099/emulator/v1/projects/noova-366d0/accounts',{method:'DELETE'});await sleep(300);}
-async function mkUser(uid,o={}){await db.doc('users/'+uid).set({role:'user',name:'User '+uid,city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true,...o});}
+async function mkUser(uid,o={}){await db.doc('users/'+uid).set({role:'user',welcomeClaimed:true,name:'User '+uid,city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true,...o});}
 async function mkCampaign(id,o={}){await db.doc('campaigns/'+id).set({merchantId:'m1',merchantName:'Le Fournil',sector:'Boulangerie',status:'active',targetCity:'le-mans',city:'le-mans',question:Q,questions:[{q:Q,format:'mcq',options:OPTS}],targetVolume:500,answersCount:0,createdAt:Timestamp.now(),...o});}
 
 const DASH='http://localhost:8950/dash.html';
@@ -32,10 +32,10 @@ const DAY=86400000;
   await wipe();
   const mkM=(id,o={})=>db.doc('merchants/'+id).set({role:'merchant',ownerUid:id,brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:id+'@shop.fr',seenDashTour:true,verifiedPopupShown:true,cashierAck:true,...o});
   await mkM('m1');await mkM('m2',{brandName:'Le Bar',name:'Le Bar',sector:'Restauration'});await mkM('m3',{brandName:'Petit Angers',name:'Petit Angers',city:'angers',cityLabel:'Angers'});
-  for(let i=1;i<=5;i++)await db.doc('rewards/r'+i).set({merchantId:'m1',merchantName:'Le Fournil',city:'le-mans',label:'Récompense '+i,slot:i,cost:50*i,valueEuros:1,status:'approved',active:true,createdAt:Timestamp.now()});
+  for(let i=1;i<=5;i++)await db.doc('rewards/m1_p'+i).set({merchantId:'m1',merchantName:'Le Fournil',city:'le-mans',label:'Récompense '+i,tier:i,slot:i,cost:[150,300,500,900,1500][i-1],priceConfirmed:true,monthlyQuota:20,timeSlots:[],withPurchase:false,minPurchase:null,status:'approved',active:true,approved:true,redeemedCount:0,createdAt:Timestamp.now()});
   // 60 habitants au Mans : 36 de 18-24 ans, 24 de 35-49 ans ; 5 à Angers
-  for(let i=0;i<60;i++)await db.doc('users/u'+i).set({role:'user',name:'U'+i,city:'le-mans',cityLabel:'Le Mans',ageRange:i<36?'18-24':'35-49',authorizedMerchants:['m1'],points:0,xp:0,createdAt:Timestamp.now()});
-  for(let i=0;i<5;i++)await db.doc('users/a'+i).set({role:'user',name:'A'+i,city:'angers',ageRange:'18-24',authorizedMerchants:[],points:0,xp:0,createdAt:Timestamp.now()});
+  for(let i=0;i<60;i++)await db.doc('users/u'+i).set({role:'user',welcomeClaimed:true,name:'U'+i,city:'le-mans',cityLabel:'Le Mans',ageRange:i<36?'18-24':'35-49',authorizedMerchants:['m1'],points:0,xp:0,createdAt:Timestamp.now()});
+  for(let i=0;i<5;i++)await db.doc('users/a'+i).set({role:'user',welcomeClaimed:true,name:'A'+i,city:'angers',ageRange:'18-24',authorizedMerchants:[],points:0,xp:0,createdAt:Timestamp.now()});
   // 28 réponses valides sur 14 jours au Mans (2 par jour), 5 signalées (ignorées), 1 ancienne (ignorée)
   for(let i=0;i<28;i++)await db.doc('answers/x'+i).set({userId:'u'+(i%60),campaignId:'cx',respondentCity:'le-mans',flagged:false,createdAt:Timestamp.fromMillis(Date.now()-(i%13)*DAY-3600000)});
   for(let i=0;i<5;i++)await db.doc('answers/f'+i).set({userId:'u'+i,campaignId:'cx',respondentCity:'le-mans',flagged:true,createdAt:Timestamp.fromMillis(Date.now()-DAY)});
@@ -65,7 +65,7 @@ const DAY=86400000;
     const camp=(id,o={})=>db.doc('campaigns/'+id).set({merchantId:'m1',merchantName:'Le Fournil',sector:'Boulangerie',status:'active',targetCity:'le-mans',city:'le-mans',question:'Boisson ?',questions:[{q:'Boisson ?',format:'mcq',options:['Café','Thé']}],answersCount:0,createdAt:Timestamp.now(),...o});
     await camp('free',{answersCount:500});                                 // aucun objectif : pas de plafond
     await camp('legacy',{volumeTarget:10,answersCount:10});               // ancienne campagne avec objectif atteint
-    await db.doc('users/uu').set({role:'user',name:'Uu',email:'uu@t.fr',city:'le-mans',ageRange:'18-24',authorizedMerchants:['m1'],points:0,xp:0,answeredCampaigns:[]});
+    await db.doc('users/uu').set({role:'user',welcomeClaimed:true,name:'Uu',email:'uu@t.fr',city:'le-mans',ageRange:'18-24',authorizedMerchants:['m1'],points:0,xp:0,answeredCampaigns:[]});
     await callFn('beginQuestion',{campaignId:'free',questionIdx:0},tu);await sleep(3300);
     const ok=await callFn('submitAnswer',{campaignId:'free',questionIdx:0,answerValue:'Café'},tu);
     check('Campagne sans objectif de volume : une 501e réponse est acceptée (aucun plafond)',!ok.error,ok);

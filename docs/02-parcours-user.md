@@ -19,7 +19,7 @@ U7 Permissions en contexte (déclenchées plus tard)
 Deux, pas trois. Le troisième argument se découvre en utilisant l'app.
 
 **Écran 1** — « Les commerces du Mans te posent une question. Tu réponds en 30 secondes. »
-**Écran 2** — « Tes réponses te rapportent des points, échangeables chez eux. »
+**Écran 2** — « Tes réponses te rapportent des points, échangeables chez eux. » (10 points par réponse, pour tes 3 premières réponses du jour.)
 
 - Fond crème, une illustration ou photo pleine largeur par écran, texte en bas, bouton `.btn--yellow` « Suivant ».
 - « Passer » en haut à droite, toujours visible, `--muted`.
@@ -39,8 +39,8 @@ L'écran `2 · Répondre` des maquettes, sans compte.
 
 L'écran `3 · Résultat` des maquettes, avec deux différences :
 
-- Le bloc jaune affiche « +10 points en attente » au lieu de « points gagnés ».
-- Le bouton bas devient « Récupérer mes 10 points » → U4.
+- Le bloc jaune affiche « +50 points de bienvenue en attente » au lieu de « points gagnés ».
+- Le bouton bas devient « Récupérer mes 50 points » → U4.
 - Un lien secondaire « Plus tard » ramène à U2 avec une autre question de démonstration (maximum 2, ensuite le compte devient obligatoire).
 
 C'est le moment de conversion. L'utilisateur a vu la valeur, il a quelque chose à perdre.
@@ -54,7 +54,7 @@ Prénom, email, mot de passe, ville. Rien d'autre.
 - Bouton « Créer mon compte » désactivé tant que les champs requis sont vides, avec message d'erreur sous le champ concerné, jamais en pop-up.
 - Connexion sociale si disponible, au-dessus du formulaire.
 - Mention RGPD en une phrase sous le bouton, avec lien vers la politique.
-- À la création : les points en attente sont crédités, avec une animation de compteur.
+- À la création : le bonus de bienvenue (+50 points, une seule fois) est crédité côté serveur, avec une animation de compteur.
 
 **Pas demandé ici** : photo de profil, intérêts, contacts, date de naissance, numéro de téléphone.
 
@@ -99,7 +99,7 @@ Pas de pop-up listant tous les commerces à l'inscription : au lancement elle se
 
 ## Réclamation d'une récompense
 
-1. Écran Cadeaux → carte « Débloqué » → bouton « Échanger contre X pts ».
+1. Écran Cadeaux → carte « Débloqué » (« Palier N · X pts », jamais un montant en euros) → bouton « Échanger ». Une récompense par commerçant et par semaine.
 2. Confirmation : ce qui est débrité, ce qu'il reste, durée de validité. Action irréversible, donc confirmation explicite.
 3. Écran code plein écran : luminosité au maximum, code en très grande taille, nom du commerce, compte à rebours de validité, bouton « C'est validé » que le commerçant ou l'utilisateur presse en caisse.
 4. Écran de confirmation + proposition de partage.

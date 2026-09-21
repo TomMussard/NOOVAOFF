@@ -31,7 +31,7 @@ Ouvrir `maquettes/noova-app-ecrans.html` dans un navigateur avant de coder : c'e
 2. Parcours user jusqu'à la première réponse
 3. États vides et écrans de permission
 4. Parcours commerçant jusqu'au dashboard non vérifié
-5. Création de récompenses et de campagne
+5. Ma vitrine récompenses (5 paliers fixes à remplir) puis création de campagne
 6. Affiche QR et réclamation en caisse
 
 ## Stack

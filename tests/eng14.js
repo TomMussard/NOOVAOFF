@@ -15,7 +15,7 @@ const APP='http://localhost:8950/app.html';
 const Q='Quelle est ta boisson préférée ?';
 const OPTS=['Café','Thé','Chocolat'];
 async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/noova-366d0/databases/(default)/documents',{method:'DELETE'});await fetch('http://127.0.0.1:9099/emulator/v1/projects/noova-366d0/accounts',{method:'DELETE'});await sleep(300);}
-async function mkUser(uid,o={}){await db.doc('users/'+uid).set({role:'user',name:'User '+uid,city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true,...o});}
+async function mkUser(uid,o={}){await db.doc('users/'+uid).set({role:'user',welcomeClaimed:true,name:'User '+uid,city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true,...o});}
 async function mkCampaign(id,o={}){await db.doc('campaigns/'+id).set({merchantId:'m1',merchantName:'Le Fournil',sector:'Boulangerie',status:'active',targetCity:'le-mans',city:'le-mans',question:Q,questions:[{q:Q,format:'mcq',options:OPTS}],targetVolume:500,answersCount:0,createdAt:Timestamp.now(),...o});}
 const fs=require('fs'),path=require('path');
 const ROOT=path.join(__dirname,'..');
@@ -127,7 +127,7 @@ const T2=async(n,fn)=>{try{await fn();}catch(e){fail++;console.log('FAIL '+n+' (
     await mkCampaign('c1',{photoUrl:PIXEL});
     await mkUser('me',{name:'Alex',email:'me@t.fr',friendUids:['f1'],seenHomeTour:true,online:true,lastSeen:Timestamp.now()});
     await mkUser('f1',{name:'Léa',friendUids:['me'],xp:410,streak:5,photoUrl:PIXEL,online:true,lastSeen:Timestamp.now()});
-    await db.doc('rewards/r1').set({merchantId:'m1',merchantName:'Le Fournil',city:'le-mans',label:'Café offert',slot:1,cost:10,valueEuros:1,status:'approved',active:true,photoUrl:PIXEL,createdAt:Timestamp.now()});
+    await db.doc('rewards/m1_p'+1).set({merchantId:'m1',merchantName:'Le Fournil',city:'le-mans',label:'Café offert',tier:1,slot:1,cost:[150,300,500,900,1500][1-1],priceConfirmed:true,monthlyQuota:20,timeSlots:[],withPurchase:false,minPurchase:null,status:'approved',active:true,approved:true,redeemedCount:0,photoUrl:PIXEL,createdAt:Timestamp.now()});
     await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});
     // 1) première visite sans aucun choix
     let p=await openWatched(browser,APP+'?noconsent=1',{viewport:{width:390,height:844}});

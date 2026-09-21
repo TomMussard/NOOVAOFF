@@ -7,14 +7,25 @@
  * tout le reste est décidé côté serveur.
  */
 module.exports = {
-  // ─── Points ─── (barème inchangé, simplement centralisé)
+  // ─── Points ─── (modèle unique : 10 pts par réponse, 3 réponses par jour, aucun prix ni « valeur en € » nulle part)
   POINTS: {
-    MAX_ANSWERS_PER_DAY: 3,      // seules les N premières réponses du jour rapportent des points
-    BY_QUESTION_INDEX: [10, 15, 20], // Q1 / Q2 / Q3 d'une campagne
-    STREAK_BONUS: 5,             // 1re réponse du jour
-    SERIE_BONUS: 10,             // 3e question d'une campagne
-    NOOVS_PER_ANSWER: 1,         // au-delà du quota du jour (« mode libre »)
-    DEMO_POINTS: 10,             // question d'essai avant inscription
+    PER_ANSWER: 10,              // chaque réponse valide, quelle que soit sa position dans la campagne
+    MAX_ANSWERS_PER_DAY: 3,      // seules les N premières réponses du jour rapportent des points (30 pts/jour au maximum)
+    WELCOME_BONUS: 50,           // une seule fois, à l'inscription
+    DISCOVERY_BONUS: 5,          // 1re réponse à un commerçant donné, 1 fois par jour au maximum
+    EXPIRY_MONTHS: 6,            // les points expirent après ce délai sans aucune activité (réponse ou échange)
+    NOOVS_PER_ANSWER: 1,         // au-delà du quota du jour (« mode libre ») : monnaie séparée, inchangée
+  },
+
+  // ─── Paliers de récompenses ─── (source unique : voir tiers.js)
+  TIERS: require("./tiers"),
+
+  // ─── Échanges de récompenses ───
+  REWARDS: {
+    EXCHANGE_LIMIT_DAYS: 7,      // une récompense par commerçant et par utilisateur sur cette durée
+    VOUCHER_HOURS: 24,           // validité du bon (code à montrer en caisse)
+    MAX_MIN_PURCHASE_FACTOR: 2,  // achat minimum ≤ 2 × prix carte maximum du palier
+    MONTHLY_QUOTA_MAX: 1000,
   },
 
   // ─── Temps de réponse (mesuré côté serveur depuis beginQuestion) ───

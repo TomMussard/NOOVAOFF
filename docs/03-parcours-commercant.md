@@ -17,7 +17,7 @@ C7 Affiche QR et suivi des résultats
 ## C1 · Présentation — 3 écrans
 
 **Écran 1** — « Sachez ce que vos clients veulent vraiment. » Aperçu d'un vrai résultat : une question, une répartition de réponses.
-**Écran 2** — « Vous fixez vous-même la récompense. Elle ramène le client chez vous. » Exemple concret : 1 chocolat acheté → -15 % sur un café.
+**Écran 2** — « Vous choisissez la récompense. Elle ramène le client chez vous. » Exemple concret : 1 chocolat acheté → -15 % sur un café.
 **Écran 3** — « Et vous êtes visible auprès de Manceaux qui ne vous connaissent pas encore. »
 
 Le premier écran doit montrer une capture de dashboard réelle. Un commerçant achète la sortie, pas le principe.
@@ -46,14 +46,14 @@ Accès immédiat, aucun écran d'attente.
 
 ## C4 · Préparation
 
-### Récompenses
+### Ma vitrine récompenses
 
-**Une seule est obligatoire pour lancer**, pas cinq. Afficher une recommandation : « Trois paliers donnent les meilleurs résultats. »
+**Les 5 paliers doivent être remplis avant de lancer la première campagne.** NOOVA fixe les paliers, identiques pour tous les commerçants (150, 300, 500, 900 et 1 500 pts : voir `NOOVA_POINTS_SYSTEM.md`). Le commerçant **ne saisit jamais ni prix ni points**.
 
-- Proposer 5 modèles préremplis selon la catégorie. Exemples restauration : 1 café offert (200 pts), 1 viennoiserie (300 pts), -10 % sur l'addition (500 pts), 1 dessert offert (700 pts), 1 menu (1500 pts).
-- Champs : intitulé, coût en points, quantité maximum par mois (facultatif), durée de validité, photo du produit.
-- Aperçu en direct de la carte telle que l'utilisateur la verra.
-- Alerte non bloquante si toutes les récompenses coûtent plus de 800 pts : « À 10 pts par réponse, il faudra 80 réponses. Prévoyez au moins une récompense accessible. »
+- Par palier : choisir une récompense parmi des suggestions liées à sa catégorie (la première est préremplie) ou écrire la sienne, puis cocher « le prix carte de cet article est entre X et Y € » (1–3 €, 3–6 €, 6–10 €, 10–18 €, 18–30 €).
+- Réglages par récompense : quota mensuel, créneaux horaires (facultatif), option « avec achat » (achat minimum ≤ 2 × prix carte maximum du palier), bouton pause.
+- Statuts : en attente de validation → approuvée (seul NOOVA valide) → en pause. Pas de suppression : les 5 paliers existent toujours.
+- Vocabulaire : jamais « coût » ni « valeur » dans cet écran.
 
 ### Question
 
@@ -115,7 +115,8 @@ Il affiche :
 
 ### Récompenses
 
-- Compteur : débloquées, échangées, en attente de retrait.
+- Compteur : débloquées, échangées, en attente de retrait. Sur le tableau de bord : clients ramenés ce mois, dont nouveaux clients, panier moyen des clients NOOVA.
+- À la validation d'un code : montant du panier et « nouveau client » (avec « avec achat », le panier doit atteindre l'achat minimum).
 - Onglet « Valider un code » avec un champ de saisie à 4 caractères, gros, utilisable sur mobile en caisse.
 
 ## Règles transverses dashboard

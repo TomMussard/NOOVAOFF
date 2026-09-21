@@ -22,6 +22,8 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./impact")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./configStore")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./counters")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./quota")));
+// Points : bonus de bienvenue, échange de récompenses (serveur seul), expiration des points : voir points.js.
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./points")));
 
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.
@@ -30,8 +32,6 @@ const { sectorCategory, parisDay, ADMIN_EMAILS, campaignQuestions } = require(".
 const NOOVS_PER_ANSWER = CFG.POINTS.NOOVS_PER_ANSWER;
 const MAX_POINT_ANSWERS_PER_DAY = CFG.POINTS.MAX_ANSWERS_PER_DAY;
 const MIN_ANSWER_MS = CFG.RESPONSE_TIME.MIN_FOR_GAIN_MS;
-const DEMO_POINTS = CFG.POINTS.DEMO_POINTS;
-const POINTS_BY_INDEX = CFG.POINTS.BY_QUESTION_INDEX;
 
 // « Aujourd'hui » = jour civil à Paris (le quota se réinitialise à minuit en France, pas à 1h/2h du matin).
 function todayStr() {
@@ -91,6 +91,9 @@ exports.submitAnswer = onCall(async (request) => {
 
     const user = userSnap.data();
     const camp = campSnap.data();
+    // Commerçant lu AVANT toute écriture (transaction) : compteur « points générés par ses questions ».
+    const merchantRef = camp.merchantId ? db.collection("merchants").doc(String(camp.merchantId)) : null;
+    const merchantSnap = merchantRef ? await tx.get(merchantRef) : null;
 
     // ── Re-vérification serveur de l'éligibilité (jamais confiance au client) ──
     if (camp.status !== "active" || (camp.endsAt && camp.endsAt.toMillis && camp.endsAt.toMillis() < Date.now())) {
@@ -110,8 +113,7 @@ exports.submitAnswer = onCall(async (request) => {
       if ((user.declinedMerchants || []).includes(camp.merchantId)) {
         throw new HttpsError("permission-denied", "Tu as choisi de ne plus voir ce commerce.");
       }
-      const mSnap = await tx.get(db.collection("merchants").doc(String(camp.merchantId)));
-      const mm = mSnap.exists ? mSnap.data() : null;
+      const mm = merchantSnap && merchantSnap.exists ? merchantSnap.data() : null;
       if (!mm || mm.status !== "verified" || String(mm.city || "").toLowerCase() !== userCity) {
         throw new HttpsError("permission-denied", "Ce commerce n'est pas disponible dans ta ville.");
       }
@@ -156,19 +158,17 @@ exports.submitAnswer = onCall(async (request) => {
     const answersToday = user.dailyAnswerDate === today ? (user.dailyAnswerCount || 0) : 0;
     const pointsEligible = answersToday < MAX_POINT_ANSWERS_PER_DAY;
 
-    let earnedPts = 0, streakBonus = 0, serieBonus = 0, noovsEarned = 0, noovsWithheld = null;
+    let earnedPts = 0, discoveryBonus = 0, noovsEarned = 0, noovsWithheld = null;
     const noovsToday = user.dailyNoovsDate === today ? (user.dailyNoovs || 0) : 0;
     let newStreak = user.streak || 0;
     let newLastAnswerDate = user.lastAnswerDate || null;
     if (!flagged) {
       if (pointsEligible) {
-        earnedPts = POINTS_BY_INDEX[qIdx] || 10;
-        if (user.lastAnswerDate !== today) {
-          streakBonus = CFG.POINTS.STREAK_BONUS;
+        earnedPts = CFG.POINTS.PER_ANSWER;               // 10 pts par réponse, quelle que soit la question
+        if (user.lastAnswerDate !== today) {              // la série reste un simple compteur de jours d'affilée (aucun point)
           newStreak = user.lastAnswerDate === yesterdayStr() ? (user.streak || 0) + 1 : 1;
           newLastAnswerDate = today;
         }
-        if (qIdx === 2) serieBonus = CFG.POINTS.SERIE_BONUS;
       } else if (CFG.NOOVS.MIN_RESPONSE_MS > 0 && serverElapsed < CFG.NOOVS.MIN_RESPONSE_MS) {
         noovsWithheld = "suspect";            // lue très vite : compte pour les résultats, pas de NOOVS
       } else if (noovsToday >= CFG.NOOVS.DAILY_CAP) {
@@ -176,8 +176,12 @@ exports.submitAnswer = onCall(async (request) => {
       } else {
         noovsEarned = Math.min(NOOVS_PER_ANSWER, CFG.NOOVS.DAILY_CAP - noovsToday);
       }
+      // Bonus découverte : 1re réponse à ce commerçant, une fois par jour au maximum (même au-delà des 3 réponses du jour).
+      if (camp.merchantId && !(user.answeredMerchants || []).includes(camp.merchantId) && user.discoveryBonusDate !== today) {
+        discoveryBonus = CFG.POINTS.DISCOVERY_BONUS;
+      }
     }
-    const totalEarned = earnedPts + streakBonus + serieBonus;
+    const totalEarned = earnedPts + discoveryBonus;
     // Une réponse trop rapide (non lue) ne consomme pas le quota du jour.
     const newAnswersToday = answersToday + (flagged ? 0 : 1);
 
@@ -233,6 +237,9 @@ exports.submitAnswer = onCall(async (request) => {
       const minutes = +hh.find((x) => x.type === "hour").value * 60 + +hh.find((x) => x.type === "minute").value;
       userUpdate.answerMinutes = [...(user.answerMinutes || []), minutes].slice(-5);
     }
+    userUpdate.lastActivityAt = FieldValue.serverTimestamp();          // les points expirent après 6 mois sans activité
+    if (!flagged && camp.merchantId) userUpdate.answeredMerchants = FieldValue.arrayUnion(camp.merchantId);
+    if (discoveryBonus > 0) userUpdate.discoveryBonusDate = today;
     if (totalEarned > 0) { userUpdate.points = FieldValue.increment(totalEarned); userUpdate.xp = FieldValue.increment(totalEarned); }
     if (noovsEarned > 0) { userUpdate.noovs = FieldValue.increment(noovsEarned); userUpdate.dailyNoovs = noovsToday + noovsEarned; userUpdate.dailyNoovsDate = today; }
     if (qIdx === 0) userUpdate.answeredCampaigns = FieldValue.arrayUnion(campaignId);
@@ -242,6 +249,8 @@ exports.submitAnswer = onCall(async (request) => {
       answersCount: FieldValue.increment(1),
       responsesCount: FieldValue.increment(1),
     });
+    // Points générés par les questions de ce commerçant (affichés dans l'admin).
+    if (merchantSnap && merchantSnap.exists && totalEarned > 0) tx.update(merchantRef, { pointsGenerated: FieldValue.increment(totalEarned) });
 
     // Jalon de série (3, 7, 14… jours d'affilée) : annoncé aux amis dans le fil, une seule fois, à la 1re réponse du jour.
     if (user.city && newLastAnswerDate === today && CFG.COMMUNITY.STREAK_MILESTONES.includes(newStreak)) {
@@ -267,6 +276,7 @@ exports.submitAnswer = onCall(async (request) => {
 
     return {
       pointsAwarded: totalEarned,
+      discoveryBonus,
       noovsAwarded: noovsEarned,
       noovsWithheld,
       totalPoints: (user.points || 0) + totalEarned,
@@ -294,29 +304,6 @@ exports.countConsent = onDocumentCreated("consentEvents/{eventId}", async (event
   const snap = await ref.get();
   if (!snap.exists) return;
   await ref.update({ consentCount: FieldValue.increment(e.action === "granted" ? 1 : -1) });
-});
-
-/**
- * claimDemoPoints — crédite une seule fois les 10 points de la question d'essai
- * (répondue avant la création du compte). Idempotent : le drapeau demoClaimed
- * empêche tout second crédit, même si le client rappelle la fonction.
- */
-exports.claimDemoPoints = onCall(async (request) => {
-  const uid = request.auth && request.auth.uid;
-  if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi pour récupérer tes points.");
-  const userRef = db.collection("users").doc(uid);
-  return db.runTransaction(async (tx) => {
-    const snap = await tx.get(userRef);
-    if (!snap.exists) throw new HttpsError("failed-precondition", "Profil introuvable.");
-    if (snap.data().demoClaimed) return { claimed: false, points: 0 };
-    tx.update(userRef, {
-      points: FieldValue.increment(DEMO_POINTS),
-      xp: FieldValue.increment(DEMO_POINTS),
-      demoClaimed: true,
-      updatedAt: FieldValue.serverTimestamp(),
-    });
-    return { claimed: true, points: DEMO_POINTS };
-  });
 });
 
 /**
@@ -400,7 +387,7 @@ exports.adminResetAllData = onCall({ timeoutSeconds: 300 }, async (request) => {
 
   const collectionsToWipe = [
     "merchants", "users", "campaigns", "rewards", "answers", "redemptions",
-    "communityEvents", "weeklyQuestions", "chats", "friendCodes",
+    "communityEvents", "weeklyQuestions", "chats", "friendCodes", "pointsExpirations",
     "friendNotifications", "consentEvents", "planRequests", "invoices", "broadcasts",
   ];
   for (const name of collectionsToWipe) {

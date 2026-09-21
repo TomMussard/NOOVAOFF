@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <!-- Consentement aux traceurs : aucune mesure d'audience ne démarre avant un choix explicite (voir consent.js) -->
 <script src="/consent.js"></script>
+<script src="/tiers.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Noova — Là où vos avis ont de la valeur</title>
 <meta name="description" content="Répondez aux sondages de commerces près de chez vous et gagnez des récompenses exclusives. Votre avis vaut quelque chose sur Noova.">
@@ -1145,7 +1146,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <div id="claim-splash" style="position:fixed;inset:0;z-index:10002;background:var(--yellow);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px">
   <div style="font-family:var(--fd);font-weight:800;font-size:96px;line-height:1;letter-spacing:-4px;color:var(--ink)">+<span id="claim-num">0</span></div>
   <div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink);margin-top:6px">points crédités</div>
-  <div style="font-size:13px;color:var(--ink2);margin-top:8px">Bienvenue sur NOOVA.</div>
+  <div style="font-size:13px;color:var(--ink);margin-top:8px">Bienvenue sur NOOVA : voici tes points de bienvenue.</div>
 </div>
 
 <!-- Feuille d'explication avant une permission système (notifications, position) -->
@@ -1176,8 +1177,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="q-hint">Quatre étapes, aucune obligation.</div>
     <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
       <div class="how-row"><div class="how-n">1</div><div><div class="how-t">Un commerce te pose une question</div><div class="how-d">Les commerces que tu suis, et parfois un nouveau commerce à découvrir (d'une autre couleur). Tu réponds en 30 secondes, ou tu passes.</div></div></div>
-      <div class="how-row"><div class="how-n">2</div><div><div class="how-t">Tu gagnes des points, puis des NOOVS</div><div class="how-d">Tes 3 premières réponses du jour rapportent des points échangeables. Les suivantes rapportent des NOOVS, la monnaie de NOOVA (concours, cash et bons cadeaux à venir).</div></div></div>
-      <div class="how-row"><div class="how-n">3</div><div><div class="how-t">Tu échanges tes points</div><div class="how-d">Contre une récompense choisie par le commerce, à récupérer chez lui.</div></div></div>
+      <div class="how-row"><div class="how-n">2</div><div><div class="how-t">Tu gagnes des points, puis des NOOVS</div><div class="how-d">Chaque réponse rapporte 10 points, pour tes 3 premières réponses du jour (30 points par jour au maximum). Tu reçois aussi 50 points de bienvenue, et 5 points la première fois que tu réponds à un commerce. Ensuite, tu peux répondre sans points, et gagner des NOOVS, la monnaie de NOOVA. Tes points expirent après 6 mois sans aucune activité.</div></div></div>
+      <div class="how-row"><div class="how-n">3</div><div><div class="how-t">Tu échanges tes points</div><div class="how-d">Contre une récompense choisie par le commerce, à récupérer chez lui : une par commerce et par semaine.</div></div></div>
       <div class="how-row"><div class="how-n">4</div><div><div class="how-t">Tu montres ton code en caisse</div><div class="how-d">Il est valable 24 h et ne sert qu'une fois.</div></div></div>
     </div>
     <div style="background:var(--md);border-radius:14px;padding:12px 14px;font-size:12px;color:var(--ink2);line-height:1.6;margin-top:18px"><strong style="color:var(--ink)">Tu gardes le contrôle.</strong> Les commerces ne voient jamais qui a répondu, seulement des résultats regroupés. Un commerce que tu ne suis pas reçoit ta réponse sans ton profil ; tu choisis ensuite de le suivre ou non, et tu peux arrêter à tout moment depuis ton profil.</div>
@@ -1271,7 +1272,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="dstreak-card">
       <div class="dstreak-top">
         <div class="dstreak-fire"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 2c1 3-2 4-2 7a2 2 0 004 0c1 1 2 2.5 2 4.5A5.5 5.5 0 016.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0012 22a8 8 0 007-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg></div>
-        <div style="flex:1"><div class="dstreak-title" id="streak-title">Lance ta série aujourd'hui</div><div class="dstreak-sub" id="streak-sub">Continue pour débloquer un bonus</div></div>
+        <div style="flex:1"><div class="dstreak-title" id="streak-title">Lance ta série aujourd'hui</div><div class="dstreak-sub" id="streak-sub">Continue, une réponse par jour suffit</div></div>
       </div>
       <div class="dstreak-dots" id="streak-dots"></div>
     </div>
@@ -1673,8 +1674,13 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 const S={user:null,pts:0,xp:0,ans:0,streak:1,themes:['sport','gaming','culture'],brands:{},qs:[],qIdx:0,curQ:null,hist:[],done:{},friends:[],chats:{}};
 // Config d'engagement côté écran. Doit rester alignée avec functions/engagementConfig.js (POINTS.MAX_ANSWERS_PER_DAY) ;
 // tous les autres seuils (reveal, prédiction, compatibilité...) sont décidés côté serveur.
-const ENGAGEMENT={MAX_ANSWERS_PER_DAY:3};
+const ENGAGEMENT={MAX_ANSWERS_PER_DAY:3,PTS_PER_ANSWER:10};   // valeurs d'affichage : le serveur fait foi (functions/engagementConfig.js)
 const MAX_POINT_ANSWERS=ENGAGEMENT.MAX_ANSWERS_PER_DAY;
+// Paliers de récompenses (tiers.js, identiques pour tous les commerçants). Aucun prix en € n'est jamais montré à l'habitant.
+// (« TIERS » plus bas = niveaux de statut, une autre notion.)
+function rewardTier(r){const n=r&&r.tier;return (window.NOOVA_TIERS||[]).find(t=>t.n===n)||null;}
+function rewardCost(r){const t=rewardTier(r);return t?t.pts:((r&&r.cost)||0);}
+function tierLabel(r){const t=rewardTier(r);return t?('Palier '+t.n+' · '+t.pts+' pts'):(rewardCost(r)+' pts');}
 // « Aujourd'hui » = jour civil à Paris, comme côté serveur (le quota se réinitialise à minuit en France).
 function parisToday(ms){return new Date(ms||Date.now()).toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});}
 function getAnswersToday(){return S._answersDate===parisToday()?(S._answersToday||0):0;}
@@ -2003,7 +2009,7 @@ function refreshHome(){
   {const av=document.getElementById('home-av');const n=S.user.name||'?';const c=AVC[n.charCodeAt(0)%AVC.length];av.style.background=c+'22';av.style.color=c;renderUserAvatar(av,document.getElementById('home-av-letter'),n,S.user.photoUrl);}
   {const st=document.getElementById('streak-title');if(st)st.innerHTML=S.streak>0?`<span id="streak-num">${S.streak}</span> jour${S.streak>1?'s':''} d'affilée`:'Lance ta série aujourd\'hui';}
   const streakSub=document.getElementById('streak-sub');
-  if(streakSub) streakSub.textContent = S.streak>=10 ? 'Bonus débloqué !' : S.streak===0 ? 'Réponds chaque jour : +50 pts bonus au bout de 10 jours' : `Encore ${10-S.streak} jour${10-S.streak>1?'s':''} pour +50 pts bonus`;
+  if(streakSub) streakSub.textContent = S.streak>=10 ? '10 jours d\'affilée, bravo !' : S.streak===0 ? 'Réponds chaque jour pour garder ta série' : `Encore ${10-S.streak} jour${10-S.streak>1?'s':''} pour atteindre 10 jours d\'affilée`;
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<10;i++){const d=document.createElement('div');d.className='dstreak-dot'+(i<S.streak?' on':'');sd.appendChild(d)}
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('today-card').classList.toggle('disc',!!q._discovery);document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector(':scope > img');
@@ -3492,9 +3498,9 @@ function startCampaignById(campId) {
     const d=doc.data();
     // Mêmes données que sur l'accueil : options PROPRES à chaque question, et questions 2 et 3 à la suite (avant : options de la
     // campagne entière et questions suivantes perdues quand on démarrait depuis la page du commerce).
-    const allQs=getCampaignQuestions(d), SCALE=[10,15,20];
-    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:10,type:allQs[0].format||d.format||'text',q:allQs[0].q||d.question,hint:'',opts:allQs[0].options||[],items:allQs[0].options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce'),_surveyCount:allQs.length,
-      survey:allQs.slice(1).map((sq,idx)=>({_firestoreId:doc.id,_merchantId:d.merchantId||null,_questionIdx:idx+1,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',theme:d.sector||'Commerce local',pts:SCALE[idx+1]||20,type:sq.format||'text',q:sq.q,hint:'',opts:sq.options||[],items:sq.options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce')}))};
+    const allQs=getCampaignQuestions(d);
+    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:ENGAGEMENT.PTS_PER_ANSWER,type:allQs[0].format||d.format||'text',q:allQs[0].q||d.question,hint:'',opts:allQs[0].options||[],items:allQs[0].options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce'),_surveyCount:allQs.length,
+      survey:allQs.slice(1).map((sq,idx)=>({_firestoreId:doc.id,_merchantId:d.merchantId||null,_questionIdx:idx+1,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',theme:d.sector||'Commerce local',pts:ENGAGEMENT.PTS_PER_ANSWER,type:sq.format||'text',q:sq.q,hint:'',opts:sq.options||[],items:sq.options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce')}))};
     S.mode='hook';S.curQ=q;
     const pg=document.getElementById('q-prog');pg.innerHTML='';
     const seg=document.createElement('div');seg.className='q-seg cur';pg.appendChild(seg);
@@ -4360,16 +4366,15 @@ function submitDemo(){
 }
 function demoLater(){openDemoQ((_demoIdx+1)%DEMO_QS.length);}
 
-// Points en attente : crédités côté serveur à la création du compte (une seule fois).
+// Bonus de bienvenue (+50 pts, une seule fois) : crédité CÔTÉ SERVEUR (claimWelcomeBonus), jamais par le client.
+// Idempotent : appelé à chaque création de compte, quelle que soit la méthode (email, Google, Apple), et par précaution à la connexion.
 async function claimPendingDemo(){
-  let demo=null;
-  try{demo=JSON.parse(localStorage.getItem('nv_demo')||'null');}catch(e){}
-  if(!demo||!auth.currentUser)return 0;
+  if(!auth.currentUser)return 0;
   try{
-    const r=await fx.httpsCallable('claimDemoPoints')({questionId:demo.id,answer:demo.answer});
+    const r=await fx.httpsCallable('claimWelcomeBonus')({});
     try{localStorage.removeItem('nv_demo');}catch(e){}
-    return (r.data&&r.data.claimed)?(r.data.points||10):0;
-  }catch(e){console.warn('claimDemoPoints:',e);return 0;}
+    return (r.data&&r.data.claimed)?(r.data.points||0):0;
+  }catch(e){console.warn('claimWelcomeBonus:',e);return 0;}
 }
 function showClaimSplash(pts){
   return new Promise(resolve=>{
@@ -4699,7 +4704,7 @@ async function loadRewardsFromFirestore() {
       const d = doc.data();
       if(normalizeCity(d.city||'') === city) rewards.push({ id: doc.id, ...d, photoUrl: (_verifiedMerchantsCache[d.merchantId]||{}).coverUrl || null, logoUrl: (_verifiedMerchantsCache[d.merchantId]||{}).logoUrl || null });
     });
-    rewards.sort((a,b) => (a.cost||0)-(b.cost||0));
+    rewards.sort((a,b) => rewardCost(a)-rewardCost(b));
     S._rewardsCache = rewards;
 
     const gg = document.getElementById('gift-grid');
@@ -4713,10 +4718,10 @@ async function loadRewardsFromFirestore() {
         // Grille de carrés simples, une carte par récompense (jusqu'à 5 par commerce, du moins
         // cher au plus cher) — le solde s'utilise chez n'importe quel commerce visible de la ville.
         rewards.forEach(r => {
-          const locked = S.pts < (r.cost||0);
+          const locked = S.pts < rewardCost(r);
           const card = document.createElement('div');
           card.className = 'gift-c' + (locked ? ' locked' : '');
-          card.innerHTML = `<div style="margin-bottom:7px">${logoHTML(r.merchantName||r.label,38)}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${esc(r.merchantName||'Commerce')}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${r.icon?esc(r.icon):icon('gift-generic',{size:12})} ${esc(r.label||'Récompense')}</div><div style="margin-top:7px;font-size:10px;font-weight:800;padding:3px 9px;border-radius:99px;background:${locked?'var(--bg2)':'var(--coral)'};color:${locked?'var(--ink3)':'var(--ink)'};display:inline-block">${r.cost||0} pts</div>`;
+          card.innerHTML = `<div style="margin-bottom:7px">${logoHTML(r.merchantName||r.label,38)}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${esc(r.merchantName||'Commerce')}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${r.icon?esc(r.icon):icon('gift-generic',{size:12})} ${esc(r.label||'Récompense')}</div><div style="margin-top:7px;font-size:10px;font-weight:800;padding:3px 9px;border-radius:99px;background:${locked?'var(--bg2)':'var(--coral)'};color:${locked?'var(--ink3)':'var(--ink)'};display:inline-block">${esc(tierLabel(r))}</div>`;
           if(!locked) card.onclick = () => redeemReward(r);
           gg.appendChild(card);
         });
@@ -4738,12 +4743,12 @@ async function loadRewardsFromFirestore() {
 function renderAlmostReward(){
   const wrap = document.getElementById('dpat-wrap');
   if(!wrap) return;
-  const rewards = (S._rewardsCache||[]).filter(r => (r.cost||0) > S.pts);
+  const rewards = (S._rewardsCache||[]).filter(r => rewardCost(r) > S.pts);
   if(!rewards.length){ wrap.innerHTML=''; return; }
-  rewards.sort((a,b) => ((a.cost||0)-S.pts) - ((b.cost||0)-S.pts));
+  rewards.sort((a,b) => (rewardCost(a)-S.pts) - (rewardCost(b)-S.pts));
   const r = rewards[0];
-  const pct = Math.max(4, Math.min(96, (S.pts / (r.cost||1)) * 100));
-  const missing = Math.max(0, (r.cost||0) - S.pts);
+  const pct = Math.max(4, Math.min(96, (S.pts / rewardCost(r)) * 100));
+  const missing = Math.max(0, rewardCost(r) - S.pts);
   wrap.innerHTML = `<div class="dsec-h">Ta prochaine récompense</div><div class="dpat-card" onclick="goNav('rewards-tab')">
     <div class="dpat-photo">${r.photoUrl?`<img src="${r.photoUrl}" alt="Photo de la récompense : ${esc(r.label||'')}" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}<div class="dpat-pct">${Math.round(pct)}%</div></div>
     <div class="dpat-body">
@@ -4764,7 +4769,7 @@ function renderFeaturedReward(){
   if(!wrap) return;
   const all = S._rewardsCache||[];
   if(!all.length){ wrap.innerHTML=''; if(labelEl) labelEl.innerHTML=''; S._featuredRewardId=null; return; }
-  const redeemable = all.filter(r => (r.cost||0) <= S.pts).sort((a,b)=>(b.cost||0)-(a.cost||0));
+  const redeemable = all.filter(r => rewardCost(r) <= S.pts).sort((a,b)=>rewardCost(b)-rewardCost(a));
   if(labelEl) labelEl.innerHTML = redeemable.length
     ? icon('gift-generic',{size:18})+' Disponible maintenant'
     : 'Ta prochaine récompense';
@@ -4777,13 +4782,13 @@ function renderFeaturedReward(){
         ${logoHTML(r.merchantName||r.label,52,r.logoUrl)}
         <div style="flex:1;min-width:0"><div class="rf-name">${esc(r.label||'Récompense')}</div><div class="rf-sub">${esc(r.merchantName||'')}</div></div>
       </div>
-      <button class="btn-p" onclick="redeemFeaturedReward()">Échanger contre ${r.cost||0} pts</button>
+      <button class="btn-p" onclick="redeemFeaturedReward()">Échanger · ${esc(tierLabel(r))}</button>
     </div>`;
   } else {
-    const r = all.slice().sort((a,b)=>(a.cost||0)-(b.cost||0))[0];
+    const r = all.slice().sort((a,b)=>rewardCost(a)-rewardCost(b))[0];
     S._featuredRewardId = r.id;
-    const pct = Math.max(4, Math.min(96, (S.pts / (r.cost||1)) * 100));
-    const missing = Math.max(0, (r.cost||0) - S.pts);
+    const pct = Math.max(4, Math.min(96, (S.pts / rewardCost(r)) * 100));
+    const missing = Math.max(0, rewardCost(r) - S.pts);
     const circ = 2*Math.PI*20;
     wrap.innerHTML = `<div class="reward-featured off">
       <div class="rf-top">
@@ -4820,13 +4825,13 @@ function renderInProgressRewards(){
   const el = document.getElementById('dprog-list');
   const countEl = document.getElementById('dprog-count');
   if(!el) return;
-  const rewards = (S._rewardsCache||[]).filter(r => (r.cost||0) > S.pts && r.id!==S._featuredRewardId)
-    .sort((a,b) => ((a.cost||0)-S.pts) - ((b.cost||0)-S.pts)).slice(0,5);
+  const rewards = (S._rewardsCache||[]).filter(r => rewardCost(r) > S.pts && r.id!==S._featuredRewardId)
+    .sort((a,b) => (rewardCost(a)-S.pts) - (rewardCost(b)-S.pts)).slice(0,5);
   if(countEl) countEl.textContent = rewards.length ? '· '+rewards.length : '';
   renderTierTrack();
   if(!rewards.length){ el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:12.5px">Tu peux échanger tous tes points dès maintenant !</div>'; return; }
   el.innerHTML = rewards.map(r => {
-    const pct = Math.max(0, Math.min(100, (S.pts / (r.cost||1)) * 100));
+    const pct = Math.max(0, Math.min(100, (S.pts / rewardCost(r)) * 100));
     const circ = 2*Math.PI*20;
     return `<div class="dprog-chipcard" onclick="openRewardsSheet()">
       <div class="dprog-ring-wrap"><svg aria-hidden="true" focusable="false" viewBox="0 0 48 48" class="dprog-ring"><circle cx="24" cy="24" r="20" class="dprog-ring-track"/><circle cx="24" cy="24" r="20" class="dprog-ring-fill" style="stroke-dasharray:${circ.toFixed(1)};stroke-dashoffset:${(circ*(1-pct/100)).toFixed(1)}"/></svg><div class="dprog-pct">${Math.round(pct)}%</div></div>
@@ -4849,6 +4854,8 @@ function loadActiveRedemptions(){
     const now = Date.now();
     const active = [];
     if(!snap.empty) S._everRedeemed = true;
+    _redeemTimes = {};
+    snap.forEach(doc => { const d = doc.data(); const ms = d.createdAt && d.createdAt.toMillis ? d.createdAt.toMillis() : 0; if(d.merchantId && ms > (_redeemTimes[d.merchantId]||0)) _redeemTimes[d.merchantId] = ms; });
     snap.forEach(doc => {
       const d = doc.data();
       if(d.status !== 'pending') return;
@@ -4864,7 +4871,7 @@ function loadActiveRedemptions(){
       <div class="dcode-name">${esc(r.label||'Récompense')}</div>
       <div class="dcode-sub">${esc(r.merchantName||'')}${exp?' · expire le '+exp:''}</div>
       <div class="dcode-box"><div class="dcode-lbl">Code à montrer en caisse</div><div class="dcode-val">${esc((r.code||'').split('').join(' '))}</div></div>
-      <button class="dcode-btn" onclick="showVoucherModal({id:'${r.id}',code:'${(r.code||'').replace(/'/g,"\\'")}',label:'${(r.label||'').replace(/'/g,"\\'")}',merchantName:'${(r.merchantName||'').replace(/'/g,"\\'")}',cost:${r.cost||0},purchaseCondition:${r.purchaseCondition?`'${r.purchaseCondition.replace(/'/g,"\\'")}'`:'null'},expiresAt:${r._expMs?`new Date(${r._expMs})`:'null'}})">Utiliser maintenant</button>
+      <button class="dcode-btn" onclick="showVoucherModal({id:'${r.id}',code:'${(r.code||'').replace(/'/g,"\\'")}',label:'${(r.label||'').replace(/'/g,"\\'")}',merchantName:'${(r.merchantName||'').replace(/'/g,"\\'")}',cost:${r.cost||0},tier:${r.tier||0},purchaseCondition:${r.purchaseCondition?`'${r.purchaseCondition.replace(/'/g,"\\'")}'`:'null'},expiresAt:${r._expMs?`new Date(${r._expMs})`:'null'}})">Utiliser maintenant</button>
     </div>
     ${active.length>1?`<div class="dcode-more" onclick="showToast('${active.length-1} autre${active.length>2?'s':''} code${active.length>2?'s':''} disponible${active.length>2?'s':''}','success')">+${active.length-1} autre${active.length>2?'s':''} code${active.length>2?'s':''} actif${active.length>2?'s':''}</div>`:''}`;
   }, e => { console.warn('loadActiveRedemptions:', e); wrap.innerHTML=''; });
@@ -4873,79 +4880,32 @@ function loadActiveRedemptions(){
 async function redeemReward(reward) {
   const u = auth.currentUser;
   if(!u) return;
-  if(S.pts < (reward.cost||0)) { showVoucherError('Solde insuffisant.'); return; }
-
-  // Vérification expiration
-  if(reward.expiresAt && reward.expiresAt.seconds && reward.expiresAt.seconds < Date.now()/1000) {
-    showVoucherError('Cette récompense a expiré.'); return;
-  }
-
-  // Vérification perUserLimit (1 fois par personne par défaut) — nécessite une query,
-  // donc faite ici en pré-check (une transaction Firestore ne peut lire que par référence
-  // directe, pas par requête). En échec, on bloque (fail closed).
-  const limit = reward.perUserLimit !== undefined ? reward.perUserLimit : 1;
-  if(limit > 0) {
-    try {
-      const existing = await db.collection('redemptions')
-        .where('userId','==',u.uid).where('rewardId','==',reward.id).limit(1).get();
-      if(!existing.empty) { showVoucherError('Tu as déjà échangé cette récompense.'); return; }
-    } catch(e) {
-      console.warn('perUserLimit check:', e);
-      showVoucherError('Impossible de vérifier ton échange. Réessaie dans un instant.');
-      return;
-    }
-  }
-
+  const cost = rewardCost(reward);
+  if(S.pts < cost) { showVoucherError('Il te manque ' + (cost - S.pts) + ' pts pour cette récompense.'); return; }
+  // Une récompense par commerçant et par semaine : signalé avant de demander la confirmation (le serveur refait la vérification).
+  const wait = _redeemWaitUntil(reward.merchantId);
+  if(wait) { showVoucherError('Tu as déjà échangé une récompense chez ce commerçant cette semaine. Tu pourras à nouveau à partir du ' + wait.toLocaleDateString('fr-FR',{day:'numeric',month:'long'}) + '.'); return; }
   if(!(await askRedeemConfirm(reward))) return;
-
-  // Code à 4 caractères, sans caractères ambigus (0/O, 1/I) : il se lit et se saisit en caisse.
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for(let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
-
-  const expiresAt = new Date(Date.now() + 24*60*60*1000); // 24h
-  const userRef = db.collection('users').doc(u.uid);
-  const rewardRef = db.collection('rewards').doc(reward.id);
-  const redemRef = db.collection('redemptions').doc();
-
   try {
-    // Transaction (pas un simple batch) : relit le solde et le stock qui font foi au
-    // moment même de l'écriture, pas la valeur locale potentiellement périmée. C'est ce
-    // qui empêchait un double-échange rapide (double tap, double onglet) de faire passer
-    // le solde en négatif — le batch précédent ne revérifiait rien à l'écriture.
-    await db.runTransaction(async (tx) => {
-      const [userSnap, rewardSnap] = await Promise.all([tx.get(userRef), tx.get(rewardRef)]);
-      if(!userSnap.exists) throw new Error('Profil introuvable.');
-      if(!rewardSnap.exists) throw new Error('Récompense introuvable.');
-      const userData = userSnap.data();
-      const rewardData = rewardSnap.data();
-      const cost = rewardData.cost || 0;
-      if((userData.points||0) < cost) throw new Error('Solde insuffisant.');
-      if(rewardData.active === false) throw new Error("Cette récompense n'est plus disponible.");
-      if(rewardData.stock !== null && rewardData.stock !== undefined && (rewardData.redeemedCount||0) >= rewardData.stock) {
-        throw new Error('Stock épuisé.');
-      }
-      tx.set(redemRef, {
-        userId: u.uid, rewardId: reward.id, merchantId: rewardData.merchantId||null,
-        cost, label: rewardData.label||'Récompense', merchantName: rewardData.merchantName||'',
-        purchaseCondition: rewardData.purchaseCondition||null, code, status: 'pending',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        expiresAt: firebase.firestore.Timestamp.fromDate(expiresAt), usedAt: null
-      });
-      // N'écrit points que si la récompense coûte réellement quelque chose : à cost=0, la
-      // règle Firestore exige une baisse stricte, et écrire la même valeur serait refusé.
-      if(cost > 0) tx.update(userRef, { points: userData.points - cost });
-      tx.update(rewardRef, { redeemedCount: firebase.firestore.FieldValue.increment(1) });
-    });
-    S.pts = Math.max(0, S.pts - (reward.cost||0));
+    // L'échange se fait CÔTÉ SERVEUR (redeemReward) : il débite les points et applique, dans une seule transaction, le quota mensuel,
+    // les créneaux, la limite d'une récompense par commerçant et par semaine, et un solde jamais négatif.
+    const res = await fx.httpsCallable('redeemReward')({ rewardId: reward.id });
+    const d = res.data || {};
+    S.pts = typeof d.totalPoints === 'number' ? d.totalPoints : Math.max(0, S.pts - cost);
     S._everRedeemed = true;
     setTimeout(maybeShowInstallInvite, 2500);
     refreshWallet();
-    trackEvent('spend_virtual_currency', { virtual_currency_name: 'points', value: reward.cost||0, item_name: reward.label||'Récompense' });
-    showVoucherModal({ id: redemRef.id, code, label: reward.label, merchantName: reward.merchantName, cost: reward.cost, purchaseCondition: reward.purchaseCondition, expiresAt });
+    trackEvent('spend_virtual_currency', { virtual_currency_name: 'points', value: cost, item_name: reward.label||'Récompense' });
+    showVoucherModal({ id: d.redemptionId, code: d.code, label: d.label || reward.label, merchantName: d.merchantName || reward.merchantName, cost, tier: d.tier || reward.tier, purchaseCondition: d.purchaseCondition, expiresAt: new Date(d.expiresAt) });
   } catch(e) {
-    showVoucherError(e.message || ('Erreur : ' + e));
+    showVoucherError((e && e.message) || ('Erreur : ' + e));
   }
+}
+// Date à partir de laquelle l'habitant peut de nouveau échanger chez ce commerçant (d'après ses propres échanges), sinon null.
+let _redeemTimes = {};
+function _redeemWaitUntil(merchantId){
+  const t = _redeemTimes[merchantId];
+  return t && Date.now() - t < 7*86400000 ? new Date(t + 7*86400000) : null;
 }
 
 // Confirmation explicite avant l'échange : ce qui est débité, ce qu'il reste, la durée de validité.
@@ -4956,18 +4916,18 @@ function askRedeemConfirm(reward) {
     ov = document.createElement('div');
     ov.id = 'redeem-confirm';
     ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center';
-    const left = Math.max(0, (S.pts||0) - (reward.cost||0));
+    const left = Math.max(0, (S.pts||0) - rewardCost(reward));
     ov.innerHTML = `<div style="background:var(--card);border-radius:24px 24px 0 0;max-width:430px;width:100%;padding:22px 22px calc(24px + env(safe-area-inset-bottom,0px))">
       <div style="width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px"></div>
       <div style="font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:-.5px;color:var(--ink);margin-bottom:4px">${esc(reward.label||'Récompense')}</div>
       <div style="font-size:13px;color:var(--ink2);margin-bottom:16px">${esc(reward.merchantName||'')}</div>
       <div style="background:var(--bg2);border-radius:14px;padding:12px 14px;font-size:13.5px;color:var(--ink);line-height:1.9;margin-bottom:8px">
-        <div style="display:flex;justify-content:space-between"><span>Débité</span><strong>${reward.cost||0} pts</strong></div>
+        <div style="display:flex;justify-content:space-between"><span>Débité</span><strong>${esc(tierLabel(reward))}</strong></div>
         <div style="display:flex;justify-content:space-between"><span>Il te restera</span><strong>${left} pts</strong></div>
         <div style="display:flex;justify-content:space-between"><span>Valable</span><strong>24 h</strong></div>
       </div>
       <div style="font-size:11.5px;color:var(--ink3);margin-bottom:16px">Cette action est irréversible. Montre le code en caisse pour récupérer ta récompense.</div>
-      <button class="btn-p" id="rc-yes">Échanger contre ${reward.cost||0} pts</button>
+      <button class="btn-p" id="rc-yes">Échanger contre ${rewardCost(reward)} pts</button>
       <button class="btn-s" id="rc-no" style="margin-top:8px">Annuler</button>
     </div>`;
     document.body.appendChild(ov);
@@ -5093,7 +5053,7 @@ function finishAuthTransition() {
 // ─── Mini-didacticiel de première connexion : info-bulles sur l'accueil ────
 const HOME_TOUR_STEPS=[
   {sel:'#today-card', txt:'La question du jour est ici — réponds en quelques secondes pour gagner des points.'},
-  {sel:'.dstreak-card', txt:'Réponds chaque jour pour construire ta série et débloquer un bonus.'},
+  {sel:'.dstreak-card', txt:'Réponds chaque jour pour construire ta série.'},
   {sel:'#nav-rewards-tab', txt:'Échange tes points contre de vraies récompenses chez les commerces du quartier.'},
   {sel:'#nav-social', txt:'Défie tes amis et grimpe dans le classement de la semaine.'}
 ];
@@ -5383,7 +5343,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   await loadCampaignsFromFirestore(data);
   loadFriendAnswers().then(() => { renderQueue(); }).catch(() => {});
   finishAuthTransition();
-  if(!window._claimTried){ window._claimTried = true; claimPendingDemo().then(pts => { if(pts > 0) showClaimSplash(pts); }); }
+  if(!window._claimTried && data.welcomeClaimed !== true){ window._claimTried = true; claimPendingDemo().then(pts => { if(pts > 0) showClaimSplash(pts); }); }
 }
 
 // Chaque habitant a UN code ami unique, réservé de façon atomique : si le code enregistré est déjà
@@ -5698,11 +5658,10 @@ function recomputeCampaignFeed(city) {
       }
 
       const allQs = getCampaignQuestions(d);
-      const SCALE = [10, 15, 20];
       const surveyList = allQs.slice(1).map((sq, idx) => ({
         _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: idx + 1,
         brand: d.merchantName || 'Commerce', ico: d.brandEmoji || '🏪',
-        theme: d.sector || 'Commerce local', pts: SCALE[idx + 1] || 20,
+        theme: d.sector || 'Commerce local', pts: ENGAGEMENT.PTS_PER_ANSWER,
         type: sq.format || 'text', q: sq.q, hint: '',
         opts: sq.options || [], items: sq.options || [],
         usage: 'Ta réponse aide ' + (d.merchantName || 'ce commerce')
@@ -5822,11 +5781,12 @@ submitAns = function() {
       } else {
         if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
         if (rwTotalEl) rwTotalEl.textContent = S.pts + ' pts';
+        const disc = data.discoveryBonus > 0 ? 'Dont +' + data.discoveryBonus + ' pts de bonus découverte. ' : '';
         const left = typeof data.pointAnswersLeft === 'number' ? data.pointAnswersLeft : null;
         // Fin de palier : présenté comme un palier débloqué, pas comme une interdiction.
         if (rwSub && left !== null) {
-          if (left > 0) rwSub.textContent = 'Encore ' + left + ' réponse' + (left > 1 ? 's' : '') + ' en points aujourd\'hui.';
-          else rwSub.innerHTML = 'Tes ' + (S._pointsToday || 0) + ' pts du jour sont validés ' + icon('check', { size: 15 });
+          if (left > 0) rwSub.textContent = disc + 'Encore ' + left + ' réponse' + (left > 1 ? 's' : '') + ' en points aujourd\'hui.';
+          else rwSub.innerHTML = disc + 'Tes ' + (S._pointsToday || 0) + ' pts du jour sont validés ' + icon('check', { size: 15 });
         }
       }
       renderDailyTrack();

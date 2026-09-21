@@ -39,6 +39,29 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('city', null);
     }
 
+    // ─── Paliers de récompenses (identiques pour TOUS les commerçants) ───────────
+    // Source unique : tiers.js (côté fonctions) — les règles ne peuvent pas importer de fichier, les valeurs sont donc
+    // répétées ici ; tests/points_rules.js vérifie qu'elles restent identiques à tiers.js.
+    //   palier :  1    2    3     4     5(gros lot)
+    //   points : 150  300  500   900   1500     · prix carte : 1-3 €, 3-6 €, 6-10 €, 10-18 €, 18-30 €
+    function tierPts(t) { return t == 1 ? 150 : (t == 2 ? 300 : (t == 3 ? 500 : (t == 4 ? 900 : 1500))); }
+    function tierMax(t) { return t == 1 ? 3 : (t == 2 ? 6 : (t == 3 ? 10 : (t == 4 ? 18 : 30))); }
+    function validTier(t) { return t is int && t >= 1 && t <= 5; }
+    // Réglages d'une récompense (quota mensuel, créneaux, « avec achat »). Ne contient ni prix ni points : le commerçant n'en saisit jamais.
+    function rewardSettingsOk(d) {
+      return d.monthlyQuota is int && d.monthlyQuota >= 1 && d.monthlyQuota <= 1000 &&
+        d.get('timeSlots', []) is list && d.get('timeSlots', []).size() <= 3 &&
+        d.withPurchase is bool &&
+        (d.withPurchase == false ? d.get('minPurchase', null) == null
+          : (d.get('minPurchase', null) is number && d.minPurchase > 0 && d.minPurchase <= 2 * tierMax(d.tier)));
+    }
+    // Contenu à faire valider par l'admin : intitulé, icône, confirmation de la fourchette de prix carte.
+    function rewardContentOk(d) {
+      return d.label is string && d.label.size() >= 3 && d.label.size() <= 80 &&
+        (d.get('icon', null) == null || (d.icon is string && d.icon.size() <= 8)) &&
+        d.priceConfirmed == true;
+    }
+
     // ─── Users ────────────────────────────────────────────────────────────────
     // Lecture : soi-même, ses amis, les autres users de sa propre ville (classement/groupes), ou l'admin
     // Écriture : propriétaire uniquement
@@ -50,21 +73,18 @@ service cloud.firestore {
       // À la création, un compte démarre TOUJOURS à zéro : impossible de s'inscrire avec un solde.
       allow create: if isOwner(uid) && ownFile(request.resource.data.get('photoUrl', null), 'users', uid) &&
         request.resource.data.get('points', 0) == 0 && request.resource.data.get('xp', 0) == 0 &&
-        request.resource.data.get('noovs', 0) == 0 && request.resource.data.get('demoClaimed', false) == false;
-      // Le crédit de points (points/xp/dailyEarned/streak/ans/lastAnswerDate/answeredCampaigns)
-      // passe uniquement par la Cloud Function submitAnswer (SDK Admin, hors règles) — le
-      // client ne peut plus jamais écrire librement ces champs. Seule exception tolérée : le
-      // DÉBIT de points lors d'un échange de récompense (points ne peut alors que baisser).
+        request.resource.data.get('noovs', 0) == 0 && request.resource.data.get('demoClaimed', false) == false &&
+        request.resource.data.get('welcomeClaimed', false) == false && !('lastActivityAt' in request.resource.data) &&
+        !('answeredMerchants' in request.resource.data) && !('discoveryBonusDate' in request.resource.data);
+      // Le solde de points (points/xp/noovs…) et tout ce qui sert à le calculer passent UNIQUEMENT par les Cloud Functions
+      // (SDK Admin, hors règles) : submitAnswer (réponses, bonus découverte), claimWelcomeBonus (+50), redeemReward (échange),
+      // expirePoints. Le client ne peut jamais écrire ces champs, pas même pour débiter : le solde ne peut donc pas devenir
+      // négatif et les limites d'échange (quota, une récompense par semaine) ne peuvent pas être contournées.
       allow update: if isAdmin() || (isOwner(uid) &&
-        ownFile(request.resource.data.get('photoUrl', null), 'users', uid) && (
+        ownFile(request.resource.data.get('photoUrl', null), 'users', uid) &&
         !request.resource.data.diff(resource.data).affectedKeys().hasAny(
-          ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats']
-        )
-        ||
-        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']) &&
-         request.resource.data.points < resource.data.points &&
-         request.resource.data.points >= 0)
-      ));
+          ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','welcomeClaimed','lastActivityAt','answeredMerchants','discoveryBonusDate','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats']
+        ));
       allow delete: if isOwner(uid) || isAdmin();
 
       // Notifications subcollection
@@ -110,12 +130,12 @@ service cloud.firestore {
           ownFile(request.resource.data.get('logoUrl', null), 'merchants', merchantId) &&
           ownFile(request.resource.data.get('coverUrl', null), 'merchants', merchantId) &&
           (
-            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'verifiedAt', 'submittedAt', 'ownerUid', 'role', 'monthlyQuestionQuota'])
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'verifiedAt', 'submittedAt', 'ownerUid', 'role', 'monthlyQuestionQuota', 'pointsGenerated', 'pointsSpent'])
             ||
             // « Corriger et renvoyer » : un dossier refusé (à corriger) repasse en attente,
             // sans jamais pouvoir se déclarer vérifié soi-même.
             (resource.data.status == 'rejected' && request.resource.data.status == 'pending' &&
-             !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verifiedAt', 'ownerUid', 'role', 'monthlyQuestionQuota']))
+             !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verifiedAt', 'ownerUid', 'role', 'monthlyQuestionQuota', 'pointsGenerated', 'pointsSpent']))
           )
         )
       );
@@ -146,7 +166,14 @@ service cloud.firestore {
         request.resource.data.get('archived', false) == false &&
         getMerchant(request.auth.uid).get('status', null) == 'verified' &&
         (getMerchant(request.auth.uid).get('city', null) == null ||
-         request.resource.data.get('targetCity', null) == getMerchant(request.auth.uid).get('city', null));
+         request.resource.data.get('targetCity', null) == getMerchant(request.auth.uid).get('city', null)) &&
+        // Lancer une campagne exige les 5 paliers de la vitrine récompenses remplis (un document par palier).
+        (request.resource.data.status != 'active' || (
+          exists(/databases/$(database)/documents/rewards/$(request.auth.uid + '_p1')) &&
+          exists(/databases/$(database)/documents/rewards/$(request.auth.uid + '_p2')) &&
+          exists(/databases/$(database)/documents/rewards/$(request.auth.uid + '_p3')) &&
+          exists(/databases/$(database)/documents/rewards/$(request.auth.uid + '_p4')) &&
+          exists(/databases/$(database)/documents/rewards/$(request.auth.uid + '_p5'))));
       // answersCount/responsesCount ne sont plus incrémentables par le client : seule la
       // Cloud Function submitAnswer (SDK Admin, hors règles) les met à jour désormais. Le
       // commerçant ne peut pas non plus changer merchantId (transfert de propriété).
@@ -214,34 +241,57 @@ service cloud.firestore {
         resource.data.merchantId == request.auth.uid ||
         isAdmin()
       );
-      // Une récompense créée par un commerçant démarre toujours en attente de validation
-      // admin — jamais visible/active tant qu'elle n'a pas été approuvée (voir update).
+      // Exactement 5 paliers par commerçant : un document par palier, à l'identifiant imposé {merchantId}_p{1..5}, donc jamais
+      // plus de 5 ni deux fois le même. Le coût en points est celui du palier (tierPts) : le commerçant n'en saisit aucun.
+      // Une récompense démarre toujours en attente de validation admin, jamais visible/active avant.
       allow create: if isAuth() &&
         request.resource.data.merchantId == request.auth.uid &&
         getMerchant(request.auth.uid).get('status', null) in ['pending', 'verified'] &&
+        request.resource.data.keys().hasOnly(['merchantId','merchantName','city','tier','slot','cost','label','icon','priceConfirmed','monthlyQuota','timeSlots','withPurchase','minPurchase','status','active','approved','redeemedCount','createdAt','updatedAt']) &&
+        validTier(request.resource.data.get('tier', null)) &&
+        rewardId == request.auth.uid + '_p' + string(request.resource.data.tier) &&
+        request.resource.data.get('slot', null) == request.resource.data.tier &&
+        request.resource.data.get('cost', null) == tierPts(request.resource.data.tier) &&
+        rewardContentOk(request.resource.data) && rewardSettingsOk(request.resource.data) &&
         request.resource.data.status == 'pending' &&
-        request.resource.data.active == false;
+        request.resource.data.active == false &&
+        request.resource.data.get('approved', null) == false &&
+        request.resource.data.get('redeemedCount', null) == 0;
+      // Le champ « approved » (et donc le passage en « approved ») est réservé à l'admin.
       allow update: if isAuth() && (
-        isAdmin()
+        (isAdmin() && (request.resource.data.get('approved', false) != true ||
+                       (validTier(request.resource.data.get('tier', null)) && request.resource.data.get('cost', null) == tierPts(request.resource.data.tier))))
         ||
-        // Commerçant : modification complète de son propre palier, mais il ne peut ni
-        // s'auto-approuver/rejeter, ni s'auto-activer avant validation par l'admin.
         (resource.data.merchantId == request.auth.uid &&
-         (request.resource.data.status == 'pending' || request.resource.data.status == resource.data.status) &&
-         (request.resource.data.active == false || resource.data.status == 'approved'))
-        ||
-        // Utilisateur : uniquement incrémenter redeemedCount de 1
-        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['redeemedCount']) &&
-         request.resource.data.redeemedCount == resource.data.redeemedCount + 1)
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['merchantId','merchantName','city','tier','slot','cost','approved','approvedAt','redeemedCount','createdAt','rejectionReason']) &&
+         rewardSettingsOk(request.resource.data) &&
+         (
+           // Réglages (quota, créneaux, « avec achat ») et pause / reprise : sans nouvelle validation. On ne peut reprendre qu'une
+           // récompense DÉJÀ approuvée par l'admin (approved == true) ; jamais passer de « pending » à « approved » soi-même.
+           (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','active','updatedAt','monthlyQuota','timeSlots','withPurchase','minPurchase']) &&
+            (request.resource.data.status == resource.data.status ||
+             (resource.data.get('approved', false) == true &&
+              ((resource.data.status == 'approved' && request.resource.data.status == 'paused') ||
+               (resource.data.status == 'paused' && request.resource.data.status == 'approved')))) &&
+            request.resource.data.active == (request.resource.data.status == 'approved' && resource.data.get('approved', false) == true))
+           ||
+           // Nouveau contenu (intitulé, icône…) : repasse en attente de validation, désactivée.
+           (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['label','icon','priceConfirmed','status','active','updatedAt','monthlyQuota','timeSlots','withPurchase','minPurchase']) &&
+            rewardContentOk(request.resource.data) &&
+            request.resource.data.status == 'pending' &&
+            request.resource.data.active == false)
+         ))
       );
-      allow delete: if isAuth() && (resource.data.merchantId == request.auth.uid || isAdmin());
+      // Le commerçant met en pause au lieu de supprimer (les 5 paliers doivent toujours exister) ; seul l'admin supprime.
+      allow delete: if isAdmin();
     }
 
     // ─── Redemptions ─────────────────────────────────────────────────────────
-    // Création : par l'utilisateur concerné
+    // Création : JAMAIS par le client — uniquement la fonction redeemReward (SDK Admin), qui débite les points et applique le
+    // quota mensuel et la limite d'une récompense par commerçant et par semaine dans la même transaction.
     // Lecture : par l'utilisateur OU le commerçant concerné
     match /redemptions/{redemptionId} {
-      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow create: if false;
       allow read: if isAuth() && (
         resource.data.userId == request.auth.uid ||
         resource.data.merchantId == request.auth.uid ||
@@ -249,11 +299,16 @@ service cloud.firestore {
       );
       // Le commerçant peut passer le bon à "used" (validation au comptoir)
       // L'habitant peut aussi presser « C'est validé » sur son propre bon en attente.
-      allow update: if isAuth() &&
-        (resource.data.merchantId == request.auth.uid ||
-         (resource.data.userId == request.auth.uid && resource.data.status == 'pending')) &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','usedAt']) &&
-        request.resource.data.status == 'used';
+      // Le commerçant renseigne aussi, au comptoir, le montant du panier et s'il s'agit d'un nouveau client (tableau de bord).
+      allow update: if isAuth() && request.resource.data.status == 'used' && (
+        (resource.data.merchantId == request.auth.uid &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','usedAt','basketEuros','newCustomer']) &&
+         (request.resource.data.get('basketEuros', null) == null || (request.resource.data.basketEuros is number && request.resource.data.basketEuros > 0 && request.resource.data.basketEuros <= 5000)) &&
+         (request.resource.data.get('newCustomer', null) == null || request.resource.data.newCustomer is bool))
+        ||
+        (resource.data.userId == request.auth.uid && resource.data.status == 'pending' &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','usedAt']))
+      );
       // delete : uniquement par l'utilisateur concerné (suppression de compte / droit à l'effacement)
       allow delete: if isAuth() && (resource.data.userId == request.auth.uid || isAdmin());
     }

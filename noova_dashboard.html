@@ -793,6 +793,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 <script src="icons.js"></script>
+<script src="/tiers.js"></script>
 </head>
 <body>
 
@@ -831,7 +832,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <button class="sb-item" id="nav-results" onclick="navTo('results',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>Résultats</button>
       <button class="sb-item" onclick="navTo('consents',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>Consentements RGPD</button>
       <button class="sb-item" id="nav-news" onclick="navTo('news',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2V5z"/><path d="M19 9h1a1 1 0 0 1 1 1v7a2 2 0 0 1-2 2"/><path d="M8 9h6M8 13h6"/></svg></span>Actualités</button>
-      <button class="sb-item" id="nav-rewards" onclick="navTo('rewards',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="13" rx="1"/><path d="M4 12h16"/><path d="M12 8v13"/><path d="M12 8c-1.2-3-5-3.3-5-.6 0 1.8 2.2.6 5 .6zM12 8c1.2-3 5-3.3 5-.6 0 1.8-2.2.6-5 .6z"/></svg></span>Mes récompenses</button>
+      <button class="sb-item" id="nav-rewards" onclick="navTo('rewards',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="13" rx="1"/><path d="M4 12h16"/><path d="M12 8v13"/><path d="M12 8c-1.2-3-5-3.3-5-.6 0 1.8 2.2.6 5 .6zM12 8c1.2-3 5-3.3 5-.6 0 1.8-2.2.6-5 .6z"/></svg></span>Ma vitrine récompenses</button>
       <button class="sb-item" id="nav-validate" onclick="navTo('validate',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></span>Valider un code</button>
       <div class="sb-section">Compte</div>
       <button class="sb-item" onclick="navTo('settings',this)"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M4 12h2M18 12h2M12 4v2M12 18v2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M6.3 17.7l1.4-1.4M16.3 7.7l1.4-1.4"/></svg></span>Paramètres</button>
@@ -877,6 +878,24 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <div class="page active" id="page-dashboard">
         <div id="quota-card" style="display:none"></div>
         <div id="acq-card" style="display:none"></div>
+        <!-- Clients ramenés par NOOVA (bons validés ce mois-ci) -->
+        <div class="kpi-row" id="bring-row" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi-card">
+            <div class="kpi-top"><span class="kpi-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></svg></span></div>
+            <div class="kpi-val" id="bring-val-0">0</div>
+            <div class="kpi-lbl">Clients ramenés ce mois</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span class="kpi-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></span></div>
+            <div class="kpi-val" id="bring-val-1">0</div>
+            <div class="kpi-lbl">dont nouveaux clients</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><span class="kpi-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6"/></svg></span></div>
+            <div class="kpi-val" id="bring-val-2">—</div>
+            <div class="kpi-lbl">Panier moyen des clients NOOVA</div>
+          </div>
+        </div>
         <!-- KPIs -->
         <div class="kpi-row">
           <div class="kpi-card">
@@ -1330,16 +1349,12 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <!-- ═══ REWARDS MANAGEMENT ═══ -->
       <div class="page" id="page-rewards">
         <div style="max-width:700px">
-          <div style="margin-bottom:24px">
-            <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink);display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-1px"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg> Mes récompenses</div>
-            <div style="font-size:13px;color:var(--ink2);margin-top:4px">Proposez jusqu'à 5 récompenses à vos clients. 1 pt ≈ 1 centime de valeur perçue.</div>
+          <div style="margin-bottom:20px">
+            <div style="font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink);display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-1px"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M4 10h16v3.5H4z"/><path d="M12 10v10"/><path d="M12 10c-1-2.7-2.8-4-4.2-4S5.5 7 6.3 8.4C7 9.6 8.7 10 12 10z"/><path d="M12 10c1-2.7 2.8-4 4.2-4S18.5 7 17.7 8.4C17 9.6 15.3 10 12 10z"/></svg> Ma vitrine récompenses</div>
+            <div style="font-size:13px;color:var(--ink2);margin-top:4px">NOOVA fixe 5 paliers, les mêmes pour tous les commerçants : vous n'avez aucun prix ni aucun nombre de points à saisir. Pour chaque palier, choisissez la récompense que vous offrez, dans la fourchette de prix indiquée.</div>
           </div>
-          <div id="rewards-suggestion" style="display:none;background:var(--ad);border:1.5px solid rgba(242,151,21,.25);border-radius:var(--rs);padding:14px 18px;margin-bottom:20px">
-            <div style="font-size:13px;color:var(--ink2);margin-bottom:10px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg> <strong>Suggestions selon votre activité</strong> — cliquez pour pré-remplir, vous gardez la main avant de publier.</div>
-            <div id="rewards-suggestion-chips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-          </div>
+          <div id="rewards-progress" style="font-size:13px;color:var(--ink2);background:var(--ad);border:1.5px solid rgba(242,151,21,.25);border-radius:var(--rs);padding:12px 16px;margin-bottom:18px"></div>
           <div id="reward-slots"></div>
-          <button class="tb-btn tb-btn-primary" style="margin-top:8px" id="add-reward-btn" onclick="addRewardSlot()">+ Ajouter une récompense</button>
         </div>
       </div>
 
@@ -1834,9 +1849,11 @@ async function checkRewardsReadyForCampaign(){
   if(!u) return true;
   try{
     const snap = await db.collection('rewards').where('merchantId','==',u.uid).get();
-    if(snap.size >= 5) return true;
-    const missing = 5 - snap.size;
-    showToast(`Ajoute encore ${missing} récompense${missing>1?'s':''} pour compléter tes 5 paliers avant ta première campagne`, 'gift-generic');
+    const filled = new Set();
+    snap.forEach(d => { const t = d.data().tier; if(d.id === u.uid + '_p' + t) filled.add(t); });
+    if(filled.size >= 5) return true;
+    const missing = 5 - filled.size;
+    showToast(`Remplissez encore ${missing} palier${missing>1?'s':''} de votre vitrine récompenses avant votre première campagne`, 'gift-generic');
     navTo('rewards', document.querySelector('.sb-item[onclick*="\'rewards\'"]'));
     return false;
   } catch(e){ return true; }
@@ -1853,7 +1870,7 @@ async function navTo(page, btn){
   closeMobMenu();
   curPage=page;
   const brandName = (_mData && _mData.brandName) || 'votre espace';
-  const titles={dashboard:['Dashboard','Bienvenue — '+brandName],create:['Créer une campagne','Moins de 5 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet de vos campagnes'],consents:['Consentements RGPD','Journal des consentements (RGPD, art. 6 et 7)'],settings:['Paramètres','Configuration de votre espace marque'],news:['Actualités','Montrez ce que vos clients ont changé chez vous'],rewards:['Mes récompenses','Ce que vos clients peuvent gagner chez vous'],validate:['Valider un code','Le code à 4 caractères montré par le client']};
+  const titles={dashboard:['Dashboard','Bienvenue — '+brandName],create:['Créer une campagne','Moins de 5 minutes pour lancer votre étude'],campaigns:['Mes campagnes','Gérez et suivez toutes vos campagnes'],results:['Résultats','Rapport complet de vos campagnes'],consents:['Consentements RGPD','Journal des consentements (RGPD, art. 6 et 7)'],settings:['Paramètres','Configuration de votre espace marque'],news:['Actualités','Montrez ce que vos clients ont changé chez vous'],rewards:['Ma vitrine récompenses','Ce que vos clients peuvent gagner chez vous'],validate:['Valider un code','Le code à 4 caractères montré par le client']};
   const t=titles[page]||[page,''];
   document.getElementById('topbar-title').textContent=t[0];
   document.getElementById('topbar-sub').textContent=t[1];
@@ -2971,6 +2988,7 @@ async function loadMerchantAndStart(uid) {
 
   loadMerchantCampaigns(uid);
   loadQuota();
+  loadBringKpis(uid);
   // Nb utilisateurs : stocké dans le doc merchant (consentCount) pour éviter les restrictions RGPD
   _totalConsentedUsers = _mData.consentCount || 0;
   updAud();
@@ -3162,7 +3180,7 @@ launchCampaign = async function() {
   try {
     const approvedSnap = await db.collection('rewards').where('merchantId','==',u.uid).where('status','==','approved').limit(1).get();
     if(approvedSnap.empty) {
-      showToast('Configure et fais valider au moins une récompense avant de lancer une campagne','gift-generic');
+      showToast('Faites valider au moins une récompense de votre vitrine avant de lancer une campagne','gift-generic');
       navTo('rewards', document.querySelector('.sb-item[onclick*="\'rewards\'"]'));
       return;
     }
@@ -3254,8 +3272,8 @@ function closeVerifiedModal() {
 // ─── Mini didacticiel commerçant : première connexion, un tour complet du menu ─
 const DASH_TOUR_STEPS=[
   {sel:'#nav-dashboard', txt:'Ton dashboard résume en un coup d’œil tes réponses, ton taux de participation et tes campagnes en cours.'},
-  {sel:'#nav-rewards', txt:'Commence ici : configure tes 5 récompenses. C’est ce qui donne envie aux habitants de répondre à tes questions.'},
-  {sel:'#nav-create', txt:'Une fois tes 5 récompenses prêtes, crée ta première campagne ici : une question, un format, un public, en quelques minutes.'},
+  {sel:'#nav-rewards', txt:'Commence ici : remplis les 5 paliers de ta vitrine récompenses. C’est ce qui donne envie aux habitants de répondre à tes questions.'},
+  {sel:'#nav-create', txt:'Une fois ta vitrine remplie, crée ta première campagne ici : une question, un format, un public, en quelques minutes.'},
   {sel:'#nav-campaigns', txt:'Retrouve toutes tes campagnes ici, en cours ou terminées, avec leur nombre de réponses.'},
   {sel:'#nav-results', txt:'Les résultats détaillés et les recommandations arrivent ici dès que les premières réponses tombent.'},
   {sel:'#nav-validate', txt:'Quand un client vient chercher sa récompense, valide son bon ici en quelques secondes.'}
@@ -3444,51 +3462,70 @@ function showRejectedScreen(data) {
   sc.style.display = 'flex';
 }
 
-// ═══ RÉCOMPENSES — gestion des 5 slots ═══════════════════════
+// ═══ MA VITRINE RÉCOMPENSES — 5 paliers fixes ════════════════
+// Les paliers (points, fourchette de prix carte) sont identiques pour tous les commerçants (tiers.js, NOOVA_TIERS) : le commerçant
+// ne saisit ni prix ni points. Par palier, il choisit UNE récompense (suggestion liée à son activité, pré-remplie, ou texte libre),
+// confirme que le prix carte de l'article est dans la fourchette, puis règle quota mensuel, créneaux, « avec achat » et pause.
+// Seul l'admin valide (règles Firestore). Un document par palier : rewards/{uid}_p{1..5}.
 
+// Suggestions par secteur, une liste par palier (du plus petit au gros lot) : pensées pour tenir dans la fourchette de prix du palier.
 const REWARD_SUGGESTIONS = {
   'Restauration': [
-    { icon: '☕', label: 'Café offert' },
-    { icon: '🍰', label: 'Dessert offert' },
-    { icon: '💸', label: "-20% sur l'addition" },
-    { icon: '🍽️', label: 'Menu offert', condition: "pour un plat acheté" },
+    [{icon:'☕',label:'Café offert'},{icon:'🍪',label:'Cookie offert'},{icon:'🥤',label:'Boisson fraîche offerte'}],
+    [{icon:'🍰',label:'Dessert offert'},{icon:'🥗',label:'Entrée offerte'},{icon:'🍹',label:'Boisson au choix offerte'}],
+    [{icon:'🥪',label:'Sandwich offert'},{icon:'🍨',label:'Coupe glacée offerte'},{icon:'🥤',label:'Boisson et dessert offerts'}],
+    [{icon:'🍽️',label:'Plat du jour offert'},{icon:'🍝',label:'Plat au choix à moitié prix'},{icon:'🥂',label:'Apéritif pour deux offert'}],
+    [{icon:'🍽️',label:'Menu complet offert'},{icon:'🍷',label:'Plat, dessert et boisson offerts'},{icon:'🎁',label:'Repas à moitié prix'}],
   ],
   'Boulangerie': [
-    { icon: '🥐', label: 'Viennoiserie offerte' },
-    { icon: '🥖', label: 'Baguette offerte' },
-    { icon: '🍰', label: 'Pâtisserie offerte' },
+    [{icon:'🥐',label:'Viennoiserie offerte'},{icon:'🍪',label:'Cookie offert'},{icon:'🥖',label:'Petit pain offert'}],
+    [{icon:'🍰',label:'Pâtisserie individuelle offerte'},{icon:'🥐',label:'Deux viennoiseries offertes'},{icon:'🥪',label:'Petit sandwich offert'}],
+    [{icon:'🥪',label:'Sandwich et boisson offerts'},{icon:'🎂',label:'Part de gâteau offerte'},{icon:'🍞',label:'Pain spécial offert'}],
+    [{icon:'🎂',label:'Petit gâteau offert'},{icon:'🥪',label:'Formule déjeuner pour deux offerte'},{icon:'🧺',label:'Panier de viennoiseries offert'}],
+    [{icon:'🎂',label:'Gâteau offert'},{icon:'🧺',label:'Plateau de pâtisseries offert'},{icon:'🎁',label:'Coffret dégustation offert'}],
   ],
   'Café': [
-    { icon: '☕', label: 'Expresso offert' },
-    { icon: '🥤', label: 'Boisson chaude offerte' },
-    { icon: '🥐', label: 'Viennoiserie offerte' },
+    [{icon:'☕',label:'Expresso offert'},{icon:'🍵',label:'Thé offert'},{icon:'🥐',label:'Viennoiserie offerte'}],
+    [{icon:'🥤',label:'Boisson chaude au choix offerte'},{icon:'🍪',label:'Cookie et boisson offerts'},{icon:'🧁',label:'Muffin offert'}],
+    [{icon:'🍰',label:'Part de gâteau et boisson offertes'},{icon:'🥞',label:'Pancakes offerts'},{icon:'🥪',label:'Croque-monsieur offert'}],
+    [{icon:'🥂',label:'Brunch offert'},{icon:'🍽️',label:'Formule déjeuner offerte'},{icon:'🍰',label:'Goûter pour deux offert'}],
+    [{icon:'🍽️',label:'Brunch pour deux offert'},{icon:'☕',label:'Carte de dix cafés offerte'},{icon:'🎁',label:'Coffret café à emporter offert'}],
   ],
   'Beauté': [
-    { icon: '💆', label: 'Soin découverte' },
-    { icon: '💸', label: 'Remise 15%' },
-    { icon: '🎁', label: 'Produit offert' },
+    [{icon:'💅',label:'Soin des mains express offert'},{icon:'🎁',label:'Échantillon offert'},{icon:'💆',label:'Massage de cinq minutes offert'}],
+    [{icon:'💆',label:'Massage du cuir chevelu offert'},{icon:'💅',label:'Vernis offert'},{icon:'🎁',label:'Mini produit offert'}],
+    [{icon:'💅',label:'Manucure express offerte'},{icon:'🧴',label:'Produit de soin offert'},{icon:'✂️',label:'Shampoing et coiffage offerts'}],
+    [{icon:'💆',label:'Soin du visage express offert'},{icon:'✂️',label:'Coupe à moitié prix'},{icon:'🎁',label:'Produit de soin au choix offert'}],
+    [{icon:'💆',label:'Soin complet offert'},{icon:'✂️',label:'Coupe et soin offerts'},{icon:'🎁',label:'Coffret beauté offert'}],
   ],
   'Sport': [
-    { icon: '🏋️', label: 'Cours découverte' },
-    { icon: '💸', label: '-20% abonnement' },
+    [{icon:'💧',label:'Boisson offerte'},{icon:'🧴',label:'Serviette offerte'},{icon:'🎟️',label:'Accès d’une heure offert'}],
+    [{icon:'🥤',label:'Shaker offert'},{icon:'🧘',label:'Cours d’essai collectif offert'},{icon:'🎟️',label:'Séance découverte offerte'}],
+    [{icon:'🏋️',label:'Cours collectif offert'},{icon:'🎟️',label:'Pass à la journée offert'},{icon:'🥤',label:'Boisson et barre protéinée offertes'}],
+    [{icon:'🏋️',label:'Séance découverte avec coach offerte'},{icon:'🎟️',label:'Pass de trois jours offert'},{icon:'👕',label:'T-shirt du club offert'}],
+    [{icon:'🏋️',label:'Séance de coaching individuelle offerte'},{icon:'🎟️',label:'Semaine d’accès offerte'},{icon:'🎁',label:'Pack d’accessoires offert'}],
   ],
   'Mode': [
-    { icon: '💸', label: '-15% sur un article' },
-    { icon: '🎁', label: 'Accessoire offert' },
+    [{icon:'🎀',label:'Accessoire offert'},{icon:'🛍️',label:'Sac shopping offert'},{icon:'🎁',label:'Petit cadeau offert'}],
+    [{icon:'🧦',label:'Paire de chaussettes offerte'},{icon:'🧣',label:'Foulard léger offert'},{icon:'🎁',label:'Accessoire au choix offert'}],
+    [{icon:'👜',label:'Tote bag offert'},{icon:'🧢',label:'Casquette offerte'},{icon:'💸',label:'10 € de réduction dès 40 € d’achat'}],
+    [{icon:'🧣',label:'Écharpe offerte'},{icon:'👕',label:'T-shirt offert'},{icon:'💸',label:'15 € de réduction sur un article'}],
+    [{icon:'👖',label:'Article offert jusqu’à 30 €'},{icon:'💸',label:'25 € de réduction sur un article'},{icon:'🎁',label:'Pièce du mois offerte'}],
   ],
   'Commerce': [
-    { icon: '💸', label: '10% de réduction' },
-    { icon: '🎁', label: 'Produit surprise' },
-    { icon: '💸', label: '-15% sur commande' },
+    [{icon:'🎁',label:'Petit cadeau surprise'},{icon:'🍬',label:'Douceur offerte'},{icon:'✏️',label:'Goodies offerts'}],
+    [{icon:'🎁',label:'Petit produit au choix offert'},{icon:'💸',label:'5 € de réduction sur un achat'},{icon:'🛍️',label:'Sac réutilisable offert'}],
+    [{icon:'🎁',label:'Produit surprise offert'},{icon:'💸',label:'10 € de réduction dès 40 € d’achat'},{icon:'🎀',label:'Petit coffret offert'}],
+    [{icon:'🎁',label:'Produit au choix offert'},{icon:'💸',label:'15 € de réduction dès 60 € d’achat'},{icon:'🎀',label:'Coffret découverte offert'}],
+    [{icon:'🎁',label:'Gros lot : produit offert'},{icon:'💸',label:'25 € de réduction dès 80 € d’achat'},{icon:'🎀',label:'Grand coffret offert'}],
   ],
 };
 
-// Associe le secteur (texte libre saisi par le commerçant à l'inscription) à un jeu
-// de suggestions par mots-clés — plus robuste qu'une correspondance exacte, qui
-// échouait dès que le commerçant n'écrivait pas le libellé au mot près.
+// Associe le secteur (texte libre saisi par le commerçant à l'inscription) à un jeu de suggestions par mots-clés.
 const SECTOR_KEYWORDS = [
   { key: 'Café',         words: ['café', 'coffee', 'salon de thé', 'brunch'] },
-  { key: 'Restauration', words: ['resto', 'restaurant', 'brasserie', 'pizzeria', 'boulangerie', 'traiteur', 'kebab', 'food'] },
+  { key: 'Boulangerie',  words: ['boulang', 'pâtiss', 'patiss', 'viennois'] },
+  { key: 'Restauration', words: ['resto', 'restaurant', 'brasserie', 'pizzeria', 'traiteur', 'kebab', 'food'] },
   { key: 'Beauté',       words: ['coiff', 'beaut', 'salon', 'esthét', 'barbier', 'spa', 'onglerie'] },
   { key: 'Sport',        words: ['sport', 'fitness', 'gym', 'yoga', 'musculation', 'salle de sport'] },
   { key: 'Mode',         words: ['mode', 'vêtement', 'boutique', 'prêt-à-porter', 'shopping'] },
@@ -3498,22 +3535,13 @@ function matchSectorKey(sectorText) {
   const found = SECTOR_KEYWORDS.find(entry => entry.words.some(w => s.includes(w)));
   return found ? found.key : 'Commerce';
 }
-// Le commerçant saisit la valeur réelle en € de chaque récompense ; le coût en points
-// est calculé automatiquement (1 pt ≈ 1 centime, cf. NOOVA_POINTS_SYSTEM.md) plutôt que
-// choisi librement — ça garde un repère de valeur cohérent dans toute l'app. Les 5 slots
-// doivent être des paliers strictement croissants (slot 5 = le gros lot du commerçant).
-const POINTS_PER_EURO = 100;
-const REWARD_TIER_HINTS = [
-  'petit geste — café, cookie, -10%…',
-  'dessert, boisson, -15%…',
-  '-20%, entrée offerte…',
-  '-30%, produit premium…',
-  'le gros lot — menu offert, -50%…',
-];
-function eurosToPoints(euros) { return Math.round((parseFloat(euros)||0) * POINTS_PER_EURO); }
+const RW_DAYS = [[1,'L'],[2,'M'],[3,'M'],[4,'J'],[5,'V'],[6,'S'],[0,'D']];
+const RW_DAY_NAMES = { 0:'dim', 1:'lun', 2:'mar', 3:'mer', 4:'jeu', 5:'ven', 6:'sam' };
+const rwTier = n => (window.NOOVA_TIERS || []).find(t => t.n === n);
+const rwEur = n => String(n).replace('.', ',') + ' €';
 
-let _rewardSlots = []; // [{id, data}] loaded from Firestore
-let _slotCount = 0;
+let _rewardSlots = []; // [{id, data}] : au plus un document par palier (rewards/{uid}_p{n})
+const rewardOf = n => (_rewardSlots.find(r => r.data.tier === n) || {}).data || null;
 
 function navToRewards() {
   loadMerchantRewards();
@@ -3525,191 +3553,225 @@ function loadMerchantRewards() {
   if(!u) return;
   const el = document.getElementById('reward-slots');
   if(!el) return;
-  el.innerHTML = '<div style="color:var(--ink3);font-size:13px;padding:12px 0">Chargement…</div>';
+  if(!_rewardSlots.length) el.innerHTML = '<div style="color:var(--ink3);font-size:13px;padding:12px 0">Chargement…</div>';
 
   if (_merchantRewardsUnsub) _merchantRewardsUnsub();
-  _merchantRewardsUnsub = db.collection('rewards').where('merchantId','==',u.uid).orderBy('slot','asc').onSnapshot(snap => {
+  _merchantRewardsUnsub = db.collection('rewards').where('merchantId','==',u.uid).onSnapshot(snap => {
     _rewardSlots = [];
-    snap.forEach(doc => _rewardSlots.push({ id: doc.id, data: doc.data() }));
-    renderRewardSuggestions();
-    renderRewardSlots();
-  }, () => { renderRewardSuggestions(); renderRewardSlots(); });
+    snap.forEach(doc => { const d = doc.data(); if(d.tier >= 1 && d.tier <= 5 && doc.id === u.uid + '_p' + d.tier) _rewardSlots.push({ id: doc.id, data: d }); });
+    _rewardSlots.sort((a, b) => a.data.tier - b.data.tier);
+    if(!document.querySelector('#reward-slots .rw-form')) renderRewardSlots();   // ne casse pas un formulaire en cours de saisie
+    else renderRewardProgress();
+  }, () => { renderRewardSlots(); });
 }
 
-// Suggestions selon secteur — affichées seulement tant qu'aucune récompense n'existe,
-// cliquables pour pré-remplir le formulaire (rien n'est publié sans confirmation).
-function renderRewardSuggestions() {
-  const sugEl = document.getElementById('rewards-suggestion');
-  const chipsEl = document.getElementById('rewards-suggestion-chips');
-  if(!sugEl || !chipsEl) return;
-  if(_rewardSlots.length > 0) { sugEl.style.display = 'none'; return; }
-  const sectorKey = matchSectorKey(_mData?.sector || '');
-  const suggestions = REWARD_SUGGESTIONS[sectorKey] || REWARD_SUGGESTIONS['Commerce'];
-  chipsEl.innerHTML = '';
-  // Le coût est désormais fixé par le palier (slot), pas par le contenu — les suggestions
-  // ne proposent donc plus qu'une idée de contenu (icône/intitulé/condition) à reprendre.
-  suggestions.forEach(s => {
-    const chip = document.createElement('button');
-    chip.type = 'button';
-    chip.style.cssText = 'padding:8px 14px;border-radius:99px;border:1.5px solid rgba(242,151,21,.35);background:var(--card);color:var(--ink);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--fb);white-space:nowrap';
-    chip.textContent = `${s.icon} ${s.label}`;
-    chip.onclick = () => useSuggestedReward(s);
-    chipsEl.appendChild(chip);
-  });
-  sugEl.style.display = 'block';
+function renderRewardProgress() {
+  const el = document.getElementById('rewards-progress');
+  if(!el) return;
+  const filled = _rewardSlots.length, approved = _rewardSlots.filter(r => r.data.status === 'approved' || r.data.status === 'paused').length;
+  el.innerHTML = `<strong style="color:var(--ink)">${filled} / 5 paliers remplis.</strong> ` + (filled < 5
+    ? 'Il faut remplir les 5 paliers avant de lancer votre première campagne.'
+    : (approved ? `${approved} validé${approved > 1 ? 's' : ''} par NOOVA.` : 'Vos 5 paliers sont remplis : NOOVA les valide avant qu’ils ne soient visibles dans l’app.'));
 }
 
-function useSuggestedReward(s) {
-  if (!document.getElementById('new-r-label')) addRewardSlot();
-  const iconEl  = document.getElementById('new-r-icon');
-  const labelEl = document.getElementById('new-r-label');
-  const condEl  = document.getElementById('new-r-condition');
-  if (iconEl)  iconEl.value = s.icon;
-  if (labelEl) labelEl.value = s.label;
-  if (condEl && s.condition) condEl.value = s.condition;
-  const formCard = labelEl && labelEl.closest('.card');
-  if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+function rewardBadge(d) {
+  const b = {
+    pending:  { bg: 'rgba(59,130,246,.12)', c: '#1D4ED8', txt: icon('clock',{size:11})+' En attente de validation' },
+    approved: { bg: 'rgba(11,171,132,.12)', c: '#087355', txt: icon('success',{size:11})+' Approuvée' },
+    paused:   { bg: 'var(--bg3)', c: 'var(--ink2)', txt: icon('pause',{size:11})+' En pause' },
+    rejected: { bg: 'rgba(239,68,68,.1)', c: '#B91C1C', txt: icon('error',{size:11})+' Refusée par NOOVA' },
+  }[d.status || 'pending'] || {};
+  return `<span style="padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${b.bg};color:${b.c};white-space:nowrap;display:inline-flex;align-items:center;gap:4px">${b.txt}</span>`;
+}
+function slotsText(slots) {
+  return (slots || []).map(s => ((s.days && s.days.length && s.days.length < 7) ? s.days.map(x => RW_DAY_NAMES[x]).join(', ') + ' ' : '') + s.from + '–' + s.to).join(' · ');
 }
 
 function renderRewardSlots() {
   const el = document.getElementById('reward-slots');
   if(!el) return;
   el.innerHTML = '';
-  if(!_rewardSlots.length) {
-    el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--ink3);font-size:13px;border:2px dashed var(--border);border-radius:var(--rs)">Aucune récompense encore. Crée ta première récompense ci-dessous.</div>';
-  }
-  _rewardSlots.forEach((r, i) => renderRewardCard(r, i));
-  const addBtn = document.getElementById('add-reward-btn');
-  if(addBtn) addBtn.style.display = _rewardSlots.length >= 5 ? 'none' : '';
+  renderRewardProgress();
+  (window.NOOVA_TIERS || []).forEach(t => renderRewardCard(t));
 }
 
-function renderRewardCard(r, i) {
+function renderRewardCard(t) {
   const el = document.getElementById('reward-slots');
-  const d = r.data;
+  const d = rewardOf(t.n);
   const card = document.createElement('div');
   card.className = 'card';
+  card.id = 'rw-card-' + t.n;
   card.style.marginBottom = '14px';
-  const statusBadge = {
-    pending:  { bg: 'rgba(59,130,246,.12)', c: '#1D4ED8', txt: icon('clock',{size:11})+' En attente de validation' },
-    approved: { bg: d.active ? 'rgba(11,171,132,.12)' : 'var(--bg3)', c: d.active ? '#087355' : 'var(--ink3)', txt: d.active ? icon('success',{size:11})+' Actif' : icon('pause',{size:11})+' Inactif' },
-    rejected: { bg: 'rgba(239,68,68,.1)', c: '#B91C1C', txt: icon('error',{size:11})+' Refusée par Noova' }
-  }[d.status || 'pending'];
-  card.innerHTML = `
-    <div class="rw-head" style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div style="font-size:28px">${d.icon||'🎁'}</div>
-      <div class="rw-main" style="flex:1">
-        <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink)">${esc(d.label||'Récompense')}</div>
-        <div style="font-size:12px;color:var(--ink3);margin-top:2px">${(d.valueEuros||0).toFixed(2)} € · ${d.cost||0} pts · Stock : ${d.stock===null||d.stock===undefined?'Illimité':d.stock} · Échangés : ${d.redeemedCount||0}</div>
+  const head = `<div class="rw-head" style="display:flex;align-items:center;gap:12px;margin-bottom:${d ? 12 : 8}px">
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)">Palier ${t.n} · ${t.pts} pts${t.n === 5 ? ' <span style="font-size:11px;font-weight:700;color:var(--coral-text)">gros lot</span>' : ''}</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:2px">Article dont le prix carte est entre ${rwEur(t.min)} et ${rwEur(t.max)}</div>
       </div>
-      <div class="rw-actions" style="display:flex;align-items:center;gap:12px">
-      <span style="padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:${statusBadge.bg};color:${statusBadge.c};white-space:nowrap;display:inline-flex;align-items:center;gap:4px">${statusBadge.txt}</span>
-      ${d.status==='approved' ? `<button class="tb-btn" style="font-size:11px;padding:4px 10px" onclick="toggleRewardActive('${r.id}',${!d.active})">${d.active?'Désactiver':'Activer'}</button>` : ''}
-      <button class="tb-btn" style="font-size:11px;padding:4px 10px;color:var(--coral-text)" onclick="deleteReward('${r.id}')">Supprimer</button>
+      ${d ? rewardBadge(d) : ''}
+    </div>`;
+  if(!d) {
+    card.innerHTML = head + `<div style="font-size:12.5px;color:var(--ink2);margin-bottom:12px">Aucune récompense choisie pour ce palier.</div>
+      <button class="tb-btn tb-btn-primary" onclick="openRewardForm(${t.n})">Choisir ma récompense</button>`;
+  } else {
+    const purchase = d.withPurchase ? `Avec achat (minimum ${rwEur(d.minPurchase)})` : 'Sans achat obligatoire';
+    card.innerHTML = head + `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="font-size:28px">${esc(d.icon||'🎁')}</div>
+        <div style="flex:1;min-width:0"><div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ink)">${esc(d.label||'Récompense')}</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px">Quota : ${d.monthlyQuota} par mois · Échangées : ${d.redeemedCount||0} · ${purchase}${(d.timeSlots||[]).length ? ' · Créneaux : ' + esc(slotsText(d.timeSlots)) : ''}</div></div>
       </div>
-    </div>
-    ${d.status==='rejected' && d.rejectionReason ? `<div style="font-size:11px;color:#B91C1C;margin-top:-6px;margin-bottom:8px">Motif : ${esc(d.rejectionReason)}</div>` : ''}
-    ${d.purchaseCondition ? `<div style="font-size:11px;color:var(--ink2);margin-top:-6px;margin-bottom:8px;display:flex;align-items:center;gap:4px">${icon('document',{size:11})} Condition : ${esc(d.purchaseCondition)}</div>` : ''}
-  `;
+      ${d.status==='rejected' && d.rejectionReason ? `<div style="font-size:11.5px;color:#B91C1C;margin-bottom:8px">Motif : ${esc(d.rejectionReason)}</div>` : ''}
+      ${d.status==='pending' ? `<div style="font-size:11.5px;color:var(--ink3);margin-bottom:8px">NOOVA vérifie chaque récompense avant qu’elle ne soit visible dans l’app.</div>` : ''}
+      <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+        ${(d.status==='approved' || d.status==='paused') && d.approved === true ? `<button class="tb-btn" onclick="toggleRewardPause(${t.n})">${d.status==='approved' ? 'Mettre en pause' : 'Reprendre'}</button>` : ''}
+        <button class="tb-btn" onclick="openRewardForm(${t.n})">Modifier</button>
+      </div>`;
+  }
   el.appendChild(card);
 }
 
-function addRewardSlot() {
-  if(_rewardSlots.length >= 5) { showToast('Maximum 5 récompenses','warning'); return; }
-  const el = document.getElementById('reward-slots');
-  const slot = _rewardSlots.length + 1;
-  const hint = REWARD_TIER_HINTS[slot-1];
-  const prevValue = slot > 1 ? (_rewardSlots[slot-2].data.valueEuros || 0) : 0;
+// ── Formulaire d'un palier ──
+function rwSlotRow(s) {
+  const days = (s && s.days && s.days.length) ? s.days : [0,1,2,3,4,5,6];
+  return `<div class="rw-slot" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+    <span style="display:inline-flex;gap:4px">${RW_DAYS.map(([v,l]) => `<label style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;color:var(--ink2)" title="${RW_DAY_NAMES[v]}"><input type="checkbox" class="rw-day" value="${v}" ${days.includes(v)?'checked':''} style="position:absolute;opacity:0;width:0;height:0" onchange="this.parentElement.style.background=this.checked?'var(--coral)':'';this.parentElement.style.color=this.checked?'var(--ink)':'var(--ink2)'"><span aria-hidden="true">${l}</span><span class="sr-only" style="position:absolute;left:-9999px">${RW_DAY_NAMES[v]}</span></label>`).join('')}</span>
+    <input class="field-inp rw-from" type="time" value="${esc((s&&s.from)||'14:00')}" aria-label="De" style="width:110px">
+    <span style="font-size:12px;color:var(--ink3)">à</span>
+    <input class="field-inp rw-to" type="time" value="${esc((s&&s.to)||'17:00')}" aria-label="À" style="width:110px">
+    <button type="button" class="tb-btn" style="font-size:11px;padding:4px 10px" onclick="this.closest('.rw-slot').remove()">Retirer</button>
+  </div>`;
+}
+function rwSyncSlotChips(root) {
+  root.querySelectorAll('.rw-day').forEach(cb => { cb.parentElement.style.background = cb.checked ? 'var(--coral)' : ''; cb.parentElement.style.color = cb.checked ? 'var(--ink)' : 'var(--ink2)'; });
+}
+function addRewardSlotRow(n) {
+  const box = document.getElementById('rf-slots-' + n);
+  if(!box) return;
+  if(box.querySelectorAll('.rw-slot').length >= 3) { showToast('3 créneaux au maximum','warning'); return; }
+  box.insertAdjacentHTML('beforeend', rwSlotRow(null));
+  rwSyncSlotChips(box);
+}
+
+function openRewardForm(n) {
+  if(document.querySelector('#reward-slots .rw-form')) { showToast('Terminez d’abord le palier en cours de modification','warning'); return; }
+  const t = rwTier(n), d = rewardOf(n);
+  const card = document.getElementById('rw-card-' + n);
+  if(!t || !card) return;
+  const sectorKey = matchSectorKey(_mData?.sector || '');
+  const suggestions = (REWARD_SUGGESTIONS[sectorKey] || REWARD_SUGGESTIONS['Commerce'])[n-1] || [];
+  const pre = d ? { icon: d.icon || '🎁', label: d.label || '' } : (suggestions[0] || { icon: '🎁', label: '' });   // pré-rempli avec la 1re suggestion
+  const slots = (d && d.timeSlots) || [];
   const form = document.createElement('div');
-  form.className = 'card';
-  form.style.marginBottom = '14px';
-  form.style.border = '2px dashed var(--coral)';
+  form.className = 'rw-form';
+  form.style.cssText = 'border-top:1px solid var(--border);margin-top:14px;padding-top:14px';
   form.innerHTML = `
-    <div style="font-family:var(--fd);font-weight:700;font-size:14px;color:var(--coral-text);margin-bottom:4px">Nouvelle récompense (palier ${slot}/5)</div>
-    <div style="font-size:11.5px;color:var(--ink3);margin-bottom:14px">Idée pour ce palier : ${hint}${prevValue?` · doit valoir plus que le palier ${slot-1} (${prevValue.toFixed(2)} €)`:''}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Emoji icône</label>
-        <input class="field-inp" id="new-r-icon" placeholder="🎁" style="font-size:22px;text-align:center" maxlength="2" value="🎁"></div>
-      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Intitulé *</label>
-        <input class="field-inp" id="new-r-label" placeholder="ex. Café offert"></div>
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:8px;display:flex;align-items:center;gap:5px">${icon('idea',{size:12})} <strong>Idées pour ce palier, selon votre activité</strong> : cliquez pour pré-remplir, ou écrivez la vôtre.</div>
+    <div id="rf-chips-${n}" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div>
+    <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;margin-bottom:14px">
+      <div><label for="rf-icon-${n}" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Emoji</label>
+        <input class="field-inp" id="rf-icon-${n}" maxlength="2" value="${esc(pre.icon)}" style="font-size:22px;text-align:center"></div>
+      <div><label for="rf-label-${n}" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Récompense offerte *</label>
+        <input class="field-inp" id="rf-label-${n}" maxlength="80" placeholder="ex. Café offert" value="${esc(pre.label)}"></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Valeur réelle (€) *</label>
-        <input class="field-inp" id="new-r-value" type="number" step="0.10" min="0.10" placeholder="5.00" oninput="document.getElementById('new-r-cost-preview').textContent=eurosToPoints(this.value)+' pts'"></div>
-      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Coût en points (calculé)</label>
-        <div class="field-inp" style="display:flex;align-items:center;color:var(--ink3);font-weight:700" id="new-r-cost-preview">0 pts</div></div>
+    <label style="display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--ink);cursor:pointer;margin-bottom:16px;background:var(--bg2);border-radius:10px;padding:10px 12px">
+      <input type="checkbox" id="rf-price-${n}" ${d && d.priceConfirmed ? 'checked' : ''} style="margin-top:2px">
+      <span>Je confirme que le prix carte de cet article est entre <strong>${rwEur(t.min)}</strong> et <strong>${rwEur(t.max)}</strong>.</span></label>
+    <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px">
+      <div><label for="rf-quota-${n}" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Quota mensuel (nombre de récompenses offertes par mois) *</label>
+        <input class="field-inp" id="rf-quota-${n}" type="number" min="1" max="1000" step="1" value="${d ? d.monthlyQuota : 20}" style="max-width:160px"></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Stock (vide=illimité)</label>
-        <input class="field-inp" id="new-r-stock" type="number" placeholder="50" min="1"></div>
-      <div><label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Expire le (optionnel)</label>
-        <input class="field-inp" id="new-r-expires" type="date"></div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--ink3);margin-bottom:6px">Créneaux horaires (facultatif : sans créneau, l’échange est possible à tout moment)</div>
+      <div id="rf-slots-${n}">${slots.map(rwSlotRow).join('')}</div>
+      <button type="button" class="tb-btn" style="font-size:12px" onclick="addRewardSlotRow(${n})">+ Ajouter un créneau</button>
     </div>
-    <div style="margin-bottom:12px">
-      <label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Condition d'achat (optionnel)</label>
-      <input class="field-inp" id="new-r-condition" placeholder="ex. pour tout plat commandé">
+    <div style="margin-bottom:16px">
+      <label style="display:flex;gap:9px;align-items:center;font-size:13px;color:var(--ink);cursor:pointer"><input type="checkbox" id="rf-buy-${n}" ${d && d.withPurchase ? 'checked' : ''} onchange="document.getElementById('rf-buybox-${n}').style.display=this.checked?'block':'none'"> Avec achat : le client doit acheter quelque chose pour en profiter</label>
+      <div id="rf-buybox-${n}" style="display:${d && d.withPurchase ? 'block' : 'none'};margin-top:10px">
+        <label for="rf-min-${n}" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px">Achat minimum (€), au plus ${rwEur(2 * t.max)}</label>
+        <input class="field-inp" id="rf-min-${n}" type="number" min="0.5" max="${2 * t.max}" step="0.5" value="${d && d.minPurchase ? d.minPurchase : ''}" style="max-width:160px">
+      </div>
     </div>
-    <div style="font-size:11px;color:var(--ink3);margin-bottom:12px;display:flex;align-items:center;gap:5px">${icon('document',{size:12})} Chaque récompense est vérifiée par Noova avant de devenir visible dans l'app.</div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="tb-btn" onclick="this.closest('.card').remove();const ab=document.getElementById('add-reward-btn');if(ab)ab.style.display=''">Annuler</button>
-      <button class="tb-btn tb-btn-primary" onclick="saveReward(${slot},this)">Envoyer pour validation</button>
-    </div>
-  `;
-  el.appendChild(form);
-  document.getElementById('add-reward-btn').style.display = 'none';
+      <button class="tb-btn" onclick="closeRewardForm()">Annuler</button>
+      <button class="tb-btn tb-btn-primary" id="rf-save-${n}" onclick="saveReward(${n},this)">${d ? 'Enregistrer' : 'Envoyer pour validation'}</button>
+    </div>`;
+  // le bouton d'ouverture disparaît le temps de la saisie
+  card.querySelectorAll('button.tb-btn').forEach(b => { b.style.display = 'none'; });
+  card.appendChild(form);
+  rwSyncSlotChips(form);
+  const chips = form.querySelector('#rf-chips-' + n);
+  suggestions.forEach(s => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.style.cssText = 'padding:7px 13px;border-radius:99px;border:1.5px solid rgba(242,151,21,.35);background:var(--card);color:var(--ink);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--fb)';
+    chip.textContent = `${s.icon} ${s.label}`;
+    chip.onclick = () => { document.getElementById('rf-icon-' + n).value = s.icon; document.getElementById('rf-label-' + n).value = s.label; };
+    chips.appendChild(chip);
+  });
+  const lab = document.getElementById('rf-label-' + n);
+  if(lab) lab.focus();
 }
+function closeRewardForm() { renderRewardSlots(); }
 
-async function saveReward(slot, btn) {
+async function saveReward(n, btn) {
   const u = auth.currentUser;
-  if(!u || !_mData) return;
-  const label = document.getElementById('new-r-label')?.value.trim();
-  const valueEuros = parseFloat(document.getElementById('new-r-value')?.value);
-  if(!label) { showToast('Remplis l\'intitulé','warning'); return; }
-  if(!valueEuros || valueEuros <= 0) { showToast('Renseigne une valeur en € valide','warning'); return; }
-  const prevValue = slot > 1 ? (_rewardSlots[slot-2].data.valueEuros || 0) : 0;
-  if(prevValue && valueEuros <= prevValue) { showToast(`Ce palier doit valoir plus que le palier ${slot-1} (${prevValue.toFixed(2)} €)`,'warning'); return; }
-  const cost = eurosToPoints(valueEuros);
-  const icon = document.getElementById('new-r-icon')?.value || '🎁';
-  const stockVal = document.getElementById('new-r-stock')?.value;
-  const stock = stockVal ? parseInt(stockVal) : null;
-  const condition = document.getElementById('new-r-condition')?.value.trim() || null;
-  const expiresVal = document.getElementById('new-r-expires')?.value;
-  const expiresAt = expiresVal ? firebase.firestore.Timestamp.fromDate(new Date(expiresVal)) : null;
+  const t = rwTier(n);
+  if(!u || !_mData || !t) return;
+  const old = rewardOf(n);
+  const label = document.getElementById('rf-label-' + n)?.value.trim();
+  const ico = document.getElementById('rf-icon-' + n)?.value.trim() || '🎁';
+  if(!label || label.length < 3) { showToast('Indiquez la récompense offerte (3 caractères au minimum)','warning'); return; }
+  if(!document.getElementById('rf-price-' + n)?.checked) { showToast(`Confirmez que le prix carte de l’article est entre ${rwEur(t.min)} et ${rwEur(t.max)}`,'warning'); return; }
+  const quota = parseInt(document.getElementById('rf-quota-' + n)?.value, 10);
+  if(!(quota >= 1 && quota <= 1000)) { showToast('Le quota mensuel doit être compris entre 1 et 1000','warning'); return; }
+  const timeSlots = [];
+  for(const row of document.querySelectorAll('#rf-slots-' + n + ' .rw-slot')) {
+    const from = row.querySelector('.rw-from').value, to = row.querySelector('.rw-to').value;
+    const days = [...row.querySelectorAll('.rw-day:checked')].map(c => parseInt(c.value, 10));
+    if(!from || !to || from >= to) { showToast('Chaque créneau doit avoir une heure de fin après l’heure de début','warning'); return; }
+    if(!days.length) { showToast('Choisissez au moins un jour pour chaque créneau','warning'); return; }
+    timeSlots.push({ days, from, to });
+  }
+  const withPurchase = !!document.getElementById('rf-buy-' + n)?.checked;
+  let minPurchase = null;
+  if(withPurchase) {
+    minPurchase = parseFloat(document.getElementById('rf-min-' + n)?.value);
+    if(!(minPurchase > 0)) { showToast('Indiquez l’achat minimum','warning'); return; }
+    if(minPurchase > 2 * t.max) { showToast(`L’achat minimum ne peut pas dépasser ${rwEur(2 * t.max)} pour ce palier`,'warning'); return; }
+  }
   btn.disabled = true; btn.textContent = 'Envoi…';
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  const ref = db.collection('rewards').doc(u.uid + '_p' + n);
   try {
-    await db.collection('rewards').add({
-      merchantId:   u.uid,
-      merchantName: _mData.brandName || '',
-      city:         _mData.city || '',
-      slot,
-      label, icon, valueEuros, cost,
-      stock, perUserLimit: 1,
-      purchaseCondition: condition,
-      expiresAt,
-      status: 'pending',
-      active: false,
-      redeemedCount: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showToast('Envoyée pour validation !','document');
-    loadMerchantRewards();
-  } catch(e) { showToast('Erreur : ' + e.message,'error'); btn.disabled = false; btn.textContent = 'Envoyer pour validation'; }
+    if(!old) {
+      await ref.set({
+        merchantId: u.uid, merchantName: _mData.brandName || '', city: _mData.city || '',
+        tier: n, slot: n, cost: t.pts,                      // le coût est celui du palier (tiers.js), jamais saisi
+        label, icon: ico, priceConfirmed: true,
+        monthlyQuota: quota, timeSlots, withPurchase, minPurchase,
+        status: 'pending', active: false, approved: false, redeemedCount: 0,
+        createdAt: ts, updatedAt: ts
+      });
+    } else if(label !== old.label || ico !== (old.icon || '🎁') || !old.priceConfirmed) {
+      // Nouveau contenu : repasse en attente de validation (règles Firestore).
+      await ref.update({ label, icon: ico, priceConfirmed: true, status: 'pending', active: false, monthlyQuota: quota, timeSlots, withPurchase, minPurchase, updatedAt: ts });
+    } else {
+      // Réglages seuls (quota, créneaux, avec achat) : pas de nouvelle validation.
+      await ref.update({ monthlyQuota: quota, timeSlots, withPurchase, minPurchase, updatedAt: ts });
+    }
+    showToast(old && old.priceConfirmed && label === old.label && ico === (old.icon || '🎁') ? 'Réglages enregistrés' : 'Envoyée pour validation !', 'document');
+    renderRewardSlots();
+  } catch(e) { showToast('Erreur : ' + e.message,'error'); btn.disabled = false; btn.textContent = old ? 'Enregistrer' : 'Envoyer pour validation'; }
 }
 
-async function toggleRewardActive(rewardId, active) {
+async function toggleRewardPause(n) {
+  const d = rewardOf(n);
+  if(!d) return;
+  const pause = d.status === 'approved';
   try {
-    await db.collection('rewards').doc(rewardId).update({ active, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast(active ? 'Récompense activée' : 'Récompense désactivée', active ? 'success' : 'pause');
-    loadMerchantRewards();
-  } catch(e) { showToast('Erreur','error'); }
-}
-
-async function deleteReward(rewardId) {
-  if(!confirm('Supprimer cette récompense ?')) return;
-  try {
-    await db.collection('rewards').doc(rewardId).delete();
-    showToast('Récompense supprimée','delete');
-    loadMerchantRewards();
+    await db.collection('rewards').doc(auth.currentUser.uid + '_p' + n).update({ status: pause ? 'paused' : 'approved', active: !pause, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast(pause ? 'Récompense mise en pause' : 'Récompense reprise', pause ? 'pause' : 'success');
   } catch(e) { showToast('Erreur','error'); }
 }
 
@@ -3757,23 +3819,32 @@ async function validateVoucher() {
       <div style="font-weight:800;font-size:16px;font-family:var(--fd);color:var(--mint-text);margin-bottom:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Bon valide</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--ink2);margin-bottom:16px">
         <div style="display:flex;align-items:center;gap:5px">${icon('gift-generic',{size:13})} <strong style="color:var(--ink)">${esc(d.label||'Récompense')}</strong></div>
-        <div style="display:flex;align-items:center;gap:5px">${icon('credit-card',{size:13})} <strong style="color:var(--ink)">${d.cost||0} pts déduits</strong></div>
+        <div style="display:flex;align-items:center;gap:5px">${icon('credit-card',{size:13})} <strong style="color:var(--ink)">Palier ${d.tier||'?'}</strong></div>
         <div style="display:flex;align-items:center;gap:5px">${icon('key',{size:13})} Code : <code style="font-size:13px;font-weight:700;color:var(--coral-text)">${esc(d.code)}</code></div>
-        ${d.purchaseCondition ? `<div style="display:flex;align-items:center;gap:5px">${icon('document',{size:13})} Condition : ${esc(d.purchaseCondition)}</div>` : '<div></div>'}
+        ${d.minPurchase ? `<div style="display:flex;align-items:center;gap:5px">${icon('document',{size:13})} Avec achat : minimum ${rwEur(d.minPurchase)}</div>` : '<div></div>'}
       </div>
-      <button class="tb-btn tb-btn-primary" style="width:100%;padding:12px" onclick="confirmValidateVoucher('${doc.id}',this)">Confirmer l'utilisation</button>
+      <div style="border-top:1px solid rgba(11,171,132,.25);padding-top:14px;margin-bottom:16px">
+        <label for="vch-basket" style="font-size:12px;font-weight:700;color:var(--ink2);display:block;margin-bottom:6px">Montant du panier (€)${d.minPurchase ? ' *' : ' (facultatif, pour suivre le panier moyen)'}</label>
+        <input class="field-inp" id="vch-basket" type="number" min="0.5" max="5000" step="0.1" placeholder="ex. 12,50" style="max-width:180px;margin-bottom:12px">
+        <label style="display:flex;gap:9px;align-items:center;font-size:13px;color:var(--ink);cursor:pointer"><input type="checkbox" id="vch-new"> C'est un nouveau client (première visite chez nous)</label>
+      </div>
+      <button class="tb-btn tb-btn-primary" style="width:100%;padding:12px" onclick="confirmValidateVoucher('${doc.id}',this,${d.minPurchase||0})">Confirmer l'utilisation</button>
     </div>`;
     loadRecentRedemptions();
   } catch(e) { el.innerHTML = `<div style="color:var(--ink3);font-size:13px">Erreur : ${e.message}</div>`; }
 }
 
-async function confirmValidateVoucher(redemId, btn) {
+async function confirmValidateVoucher(redemId, btn, minPurchase) {
+  const basketRaw = (document.getElementById('vch-basket')?.value || '').replace(',', '.');
+  const basket = basketRaw ? parseFloat(basketRaw) : null;
+  if(basketRaw && !(basket > 0 && basket <= 5000)) { showToast('Montant du panier invalide','warning'); return; }
+  if(minPurchase && !basket) { showToast(`Indiquez le montant du panier (achat minimum : ${rwEur(minPurchase)})`,'warning'); return; }
+  if(minPurchase && basket < minPurchase) { showToast(`Le panier est inférieur à l'achat minimum (${rwEur(minPurchase)}) : le bon ne peut pas être validé`,'warning'); return; }
   btn.disabled = true; btn.textContent = 'Validation…';
   try {
-    await db.collection('redemptions').doc(redemId).update({
-      status: 'used',
-      usedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    const upd = { status: 'used', usedAt: firebase.firestore.FieldValue.serverTimestamp(), newCustomer: !!document.getElementById('vch-new')?.checked };
+    if(basket) upd.basketEuros = basket;
+    await db.collection('redemptions').doc(redemId).update(upd);
     document.getElementById('voucher-code-inp').value = '';
     document.getElementById('voucher-result').innerHTML = `<div style="background:rgba(11,171,132,.1);border-radius:var(--rs);padding:16px;text-align:center;color:var(--mint-text);font-weight:700;font-family:var(--fd);font-size:16px;display:flex;align-items:center;justify-content:center;gap:6px">${icon('success',{size:18})} Bon validé avec succès !</div>`;
     showToast('Bon validé !','success');
@@ -3799,7 +3870,7 @@ function loadRecentRedemptions() {
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)';
       row.innerHTML = `<code style="font-size:12px;font-weight:700;color:var(--coral-text);flex-shrink:0">${esc(d.code)}</code>
-        <div style="flex:1;font-size:12px;color:var(--ink2)">${esc(d.label||'Récompense')} · ${d.cost||0} pts</div>
+        <div style="flex:1;font-size:12px;color:var(--ink2)">${esc(d.label||'Récompense')}${d.tier ? ' · Palier ' + d.tier : ''}</div>
         <span style="padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;background:${st.c}18;color:${st.c}">${st.t}</span>`;
       el.appendChild(row);
     });
@@ -3890,6 +3961,25 @@ async function deleteNews(id){
 // ─── Quota de questions du mois ─────────────────────────────
 // Pas d'abonnement ni de facture : la ville offre une quantité fixe de questions chaque mois.
 let _quota = null;
+// Clients ramenés ce mois : bons validés (au comptoir) ce mois-ci. Nouveaux clients et panier : renseignés par le commerçant à la validation.
+let _bringUnsub = null;
+function loadBringKpis(uid){
+  if(_bringUnsub) _bringUnsub();
+  _bringUnsub = db.collection('redemptions').where('merchantId','==',uid).where('status','==','used').onSnapshot(snap => {
+    const now = new Date(), m0 = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    const users = new Set(), fresh = new Set(); let sum = 0, n = 0;
+    snap.forEach(doc => {
+      const d = doc.data(), ms = d.usedAt && d.usedAt.toMillis ? d.usedAt.toMillis() : 0;
+      if(ms < m0) return;
+      users.add(d.userId);
+      if(d.newCustomer === true) fresh.add(d.userId);
+      if(typeof d.basketEuros === 'number') { sum += d.basketEuros; n++; }
+    });
+    const set = (i, v) => { const el = document.getElementById('bring-val-' + i); if(el) el.textContent = v; };
+    set(0, users.size); set(1, fresh.size);
+    set(2, n ? (sum / n).toFixed(2).replace('.', ',') + ' €' : '—');
+  }, e => console.warn('bring kpis:', e));
+}
 async function loadQuota(){
   try{
     _quota = (await fx.httpsCallable('getMyQuota')()).data;

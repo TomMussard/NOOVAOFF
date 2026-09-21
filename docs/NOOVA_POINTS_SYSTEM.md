@@ -1,219 +1,150 @@
-> ⚠ **Document historique** (août 2026). Le barème et l'économie actuels (3 réponses en points par jour, NOOVS ensuite, quotas, plafonds) sont dans `functions/engagementConfig.js` ; le modèle commercial (pas d'abonnement, quota mensuel offert par la ville) est décrit dans `SECURITE.md` et `docs/README.md`.
+# NOOVA — Système de points & récompenses
 
-# NOOVA — Système de points & récompenses (à rendre FONCTIONNEL)
-
-> **Pour Claude Code.** Ce fichier **complète** `NOOVA_SPEC.md` (même stack, même arborescence, même approche Firestore/règles de sécurité). Lis d'abord `NOOVA_SPEC.md`, puis implémente ce système de points **dans l'app utilisateur ET dans le dashboard commerçant**. On n'est plus en démo : **aucune fausse donnée**, tout passe par Firestore. **Ne change pas le design** (voir la capture de l'écran Récompenses qui existe déjà), tu ne fais que le brancher sur les bonnes valeurs.
+> **État : à jour au 21 septembre 2026.** Ce document décrit le modèle de points et de récompenses en vigueur.
+> Les valeurs chiffrées vivent à **un seul endroit** : `functions/engagementConfig.js` (gains, plafonds, expiration) et `functions/tiers.js` (les 5 paliers). Le client n'affiche que ce que le serveur décide.
 
 ---
 
 ## 0. Le principe en une phrase
 
-Répondre à une question crédite **deux compteurs à la fois** : un **solde dépensable** (la monnaie) et une **XP à vie** (le statut). On dépense le solde, jamais l'XP.
+Répondre à une question rapporte des **points** (un solde dépensable) et de l'**XP** (le statut à vie). Les points s'échangent contre la récompense que chaque commerçant a choisie pour l'un des **5 paliers fixes** — les mêmes pour tous. Ni l'habitant ni le commerçant ne voient ou ne saisissent jamais un prix en points ou en euros qui ne soit pas un palier.
 
 ---
 
-## 1. LES DEUX COMPTEURS (le point le plus important)
+## 1. Les deux compteurs (inchangé)
 
-Aujourd'hui l'app confond « Mon solde » et la barre de niveau : c'est un bug. Un utilisateur qui dépense ses points redescendrait de niveau. Il faut **deux valeurs distinctes** sur `users/{uid}` :
+Sur `users/{uid}` :
 
-- **`points`** = **solde dépensable (wallet)**. Monte quand on répond, **descend quand on échange** une récompense. C'est la monnaie.
-- **`xp`** = **expérience à vie**. Monte quand on répond, **ne descend JAMAIS**. Pilote le statut (Curieux → Légende).
+- **`points`** = solde dépensable (wallet). Monte quand on répond, descend quand on échange, retombe à 0 à l'expiration (§3).
+- **`xp`** = expérience à vie. Monte avec les points gagnés, **ne descend jamais** (ni à l'échange, ni à l'expiration). Pilote le statut (Curieux → Légende, seuils 0 / 1 000 / 3 000 / 6 000 / 10 000).
 
-**Câblage sur l'écran Récompenses existant (sans toucher au design) :**
-- Le grand nombre « **Mon solde : X pts** » = `points` (wallet).
-- La **barre de progression** + le libellé « Niveau X · Curieux » + le seuil « 1000 pts » = basés sur **`xp`** (progression vers le prochain palier de statut).
-- La section « **Paliers** » (Curieux/Actif/Expert/Ambassadeur/Légende) = basée sur **`xp`**.
-- La section « **Récompenses près de toi** » = les vraies récompenses des commerçants de la ville (vide tant qu'aucun commerçant n'en a créé → garder l'état vide actuel).
-
-> Tant que personne n'a rien dépensé, `points == xp` et l'écran est identique. La séparation ne se voit qu'à la première dépense — mais elle est indispensable.
+Le solde est **universel** : utilisable chez tous les commerçants de la ville de l'habitant.
 
 ---
 
-## 2. GAGNER DES POINTS
+## 2. Gagner des points
 
-Le commerçant pose **jusqu'à 3 questions** (Q1 montrée directement, Q2/Q3 optionnelles). On récompense la profondeur avec un **barème en escalier fixé par NOOVA** (le commerçant ne fixe PAS les points — NOOVA possède l'économie de points, pour rester cohérent partout) :
+| Source | Points | Règle |
+|---|---|---|
+| Réponse | **10** | Quelle que soit la question (1re, 2e ou 3e d'une campagne). |
+| Plafond du jour | **3 réponses** | Seules les 3 premières réponses du jour rapportent des points : **30 pts par jour au maximum**. Au-delà, on peut répondre sans points (mode libre, NOOVS). |
+| Bonus de bienvenue | **+50** | Une seule fois, à l'inscription (`welcomeClaimed`). |
+| Bonus découverte | **+5** | La première fois qu'on répond à un commerçant donné, **une fois par jour au maximum** (`answeredMerchants`, `discoveryBonusDate`). |
+| Expiration | — | Les points expirent après **6 mois sans aucune activité** (§3). |
 
-| Élément | Points |
-|---|---|
-| Question 1 | **10** |
-| Question 2 | **15** |
-| Question 3 | **20** |
-| Bonus « série complète » (les 3 d'une campagne) | **+10** |
-| Bonus de série quotidienne (streak, 1×/jour) | **+5** |
+Il n'y a **plus** de bonus « série complète » ni de bonus de série quotidienne : la série (`streak`) reste un simple compteur de jours d'affilée, sans points.
 
-→ Répondre aux 3 questions d'un commerçant = **55 pts** (+5 si streak du jour).
+**Tout le crédit se fait côté serveur**, jamais côté client :
 
-**Règles d'attribution (dans `responses.js`) :**
-- À chaque réponse valide : `points += montant` **ET** `xp += montant`, dans **une transaction Firestore atomique** (avec `campaigns.responsesCount += 1`).
-- Le montant par question dépend de **sa position** dans la campagne (index 0/1/2 → 10/15/20), pas d'une valeur libre du commerçant.
-- Le bonus +10 est crédité **une seule fois**, quand la 3ᵉ réponse d'une même campagne est enregistrée.
-- Le streak +5 est crédité **une fois par jour** (au premier point du jour), et met à jour `streak` + `lastAnswerDate`.
-- **Plafond quotidien** : `dailyEarned` ne peut pas dépasser **~300 pts/jour** (paramétrable), remis à 0 chaque jour (`dailyEarnedDate`). Au-delà, les réponses restent possibles mais ne créditent plus (anti-abus).
-- **Score qualité** : si `qualityScore` d'une réponse est sous le seuil (réponse trop rapide / vide / incohérente), la réponse rapporte **0 pt** et est marquée `flagged: true`. Voir §7.
+- réponse et bonus découverte → Cloud Function `submitAnswer` (transaction) ;
+- bonus de bienvenue → Cloud Function `claimWelcomeBonus` (idempotente) ;
+- les règles Firestore interdisent au client d'écrire `points`, `xp`, `welcomeClaimed`, `lastActivityAt`, `answeredMerchants`, `discoveryBonusDate`… (pas même pour débiter : l'échange passe aussi par une fonction, §6).
 
-**Repère de valeur (à mémoriser pour toute l'économie) : 1 pt ≈ 1 centime de valeur perçue.** Sert à calibrer les prix des récompenses côté commerçant.
+Une réponse lue trop vite (moins de 2,5 s) est « flaggée » : elle est enregistrée mais ne rapporte ni points, ni bonus découverte, et ne consomme pas le quota du jour.
+
+Le total gagné (réponse + bonus) est aussi ajouté à `merchants/{id}.pointsGenerated` : les points générés par les questions de ce commerçant (visible dans l'admin).
 
 ---
 
-## 3. STATUT (paliers à vie, pilotés par `xp`)
+## 3. Expiration
 
-Seuils **déjà présents dans l'UI**, à conserver :
-
-| Statut | XP requise |
-|---|---|
-| Curieux | 0 (dès le départ) |
-| Actif | 1 000 |
-| Expert | 3 000 |
-| Ambassadeur | 6 000 |
-| Légende | 10 000 |
-
-- Le statut se **calcule** depuis `xp` (fonction `getStatut(xp)`), pas besoin de le stocker (ou le stocker en cache dénormalisé, au choix).
-- **En beta, le statut est cosmétique** (fierté / badge / classement), il ne débloque pas d'avantage. *(Hook prévu : plus tard, un palier haut pourra débloquer des récompenses exclusives ou un petit multiplicateur — laisse le code prêt à l'accueillir, mais ne l'active pas maintenant.)*
+Chaque activité (réponse, échange, bonus de bienvenue) met à jour `users.lastActivityAt`. La fonction planifiée `expirePoints` (tous les jours à 4 h 30, heure de Paris) remet à 0 le solde `points` des comptes dont `lastActivityAt` a plus de **6 mois**, et journalise chaque expiration dans `pointsExpirations`. L'`xp` n'est jamais touché.
 
 ---
 
-## 4. SOLDE UNIVERSEL
+## 4. Les 5 paliers (identiques pour tous les commerçants)
 
-Le solde `points` est **utilisable chez TOUS les commerçants** que l'utilisateur peut voir (sa ville, autorisés). Peu importe où les points ont été gagnés. Raison : avec 3 questions max par commerçant, un solde cloisonné par commerce serait inatteignable. La récompense, elle, reste **100 % contrôlée par le commerçant** (voir §5), donc échanger chez lui = une visite garantie dans SA boutique, ce qu'il veut.
+Constante unique : `TIERS` dans `functions/tiers.js` (copie identique `tiers.js` à la racine pour les pages web ; les règles Firestore répètent les valeurs — un test vérifie que les trois restent identiques).
 
----
+| Palier | Points | Prix carte de l'article offert |
+|---|---|---|
+| Palier 1 | **150 pts** | 1 à 3 € |
+| Palier 2 | **300 pts** | 3 à 6 € |
+| Palier 3 | **500 pts** | 6 à 10 € |
+| Palier 4 | **900 pts** | 10 à 18 € |
+| Palier 5 (gros lot) | **1 500 pts** | 18 à 30 € |
 
-## 5. RÉCOMPENSES CÔTÉ COMMERÇANT (dashboard)
-
-**C'est le commerçant qui crée et finance ses récompenses**, pas NOOVA. Il faut donc une **section « Récompenses » dans le dashboard** où il configure **jusqu'à 5 récompenses** (5 slots). NOOVA fixe l'échelle de points ; le commerçant remplit le contenu.
-
-**Champs d'une récompense (`rewards/{rewardId}`) configurables par le commerçant :**
-- `label` (ex. « Café offert »), `icon`
-- `cost` : prix en points (le commerçant le fixe, guidé par des suggestions — voir plus bas)
-- `stock` : nombre total d'échanges possibles (ex. 50), OU illimité
-- `perUserLimit` : par défaut **1** (une fois par personne)
-- `expiresAt` : date de fin de validité de l'offre
-- `purchaseCondition` : optionnel (ex. « pour un plat acheté », « -20 % sur l'addition ») → garantit la marge sur les grosses offres
-- `active` : true/false
-- `redeemedCount` : compteur (géré par le système, pas éditable)
-
-**Prix suggérés (pré-remplis selon la catégorie, modifiables) — sur la base 1 pt ≈ 1 cent :**
-- Petit geste (café, cookie, -10 %) : **≈ 200 pts**
-- Moyen (dessert, boisson, -15 %) : **≈ 350 pts**
-- Belle offre (-20 %, entrée offerte) : **≈ 500 pts**
-- Grosse offre (menu, -30 %, produit premium, **avec** condition d'achat) : **≈ 800–1 000 pts**
-
-Au premier accès, proposer au commerçant un **jeu d'exemples selon son thème** (café / resto / coiffeur…) qu'il **valide ou modifie** — jamais imposé, et rien n'est publié tant qu'il n'a pas confirmé.
+Les points ne sont **pas** une valeur en euros : aucune conversion n'existe, aucune n'est affichée.
 
 ---
 
-## 6. ÉCHANGE (app) + VALIDATION AU COMPTOIR (dashboard)
+## 5. Récompenses côté commerçant — « Ma vitrine récompenses »
 
-C'est ce qui rend le système **réel** et non décoratif.
+- Le commerçant doit **remplir les 5 paliers** avant de lancer sa première campagne (contrôle dans le dashboard **et** dans les règles Firestore : création d'une campagne active refusée s'il manque un palier).
+- Il **ne saisit jamais** ni prix ni points. Par palier, il choisit une récompense parmi des **suggestions liées à sa catégorie** (la première est pré-remplie) ou un texte libre, puis coche : « le prix carte de cet article est entre X et Y € ».
+- Réglages par récompense : **quota mensuel**, **créneaux horaires** (facultatif, jusqu'à 3), option **« avec achat »** (achat minimum ≤ 2 × le prix carte maximum du palier), bouton **pause**.
+- Statut : `pending` → `approved` (**seul l'admin valide**) → `paused` (le commerçant peut mettre en pause et reprendre une récompense déjà approuvée). Changer l'intitulé ou l'icône la remet en attente de validation ; les réglages (quota, créneaux, avec achat) et la pause n'en ont pas besoin.
+- Il n'y a plus de « supprimer » côté commerçant (les 5 paliers doivent toujours exister) : il met en pause.
+- Vocabulaire côté commerçant : on ne parle jamais de « coût » ni de « valeur » (ni d'un prix en points).
 
-**Côté app (échange) — dans une transaction :**
-1. L'utilisateur peut échanger une récompense si : `points >= reward.cost` **ET** stock dispo (`redeemedCount < stock`) **ET** pas déjà prise par lui (`perUserLimit`) **ET** non expirée **ET** `active`.
-2. Transaction atomique : `points -= reward.cost`, `reward.redeemedCount += 1`, création d'un doc `redemptions` avec un **code unique** + `expiresAt` + `status: "pending"`.
-3. L'app affiche le **bon avec son code** (et la condition d'achat éventuelle).
+Le dashboard affiche : **clients ramenés ce mois**, **dont nouveaux clients**, **panier moyen des clients NOOVA**. Ces chiffres viennent des bons validés au comptoir (le commerçant indique le montant du panier et s'il s'agit d'un nouveau client ; avec « avec achat », le panier doit atteindre l'achat minimum).
 
-**Côté dashboard (validation) :**
-- Écran **« Valider un bon »** : le commerçant saisit/scanne le code → on cherche la `redemption` correspondante → si `pending` et non expirée → passage à `status: "used"`, `usedAt: now`.
-- **Usage unique** : un code déjà `used` ou expiré est refusé. Zéro fraude possible.
+L'admin voit, pour chaque commerçant, les **points générés par ses questions** (`pointsGenerated`) et les **points dépensés chez lui** (`pointsSpent`).
 
----
+### `rewards/{merchantId}_p{1..5}`
 
-## 7. ANTI-ABUS (garde-fous)
+Un document par palier, à l'identifiant imposé : jamais plus de 5 récompenses par commerçant, jamais deux fois le même palier.
 
-Un gros répondeur ne doit pas pouvoir ruiner le modèle. Mécanismes à implémenter :
-
-- **Offre de points finie** : 3 questions max/commerçant + nombre fini de commerçants/ville → pas de farm infini. Renforcé par le **plafond quotidien** (§2).
-- **Score qualité** sur chaque réponse (temps de rédaction, longueur/cohérence minimale) : sous le seuil → 0 pt + `flagged`. Protège la data ET les points.
-- **Le vrai garde-fou est côté récompense** : chaque offre est bornée par le commerçant (`stock`, `perUserLimit: 1`, `expiresAt`, `purchaseCondition`). Même un user avec 50 000 pts ne prend une offre donnée **qu'une fois**, dans la limite du stock. L'exposition du commerçant dépend de **ses** réglages, pas du solde du user.
-- **Réponses non dupliquables** : id déterministe `${userId}_${campaignId}_${qid}` (déjà dans `NOOVA_SPEC.md`).
-- **Bons à usage unique** : code validé une seule fois (§6).
-
----
-
-## 8. MODÈLE DE DONNÉES (compléments à `NOOVA_SPEC.md`)
-
-### `users/{uid}` — ajouter / préciser
 ```
-points: 0            // solde dépensable (wallet) — descend à l'échange
-xp: 0                // à vie — ne descend jamais, pilote le statut
-streak: 0
-lastAnswerDate: null // "YYYY-MM-DD"
-dailyEarned: 0       // points gagnés aujourd'hui (plafond)
-dailyEarnedDate: null
+merchantId, merchantName, city
+tier (1..5), slot (= tier), cost (= points du palier, imposé par les règles)
+label, icon, priceConfirmed: true
+monthlyQuota (1..1000), timeSlots [{days:[0..6], from:"HH:MM", to:"HH:MM"}] (0 à 3), withPurchase, minPurchase
+status: "pending" | "approved" | "paused" | "rejected", active (= approved et pas en pause)
+approved (booléen réservé à l'admin), approvedAt, rejectionReason
+redeemedCount, createdAt, updatedAt
+rewards/{id}/monthly/{YYYY-MM} : { used }   // compteur du quota mensuel (serveur seul)
 ```
 
-### `rewards/{rewardId}` — étendre
-```
-merchantId, merchantName, city, slot (1..5)
-label, icon, cost
-stock            // ou null = illimité
-perUserLimit: 1
-expiresAt
-purchaseCondition   // null ou texte
-active: true
-redeemedCount: 0
-createdAt, updatedAt
-```
+---
 
-### `redemptions/{redemptionId}`
-```
-userId, rewardId, merchantId
-cost, code (unique)
-status: "pending" | "used" | "expired"
-createdAt, expiresAt, usedAt
-```
+## 6. Échanger une récompense (habitant)
 
-### `responses/{responseId}` — ajouter
-```
-pointsAwarded    // ce qui a réellement été crédité (0 si flaggé)
-qualityScore
-flagged: false
-```
+Côté habitant : **« Palier N · X pts »**, jamais un euro, nulle part.
 
-### Index composites à ajouter
-- `rewards` : `city` + `active`
-- `rewards` : `merchantId` + `slot`
-- `redemptions` : `userId` + `rewardId` (contrôle du perUserLimit)
-- `redemptions` : `merchantId` + `status` (validation au comptoir)
+L'échange est la Cloud Function `redeemReward` (le client n'écrit ni `points` ni `redemptions`). Dans **une seule transaction**, elle vérifie : récompense approuvée et active · commerçant vérifié · même ville · créneau horaire (heure de Paris) · **quota mensuel** non atteint · **une récompense par commerçant et par utilisateur sur 7 jours glissants** (`users/{uid}/redeemLimits/{merchantId}`) · **solde suffisant** (le solde ne peut jamais devenir négatif). Le coût vient toujours du palier, jamais du document de la récompense.
+
+Elle débite les points, crée le bon (`redemptions`, code à 4 caractères valable 24 h, `status: "pending"`), incrémente le quota du mois, `redeemedCount` et `merchants.pointsSpent`.
+
+### Validation au comptoir (dashboard)
+
+Le commerçant saisit le code → si `pending` et non expiré → `status: "used"`, `usedAt`, plus `basketEuros` (montant du panier) et `newCustomer`. Usage unique.
+
+### `redemptions/{id}`
+
+```
+userId, rewardId, merchantId, merchantName, city
+tier, cost, label, icon, purchaseCondition (« Valable avec un achat… », sans montant côté habitant), minPurchase (côté commerçant)
+code, status: "pending" | "used", createdAt, expiresAt, usedAt, basketEuros?, newCustomer?
+```
 
 ---
 
-## 9. RÈGLES DE SÉCURITÉ & INTÉGRITÉ
+## 7. Anti-abus
 
-- Un utilisateur **ne peut jamais écrire librement** `points`/`xp` sur son propre doc. Le crédit passe **uniquement** par la transaction de `responses.js` (création de réponse + incrément), et le débit par la transaction d'échange.
-- Les règles Firestore valident au mieux : une réponse ne peut pas déclarer un `pointsAwarded` supérieur au barème autorisé pour sa position, et le débit d'un échange doit correspondre à `reward.cost`.
-- **Limite honnête à me signaler :** avec du 100 % client, un utilisateur techniquement malveillant pourrait tenter de forger un solde. Pour la beta/démo fonctionnelle, la transaction client + règles suffisent. **En production, déplacer l'attribution des points et la validation des bons dans une Cloud Function** (plan Blaze) pour une intégrité totale. Prépare le code pour que ce basculement soit simple (logique d'attribution isolée dans une fonction dédiée).
-
----
-
-## 10. ÉTATS VIDES & DESIGN
-
-- « Récompenses près de toi » **vide** tant qu'aucun commerçant de la ville n'a créé de récompense active → garder le message existant (« Les récompenses arrivent bientôt dans ta ville »).
-- Dashboard sans récompense → état vide + CTA « Crée ta première récompense ».
-- Aucune récompense/valeur d'exemple codée en dur. Tout vient de Firestore.
-- **Design préservé à l'identique** — tu ne fais que lier les bons compteurs et brancher les actions.
+- Crédit et débit **uniquement côté serveur** ; règles Firestore : aucun champ de solde ni de compteur d'activité modifiable par le client.
+- 3 réponses payées par jour, réponses lues trop vite exclues, bonus découverte 1 fois par jour.
+- Une récompense par commerçant et par semaine, quota mensuel par récompense, bons à usage unique, valables 24 h.
+- Un commerçant ne peut ni s'approuver, ni modifier le palier ou les points d'une récompense, ni créer plus de 5 paliers.
 
 ---
 
-## 11. PLAN D'IMPLÉMENTATION (par phases, commit à chaque étape)
+## 8. Règles Firestore (résumé)
 
-- **Phase A** — Séparer les compteurs : ajouter `xp`, câbler le grand nombre sur `points` (wallet) et la barre/paliers sur `xp`. (Aucune régression visuelle.)
-- **Phase B** — `responses.js` : barème 10/15/20 + bonus série +10 + streak +5, transaction (crédit `points` & `xp`, `responsesCount`), plafond quotidien, `qualityScore`.
-- **Phase C** — Statut : `getStatut(xp)` + affichage (cosmétique).
-- **Phase D** — Dashboard : section « Récompenses » (5 slots) avec suggestions par catégorie → écriture dans `rewards`.
-- **Phase E** — App : « Récompenses près de toi » alimentée par `rewards` (ville) + flux d'échange (transaction : débit, `redemptions`, code, stock/perUserLimit/expiration).
-- **Phase F** — Dashboard : écran « Valider un bon » (code → `used`).
-- **Phase G** — Anti-abus : score qualité, plafond quotidien, contrôles de récompense, tests.
-- **Phase H** — Règles de sécurité + index + états vides/chargement. Note sur le passage en Cloud Function pour la prod.
+- `users` : création avec `points = xp = noovs = 0`, `welcomeClaimed = false` ; aucune mise à jour cliente des champs de solde/activité.
+- `rewards` : identifiant `{merchantId}_p{tier}`, `cost == points du palier`, `priceConfirmed`, quota 1–1000, `minPurchase ≤ 2 × prix carte max`, création toujours `pending` / `active: false` / `approved: false` ; un commerçant ne peut ni écrire `approved` ni passer de `pending` à `approved` (seul l'admin) ; l'admin ne peut approuver qu'un palier valide au bon coût ; suppression réservée à l'admin.
+- `redemptions` : création interdite au client ; le commerçant ne peut que passer le bon à `used` (avec panier et nouveau client) ; l'habitant peut aussi marquer son propre bon comme utilisé.
+- `campaigns` : création d'une campagne active refusée sans les 5 paliers.
+- `merchants` : `pointsGenerated` et `pointsSpent` non modifiables par le client.
 
 ---
 
-## 12. DEFINITION OF DONE
-- [ ] `points` (wallet) et `xp` (statut) **séparés** ; dépenser ne fait plus baisser le niveau.
-- [ ] Répondre crédite les deux compteurs via **transaction** ; barème 10/15/20 + bonus série + streak ; **plafond quotidien** actif.
-- [ ] Solde **universel** utilisable chez tous les commerçants visibles de la ville.
-- [ ] Le commerçant configure **jusqu'à 5 récompenses** (prix en points, stock, 1/personne, expiration, condition d'achat) depuis son dashboard.
-- [ ] Échange fonctionnel : débit du solde + **bon à code unique** + respect stock/limite/expiration.
-- [ ] Validation du bon au comptoir dans le dashboard (usage unique).
-- [ ] Score qualité + garde-fous anti-abus en place.
-- [ ] Zéro donnée statique ; états vides partout ; design inchangé.
-- [ ] Data model, règles et index à jour ; note sur l'intégrité prod (Cloud Function).
+## 9. Définition de « terminé »
+
+- [x] Modèle unique : 10 pts/réponse, 3 réponses payées par jour, +50 bienvenue, +5 découverte, expiration à 6 mois d'inactivité — crédits côté serveur.
+- [x] 5 paliers fixes dans une constante unique (`TIERS`), identiques pour tous les commerçants.
+- [x] « Ma vitrine récompenses » : 5 paliers obligatoires avant la première campagne, aucune saisie de prix ni de points, suggestions par catégorie, quota / créneaux / avec achat / pause, validation admin.
+- [x] Échange côté serveur : quota mensuel, une récompense par commerçant et par semaine, solde jamais négatif.
+- [x] Côté habitant : « Palier N · X pts », aucun euro. Côté commerçant : ni « coût » ni « valeur ».
+- [x] Dashboard : clients ramenés, nouveaux clients, panier moyen. Admin : points générés / dépensés par commerçant.
+- [x] Règles Firestore et tests à jour (voir `tests/eng21.js`, `tests/eng22.js`).

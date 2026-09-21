@@ -15,7 +15,7 @@ const APP='http://localhost:8950/app.html';
 const Q='Quelle est ta boisson préférée ?';
 const OPTS=['Café','Thé','Chocolat'];
 async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/noova-366d0/databases/(default)/documents',{method:'DELETE'});await fetch('http://127.0.0.1:9099/emulator/v1/projects/noova-366d0/accounts',{method:'DELETE'});await sleep(300);}
-async function mkUser(uid,o={}){await db.doc('users/'+uid).set({role:'user',name:'User '+uid,city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true,...o});}
+async function mkUser(uid,o={}){await db.doc('users/'+uid).set({role:'user',welcomeClaimed:true,name:'User '+uid,city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true,...o});}
 async function mkCampaign(id,o={}){await db.doc('campaigns/'+id).set({merchantId:'m1',merchantName:'Le Fournil',sector:'Boulangerie',status:'active',targetCity:'le-mans',city:'le-mans',question:Q,questions:[{q:Q,format:'mcq',options:OPTS}],targetVolume:500,answersCount:0,createdAt:Timestamp.now(),...o});}
 async function ans(uid,cid,answer,o={}){await db.doc(`answers/${uid}_${cid}_q${o.q||0}`).set({userId:uid,campaignId:cid,questionIdx:o.q||0,answer,flagged:!!o.flagged,suspect:!!o.suspect,pointsAwarded:0,createdAt:Timestamp.now()});}
 const reveal=(uid,cid,o={})=>E.revealCore(uid,{campaignId:cid,questionIdx:0},o);
@@ -33,7 +33,7 @@ const DASH='http://localhost:8950/dash.html',ADMIN='http://localhost:8950/admin.
 const setClock=ms=>db.doc('_testClock/now').set({ms});
 const sink=async u=>(await db.collection('_pushSink').where('uid','==',u).get()).docs.map(d=>d.data()).sort((a,b)=>a.at-b.at);
 const until=async(fn,t=15000)=>{const s=Date.now();while(Date.now()-s<t){if(await fn())return true;await sleep(300);}return false;};
-const mkU=(uid,o={})=>db.doc('users/'+uid).set({role:'user',name:'User '+uid,city:'le-mans',cityLabel:'Le Mans',pushEnabled:true,fcmTokens:['tok_'+uid],authorizedMerchants:['m1'],declinedMerchants:[],interests:['boulangerie'],answeredCampaigns:[],friendUids:[],points:0,xp:0,streak:0,onboardingStep:'done',seenHomeTour:true,...o});
+const mkU=(uid,o={})=>db.doc('users/'+uid).set({role:'user',welcomeClaimed:true,name:'User '+uid,city:'le-mans',cityLabel:'Le Mans',pushEnabled:true,fcmTokens:['tok_'+uid],authorizedMerchants:['m1'],declinedMerchants:[],interests:['boulangerie'],answeredCampaigns:[],friendUids:[],points:0,xp:0,streak:0,onboardingStep:'done',seenHomeTour:true,...o});
 const mkM=(id,o={})=>db.doc('merchants/'+id).set({role:'merchant',ownerUid:id,brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:id+'@shop.fr',...o});
 const ansM=(uid,cid,o={})=>db.doc(`answers/${uid}_${cid}_q0`).set({userId:uid,campaignId:cid,merchantId:'m1',questionIdx:0,answer:'Café',flagged:!!o.flagged,pointsAwarded:0,createdAt:Timestamp.now()});
 const post=(id,o={})=>db.doc('merchantPosts/'+id).set({merchantId:'m1',merchantName:'Le Fournil',text:'Suite à vos avis, nous ouvrons dès 6h30 le samedi.',campaignIds:[],status:'pending',city:'le-mans',createdAt:Timestamp.now(),...o});

@@ -15,6 +15,7 @@ const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/
 const { FieldValue, Timestamp, getFirestore } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
 const logger = require("firebase-functions/logger");
+const CFG = require("./engagementConfig");
 
 const db = () => getFirestore();
 
@@ -27,7 +28,7 @@ const WEEKLY_AFTER_MISSES = 3;
 const OFF_AFTER_MISSES = 6;
 const MISS_AFTER_MS = 24 * 3600000;
 const RESULT_THRESHOLD = 50;
-const IMMINENT_UNIT_PTS = 10;    // valeur d'une réponse en points (barème de base)
+const IMMINENT_UNIT_PTS = CFG.POINTS.PER_ANSWER;    // points d'une réponse (barème unique)
 
 // Un type = une famille de règles. « nudge » : relance soumise à la règle « aucune notification
 // le jour où l'habitant a déjà répondu ». Les types issus de sa propre action (récompense, résultat,
