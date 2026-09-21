@@ -261,6 +261,22 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .pd-d{font-size:12.5px;color:var(--ink2);line-height:1.6;margin-top:3px}
 .pd-act{display:inline-block;margin-top:8px;background:none;border:none;padding:6px 0;font-family:var(--fb);font-size:12.5px;font-weight:800;color:var(--ink);text-decoration:underline;cursor:pointer}
 .pd-tgl{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:12px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.dtoday-card.disc .dtoday-body{background:var(--mint)}
+.dtoday-card.disc .dtoday-q{color:#fff}
+.dtoday-card.disc .dtoday-cta{background:#fff;color:var(--ink)}
+.dtoday-card.disc .tc-arr{background:rgba(0,0,0,.1)}
+.disc-pill{display:none;background:#fff;color:var(--mint);font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:99px;margin-bottom:10px}
+.dtoday-card.disc .disc-pill{display:inline-block}
+.q-card.disc{background:var(--md);box-shadow:none;border:1.5px dashed rgba(38,79,60,.55)}
+.disc-tag{font-size:10px;font-weight:800;color:#fff;background:var(--mint);padding:2px 8px;border-radius:99px}
+.disc-note{margin:0 0 14px;padding:12px 14px;background:var(--md);border:1.5px dashed rgba(38,79,60,.55);border-radius:14px;font-size:12px;line-height:1.55;color:var(--ink)}
+.disc-note b{color:var(--mint)}
+.follow-card{width:100%;margin:0 0 12px;padding:16px;background:var(--md);border:1.5px solid rgba(38,79,60,.35);border-radius:18px;text-align:left}
+.follow-card .fc-t{font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink);margin-bottom:4px}
+.follow-card .fc-d{font-size:12px;color:var(--ink2);line-height:1.55;margin-bottom:12px}
+.follow-card .fc-b{display:flex;gap:8px}
+.follow-card .fc-b button{flex:1}
+.follow-card .fc-x{display:block;margin:10px auto 0;background:none;border:none;color:var(--ink2);font-size:11.5px;text-decoration:underline;cursor:pointer;font-family:var(--fb);padding:6px}
 .rv-skel .rv-bar{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
 #lock-bar{height:6px;border-radius:99px;overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
 #lock-bar.on{opacity:1}
@@ -1159,12 +1175,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="q-text" style="margin-bottom:6px">Comment ça marche</div>
     <div class="q-hint">Quatre étapes, aucune obligation.</div>
     <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
-      <div class="how-row"><div class="how-n">1</div><div><div class="how-t">Un commerce te pose une question</div><div class="how-d">Seulement s'il a ton accord. Tu réponds en 30 secondes.</div></div></div>
+      <div class="how-row"><div class="how-n">1</div><div><div class="how-t">Un commerce te pose une question</div><div class="how-d">Les commerces que tu suis, et parfois un nouveau commerce à découvrir (d'une autre couleur). Tu réponds en 30 secondes, ou tu passes.</div></div></div>
       <div class="how-row"><div class="how-n">2</div><div><div class="how-t">Tu gagnes des points, puis des NOOVS</div><div class="how-d">Tes 3 premières réponses du jour rapportent des points échangeables. Les suivantes rapportent des NOOVS, la monnaie de NOOVA (concours, cash et bons cadeaux à venir).</div></div></div>
       <div class="how-row"><div class="how-n">3</div><div><div class="how-t">Tu échanges tes points</div><div class="how-d">Contre une récompense choisie par le commerce, à récupérer chez lui.</div></div></div>
       <div class="how-row"><div class="how-n">4</div><div><div class="how-t">Tu montres ton code en caisse</div><div class="how-d">Il est valable 24 h et ne sert qu'une fois.</div></div></div>
     </div>
-    <div style="background:var(--md);border-radius:14px;padding:12px 14px;font-size:12px;color:var(--ink2);line-height:1.6;margin-top:18px"><strong style="color:var(--ink)">Tu gardes le contrôle.</strong> Les commerces ne voient jamais qui a répondu, seulement des résultats regroupés. Tu peux retirer ton accord à un commerce à tout moment depuis ton profil.</div>
+    <div style="background:var(--md);border-radius:14px;padding:12px 14px;font-size:12px;color:var(--ink2);line-height:1.6;margin-top:18px"><strong style="color:var(--ink)">Tu gardes le contrôle.</strong> Les commerces ne voient jamais qui a répondu, seulement des résultats regroupés. Un commerce que tu ne suis pas reçoit ta réponse sans ton profil ; tu choisis ensuite de le suivre ou non, et tu peux arrêter à tout moment depuis ton profil.</div>
   </div>
 </div>
 
@@ -1190,7 +1206,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="back-btn" role="button" tabindex="0" aria-label="Retour au profil" onclick="mmBack()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();mmBack()}">←</div>
       <div class="auth-badge" style="background:var(--cd);color:var(--ink)">Mes commerces</div>
       <h2 class="auth-title" style="margin-top:8px">Gérer mes<br>commerces</h2>
-      <p class="auth-sub" style="margin-bottom:12px">Seuls les commerces que tu autorises peuvent te poser des questions. Ils voient alors tes réponses à leurs questions et ton profil anonyme (ville, tranche d'âge, centres d'intérêt).</p>
+      <p class="auth-sub" style="margin-bottom:12px">Les commerces que tu suis te posent leurs questions à l'accueil et voient alors tes réponses et ton profil anonyme (ville, tranche d'âge, centres d'intérêt). Les autres peuvent te proposer une question « découverte » : tu réponds ou non, et ils ne reçoivent que ta réponse.</p>
       <div class="mm-sum"><span id="mm-summary" aria-live="polite"></span><button type="button" id="mm-all-off" onclick="mmDisableAll()">Tout désactiver</button></div>
       <input type="search" id="mm-search" class="mm-search" placeholder="Rechercher un commerce" aria-label="Rechercher un commerce" oninput="mmRender()" autocomplete="off">
     </div>
@@ -1244,6 +1260,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="dt-pts" id="tc-pts">+pts</div>
       <div class="dtoday-body">
         <div class="mark">?!</div>
+        <div class="disc-pill" id="tc-disc">Découverte · nouveau près de chez toi</div>
         <div class="dtoday-q" id="tc-q">Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?</div>
         <div class="dtoday-cta">Répondre en 30 secondes <div class="tc-arr">→</div></div>
       </div>
@@ -1304,6 +1321,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     </div>
     <div class="q-text" id="q-text">Question…</div>
     <div class="q-hint" id="q-hint">Réponds librement.</div>
+    <div class="disc-note" id="q-disc-note" style="display:none"></div>
     <div class="ans-area" id="ans-area"></div>
     <div id="lock-bar"><div id="lock-fill"></div></div>
     <div class="q-actions">
@@ -1324,6 +1342,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="share-row" onclick="shareReward()"><span style="display:inline-flex"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:19px;height:19px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg></span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">Partager ma réponse</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">Montre-la à tes amis</div></div><span style="color:var(--ink3)">→</span></div>
   <div id="rw-reveal" style="width:100%;position:relative;z-index:1"></div>
   <div id="rw-news" style="width:100%;position:relative;z-index:1"></div>
+  <div id="rw-follow" style="width:100%;position:relative;z-index:1"></div>
   <div id="rw-invite" style="width:100%;position:relative;z-index:1"></div>
   <div id="rw-actions" style="width:100%;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1"></div>
 </div>
@@ -1986,7 +2005,7 @@ function refreshHome(){
   const streakSub=document.getElementById('streak-sub');
   if(streakSub) streakSub.textContent = S.streak>=10 ? 'Bonus débloqué !' : S.streak===0 ? 'Réponds chaque jour : +50 pts bonus au bout de 10 jours' : `Encore ${10-S.streak} jour${10-S.streak>1?'s':''} pour +50 pts bonus`;
   const sd=document.getElementById('streak-dots');sd.innerHTML='';for(let i=0;i<10;i++){const d=document.createElement('div');d.className='dstreak-dot'+(i<S.streak?' on':'');sd.appendChild(d)}
-  if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
+  if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('today-card').classList.toggle('disc',!!q._discovery);document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector(':scope > img');
     if(q.photoUrl){
       // Certains fichiers Storage sont corrompus/tronqués : ils chargent (pas d'erreur réseau)
@@ -2010,7 +2029,7 @@ function refreshHome(){
     else if(existingImg){ existingImg.remove(); }
     document.getElementById('dtoday-logo').innerHTML=logoHTML(q.brand,40,q.logoUrl);
   }
-  else{document.getElementById('tc-brand').textContent='Pas encore de question';document.getElementById('tc-pts').textContent='';document.getElementById('tc-q').textContent='Aucun commerce de ta zone n\'a encore posté de question. Reviens bientôt !';document.getElementById('today-card').style.opacity='.75';document.querySelector('#today-card .dtoday-cta').style.display='none';
+  else{document.getElementById('today-card').classList.remove('disc');document.getElementById('tc-brand').textContent='Pas encore de question';document.getElementById('tc-pts').textContent='';document.getElementById('tc-q').textContent='Aucun commerce de ta zone n\'a encore posté de question. Reviens bientôt !';document.getElementById('today-card').style.opacity='.75';document.querySelector('#today-card .dtoday-cta').style.display='none';
     document.getElementById('dtoday-logo').innerHTML='';
     const tcImg=document.getElementById('dtoday-photo').querySelector(':scope > img'); if(tcImg) tcImg.remove();
   }
@@ -2028,7 +2047,7 @@ function renderQueue(){
   const clrs=['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
   let cnt=0;
   S.qs.slice(1).forEach((q,i)=>{
-    const d=document.createElement('div');d.className='q-card';d.onclick=()=>openQ(i+1);
+    const d=document.createElement('div');d.className='q-card'+(q._discovery?' disc':'');d.onclick=()=>openQ(i+1);
     const tc={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle',rank:'Classement'}[q.type];
     const friendArr=(S._friendAnswers||{})[q._firestoreId]||[];
     let badge='';
@@ -2039,7 +2058,7 @@ function renderQueue(){
       const verb=friendArr.length>1?'ont répondu':'a répondu';
       badge=`<div class="friend-badge"><div class="fb-av" style="background:${c}22;color:${c}">${(fn||'?')[0]}</div>${esc(fn)}${more>0?` + ${more} ami${more>1?'s':''}`:''} ${verb}</div>`;
     }
-    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta"><span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${badge}</div>`;
+    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta">${q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:10.5px;color:var(--ink2);margin-top:5px">Nouveau près de chez toi · tu ne le suis pas encore</div>':''}${badge}</div>`;
     el.appendChild(d);cnt++;
     if(cnt%3===0){const sc=buildSocialCard();if(sc)el.appendChild(sc);}
   });
@@ -3207,7 +3226,7 @@ function refreshProfile(){
   }
   const cm=document.getElementById('consent-mgmt');cm.innerHTML='';
   const _cm=S._nearbyMerchants||[];
-  if(!_cm.length){cm.innerHTML='<div style="font-size:12px;color:var(--ink2);text-align:center;padding:8px 0">Aucun commerce autorisé. Les demandes des commerces arrivent sur ton accueil.</div>';}
+  if(!_cm.length){cm.innerHTML='<div style="font-size:12px;color:var(--ink2);text-align:center;padding:8px 0">Tu ne suis aucun commerce pour l\'instant. Réponds à une question « découverte » sur ton accueil, puis suis le commerce si ça te plaît.</div>';}
   else{_cm.slice(0,6).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='dconsent-row';d.innerHTML=`${logoHTML(label,40,m.logoUrl)}<div style="flex:1;min-width:0"><div class="dconsent-name">${esc(label)}</div><div class="dconsent-sub">${esc(m.sector||m.address||'')} · ${questionsAsked(label)} question${questionsAsked(label)>1?'s':''} posée${questionsAsked(label)>1?'s':''}</div></div><label class="tgl"><input type="checkbox" checked onchange="toggleMerchantConsentQuick('${m.id}',this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label>`;cm.appendChild(d)});if(_cm.length>6){const more=document.createElement('div');more.style.cssText='font-size:11px;color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`+${_cm.length-6} autres · Gérer`;more.onclick=openManageMerchants;more.style.cursor='pointer';cm.appendChild(more);}}
   const bl=document.getElementById('badges-list');bl.innerHTML='';
   checkTierAndBadgeCelebrations();
@@ -3259,6 +3278,7 @@ function fillQuestion(q,opts){
   document.getElementById('bh-tag').textContent=q.theme||'';
   document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||defaultHint(q.type);
   const sk=document.getElementById('skip-btn');if(sk){sk.textContent=opts.skipLabel;sk.setAttribute('onclick',opts.skipFn);}
+  {const dn=document.getElementById('q-disc-note');if(dn){const on=!!(q._discovery&&S.mode!=='survey');dn.style.display=on?'block':'none';if(on)dn.innerHTML='<b>Découverte</b> : tu ne suis pas encore '+esc(q.brand)+'. Tu peux répondre ou passer. Si tu réponds, ce commerce reçoit ta réponse, <b>sans ton âge ni tes centres d\'intérêt</b>. Ensuite, tu choisis de le suivre ou non.';}}
   document.getElementById('sub-btn').disabled=true;buildAns(q);
 }
 function curQuestion(){return S.mode==='survey'&&S.sv?S.sv.list[S.sv.idx]:S.curQ;}
@@ -3343,12 +3363,14 @@ function openReward(o){
   {const rv=document.getElementById('rw-reveal');if(rv)rv.innerHTML='';}
   renderInvitePrompt();
   {const rn=document.getElementById('rw-news');if(rn)rn.innerHTML='';}
+  renderFollowPrompt(o.merchantId,o.brandName);
   const t=document.querySelector('#reward .rw-title');if(t)t.textContent=o.title||'Bien joué !';
   const s=document.querySelector('#reward .rw-sub');if(s)s.textContent=o.sub||'Ta réponse a été envoyée';
   document.getElementById('rw-pts').textContent=o.pts;
   {const l=document.querySelector('#reward .pe-lbl');if(l)l.textContent='Total cumulé';}
   document.getElementById('rw-total').textContent=o.total+' pts';
-  document.getElementById('rw-usage').innerHTML='Ta réponse aide <strong>'+o.brand+'</strong>, '+(o.usage||'à mieux servir le quartier.');
+  // Le texte d'usage des questions commence déjà par « Ta réponse aide … » : on ne le répète pas.
+  document.getElementById('rw-usage').innerHTML=/^Ta réponse aide /.test(o.usage||'')?esc(o.usage).replace(esc(o.brand),'<strong>'+esc(o.brand)+'</strong>'):'Ta réponse aide <strong>'+esc(o.brand)+'</strong>, '+(o.usage||'à mieux servir le quartier.');
   const act=document.getElementById('rw-actions');act.innerHTML='';
   const mk=(cls,txt,fn)=>{const b=document.createElement('button');b.className=cls;b.textContent=txt;b.onclick=fn;act.appendChild(b);};
   if(S.qs&&S.qs.length>0)mk('btn-p','Question suivante →',nextQ);
@@ -3522,7 +3544,7 @@ function mapMerchants(){
   const map=new Map();
   Object.entries(_verifiedMerchantsCache||{}).forEach(([id,m])=>map.set(id,Object.assign({id},m)));
   (S._nearbyMerchants||[]).forEach(m=>{if(m&&m.id&&!map.has(m.id))map.set(m.id,m);});
-  const auth_=S._authorizedMerchants||[],reqs=(S._requests||[]).map(r=>r.id);
+  const auth_=S._authorizedMerchants||[],reqs=(S._discovery||[]).map(r=>r.id);
   return [...map.values()].map(m=>({
     id:m.id,name:m.brandName||m.name||'Commerce',sector:m.sector||'Commerce local',cat:sectorCat(m.sector||m.theme),
     address:m.address||'',city:m.cityLabel||m.city||S._cityLabel||S._city||'',logoUrl:m.logoUrl||null,photoUrl:m.coverUrl||null,
@@ -3671,7 +3693,7 @@ async function renderNearbyGrid(){
     <div class="dnb-card" ${c._merchantId?`onclick="openBrandById('${c._merchantId}','${esc(c.name).replace(/'/g,"\\'")}')"`:''}>
       <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="Photo de ${esc(c.name)}" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}</div>
       <div class="dnb-scrim"></div>
-      <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':(c.request?'Demande':'Bientôt')}</div>
+      <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':(c.request?'À découvrir':'Bientôt')}</div>
       <div class="dnb-body"><div class="dnb-name">${esc(c.name)}</div><div class="dnb-meta">${esc(c.sector)}${c._dist!=null?' · '+fmtDist(c._dist):''}</div></div>
     </div>`).join('');
 }
@@ -3724,7 +3746,7 @@ function mapRenderList(){
   if(!vis.length){el.innerHTML='<div class="mf-empty">Aucun commerce dans cette catégorie.</div>';return;}
   el.innerHTML=vis.map(m=>{
     const d=mapDist(m);
-    const tag=m.hasQ?'<span class="mf-tag q">Question active</span>':m.request?'<span class="mf-tag q">Veut te poser des questions</span>':m.authorized?'<span class="mf-tag">Autorisé</span>':'<span class="mf-tag">Bientôt</span>';
+    const tag=m.hasQ?'<span class="mf-tag q">Question active</span>':m.request?'<span class="mf-tag q">À découvrir</span>':m.authorized?'<span class="mf-tag">Autorisé</span>':'<span class="mf-tag">Bientôt</span>';
     const meta=esc(m.sector)+(d!=null?' · '+fmtDist(d):(m.lat==null&&m._geoDone?' · adresse introuvable':''));
     return `<div class="mf-row${_mapSt.sel===m.id?' sel':''}" data-id="${m.id}" onclick="mapSelect('${m.id}',true)">${logoHTML(m.name,46,m.logoUrl)}<div class="mf-bd"><div class="mf-nm">${esc(m.name)}</div><div class="mf-mt">${meta}</div>${tag}</div><div class="mf-act"><button onclick="event.stopPropagation();openBrandById('${m.id}','${esc(m.name).replace(/'/g,"\\'")}')">Voir</button>${m.lat!=null?`<button class="alt" onclick="event.stopPropagation();mapDirections('${m.id}')">Y aller</button>`:''}</div></div>`;
   }).join('');
@@ -4410,21 +4432,44 @@ function matchesCats(m){
   if(!ints.length||ints.length===CAT_KEYS.length)return true;
   return ints.includes(sectorCat(m.sector||m.theme));
 }
+// ─── Questions « découverte » : les commerces qu'on ne suit pas encore ─────────────────────
+// Un nouveau commerce de la ville est proposé DIRECTEMENT dans les questions à répondre (sans demande préalable),
+// d'une autre couleur. Il est montré en priorité aux habitants dont les centres d'intérêt correspondent, et à une petite
+// part d'habitants tirée au hasard (stable : même habitant, même commerce, même résultat). L'habitant répond ou non ;
+// après avoir répondu il choisit de suivre le commerce (et de l'autoriser à lui poser d'autres questions) ou non.
+const DISCOVERY = { RANDOM_PCT: 15, MAX_ON_HOME: 3 };
+function hash01(str){ let h = 2166136261; for(let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 10000) / 10000; }
+// Correspondance STRICTE avec les catégories choisies à l'inscription (contrairement à matchesCats, qui laisse tout passer
+// quand rien n'est choisi ou que « Tout m'intéresse » est coché) : sert au classement de l'accueil.
+function interestMatch(m){
+  const ints=(S._interests||[]).filter(i=>CAT_KEYS.includes(i));
+  if(!ints.length||ints.length===CAT_KEYS.length)return false;
+  return ints.includes(sectorCat(m.sector||m.theme));
+}
 function questionsAsked(label){return (S.hist||[]).filter(h=>h.brand===label).length;}
-function renderRequests(){
-  const el=document.getElementById('home-requests');if(!el)return;
-  const reqs=S._requests||[];
-  if(!reqs.length){el.innerHTML='';return;}
-  el.innerHTML='<div class="sec-lbl">Demandes</div>'+reqs.slice(0,3).map(m=>{
-    const label=m.brandName||m.name||'Commerce';
-    const photo=m.coverUrl?`<img src="${esc(m.coverUrl)}" alt="Photo de ${esc(label)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">`:'';
-    return `<div style="margin:0 22px 14px;background:var(--surface);border-radius:var(--r-card);box-shadow:var(--shadow-card);overflow:hidden">
-      <div style="position:relative;height:96px;background:var(--nv-photo)">${photo}<div style="position:absolute;left:14px;bottom:-22px;z-index:1">${logoHTML(label,46,m.logoUrl)}</div></div>
-      <div style="padding:30px 16px 16px">
-        <div style="font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink);letter-spacing:-.4px">${esc(label)}</div>
-        <div style="font-size:12px;color:var(--ink2);margin:2px 0 12px">${esc(m.sector||'Commerce')}${m.cityLabel?' · '+esc(m.cityLabel):''} · veut te poser des questions</div>
-        <div style="display:flex;gap:8px"><button class="btn-p" style="flex:1" onclick="authorizeMerchant('${m.id}')">Autoriser</button><button class="btn-s" style="flex:1" onclick="declineMerchant('${m.id}')">Non merci</button></div>
-      </div></div>`;}).join('')+(reqs.length>3?`<div style="text-align:center;font-size:12px;color:var(--ink3);margin-bottom:12px">+${reqs.length-3} autre${reqs.length>4?'s':''} demande${reqs.length>4?'s':''}</div>`:'');
+// L'ancienne section « Demandes » (autoriser / non merci) n'existe plus : les nouveaux commerces arrivent directement dans les
+// questions à répondre (voir « questions découverte »), et l'habitant les suit après avoir répondu.
+function renderRequests(){ const el=document.getElementById('home-requests'); if(el) el.innerHTML=''; }
+// Après une réponse à un commerce qu'on ne suit pas encore : le suivre (donc l'autoriser à poser d'autres questions), ou non.
+function renderFollowPrompt(mid,brand){
+  const el=document.getElementById('rw-follow');if(!el)return;el.innerHTML='';
+  if(!mid||(S._authorizedMerchants||[]).includes(mid)||(S._declinedMerchants||[]).includes(mid))return;
+  const b=esc(brand||'ce commerce'),id=esc(mid);
+  el.innerHTML=`<div class="follow-card" role="group" aria-label="Suivre ${b}"><div class="fc-t">Tu veux suivre ${b} ?</div>
+    <div class="fc-d">Tu recevras ses prochaines questions à l'accueil, et il pourra voir ton profil anonyme (ville, tranche d'âge, centres d'intérêt). Tu peux arrêter à tout moment dans Profil.</div>
+    <div class="fc-b"><button class="btn-p" onclick="followFromReward('${id}','${b.replace(/'/g,"\\'")}')">Suivre</button><button class="btn-s" onclick="dismissFollow()">Pas maintenant</button></div>
+    <button class="fc-x" onclick="blockFromReward('${id}')">Ne plus voir ce commerce</button></div>`;
+}
+async function followFromReward(mid,brand){
+  await authorizeMerchant(mid);
+  const el=document.getElementById('rw-follow');
+  if(el&&(S._authorizedMerchants||[]).includes(mid))el.innerHTML='<div class="follow-card"><div class="fc-t">Tu suis '+brand+' '+icon('check',{size:15})+'</div><div class="fc-d" style="margin:0">Tu retrouveras ses questions à l\'accueil.</div></div>';
+}
+function dismissFollow(){const el=document.getElementById('rw-follow');if(el)el.innerHTML='';}
+async function blockFromReward(mid){
+  await declineMerchant(mid);
+  const el=document.getElementById('rw-follow');
+  if(el&&(S._declinedMerchants||[]).includes(mid))el.innerHTML='<div class="follow-card"><div class="fc-d" style="margin:0">C\'est noté : on ne te proposera plus ce commerce. Tu peux changer d\'avis dans Profil.</div></div>';
 }
 async function authorizeMerchant(mid){
   const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
@@ -4440,7 +4485,7 @@ async function authorizeMerchant(mid){
     loadNearbyMerchants(S._authorizedMerchants);
     recomputeCampaignFeed(normalizeCity(S._city||''));
     refreshHome();
-    showToast('Autorisé : tu recevras ses questions.','success');
+    showToast('Tu suis ce commerce : tu recevras ses prochaines questions.','success');
   }catch(e){console.warn('authorizeMerchant:',e);showToast("Impossible d'enregistrer ton choix.",'error');}
 }
 async function declineMerchant(mid){
@@ -4571,8 +4616,6 @@ function renderHomeState(){
     el.innerHTML='<div style="'+box+'"><div style="'+h+'">NOOVA arrive '+esc(cityPhrase(S._cityLabel))+'.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Aucun commerce de ta ville n\'a encore lancé de question. Dis-nous lesquels tu aimerais voir ici.</div></div>'
       +'<div style="display:flex;gap:8px;margin-bottom:10px"><input id="suggest-inp" type="text" maxlength="80" placeholder="Un commerce à suggérer" style="flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb)"><button onclick="suggestMerchant()" style="padding:0 18px;border-radius:16px;border:none;background:var(--ink);color:#fff;font-family:var(--fd);font-weight:800;font-size:14px;cursor:pointer">Suggérer</button></div>'
       +'<button class="btn-s" onclick="shareNoova()">Inviter mes amis</button>';
-  }else if((S._requests||[]).length){
-    el.innerHTML='<div style="'+box+'"><div style="'+h+'">Un commerce veut te poser des questions.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Autorise-le ci-dessous pour recevoir ses questions.</div></div>';
   }else if((S.ans||0)>0){
     el.innerHTML='<div style="'+box+'"><div style="'+h+'">C\'est fait pour aujourd\'hui.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Merci pour tes réponses. Reviens demain pour de nouvelles questions.</div></div>';
   }else{
@@ -5629,7 +5672,8 @@ function recomputeCampaignFeed(city) {
 
     const campaigns = [];
     const declined = S._declinedMerchants || [];
-    const requests = {};
+    const discoveryMerchants = {};
+    const myUid = (auth.currentUser && auth.currentUser.uid) || '';
     _campaignsCache.forEach(({ id, data: d }) => {
       if (answered.includes(id)) return;
       const campaignCity = getCampaignCity(d);
@@ -5642,10 +5686,15 @@ function recomputeCampaignFeed(city) {
       if (d.endsAt && d.endsAt.toMillis && d.endsAt.toMillis() < Date.now()) return; // campagne terminée
       const ageRanges = getCampaignAgeRanges(d).map(normalizeAgeRange);
       if (ageRanges.length && userAge && !ageRanges.includes(userAge)) return;
-      if (d.merchantId && !authorized.includes(d.merchantId)) {
-        // Modèle « demande d'ami » : aucune question sans autorisation explicite.
-        if (!declined.includes(d.merchantId) && matchesCats(merchantData)) requests[d.merchantId] = { id: d.merchantId, ...merchantData };
-        return;
+      // Commerce pas encore suivi : question « découverte », proposée selon les centres d'intérêt, ou à une petite part au hasard.
+      const followed = !d.merchantId || authorized.includes(d.merchantId);
+      let discoveryReason = '';
+      if (!followed) {
+        if (declined.includes(d.merchantId)) return;                              // écarté par l'habitant : plus jamais proposé
+        if (matchesCats(merchantData)) discoveryReason = 'interest';
+        else if (hash01(myUid + '|' + id) < DISCOVERY.RANDOM_PCT / 100) discoveryReason = 'random';
+        else return;
+        discoveryMerchants[d.merchantId] = { id: d.merchantId, ...merchantData };
       }
 
       const allQs = getCampaignQuestions(d);
@@ -5663,6 +5712,8 @@ function recomputeCampaignFeed(city) {
         _surveyCount: allQs.length,
         brand: d.merchantName || 'Commerce', ico: d.brandEmoji || '🏪',
         photoUrl: merchantData.coverUrl || null, logoUrl: merchantData.logoUrl || null,
+        _discovery: !followed, _reason: discoveryReason, _strict: interestMatch(merchantData) ? 1 : 0, _followed: followed ? 1 : 0,
+        _createdMs: (d.createdAt && d.createdAt.toMillis ? d.createdAt.toMillis() : 0),
         theme: d.sector || 'Commerce local', pts: 10,
         type: allQs[0].format || d.format || 'text',
         q: allQs[0].q || d.question, hint: '',
@@ -5671,8 +5722,12 @@ function recomputeCampaignFeed(city) {
         survey: surveyList
       });
     });
-    S.qs = campaigns;
-    S._requests = Object.values(requests);
+    // Classement : d'abord les questions qui correspondent aux centres d'intérêt de l'habitant (commerces suivis ou à découvrir),
+    // puis les commerces suivis, puis les plus récentes. Les questions découverte sont plafonnées pour ne pas noyer l'accueil.
+    campaigns.sort((a, b) => (b._strict - a._strict) || (b._followed - a._followed) || (b._createdMs - a._createdMs));
+    let shownDisc = 0;
+    S.qs = campaigns.filter(c => !c._discovery || ++shownDisc <= DISCOVERY.MAX_ON_HOME);
+    S._discovery = Object.values(discoveryMerchants);
     if (S.qIdx === undefined) S.qIdx = 0;
     // Rafraîchit l'écran uniquement pour les mises à jour en direct (le premier
     // rendu est déjà déclenché par handleUserSnapshot juste après ce chargement).
@@ -5821,7 +5876,7 @@ function renderPrivacyData() {
   el.innerHTML = `
     <div class="pd-h">Qui voit quoi</div>
     <div class="pd-card">
-      <div class="pd-row"><div class="pd-t">Les commerces que tu autorises (${nAuth})</div><div class="pd-d">Ils voient tes réponses à leurs propres questions et ton profil anonyme : ville, tranche d'âge, centres d'intérêt. Jamais les commerces que tu n'as pas autorisés.</div><button type="button" class="pd-act" onclick="openManageMerchants()">Gérer mes commerces →</button></div>
+      <div class="pd-row"><div class="pd-t">Les commerces que tu autorises (${nAuth})</div><div class="pd-d">Ils voient tes réponses à leurs propres questions et ton profil anonyme : ville, tranche d'âge, centres d'intérêt. Un commerce que tu ne suis pas reçoit seulement ta réponse, sans ton profil, si tu réponds à l'une de ses questions « découverte ».</div><button type="button" class="pd-act" onclick="openManageMerchants()">Gérer mes commerces →</button></div>
       <div class="pd-row"><div class="pd-t">Tes amis${nFr ? ' (' + nFr + ')' : ''}</div><div class="pd-d">Ils voient ton prénom, ta photo, ton niveau, ta série et ton activité. Tes réponses ne leur sont montrées que si tu le permets.</div>
         <label class="pd-tgl"><span>Montrer mes réponses à mes amis</span><span class="tgl"><input type="checkbox" id="share-answers-inp2" aria-label="Montrer mes réponses à mes amis" onchange="setShareAnswers(this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></span></label></div>
       <div class="pd-row"><div class="pd-t">Les autres habitants</div><div class="pd-d">Ils ne voient jamais qui tu es : seulement des pourcentages, à partir de 5 réponses.</div></div>

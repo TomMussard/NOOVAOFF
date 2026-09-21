@@ -56,14 +56,14 @@ const ADMIN='http://localhost:8950/admin.html';
     const chip=await p.evaluate(()=>{const e=document.querySelector('#home .q-type-t');return e?getComputedStyle(e).color:null;});
     check('Pastille de format plus lisible (texte foncé)',!!chip&&(chip.match(/\d+/g).map(Number)[0]<120),chip);
     // question : consigne et verrou de lecture
-    await p.evaluate(()=>openQ(0));await sleep(400);
+    await p.evaluate(()=>openQ(S.qs.findIndex(q=>q.type==='mcq')));await sleep(400);
     const q1=await p.evaluate(()=>({hint:document.getElementById('q-hint').textContent,usage:document.getElementById('bh-usage').textContent,btn:document.getElementById('sub-btn').textContent}));
     check('Question à choix : consigne adaptée, plus de « Donne ton avis »',/Choisis la réponse/.test(q1.hint)&&!/Donne ton avis/.test(q1.hint),q1);
     check('Ligne d\'utilité sans répéter le nom (« Ta réponse aide … »)',/^Ta réponse aide/.test(q1.usage)&&!/veut ton avis/.test(q1.usage),q1.usage);
     check('Bouton verrouillé pendant la lecture : « Prends le temps de lire… »',/Prends le temps de lire/.test(q1.btn),q1.btn);
     await sleep(3300);
     check('… puis retrouve son libellé « Valider »',/Valider/.test(await p.$eval('#sub-btn',e=>e.textContent)),await p.$eval('#sub-btn',e=>e.textContent));
-    await p.evaluate(()=>{goNav('home');openQ(1);});await sleep(400);
+    await p.evaluate(()=>{goNav('home');openQ(S.qs.findIndex(q=>q.type==='text'));});await sleep(400);
     check('Question texte : consigne « Écris ce que tu en penses »',/Écris ce que tu en penses/.test(await p.$eval('#q-hint',e=>e.textContent)));
     // cadeaux + profil
     await p.evaluate(()=>{goNav('rewards-tab');});await sleep(800);

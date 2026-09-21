@@ -172,18 +172,9 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     await waitFn(up, () => document.getElementById('home').classList.contains('active') && S.user, null, 25000);
     check('U5 catégories enregistrées puis accueil', (await adb.doc('users/' + uuid).get()).data().interests.includes('restauration'));
   });
-  await step('user request -> authorize -> answer', async () => {
-    await waitFn(up, () => (S._requests || []).length === 1, null, 20000);
-    const html = await up.$eval('#home-requests', e => e.textContent);
-    check('U6 demande du commerce affichée sur l\'accueil', /Boulangerie du Centre/.test(html) && /Autoriser/.test(html));
-    check('U6 aucune question sans autorisation', await up.evaluate(() => S.qs.length === 0));
-    await up.evaluate(() => authorizeMerchant(S._requests[0].id));
-    await waitFn(up, () => S.qs.length === 1 && S._requests.length === 0, null, 15000);
-    check('U6 après Autoriser : la question apparaît', true);
-    const ce = await adb.collection('consentEvents').where('userId', '==', uuid).get();
-    await sleep(2500);
-    const mm = (await adb.doc('merchants/' + muid).get()).data();
-    check('Consentement journalisé + countConsent serveur', ce.size === 1 && mm.consentCount === 1, 'events=' + ce.size + ' count=' + mm.consentCount);
+  await step('user discovery -> answer -> follow', async () => {
+    await waitFn(up, () => S.qs.length === 1 && S.qs[0]._discovery === true, null, 20000);
+    check('U6 la question du commerce arrive directement sur l\'accueil, en « découverte » (plus de demande à autoriser)', await up.evaluate(() => document.getElementById('home-requests').textContent.trim() === '' && document.getElementById('today-card').classList.contains('disc') && /Boulangerie du Centre/.test(document.getElementById('tc-brand').textContent)));
     await up.evaluate(() => openQ(0));
     await waitFn(up, () => document.querySelectorAll('#ans-area .mcq-opt').length > 0);
     await up.evaluate(() => document.querySelector('#ans-area .mcq-opt').click());
@@ -192,7 +183,15 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     await sleep(3500);
     const ans = await adb.collection('answers').where('userId', '==', uuid).get();
     const u = (await adb.doc('users/' + uuid).get()).data();
-    check('U6 réponse validée côté serveur (submitAnswer)', ans.size === 1 && u.points === 25, 'answers=' + ans.size + ' points=' + u.points);
+    check('U6 réponse validée côté serveur (submitAnswer), sans profil pour un commerce non suivi', ans.size === 1 && u.points === 25 && ans.docs[0].data().discovery === true && ans.docs[0].data().respondentAge === '', 'answers=' + ans.size + ' points=' + u.points);
+    await waitFn(up, () => document.querySelector('#rw-follow .follow-card'), null, 10000);
+    check('U6 proposition de suivre le commerce après la réponse', true);
+    await up.evaluate(() => document.querySelector('#rw-follow .btn-p').click());
+    await waitFn(up, () => S._authorizedMerchants.length === 1, null, 15000);
+    for (let i = 0; i < 30 && !((await adb.doc('merchants/' + muid).get()).data() || {}).consentCount; i++) await sleep(500);
+    const ce = await adb.collection('consentEvents').where('userId', '==', uuid).get();
+    const mm = (await adb.doc('merchants/' + muid).get()).data();
+    check('Consentement journalisé + countConsent serveur', ce.size === 1 && mm.consentCount === 1, 'events=' + ce.size + ' count=' + mm.consentCount);
   });
   await step('strict authorization server-side', async () => {
     const camp2 = await adb.collection('campaigns').add({ merchantId: 'other', merchantName: 'Autre', status: 'active', targetCity: 'le-mans', city: 'le-mans', question: 'Q ?', questions: [{ q: 'Q ?', format: 'mcq', options: ['a', 'b'] }], targetVolume: 100, answersCount: 0 });

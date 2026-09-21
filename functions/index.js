@@ -101,10 +101,21 @@ exports.submitAnswer = onCall(async (request) => {
     if (!userCity || userCity !== campCity) {
       throw new HttpsError("permission-denied", "Cette campagne n'est pas disponible dans ta ville.");
     }
-    // Modèle « demande d'ami » : aucune question d'un commerce sans autorisation explicite.
+    // Commerce suivi (autorisé) : réponse complète. Commerce PAS ENCORE suivi : question « découverte » — l'habitant choisit
+    // librement d'y répondre ; le commerce reçoit alors la réponse SANS le profil (âge, centres d'intérêt), et l'habitant
+    // décidera ensuite de le suivre ou non. Un commerce que l'habitant a écarté, non vérifié ou d'une autre ville : refusé.
     const authorized = user.authorizedMerchants || [];
+    let discovery = false;
     if (camp.merchantId && !authorized.includes(camp.merchantId)) {
-      throw new HttpsError("permission-denied", "Tu n'as pas autorisé ce commerce.");
+      if ((user.declinedMerchants || []).includes(camp.merchantId)) {
+        throw new HttpsError("permission-denied", "Tu as choisi de ne plus voir ce commerce.");
+      }
+      const mSnap = await tx.get(db.collection("merchants").doc(String(camp.merchantId)));
+      const mm = mSnap.exists ? mSnap.data() : null;
+      if (!mm || mm.status !== "verified" || String(mm.city || "").toLowerCase() !== userCity) {
+        throw new HttpsError("permission-denied", "Ce commerce n'est pas disponible dans ta ville.");
+      }
+      discovery = true;
     }
     const ageRanges = camp.ageRanges || [];
     const userAge = user.ageRange || user.age || "";
@@ -199,9 +210,10 @@ exports.submitAnswer = onCall(async (request) => {
       suspect,
       category: sectorCategory(camp.sector || camp.merchantTheme),
       optionIdx,
-      respondentAge: userAge,
+      respondentAge: discovery ? "" : userAge,
       respondentCity: user.city || "",
-      respondentInterests: user.interests || [],
+      respondentInterests: discovery ? [] : (user.interests || []),
+      discovery,
       createdAt: FieldValue.serverTimestamp(),
     });
 

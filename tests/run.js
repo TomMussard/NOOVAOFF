@@ -49,7 +49,7 @@ function serve(port) {
   });
 }
 
-const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "eng8", "eng9", "eng10", "eng11", "eng12", "eng13", "eng14", "eng15", "eng16", "eng17", "eng18", "notif_server", "notif_ui", "mobile_audit", "a11y_audit", "tour_audit", "perf_audit"];
+const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "eng8", "eng9", "eng10", "eng11", "eng12", "eng13", "eng14", "eng15", "eng16", "eng17", "eng18", "eng19", "notif_server", "notif_ui", "mobile_audit", "a11y_audit", "tour_audit", "perf_audit"];
 
 function runSuite(name) {
   return new Promise((resolve) => {
