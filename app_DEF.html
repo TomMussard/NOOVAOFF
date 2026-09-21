@@ -244,6 +244,23 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .legal-links a{color:var(--ink2);text-decoration:underline;padding:8px 2px;min-height:24px}
 @supports (-webkit-touch-callout:none){input,select,textarea{font-size:16px!important}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+.set-danger{padding:12px 13px 10px;border-top:1px solid var(--bg3);margin-top:8px}
+.set-danger-l{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
+.mm-sum{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--ink2);margin:0 0 12px}
+.mm-sum button{background:none;border:none;color:var(--ink);font-weight:800;text-decoration:underline;font-size:12.5px;cursor:pointer;font-family:var(--fb);padding:8px 0}
+.mm-sum button[hidden]{display:none}
+.mm-search{width:100%;padding:13px 18px;border-radius:var(--r-pill);border:1.5px solid var(--bg3);background:var(--surface);font-size:14px;font-family:var(--fb);color:var(--ink);outline:none}
+.mm-search:focus{border-color:var(--ink)}
+.mm-savebar{position:sticky;bottom:0;padding:16px 18px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(rgba(255,251,215,0),var(--bg) 38%)}
+.mm-savebar .btn-p:disabled{opacity:.5;cursor:default}
+.pd-h{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink);margin:20px 20px 8px}
+.pd-card{background:var(--surface);border-radius:var(--r-card);box-shadow:var(--shadow-card);margin:0 18px 12px;padding:4px 16px}
+.pd-row{padding:13px 0;border-bottom:1px solid var(--bg3)}
+.pd-row:last-child{border-bottom:none}
+.pd-t{font-size:13.5px;font-weight:700;color:var(--ink)}
+.pd-d{font-size:12.5px;color:var(--ink2);line-height:1.6;margin-top:3px}
+.pd-act{display:inline-block;margin-top:8px;background:none;border:none;padding:6px 0;font-family:var(--fb);font-size:12.5px;font-weight:800;color:var(--ink);text-decoration:underline;cursor:pointer}
+.pd-tgl{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:12px;font-size:12.5px;font-weight:700;color:var(--ink)}
 .rv-skel .rv-bar{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
 #lock-bar{height:6px;border-radius:99px;overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
 #lock-bar.on{opacity:1}
@@ -629,7 +646,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .hist-it:last-child{border-bottom:none}
 .danger-c{background:var(--card);border-radius:18px;padding:13px;margin-bottom:11px;box-shadow:0 3px 12px rgba(0,0,0,.04)}
 .dbtn{width:100%;padding:12px;border-radius:var(--r-pill);background:var(--cream);border:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .13s;margin-bottom:7px}
-.dbtn:last-child{margin:0;border-color:rgba(239,68,68,.22);color:#EF4444}
+.dbtn:last-child{margin:0;border-color:rgba(239,68,68,.22);color:#B91C1C}
 .badge-list{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:4px 13px 13px}
 .bp{display:flex;flex-direction:column;align-items:center;gap:5px}
 .bp-ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center}
@@ -1169,11 +1186,13 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- MANAGE MERCHANTS (from profile) -->
 <div id="manage-merchants" class="screen">
   <div class="brands-body">
-    <div style="padding:56px 20px 14px">
-      <div class="back-btn" onclick="goTo('profile');document.getElementById('bnav').classList.add('show')">←</div>
+    <div style="padding:56px 20px 10px">
+      <div class="back-btn" role="button" tabindex="0" aria-label="Retour au profil" onclick="mmBack()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();mmBack()}">←</div>
       <div class="auth-badge" style="background:var(--cd);color:var(--ink)">Mes commerces</div>
       <h2 class="auth-title" style="margin-top:8px">Gérer mes<br>commerces</h2>
-      <p class="auth-sub" style="margin-bottom:4px">Active ou désactive chaque commerce en un tap. Seuls ceux que tu acceptes peuvent te poser des questions.</p>
+      <p class="auth-sub" style="margin-bottom:12px">Seuls les commerces que tu autorises peuvent te poser des questions. Ils voient alors tes réponses à leurs questions et ton profil anonyme (ville, tranche d'âge, centres d'intérêt).</p>
+      <div class="mm-sum"><span id="mm-summary" aria-live="polite"></span><button type="button" id="mm-all-off" onclick="mmDisableAll()">Tout désactiver</button></div>
+      <input type="search" id="mm-search" class="mm-search" placeholder="Rechercher un commerce" aria-label="Rechercher un commerce" oninput="mmRender()" autocomplete="off">
     </div>
     <div id="mm-authorized-section">
       <div class="brand-cat-hdr" style="display:flex;align-items:center;gap:6px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Autorisés</div>
@@ -1183,10 +1202,24 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="brand-cat-hdr" style="display:flex;align-items:center;gap:6px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 5v14M5 12h14"/></svg> Autres commerces près de toi</div>
       <div id="mm-available-list"></div>
     </div>
+    <div id="mm-nomatch" style="display:none;text-align:center;padding:26px 24px;color:var(--ink2);font-size:13px">Aucun commerce ne correspond à ta recherche.</div>
     <div class="consent-note" style="margin:14px 18px"><strong style="color:var(--violet)">Tu gardes le contrôle.</strong> Un commerce retiré ne pourra plus te contacter. Aucune revente à des tiers.</div>
-    <div style="padding:0 18px 32px">
-      <button class="btn-p" id="mm-save-btn" onclick="saveMerchantConsents()">Enregistrer les modifications</button>
+    <div class="mm-savebar">
+      <button class="btn-p" id="mm-save-btn" onclick="saveMerchantConsents()" disabled>Aucune modification</button>
     </div>
+  </div>
+</div>
+
+<!-- DONNÉES ET CONFIDENTIALITÉ (depuis les réglages) -->
+<div id="privacy-data" class="screen">
+  <div class="brands-body">
+    <div style="padding:56px 20px 6px">
+      <div class="back-btn" role="button" tabindex="0" aria-label="Retour au profil" onclick="goNav('profile')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goNav('profile')}">←</div>
+      <div class="auth-badge" style="background:var(--md);color:var(--ink)">Confidentialité</div>
+      <h2 class="auth-title" style="margin-top:8px">Données et<br>confidentialité</h2>
+      <p class="auth-sub" style="margin-bottom:6px">Ce que Noova sait de toi, qui peut le voir, et comment garder la main.</p>
+    </div>
+    <div id="pd-body"></div>
   </div>
 </div>
 
@@ -1454,7 +1487,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       </div>
     </div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="openManageMerchants()">Gérer</span><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="event.stopPropagation();openManageMerchants()">Gérer</span><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div id="consent-mgmt"></div>
       </div>
@@ -1462,10 +1495,15 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="sec-card acc" id="share-answers-card">
       <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
-      <div class="consent-it" style="cursor:pointer" onclick="goTo('manage-merchants');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
-      <div class="consent-it"><div style="flex:1;min-width:0"><div class="dconsent-name">Montrer mes réponses à mes amis</div><div class="dconsent-sub" style="white-space:normal">Tes amis voient ce que tu as répondu. Tu comptes toujours dans les résultats.</div></div><label class="tgl"><input type="checkbox" id="share-answers-inp" checked onchange="setShareAnswers(this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>
+      <div class="consent-it" style="cursor:pointer" onclick="openPrivacyData()"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
+      <div class="consent-it"><div style="flex:1;min-width:0"><div class="dconsent-name">Montrer mes réponses à mes amis</div><div class="dconsent-sub" style="white-space:normal">Tes amis voient ce que tu as répondu. Tu comptes toujours dans les résultats.</div></div><label class="tgl"><input type="checkbox" id="share-answers-inp" aria-label="Montrer mes réponses à mes amis" checked onchange="setShareAnswers(this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>
       <div class="consent-it" style="cursor:pointer" onclick="goTo('how-it-works');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Comment ça marche</div><span style="color:var(--ink3);font-size:17px">›</span></div>
-      <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Tu peux révoquer ou supprimer tes données à tout moment ci-dessous.</div></div>
+      <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Tu peux révoquer tes consentements ou supprimer ton compte à tout moment, juste en dessous.</div></div>
+      <div class="set-danger">
+        <div class="set-danger-l">Mes données</div>
+        <button class="dbtn" onclick="revokeAllConsents()">Révoquer tous les consentements</button>
+        <button class="dbtn" onclick="deleteMyAccount()">Supprimer mon compte et mes données</button>
+      </div>
       </div>
     </div>
     <div class="sec-card acc" id="notif-section">
@@ -1488,6 +1526,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div id="hist-list"></div>
       </div>
     </div>
+    <div style="padding:0 0 12px">
+      <button onclick="logout()" class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fd)"><span style="display:inline-flex;width:16px;height:16px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M20 12H10"/><path d="M16 8l4 4-4 4"/></svg></span> Se déconnecter</button>
+    </div>
     <nav class="legal-links" aria-label="Informations légales">
       <a href="/confidentialite.html" target="_blank" rel="noopener">Confidentialité</a>
       <a href="/cookies.html" target="_blank" rel="noopener">Cookies</a>
@@ -1496,14 +1537,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <a href="/mentions-legales.html" target="_blank" rel="noopener">Mentions légales</a>
       <a href="/accessibilite.html" target="_blank" rel="noopener">Accessibilité</a>
     </nav>
-    <div style="padding:0 0 12px">
-      <button onclick="logout()" class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fd)"><span style="display:inline-flex;width:16px;height:16px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M20 12H10"/><path d="M16 8l4 4-4 4"/></svg></span> Se déconnecter</button>
-    </div>
-    <div class="danger-c">
-      <div style="font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:15px;height:15px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg></span> Zone danger</div>
-      <button class="dbtn" onclick="revokeAllConsents()">Révoquer tous les consentements</button>
-      <button class="dbtn" onclick="deleteMyAccount()">Supprimer mon compte et mes données</button>
-    </div>
   </div>
 </div>
 
@@ -3160,7 +3193,7 @@ function refreshProfile(){
   renderUserAvatar(document.getElementById('settings-av-thumb'), document.getElementById('settings-av-thumb-letter'), S.user.name, S.user.photoUrl);
   refreshSettingsDisplay();
   refreshNotifSettingsUI();
-  {const si=document.getElementById('share-answers-inp');if(si)si.checked=S._shareAnswers!==false;}
+  syncShareToggles();
   renderPredCard();
   document.getElementById('prof-name').textContent=S.user.name;document.getElementById('prof-email').textContent=S.user.name||S.user.email||S._city||'';
   document.getElementById('s-pts').textContent=S.pts;document.getElementById('s-ans').textContent=S.ans;document.getElementById('s-str').textContent=S.streak;
@@ -4495,9 +4528,9 @@ async function answerPrediction(guess){
 }
 async function setShareAnswers(v){
   const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
-  const prev=S._shareAnswers!==false;S._shareAnswers=!!v;
+  const prev=S._shareAnswers!==false;S._shareAnswers=!!v;syncShareToggles();
   try{await db.collection('users').doc(uid).update({shareAnswers:!!v});trackEvent('share_answers',{enabled:!!v});}
-  catch(e){console.warn('setShareAnswers:',e);S._shareAnswers=prev;const i=document.getElementById('share-answers-inp');if(i)i.checked=prev;showToast("Impossible d'enregistrer ce réglage.",'error');}
+  catch(e){console.warn('setShareAnswers:',e);S._shareAnswers=prev;syncShareToggles();showToast("Impossible d'enregistrer ce réglage.",'error');}
 }
 
 // ─── États de l'accueil (U6) ─────────────────────────────────
@@ -5365,64 +5398,92 @@ async function loadFriendsFromFirestore(uids) {
 }
 
 // ─── Gérer les commerces depuis le profil ─────────────────────
-let _mmConsents = {};
+let _mmConsents = {};   // état en cours d'édition : id -> autorisé ?
+let _mmOrig = new Set(); // état enregistré au moment de l'ouverture
+let _mmAll = [];        // commerces vérifiés de la ville (+ ceux déjà autorisés)
+
+function mmDirtyCount() {
+  const ids = new Set([..._mmOrig, ...Object.keys(_mmConsents)]);
+  let n = 0; ids.forEach(id => { if(!!_mmConsents[id] !== _mmOrig.has(id)) n++; });
+  return n;
+}
+function mmUpdateBar() {
+  const n = mmDirtyCount();
+  const on = Object.values(_mmConsents).filter(Boolean).length;
+  const sum = document.getElementById('mm-summary');
+  if(sum) sum.textContent = on + ' autorisé' + (on > 1 ? 's' : '') + ' sur ' + _mmAll.length + ' dans ' + (S._cityLabel || 'ta ville');
+  const off = document.getElementById('mm-all-off'); if(off) off.hidden = on === 0;
+  const btn = document.getElementById('mm-save-btn');
+  if(btn) { btn.disabled = n === 0; btn.textContent = n === 0 ? 'Aucune modification' : 'Enregistrer ' + n + ' modification' + (n > 1 ? 's' : ''); }
+}
+function mmBack() {
+  if(mmDirtyCount() && !confirm('Abandonner tes modifications ?')) return;
+  goNav('profile');
+}
+function mmDisableAll() {
+  Object.keys(_mmConsents).forEach(id => { _mmConsents[id] = false; });
+  mmRender();
+}
+function mmRender() {
+  const q = ((document.getElementById('mm-search') || {}).value || '').trim().toLowerCase();
+  const match = m => !q || (m.brandName || m.name || '').toLowerCase().includes(q) || (m.sector || '').toLowerCase().includes(q);
+  const authList = document.getElementById('mm-authorized-list');
+  const availList = document.getElementById('mm-available-list');
+  authList.innerHTML = ''; availList.innerHTML = '';
+  function item(m, container) {
+    const checked = !!_mmConsents[m.id];
+    const label = m.brandName || m.name || 'Commerce';
+    const n = questionsAsked(label);
+    const sub = (m.sector || m.address || m.city || '') + (_mmOrig.has(m.id) ? ' · ' + n + ' question' + (n > 1 ? 's' : '') + ' posée' + (n > 1 ? 's' : '') : '');
+    const d = document.createElement('div');
+    d.className = 'brand-item' + (checked ? ' on' : '');
+    d.innerHTML = `${logoHTML(label,44,m.logoUrl)}<div style="flex:1;min-width:0"><div class="bi-name">${esc(label)}</div><div class="bi-use">${esc(sub)}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} data-mid="${esc(m.id)}" aria-label="Autoriser ${esc(label)}"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
+    d.querySelector('input').addEventListener('change', function() {
+      _mmConsents[m.id] = this.checked;
+      d.classList.toggle('on', this.checked);
+      mmUpdateBar();
+    });
+    container.appendChild(d);
+  }
+  const auth = _mmAll.filter(m => _mmOrig.has(m.id) && match(m));
+  const avail = _mmAll.filter(m => !_mmOrig.has(m.id) && match(m));
+  auth.forEach(m => item(m, authList));
+  avail.forEach(m => item(m, availList));
+  const hasAuthAtAll = _mmAll.some(m => _mmOrig.has(m.id)), hasAvailAtAll = _mmAll.some(m => !_mmOrig.has(m.id));
+  document.getElementById('mm-authorized-section').style.display = (auth.length || (!q && !hasAuthAtAll)) ? '' : 'none';
+  document.getElementById('mm-available-section').style.display = (avail.length || (!q && !hasAvailAtAll)) ? '' : 'none';
+  if(!q && !hasAuthAtAll) authList.innerHTML = '<div style="padding:12px 18px 4px;color:var(--ink2);font-size:13px">Aucun commerce autorisé pour l\'instant.</div>';
+  if(!q && !hasAvailAtAll) availList.innerHTML = '<div style="padding:12px 18px 4px;color:var(--ink2);font-size:13px">' + (_mmAll.length ? 'Tous les commerces de ta ville sont déjà autorisés !' : 'Aucun commerce vérifié dans ta ville pour l\'instant.') + '</div>';
+  document.getElementById('mm-nomatch').style.display = (q && !auth.length && !avail.length) ? 'block' : 'none';
+  mmUpdateBar();
+}
 
 async function openManageMerchants() {
   goTo('manage-merchants');
   document.getElementById('bnav').classList.remove('show');
   const authList = document.getElementById('mm-authorized-list');
   const availList = document.getElementById('mm-available-list');
+  const search = document.getElementById('mm-search'); if(search) search.value = '';
   authList.innerHTML = '<div style="text-align:center;padding:20px;color:var(--ink3);font-size:13px">Chargement…</div>';
   availList.innerHTML = '';
-
+  _mmAll = [];
+  _mmOrig = new Set(S._authorizedMerchants || []);
   _mmConsents = {};
-  (S._authorizedMerchants || []).forEach(id => { _mmConsents[id] = true; });
-
+  _mmOrig.forEach(id => { _mmConsents[id] = true; });
+  mmUpdateBar();
   try {
     const city = normalizeCity(S._city || '');
     const snap = await db.collection('merchants').where('status','==','verified').where('city','==',city).get();
-    const allMerchants = [];
+    const all = [];
     snap.forEach(doc => {
       const d = doc.data();
-      if(!city || normalizeCity(d.city||'') === city) allMerchants.push({ id: doc.id, ...d });
+      if(!city || normalizeCity(d.city||'') === city) all.push({ id: doc.id, ...d });
     });
-
-    // also include authorized merchants not in Firestore result (local cache)
-    (S._nearbyMerchants || []).forEach(m => {
-      if(!allMerchants.find(x => x.id === m.id)) allMerchants.push(m);
-    });
-
-    const authIds = new Set(S._authorizedMerchants || []);
-    const authorized = allMerchants.filter(m => authIds.has(m.id));
-    const available  = allMerchants.filter(m => !authIds.has(m.id));
-
-    function mmRenderItem(m, container) {
-      const checked = !!_mmConsents[m.id];
-      const label = m.brandName || m.name || 'Commerce';
-      const sub   = (m.sector || m.address || m.city || '') + (checked ? ' · ' + questionsAsked(label) + ' question' + (questionsAsked(label) > 1 ? 's' : '') + ' posée' + (questionsAsked(label) > 1 ? 's' : '') : '');
-      const d = document.createElement('div');
-      d.className = 'brand-item' + (checked ? ' on' : '');
-      d.innerHTML = `${logoHTML(label,44,m.logoUrl)}<div style="flex:1;min-width:0"><div class="bi-name">${esc(label)}</div><div class="bi-use">${esc(sub)}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} data-mid="${m.id}"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
-      d.querySelector('input').addEventListener('change', function() {
-        _mmConsents[m.id] = this.checked;
-        d.classList.toggle('on', this.checked);
-      });
-      container.appendChild(d);
-    }
-
-    authList.innerHTML = '';
-    if(!authorized.length) {
-      authList.innerHTML = '<div style="padding:12px 18px 4px;color:var(--ink3);font-size:13px">Aucun commerce autorisé pour l\'instant.</div>';
-    } else {
-      authorized.forEach(m => mmRenderItem(m, authList));
-    }
-
-    availList.innerHTML = '';
-    if(!available.length) {
-      availList.innerHTML = '<div style="padding:12px 18px 4px;color:var(--ink3);font-size:13px">Tous les commerces de ta ville sont déjà autorisés !</div>';
-    } else {
-      available.forEach(m => mmRenderItem(m, availList));
-    }
+    // commerces déjà autorisés absents du résultat (cache local)
+    (S._nearbyMerchants || []).forEach(m => { if(!all.find(x => x.id === m.id)) all.push(m); });
+    all.sort((x, y) => (x.brandName || x.name || '').localeCompare(y.brandName || y.name || '', 'fr'));
+    _mmAll = all;
+    mmRender();
   } catch(e) {
     console.warn('openManageMerchants:', e);
     authList.innerHTML = '<div style="padding:20px 18px;color:var(--ink2);font-size:13px">Impossible de charger les commerces. Réessaie.</div>';
@@ -5468,13 +5529,13 @@ async function saveMerchantConsents() {
     await batch.commit();
     S._authorizedMerchants = newAuthorized;
     if(newAuthorized.length) loadNearbyMerchants(newAuthorized);
-    goTo('profile');
-    document.getElementById('bnav').classList.add('show');
-    refreshProfile();
+    _mmOrig = new Set(newAuthorized);
+    goNav('profile');
+    showToast('Modifications enregistrées.', 'success');
   } catch(e) {
     console.warn('saveMerchantConsents:', e);
     showVoucherError('Erreur lors de la sauvegarde.');
-    if(btn) { btn.textContent = 'Enregistrer les modifications'; btn.disabled = false; }
+    mmUpdateBar();
   }
 }
 
@@ -5737,6 +5798,54 @@ submitAns = function() {
       if(btn && curQuestion() === q) btn.disabled = false;
     });
 };
+
+// ─── Données et confidentialité ──────────────────────────────
+function syncShareToggles() {
+  ['share-answers-inp', 'share-answers-inp2'].forEach(id => { const i = document.getElementById(id); if(i) i.checked = S._shareAnswers !== false; });
+}
+function openSettingsAcc() {
+  goNav('profile');
+  const c = document.getElementById('share-answers-card');
+  if(c) { c.classList.add('open'); setTimeout(() => c.scrollIntoView({ block: 'center', behavior: 'smooth' }), 350); }
+}
+function openPrivacyData() {
+  renderPrivacyData();
+  goTo('privacy-data');
+}
+function renderPrivacyData() {
+  const el = document.getElementById('pd-body'); if(!el) return;
+  const nAuth = (S._authorizedMerchants || []).length;
+  const nFr = (S.friends || []).length;
+  const cons = window.NVConsent ? (NVConsent.decided() ? (NVConsent.analytics() ? 'acceptée' : 'refusée') : 'pas encore choisie') : 'refusée';
+  const mail = 'mailto:noovaoffr@gmail.com?subject=' + encodeURIComponent("Demande d'accès à mes données") + '&body=' + encodeURIComponent('Bonjour, je souhaite obtenir une copie de mes données personnelles. Compte : ' + ((S.user && S.user.email) || ''));
+  el.innerHTML = `
+    <div class="pd-h">Qui voit quoi</div>
+    <div class="pd-card">
+      <div class="pd-row"><div class="pd-t">Les commerces que tu autorises (${nAuth})</div><div class="pd-d">Ils voient tes réponses à leurs propres questions et ton profil anonyme : ville, tranche d'âge, centres d'intérêt. Jamais les commerces que tu n'as pas autorisés.</div><button type="button" class="pd-act" onclick="openManageMerchants()">Gérer mes commerces →</button></div>
+      <div class="pd-row"><div class="pd-t">Tes amis${nFr ? ' (' + nFr + ')' : ''}</div><div class="pd-d">Ils voient ton prénom, ta photo, ton niveau, ta série et ton activité. Tes réponses ne leur sont montrées que si tu le permets.</div>
+        <label class="pd-tgl"><span>Montrer mes réponses à mes amis</span><span class="tgl"><input type="checkbox" id="share-answers-inp2" aria-label="Montrer mes réponses à mes amis" onchange="setShareAnswers(this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></span></label></div>
+      <div class="pd-row"><div class="pd-t">Les autres habitants</div><div class="pd-d">Ils ne voient jamais qui tu es : seulement des pourcentages, à partir de 5 réponses.</div></div>
+      <div class="pd-row"><div class="pd-t">L'équipe Noova</div><div class="pd-d">Accède aux données pour faire fonctionner et sécuriser le service (modération, lutte contre la fraude). Aucune revente à des tiers.</div></div>
+    </div>
+    <div class="pd-h">Ce que Noova conserve</div>
+    <div class="pd-card">
+      <div class="pd-row"><div class="pd-t">Ton compte</div><div class="pd-d">Prénom, e-mail, ville, tranche d'âge, centres d'intérêt et photo (facultative).</div></div>
+      <div class="pd-row"><div class="pd-t">Ton activité</div><div class="pd-d">Tes réponses, tes points et NOOVS, ta série, tes amis et tes récompenses.</div></div>
+      <div class="pd-row"><div class="pd-t">Ta position</div><div class="pd-d">Elle sert uniquement à afficher les commerces autour de toi et n'est pas enregistrée.</div></div>
+      <div class="pd-row"><div class="pd-t">Tes droits</div><div class="pd-d">Tu peux corriger tes informations dans Profil, demander une copie de tes données, ou tout supprimer.</div>
+        <a class="pd-act" href="${mail}">Demander une copie de mes données</a> · <a class="pd-act" href="/confidentialite.html" target="_blank" rel="noopener">Politique de confidentialité</a></div>
+    </div>
+    <div class="pd-h">Cookies et mesure d'audience</div>
+    <div class="pd-card">
+      <div class="pd-row"><div class="pd-t">Mesure d'audience : ${cons}</div><div class="pd-d">Elle ne démarre que si tu l'acceptes, et tu peux changer d'avis à tout moment.</div><button type="button" class="pd-act" data-nv-cookies>Gérer mes cookies</button> · <a class="pd-act" href="/cookies.html" target="_blank" rel="noopener">Politique de cookies</a></div>
+    </div>
+    <div class="pd-h">Aller plus loin</div>
+    <div class="pd-card">
+      <div class="pd-row"><div class="pd-t">Révoquer tous les consentements, supprimer ton compte</div><div class="pd-d">Ces deux actions se trouvent dans Profil → Réglages.</div><button type="button" class="pd-act" onclick="openSettingsAcc()">Ouvrir les réglages →</button></div>
+    </div>
+    <div style="height:40px"></div>`;
+  syncShareToggles();
+}
 
 // ─── Zone danger ─────────────────────────────────────────────
 async function revokeAllConsents() {
