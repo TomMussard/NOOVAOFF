@@ -293,6 +293,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .sso-wrap{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
 .sso-btn{width:100%;padding:14px;border-radius:var(--r-pill);background:var(--surface);border:none;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;transition:all .13s;box-shadow:var(--shadow-card);font-family:var(--fb)}
 .sso-btn:active{transform:scale(.97)}
+.sso-apple{background:#000;color:#fff;margin-top:9px}
 .sso-div{display:flex;align-items:center;gap:10px;margin:2px 0 16px}
 .sso-line{flex:1;height:1px;background:var(--bg3)}
 .sso-or{font-size:12px;color:var(--ink3)}
@@ -3882,10 +3883,7 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
       Continuer avec Google
     </button>
 
-    <!-- Apple Sign-In en pause : bouton masqué tant que le Services ID + la clé côté
-         Apple Developer et le provider Firebase ne sont pas configurés (signInWithApple()
-         reste dans le code, prêt à réactiver — il suffit de retirer ce display:none). -->
-    <button onclick="signInWithApple()" style="display:none;width:100%;padding:14px 16px;border-radius:14px;background:#000;border:none;color:#fff;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer;align-items:center;justify-content:center;gap:10px;margin-top:9px">
+    <button type="button" id="aw-apple-btn" onclick="signInWithApple()" class="sso-btn sso-apple" aria-label="Continuer avec Apple">
       <svg aria-hidden="true" focusable="false" width="16" height="18" viewBox="0 0 16 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path fill="#fff" d="M13.05 9.53c-.02-2.06 1.68-3.05 1.76-3.1-.96-1.4-2.45-1.6-2.98-1.62-1.27-.13-2.48.75-3.12.75-.65 0-1.63-.73-2.69-.71-1.38.02-2.66.8-3.37 2.03-1.44 2.5-.37 6.2 1.03 8.23.69.99 1.5 2.1 2.58 2.06 1.03-.04 1.42-.67 2.67-.67 1.24 0 1.6.67 2.69.65 1.11-.02 1.82-1 2.49-2 .79-1.14 1.11-2.25 1.13-2.31-.02-.01-2.17-.83-2.19-3.31zM11 3.34c.56-.68.94-1.62.83-2.56-.81.03-1.79.54-2.37 1.22-.52.6-.97 1.57-.85 2.49.91.07 1.83-.46 2.39-1.15z"/></svg>
       Continuer avec Apple
     </button>
@@ -4180,7 +4178,11 @@ function awFrErr(code) {
     'auth/invalid-credential':'Email ou mot de passe incorrect.',
     'auth/email-already-in-use':'Cet email est déjà utilisé.',
     'auth/weak-password':'Mot de passe trop court (6 car. min).',
-    'auth/invalid-email':'Email invalide.'
+    'auth/invalid-email':'Email invalide.',
+    'auth/account-exists-with-different-credential':'Un compte existe déjà avec cet email : connecte-toi avec ta première méthode (email, Google ou Apple).',
+    'auth/operation-not-allowed':'Cette méthode de connexion n\'est pas encore disponible. Utilise ton email.',
+    'auth/network-request-failed':'Connexion impossible. Vérifie ta connexion internet.',
+    'auth/too-many-requests':'Trop de tentatives. Réessaie dans quelques minutes.'
   })[code] || 'Erreur. Réessaie.';
 }
 
@@ -5874,8 +5876,10 @@ async function _completeSocialSignIn(cred) {
   }
 }
 
-async function signInWithGoogle() {
-  const provider = new firebase.auth.GoogleAuthProvider();
+// Connexion Google / Apple par fenêtre surgissante. (La redirection n'est volontairement pas utilisée :
+// elle exige que le domaine d'authentification soit le même que celui du site, sinon Safari et
+// Chrome bloquent le stockage tiers et la connexion échoue sans message.)
+async function _socialSignIn(provider) {
   try {
     // Comme pour l'inscription email/mot de passe : on prend nous-mêmes la main sur la
     // suite (_completeSocialSignIn) plutôt que de laisser onAuthStateChanged se déclencher
@@ -5886,24 +5890,20 @@ async function signInWithGoogle() {
     await _completeSocialSignIn(cred);
   } catch(e) {
     _skipNextAuth = false;
-    if(e.code !== 'auth/popup-closed-by-user') awShowErr(awFrErr(e.code));
+    if(e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') return;
+    awShowErr(e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment'
+      ? 'La fenêtre de connexion n\'a pas pu s\'ouvrir. Autorise les fenêtres surgissantes, ouvre Noova dans Safari ou Chrome, ou utilise ton email.'
+      : awFrErr(e.code));
   }
 }
-
-async function signInWithApple() {
-  // Nécessite : provider Apple activé dans Firebase Auth (Services ID, clé Sign in with
-  // Apple et domaine vérifiés côté Apple Developer) — voir configuration à faire côté compte.
+function signInWithGoogle() { return _socialSignIn(new firebase.auth.GoogleAuthProvider()); }
+function signInWithApple() {
+  // Nécessite : provider Apple activé dans Firebase Auth (Services ID, clé « Sign in with Apple »
+  // et domaine vérifiés côté Apple Developer). Apple ne renvoie le nom qu'à la toute première connexion.
   const provider = new firebase.auth.OAuthProvider('apple.com');
   provider.addScope('email');
   provider.addScope('name');
-  try {
-    _skipNextAuth = true;
-    const cred = await auth.signInWithPopup(provider);
-    await _completeSocialSignIn(cred);
-  } catch(e) {
-    _skipNextAuth = false;
-    if(e.code !== 'auth/popup-closed-by-user') awShowErr(awFrErr(e.code));
-  }
+  return _socialSignIn(provider);
 }
 
 let _gcwAge = '';
@@ -5958,9 +5958,7 @@ function hideAppLoader() {
   setTimeout(() => { try { el.remove(); } catch(e){} }, 650);
 }
 
-auth.onAuthStateChanged(user => {
-  _authDone = true;
-  if(_skipNextAuth) { _skipNextAuth = false; return; }
+function routeAuthState(user) {
   const loading = document.getElementById('auth-loading');
   if(loading) loading.style.display = 'none';
   hideAppLoader();
@@ -5979,7 +5977,13 @@ auth.onAuthStateChanged(user => {
     const obBtn=document.getElementById('ob-btn');if(obBtn)obBtn.textContent='Suivant →';
     goTo('onboard');
   }
+}
+auth.onAuthStateChanged(user => {
+  _authDone = true;
+  if(_skipNextAuth) { _skipNextAuth = false; return; }
+  routeAuthState(user);
 });
+
 </script>
 
 <!-- COMPARE SHEET -->
