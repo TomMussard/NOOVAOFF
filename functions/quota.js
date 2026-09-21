@@ -5,7 +5,8 @@
  *  - Le quota vient de merchants.monthlyQuestionQuota (fixé par l'admin), sinon du défaut réglable
  *    (QUOTA.DEFAULT_MONTHLY_QUESTIONS, carte « Réglages de l'engagement » de l'admin).
  *  - Une campagne consomme autant de questions qu'elle en contient, dès sa CRÉATION (brouillon compris),
- *    et supprimer la campagne ne rend rien : un registre (quotaLedger) garde la trace.
+ *    et supprimer la campagne ne rend rien (et n'ajoute rien) : un registre (quotaLedger) garde la trace,
+ *    même si la campagne est supprimée avant que le comptage ait tourné (le déclencheur reçoit une copie de ses données).
  *  - Au-delà du quota, la campagne est bloquée (status « blocked ») et n'est jamais diffusée ni notifiée.
  *    Les règles Firestore interdisent au commerçant de la débloquer ou d'ajouter des questions après coup.
  * Le mois est le mois calendaire à Paris.
@@ -50,12 +51,12 @@ async function accountCampaign(campaignId, camp, now) {
   const usedRef = merchantRef.collection("quota").doc(month);
   const campRef = db().collection("campaigns").doc(campaignId);
   return db().runTransaction(async (tx) => {
-    const [l, u] = await Promise.all([tx.get(ledgerRef), tx.get(usedRef)]);
+    const [l, u, c] = await Promise.all([tx.get(ledgerRef), tx.get(usedRef), tx.get(campRef)]);
     if (l.exists) return l.data().allowed === true;                              // déjà comptée (déclencheur livré deux fois)
     const used = (u.data() || {}).used || 0;
     if (used + n > quota) {
       tx.set(ledgerRef, { n, month, allowed: false, createdAt: FieldValue.serverTimestamp() });
-      tx.update(campRef, { status: "blocked", blockedReason: "quota" });
+      if (c.exists) tx.update(campRef, { status: "blocked", blockedReason: "quota" });   // supprimée entre-temps : rien à bloquer
       return false;
     }
     tx.set(usedRef, { used: used + n, month }, { merge: true });

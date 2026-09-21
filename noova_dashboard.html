@@ -369,6 +369,20 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   cursor: pointer; transition: all .15s;
 }
 .age-chip.sel { border-color: var(--violet); background: var(--vd); color: var(--violet); }
+/* Durée de campagne (facultative) + estimation */
+.opt-tag { font-family: var(--fb); font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--ink2); background: var(--bg3); border-radius: 99px; padding: 3px 9px; margin-left: 8px; vertical-align: middle; }
+.dur-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.dur-chip { padding: 9px 14px; border-radius: 99px; border: 1.5px solid var(--border); background: var(--card); color: var(--ink2); font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: var(--fb); }
+.dur-chip.sel { border-color: var(--ink); background: var(--ink); color: #fff; }
+.dur-custom { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 12.5px; color: var(--ink2); flex-wrap: wrap; }
+.dur-custom input { width: 96px; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; background: var(--card); color: var(--ink); font-family: var(--fb); }
+.dur-end { margin-top: 10px; font-size: 12.5px; color: var(--ink2); }
+.dur-est { margin: 4px 0 18px; padding: 16px 18px; border-radius: var(--r); background: var(--md); border: 1px solid rgba(11,171,132,.2); }
+.dur-est-t { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--mint-text); margin-bottom: 6px; }
+.dur-est-n { font-family: var(--fd); font-weight: 800; font-size: 26px; color: var(--ink); letter-spacing: -.5px; line-height: 1.2; }
+.dur-est-d { font-size: 12px; color: var(--ink2); line-height: 1.6; margin-top: 6px; }
+.loc-fixed { display: flex; align-items: center; gap: 10px; padding: 13px 15px; border-radius: 12px; background: var(--bg2); border: 1.5px solid var(--border); font-size: 13px; color: var(--ink2); }
+.loc-fixed b { color: var(--ink); font-size: 14px; }
 /* Volume slider */
 .vol-wrap { display: flex; align-items: center; gap: 14px; }
 .vol-num { font-family: var(--fd); font-weight: 800; font-size: 32px; color: var(--ink); min-width: 80px; }
@@ -863,7 +877,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
           <div class="wizard-steps" id="wiz-steps">
             <div class="wiz-step-btn active" data-step="0"><div class="wiz-circle">1</div><div class="wiz-step-lbl">Questions</div></div>
             <div class="wiz-step-btn" data-step="1"><div class="wiz-circle">2</div><div class="wiz-step-lbl">Audience</div></div>
-            <div class="wiz-step-btn" data-step="2"><div class="wiz-circle">3</div><div class="wiz-step-lbl">Volume</div></div>
+            <div class="wiz-step-btn" data-step="2"><div class="wiz-circle">3</div><div class="wiz-step-lbl">Durée</div></div>
             <div class="wiz-step-btn" data-step="3"><div class="wiz-circle">4</div><div class="wiz-step-lbl">Validation</div></div>
           </div>
 
@@ -981,9 +995,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               <div>
                 <div class="step-card">
                   <div class="step-card-title">Ciblez votre audience</div>
-                  <div class="step-card-sub" id="aud-subtitle">Chaque filtre affine les profils éligibles. C'est la <strong>localisation de la question</strong> (pas de l'entreprise) qui détermine le bassin de répondants.</div>
+                  <div class="step-card-sub" id="aud-subtitle">Chaque filtre affine les profils éligibles. Vos questions sont posées aux habitants de <strong class="wz-city">votre ville</strong> : affinez seulement par tranche d'âge.</div>
                   <div class="field">
-                    <label class="field-lbl" style="display:flex;align-items:center;justify-content:space-between">Thèmes d'intérêt <span style="color:var(--ink3);font-weight:400">(laisser vide = tous)</span><button type="button" onclick="toggleAllThemes()" style="background:none;border:none;padding:0;font-size:11px;font-weight:700;color:var(--coral-text);cursor:pointer;text-transform:none;letter-spacing:0">Tout sélectionner</button></label>
+                    <label class="field-lbl" style="display:flex;align-items:center;justify-content:space-between">Thèmes d'intérêt <span style="color:var(--ink3);font-weight:400">(indicatif)</span><button type="button" onclick="toggleAllThemes()" style="background:none;border:none;padding:0;font-size:11px;font-weight:700;color:var(--coral-text);cursor:pointer;text-transform:none;letter-spacing:0">Tout sélectionner</button></label>
                     <div class="theme-grid" id="theme-grid">
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.3 3.6 5.6 3.6 9s-1.2 6.7-3.6 9c-2.4-2.3-3.6-5.6-3.6-9S9.6 5.3 12 3z"/></svg> Sport</div>
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 20s-7-4.4-7-9.8A4.2 4.2 0 0 1 12 7.5a4.2 4.2 0 0 1 7 2.7C19 15.6 12 20 12 20z"/></svg> Bien-être</div>
@@ -1004,6 +1018,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Gastronomie</div>
                       <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5H18.5V10"/><path d="M10 19.5v-6h4v6"/></svg> Immobilier</div>
                     </div>
+                    <div style="font-size:11.5px;color:var(--ink2);margin-top:8px">Les thèmes sont indicatifs : ils ne restreignent pas encore les habitants à qui la question est posée.</div>
                   </div>
                   <div class="field">
                     <label class="field-lbl">Tranches d'âge <span style="color:var(--ink3);font-weight:400">(laisser vide = toutes)</span></label>
@@ -1017,29 +1032,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     </div>
                   </div>
                   <div class="field" style="margin-bottom:0">
-                    <label class="field-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg> Localisation des répondants</label>
-                    <select class="field-inp" id="aud-loc-sel" style="cursor:pointer" onchange="updAud();updVol(document.getElementById('vol-sl').value)">
-                      <option value="national">Toute la France (moins cher)</option>
-                      <optgroup label="── Grandes régions ──">
-                        <option value="idf">Île-de-France</option>
-                        <option value="aura">Auvergne-Rhône-Alpes</option>
-                        <option value="paca">PACA</option>
-                        <option value="occ">Occitanie</option>
-                        <option value="na">Nouvelle-Aquitaine</option>
-                        <option value="bre">Bretagne</option>
-                        <option value="pdl">Pays de la Loire</option>
-                        <option value="nor">Normandie</option>
-                        <option value="ge">Grand Est</option>
-                        <option value="hdf">Hauts-de-France</option>
-                        <option value="bfc">Bourgogne-Franche-Comté</option>
-                        <option value="cvl">Centre-Val de Loire</option>
-                        <option value="cor">Corse</option>
-                      </optgroup>
-                      <optgroup label="── Villes actives ──" id="aud-loc-cities-optgroup">
-                        <option disabled value="">Chargement des villes…</option>
-                      </optgroup>
-                    </select>
-                    <div style="font-size:11px;color:var(--ink3);margin-top:5px;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg> Cibler une ville ou région précise garantit une audience locale plus pertinente.</div>
+                    <label class="field-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg> Localisation</label>
+                    <div class="loc-fixed" id="aud-loc-fixed"><span><b id="aud-loc-city" class="wz-city">Votre ville</b><br><span style="font-size:12px">Vos questions sont posées aux habitants de votre ville.</span></span></div>
                   </div>
                 </div>
                 <div class="step-card" style="background:var(--vd);border-color:rgba(161,78,8,.2)">
@@ -1053,17 +1047,13 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                 </div>
                 <div class="wizard-actions">
                   <button class="wiz-btn-back" onclick="wzGo(0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M20 12H4"/><path d="M11 5l-7 7 7 7"/></svg> Retour</button>
-                  <button class="wiz-btn-next" onclick="wzGo(2)">Volume <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
+                  <button class="wiz-btn-next" onclick="wzGo(2)">Durée <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
                 </div>
               </div>
               <div>
                 <div class="preview-box">
-                  <div class="preview-title">Répartition audience estimée</div>
-                  <div id="aud-preview-bars" style="margin-bottom:12px">
-                    <div class="aud-row"><div class="aud-lbl">18–34 ans</div><div class="aud-bar"><div class="aud-fill" style="width:58%;background:var(--coral)"></div></div><div class="aud-val">58%</div></div>
-                    <div class="aud-row"><div class="aud-lbl">35–49 ans</div><div class="aud-bar"><div class="aud-fill" style="width:31%;background:var(--violet)"></div></div><div class="aud-val">31%</div></div>
-                    <div class="aud-row"><div class="aud-lbl">50+ ans</div><div class="aud-bar"><div class="aud-fill" style="width:11%;background:var(--ink3)"></div></div><div class="aud-val">11%</div></div>
-                  </div>
+                  <div class="preview-title" id="aud-dist-title">Habitants par tranche d'âge</div>
+                  <div id="aud-preview-bars" style="margin-bottom:12px"><div class="aud-row"><div class="aud-lbl">Chargement…</div></div></div>
                   <div style="background:var(--md);border-radius:var(--rx);padding:10px 12px;font-size:11px;color:var(--mint-text);line-height:1.6"><strong style="display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg> Consentement explicite</strong><br>Chaque profil a consenti explicitement à votre commerce. Révocable à tout moment depuis l'app.</div>
                 </div>
               </div>
@@ -1075,22 +1065,22 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div style="display:grid;grid-template-columns:1fr 240px;gap:18px">
               <div>
                 <div class="step-card">
-                  <div class="step-card-title">Volume de réponses</div>
-                  <div class="step-card-sub">Plus vous ciblez localement, plus la collecte peut prendre du temps — mais l'audience est plus précise.</div>
+                  <div class="step-card-title">Durée de la campagne <span class="opt-tag">facultatif</span></div>
+                  <div class="step-card-sub">Combien de temps la campagne reste-t-elle ouverte aux habitants de <strong class="wz-city">votre ville</strong> ? Sans limite, elle reste en ligne jusqu'à ce que vous la suspendiez ou la supprimiez.</div>
                   <div class="field">
-                    <label class="field-lbl">Nombre de réponses souhaité</label>
-                    <div class="vol-wrap">
-                      <div style="flex:1">
-                        <input type="range" class="vol-slider" id="vol-sl" min="50" max="5000" step="50" value="200" oninput="updVol(this.value)">
-                        <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--ink3)"><span>50</span><span>1 000</span><span>2 500</span><span>5 000</span></div>
-                      </div>
-                      <div class="vol-num" id="vol-num">200</div>
+                    <label class="field-lbl" id="dur-lbl">Durée</label>
+                    <div class="dur-chips" role="group" aria-labelledby="dur-lbl" id="dur-chips">
+                      <button type="button" class="dur-chip sel" data-days="" aria-pressed="true" onclick="pickDuration(this)">Sans limite</button>
+                      <button type="button" class="dur-chip" data-days="7" aria-pressed="false" onclick="pickDuration(this)">7 jours</button>
+                      <button type="button" class="dur-chip" data-days="14" aria-pressed="false" onclick="pickDuration(this)">14 jours</button>
+                      <button type="button" class="dur-chip" data-days="30" aria-pressed="false" onclick="pickDuration(this)">30 jours</button>
+                      <button type="button" class="dur-chip" data-days="60" aria-pressed="false" onclick="pickDuration(this)">60 jours</button>
+                      <button type="button" class="dur-chip" data-days="90" aria-pressed="false" onclick="pickDuration(this)">90 jours</button>
                     </div>
-                    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-                      <div class="est-chip"><span class="est-chip-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg></span>Délai estimé <span class="est-chip-val" id="est-delay">6h</span></div>
-                      <div class="est-chip"><span class="est-chip-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg></span>Localisation <span class="est-chip-val" id="est-loc-label">France entière</span></div>
-                    </div>
+                    <div class="dur-custom"><label for="dur-days">Ou un nombre de jours précis</label><input type="number" id="dur-days" min="1" max="365" inputmode="numeric" placeholder="ex : 21" oninput="typeDuration(this)"><span>jours</span></div>
+                    <div class="dur-end" id="dur-end"></div>
                   </div>
+                  <div class="dur-est" id="dur-est" aria-live="polite"><div class="dur-est-t">Réponses estimées</div><div class="dur-est-n">Calcul en cours…</div></div>
                   <div class="field" style="margin-bottom:0">
                     <label class="field-lbl">Nom de la campagne</label>
                     <input class="field-inp" id="camp-name-inp" placeholder="Ex : Test nouveau produit — Été 2025">
@@ -1113,22 +1103,18 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
               </div>
               <div>
                 <div class="preview-box">
-                  <div class="preview-title">Simulation livraison</div>
+                  <div class="preview-title">Calendrier</div>
                   <div style="display:flex;flex-direction:column;gap:10px">
                     <div style="background:var(--bg3);border-radius:var(--rx);padding:11px 12px">
-                      <div style="font-size:10px;color:var(--ink3);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Aujourd'hui</div>
-                      <div style="font-size:12px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Lancement campagne</div>
+                      <div style="font-size:10px;color:var(--ink2);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Aujourd'hui</div>
+                      <div style="font-size:12px;color:var(--ink2);font-weight:600">Lancement de la campagne</div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink3)" id="sim-delay">~6h</div></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:2px;height:14px;background:var(--border)"></div><div style="font-size:11px;font-weight:700;color:var(--ink2)" id="sim-delay">sans limite</div><div style="width:2px;height:14px;background:var(--border)"></div></div>
                     <div style="background:var(--md);border-radius:var(--rx);padding:11px 12px;border:1px solid rgba(11,171,132,.2)">
-                      <div style="font-size:10px;color:var(--mint-text);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Collecte</div>
-                      <div style="font-size:12px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> <span id="sim-vol">200</span> réponses atteintes</div>
+                      <div style="font-size:10px;color:var(--mint-text);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Fin</div>
+                      <div style="font-size:12px;color:var(--ink2);font-weight:600" id="sim-end">Reste en ligne jusqu'à ce que vous l'arrêtiez</div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:1px;flex:1;background:var(--border);height:20px;margin:0 auto"></div><div style="font-size:10px;color:var(--ink3)">+48–72h</div></div>
-                    <div style="background:var(--vd);border-radius:var(--rx);padding:11px 12px;border:1px solid rgba(161,78,8,.2)">
-                      <div style="font-size:10px;color:var(--violet);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Livraison</div>
-                      <div style="font-size:12px;color:var(--ink2);font-weight:600;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20V9M10 20V4M16 20v-7M21 20H3"/></svg> Rapport disponible</div>
-                    </div>
+                    <div style="font-size:11px;color:var(--ink2);line-height:1.6">Les résultats se mettent à jour en temps réel dans « Mes campagnes ». Vous pourrez prolonger ou arrêter la campagne à tout moment.</div>
                   </div>
                 </div>
               </div>
@@ -1145,7 +1131,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                     <div class="recap-item"><div class="recap-lbl">Question</div><div class="recap-val" id="recap-q">Quel est votre critère principal lors de l'achat d'un équipement sportif ?</div></div>
                     <div class="recap-item"><div class="recap-lbl">Format</div><div class="recap-val" id="recap-fmt">Choix multiple · 5 options</div></div>
                     <div class="recap-item"><div class="recap-lbl">Audience</div><div class="recap-val" id="recap-aud">Sport + Bien-être · 18–49 ans</div></div>
-                    <div class="recap-item"><div class="recap-lbl">Volume</div><div class="recap-val big" id="recap-vol">500</div></div>
+                    <div class="recap-item"><div class="recap-lbl">Durée</div><div class="recap-val big" id="recap-vol">Sans limite</div></div>
                     <div class="recap-item"><div class="recap-lbl">Nom campagne</div><div class="recap-val" id="recap-name">Test équipement sportif — Été 2025</div></div>
                     <div class="recap-item" style="grid-column:span 2"><div class="recap-lbl">Portée estimée</div><div class="recap-val" id="recap-reach">Calcul en cours…</div></div>
                   </div>
@@ -1453,7 +1439,7 @@ function viewCampaign(campaignId) {
 }
 
 function renderCampModal(c, answers) {
-  const pct = c.volumeTarget ? Math.min(100, Math.round((c.answersCount||0)/c.volumeTarget*100)) : 0;
+  const pct = campProgress(c);
   const stMap   = { active:'En cours', draft:'Brouillon', paused:'Suspendue', completed:'Terminée' };
   const stColor = { active:'var(--coral)', draft:'var(--ink3)', paused:'var(--amber)', completed:'var(--mint)' };
   const dateStr = c.createdAt?.toDate ? c.createdAt.toDate().toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : '';
@@ -1543,10 +1529,10 @@ function renderCampModal(c, answers) {
     <div style="background:var(--bg2);border-radius:var(--rx);padding:14px">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
         <span style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink)">${c.answersCount||0} <span style="font-size:14px;font-weight:600;color:var(--ink3)">réponses</span></span>
-        <span style="font-size:12px;color:var(--ink3)">Objectif : ${c.volumeTarget||'—'}</span>
+        <span style="font-size:12px;color:var(--ink2)">${campEndLabel(c)}</span>
       </div>
-      <div style="background:var(--bg3);border-radius:4px;height:8px;overflow:hidden"><div style="background:linear-gradient(90deg,var(--coral),var(--violet));height:100%;width:${pct}%;border-radius:4px;transition:width .4s"></div></div>
-      <div style="font-size:11px;color:var(--ink3);margin-top:6px">${pct}% · ${c.targetCity||'Toutes villes'}</div>
+      ${pct===null?'':`<div style="background:var(--bg3);border-radius:4px;height:8px;overflow:hidden"><div style="background:linear-gradient(90deg,var(--coral),var(--violet));height:100%;width:${pct}%;border-radius:4px;transition:width .4s"></div></div>`}
+      <div style="font-size:11px;color:var(--ink2);margin-top:6px">${pct===null?'':pct+'% du temps écoulé · '}${c.cityLabel||c.targetCity||''}</div>
     </div>
     ${distHTML}
     ${profileHTML}
@@ -1596,8 +1582,20 @@ function openEditCamp(id) {
         <option value="completed" ${c.status==='completed'?'selected':''}>Terminée</option>
       </select>
     </div>
-    <div style="background:var(--bg2);border-radius:var(--rx);padding:12px;font-size:12px;color:var(--ink3);margin-bottom:18px;line-height:1.55">
-      <strong style="color:var(--ink2)">Question :</strong> ${c.question||'—'}
+    <div class="field">
+      <label class="field-lbl" for="edit-camp-dur">Durée <span class="opt-tag">facultatif</span></label>
+      <select class="field-inp" id="edit-camp-dur">
+        <option value="keep">${campEndLabel(c)} (inchangée)</option>
+        <option value="none">Sans limite de durée</option>
+        <option value="7">Jusqu'à 7 jours à partir d'aujourd'hui</option>
+        <option value="14">Jusqu'à 14 jours à partir d'aujourd'hui</option>
+        <option value="30">Jusqu'à 30 jours à partir d'aujourd'hui</option>
+        <option value="60">Jusqu'à 60 jours à partir d'aujourd'hui</option>
+        <option value="90">Jusqu'à 90 jours à partir d'aujourd'hui</option>
+      </select>
+    </div>
+    <div style="background:var(--bg2);border-radius:var(--rx);padding:12px;font-size:12px;color:var(--ink2);margin-bottom:18px;line-height:1.55">
+      <strong style="color:var(--ink);">Question :</strong> ${c.question||'—'}
     </div>
     <div style="display:flex;gap:9px">
       <button onclick="saveEditCamp('${id}')" style="flex:1;background:var(--coral);color:var(--ink);border:none;border-radius:var(--rx);padding:11px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px var(--cg)">Enregistrer</button>
@@ -1606,11 +1604,12 @@ function openEditCamp(id) {
 }
 
 async function deleteCampaign(id, name) {
-  if(!confirm(`Supprimer la campagne "${name}" ? Cette action est irréversible.`)) return;
+  if(!confirm(`Supprimer définitivement la campagne "${name}" ?\n\nLa suppression est irréversible. Les questions déjà utilisées ce mois-ci restent décomptées de votre quota : elles ne sont ni rendues ni ajoutées.`)) return;
   try {
     await db.collection('campaigns').doc(id).delete();
-    showToast('Campagne supprimée', 'delete');
+    showToast('Campagne supprimée définitivement', 'delete');
     closeCampModal();
+    loadQuota();   // le quota du mois ne bouge pas : la suppression ne rend rien
   } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 
@@ -1619,7 +1618,17 @@ async function saveEditCamp(id) {
   const status = document.getElementById('edit-camp-status')?.value;
   if(!name) { showToast('Le nom ne peut pas être vide','warning'); return; }
   try {
-    await db.collection('campaigns').doc(id).update({ name, status });
+    const upd = { name, status };
+    const dur = document.getElementById('edit-camp-dur')?.value || 'keep';
+    if(dur === 'none') { upd.endsAt = firebase.firestore.FieldValue.delete(); upd.durationDays = firebase.firestore.FieldValue.delete(); }
+    else if(dur !== 'keep') {
+      const d = parseInt(dur, 10);
+      upd.endsAt = firebase.firestore.Timestamp.fromMillis(Date.now() + d*86400000); upd.durationDays = d;
+    }
+    // Une campagne terminée (durée écoulée) qu'on prolonge repart automatiquement, sauf si on l'a volontairement suspendue.
+    const prev = _mCampaigns.find(x => x.id === id);
+    if(dur !== 'keep' && prev && prev.status === 'completed' && status === 'completed') upd.status = 'active';
+    await db.collection('campaigns').doc(id).update(upd);
     showToast('Campagne mise à jour', 'success');
     closeCampModal();
   } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
@@ -1674,17 +1683,18 @@ function wzGo(n){
   document.querySelectorAll('.step-panel').forEach((p,i)=>{p.classList[i===n?'add':'remove']('active')});
   document.querySelectorAll('.wiz-step-btn').forEach((b,i)=>{b.classList.remove('active','done');if(i<n)b.classList.add('done');else if(i===n)b.classList.add('active')});
   wzCur=n;
-  if(n===1) loadCitiesForAudience();
+  wzCityLabels();
+  if(n>=1) loadEstimate();
   if(n===3){
     const qs=wzQuestionsSummary();
     document.getElementById('recap-q').textContent=qs.length?(qs[0].q.substring(0,80)+(qs.length>1?'  (+ '+(qs.length-1)+' autre'+(qs.length>2?'s':'')+' question'+(qs.length>2?'s':'')+')':'')):'—';
     document.getElementById('recap-fmt').textContent=qs.map(x=>x.label).join(' · ')||'—';
-    document.getElementById('recap-vol').textContent=document.getElementById('vol-num').textContent;
+    document.getElementById('recap-vol').textContent=wzDurationLabel();
     document.getElementById('recap-name').textContent=document.getElementById('camp-name-inp').value;
     const ages=[...document.querySelectorAll('.age-chip.sel')].map(e=>e.textContent.trim()).filter(Boolean);
     const audEl=document.getElementById('recap-aud');
     if(audEl) audEl.textContent=((_mData&&(_mData.cityLabel||_mData.city))||'Ma ville')+' · '+(ages.length?ages.join(', '):'Tous les âges');
-    loadReachEstimate();
+    renderReachRecap();
   }
 }
 function wzSync(){ wzGo(wzCur); }
@@ -1698,6 +1708,7 @@ function wzQuestionsSummary(){
 }
 
 function resetWizard(){
+  _wzDays=null;{const di=document.getElementById('dur-days');if(di)di.value='';}renderDuration();
   const ta=document.getElementById('q-text-inp');if(ta)ta.value='';
   const ni=document.getElementById('camp-name-inp');if(ni)ni.value='';
   const pq=document.getElementById('preview-q');if(pq)pq.textContent='Votre question…';
@@ -1823,70 +1834,111 @@ function toggleAllThemes(){
   updAud();
 }
 function updAud(){
-  const sel=document.querySelectorAll('.th-chip.sel').length+document.querySelectorAll('.age-chip.sel').length;
-  const base=_totalConsentedUsers||0;
-  const count=base?Math.max(1,Math.floor(base*(0.4+sel*0.08))):'-';
-  document.getElementById('aud-count').textContent=count;
-  const footer=document.getElementById('aud-footer');
-  if(footer&&base) footer.textContent=base+' profils ayant donné leur consentement';
+  // Le nombre de profils éligibles vient des données réelles (habitants inscrits dans la ville, filtrés par tranche d'âge).
+  loadEstimate();
 }
 
-// ═══ VILLES DYNAMIQUES ═══════════════════════════════════════
-let _citiesLoaded = false;
-async function loadCitiesForAudience() {
-  if(_citiesLoaded) return;
-  const og = document.getElementById('aud-loc-cities-optgroup');
-  if(!og) return;
-  try {
-    const snap = await db.collection('cities').orderBy('count','desc').limit(60).get();
-    og.innerHTML = '';
-    if(snap.empty) {
-      const opt = document.createElement('option');
-      opt.disabled = true; opt.value = '';
-      opt.textContent = 'Aucune ville enregistrée pour l\'instant';
-      og.appendChild(opt);
-    } else {
-      snap.forEach(doc => {
-        const d = doc.data();
-        const opt = document.createElement('option');
-        opt.value = doc.id;
-        const label = d.label || doc.id.charAt(0).toUpperCase() + doc.id.slice(1);
-        opt.textContent = label + ' (' + (d.count || 0) + ' utilisateur' + ((d.count||0)>1?'s':'') + ')';
-        og.appendChild(opt);
-      });
-      _citiesLoaded = true;
-    }
-  } catch(e) {
-    if(og) og.innerHTML = '<option disabled value="">Erreur de chargement</option>';
-    console.warn('loadCitiesForAudience:', e);
+// ═══ LOCALISATION : toujours la ville du commerce ═══════════════
+// Un commerce du Mans questionne les Manceaux : plus de choix de ville ni de région dans l'assistant.
+function wzCityLabel(){ return (_mData && (_mData.cityLabel || _mData.city)) || 'votre ville'; }
+function wzCityLabels(){ document.querySelectorAll('.wz-city').forEach(e => { e.textContent = wzCityLabel(); }); }
+
+// ═══ DURÉE (facultative) + ESTIMATION ═══════════════════════════
+let _wzDays = null;          // null = sans limite
+let _est = null;             // dernière estimation renvoyée par le serveur
+let _estKey = '', _estTimer = null;
+function wzAges(){ return Array.from(document.querySelectorAll('.age-chip.sel')).map(el => el.textContent.trim()).filter(Boolean); }
+function wzDurationLabel(){ return _wzDays ? _wzDays + ' jour' + (_wzDays > 1 ? 's' : '') : 'Sans limite'; }
+function wzEndDate(){ return _wzDays ? new Date(Date.now() + _wzDays * 86400000) : null; }
+function fmtDay(d){ return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); }
+function pickDuration(btn){
+  _wzDays = btn.dataset.days ? parseInt(btn.dataset.days, 10) : null;
+  const inp = document.getElementById('dur-days'); if(inp) inp.value = '';
+  renderDuration();
+}
+function typeDuration(inp){
+  const v = parseInt(inp.value, 10);
+  _wzDays = v >= 1 ? Math.min(365, v) : null;
+  renderDuration();
+}
+// Réponses attendues sur `days` jours (30 si sans limite) : rythme réel de la ville, plafonné par le nombre d'habitants éligibles.
+function estimateFor(days){
+  const e = _est; if(!e) return null;
+  const cap = e.pool * e.questions, base = e.perDay * days;
+  const mid = Math.min(base, cap);
+  return { lo: Math.round(mid * 0.6), hi: Math.round(Math.min(base * 1.4, cap)), capped: base > cap };
+}
+function estimateHTML(){
+  const e = _est, city = wzCityLabel();
+  if(!e) return '<div class="dur-est-t">Réponses estimées</div><div class="dur-est-n">Calcul en cours…</div>';
+  if(!e.enoughData) {
+    return `<div class="dur-est-t">Réponses estimées</div><div class="dur-est-n">Pas encore chiffrable</div>
+      <div class="dur-est-d">${e.totalUsers} habitant${e.totalUsers > 1 ? 's' : ''} inscrit${e.totalUsers > 1 ? 's' : ''} à ${esc(city)} et ${e.answers14 || 0} réponse${(e.answers14 || 0) > 1 ? 's' : ''} sur les 14 derniers jours : l'activité est encore trop faible pour une estimation fiable. Elle se précisera avec l'usage de Noova dans votre ville.</div>`;
   }
+  const days = _wzDays || 30, r = estimateFor(days);
+  const range = r.hi < 5 ? 'moins de 5' : (r.lo === r.hi ? String(r.hi) : r.lo + ' à ' + r.hi);
+  const perDay = e.perDay >= 1 ? 'environ ' + Math.round(e.perDay) + ' réponse' + (Math.round(e.perDay) > 1 ? 's' : '') + ' par jour' : 'moins d\'une réponse par jour';
+  return `<div class="dur-est-t">Réponses estimées</div>
+    <div class="dur-est-n">${range} réponse${r.hi > 1 ? 's' : ''}</div>
+    <div class="dur-est-d">${_wzDays ? 'sur ' + _wzDays + ' jour' + (_wzDays > 1 ? 's' : '') : 'par période de 30 jours'} · ${perDay}<br>
+    Basé sur l'activité réelle des ${e.totalUsers} habitants inscrits à ${esc(city)} (${e.pool} éligibles), ${e.activeCampaigns} campagne${e.activeCampaigns > 1 ? 's' : ''} déjà en ligne.${r.capped ? '<br>Plafonné par le nombre d\'habitants éligibles.' : ''}<br>
+    <span style="color:var(--ink3)">Estimation indicative, non garantie.</span></div>`;
 }
-
-// ═══ VOLUME ══════════════════════════════════════════════════
-function updVol(v){
-  v=parseInt(v)||200;
-  document.getElementById('vol-num').textContent=v;
-  const locSel=document.getElementById('aud-loc-sel');
-  const locVal=locSel?locSel.value:'national';
-  const LOC_LABELS={'national':'France entière','idf':'Île-de-France','aura':'Auvergne-Rhône-Alpes','paca':'PACA','occ':'Occitanie','na':'Nouvelle-Aquitaine','bre':'Bretagne','pdl':'Pays de la Loire','nor':'Normandie','ge':'Grand Est','hdf':'Hauts-de-France','bfc':'Bourgogne-Franche-Comté','cvl':'Centre-Val de Loire','cor':'Corse'};
-  const REGIONS=['idf','aura','paca','occ','na','bre','pdl','nor','ge','hdf','bfc','cvl','cor'];
-  const locType=locVal==='national'?'national':REGIONS.includes(locVal)?'region':'city';
-  const locLabel=LOC_LABELS[locVal]||(locSel&&locSel.options[locSel.selectedIndex]?locSel.options[locSel.selectedIndex].text.replace(/\s*\(\d+.*?\)$/,'').trim():null)||'France entière';
-  // Délai indicatif : national répond plus vite, ville précise plus lentement (pool moyen : 1200 réponses/jour)
-  const poolFactor=locType==='national'?1:locType==='region'?0.3:0.1;
-  const delay=Math.ceil(v/(1200*poolFactor)*24);
-  const delayStr=delay<=24?delay+'h':Math.ceil(delay/24)+'j';
-  const elDelay=document.getElementById('est-delay');if(elDelay)elDelay.textContent=delayStr;
-  const elLocLbl=document.getElementById('est-loc-label');if(elLocLbl)elLocLbl.textContent=locLabel;
-  const elSimDelay=document.getElementById('sim-delay');if(elSimDelay)elSimDelay.textContent='~'+delayStr;
-  const elSimVol=document.getElementById('sim-vol');if(elSimVol)elSimVol.textContent=v;
-  const sl=document.getElementById('vol-sl');if(sl){const pct=(v-50)/(5000-50)*100;sl.style.background=`linear-gradient(to right,var(--coral) ${pct}%,rgba(23,20,26,.1) ${pct}%)`}
+function renderDuration(){
+  wzCityLabels();
+  document.querySelectorAll('#dur-chips .dur-chip').forEach(b => {
+    const on = (b.dataset.days ? parseInt(b.dataset.days, 10) : null) === _wzDays && !(document.getElementById('dur-days') || {}).value;
+    b.classList.toggle('sel', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  const end = wzEndDate();
+  const endEl = document.getElementById('dur-end');
+  if(endEl) endEl.textContent = end ? 'La campagne se terminera le ' + fmtDay(end) + '.' : 'Sans limite : elle reste en ligne jusqu\'à ce que vous l\'arrêtiez.';
+  const sd = document.getElementById('sim-delay'); if(sd) sd.textContent = _wzDays ? _wzDays + ' jour' + (_wzDays > 1 ? 's' : '') : 'sans limite';
+  const se = document.getElementById('sim-end'); if(se) se.textContent = end ? fmtDay(end) : 'Reste en ligne jusqu\'à ce que vous l\'arrêtiez';
+  const box = document.getElementById('dur-est'); if(box) box.innerHTML = estimateHTML();
+  renderReachRecap();
+  const cnt = document.getElementById('aud-count'); if(cnt) cnt.textContent = _est ? _est.pool : '—';
+  renderAgeDist();
+  const foot = document.getElementById('aud-footer'); if(foot) foot.textContent = _est ? _est.totalUsers + ' habitant' + (_est.totalUsers > 1 ? 's' : '') + ' inscrit' + (_est.totalUsers > 1 ? 's' : '') + ' à ' + wzCityLabel() : 'Habitants inscrits dans votre ville';
+}
+// Répartition réelle des habitants de la ville par tranche d'âge ; les tranches choisies sont en couleur.
+function renderAgeDist(){
+  const box = document.getElementById('aud-preview-bars'); if(!box) return;
+  const t = document.getElementById('aud-dist-title'); if(t) t.textContent = 'Habitants de ' + wzCityLabel() + ' par âge';
+  if(!_est || !_est.ageShare){ box.innerHTML = '<div class="aud-row"><div class="aud-lbl">Chargement…</div></div>'; return; }
+  const sel = wzAges(), rows = ['16-17','18-24','25-34','35-49','50-64','65+','unknown'];
+  box.innerHTML = rows.filter(k => k !== 'unknown' || _est.ageShare.unknown > 0).map(k => {
+    const pct = Math.round((_est.ageShare[k] || 0) * 100), on = !sel.length || sel.includes(k);
+    return `<div class="aud-row"><div class="aud-lbl">${k === 'unknown' ? 'Non renseigné' : k + ' ans'}</div><div class="aud-bar"><div class="aud-fill" style="width:${pct}%;background:${on ? 'var(--coral)' : 'var(--ink3)'}"></div></div><div class="aud-val">${pct}%</div></div>`;
+  }).join('');
+}
+function renderReachRecap(){
+  const el = document.getElementById('recap-reach'); if(!el) return;
+  if(!_est){ el.textContent = 'Calcul en cours…'; return; }
+  const r = _est.enoughData ? estimateFor(_wzDays || 30) : null;
+  el.textContent = _est.totalUsers === 0
+    ? `Aucun habitant inscrit à ${wzCityLabel()} pour l'instant : votre affiche en vitrine fera venir les premiers.`
+    : (r ? (r.hi < 5 ? 'moins de 5' : (r.lo === r.hi ? r.hi : r.lo + ' à ' + r.hi)) + ' réponses ' + (_wzDays ? 'sur ' + _wzDays + ' jours' : 'par période de 30 jours') + ' · ' : '') + `${_est.pool} habitant${_est.pool > 1 ? 's' : ''} éligible${_est.pool > 1 ? 's' : ''} à ${wzCityLabel()}` + (r ? ' (estimation indicative)' : ' (activité encore trop faible pour estimer les réponses)') + '.';
+}
+// Appel serveur (données agrégées uniquement), avec anti-rebond et sans rappel si rien n'a changé.
+function loadEstimate(){
+  const key = wzAges().join(',') + '|' + (typeof _wzQCount === 'number' ? _wzQCount : 1);
+  if(_est && key === _estKey){ renderDuration(); return; }
+  clearTimeout(_estTimer);
+  _estTimer = setTimeout(async () => {
+    const asked = key;
+    try {
+      const r = (await fx.httpsCallable('estimateCampaign')({ ageRanges: wzAges(), questions: typeof _wzQCount === 'number' ? _wzQCount : 1 })).data;
+      _est = r; _estKey = asked;
+    } catch(e) { console.warn('estimateCampaign:', e); _est = null; const box = document.getElementById('dur-est'); if(box) box.innerHTML = '<div class="dur-est-t">Réponses estimées</div><div class="dur-est-n">Estimation indisponible</div><div class="dur-est-d">Réessayez dans un instant.</div>'; return; }
+    renderDuration();
+  }, 300);
 }
 
 // ═══ LAUNCH ══════════════════════════════════════════════════
 function launchCampaign(){
   spawnConfetti();
-  setTimeout(()=>{showToast('Campagne lancée ! Rapport estimé dans 38h','rocket')},200);
+  setTimeout(()=>{showToast('Campagne lancée !','rocket')},200);
   setTimeout(()=>{navTo('campaigns',document.querySelectorAll('.sb-item')[2])},1500);
 }
 
@@ -2116,7 +2168,7 @@ function exportRegistry() {
 
 // ═══ INIT ════════════════════════════════════════════════════
 window.addEventListener('load',()=>{
-  updVol(500);updAud();updatePreview();
+  renderDuration();updatePreview();
   renderVerbatims('all');renderClusters();renderRecos();
   const inp=document.getElementById('q-text-inp');if(inp)inp.addEventListener('input',updatePreview);
 });
@@ -2223,29 +2275,30 @@ window.addEventListener('load',()=>{
     <div style="display:flex;flex-direction:column;gap:11px">
       <div id="aw-progress" style="display:none">
         <div style="display:flex;gap:6px;margin-bottom:8px"><div id="aw-p1" style="flex:1;height:4px;border-radius:99px;background:var(--coral)"></div><div id="aw-p2" style="flex:1;height:4px;border-radius:99px;background:var(--bg3)"></div></div>
-        <div id="aw-p-lbl" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)">Étape 1 sur 2 · Vous</div>
+        <div id="aw-p-lbl" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink2)">Étape 1 sur 2 · Votre établissement</div>
       </div>
       <datalist id="aw-city-list"><option value="Le Mans"><option value="Angers"></datalist>
+      <datalist id="aw-sector-list"><option value="Restauration"><option value="Boulangerie"><option value="Café"><option value="Beauté"><option value="Sport"><option value="Culture"><option value="Commerce"><option value="Ville et services"></datalist>
+      <div id="aw-siret-intro" style="display:none;font-size:12.5px;color:var(--ink2);line-height:1.55">Commencez par votre <strong>numéro SIRET</strong> : nous retrouvons automatiquement le nom, l'adresse et la ville de votre établissement.</div>
+      <input id="aw-siret"   type="text"  placeholder="Numéro SIRET (14 chiffres)"  inputmode="numeric" maxlength="17" oninput="awLookupSiret()" style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <div id="aw-siret-note" style="display:none;font-size:11.5px;color:var(--ink3);line-height:1.5;margin-top:-4px"></div>
       <input id="aw-brand"  type="text"     placeholder="Nom commercial"           autocomplete="organization"    style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-sector" type="text" list="aw-sector-list" placeholder="Catégorie (ex: Restauration)"                                  style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
-      <datalist id="aw-sector-list"><option value="Restauration"><option value="Boulangerie"><option value="Café"><option value="Beauté"><option value="Sport"><option value="Culture"><option value="Commerce"><option value="Ville et services"></datalist>
       <input id="aw-city"   type="text"     list="aw-city-list" placeholder="Ville"      autocomplete="address-level2"  style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
-      <div id="aw-name-row" style="display:none;gap:10px">
-        <input id="aw-firstname" type="text" placeholder="Prénom" autocomplete="given-name" style="flex:1;min-width:0;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
-        <input id="aw-lastname"  type="text" placeholder="Nom"    autocomplete="family-name" style="flex:1;min-width:0;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
-      </div>
-      <input id="aw-phone"   type="tel"  placeholder="Téléphone professionnel"     autocomplete="tel"    style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-address" type="text"  placeholder="Adresse professionnelle"     autocomplete="street-address" style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
-      <input id="aw-siret"   type="text"  placeholder="SIRET (14 chiffres)"  inputmode="numeric" maxlength="17" oninput="awLookupSiret()" style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
-      <div id="aw-siret-note" style="display:none;font-size:11.5px;color:var(--ink3);line-height:1.5;margin-top:-4px"></div>
-      <textarea id="aw-desc" placeholder="Décris ton établissement en quelques mots…" maxlength="300" style="display:none;width:100%;height:70px;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);resize:none;box-sizing:border-box"></textarea>
       <input id="aw-site" type="url" placeholder="Site ou page sociale (facultatif)" autocomplete="url" style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <textarea id="aw-desc" placeholder="Décris ton établissement en quelques mots…" maxlength="300" style="display:none;width:100%;height:70px;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);resize:none;box-sizing:border-box"></textarea>
       <label id="aw-cover-wrap" style="display:none;border:1.5px dashed var(--border);border-radius:10px;padding:12px 14px;background:var(--bg2);cursor:pointer">
         <div style="font-size:13px;font-weight:700;color:var(--ink)">Photo de devanture (facultatif)</div>
         <div style="font-size:11.5px;color:var(--ink3);margin-top:3px;line-height:1.5">Les commerces avec photo reçoivent nettement plus de réponses.</div>
         <div id="aw-cover-name" style="font-size:11.5px;color:var(--coral-text);font-weight:700;margin-top:4px"></div>
         <input id="aw-cover" type="file" accept="image/*" style="display:none" onchange="document.getElementById('aw-cover-name').textContent=this.files[0]?this.files[0].name:''">
       </label>
+      <div id="aw-name-row" style="display:none;gap:10px">
+        <input id="aw-firstname" type="text" placeholder="Prénom" autocomplete="given-name" style="flex:1;min-width:0;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+        <input id="aw-lastname"  type="text" placeholder="Nom"    autocomplete="family-name" style="flex:1;min-width:0;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      </div>
+      <input id="aw-phone"   type="tel"  placeholder="Téléphone professionnel"     autocomplete="tel"    style="display:none;width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-email"  type="email"    placeholder="Email professionnel"            autocomplete="email"           style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="aw-pass"   type="password" placeholder="Mot de passe"                  autocomplete="current-password" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <div id="aw-forgot" style="text-align:right;margin-top:-3px"><button type="button" id="aw-forgot-link" onclick="awForgotPassword()" style="background:none;border:none;padding:0;font-size:12px;color:var(--ink3);cursor:pointer;font-family:var(--fb);text-decoration:underline">Mot de passe oublié ?</button></div>
@@ -2275,6 +2328,9 @@ window.addEventListener('load',()=>{
     <div style="font-family:var(--fd);font-weight:800;font-size:22px;color:var(--ink);letter-spacing:-.5px;margin-bottom:6px">Dernière étape</div>
     <div style="font-size:13px;color:var(--ink3);margin-bottom:22px">Complète le profil de ton commerce pour continuer.</div>
     <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:12.5px;color:var(--ink2);line-height:1.55">Commence par ton <strong>numéro SIRET</strong> : nous retrouvons automatiquement le nom, l'adresse et la ville de ton établissement.</div>
+      <input id="gmw-siret"   type="text" placeholder="Numéro SIRET (14 chiffres)" oninput="gmwLookupSiret()" inputmode="numeric" maxlength="17" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
+      <div id="gmw-siret-note" style="display:none;font-size:11.5px;color:var(--ink2);line-height:1.5;margin-top:-4px"></div>
       <input id="gmw-brand"  type="text" placeholder="Nom de ton commerce"       style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="gmw-sector" type="text" placeholder="Secteur (ex: Restauration)" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="gmw-city"   type="text" placeholder="Ville (ex: Paris)"          style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
@@ -2284,7 +2340,6 @@ window.addEventListener('load',()=>{
       </div>
       <input id="gmw-phone"   type="tel"  placeholder="Téléphone professionnel" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <input id="gmw-address" type="text" placeholder="Adresse professionnelle" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
-      <input id="gmw-siret"   type="text" placeholder="SIRET (14 chiffres)" inputmode="numeric" maxlength="17" style="width:100%;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
       <textarea id="gmw-desc" placeholder="Décris ton établissement en quelques mots…" maxlength="300" style="width:100%;height:70px;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);resize:none;box-sizing:border-box"></textarea>
       <div id="gmw-err" style="color:#EF4444;font-size:12px;display:none;padding:8px 12px;background:rgba(239,68,68,.08);border-radius:8px"></div>
       <button id="gmw-submit-btn" onclick="saveGoogleMerchant()" style="width:100%;padding:15px;border-radius:11px;background:var(--coral);border:none;color:var(--ink);font-size:15px;font-weight:700;font-family:var(--fd);cursor:pointer;box-shadow:0 5px 18px var(--cg)">Créer mon espace <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg></button>
@@ -2317,17 +2372,18 @@ let _totalConsentedUsers = 0;
 let _awMode = 'login';
 let _skipNextAuth = false;
 let _awStep = 1;
-const AW_STEP1 = ['aw-name-row','aw-phone','aw-email','aw-pass'];
-const AW_STEP2 = ['aw-brand','aw-sector','aw-city','aw-address','aw-siret','aw-site','aw-desc','aw-cover-wrap'];
+// Inscription en 2 étapes : 1) l'établissement (le SIRET d'abord, il remplit le reste)  2) la personne et ses identifiants.
+const AW_STEP1 = ['aw-siret-intro','aw-siret','aw-brand','aw-sector','aw-city','aw-address','aw-site','aw-desc','aw-cover-wrap'];
+const AW_STEP2 = ['aw-name-row','aw-phone','aw-email','aw-pass'];
 function awSetStep(n) {
   _awStep = n;
   const show = (id, on) => { const el = document.getElementById(id); if(el) el.style.display = on ? (id==='aw-name-row' ? 'flex' : 'block') : 'none'; };
   AW_STEP1.forEach(id => show(id, n === 1));
   AW_STEP2.forEach(id => show(id, n === 2));
   document.getElementById('aw-p2').style.background = n === 2 ? 'var(--coral)' : 'var(--bg3)';
-  document.getElementById('aw-p-lbl').textContent = n === 1 ? 'Étape 1 sur 2 · Vous' : 'Étape 2 sur 2 · Votre établissement';
+  document.getElementById('aw-p-lbl').textContent = n === 1 ? 'Étape 1 sur 2 · Votre établissement' : 'Étape 2 sur 2 · Vous';
   document.getElementById('aw-back').style.display = n === 2 ? 'block' : 'none';
-  document.getElementById('aw-siret-note').style.display = 'none';
+  { const note = document.getElementById('aw-siret-note'); if(note) note.style.display = (n === 1 && note.textContent) ? 'block' : 'none'; }
   document.getElementById('aw-submit').textContent = n === 1 ? 'Continuer' : 'Créer mon compte';
   document.getElementById('aw-err').style.display = 'none';
 }
@@ -2341,7 +2397,7 @@ function awTab(mode) {
   document.getElementById('aw-progress').style.display = isReg ? 'block' : 'none';
   if(isReg) awSetStep(1);
   else {
-    [...AW_STEP2, 'aw-name-row', 'aw-phone'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+    [...AW_STEP1, ...AW_STEP2, 'aw-siret-note'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
     ['aw-email','aw-pass'].forEach(id => { document.getElementById(id).style.display = 'block'; });
     document.getElementById('aw-back').style.display = 'none';
     document.getElementById('aw-submit').textContent = 'Connexion';
@@ -2377,12 +2433,23 @@ async function awSubmit() {
   const btn = document.getElementById('aw-submit');
   const label = () => _awMode === 'login' ? 'Connexion' : (_awStep === 1 ? 'Continuer' : 'Créer mon compte');
   if(_awMode === 'register' && _awStep === 1) {
+    const siret1 = document.getElementById('aw-siret').value.replace(/\s+/g,'');
+    const brand1 = document.getElementById('aw-brand').value.trim(), city1 = document.getElementById('aw-city').value.trim();
+    const addr1 = document.getElementById('aw-address').value.trim(), sector1 = document.getElementById('aw-sector').value.trim();
+    if(!siret1) { awShowErr('Commence par ton numéro SIRET : il remplit le reste pour toi.'); return; }
+    if(!siretValid(siret1)) { awShowErr('SIRET invalide : vérifie les 14 chiffres.'); return; }
+    if(_awSiretClosed === siret1) { awShowErr('Cet établissement est indiqué comme fermé dans le répertoire officiel. Vérifie le SIRET.'); return; }
+    if(!brand1 || !city1 || !addr1 || !sector1) { awShowErr('Remplis tous les champs obligatoires.'); return; }
+    const cf = document.getElementById('aw-cover').files[0] || null;
+    if(cf && (!cf.type.startsWith('image/') || cf.size > 8*1024*1024 || !(await fileIsDecodableImage(cf)))) { awShowErr('La photo est illisible ou trop lourde (8 Mo max). Choisis-en une autre ou retire-la.'); return; }
+    awSetStep(2);
+    return;
+  }
+  if(_awMode === 'register' && _awStep === 2) {
     const fn = document.getElementById('aw-firstname').value.trim(), ln = document.getElementById('aw-lastname').value.trim();
     const ph = document.getElementById('aw-phone').value.trim();
     if(!fn || !ln || !email || !pass || !ph) { awShowErr('Remplis tous les champs.'); return; }
     if(pass.length < 6) { awShowErr('Mot de passe trop court (6 caractères minimum).'); return; }
-    awSetStep(2);
-    return;
   }
   if(!email || !pass) { awShowErr('Remplis tous les champs.'); return; }
   btn.textContent = '…'; btn.disabled = true;
@@ -2402,9 +2469,7 @@ async function awSubmit() {
       const site      = document.getElementById('aw-site').value.trim();
       const desc      = document.getElementById('aw-desc').value.trim();
       const coverFile = document.getElementById('aw-cover').files[0] || null;
-      if(!brand || !city || !address || !sector) { awShowErr('Remplis tous les champs obligatoires.'); btn.textContent=label(); btn.disabled=false; return; }
-      if(!siretValid(siret)) { awShowErr('SIRET invalide : vérifie les 14 chiffres.'); btn.textContent=label(); btn.disabled=false; return; }
-      if(coverFile && (!coverFile.type.startsWith('image/') || coverFile.size > 8*1024*1024 || !(await fileIsDecodableImage(coverFile)))) { awShowErr('La photo est illisible ou trop lourde (8 Mo max). Choisis-en une autre ou retire-la.'); btn.textContent=label(); btn.disabled=false; return; }
+      if(!brand || !city || !address || !sector || !siretValid(siret)) { awShowErr('Informations de l\'établissement incomplètes : reviens à l\'étape précédente.'); btn.textContent=label(); btn.disabled=false; return; }
       _skipNextAuth = true;
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       cred.user.sendEmailVerification().catch(() => {}); // non bloquant : l'email arrive en tâche de fond
@@ -2557,7 +2622,7 @@ function copySocialText() {
 function renderAcqCard(camps) {
   const el = document.getElementById('acq-card');
   if(!el) return;
-  const active = (camps || []).filter(c => c.status === 'active');
+  const active = (camps || []).filter(c => campStatus(c) === 'active');
   if(!active.length) { el.style.display = 'none'; return; }
   const total = active.reduce((a, c) => a + (c.answersCount || 0), 0);
   const title = total === 0 ? 'Votre campagne est en ligne. Voici comment faire venir les premières réponses.' : 'Faites venir plus de réponses.';
@@ -2566,18 +2631,6 @@ function renderAcqCard(camps) {
 }
 
 // ═══ Portée estimée, visuels réseaux sociaux, recherche SIRET ═══
-async function loadReachEstimate() {
-  const el = document.getElementById('recap-reach');
-  if(!el) return;
-  el.textContent = 'Calcul en cours…';
-  try {
-    const r = (await fx.httpsCallable('estimateReach')()).data;
-    const cat = { restauration: 'la restauration', boulangerie: 'la boulangerie', sport: 'le sport', beaute: 'la beauté', culture: 'la culture', commerce: 'le commerce de proximité', services: 'la ville et les services' }[r.category] || 'votre secteur';
-    el.textContent = r.total === 0
-      ? `Aucun habitant inscrit à ${r.city} pour l'instant : votre affiche en vitrine fera venir les premiers.`
-      : `${r.total} habitant${r.total > 1 ? 's' : ''} à ${r.city}` + (r.matching != null ? ` dont ${r.matching} intéressé${r.matching > 1 ? 's' : ''} par ${cat}` : '') + '.';
-  } catch(e) { el.textContent = 'Estimation indisponible pour le moment.'; }
-}
 function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
 function downloadVisual(kind) {
   if(typeof qrcode === 'undefined') { showToast('QR code indisponible, réessayez dans un instant.', 'warning'); return; }
@@ -2612,28 +2665,55 @@ function downloadVisual(kind) {
   };
   img.src = qr.createDataURL(10, 0);
 }
-// Pré-remplissage depuis le répertoire officiel des entreprises (gratuit, sans clé) :
-// le commerçant corrige ensuite ; une erreur réseau n'empêche jamais l'inscription.
-let _siretLooked = '';
-async function awLookupSiret() {
-  const siret = document.getElementById('aw-siret').value.replace(/\s+/g, '');
-  const note = document.getElementById('aw-siret-note');
-  if(!siretValid(siret) || siret === _siretLooked) return;
-  _siretLooked = siret;
-  note.style.display = 'block'; note.textContent = "Recherche de l'établissement…";
+// Pré-remplissage depuis le répertoire officiel des entreprises (gratuit, sans clé) : le SIRET est demandé EN PREMIER
+// et remplit le nom, l'adresse, la ville et la catégorie. Le commerçant peut tout corriger ; une erreur réseau
+// n'empêche jamais l'inscription.
+let _siretLooked = {}, _awSiretClosed = '', _awAuto = {};
+// Code NAF (ex. « 10.71C ») -> catégorie proposée par Noova (la liste de l'inscription).
+function nafToSector(naf) {
+  const c = String(naf || '').replace(/[^0-9A-Za-z]/g, '').toUpperCase();
+  const p2 = c.slice(0, 2), p3 = c.slice(0, 3), p4 = c.slice(0, 4);
+  if(p4 === '1071' || p4 === '4724') return 'Boulangerie';
+  if(p4 === '5630') return 'Café';
+  if(p2 === '56') return 'Restauration';
+  if(p4 === '9602' || p4 === '9604' || p4 === '9601') return 'Beauté';
+  if(p3 === '931') return 'Sport';
+  if(['90', '91', '58', '59', '60'].includes(p2) || p4 === '4761' || p4 === '4762') return 'Culture';
+  if(p2 === '84') return 'Ville et services';
+  if(p2 === '47' || p2 === '46') return 'Commerce';
+  return '';
+}
+async function siretLookupFor(pre) {
+  const siret = document.getElementById(pre + '-siret').value.replace(/\s+/g, '');
+  const note = document.getElementById(pre + '-siret-note');
+  if(siret.length < 14) { note.style.display = 'none'; _siretLooked[pre] = ''; if(pre === 'aw') _awSiretClosed = ''; return; }
+  if(!siretValid(siret)) { note.style.display = 'block'; note.style.color = 'var(--red-text)'; note.textContent = 'Ce SIRET ne semble pas valide : vérifie les 14 chiffres.'; _siretLooked[pre] = ''; return; }
+  if(siret === _siretLooked[pre]) return;
+  _siretLooked[pre] = siret; if(pre === 'aw') _awSiretClosed = '';
+  note.style.display = 'block'; note.style.color = 'var(--ink2)'; note.textContent = "Recherche de l'établissement…";
   try {
-    const d = await (await fetch('https://recherche-entreprises.api.gouv.fr/search?per_page=1&q=' + siret)).json();
+    const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 9000);
+    const d = await (await fetch('https://recherche-entreprises.api.gouv.fr/search?per_page=1&q=' + siret, { signal: ctl.signal })).json();
+    clearTimeout(to);
+    if(document.getElementById(pre + '-siret').value.replace(/\s+/g, '') !== siret) return;   // le champ a changé pendant la recherche
     const e = d.results && d.results[0];
-    if(!e) { note.textContent = 'SIRET introuvable dans le répertoire officiel : vérifie-le.'; return; }
-    const et = (e.matching_etablissements && e.matching_etablissements[0]) || e.siege || {};
-    const fill = (id, v) => { const el = document.getElementById(id); if(el && !el.value.trim() && v) el.value = v; };
-    fill('aw-brand', et.nom_commercial || e.nom_complet);
-    fill('aw-address', et.adresse);
+    if(!e) { note.style.color = 'var(--red-text)'; note.textContent = 'SIRET introuvable dans le répertoire officiel : vérifie-le.'; return; }
+    const et = (e.matching_etablissements || []).find(x => x.siret === siret) || (e.siege && e.siege.siret === siret ? e.siege : null) || (e.matching_etablissements && e.matching_etablissements[0]) || e.siege || {};
+    if(et.etat_administratif === 'F') { if(pre === 'aw') _awSiretClosed = siret; note.style.color = 'var(--red-text)'; note.textContent = 'Cet établissement est indiqué comme fermé dans le répertoire officiel : vérifie le SIRET.'; return; }
+    // On remplit un champ vide, ou un champ que le remplissage automatique avait lui-même rempli (SIRET changé) ; jamais ce que la personne a écrit.
+    const fill = (id, v) => { const el = document.getElementById(id); if(!el || !v) return; if(!el.value.trim() || el.value === _awAuto[id]) { el.value = v; _awAuto[id] = v; } };
+    fill(pre + '-brand', et.nom_commercial || e.nom_complet);
+    fill(pre + '-address', et.adresse);
     const com = et.libelle_commune || (e.siege && e.siege.libelle_commune);
-    fill('aw-city', com ? com.charAt(0) + com.slice(1).toLowerCase() : '');
-    note.textContent = 'Établissement trouvé : ' + (e.nom_complet || '') + '. Vérifie les champs préremplis.';
+    fill(pre + '-city', com ? com.charAt(0) + com.slice(1).toLowerCase() : '');
+    fill(pre + '-sector', nafToSector(et.activite_principale || e.activite_principale));
+    note.style.color = 'var(--mint-text)';
+    note.textContent = 'Établissement trouvé : ' + (e.nom_complet || '') + '. Vérifie les champs remplis automatiquement.';
   } catch(err) { note.style.display = 'none'; }
 }
+
+function awLookupSiret() { return siretLookupFor('aw'); }
+function gmwLookupSiret() { return siretLookupFor('gmw'); }
 
 // ═══ RÉSULTATS : seuil d'anonymat et export CSV ═══
 const RESULTS_MIN = 5;
@@ -2772,12 +2852,28 @@ async function loadMerchantAndStart(uid) {
   updAud();
 }
 
+// Une campagne « en cours » dont la date de fin est passée est affichée « Terminée » sans attendre le passage en base.
+function campMs(t){ return t && t.toMillis ? t.toMillis() : (t && t.seconds ? t.seconds*1000 : 0); }
+function campExpired(c){ const e = campMs(c.endsAt); return !!e && e <= Date.now(); }
+function campStatus(c){ return c.status === 'active' && campExpired(c) ? 'completed' : c.status; }
+function campEndLabel(c){
+  const e = campMs(c.endsAt);
+  if(e) return (e <= Date.now() ? 'Terminée le ' : 'Fin le ') + new Date(e).toLocaleDateString('fr-FR',{day:'numeric',month:'long'});
+  return c.volumeTarget ? 'Objectif : ' + c.volumeTarget + ' réponses' : 'Sans limite de durée';
+}
+// Avancement : jours écoulés sur la durée choisie ; anciennes campagnes : réponses sur l'objectif ; sinon pas de barre.
+function campProgress(c){
+  const e = campMs(c.endsAt), b = campMs(c.createdAt);
+  if(e && b && e > b) return Math.max(0, Math.min(100, Math.round((Date.now() - b) / (e - b) * 100)));
+  if(c.volumeTarget) return Math.min(100, Math.round((c.answersCount||0)/c.volumeTarget*100));
+  return null;
+}
 function loadMerchantCampaigns(uid) {
   db.collection('campaigns')
     .where('merchantId','==',uid)
     .onSnapshot(snap => {
       _mCampaigns = [];
-      snap.forEach(doc => _mCampaigns.push({ id:doc.id, ...doc.data() }));
+      snap.forEach(doc => { const c = { id:doc.id, ...doc.data() }; c.status = campStatus(c); _mCampaigns.push(c); });
       // Tri côté client pour éviter l'index composite Firestore
       _mCampaigns.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
       renderFirestoreCampaigns(_mCampaigns);
@@ -2860,7 +2956,7 @@ function renderFirestoreCampaigns(camps) {
     const card = page.querySelector('.card');
     if(!card) return;
     camps.forEach(c => {
-      const pct = c.volumeTarget ? Math.min(100, Math.round((c.answersCount||0)/c.volumeTarget*100)) : 0;
+      const pct = campProgress(c);
       const st  = stMap[c.status] || 'draft';
       const row = document.createElement('div');
       row.className = 'camp-row';
@@ -2868,8 +2964,8 @@ function renderFirestoreCampaigns(camps) {
       row.innerHTML = `
         <div class="camp-name-wrap"><div class="camp-ico" style="color:var(--icon-gray);display:flex;align-items:center;justify-content:center">${icon('store',{size:16})}</div><div><div class="camp-name">${label.substring(0,38)}${label.length>38?'…':''}</div><div class="camp-date">${c.targetCity||'France'} · ${c.questions?.length>1?c.questions.length+' q.':'1 q.'}</div></div></div>
         <div><span class="status-pill ${st}">${stLbl[c.status]||'Brouillon'}</span></div>
-        <div><div class="camp-metric">${c.answersCount||0}</div><div class="camp-metric-sub">/ ${c.volumeTarget||100} obj.</div></div>
-        <div class="camp-prog"><div class="cprog-bar"><div class="cprog-fill" style="width:${pct}%;background:var(--mint)"></div></div><div class="cprog-lbl">${pct}%</div></div>
+        <div><div class="camp-metric">${c.answersCount||0}</div><div class="camp-metric-sub">${c.answersCount===1?'réponse':'réponses'}</div></div>
+        <div class="camp-prog">${pct===null?`<div class="cprog-lbl" style="white-space:nowrap">Sans limite</div>`:`<div class="cprog-bar"><div class="cprog-fill" style="width:${pct}%;background:var(--mint)"></div></div><div class="cprog-lbl">${campEndLabel(c)}</div>`}</div>
         <div class="camp-actions" style="display:flex;gap:6px;justify-content:flex-end">
           <button class="camp-act-btn" style="background:var(--md);color:var(--mint-text)" onclick="event.stopPropagation();viewCampaign('${c.id}')">Voir</button>
           <button class="camp-act-btn" style="background:var(--vd);color:var(--violet)" onclick="event.stopPropagation();openEditCamp('${c.id}')">Modifier</button>
@@ -2882,7 +2978,7 @@ function renderFirestoreCampaigns(camps) {
 
 function updateKPIFromCampaigns(camps) {
   const total    = camps.reduce((a,c) => a + (c.answersCount||0), 0);
-  const active   = camps.filter(c => c.status === 'active').length;
+  const active   = camps.filter(c => campStatus(c) === 'active').length;
   const completed = camps.filter(c => c.status === 'completed').length;
 
   const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
@@ -2951,7 +3047,7 @@ launchCampaign = async function() {
   if(!q1) { showToast('Saisis une question d\'abord','warning'); return; }
   const options  = needsOptions(curFmt) ? collectOptions('#mcq-options') : [];
   if(needsOptions(curFmt) && options.length < 2) { showToast('Question 1 : ajoutez au moins 2 ' + (curFmt === 'rank' ? 'éléments à classer' : 'options de réponse') + ' différents.', 'warning'); return; }
-  const volume   = parseInt(document.getElementById('vol-num')?.textContent)||100;
+  const days     = _wzDays;                      // durée facultative : null = sans limite
   const themes   = Array.from(document.querySelectorAll('.th-chip.sel')).map(el=>el.textContent.replace(/[^\w\s\-éèêàùç]/gi,'').trim());
   const city     = normalizeCity(_mData.city || _mData.cityLabel || '');
   const cityLabel = _mData.cityLabel || _mData.city || '';
@@ -2991,13 +3087,11 @@ launchCampaign = async function() {
       targetCity:      city,
       ageRanges,
       targetInterests: themes,
-      targetVolume:    volume,
-      volumeTarget:    volume,
       pointsPerAnswer: 20,
       answersCount:    0,
       responsesCount:  0,
       status:          'active',
-      endsAt:          firebase.firestore.Timestamp.fromMillis(Date.now() + 30*86400000), // durée de campagne : 30 jours
+      ...(days ? { durationDays: days, endsAt: firebase.firestore.Timestamp.fromMillis(Date.now() + days*86400000) } : {}),   // sans durée : la campagne reste en ligne jusqu'à ce qu'on l'arrête
       createdAt:       firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt:       firebase.firestore.FieldValue.serverTimestamp()
     });

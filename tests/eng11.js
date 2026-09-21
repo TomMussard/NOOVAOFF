@@ -121,7 +121,7 @@ const camps=async()=>(await db.collection('campaigns').get()).docs.map(d=>({id:d
     await p.evaluate(()=>navTo('create',document.getElementById('nav-create')));await sleep(900);
     const st=await p.evaluate(()=>({steps:[...document.querySelectorAll('.wiz-step-btn .wiz-step-lbl')].map(e=>e.textContent),panels:document.querySelectorAll('.step-panel').length,
       q1:{text:!!document.querySelector('#wz-q-1 #q-text-inp'),fmt:document.querySelectorAll('#wz-q-1 #fmt-grid .fmt-card').length,opts:!!document.querySelector('#wz-q-1 #mcq-options')}}));
-    check('Assistant en 4 étapes : Questions, Audience, Volume, Validation (plus d\'étape « Format » séparée)',st.steps.join()==='Questions,Audience,Volume,Validation'&&st.panels===4,st);
+    check('Assistant en 4 étapes : Questions, Audience, Durée, Validation (plus d\'étape « Format » séparée)',st.steps.join()==='Questions,Audience,Durée,Validation'&&st.panels===4,st);
     check('Question 1 : rédaction, format de réponse et options dans le MÊME bloc',st.q1.text&&st.q1.fmt===3&&st.q1.opts,st.q1);
     await p.evaluate(()=>{addWizQ();});
     const q2=await p.evaluate(()=>({text:!!document.querySelector('#wz-q-extra-2 #q2-text-inp'),fmt:document.querySelectorAll('#wz-q-extra-2 .qfmt .fmt-card').length,opts:!!document.querySelector('#wz-q-extra-2 #q2-mcq-opts'),vis:getComputedStyle(document.getElementById('wz-q-extra-2')).display}));

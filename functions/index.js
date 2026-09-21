@@ -123,9 +123,10 @@ exports.submitAnswer = onCall(async (request) => {
       else if (qd.format === "text") ok = val.trim().length >= 5;
       if (!ok) throw new HttpsError("invalid-argument", "Réponse invalide pour cette question.");
     }
-    const targetVolume = Number(camp.targetVolume ?? camp.volumeTarget ?? 100) || 100;
+    // Objectif de réponses FACULTATIF (anciennes campagnes seulement) : sans valeur, aucun plafond.
+    const targetVolume = Number(camp.targetVolume ?? camp.volumeTarget) || 0;
     const currentVolume = camp.answersCount || camp.responsesCount || 0;
-    if (currentVolume >= targetVolume) {
+    if (targetVolume > 0 && currentVolume >= targetVolume) {
       throw new HttpsError("resource-exhausted", "Cette campagne a atteint son volume cible.");
     }
 
@@ -327,6 +328,50 @@ exports.estimateReach = onCall(async (request) => {
   return { city: m.cityLabel || m.city || "", total, matching, category };
 });
 
+
+/**
+ * estimateCampaign — estimation des réponses d'une campagne à partir des données réelles de la ville du commerçant :
+ *  - habitants inscrits (et part qui correspond aux tranches d'âge choisies : seul filtre réellement appliqué à l'envoi),
+ *  - réponses valides des 14 derniers jours dans la ville (rythme réel de l'activité) et nombre de campagnes actives
+ *    qui se partagent cette attention.
+ * Seuls des nombres agrégés sont renvoyés. Le client en déduit l'estimation pour la durée choisie.
+ */
+const AGE_BUCKETS = ["16-17", "18-24", "25-34", "35-49", "50-64", "65+"];
+exports.estimateCampaign = onCall(async (request) => {
+  const uid = request.auth && request.auth.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "Connecte-toi.");
+  const mSnap = await db.collection("merchants").doc(uid).get();
+  if (!mSnap.exists) throw new HttpsError("permission-denied", "Réservé aux commerçants.");
+  const m = mSnap.data();
+  const city = String(m.city || "").toLowerCase();
+  const d = request.data || {};
+  const ageRanges = (Array.isArray(d.ageRanges) ? d.ageRanges : []).filter((a) => AGE_BUCKETS.includes(a));
+  const questions = Math.max(1, Math.min(3, parseInt(d.questions, 10) || 1));
+  if (!city) return { city: "", cityLabel: "", totalUsers: 0, pool: 0, questions, enoughData: false, perDay: 0, cityAnswersPerDay: 0, activeCampaigns: 0 };
+
+  const SAMPLE = 3000, WINDOW_DAYS = 14;
+  const usersRef = db.collection("users").where("city", "==", city);
+  const [totalUsers, sample, answers14, activeCampaigns] = await Promise.all([
+    usersRef.count().get().then((r) => r.data().count),
+    usersRef.select("ageRange", "age").limit(SAMPLE).get(),
+    db.collection("answers").where("respondentCity", "==", city).where("flagged", "==", false)
+      .where("createdAt", ">=", Timestamp.fromMillis(Date.now() - WINDOW_DAYS * 86400000)).count().get().then((r) => r.data().count).catch((e) => { logger.warn("estimateCampaign: answers", { message: e.message }); return null; }),
+    db.collection("campaigns").where("targetCity", "==", city).where("status", "==", "active").count().get().then((r) => r.data().count).catch(() => 0),
+  ]);
+  // Même règle que submitAnswer : un habitant sans tranche d'âge renseignée n'est jamais exclu.
+  let matching = 0;
+  const ages = { unknown: 0 }; AGE_BUCKETS.forEach((b) => { ages[b] = 0; });
+  sample.forEach((doc) => { const u = doc.data(), a = u.ageRange || u.age || ""; ages[AGE_BUCKETS.includes(a) ? a : "unknown"]++; if (!ageRanges.length || !a || ageRanges.includes(a)) matching++; });
+  const share = sample.size ? matching / sample.size : 1;
+  const pool = Math.round(totalUsers * share);
+  const cityAnswersPerDay = answers14 == null ? 0 : answers14 / WINDOW_DAYS;
+  // La nouvelle campagne se partage l'activité de la ville avec les campagnes déjà actives.
+  const perDay = cityAnswersPerDay * share / (activeCampaigns + 1);
+  const enoughData = answers14 != null && answers14 >= 10 && totalUsers >= 5;
+  // Répartition par âge des habitants de la ville (part de l'échantillon, 0 à 1) : affichée telle quelle dans l'assistant.
+  const ageShare = {}; Object.keys(ages).forEach((k) => { ageShare[k] = sample.size ? ages[k] / sample.size : 0; });
+  return { city, cityLabel: m.cityLabel || m.city || "", totalUsers, pool, share, questions, answers14, cityAnswersPerDay, activeCampaigns, perDay, enoughData, ageShare };
+});
 
 /**
  * adminResetAllData — remise à zéro complète avant lancement (réservé admin).

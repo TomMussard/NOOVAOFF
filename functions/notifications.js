@@ -337,8 +337,8 @@ function availableFor(u, list) {
   return (list || []).filter((c) => {
     if (answered.includes(c.id) || !authorized.includes(c.merchantId)) return false;
     if ((c.ageRanges || []).length && age && !c.ageRanges.includes(age)) return false;
-    const target = Number(c.targetVolume ?? c.volumeTarget ?? 100) || 100;
-    return (c.answersCount || 0) < target;
+    const target = Number(c.targetVolume ?? c.volumeTarget) || 0;   // objectif facultatif : sans valeur, pas de plafond
+    return !(target > 0 && (c.answersCount || 0) >= target);
   }).sort((a, b) => toMs(b.createdAt) - toMs(a.createdAt));
 }
 
@@ -384,6 +384,7 @@ async function runTick(now = Date.now()) {
 
   if (p.hour === 11) out.code = await notifyExpiringCodes(now);
   if (p.hour === 10) out.ending = await notifyEndingCampaigns(now, caches);
+  out.expired = await expireCampaigns(now);
   return out;
 }
 
@@ -424,6 +425,17 @@ async function notifyMerchant(mid, key, { title, message, type }) {
     }).catch(() => {});
   }
   return true;
+}
+
+// Une campagne dont la durée est écoulée passe à « Terminée » (elle n'était déjà plus diffusée : submitAnswer et l'app
+// ignorent les campagnes dont endsAt est passé). Le commerçant peut la relancer en prolongeant sa durée.
+async function expireCampaigns(now) {
+  try {
+    const snap = await db().collection("campaigns").where("status", "==", "active").where("endsAt", "<=", Timestamp.fromMillis(now)).get();
+    let n = 0;
+    for (const d of snap.docs) { await d.ref.update({ status: "completed", completedReason: "duration", completedAt: FieldValue.serverTimestamp() }); n++; }
+    return n;
+  } catch (e) { logger.warn("expireCampaigns", { message: e.message }); return 0; }
 }
 
 async function notifyEndingCampaigns(now, caches) {
@@ -593,5 +605,5 @@ module.exports = {
   notifTick, notifyNewCampaign, onAnswerNotifs, onFriendNotif, onCampaignProgress, onRedemptionUpdated, onMerchantStatus,
   trackNotifOpen, setNotifPref,
   // Internes exposés aux tests
-  _t: { deliver, runTick, nowMs, trackOpen, setPref, processMisses, drainQueue, habitMinutes, parisParts, next9h, copy, TYPES, GROUPS, notifyMerchant, notifyExpiringCodes, notifyEndingCampaigns, loadCaches, sectorCategory },
+  _t: { deliver, runTick, nowMs, trackOpen, setPref, processMisses, drainQueue, habitMinutes, parisParts, next9h, copy, TYPES, GROUPS, notifyMerchant, notifyExpiringCodes, notifyEndingCampaigns, expireCampaigns, loadCaches, sectorCategory },
 };
