@@ -2160,12 +2160,23 @@ function spawnConfetti(){
 // ═══ TOAST ═══════════════════════════════════════════════════
 // Villes beta connues : rattache les variantes d'\u00e9criture (espace manquant, tirets...)
 // au m\u00eame slug pour \u00e9viter qu'un commer\u00e7ant atterrisse dans une "ville fant\u00f4me".
-const NOOVA_KNOWN_CITIES=[{slug:'le-mans',label:'Le Mans'},{slug:'angers',label:'Angers'}];
+// Communes de la zone « Le Mans » (Le Mans Métropole) : ébauche établie à partir de nos connaissances générales, PAS
+// vérifiée auprès d'une source officielle — à corriger. Un habitant ou un commerçant de l'une de ces communes est
+// rattaché au slug « le-mans » pour tout l'appariement (campagnes, commerces, règles), mais garde son nom affiché
+// (cityLabel) : « Allonnes » reste écrit « Allonnes » dans son profil, seule la ville de correspondance change.
+const NOOVA_KNOWN_CITIES=[
+  {slug:'le-mans',label:'Le Mans',zone:['Aigné','Allonnes','Arnage','Champagné','Changé','Coulaines','La Chapelle-Saint-Aubin','Laigné-en-Belin','Mulsanne','Neuville-sur-Sarthe','Pruillé-le-Chétif','Ruaudin','Saint-Saturnin','Sargé-lès-Le Mans',"Savigné-l'Évêque",'Trangé',"Yvré-l'Évêque"]},
+  {slug:'angers',label:'Angers',zone:[]}
+];
 function normalizeCity(s){
   const base=(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
   const flat=base.replace(/-/g,'');
-  const known=NOOVA_KNOWN_CITIES.find(c=>c.slug.replace(/-/g,'')===flat);
-  return known?known.slug:base;
+  const slugifyZone=x=>x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'');
+  for(const c of NOOVA_KNOWN_CITIES){
+    if(c.slug.replace(/-/g,'')===flat) return c.slug;                                  // variante d'écriture de la ville elle-même
+    if((c.zone||[]).some(z=>slugifyZone(z)===flat)) return c.slug;                     // commune de sa zone (ex. Allonnes → le-mans)
+  }
+  return base;
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 // Icône de repli affichée à la place du logo commerçant si l'image ne charge pas
