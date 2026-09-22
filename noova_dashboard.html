@@ -2178,6 +2178,16 @@ function normalizeCity(s){
   }
   return base;
 }
+// Rayon de 25 km autour d'une ville NOOVA (functions/cityZones.js) : une commune qui n'est pas elle-même une ville
+// NOOVA peut être rattachée à la plus proche si elle est assez près. Ne bloque jamais une inscription en cas
+// d'erreur réseau (on garde alors la commune telle quelle, non appariée — comme avant cette fonctionnalité).
+async function resolveCityZone(norm,rawLabel){
+  if(NOOVA_KNOWN_CITIES.some(c=>c.slug===norm))return norm;
+  try{
+    const r=await fx.httpsCallable('resolveCityZone')({slug:norm,label:rawLabel});
+    return (r.data&&r.data.slug)||norm;
+  }catch(e){ console.warn('resolveCityZone:',e); return norm; }
+}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 // Icône de repli affichée à la place du logo commerçant si l'image ne charge pas
 // (Storage supprimé, URL cassée...) — évite l'icône "image cassée" du navigateur.
@@ -2658,7 +2668,7 @@ async function awSubmit() {
       await db.collection('merchants').doc(cred.user.uid).set({
         role: 'merchant',
         name: brand,
-        brandName: brand, email, sector: sector||'Commerce', theme: (sector||'Commerce').toLowerCase(), city: normalizeCity(city), cityLabel: city,
+        brandName: brand, email, sector: sector||'Commerce', theme: (sector||'Commerce').toLowerCase(), city: await resolveCityZone(normalizeCity(city),city), cityLabel: city,
         firstName, lastName, phone, address, siret, description: desc, website: site,
         ownerUid: cred.user.uid,
         status: 'pending',
@@ -4156,7 +4166,7 @@ async function saveGoogleMerchant() {
     await db.collection('merchants').doc(uid).set({
       role: 'merchant',
       name: brand,
-      brandName: brand, email, sector: sector||'Commerce', theme: (sector||'Commerce').toLowerCase(), city: normalizeCity(city), cityLabel: city,
+      brandName: brand, email, sector: sector||'Commerce', theme: (sector||'Commerce').toLowerCase(), city: await resolveCityZone(normalizeCity(city),city), cityLabel: city,
       firstName, lastName, phone, address, siret, description: desc,
       ownerUid: uid,
       status: 'pending',

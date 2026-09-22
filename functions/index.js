@@ -24,6 +24,8 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./counters")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./quota")));
 // Points : bonus de bienvenue, échange de récompenses (serveur seul), expiration des points : voir points.js.
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./points")));
+// Zone de correspondance (25 km) autour d'une ville NOOVA : voir cityZones.js.
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./cityZones")));
 
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.

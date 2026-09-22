@@ -1883,7 +1883,7 @@ async function confirmUserEditModal(){
       S.user.name=val;
       document.getElementById('prof-name').textContent=val;
     } else if(field==='cityLabel'){
-      const norm=normalizeCity(val);
+      const norm=await resolveCityZone(normalizeCity(val),val);
       if(!(await isCityOpen(norm))){ showToast("Noova n'est pas encore ouvert dans cette ville.",'warning'); return; }
       await db.collection('users').doc(uid).update({ city: norm, cityLabel: val });
       S._city=norm; S._cityLabel=val;
@@ -1973,6 +1973,16 @@ function normalizeCity(s){
 // Vérifie qu'une ville n'a pas été explicitement fermée par l'admin (onglet
 // Lancement). Fail-open : si le doc n'existe pas encore ou en cas d'erreur
 // réseau, on n'empêche jamais une inscription légitime.
+// Rayon de 25 km autour d'une ville NOOVA (functions/cityZones.js) : une commune qui n'est pas elle-même une ville
+// NOOVA peut être rattachée à la plus proche si elle est assez près. Ne bloque jamais une inscription en cas
+// d'erreur réseau (on garde alors la commune telle quelle, non appariée — comme avant cette fonctionnalité).
+async function resolveCityZone(norm,rawLabel){
+  if(NOOVA_KNOWN_CITIES.some(c=>c.slug===norm))return norm;   // déjà une ville NOOVA connue : rien à résoudre
+  try{
+    const r=await fx.httpsCallable('resolveCityZone')({slug:norm,label:rawLabel});
+    return (r.data&&r.data.slug)||norm;
+  }catch(e){ console.warn('resolveCityZone:',e); return norm; }
+}
 async function isCityOpen(slug){
   if(!slug) return true;
   try{
@@ -4367,7 +4377,7 @@ async function awSubmit() {
       const name = document.getElementById('aw-name').value.trim();
       const city = document.getElementById('aw-city').value.trim();
       if(!name || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
-      const cityNorm = normalizeCity(city);
+      const cityNorm = await resolveCityZone(normalizeCity(city),city);
       if(!(await isCityOpen(cityNorm))) { awShowErr('Noova n\'est pas encore ouvert dans ta ville — reviens bientôt !'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       _skipNextAuth = true;
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
@@ -6154,7 +6164,7 @@ async function saveGoogleCity() {
   const errEl = document.getElementById('gcw-err');
   if(!uid) return;
   if(!city) { errEl.textContent = 'Indique ta ville.'; errEl.style.display='block'; return; }
-  const cityNormG = normalizeCity(city);
+  const cityNormG = await resolveCityZone(normalizeCity(city),city);
   if(!(await isCityOpen(cityNormG))) { errEl.textContent = 'Noova n\'est pas encore ouvert dans ta ville — reviens bientôt !'; errEl.style.display='block'; return; }
   const btn = document.getElementById('gcw-submit-btn');
   errEl.style.display = 'none';
