@@ -899,7 +899,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dh-coin img,.dh-flame img{width:100%;height:100%;object-fit:contain}
 .dh-coin.bump{animation:coinBump .42s ease}
 @keyframes coinBump{0%{transform:scale(1)}35%{transform:scale(1.35)}60%{transform:scale(.9)}100%{transform:scale(1)}}
-.noov-fly{position:fixed;width:30px;height:30px;border-radius:50%;pointer-events:none;z-index:9999;opacity:1;transition:transform .65s cubic-bezier(.22,.85,.3,1),opacity .5s ease .18s;will-change:transform,opacity}
+.noov-fly{position:fixed;width:34px;height:34px;border-radius:50%;pointer-events:none;z-index:9999;opacity:1;transition:transform 1.35s cubic-bezier(.3,.75,.3,1),opacity .35s ease 1.05s;will-change:transform,opacity}
 .dh-noov-n{font-family:var(--fd);font-weight:800;font-size:15px}
 .dh-streak{display:flex;align-items:center;gap:3px;font-family:var(--fd);font-weight:800;font-size:19px;color:var(--ink);letter-spacing:-.4px}
 .dh-flame{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#B9B1A2}
@@ -2142,14 +2142,15 @@ function flyNoovToHeader(fromEl){
     if(!target) return;
     const from=fromEl.getBoundingClientRect(),to=target.getBoundingClientRect();
     if(!from.width || !to.width) return;
-    const size=30,fx=from.left+from.width/2-size/2,fy=from.top+from.height/2-size/2;
+    const size=34,fx=from.left+from.width/2-size/2,fy=from.top+from.height/2-size/2;
     const dx=(to.left+to.width/2)-(from.left+from.width/2),dy=(to.top+to.height/2)-(from.top+from.height/2);
     const coin=document.createElement('img');
     coin.src=NV_ASSETS.coin;coin.alt='';coin.setAttribute('aria-hidden','true');coin.className='noov-fly';
     coin.style.left=fx+'px';coin.style.top=fy+'px';
     document.body.appendChild(coin);
+    // Vol nettement plus lent (1,35 s) pour qu'on la voie vraiment monter, avant qu'elle rapetisse et disparaisse juste à l'arrivée.
     requestAnimationFrame(()=>{coin.style.transform=`translate(${dx}px,${dy}px) scale(.45) rotate(20deg)`;coin.style.opacity='0';});
-    setTimeout(()=>{coin.remove();target.classList.add('bump');setTimeout(()=>target.classList.remove('bump'),420);},680);
+    setTimeout(()=>{coin.remove();target.classList.add('bump');setTimeout(()=>target.classList.remove('bump'),420);},1420);
   }catch(e){}
 }
 // En-tête : pièce + NOOVS, flamme + série (allumée quand la journée est validée : 3 réponses), points —
