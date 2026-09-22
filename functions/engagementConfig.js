@@ -47,7 +47,7 @@ module.exports = {
   // ─── Reveal (comment les autres ont répondu) ───
   REVEAL: {
     FORMATS: ["mcq"],            // formats de question concernés (choix multiple uniquement)
-    MIN_ANSWERS: 5,              // seuil avant d'afficher un pourcentage
+    MIN_ANSWERS: 1,              // pas de seuil : dès qu'il y a une réponse, le pourcentage s'affiche
     MAX_FRIENDS: 30,             // amis regardés au maximum
     COUNT_SUSPECT: true,         // les réponses « suspectes » comptent dans les pourcentages
     COUNT_FLAGGED: true,         // les réponses « flaggées » (< MIN_FOR_GAIN_MS) aussi, pour l'instant
@@ -65,8 +65,8 @@ module.exports = {
 
   // ─── Compatibilité entre amis ─── (étape 2)
   COMPAT: {
-    MIN_COMMON: 5,               // questions en commun avant d'afficher un score
-    MIN_COMMON_PER_CATEGORY: 3,  // idem pour le détail d'une catégorie de commerce
+    MIN_COMMON: 1,               // pas de seuil : dès qu'une question est en commun, le score s'affiche
+    MIN_COMMON_PER_CATEGORY: 1,  // idem pour le détail d'une catégorie de commerce
     CACHE_MINUTES: 10,
     FORMATS: ["mcq"],            // formats comparables (un accord n'a de sens que sur un choix fermé)
     MAX_ANSWERS_SCAN: 500,       // réponses les plus récentes lues par personne

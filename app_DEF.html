@@ -901,6 +901,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dh-streak.on .dh-flame{color:#E07D0A}
 .dh-flame .fo{fill:currentColor}.dh-flame .fi{fill:#FFF3D1}
 .dh-streak.on .dh-flame .fi{fill:#FFC300}
+.dh-flame img{filter:grayscale(1) opacity(.4);transition:filter .2s}
+.dh-streak.on .dh-flame img{filter:none}
 .dh-pts-n{font-family:var(--fd);font-weight:800;font-size:15px}
 .dh-pts-l{font-size:10px;color:rgba(255,255,255,.55);font-weight:600}
 
@@ -2110,7 +2112,7 @@ async function doBrands(){
 // Images et icônes personnalisées : renseigne l'URL d'un fichier pour remplacer l'icône par défaut (rien d'autre à changer).
 // Flamme pleine de l'en-tête (l'icône « fire » du jeu d'icônes est un simple contour).
 const FLAME_SVG='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path class="fo" d="M12.6 1.8c.5 3.4-1.3 5.2-2.9 7.1C8.2 10.6 6.8 12.3 6.8 14.9a5.3 5.3 0 0 0 5.2 5.4 5.3 5.3 0 0 0 5.2-5.5c0-2.4-1.1-4.1-2.3-5.5-.4 1.5-1.3 2.3-2.4 2.6.7-3.2 0-6.3.1-10.1z"/><path class="fi" d="M12 20.3a2.7 2.7 0 0 1-2.7-2.7c0-1.7 1.4-2.6 2.7-4.2 1.3 1.6 2.7 2.5 2.7 4.2a2.7 2.7 0 0 1-2.7 2.7z"/></svg>';
-const NV_ASSETS={coin:'/noov-coin.png',flame:'',points:'',noovs:'',xp:'',rewards:''};
+const NV_ASSETS={coin:'/noov-coin.png',flame:'/noov-flame.svg',points:'',noovs:'',xp:'',rewards:''};
 function nvImg(key,fallback,alt){const u=NV_ASSETS[key];return u?'<img src="'+esc(u)+'" alt="'+esc(alt||'')+'">':fallback;}
 // Petit effet « pièce gagnée » : elle s'envole de l'écran de récompense jusqu'au score NOOVS de l'accueil
 // (#hdr-coin), même si l'accueil n'est pas l'écran affiché — .screen reste en position:absolute;inset:0

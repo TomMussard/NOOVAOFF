@@ -14,8 +14,8 @@ const { ADMIN_EMAILS } = require("./lib");
 const db = () => getFirestore();
 
 const TUNABLE = {
-  "REVEAL.MIN_ANSWERS":               { min: 2, max: 50, int: true, label: "Reveal : réponses minimum avant d'afficher les pourcentages" },
-  "COMPAT.MIN_COMMON":                { min: 2, max: 30, int: true, label: "Compatibilité : questions en commun minimum" },
+  "REVEAL.MIN_ANSWERS":               { min: 1, max: 50, int: true, label: "Reveal : réponses minimum avant d'afficher les pourcentages" },
+  "COMPAT.MIN_COMMON":                { min: 1, max: 30, int: true, label: "Compatibilité : questions en commun minimum" },
   "COMPAT.MIN_COMMON_PER_CATEGORY":   { min: 1, max: 20, int: true, label: "Compatibilité : questions en commun minimum par catégorie" },
   "NOOVS.DAILY_CAP":                  { min: 1, max: 500, int: true, label: "NOOVS : plafond par jour et par habitant" },
   "NOOVS.MIN_RESPONSE_MS":            { min: 0, max: 15000, int: true, label: "NOOVS : temps de réponse minimum en ms (0 = désactivé)" },

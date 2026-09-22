@@ -32,11 +32,11 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     check('Reveal : refusé tant qu\'on n\'a pas répondu',await err(()=>reveal('me','c1'))==='permission-denied');
     await ans('me','c1','Café');
     let r=await reveal('me','c1');
-    check('Reveal : sous le seuil (1 réponse) : pas de pourcentage, « encore N »',r.available&&r.belowThreshold===true&&r.needed===CFG.REVEAL.MIN_ANSWERS-1&&r.options.every(o=>o.pct===undefined),r);
+    check('Reveal : pas de seuil minimum, pourcentage dès la 1re réponse',r.available&&!r.belowThreshold&&r.n===1&&r.options[0].pct===100,r);
     for(const [u,a] of [['a','Café'],['b','Café'],['c','Café']]) await ans(u,'c1',a);
     await db.doc('campaignStats/c1').delete();                       // réponses insérées à la main : on force le recomptage
     r=await reveal('me','c1');
-    check('Reveal : 4 réponses = encore sous le seuil de 5 (« encore 1 »)',r.belowThreshold===true&&r.needed===1&&r.n===4,r);
+    check('Reveal : 4 réponses, toujours pas de seuil, pourcentages exacts',!r.belowThreshold&&r.n===4,r);
     for(const [u,a] of [['d','Thé'],['e','Thé'],['f','Chocolat'],['g','Café']]) await ans(u,'c1',a);
     await db.doc('campaignStats/c1').delete();
     r=await reveal('me','c1');
@@ -77,7 +77,7 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     check('Reveal : les réponses suspectes ou flaggées sont comptées (rien n\'est exclu pour l\'instant)',r.n===6,r.n);
     check('Reveal : campagne inconnue = refusé (pas de réponse à cette question)',await err(()=>E.revealCore('me',{campaignId:'zzz',questionIdx:0}))==='permission-denied');
     check('Reveal : entrée invalide refusée',await err(()=>E.revealCore('me',{}))==='invalid-argument');
-    check('Config : le seuil vient de engagementConfig.js',CFG.REVEAL.MIN_ANSWERS===5&&CFG.RESPONSE_TIME.SUSPECT_MS===4000);
+    check('Config : le seuil vient de engagementConfig.js',CFG.REVEAL.MIN_ANSWERS===1&&CFG.RESPONSE_TIME.SUSPECT_MS===4000);
   });
 
   // ═════════ INTERFACE + submitAnswer réel ═════════

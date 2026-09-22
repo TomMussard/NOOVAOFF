@@ -1639,10 +1639,10 @@ function rsQuestionHTML(q, idx, r, total){
     body = rsBars(rows, { pct: true, total: tot });
     // Réponse par tranche d'âge (abonnés seulement : les réponses de découverte n'ont pas d'âge)
     const aged = qa.filter(a => a.respondentAge);
-    if(aged.length >= 10){
+    if(aged.length >= 1){
       const groups = {}; aged.forEach(a => { const k = resAgeBucket(a.respondentAge); (groups[k] = groups[k] || []).push(a); });
-      const cols = RES_AGES.filter(k => (groups[k] || []).length >= 3);
-      if(cols.length >= 2) body += `<div class="rs-sub">Par tranche d'âge <span>(abonnés, tranches d'au moins 3 réponses)</span></div><div class="rs-tblwrap" tabindex="0" role="region" aria-label="Réponses par tranche d'âge"><table class="rs-tbl"><thead><tr><th scope="col">Réponse</th>${cols.map(k => `<th scope="col">${k}</th>`).join('')}</tr></thead><tbody>${rows.map(rw => `<tr><th scope="row">${esc(rw.label)}</th>${cols.map(k => { const g = groups[k]; return `<td>${rsPct(g.filter(a => a.answer === rw.label).length, g.length)} %</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`;
+      const cols = RES_AGES.filter(k => (groups[k] || []).length >= 1);
+      if(cols.length >= 2) body += `<div class="rs-sub">Par tranche d'âge <span>(abonnés)</span></div><div class="rs-tblwrap" tabindex="0" role="region" aria-label="Réponses par tranche d'âge"><table class="rs-tbl"><thead><tr><th scope="col">Réponse</th>${cols.map(k => `<th scope="col">${k}</th>`).join('')}</tr></thead><tbody>${rows.map(rw => `<tr><th scope="row">${esc(rw.label)}</th>${cols.map(k => { const g = groups[k]; return `<td>${rsPct(g.filter(a => a.answer === rw.label).length, g.length)} %</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`;
     }
   } else if(q.format === 'scale'){
     const vals = qa.map(a => Number(a.answer)).filter(v => v >= 1 && v <= 10);

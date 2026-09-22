@@ -30,9 +30,9 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     const sect={c1:'Boulangerie',c2:'Boulangerie',c3:'Boulangerie',c4:'Boulangerie',c5:'Restauration',c6:'Restauration',c7:'Restauration',c8:'Sport',c9:'Sport'};
     for(const [id,sector] of Object.entries(sect)) await mkCampaign(id,{sector});
     await mkCampaign('ct',{questions:[{q:'Libre ?',format:'text'}]});
-    for(const u of ['me','fA','fB','fC','fD','fE']) await mkUser(u,{name:'User '+u});
-    await db.doc('users/me').update({friendUids:['fA','fB','fC','fD','fE']});
-    for(const u of ['fA','fB','fC','fE']) await db.doc('users/'+u).update({friendUids:['me']});
+    for(const u of ['me','fA','fB','fC','fD','fE','fF']) await mkUser(u,{name:'User '+u});
+    await db.doc('users/me').update({friendUids:['fA','fB','fC','fD','fE','fF']});
+    for(const u of ['fA','fB','fC','fE','fF']) await db.doc('users/'+u).update({friendUids:['me']});   // fF : réciproque mais aucune question en commun (0)
     await db.doc('users/fC').update({shareAnswers:false});
     const ids=Object.keys(sect);
     for(const c of ids){await ans('me',c,'Café');await ans('fA',c,c==='c7'?'Thé':'Café');await ans('fC',c,'Café');await ans('fD',c,'Café');}
@@ -40,15 +40,16 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     for(const [c,a] of [['c1','Café'],['c2','Café'],['c3','Café'],['c4','Thé'],['c5','Thé'],['c6','Thé']])await ans('fE',c,a);
     await ans('me','ct','du texte');await ans('fA','ct','du texte');
     let r=await compat('me');
-    const A=byName(r,'fA'),B=byName(r,'fB'),C=byName(r,'fC'),D=byName(r,'fD'),Ef=byName(r,'fE');
+    const A=byName(r,'fA'),B=byName(r,'fB'),C=byName(r,'fC'),D=byName(r,'fD'),Ef=byName(r,'fE'),F=byName(r,'fF');
     check('Compat : ami avec 9 questions en commun (8 identiques) = 89 %',A&&A.state==='ok'&&A.pct===89&&A.common===9&&A.agree===8,A);
     check('Compat : la question texte n\'est pas comptée (format non comparable)',A.common===9);
-    check('Compat : détail par catégorie (≥ 3 en commun) : Boulangerie 100 %, Restauration 67 % ; Sport (2) masqué',A.categories.map(c=>c.category+':'+c.pct).join()==='boulangerie:100,restauration:67',A.categories);
+    check('Compat : détail par catégorie (pas de seuil) : Boulangerie 100 %, Sport 100 %, Restauration 67 %',A.categories.map(c=>c.category+':'+c.pct).join()==='boulangerie:100,sport:100,restauration:67',A.categories);
     check('Compat : 6 en commun, 3 identiques = 50 %',Ef.state==='ok'&&Ef.pct===50&&Ef.common===6,Ef);
-    check('Compat : sous le seuil (3 en commun) = « encore 2 », aucun pourcentage',B.state==='need'&&B.needed===2&&B.pct===undefined&&B.common===3,B);
+    check('Compat : pas de seuil minimum, 3 en commun = 100 % déjà affiché',B.state==='ok'&&B.pct===100&&B.common===3&&B.agree===3,B);
     check('Compat : ami qui a coupé le partage = « private », aucun pourcentage',C.state==='private'&&C.pct===undefined&&C.common===undefined,C);
     check('Compat : amitié non réciproque exclue',!D);
-    check('Compat : tri par % décroissant, puis « encore N », puis privé',r.friends.map(f=>f.uid).join()==='fA,fE,fB,fC',r.friends.map(f=>f.uid));
+    check('Compat : 0 question en commun = « encore 1 » (le seul cas sous le seuil)',F&&F.state==='need'&&F.needed===1&&F.pct===undefined&&F.common===0,F);
+    check('Compat : tri par % décroissant, puis « encore N », puis privé',r.friends.map(f=>f.uid).join()==='fB,fA,fE,fF,fC',r.friends.map(f=>f.uid));
     check('Compat : aucune réponse individuelle dans la réponse serveur',!/Café|Thé|Chocolat/.test(JSON.stringify(r)),JSON.stringify(r).slice(0,200));
     check('Compat : cache de paire enregistré',(await db.doc('compatCache/fA_me').get()).exists);
     // cache : un changement de réponse n'apparaît pas avant expiration
@@ -95,28 +96,28 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     await wf(p,()=>document.querySelectorAll('#friends-list .cp-pill.ok').length>=1&&document.querySelectorAll('#friends-list .cp-row').length>=4,null,20000);
     const rows=await p.evaluate(()=>[...document.querySelectorAll('#friends-list .cp-row')].map(r=>({n:r.querySelector('.cp-name').textContent,p:r.querySelector('.cp-pill').textContent.trim(),t:r.querySelector('.cp-pill').title,s:r.querySelector('.cp-sub').textContent})));
     await shot('compat_list');
-    check('Liste d\'amis unique : triée par compatibilité (78 → 50 → encore N → privé → en attente)',rows.map(r=>r.n).join()==='User fA,User fE,User fB,User fC,User fD',rows);
-    check('Liste : pastille de compatibilité (78 %, 50 %)',rows[0].p==='78 %'&&rows[1].p==='50 %',rows.slice(0,2));
-    check('Liste : « encore 2 » sous le seuil (détail dans l\'infobulle)',rows[2].p==='encore 2'&&/Répondez à 2 questions de plus/.test(rows[2].t),rows[2]);
-    check('Liste : « privé » pour l\'ami qui ne partage pas',rows[3].p==='privé'&&/Ne partage pas/.test(rows[3].t),rows[3]);
+    check('Liste d\'amis unique : triée par compatibilité (100 → 78 → 50 → encore N → privé → en attente)',rows.map(r=>r.n).join()==='User fB,User fA,User fE,User fF,User fC,User fD',rows);
+    check('Liste : pastille de compatibilité (100 %, 78 %)',rows[0].p==='100 %'&&rows[1].p==='78 %',rows.slice(0,2));
+    check('Liste : « encore 1 » sous le seuil (détail dans l\'infobulle)',rows[3].p==='encore 1'&&/Répondez à 1 question de plus/.test(rows[3].t),rows[3]);
+    check('Liste : « privé » pour l\'ami qui ne partage pas',rows[4].p==='privé'&&/Ne partage pas/.test(rows[4].t),rows[4]);
     check('Chaque ligne affiche ses xp et sa série',rows.every(r=>/xp/.test(r.s)&&/ j/.test(r.s)),rows.map(r=>r.s));
     check('Liste : l\'ami non réciproque apparaît « en attente » (jamais comparé)',rows.some(r=>r.n==='User fD'&&r.p==='en attente'),rows.filter(r=>r.n==='User fD'));
     // profil d'ami
-    await p.evaluate(()=>document.querySelector('#friends-list .cp-row').click());
+    await p.evaluate(()=>document.querySelector('#friends-list .cp-row[data-uid="fA"]').click());
     await wf(p,()=>document.getElementById('fprofile').classList.contains('active')&&document.querySelector('#fp-compat .fpr-big'),null,15000);
     const prof=await p.evaluate(()=>({name:document.querySelector('.fpr-name').textContent,big:document.querySelector('.fpr-big').textContent,lbl:document.querySelector('.fpr-lbl').textContent,cats:[...document.querySelectorAll('.fpr-cat')].map(c=>c.textContent.replace(/\s+/g,' ').trim()),nav:document.getElementById('bnav').classList.contains('show')}));
     await shot('compat_profile');
     check('Profil d\'ami : nom, score, détail',prof.name==='User fA'&&prof.big==='78 %'&&/7 des 9/.test(prof.lbl),prof);
-    check('Profil d\'ami : catégories Boulangerie 75 % et Restauration 67 %',prof.cats.length===2&&/Boulangerie.*75 %/.test(prof.cats[0])&&/Restauration.*67 %/.test(prof.cats[1]),prof.cats);
+    check('Profil d\'ami : catégories Sport 100 %, Boulangerie 75 % et Restauration 67 % (pas de seuil)',prof.cats.length===3&&/Sport.*100 %/.test(prof.cats[0])&&/Boulangerie.*75 %/.test(prof.cats[1])&&/Restauration.*67 %/.test(prof.cats[2]),prof.cats);
     await p.evaluate(()=>document.querySelector('#fprofile .fpr-btn').click());
     await wf(p,()=>document.getElementById('chat').classList.contains('active'),null,10000);
     check('Profil d\'ami : « Envoyer un message » ouvre la conversation',(await p.$eval('#ch-name',e=>e.textContent))==='User fA');
     await p.evaluate(()=>leaveChat());
-    // profil d'un ami sous le seuil
-    await p.evaluate(()=>openFriendProfile(S.friends.find(f=>f.uid==='fB')));
+    // profil d'un ami sous le seuil (0 question en commun)
+    await p.evaluate(()=>openFriendProfile(S.friends.find(f=>f.uid==='fF')));
     await wf(p,()=>document.querySelector('#fp-compat .fpr-lbl'),null,10000);
     const need=await p.$eval('#fp-compat',e=>e.textContent);
-    check('Profil d\'ami sous le seuil : « Répondez à 2 questions de plus », pas de score',/Répondez à 2 questions de plus/.test(need)&&!/%/.test(need),need);
+    check('Profil d\'ami sous le seuil : « Répondez à 1 question de plus », pas de score',/Répondez à 1 question de plus/.test(need)&&!/%/.test(need),need);
     await p.evaluate(()=>goTo('social'));
     // règles : réponses d'un ami qui ne partage pas
     const acc=await p.evaluate(async()=>{const t=async fn=>{try{await fn();return 'allowed';}catch(e){return e.code;}};
