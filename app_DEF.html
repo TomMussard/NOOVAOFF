@@ -897,7 +897,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dh-noov:active{transform:scale(.94)}
 .dh-coin{width:30px;height:30px;border-radius:50%;background:var(--nv-yellow);color:var(--nv-black);font-family:var(--fd);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 3px rgba(28,25,23,.22);flex-shrink:0;overflow:hidden}
 .dh-coin img,.dh-flame img{width:100%;height:100%;object-fit:contain}
-.dh-coin.bump{animation:coinBump .42s ease}
+.dh-coin.bump,.dh-pts.bump{animation:coinBump .42s ease}
 @keyframes coinBump{0%{transform:scale(1)}35%{transform:scale(1.35)}60%{transform:scale(.9)}100%{transform:scale(1)}}
 .noov-fly{position:fixed;width:34px;height:34px;border-radius:50%;pointer-events:none;z-index:9999;opacity:1;transition:transform 1.35s cubic-bezier(.3,.75,.3,1),opacity .35s ease 1.05s;will-change:transform,opacity}
 .dh-noov-n{font-family:var(--fd);font-weight:800;font-size:15px}
@@ -1345,7 +1345,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="dh-hdr">
       <button class="dh-noov" onclick="goNav('rewards-tab')" aria-label="Tes NOOVS"><span class="dh-coin hdr-coin-el" id="hdr-coin" aria-hidden="true">N</span><span class="dh-noov-n hdr-noovs-el" id="home-noovs">0</span></button>
       <div class="dh-streak hdr-streak-wrap-el" id="hdr-streak" role="img" aria-label="Série de 0 jour. Réponds à 3 questions par jour pour la faire grandir."><span class="dh-flame hdr-flame-el" id="hdr-flame"></span><span class="hdr-streak-n-el" id="home-streak">0</span></div>
-      <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
+      <button class="dh-pts hdr-pts-wrap-el" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
     </div>
     <div class="dtoday-card" id="today-card" onclick="openQ(0)">
       <div class="dtoday-photo" id="dtoday-photo">
@@ -1398,7 +1398,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div class="dh-hdr dh-hdr-compact">
       <button class="dh-noov" onclick="goNav('rewards-tab')" aria-label="Tes NOOVS"><span class="dh-coin hdr-coin-el" aria-hidden="true">N</span><span class="dh-noov-n hdr-noovs-el">0</span></button>
       <div class="dh-streak hdr-streak-wrap-el" role="img" aria-label="Série de 0 jour."><span class="dh-flame hdr-flame-el"></span><span class="hdr-streak-n-el">0</span></div>
-      <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el">0</span><span class="dh-pts-l">PTS</span></button>
+      <button class="dh-pts hdr-pts-wrap-el" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el">0</span><span class="dh-pts-l">PTS</span></button>
     </div>
     <div class="q-nav">
       <div class="q-close" onclick="exitQuestion()">✕</div>
@@ -1432,7 +1432,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="dh-hdr dh-hdr-compact" style="width:100%">
     <button class="dh-noov" onclick="goNav('rewards-tab')" aria-label="Tes NOOVS"><span class="dh-coin hdr-coin-el" aria-hidden="true">N</span><span class="dh-noov-n hdr-noovs-el">0</span></button>
     <div class="dh-streak hdr-streak-wrap-el" role="img" aria-label="Série de 0 jour."><span class="dh-flame hdr-flame-el"></span><span class="hdr-streak-n-el">0</span></div>
-    <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el">0</span><span class="dh-pts-l">PTS</span></button>
+    <button class="dh-pts hdr-pts-wrap-el" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el">0</span><span class="dh-pts-l">PTS</span></button>
   </div>
   <div class="rw-circle" style="display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg></div>
   <div class="rw-title">Bien joué !</div>
@@ -2131,14 +2131,15 @@ async function doBrands(){
 const FLAME_SVG='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path class="fo" d="M12.6 1.8c.5 3.4-1.3 5.2-2.9 7.1C8.2 10.6 6.8 12.3 6.8 14.9a5.3 5.3 0 0 0 5.2 5.4 5.3 5.3 0 0 0 5.2-5.5c0-2.4-1.1-4.1-2.3-5.5-.4 1.5-1.3 2.3-2.4 2.6.7-3.2 0-6.3.1-10.1z"/><path class="fi" d="M12 20.3a2.7 2.7 0 0 1-2.7-2.7c0-1.7 1.4-2.6 2.7-4.2 1.3 1.6 2.7 2.5 2.7 4.2a2.7 2.7 0 0 1-2.7 2.7z"/></svg>';
 const NV_ASSETS={coin:'/noov-coin.png',flame:'/noov-flame.svg',points:'',noovs:'',xp:'',rewards:''};
 function nvImg(key,fallback,alt){const u=NV_ASSETS[key];return u?'<img src="'+esc(u)+'" alt="'+esc(alt||'')+'">':fallback;}
-// Petit effet « pièce gagnée » : elle s'envole jusqu'au score NOOVS visible à l'écran — le bandeau
-// NOOVS/série/points est répété en haut de l'accueil, de la question et de la récompense (mêmes
-// classes .hdr-coin-el partagées), donc il y a toujours une vraie cible sous les yeux au moment du gain.
-function flyNoovToHeader(fromEl){
+// Petit effet « pièce gagnée » : elle s'envole jusqu'au score visible à l'écran (NOOVS par défaut,
+// ou les points via targetSel) — le bandeau NOOVS/série/points est répété en haut de l'accueil, de la
+// question et de la récompense (mêmes classes partagées), donc il y a toujours une vraie cible sous
+// les yeux au moment du gain, quel que soit l'écran affiché.
+function flyNoovToHeader(fromEl,targetSel){
   try{
     if(!fromEl || !NV_ASSETS.coin) return;
-    const active=document.querySelector('.screen.active .hdr-coin-el');
-    const target=active||document.getElementById('hdr-coin');
+    const sel=targetSel||'.hdr-coin-el';
+    const target=document.querySelector('.screen.active '+sel)||document.querySelector(sel);
     if(!target) return;
     const from=fromEl.getBoundingClientRect(),to=target.getBoundingClientRect();
     if(!from.width || !to.width) return;
@@ -5945,6 +5946,7 @@ submitAns = function() {
       } else {
         if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
         if (rwTotalEl) rwTotalEl.textContent = S.pts + ' pts';
+        flyNoovToHeader(document.querySelector('#reward .pts-earned'), '.hdr-pts-wrap-el');
         const disc = data.discoveryBonus > 0 ? 'Dont +' + data.discoveryBonus + ' pts de bonus découverte. ' : '';
         const left = typeof data.pointAnswersLeft === 'number' ? data.pointAnswersLeft : null;
         // Fin de palier : présenté comme un palier débloqué, pas comme une interdiction.
