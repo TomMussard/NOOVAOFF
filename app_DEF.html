@@ -104,7 +104,10 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-webkit-font-smoothing:antialiased}
-#shell{position:fixed;inset:0;background:var(--bg);overflow:hidden}
+/* Bandeau « en phase de test » : bloc normal (pas superposé), donc tout le reste de l'app (dont le
+   shell fixe ci-dessous) est décalé de sa hauteur — jamais recouvert, jamais à retirer écran par écran. */
+.test-banner{position:fixed;top:0;left:0;right:0;z-index:100000;background:#DC2626;color:#fff;font-family:var(--fb);font-weight:800;font-size:11px;letter-spacing:.3px;text-align:center;line-height:24px;padding-top:env(safe-area-inset-top,0px)}
+#shell{position:fixed;top:calc(24px + env(safe-area-inset-top,0px));right:0;bottom:0;left:0;background:var(--bg);overflow:hidden}
 @media(min-width:520px){
   #shell{inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:390px;height:844px;border-radius:50px;box-shadow:0 60px 120px rgba(0,0,0,.55),0 0 0 12px #2A2535,0 0 0 13px #1A1820}
   #shell::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:37px;background:#17141A;border-radius:0 0 22px 22px;z-index:999}
@@ -112,7 +115,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 }
 @media(max-width:519px){.bg-label{display:none}}
 #app{position:absolute;inset:0;overflow:hidden;background:var(--bg)}
-.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .22s ease,transform .22s ease,visibility 0s linear .23s;transform:translateX(26px);-webkit-overflow-scrolling:touch;background:var(--bg);padding-top:env(safe-area-inset-top,0px)}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .22s ease,transform .22s ease,visibility 0s linear .23s;transform:translateX(26px);-webkit-overflow-scrolling:touch;background:var(--bg)}
 .screen.active{opacity:1;pointer-events:all;visibility:visible;transition-delay:0s;transform:translateX(0)}
 .screen.exit{opacity:0;transform:translateX(-26px);pointer-events:none;visibility:visible;transition-delay:0s}
 .si{min-height:100%;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
@@ -880,6 +883,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 /* — En-tête accueil — */
 .dh-hdr{padding:52px 22px 28px;display:flex;align-items:center;justify-content:space-between}
+/* Même bandeau NOOVS/série/points, répété en haut des écrans Question et Récompense (pour qu'il
+   reste visible pendant tout le parcours et que l'animation « pièce gagnée » ait une vraie cible à l'écran). */
+.dh-hdr-compact{padding:0 2px 18px;flex-shrink:0}
 .dh-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:16px;flex-shrink:0;position:relative;overflow:hidden}
 .dh-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .dh-greet{font-size:12px;color:var(--ink2);margin-bottom:2px}
@@ -1131,6 +1137,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <script src="icons.js"></script>
 </head>
 <body>
+<div class="test-banner" role="note">Version test — NOOVA n'est pas encore lancée officiellement</div>
 <div id="shell">
 <div id="app">
 
@@ -1336,9 +1343,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="ptr-bar" id="ptr-home">↻ Actualisation…</div>
   <div class="si">
     <div class="dh-hdr">
-      <button class="dh-noov" onclick="goNav('rewards-tab')" aria-label="Tes NOOVS"><span class="dh-coin" id="hdr-coin" aria-hidden="true">N</span><span class="dh-noov-n" id="home-noovs">0</span></button>
-      <div class="dh-streak" id="hdr-streak" role="img" aria-label="Série de 0 jour. Réponds à 3 questions par jour pour la faire grandir."><span class="dh-flame" id="hdr-flame"></span><span id="home-streak">0</span></div>
-      <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
+      <button class="dh-noov" onclick="goNav('rewards-tab')" aria-label="Tes NOOVS"><span class="dh-coin hdr-coin-el" id="hdr-coin" aria-hidden="true">N</span><span class="dh-noov-n hdr-noovs-el" id="home-noovs">0</span></button>
+      <div class="dh-streak hdr-streak-wrap-el" id="hdr-streak" role="img" aria-label="Série de 0 jour. Réponds à 3 questions par jour pour la faire grandir."><span class="dh-flame hdr-flame-el" id="hdr-flame"></span><span class="hdr-streak-n-el" id="home-streak">0</span></div>
+      <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
     </div>
     <div class="dtoday-card" id="today-card" onclick="openQ(0)">
       <div class="dtoday-photo" id="dtoday-photo">
@@ -1388,6 +1395,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- QUESTION -->
 <div id="question" class="screen">
   <div class="qw">
+    <div class="dh-hdr dh-hdr-compact">
+      <button class="dh-noov" onclick="goNav('rewards-tab')" aria-label="Tes NOOVS"><span class="dh-coin hdr-coin-el" aria-hidden="true">N</span><span class="dh-noov-n hdr-noovs-el">0</span></button>
+      <div class="dh-streak hdr-streak-wrap-el" role="img" aria-label="Série de 0 jour."><span class="dh-flame hdr-flame-el"></span><span class="hdr-streak-n-el">0</span></div>
+      <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el">0</span><span class="dh-pts-l">PTS</span></button>
+    </div>
     <div class="q-nav">
       <div class="q-close" onclick="exitQuestion()">✕</div>
       <div class="q-prog" id="q-prog"></div>
@@ -1417,6 +1429,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <!-- REWARD -->
 <div id="reward" class="screen">
   <div class="conf-layer" id="conf-layer"></div>
+  <div class="dh-hdr dh-hdr-compact" style="width:100%">
+    <button class="dh-noov" onclick="goNav('rewards-tab')" aria-label="Tes NOOVS"><span class="dh-coin hdr-coin-el" aria-hidden="true">N</span><span class="dh-noov-n hdr-noovs-el">0</span></button>
+    <div class="dh-streak hdr-streak-wrap-el" role="img" aria-label="Série de 0 jour."><span class="dh-flame hdr-flame-el"></span><span class="hdr-streak-n-el">0</span></div>
+    <button class="dh-pts" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el">0</span><span class="dh-pts-l">PTS</span></button>
+  </div>
   <div class="rw-circle" style="display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg></div>
   <div class="rw-title">Bien joué !</div>
   <div class="rw-sub">Ta réponse a été envoyée</div>
@@ -2114,13 +2131,14 @@ async function doBrands(){
 const FLAME_SVG='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path class="fo" d="M12.6 1.8c.5 3.4-1.3 5.2-2.9 7.1C8.2 10.6 6.8 12.3 6.8 14.9a5.3 5.3 0 0 0 5.2 5.4 5.3 5.3 0 0 0 5.2-5.5c0-2.4-1.1-4.1-2.3-5.5-.4 1.5-1.3 2.3-2.4 2.6.7-3.2 0-6.3.1-10.1z"/><path class="fi" d="M12 20.3a2.7 2.7 0 0 1-2.7-2.7c0-1.7 1.4-2.6 2.7-4.2 1.3 1.6 2.7 2.5 2.7 4.2a2.7 2.7 0 0 1-2.7 2.7z"/></svg>';
 const NV_ASSETS={coin:'/noov-coin.png',flame:'/noov-flame.svg',points:'',noovs:'',xp:'',rewards:''};
 function nvImg(key,fallback,alt){const u=NV_ASSETS[key];return u?'<img src="'+esc(u)+'" alt="'+esc(alt||'')+'">':fallback;}
-// Petit effet « pièce gagnée » : elle s'envole de l'écran de récompense jusqu'au score NOOVS de l'accueil
-// (#hdr-coin), même si l'accueil n'est pas l'écran affiché — .screen reste en position:absolute;inset:0
-// pendant qu'il est caché (juste invisible), donc getBoundingClientRect() y renvoie une vraie position.
+// Petit effet « pièce gagnée » : elle s'envole jusqu'au score NOOVS visible à l'écran — le bandeau
+// NOOVS/série/points est répété en haut de l'accueil, de la question et de la récompense (mêmes
+// classes .hdr-coin-el partagées), donc il y a toujours une vraie cible sous les yeux au moment du gain.
 function flyNoovToHeader(fromEl){
   try{
     if(!fromEl || !NV_ASSETS.coin) return;
-    const target=document.getElementById('hdr-coin');
+    const active=document.querySelector('.screen.active .hdr-coin-el');
+    const target=active||document.getElementById('hdr-coin');
     if(!target) return;
     const from=fromEl.getBoundingClientRect(),to=target.getBoundingClientRect();
     if(!from.width || !to.width) return;
@@ -2134,21 +2152,22 @@ function flyNoovToHeader(fromEl){
     setTimeout(()=>{coin.remove();target.classList.add('bump');setTimeout(()=>target.classList.remove('bump'),420);},680);
   }catch(e){}
 }
-// En-tête de l'accueil : pièce + NOOVS, flamme + série (allumée quand la journée est validée : 3 réponses), points.
+// En-tête : pièce + NOOVS, flamme + série (allumée quand la journée est validée : 3 réponses), points —
+// répété (mêmes classes) en haut de l'accueil, de la question et de la récompense : une seule mise à
+// jour ici les synchronise toutes, pour que NOOVS/série/points restent visibles tout le long du parcours.
 function renderHeaderStats(){
-  const nv=document.getElementById('home-noovs');if(nv)nv.textContent=S.noovs||0;
-  const coin=document.getElementById('hdr-coin');if(coin)coin.innerHTML=nvImg('coin','N','');
-  const st=document.getElementById('hdr-streak');if(!st)return;
+  document.querySelectorAll('.hdr-noovs-el').forEach(nv=>nv.textContent=S.noovs||0);
+  document.querySelectorAll('.hdr-coin-el').forEach(coin=>coin.innerHTML=nvImg('coin','N',''));
+  document.querySelectorAll('.hdr-pts-n-el').forEach(e=>animateNumber(e,S.pts));
   const on=S._streakDate===parisToday()&&(S.streak||0)>0;
-  st.classList.toggle('on',on);
-  document.getElementById('home-streak').textContent=S.streak||0;
-  document.getElementById('hdr-flame').innerHTML=nvImg('flame',FLAME_SVG,'');
-  st.setAttribute('aria-label','Série de '+(S.streak||0)+' jour'+((S.streak||0)>1?'s':'')+(on?' : journée validée.':'. Réponds à 3 questions aujourd\'hui pour la faire grandir.'));
+  const label='Série de '+(S.streak||0)+' jour'+((S.streak||0)>1?'s':'')+(on?' : journée validée.':'. Réponds à 3 questions aujourd\'hui pour la faire grandir.');
+  document.querySelectorAll('.hdr-streak-wrap-el').forEach(st=>{st.classList.toggle('on',on);st.setAttribute('aria-label',label);});
+  document.querySelectorAll('.hdr-streak-n-el').forEach(e=>e.textContent=S.streak||0);
+  document.querySelectorAll('.hdr-flame-el').forEach(e=>e.innerHTML=nvImg('flame',FLAME_SVG,''));
 }
 function refreshHome(){
   if(!S.user)return;
-  animateNumber(document.getElementById('home-pts'),S.pts);
-  renderHeaderStats();
+  renderHeaderStats();   // met aussi à jour #home-pts (S.pts), en plus des NOOVS/série
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('today-card').classList.toggle('disc',!!q._discovery);document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector(':scope > img');
     if(q.photoUrl){
