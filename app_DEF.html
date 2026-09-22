@@ -1612,7 +1612,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="acc-body">
         <div id="notif-device"></div>
         <div id="notif-switches"></div>
-        <div style="font-size:11px;color:var(--ink3);line-height:1.55;padding:2px 14px 12px">Au maximum une notification par jour, jamais entre 21h et 9h. Tu peux couper chaque type séparément.</div>
+        <div style="font-size:11px;color:var(--ink3);line-height:1.55;padding:2px 14px 12px">Au maximum 3 notifications par jour, jamais entre 21h et 9h. Tu peux couper chaque type séparément.</div>
       </div>
     </div>
     <div class="set-eyebrow">Activité</div>
@@ -5151,6 +5151,10 @@ function finishAuthTransition() {
     if(socScroll)  initPullToRefresh(socScroll,  'ptr-social', ()=>{ loadCommunityFeed(); });
   }
   refreshHome(); renderSocial(); goTo('home');
+  // Le teaser « Ta prochaine récompense » (accueil) dépend de S._rewardsCache, sinon rempli
+  // seulement en ouvrant l'onglet Récompenses ou via loadNearbyMerchants — un compte tout
+  // neuf sans commerce autorisé n'aurait donc rien à accrocher à l'arrivée.
+  if(document.getElementById('gift-grid')) loadRewardsFromFirestore();
   applyStagger(document.querySelector('#home .si'));
   // Le tuto et l'invite d'installation ne se chevauchent jamais : un nouveau compte voit
   // d'abord le tuto (cette session), l'invite d'installation arrive à une session suivante.

@@ -5,7 +5,7 @@
  *   - elle apparaît dans la communauté de la ville (communityEvents, type « merchant_post ») ;
  *   - les habitants qui ont répondu (aux questions rattachées, sinon à n'importe quelle question du
  *     commerce) reçoivent « Ton avis a compté », par deliver() — donc soumis à toutes les règles
- *     habituelles (1 notification/jour, silence 21h–9h, réglage « Actualités des commerces », décroissance) ;
+ *     habituelles (plafond quotidien de 2 à 3 notifications, silence 21h–9h, réglage « Actualités des commerces », décroissance) ;
  *   - au plus UNE actualité notifiée par commerce tous les NOTIFY_GAP_DAYS (les suivantes restent
  *     visibles dans la communauté, sans notification).
  * Le commerçant ne déclenche jamais lui-même une notification : seul le passage à « published »,

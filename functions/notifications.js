@@ -32,7 +32,8 @@ const IMMINENT_UNIT_PTS = CFG.POINTS.PER_ANSWER;    // points d'une réponse (ba
 
 // Un type = une famille de règles. « nudge » : relance soumise à la règle « aucune notification
 // le jour où l'habitant a déjà répondu ». Les types issus de sa propre action (récompense, résultat,
-// code) n'y sont pas soumis. « exceptional » : peut utiliser la 2e notification autorisée du jour.
+// code) n'y sont pas soumis. Plafond quotidien : 2 notifications « normales » au maximum ; un type
+// « exceptional » peut utiliser un 3e créneau, jamais plus (voir deliver()).
 const TYPES = {
   question_du_jour:     { group: "question",    nudge: true,  gapDays: 1 },
   nouveau_commerce:     { group: "commerces",   nudge: true,  gapDays: 7, deferQuiet: true, ttlH: 24 },
@@ -173,7 +174,7 @@ async function deliver(uid, type, content, opts = {}) {
     if (weekly) { if (now - (stat.lastSentAt || 0) < 7 * DAY - 3600000) { out = { status: "skip", reason: "weekly" }; return; } }
     else if (cfg.gapDays === 1 && stat.lastSentDay === p.day) { out = { status: "skip", reason: "once_a_day" }; return; }
     const daily = u.notifDaily && u.notifDaily.date === p.day ? u.notifDaily.count || 0 : 0;
-    if (daily >= (cfg.exceptional ? 2 : 1)) { out = { status: "blocked", reason: "cap" }; return; }
+    if (daily >= (cfg.exceptional ? 3 : 2)) { out = { status: "blocked", reason: "cap" }; return; }   // 2/jour, 3 avec un type exceptionnel
 
     tx.update(userRef, {
       notifDaily: { date: p.day, count: daily + 1 },

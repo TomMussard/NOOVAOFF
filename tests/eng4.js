@@ -108,13 +108,13 @@ const settle=async()=>{await sleep(4500);for(const c of ['_pushSink','notifLog',
     const q=await db.collection('notifQueue').get();
     check('Heures de silence : reportée au lendemain 9h (notifQueue), pas envoyée',q.docs.some(d=>d.id==='u1_impact_post_pF')&&(await sink('u1')).length===3,q.docs.map(d=>d.id));
     check('Type « impact » rattaché au groupe « actualites » (7e réglage)',N.TYPES.impact.group==='actualites'&&N.GROUPS.actualites.includes('impact')&&Object.keys(N.GROUPS).length===7);
-    // — plafond 1/jour entre types —
+    // — plafond 2 notifications « normales »/jour entre types —
     await db.doc('merchants/m1').update({lastImpactNotifyAt:admin.firestore.FieldValue.delete()});   // isole le plafond quotidien du plafond commerce
-    await db.doc('users/u1').update({notifDaily:{date:'2026-11-30',count:1}});
+    await db.doc('users/u1').update({notifDaily:{date:'2026-11-30',count:2}});
     await setClock(Date.parse('2026-11-30T10:00:00Z'));
     await post('pG',{text:'Merci : nous acceptons maintenant les paiements sans contact.'});await publish('pG');
     await until(async()=>(await db.doc('merchantPosts/pG').get()).data().notifyNote);await sleep(1000);
-    check('Plafond quotidien : 1 notification/jour (déjà servie) → pas de 2e envoi',(await sink('u1')).length===3,(await sink('u1')).length);
+    check('Plafond quotidien : 2 notifications « normales » déjà servies → pas de 3e envoi normal',(await sink('u1')).length===3,(await sink('u1')).length);
   });
 
   // ═════════ RÈGLES ═════════
