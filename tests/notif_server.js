@@ -5,6 +5,8 @@ admin.initializeApp({ projectId: 'noova-366d0' });
 const db = admin.firestore();
 const { Timestamp } = admin.firestore;
 const N = require(__dirname+'/../functions/notifications.js')._t;
+const P = require(__dirname+'/../functions/points.js')._t;
+const CFG = require(__dirname+'/../functions/engagementConfig.js');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let pass = 0, fail = 0;
 const check = (n, ok, x) => { ok ? pass++ : fail++; console.log((ok ? 'PASS ' : 'FAIL ') + n + (x !== undefined && (!ok || process.env.V) ? '  -> ' + JSON.stringify(x) : '')); };
@@ -411,6 +413,30 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await N.trackOpen('u1', a.nid, false);
     const m = (await db.doc('notifMetrics/ami').get()).data();
     check('Métriques par type : envois, ouvertures', m.sent === 2 && m.opened === 1, m);
+  });
+
+  // ═════════ ALERTE AVANT EXPIRATION DES POINTS (~30 jours avant) ═════════
+  await T('points expirant', async () => {
+    await wipe();
+    const DAY = 86400000;
+    const now = at(D1, '10:00');
+    const monthsAgo = (n) => { const d = new Date(now); d.setMonth(d.getMonth() - n); return d.getTime(); };
+    const exactly30 = monthsAgo(CFG.POINTS.EXPIRY_MONTHS) + 30 * DAY;          // expire dans pile 30 jours
+    await mkUser('u30', { points: 120, lastActivityAt: Timestamp.fromMillis(exactly30) });
+    await mkUser('u35', { points: 80, lastActivityAt: Timestamp.fromMillis(exactly30 + 5 * DAY) });   // expire dans 35 j : trop tôt
+    await mkUser('u25', { points: 60, lastActivityAt: Timestamp.fromMillis(exactly30 - 5 * DAY) });   // expire dans 25 j : trop tard
+    await mkUser('u0', { points: 0, lastActivityAt: Timestamp.fromMillis(exactly30) });               // plus de solde : rien à sauver
+    await mkUser('uOff', { points: 40, lastActivityAt: Timestamp.fromMillis(exactly30), notifPrefs: { recompenses: false } });
+    const r = await P.warnExpiringInactive(now);
+    check('Exactement à 30 jours de l\'expiration, avec un solde : prévenu', (await sink('u30')).length === 1, r);
+    check('Le message annonce le bon nombre de points, sans culpabilisation', /120 pts/.test((await sink('u30'))[0].title) && /30 jours/.test((await sink('u30'))[0].title), (await sink('u30'))[0]);
+    check('Trop tôt (35 jours avant expiration) : pas encore prévenu', (await sink('u35')).length === 0);
+    check('Trop tard (n\'expire plus que dans 25 jours : la fenêtre des 30 jours est déjà passée) : pas prévenu ici', (await sink('u25')).length === 0);
+    check('Solde à 0 : jamais prévenu (rien à perdre)', (await sink('u0')).length === 0);
+    check('Groupe « recompenses » (même réglage que les autres notifications de récompenses, pas de nouvel interrupteur)', N.TYPES.points_expirant.group === 'recompenses' && N.GROUPS.recompenses.includes('points_expirant'));
+    check('« Mes récompenses » désactivé : pas prévenu', (await sink('uOff')).length === 0);
+    const r2 = await P.warnExpiringInactive(now);
+    check('Relancer le même jour ne double pas l\'envoi (déduplication par cycle d\'inactivité)', (await sink('u30')).length === 1, r2);
   });
 
   console.log(`\n===== ${pass}/${pass + fail} OK =====`);

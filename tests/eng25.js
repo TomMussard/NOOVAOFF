@@ -87,8 +87,11 @@ const login=async(p,email)=>{await p.goto(APP,{waitUntil:'load'});await wf(p,()=
 
   await T('questions bulle / plein écran',async()=>{
     await p.evaluate(()=>goNav('home'));await sleep(400);
-    const modes=await p.evaluate(()=>{const m={};for(let i=0;i<40;i++){const k=qMode({_firestoreId:'camp'+i,_questionIdx:i%3});m[k]=(m[k]||0)+1;}return {m,same:qMode({_firestoreId:'abc',_questionIdx:1})===qMode({_firestoreId:'abc',_questionIdx:1})};});
+    const modes=await p.evaluate(()=>{const m={};for(let i=0;i<40;i++){const k=qMode({_firestoreId:'camp'+i,_questionIdx:i%3});m[k]=(m[k]||0)+1;}
+      const perCampaign=[0,1,2].map(idx=>qMode({_firestoreId:'campX',_questionIdx:idx}));
+      return {m,same:qMode({_firestoreId:'abc',_questionIdx:1})===qMode({_firestoreId:'abc',_questionIdx:1}),perCampaign};});
     check('Les deux mises en page sont utilisées (répartition proche de moitié-moitié) et le choix est stable pour une question donnée',modes.m.full>=10&&modes.m.bubble>=10&&modes.same,modes);
+    check('Les 3 questions d\'une même campagne partagent toujours la même mise en page (jamais bulle puis plein écran au sein d\'un même commerce)',new Set(modes.perCampaign).size===1,modes.perCampaign);
     const pickQ=async(mode,type)=>p.evaluate((mode,type)=>{for(let i=0;i<60;i++){const q={_firestoreId:'z'+i,_merchantId:'m1',brand:'Le Fournil',ico:'x',pts:10,type,q:'Quelle est ta boisson préférée du matin ?',hint:'',opts:['Café','Thé','Chocolat'],items:['Café','Thé','Chocolat'],theme:'Boulangerie',usage:'Ta réponse aide Le Fournil'};if(qMode(q)===mode){S.qs=[q];S.mode='hook';S.qIdx=0;S.curQ=q;fillQuestion(q,{skipLabel:'Passer',skipFn:"goNav('home')"});goTo('question');return true;}}return false;},mode,type);
     check('Question « plein écran » ouverte',await pickQ('full','mcq'));await sleep(700);
     const f=await p.evaluate(()=>{const q=document.getElementById('question');const o=document.querySelector('#ans-area .mcq-opt');const t=document.getElementById('q-text');return {cls:q.classList.contains('qfull'),bg:getComputedStyle(q).backgroundColor,opt:getComputedStyle(o).backgroundColor,optColor:getComputedStyle(o).color,fs:parseFloat(getComputedStyle(t).fontSize),n:document.querySelectorAll('#ans-area .mcq-opt').length,letter:getComputedStyle(o,'::before').content};});

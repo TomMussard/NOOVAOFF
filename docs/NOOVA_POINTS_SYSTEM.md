@@ -32,7 +32,7 @@ Le solde est **universel** : utilisable chez tous les commerçants de la ville d
 | Bonus découverte | **+5** | La première fois qu'on répond à un commerçant donné, **une fois par jour au maximum** (`answeredMerchants`, `discoveryBonusDate`). |
 | Expiration | — | Les points expirent après **6 mois sans aucune activité** (§3). |
 
-Il n'y a **plus** de bonus « série complète » ni de bonus de série quotidienne. La série (`streak`) est un simple compteur de jours d'affilée, sans points : **un jour ne compte que si l'habitant a répondu à au moins 3 questions ce jour-là** (se connecter ne suffit pas ; `streakDate` = dernier jour validé). Elle s'affiche en haut de l'accueil (flamme + nombre).
+Il n'y a **plus** de bonus « série complète » ni de bonus de série quotidienne. La série (`streak`) est un simple compteur de jours d'affilée, sans points : **un jour ne compte que si l'habitant a répondu à au moins 3 questions ce jour-là** (se connecter ne suffit pas ; `streakDate` = dernier jour validé) — **ou à toutes les campagnes actives de sa ville s'il y en a moins de 3** (une ville qui démarre n'offre pas toujours 3 questions par jour ; vérifié côté serveur, au plus une fois par jour et par habitant). Elle s'affiche en haut de l'accueil (flamme + nombre).
 
 **Tout le crédit se fait côté serveur**, jamais côté client :
 
@@ -49,6 +49,8 @@ Le total gagné (réponse + bonus) est aussi ajouté à `merchants/{id}.pointsGe
 ## 3. Expiration
 
 Chaque activité (réponse, échange, bonus de bienvenue) met à jour `users.lastActivityAt`. La fonction planifiée `expirePoints` (tous les jours à 4 h 30, heure de Paris) remet à 0 le solde `points` des comptes dont `lastActivityAt` a plus de **6 mois**, et journalise chaque expiration dans `pointsExpirations`. L'`xp` n'est jamais touché.
+
+Jamais de perte sans préavis : `notifyPointsExpiring` (tous les jours à 10 h) prévient l'habitant environ **30 jours avant** (notification « Tes N pts expirent dans 30 jours », groupe « recompenses », un seul envoi par cycle d'inactivité).
 
 ---
 

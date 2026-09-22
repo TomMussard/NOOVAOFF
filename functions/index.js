@@ -183,12 +183,34 @@ exports.submitAnswer = onCall(async (request) => {
     const totalEarned = earnedPts + discoveryBonus;
     // Une réponse trop rapide (non lue) ne consomme pas le quota du jour.
     const newAnswersToday = answersToday + (flagged ? 0 : 1);
-    // Série : un jour compte quand l'habitant a répondu à au moins 3 questions ce jour-là (se connecter ne suffit pas).
+    // Série : un jour compte à partir de 3 réponses — ou plus tôt si l'habitant a répondu à TOUTES les campagnes
+    // actuellement actives de sa ville (une ville qui démarre n'offre pas toujours 3 questions par jour). Cette
+    // deuxième vérification ne coûte qu'une requête, et seulement tant que nécessaire (jamais une fois le seuil
+    // atteint, ni si la journée est déjà validée) : au plus une fois par jour et par habitant.
     let streakValidatedNow = false;
-    if (!flagged && newAnswersToday >= CFG.STREAK.MIN_ANSWERS_PER_DAY && newStreakDate !== today) {
-      newStreak = newStreakDate === yesterdayStr() ? (user.streak || 0) + 1 : 1;
-      newStreakDate = today;
-      streakValidatedNow = true;
+    if (!flagged && newStreakDate !== today) {
+      if (newAnswersToday >= CFG.STREAK.MIN_ANSWERS_PER_DAY) {
+        streakValidatedNow = true;
+      } else {
+        const answeredSet = new Set(user.answeredCampaigns || []);
+        if (qIdx === 0) answeredSet.add(campaignId);
+        const cityCampaigns = await db.collection("campaigns")
+          .where("status", "==", "active").where("targetCity", "==", campCity)
+          .select("ageRanges", "endsAt").limit(200).get();
+        const nowMs = Date.now();
+        const stillAvailable = cityCampaigns.docs.some((d) => {
+          if (d.id === campaignId || answeredSet.has(d.id)) return false;
+          const dd = d.data();
+          if (dd.endsAt && dd.endsAt.toMillis && dd.endsAt.toMillis() < nowMs) return false;
+          const ar = dd.ageRanges || [];
+          return !(ar.length && userAge && !ar.includes(userAge));
+        });
+        if (!stillAvailable) streakValidatedNow = true;
+      }
+      if (streakValidatedNow) {
+        newStreak = newStreakDate === yesterdayStr() ? (user.streak || 0) + 1 : 1;
+        newStreakDate = today;
+      }
     }
     // Palier de statut atteint (fil des amis) : comparé avant / après ce gain d'xp.
     const statusOf = (xp) => CFG.STATUS.filter((t) => xp >= t.min).pop();

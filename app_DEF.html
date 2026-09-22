@@ -2163,7 +2163,9 @@ function renderQueue(){
 // Consigne courte selon le format de la question (au lieu d'un « Donne ton avis » générique).
 function defaultHint(type){return {mcq:'Choisis la réponse qui te ressemble.',text:'Écris ce que tu en penses, en une ou deux phrases.',scale:'Place le curseur là où tu te situes.',rank:'Classe du plus au moins important.'}[type]||'';}
 // « bulle » ou « plein écran » : réparti à peu près moitié-moitié, mais toujours identique pour une même question.
-function qMode(q){return hash01(String((q&&(q._firestoreId||q.q))||'')+'|'+((q&&q._questionIdx)||0))<0.5?'full':'bubble';}
+// Par CAMPAGNE (pas par question) : les 2e/3e questions d'un même commerce gardent la mise en page de la 1re — sinon
+// changer de style en plein milieu d'une série de questions du même commerce paraît arbitraire plutôt que voulu.
+function qMode(q){return hash01(String((q&&(q._firestoreId||q.q))||''))<0.5?'full':'bubble';}
 function openQ(idx){
   S.qIdx=idx;S.curQ=S.qs[idx];if(!S.curQ)return;const q=S.curQ;
   document.getElementById('question').classList.toggle('qfull',qMode(q)==='full');

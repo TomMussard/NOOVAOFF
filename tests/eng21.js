@@ -77,6 +77,32 @@ const setClock=ms=>db.doc('_testClock/now').set({ms});
     check('pointsGenerated cumule tout ce que les questions du commerçant ont rapporté (15 + 10 + 10 = 35)',m.pointsGenerated===35,m.pointsGenerated);
   });
 
+  // Ville à part (« angers ») pour contrôler exactement combien de campagnes y sont actives, sans toucher aux tests « le-mans ».
+  const campA=(id,mid)=>db.doc('campaigns/'+id).set({merchantId:mid,merchantName:'Commerce '+mid,sector:'Boulangerie',status:'active',targetCity:'angers',city:'angers',question:'Q ?',questions:[{q:'Q ?',format:'mcq',options:['A','B']}],targetVolume:500,answersCount:0,createdAt:Timestamp.now()});
+  await T('série adaptative : moins de 3 questions disponibles dans la ville',async()=>{
+    await db.doc('merchants/am1').set({role:'merchant',ownerUid:'am1',brandName:'A1',city:'angers',status:'verified',email:'am1@s.fr'});
+    await db.doc('merchants/am2').set({role:'merchant',ownerUid:'am2',brandName:'A2',city:'angers',status:'verified',email:'am2@s.fr'});
+    await campA('ac1','am1');await campA('ac2','am2');   // 2 campagnes seulement dans toute la ville : 3 réponses impossibles
+    await mkUser('az1',{city:'angers',cityLabel:'Angers',authorizedMerchants:['am1','am2']});
+    const r1=await answer('az1','ac1',0);
+    check('1re réponse (2 campagnes existent dans la ville, 1 restante) : série pas encore validée',r1.streakToday===false&&r1.streak===0,r1);
+    const r2=await answer('az1','ac2',0);
+    check('2e réponse : plus aucune campagne restante dans la ville → série validée avec seulement 2 réponses',r2.streakToday===true&&r2.streak===1,r2);
+    const today=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});
+    check('streakDate posé à aujourd\'hui',(await db.doc('users/az1').get()).data().streakDate===today);
+  });
+  await T('série adaptative : le seuil de 3 reste la règle s\'il y a assez de questions',async()=>{
+    await db.doc('merchants/am3').set({role:'merchant',ownerUid:'am3',brandName:'A3',city:'angers',status:'verified',email:'am3@s.fr'});
+    await campA('ac3','am3');   // 3e campagne désormais disponible dans la ville
+    await mkUser('az2',{city:'angers',cityLabel:'Angers',authorizedMerchants:['am1','am2','am3']});
+    const r1=await answer('az2','ac1',0);
+    check('1re réponse : série non validée (3 campagnes existent dans la ville)',r1.streakToday===false,r1);
+    const r2=await answer('az2','ac2',0);
+    check('2e réponse : toujours pas validée (ac3 n\'a pas encore de réponse)',r2.streakToday===false,r2);
+    const r3=await answer('az2','ac3',0);
+    check('3e réponse : validée normalement, le seuil de 3 étant atteint',r3.streakToday===true&&r3.streak===1,r3);
+  });
+
   await T('échange',async()=>{
     await mkUser('r1',{points:2000,xp:2000});await mkUser('r2',{points:100});
     await db.doc('rewards/m1_p1').set(rewardDoc('m1',1));await db.doc('rewards/m1_p2').set(rewardDoc('m1',2,{withPurchase:true,minPurchase:8}));

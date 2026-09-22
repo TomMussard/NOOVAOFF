@@ -40,6 +40,7 @@ const TYPES = {
   recompense_debloquee: { group: "recompenses", nudge: false, exceptional: true, deferQuiet: true, deferBusy: true, ttlH: 48 },
   serie_en_danger:      { group: "serie",       nudge: true,  exceptional: true, gapDays: 1 },
   code_expire:          { group: "recompenses", nudge: false, exceptional: true },
+  points_expirant:      { group: "recompenses", nudge: false, exceptional: true, deferQuiet: true, ttlH: 72 },
   ami:                  { group: "amis",        nudge: true,  gapDays: 1, deferQuiet: true, ttlH: 12 },
   // « Ton avis a compté » : issu de l'action de l'habitant (il a répondu), donc pas une relance.
   impact:               { group: "actualites",  nudge: false, deferQuiet: true, ttlH: 48 },
@@ -49,7 +50,7 @@ const GROUPS = {
   commerces: ["nouveau_commerce"],
   resultats: ["resultat_dispo"],
   serie: ["serie_en_danger"],
-  recompenses: ["recompense_debloquee", "code_expire"],
+  recompenses: ["recompense_debloquee", "code_expire", "points_expirant"],
   amis: ["ami"],
   actualites: ["impact"],
 };
@@ -99,6 +100,7 @@ const copy = {
   recompense: ({ reward, merchant, cost }) => finish({ title: `Ton ${short(reward, 26)} chez ${short(merchant, 20)} est à toi`, body: `Échange-le contre tes ${cost} points`, screen: "rewards-tab" }),
   serie: ({ n, merchant }) => finish({ title: `Ta série est à ${n} jours`, body: `${short(merchant, 30)} a une question : réponds à 3 questions aujourd'hui pour la garder`, screen: "home" }),
   code: ({ reward, merchant, when, until }) => finish({ title: `Ton ${short(reward, 26)} expire ${when}`, body: `Chez ${short(merchant, 30)}, à utiliser avant ${until}`, screen: "rewards-tab" }),
+  pointsExpirant: ({ points }) => finish({ title: `Tes ${points} pts expirent dans 30 jours`, body: "Réponds à une question pour les garder", screen: "rewards-tab" }),
   impact: ({ merchant, text }) => finish({ title: `Ton avis a compté chez ${short(merchant, 30)}`, body: short(text, 110), screen: "social" }),
   amiRequest: ({ name }) => finish({ title: `${short(name, 30)} veut être ton ami`, body: "Accepte sa demande dans NOOVA", screen: "social" }),
   amiAccepted: ({ name }) => finish({ title: `${short(name, 30)} est maintenant ton ami`, body: "Découvre votre classement", screen: "social" }),

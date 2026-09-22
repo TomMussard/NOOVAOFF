@@ -183,6 +183,42 @@ const expirePoints = onSchedule({ schedule: "every day 04:30", timeZone: "Europe
   logger.info("expirePoints", r);
 });
 
+// ─────────────────────────── Alerte avant expiration ───────────────────────────
+// Prévient ~30 jours avant que le solde ne tombe à 0 (expireInactive ci-dessus, silencieux) : jamais de perte de points
+// sans préavis. Le balayage quotidien capte chaque compte à ce moment précis (fenêtre d'un jour, mois calendaires comme
+// expireInactive) ; la clé de dédoublonnage de deliver() (le jour visé) garantit un seul envoi par cycle d'inactivité.
+const EXPIRY_WARNING_DAYS = 30;
+async function warnExpiringInactive(now) {
+  const N = require("./notifications")._t;
+  const cutoff = new Date(now);
+  cutoff.setMonth(cutoff.getMonth() - CFG.POINTS.EXPIRY_MONTHS);
+  const upper = cutoff.getTime() + EXPIRY_WARNING_DAYS * DAY;       // lastActivityAt à cette date : expire dans pile 30 jours
+  const lower = upper - DAY;
+  const snap = await db().collection("users")
+    .where("lastActivityAt", ">", Timestamp.fromMillis(lower))
+    .where("lastActivityAt", "<=", Timestamp.fromMillis(upper))
+    .get();
+  let sent = 0;
+  for (const d of snap.docs) {
+    const u = d.data();
+    if (!(u.points > 0)) continue;
+    const last = u.lastActivityAt.toMillis();
+    const expiresAt = new Date(last); expiresAt.setMonth(expiresAt.getMonth() + CFG.POINTS.EXPIRY_MONTHS);
+    const expiresOn = parisDay(expiresAt.getTime());
+    try {
+      const content = N.copy.pointsExpirant({ points: u.points });
+      const r = await N.deliver(d.id, "points_expirant", content, { key: `expiry_${expiresOn}`, now });
+      if (r.status === "sent") sent++;
+    } catch (e) { logger.warn("warnExpiringInactive", d.id, e.message); }
+  }
+  return { checked: snap.size, sent };
+}
+
+const notifyPointsExpiring = onSchedule({ schedule: "every day 10:00", timeZone: "Europe/Paris", retryCount: 0 }, async () => {
+  const r = await warnExpiringInactive(await nowMs());
+  logger.info("notifyPointsExpiring", r);
+});
+
 // Suppression d'un compte (par l'habitant lui-même, depuis l'app) : le client ne peut pas effacer les données de points gérées
 // par le serveur (limites d'échange, journal d'expiration) — elles partent ici avec le profil (droit à l'effacement).
 const onUserDeletedPoints = onDocumentDeleted("users/{uid}", async (event) => {
@@ -192,4 +228,4 @@ const onUserDeletedPoints = onDocumentDeleted("users/{uid}", async (event) => {
   for (const d of ex.docs) await d.ref.delete();
 });
 
-module.exports = { claimWelcomeBonus, redeemReward, expirePoints, onUserDeletedPoints, _t: { expireInactive, inTimeSlots, parisClock, newCode } };
+module.exports = { claimWelcomeBonus, redeemReward, expirePoints, notifyPointsExpiring, onUserDeletedPoints, _t: { expireInactive, warnExpiringInactive, inTimeSlots, parisClock, newCode } };
