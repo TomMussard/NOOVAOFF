@@ -247,6 +247,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .cm-compat-big{font-family:var(--fd);font-weight:800;font-size:34px;letter-spacing:-1px;color:var(--nv-yellow);line-height:1}
 .cm-compat-t{font-size:13px;line-height:1.4;color:#fff}
 .cm-compat .cp-bar{background:rgba(255,255,255,.18)}.cm-compat .cp-bar>div{background:var(--nv-yellow)}
+/* Carte « Tes avis ont aidé N commerces » : calculée localement (jamais stockée), réservée à son auteur, toujours en tête du fil. */
+.feed-post.cm-mine{background:var(--nv-black);color:#fff;padding:16px 16px 17px;display:flex;gap:13px;align-items:flex-start}
+.cm-mine-ico{width:36px;height:36px;border-radius:12px;background:rgba(255,195,0,.16);color:var(--nv-yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cm-mine-t{font-size:13px;line-height:1.55;color:rgba(255,255,255,.85)}
+.cm-mine-t strong{color:var(--nv-yellow)}
 .cm-invite{margin:0 18px 8px;background:var(--yellow-soft);border-radius:var(--r-card);padding:16px}
 .cm-invite-t{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)}
 .cm-invite-d{font-size:12px;color:var(--ink2);line-height:1.55;margin:4px 0 12px}
@@ -262,7 +267,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .legal-links a{color:var(--ink2);text-decoration:underline;padding:8px 2px;min-height:24px}
 @supports (-webkit-touch-callout:none){input,select,textarea{font-size:16px!important}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
-.set-danger{padding:12px 13px 10px;border-top:1px solid var(--bg3);margin-top:8px}
+.set-danger{padding:16px;border-top:1px solid var(--bg2);margin-top:6px}
 .set-danger-l{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
 .mm-sum{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--ink2);margin:0 0 12px}
 .mm-sum button{background:none;border:none;color:var(--ink);font-weight:800;text-decoration:underline;font-size:12.5px;cursor:pointer;font-family:var(--fb);padding:8px 0}
@@ -396,11 +401,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .bi-logo{width:44px;height:44px;border-radius:var(--r-icon);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;background:var(--bg2)}
 .bi-name{font-size:13px;font-weight:700;color:var(--ink)}
 .bi-use{font-size:10px;color:var(--ink3);margin-top:2px;line-height:1.45}
-.tgl{position:relative;width:44px;height:24px;flex-shrink:0;cursor:pointer;display:block}
+.tgl{position:relative;width:46px;height:26px;flex-shrink:0;cursor:pointer;display:block}
 .tgl input{opacity:0;width:0;height:0;position:absolute}
 .tgl-t{position:absolute;inset:0;border-radius:99px;background:var(--bg3);transition:background .2s}
 .tgl input:checked~.tgl-t{background:var(--coral)}
-.tgl-k{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s}
+.tgl-k{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s}
 .tgl input:checked~.tgl-k{transform:translateX(20px)}
 .consent-note{margin:10px 18px 0;padding:14px 16px;background:var(--green-bg);border:none;border-radius:var(--r-media);font-size:12px;color:var(--green-ink);line-height:1.6}
 /* HOME */
@@ -712,13 +717,13 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .stat-c{background:var(--card);border:1.5px solid var(--bg3);border-radius:var(--r);padding:13px 9px;text-align:center}
 .stat-n{font-family:var(--fd);font-weight:800;font-size:23px;line-height:1}
 .stat-l{font-size:10px;color:var(--ink2);margin-top:2px}
-.sec-card{background:var(--surface);border-radius:var(--r-card);margin-bottom:11px;overflow:hidden;box-shadow:var(--shadow-card)}
-.sc-hdr{padding:12px 13px;border-bottom:1px solid var(--bg3);display:flex;align-items:center;gap:8px}
-.sec-card.acc .sc-hdr{cursor:pointer;border-bottom:none;padding:15px 14px;user-select:none}
+.sec-card{background:var(--surface);border-radius:var(--r-card);margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow-card)}
+.sc-hdr{padding:14px 16px;border-bottom:1px solid var(--bg3);display:flex;align-items:center;gap:12px}
+.sec-card.acc .sc-hdr{cursor:pointer;border-bottom:none;padding:18px 16px;user-select:none}
 .sec-card.acc.open .sc-hdr{border-bottom:1px solid var(--bg3)}
 .acc-chev{display:inline-flex;color:var(--ink3);transition:transform .2s;margin-left:6px}
 .sec-card.acc.open .acc-chev{transform:rotate(90deg)}
-.acc-body{display:none;padding:2px 0 4px}
+.acc-body{display:none;padding:2px 0 8px}
 .nf-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--bg3)}
 .nf-row .nf-t{font-size:13.5px;font-weight:700;color:var(--ink)}
 .nf-row .nf-d{font-size:11.5px;color:var(--ink2);margin-top:1px;line-height:1.4}
@@ -726,13 +731,19 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .nf-dev.ok{background:var(--md)}
 .nf-dev button{margin-top:9px;padding:9px 16px;border-radius:99px;border:none;background:var(--ink);color:#fff;font-family:var(--fd);font-weight:800;font-size:12.5px;cursor:pointer}
 .sec-card.acc.open .acc-body{display:block}
-.sc-title{font-family:var(--fd);font-weight:700;font-size:13px;color:var(--ink);flex:1}
-.consent-it{padding:11px 13px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bg3)}
+.sc-title{font-family:var(--fd);font-weight:700;font-size:14.5px;letter-spacing:-.1px;color:var(--ink);flex:1}
+.consent-it{padding:14px 16px;display:flex;align-items:center;gap:13px;border-bottom:1px solid var(--bg2)}
+.set-ico{width:36px;height:36px;border-radius:12px;background:var(--bg2);color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.set-ico svg{width:18px;height:18px}
+.set-ico.mint{background:var(--md);color:var(--mint)}
+.sc-ico{width:34px;height:34px;border-radius:11px;background:var(--nv-black);color:var(--nv-yellow);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc-ico svg{width:17px;height:17px}
+.set-eyebrow{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin:22px 4px 10px;padding:0 2px}
 .consent-it:last-child{border-bottom:none}
 .hist-it{display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--bg3)}
 .hist-it:last-child{border-bottom:none}
 .danger-c{background:var(--card);border-radius:18px;padding:13px;margin-bottom:11px;box-shadow:0 3px 12px rgba(0,0,0,.04)}
-.dbtn{width:100%;padding:12px;border-radius:var(--r-pill);background:var(--cream);border:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .13s;margin-bottom:7px}
+.dbtn{width:100%;padding:13px;border-radius:var(--r-pill);background:var(--cream);border:none;color:var(--muted);font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .13s;margin-bottom:9px}
 .dbtn:last-child{margin:0;border-color:rgba(239,68,68,.22);color:#B91C1C}
 .badge-list{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:4px 13px 13px}
 .bp{display:flex;flex-direction:column;align-items:center;gap:5px}
@@ -1107,8 +1118,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dimpact-txt{font-size:12.5px;line-height:1.55;color:rgba(255,255,255,.8)}
 .dimpact-txt strong{color:var(--nv-yellow)}
 .dconsent-row{background:var(--surface);border-radius:var(--r-media);padding:12px 14px;margin:0 18px 8px;display:flex;align-items:center;gap:11px;box-shadow:var(--shadow-card)}
-.dconsent-name{font-size:13px;font-weight:700;color:var(--ink)}
-.dconsent-sub{font-size:10.5px;color:var(--ink3);margin-top:1px}
+.dconsent-name{font-size:13.5px;font-weight:700;color:var(--ink)}
+.dconsent-sub{font-size:11.5px;color:var(--ink3);margin-top:2px;line-height:1.4}
 
 </style>
 <script src="icons.js"></script>
@@ -1538,13 +1549,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="dprof-stat"><div class="dprof-stat-n" id="s-friends">0</div><div class="dprof-stat-l">Amis</div></div>
     </div>
     <div style="display:none" id="s-pts">0</div>
-    <div class="dimpact">
-      <div class="dimpact-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
-      <div class="dimpact-txt" id="dimpact-txt">Réponds à quelques questions pour commencer à aider les commerces de ton quartier.</div>
-    </div>
     <div class="dimpact" id="dpred" style="display:none"><div class="dimpact-ico" id="dpred-ico"></div><div class="dimpact-txt" id="dpred-txt"></div></div>
+    <div class="set-eyebrow" style="margin-top:4px">Compte</div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span><div class="sc-title">Mes informations</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span><div class="sc-title">Mes informations</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div class="consent-it" style="cursor:pointer" onclick="document.getElementById('avatar-file-inp').click()">
         <div class="dprof-av" id="settings-av-thumb" style="width:34px;height:34px;font-size:13px;border-width:1.5px;cursor:pointer"><span id="settings-av-thumb-letter">A</span></div>
@@ -1552,44 +1560,45 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
         <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
       </div>
       <div class="consent-it" style="cursor:pointer" onclick="editUserField('name','Prénom',S.user.name)">
-        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span>
+        <span class="set-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span>
         <div style="flex:1"><div class="dconsent-name">Prénom</div><div class="dconsent-sub" id="set-u-name">—</div></div>
         <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
       </div>
       <div class="consent-it" style="cursor:pointer" onclick="editUserCity()">
-        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg></span>
+        <span class="set-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg></span>
         <div style="flex:1"><div class="dconsent-name">Ville</div><div class="dconsent-sub" id="set-u-city">—</div></div>
         <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
       </div>
       <div class="consent-it" style="cursor:pointer" onclick="openAgeEditSheet()">
-        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
+        <span class="set-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
         <div style="flex:1"><div class="dconsent-name">Tranche d'âge</div><div class="dconsent-sub" id="set-u-age">—</div></div>
         <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline">Modifier</span>
       </div>
       <div class="consent-it" style="cursor:pointer" onclick="openInterestsEditSheet()">
-        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span>
+        <span class="set-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span>
         <div style="flex:1;min-width:0"><div class="dconsent-name">Centres d'intérêt</div><div class="dconsent-sub" id="set-u-interests" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div>
         <span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;flex-shrink:0">Modifier</span>
       </div>
       <div class="consent-it" style="border-bottom:none">
-        <span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+        <span class="set-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
         <div style="flex:1;min-width:0"><div class="dconsent-name">Email</div><div class="dconsent-sub" id="set-u-email" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div>
       </div>
       </div>
     </div>
+    <div class="set-eyebrow">Confidentialité</div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="event.stopPropagation();openManageMerchants()">Gérer</span><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="event.stopPropagation();openManageMerchants()">Gérer</span><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div id="consent-mgmt"></div>
       </div>
     </div>
     <div class="sec-card acc" id="share-answers-card">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span><div class="sc-title">Réglages</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
-      <div class="consent-it" style="cursor:pointer" onclick="openPrivacyData()"><span style="display:inline-flex;width:20px;height:20px;color:var(--mint)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
+      <div class="consent-it" style="cursor:pointer" onclick="openPrivacyData()"><span class="set-ico mint"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:17px">›</span></div>
       <div class="consent-it"><div style="flex:1;min-width:0"><div class="dconsent-name">Montrer mes réponses à mes amis</div><div class="dconsent-sub" style="white-space:normal">Tes amis voient ce que tu as répondu. Tu comptes toujours dans les résultats.</div></div><label class="tgl"><input type="checkbox" id="share-answers-inp" aria-label="Montrer mes réponses à mes amis" checked onchange="setShareAnswers(this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>
-      <div class="consent-it" style="cursor:pointer" onclick="goTo('how-it-works');document.getElementById('bnav').classList.remove('show')"><span style="display:inline-flex;width:20px;height:20px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Comment ça marche</div><span style="color:var(--ink3);font-size:17px">›</span></div>
-      <div style="display:flex;align-items:center;gap:9px;background:var(--md);border-radius:11px;padding:10px 12px;margin-top:9px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Tu peux révoquer tes consentements ou supprimer ton compte à tout moment, juste en dessous.</div></div>
+      <div class="consent-it" style="cursor:pointer" onclick="goTo('how-it-works');document.getElementById('bnav').classList.remove('show')"><span class="set-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg></span><div style="flex:1;font-size:13px;font-weight:600;color:var(--ink)">Comment ça marche</div><span style="color:var(--ink3);font-size:17px">›</span></div>
+      <div style="display:flex;align-items:center;gap:11px;background:var(--md);border-radius:14px;padding:13px 14px;margin-top:12px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Tu peux révoquer tes consentements ou supprimer ton compte à tout moment, juste en dessous.</div></div>
       <div class="set-danger">
         <div class="set-danger-l">Mes données</div>
         <button class="dbtn" onclick="revokeAllConsents()">Révoquer tous les consentements</button>
@@ -1597,27 +1606,29 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       </div>
       </div>
     </div>
+    <div class="set-eyebrow">Préférences</div>
     <div class="sec-card acc" id="notif-section">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div class="sc-title">Notifications</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div class="sc-title">Notifications</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
         <div id="notif-device"></div>
         <div id="notif-switches"></div>
         <div style="font-size:11px;color:var(--ink3);line-height:1.55;padding:2px 14px 12px">Au maximum une notification par jour, jamais entre 21h et 9h. Tu peux couper chaque type séparément.</div>
       </div>
     </div>
+    <div class="set-eyebrow">Activité</div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span><div class="sc-title">Badges</div><span style="font-size:11px;color:var(--ink2);font-weight:700" id="badges-count"></span><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 6-5.2-2.8-5.2 2.8 1-6-4.3-4.2 5.9-.8z"/></svg></span><div class="sc-title">Badges</div><span style="font-size:11px;color:var(--ink2);font-weight:700" id="badges-count"></span><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div class="badge-list" id="badges-list"></div>
       </div>
     </div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span style="display:inline-flex;width:18px;height:18px;color:var(--ink2)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg></span><div class="sc-title">Historique des réponses</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg></span><div class="sc-title">Historique des réponses</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div id="hist-list"></div>
       </div>
     </div>
-    <div style="padding:0 0 12px">
+    <div style="padding:22px 0 12px">
       <button onclick="logout()" class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fd)"><span style="display:inline-flex;width:16px;height:16px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M20 12H10"/><path d="M16 8l4 4-4 4"/></svg></span> Se déconnecter</button>
     </div>
     <nav class="legal-links" aria-label="Informations légales">
@@ -2323,6 +2334,16 @@ async function loadCommunityFeed() {
 }
 
 // Cartes de compatibilité avec mes amis (pourcentages calculés côté serveur, jamais une réponse individuelle).
+// « Tes avis ont aidé N commerces » : déplacé du profil vers le fil (2026-09-22), calculé localement depuis l'historique
+// (jamais stocké dans communityEvents, donc jamais visible par personne d'autre), toujours la toute première carte.
+function feedImpactCard(){
+  const helped=new Set((S.hist||[]).map(h=>h.brand).filter(Boolean)).size;
+  if(!helped)return null;
+  const d=document.createElement('div');
+  d.className='feed-post cm-mine';
+  d.innerHTML=`<div class="cm-mine-ico">${icon('store',{size:18})}</div><div class="cm-mine-t">Tes avis ont aidé <strong>${helped} commerce${helped>1?'s':''}</strong> de ton quartier à mieux te connaître.</div>`;
+  return d;
+}
 async function feedCompatCards() {
   try {
     if (!(S.friends || []).length) return [];
@@ -2336,8 +2357,9 @@ async function feedCompatCards() {
 async function renderFeedDocs(el, docs) {
   const token = ++_feedRenderToken;
   const compat = await feedCompatCards();
+  const mine = feedImpactCard();
   if (token !== _feedRenderToken) return;
-  if (!docs.length && !compat.length) {
+  if (!docs.length && !compat.length && !mine) {
     el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
         Le fil s'anime avec les nouveautés des commerces que tu autorises et les progrès de tes amis.<br>
         <span style="color:var(--ink);font-weight:700">Autorise des commerces ou invite des amis pour le remplir.</span><br>
@@ -2413,6 +2435,7 @@ async function renderFeedDocs(el, docs) {
     d.innerHTML = `<div class="cm-compat-top"><div class="cm-compat-big">${x.c.pct} %</div><div class="cm-compat-t">de compatibilité avec <strong>${esc(x.f.n)}</strong></div></div><div class="cp-bar"><div style="width:${x.c.pct}%"></div></div>`;
     cards.splice(Math.min(1 + k * 3, cards.length), 0, d);
   });
+  if (mine) cards.unshift(mine);   // « Tes avis ont aidé… » : toujours la toute première carte
   el.innerHTML = '';
   cards.forEach(d => el.appendChild(d));
   applyStagger(el);
@@ -3298,15 +3321,10 @@ function refreshProfile(){
   const friendsEl=document.getElementById('s-friends');if(friendsEl)friendsEl.textContent=(S.friends||[]).length;
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(2,((S.xp-l.min)/(l.max-l.min))*100));
   document.getElementById('pl-name').textContent='Niveau '+(li+1)+' · '+l.n;document.getElementById('pl-xp').textContent=S.xp+' / '+(l.max===99999?'∞':l.max)+' xp';document.getElementById('pl-fill').style.width=pct+'%';
-  const impactEl=document.getElementById('dimpact-txt');
-  if(impactEl){
-    const helped=new Set((S.hist||[]).map(h=>h.brand).filter(Boolean)).size;
-    impactEl.innerHTML=helped>0?`Tes avis ont aidé <strong>${helped} commerce${helped>1?'s':''}</strong> de ton quartier à mieux te connaître.`:'Réponds à quelques questions pour commencer à aider les commerces de ton quartier.';
-  }
   const cm=document.getElementById('consent-mgmt');cm.innerHTML='';
   const _cm=S._nearbyMerchants||[];
   if(!_cm.length){cm.innerHTML='<div style="font-size:12px;color:var(--ink2);text-align:center;padding:8px 0">Tu ne suis aucun commerce pour l\'instant. Réponds à une question « découverte » sur ton accueil, puis suis le commerce si ça te plaît.</div>';}
-  else{_cm.slice(0,6).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='dconsent-row';d.innerHTML=`${logoHTML(label,40,m.logoUrl)}<div style="flex:1;min-width:0"><div class="dconsent-name">${esc(label)}</div><div class="dconsent-sub">${esc(m.sector||m.address||'')} · ${questionsAsked(label)} question${questionsAsked(label)>1?'s':''} posée${questionsAsked(label)>1?'s':''}</div></div><label class="tgl"><input type="checkbox" checked onchange="toggleMerchantConsentQuick('${m.id}',this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label>`;cm.appendChild(d)});if(_cm.length>6){const more=document.createElement('div');more.style.cssText='font-size:11px;color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`+${_cm.length-6} autres · Gérer`;more.onclick=openManageMerchants;more.style.cursor='pointer';cm.appendChild(more);}}
+  else{_cm.slice(0,6).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='dconsent-row';d.innerHTML=`${logoHTML(label,40,m.logoUrl)}<div style="flex:1;min-width:0"><div class="dconsent-name">${esc(label)}</div><div class="dconsent-sub">${esc(m.sector||m.address||'')} · ${questionsAsked(label)} question${questionsAsked(label)>1?'s':''} posée${questionsAsked(label)>1?'s':''}</div></div><label class="tgl"><input type="checkbox" checked aria-label="Autoriser ${esc(label)}" onchange="toggleMerchantConsentQuick('${m.id}',this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label>`;cm.appendChild(d)});if(_cm.length>6){const more=document.createElement('div');more.style.cssText='font-size:11px;color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`+${_cm.length-6} autres · Gérer`;more.onclick=openManageMerchants;more.style.cursor='pointer';cm.appendChild(more);}}
   const bl=document.getElementById('badges-list');bl.innerHTML='';
   checkTierAndBadgeCelebrations();
   const earned=S._lastEarnedBadges||[];
@@ -4181,7 +4199,7 @@ function refreshNotifSettingsUI() {
   const sw=document.getElementById('notif-switches'), dev=document.getElementById('notif-device');
   if(!sw||!dev) return;
   // Un interrupteur par type (jamais un interrupteur global) : l'état de l'appareil est seulement un statut.
-  sw.innerHTML=NOTIF_GROUPS.map(x=>`<div class="nf-row"><div style="flex:1;min-width:0"><div class="nf-t">${x.t}</div><div class="nf-d">${x.d}</div></div><label class="tgl"><input type="checkbox" data-g="${x.g}" ${notifPrefOn(x.g)?'checked':''} onchange="setNotifPref('${x.g}',this.checked,this)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>`).join('');
+  sw.innerHTML=NOTIF_GROUPS.map(x=>`<div class="nf-row"><div style="flex:1;min-width:0"><div class="nf-t">${x.t}</div><div class="nf-d">${x.d}</div></div><label class="tgl"><input type="checkbox" data-g="${x.g}" aria-label="${esc(x.t)}" ${notifPrefOn(x.g)?'checked':''} onchange="setNotifPref('${x.g}',this.checked,this)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>`).join('');
   const reason=notifSupportReason();
   const _u=auth.currentUser&&auth.currentUser.uid;
   const perm=typeof Notification!=='undefined'?Notification.permission:'unsupported';
