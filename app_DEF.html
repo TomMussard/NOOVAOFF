@@ -463,7 +463,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 /* Fond illustré derrière une question « bulle » (jamais en mode « plein écran », déjà jaune plat à dessein) : image posée
    par JS (applyQuestionBg), toujours avec ce cadrage — un dégradé vers --bg est ajouté en même temps pour garder le
    texte lisible. */
-#question{background-size:cover;background-position:center top;background-repeat:no-repeat}
+#question{background-size:cover;background-position:center;background-repeat:no-repeat}
 .qw{padding:52px 20px 22px;min-height:100%;display:flex;flex-direction:column}
 .q-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .q-close{width:38px;height:38px;border-radius:var(--r-pill);background:var(--surface);border:none;box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--ink)}
@@ -472,6 +472,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .q-seg.done{background:var(--ink)}.q-seg.cur{background:var(--line-strong)}
 .q-pts{font-size:11px;font-weight:800;background:var(--yellow);color:var(--ink);border:none;padding:5px 10px;border-radius:var(--r-pill)}
 .brand-hdr{background:none;border:none;border-radius:0;padding:0;display:flex;align-items:center;gap:11px;margin-bottom:20px}
+/* Le fond illustré (bg-question_-*) se voit en entier, sans aucun dégradé dessus (voulu) : le texte a donc
+   sa propre carte, plutôt qu'un assombrissement de l'image, pour rester lisible quelle que soit la zone
+   de l'image derrière (claire ou sombre selon l'endroit). */
+#question.qbg-on .q-content-card{background:var(--card);border-radius:22px;padding:16px 16px 10px;box-shadow:0 10px 28px rgba(0,0,0,.16);margin-bottom:16px}
+#question.qbg-on .brand-hdr{margin-bottom:16px}
+#question.qbg-on.qfull .q-content-card{background:rgba(255,255,255,.94)}
 .bh-logo{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;background:var(--bg2)}
 .bh-name{font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)}
 .bh-usage{font-size:10px;color:var(--ink2);margin-top:2px;line-height:1.5}
@@ -1411,18 +1417,20 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="q-prog" id="q-prog"></div>
       <div class="q-pts" id="q-pts-tag">+25 pts</div>
     </div>
-    <div class="brand-hdr" onclick="openBrandFromQ()" style="cursor:pointer" title="Voir la page du commerce">
-      <div class="bh-logo" id="bh-logo" style="display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
-      <div style="flex:1;min-width:0">
-        <div class="bh-name" id="bh-name">Commerce</div>
-        <div class="bh-usage" id="bh-usage"></div>
+    <div class="q-content-card">
+      <div class="brand-hdr" onclick="openBrandFromQ()" style="cursor:pointer" title="Voir la page du commerce">
+        <div class="bh-logo" id="bh-logo" style="display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
+        <div style="flex:1;min-width:0">
+          <div class="bh-name" id="bh-name">Commerce</div>
+          <div class="bh-usage" id="bh-usage"></div>
+        </div>
+        <div class="bh-tag" id="bh-tag" style="background:var(--cd);color:var(--ink)">Manger &amp; boire</div>
+        <div style="color:var(--ink3);font-size:20px;margin-left:2px;flex-shrink:0">›</div>
       </div>
-      <div class="bh-tag" id="bh-tag" style="background:var(--cd);color:var(--ink)">Manger &amp; boire</div>
-      <div style="color:var(--ink3);font-size:20px;margin-left:2px;flex-shrink:0">›</div>
+      <div class="q-text" id="q-text">Question…</div>
+      <div class="q-hint" id="q-hint">Réponds librement.</div>
+      <div class="disc-note" id="q-disc-note" style="display:none"></div>
     </div>
-    <div class="q-text" id="q-text">Question…</div>
-    <div class="q-hint" id="q-hint">Réponds librement.</div>
-    <div class="disc-note" id="q-disc-note" style="display:none"></div>
     <div class="ans-area" id="ans-area"></div>
     <div id="lock-bar"><div id="lock-fill"></div></div>
     <div class="q-actions">
@@ -2139,18 +2147,19 @@ const NV_ASSETS={coin:'/noov-coin.png',flame:'/noov-flame.svg',points:'',noovs:'
 function nvImg(key,fallback,alt){const u=NV_ASSETS[key];return u?'<img src="'+esc(u)+'" alt="'+esc(alt||'')+'">':fallback;}
 // Même flamme que l'en-tête, réutilisée partout où une série est affichée (profil d'ami, listes, fil…) — jamais l'icône « fire » toute seule.
 function flameHTML(size){return NV_ASSETS.flame?'<img src="'+esc(NV_ASSETS.flame)+'" alt="" style="width:'+size+'px;height:'+size+'px;vertical-align:-'+Math.round(size*.15)+'px">':icon('fire',{size});}
-// Fonds d'écran par type de question (mode « bulle » seulement — le mode « plein écran » reste en jaune plat à
-// dessein). « noovs » : le mode libre est déjà lu partout via isFreeMode(), pas une question à part — n'importe
-// quelle question peut y basculer une fois le quota de points du jour dépassé. « noova » : réservé pour le jour où
-// NOOVA pourra poser ses propres questions (pas encore une source de contenu aujourd'hui, donc jamais utilisé pour l'instant).
+// Fonds d'écran par type de question (bulle et plein écran). « noovs » : le mode libre est déjà lu partout via
+// isFreeMode(), pas une question à part — n'importe quelle question peut y basculer une fois le quota de points
+// du jour dépassé. « noova » : réservé pour le jour où NOOVA pourra poser ses propres questions (pas encore une
+// source de contenu aujourd'hui, donc jamais utilisé pour l'instant).
 const NV_QBG={classique:'/bg-question_-classique.png',noovs:'/bg-question_-noovs.png',noova:'/bg-question_-noova.png'};
 function applyQuestionBg(q){
   const el=document.getElementById('question');
   if(!el) return;
   const url=NV_QBG[isFreeMode()?'noovs':'classique'];
-  // Toujours vers --bg (crème neutre), jamais vers le jaune : le fond NOOVS est déjà très jaune à lui seul,
-  // en rajouter en plein écran alourdissait le rendu. Le texte reste lisible dans les deux modes (contraste vérifié).
-  el.style.backgroundImage=url?'linear-gradient(180deg,rgba(0,0,0,0) 0%,var(--bg) 280px),url(\''+url+'\')':'';
+  // Image seule, en plein cadre, aucun dégradé dessus : le fond doit se voir en entier, sans rien qui l'assombrisse
+  // ou l'éclaircisse. La lisibilité est gérée à part (classe qbg-on : le texte a sa propre carte).
+  el.style.backgroundImage=url?'url(\''+url+'\')':'';
+  el.classList.toggle('qbg-on',!!url);
 }
 // Petit effet « gain » : une pastille s'envole jusqu'au score visible à l'écran — le bandeau
 // NOOVS/série/points est répété en haut de l'accueil, de la question et de la récompense (mêmes
