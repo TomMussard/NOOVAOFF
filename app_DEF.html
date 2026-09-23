@@ -463,7 +463,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 /* Fond illustré derrière une question « bulle » (jamais en mode « plein écran », déjà jaune plat à dessein) : image posée
    par JS (applyQuestionBg), toujours avec ce cadrage — un dégradé vers --bg est ajouté en même temps pour garder le
    texte lisible. */
-#question{background-size:cover;background-position:center;background-repeat:no-repeat}
+/* Fond par type de question — dégradé plat, jamais une image bitmap (ne pixellise jamais, quelle que soit la
+   taille d'écran) : crème neutre pour une question classique, dégradé jaune pièce (mêmes teintes que la pièce
+   NOOVS de l'en-tête) quand la réponse rapportera des NOOVS. */
+#question.qmode-noovs{background:linear-gradient(165deg,#FFF3D1 0%,#FFC300 58%,#F29715 100%)}
+#question.qmode-noovs.qfull{background:linear-gradient(165deg,#FFC300 0%,#F29715 100%)}
+#question.qmode-classique.qfull{background:var(--bg)}
 .qw{padding:52px 20px 22px;min-height:100%;display:flex;flex-direction:column}
 .q-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .q-close{width:38px;height:38px;border-radius:var(--r-pill);background:var(--surface);border:none;box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--ink)}
@@ -478,6 +483,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 #question.qbg-on .q-content-card{background:var(--card);border-radius:22px;padding:16px 16px 10px;box-shadow:0 10px 28px rgba(0,0,0,.16);margin-bottom:16px}
 #question.qbg-on .brand-hdr{margin-bottom:16px}
 #question.qbg-on.qfull .q-content-card{background:rgba(255,255,255,.94)}
+/* Types de réponse qui ne sont pas déjà de simples pastilles pleines (curseur, classement) : même carte que
+   ci-dessus, sinon le curseur/les chiffres restent nus sur l'image (c'est ce qui a cassé le contraste). */
+#question.qbg-on .ans-area:has(.scale-val,.rank-list,.ans-ta){background:var(--card);border-radius:22px;padding:18px 16px;box-shadow:0 10px 28px rgba(0,0,0,.16)}
+#question.qbg-on.qfull .ans-area:has(.scale-val,.rank-list,.ans-ta){background:rgba(255,255,255,.94)}
 .bh-logo{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;background:var(--bg2)}
 .bh-name{font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink)}
 .bh-usage{font-size:10px;color:var(--ink2);margin-top:2px;line-height:1.5}
@@ -2151,15 +2160,13 @@ function flameHTML(size){return NV_ASSETS.flame?'<img src="'+esc(NV_ASSETS.flame
 // isFreeMode(), pas une question à part — n'importe quelle question peut y basculer une fois le quota de points
 // du jour dépassé. « noova » : réservé pour le jour où NOOVA pourra poser ses propres questions (pas encore une
 // source de contenu aujourd'hui, donc jamais utilisé pour l'instant).
-const NV_QBG={classique:'/bg-question_-classique.png',noovs:'/bg-question_-noovs.png',noova:'/bg-question_-noova.png'};
+// Fond propre au type de question : dégradé plat en CSS (jamais une image bitmap), avec les mêmes couleurs
+// que le reste de l'app (le jaune pièce pour NOOVS) — donc jamais pixelisé, contraste maîtrisé par construction.
 function applyQuestionBg(q){
   const el=document.getElementById('question');
   if(!el) return;
-  const url=NV_QBG[isFreeMode()?'noovs':'classique'];
-  // Image seule, en plein cadre, aucun dégradé dessus : le fond doit se voir en entier, sans rien qui l'assombrisse
-  // ou l'éclaircisse. La lisibilité est gérée à part (classe qbg-on : le texte a sa propre carte).
-  el.style.backgroundImage=url?'url(\''+url+'\')':'';
-  el.classList.toggle('qbg-on',!!url);
+  el.classList.remove('qmode-classique','qmode-noovs');
+  el.classList.add(isFreeMode()?'qmode-noovs':'qmode-classique');
 }
 // Petit effet « gain » : une pastille s'envole jusqu'au score visible à l'écran — le bandeau
 // NOOVS/série/points est répété en haut de l'accueil, de la question et de la récompense (mêmes
