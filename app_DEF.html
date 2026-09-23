@@ -2147,9 +2147,9 @@ const NV_QBG={classique:'/bg-question_-classique.png',noovs:'/bg-question_-noovs
 function applyQuestionBg(q){
   const el=document.getElementById('question');
   if(!el) return;
-  if(qMode(q)==='full'){ el.style.backgroundImage=''; return; }
   const url=NV_QBG[isFreeMode()?'noovs':'classique'];
-  el.style.backgroundImage=url?'linear-gradient(180deg,rgba(0,0,0,0) 0%,var(--bg) 280px),url(\''+url+'\')':'';
+  const fadeTo=qMode(q)==='full'?'var(--nv-yellow)':'var(--bg)';   // le fond se prolonge dans la couleur propre à chaque mode (jaune en plein écran, crème en bulle)
+  el.style.backgroundImage=url?'linear-gradient(180deg,rgba(0,0,0,0) 0%,'+fadeTo+' 280px),url(\''+url+'\')':'';
 }
 // Petit effet « gain » : une pastille s'envole jusqu'au score visible à l'écran — le bandeau
 // NOOVS/série/points est répété en haut de l'accueil, de la question et de la récompense (mêmes
