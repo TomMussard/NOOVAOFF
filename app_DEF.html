@@ -460,6 +460,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .q-pts-t{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--vd);color:var(--violet)}
 .q-type-t{font-size:10px;font-weight:600;color:var(--ink2);padding:2px 7px;border-radius:99px;background:rgba(24,20,16,.08)}
 /* QUESTION */
+/* Fond illustré derrière une question « bulle » (jamais en mode « plein écran », déjà jaune plat à dessein) : image posée
+   par JS (applyQuestionBg), toujours avec ce cadrage — un dégradé vers --bg est ajouté en même temps pour garder le
+   texte lisible. */
+#question{background-size:cover;background-position:center top;background-repeat:no-repeat}
 .qw{padding:52px 20px 22px;min-height:100%;display:flex;flex-direction:column}
 .q-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .q-close{width:38px;height:38px;border-radius:var(--r-pill);background:var(--surface);border:none;box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--ink)}
@@ -546,6 +550,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .pe-plus{font-family:var(--fd);font-weight:700;font-size:22px;color:var(--ink);align-self:flex-start;padding-top:5px;margin-right:2px}
 .pe-num{font-family:var(--fd);font-weight:800;font-size:50px;color:var(--ink);line-height:1}
 .pe-right{margin-left:auto;text-align:right}
+.pe-coin{margin-left:8px;flex-shrink:0;align-self:center}
 .pe-lbl{font-size:11px;color:var(--gold-deep);margin-bottom:2px;font-weight:700}
 .pe-tot{font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink)}
 .usage-card{width:100%;background:var(--surface);border:none;box-shadow:var(--shadow-card);border-radius:var(--r-card);padding:14px;display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;position:relative;z-index:1}
@@ -899,7 +904,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dh-coin img,.dh-flame img{width:100%;height:100%;object-fit:contain}
 .dh-coin.bump,.dh-pts.bump{animation:coinBump .42s ease}
 @keyframes coinBump{0%{transform:scale(1)}35%{transform:scale(1.35)}60%{transform:scale(.9)}100%{transform:scale(1)}}
-.noov-fly{position:fixed;width:34px;height:34px;border-radius:50%;pointer-events:none;z-index:9999;opacity:1;transition:transform 1.35s cubic-bezier(.3,.75,.3,1),opacity .35s ease 1.05s;will-change:transform,opacity}
+.noov-fly{position:fixed;width:34px;height:34px;border-radius:50%;background:var(--nv-yellow);color:var(--nv-black);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 0 0 3px rgba(28,25,23,.22);pointer-events:none;z-index:9999;opacity:1;transition:transform 1.35s cubic-bezier(.3,.75,.3,1),opacity .35s ease 1.05s;will-change:transform,opacity}
+.noov-fly img{width:100%;height:100%;object-fit:contain}
 .dh-noov-n{font-family:var(--fd);font-weight:800;font-size:15px}
 .dh-streak{display:flex;align-items:center;gap:3px;font-family:var(--fd);font-weight:800;font-size:19px;color:var(--ink);letter-spacing:-.4px}
 .dh-flame{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#B9B1A2}
@@ -1437,7 +1443,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div class="rw-circle" style="display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:30px;height:30px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg></div>
   <div class="rw-title">Bien joué !</div>
   <div class="rw-sub">Ta réponse a été envoyée</div>
-  <div class="pts-earned"><div class="pe-plus">+</div><div class="pe-num" id="rw-pts">25</div><div class="pe-right"><div class="pe-lbl">Total cumulé</div><div class="pe-tot" id="rw-total">25 pts</div></div></div>
+  <div class="pts-earned"><div class="pe-plus">+</div><div class="pe-num" id="rw-pts">25</div><div class="dh-coin pe-coin hdr-coin-el" id="rw-coin" style="display:none" aria-hidden="true"></div><div class="pe-right"><div class="pe-lbl">Total cumulé</div><div class="pe-tot" id="rw-total">25 pts</div></div></div>
   <div class="usage-card"><span style="flex-shrink:0;margin-top:1px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5a2.6 2.6 0 0 1 1.1-2.2A6 6 0 0 0 12 3z"/></svg></span><div style="font-size:11px;color:var(--ink2);line-height:1.6" id="rw-usage">Ta réponse aide <strong>les commerces de ton quartier</strong> à mieux servir le coin.</div></div>
   <div class="share-row" onclick="shareReward()"><span style="display:inline-flex"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:19px;height:19px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg></span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">Partager ma réponse</div><div style="font-size:11px;color:var(--ink2);margin-top:1px">Montre-la à tes amis</div></div><span style="color:var(--ink3)">→</span></div>
   <div id="rw-reveal" style="width:100%;position:relative;z-index:1"></div>
@@ -2131,29 +2137,48 @@ async function doBrands(){
 const FLAME_SVG='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path class="fo" d="M12.6 1.8c.5 3.4-1.3 5.2-2.9 7.1C8.2 10.6 6.8 12.3 6.8 14.9a5.3 5.3 0 0 0 5.2 5.4 5.3 5.3 0 0 0 5.2-5.5c0-2.4-1.1-4.1-2.3-5.5-.4 1.5-1.3 2.3-2.4 2.6.7-3.2 0-6.3.1-10.1z"/><path class="fi" d="M12 20.3a2.7 2.7 0 0 1-2.7-2.7c0-1.7 1.4-2.6 2.7-4.2 1.3 1.6 2.7 2.5 2.7 4.2a2.7 2.7 0 0 1-2.7 2.7z"/></svg>';
 const NV_ASSETS={coin:'/noov-coin.png',flame:'/noov-flame.svg',points:'',noovs:'',xp:'',rewards:''};
 function nvImg(key,fallback,alt){const u=NV_ASSETS[key];return u?'<img src="'+esc(u)+'" alt="'+esc(alt||'')+'">':fallback;}
-// Petit effet « pièce gagnée » : elle s'envole jusqu'au score visible à l'écran (NOOVS par défaut,
-// ou les points via targetSel) — le bandeau NOOVS/série/points est répété en haut de l'accueil, de la
-// question et de la récompense (mêmes classes partagées), donc il y a toujours une vraie cible sous
-// les yeux au moment du gain, quel que soit l'écran affiché.
-function flyNoovToHeader(fromEl,targetSel){
+// Même flamme que l'en-tête, réutilisée partout où une série est affichée (profil d'ami, listes, fil…) — jamais l'icône « fire » toute seule.
+function flameHTML(size){return NV_ASSETS.flame?'<img src="'+esc(NV_ASSETS.flame)+'" alt="" style="width:'+size+'px;height:'+size+'px;vertical-align:-'+Math.round(size*.15)+'px">':icon('fire',{size});}
+// Fonds d'écran par type de question (mode « bulle » seulement — le mode « plein écran » reste en jaune plat à
+// dessein). « noovs » : le mode libre est déjà lu partout via isFreeMode(), pas une question à part — n'importe
+// quelle question peut y basculer une fois le quota de points du jour dépassé. « noova » : réservé pour le jour où
+// NOOVA pourra poser ses propres questions (pas encore une source de contenu aujourd'hui, donc jamais utilisé pour l'instant).
+const NV_QBG={classique:'/bg-question_-classique.png',noovs:'/bg-question_-noovs.png',noova:'/bg-question_-noova.png'};
+function applyQuestionBg(q){
+  const el=document.getElementById('question');
+  if(!el) return;
+  if(qMode(q)==='full'){ el.style.backgroundImage=''; return; }
+  const url=NV_QBG[isFreeMode()?'noovs':'classique'];
+  el.style.backgroundImage=url?'linear-gradient(180deg,rgba(0,0,0,0) 0%,var(--bg) 280px),url(\''+url+'\')':'';
+}
+// Petit effet « gain » : une pastille s'envole jusqu'au score visible à l'écran — le bandeau
+// NOOVS/série/points est répété en haut de l'accueil, de la question et de la récompense (mêmes
+// classes partagées), donc il y a toujours une vraie cible sous les yeux au moment du gain, quel
+// que soit l'écran affiché. Points et NOOVS sont deux monnaies différentes : jamais le même visuel
+// qui s'envole — la pièce pour les NOOVS (même image que partout où on parle de NOOVS), l'étoile
+// des points (même icône que dans le portefeuille) pour les points.
+const STAR_SVG=icon('star',{size:28});
+function flyToHeader(fromEl,targetSel,assetKey,fallback){
   try{
-    if(!fromEl || !NV_ASSETS.coin) return;
-    const sel=targetSel||'.hdr-coin-el';
-    const target=document.querySelector('.screen.active '+sel)||document.querySelector(sel);
+    if(!fromEl) return;
+    const target=document.querySelector('.screen.active '+targetSel)||document.querySelector(targetSel);
     if(!target) return;
     const from=fromEl.getBoundingClientRect(),to=target.getBoundingClientRect();
     if(!from.width || !to.width) return;
     const size=34,fx=from.left+from.width/2-size/2,fy=from.top+from.height/2-size/2;
     const dx=(to.left+to.width/2)-(from.left+from.width/2),dy=(to.top+to.height/2)-(from.top+from.height/2);
-    const coin=document.createElement('img');
-    coin.src=NV_ASSETS.coin;coin.alt='';coin.setAttribute('aria-hidden','true');coin.className='noov-fly';
-    coin.style.left=fx+'px';coin.style.top=fy+'px';
-    document.body.appendChild(coin);
+    const el=document.createElement('div');
+    el.className='noov-fly';el.setAttribute('aria-hidden','true');
+    el.innerHTML=nvImg(assetKey,fallback,'');
+    el.style.left=fx+'px';el.style.top=fy+'px';
+    document.body.appendChild(el);
     // Vol nettement plus lent (1,35 s) pour qu'on la voie vraiment monter, avant qu'elle rapetisse et disparaisse juste à l'arrivée.
-    requestAnimationFrame(()=>{coin.style.transform=`translate(${dx}px,${dy}px) scale(.45) rotate(20deg)`;coin.style.opacity='0';});
-    setTimeout(()=>{coin.remove();target.classList.add('bump');setTimeout(()=>target.classList.remove('bump'),420);},1420);
+    requestAnimationFrame(()=>{el.style.transform=`translate(${dx}px,${dy}px) scale(.45) rotate(20deg)`;el.style.opacity='0';});
+    setTimeout(()=>{el.remove();target.classList.add('bump');setTimeout(()=>target.classList.remove('bump'),420);},1420);
   }catch(e){}
 }
+function flyNoovToHeader(fromEl){flyToHeader(fromEl,'.hdr-coin-el','coin','N');}
+function flyPointsToHeader(fromEl){flyToHeader(fromEl,'.hdr-pts-wrap-el','points',STAR_SVG);}
 // En-tête : pièce + NOOVS, flamme + série (allumée quand la journée est validée : 3 réponses), points —
 // répété (mêmes classes) en haut de l'accueil, de la question et de la récompense : une seule mise à
 // jour ici les synchronise toutes, pour que NOOVS/série/points restent visibles tout le long du parcours.
@@ -2482,7 +2507,7 @@ async function renderFeedDocs(el, docs) {
       action = `<div class="cm-level-t">${mine ? 'Tu as atteint' : 'a atteint'} le palier <b>${esc(ev.level || '')}</b></div>`;
       cls += ' cm-level';
     } else {
-      avatar = `<div class="fp-av cm-av-streak">${icon('fire', { size: 20 })}</div>`;
+      avatar = `<div class="fp-av cm-av-streak">${flameHTML(20)}</div>`;
       action = `<div class="cm-streak-t">${esc(ev.text || '')}</div>`;
       cls += ' cm-streak';
     }
@@ -2799,7 +2824,7 @@ function renderFriends(){
     const d=document.createElement('div');
     d.className='cp-row';d.dataset.uid=f.uid;
     d.onclick=()=>openFriendProfile(f);
-    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${avInner(f.photoUrl,f.n)}</div><div class="cp-mid"><div class="cp-name">${esc(f.n)}</div><div class="cp-sub">${f.xp} xp · <span style="display:inline-flex;align-items:center;gap:3px">${icon('fire',{size:12})} ${f.str} j</span></div></div><div class="cp-pill" data-uid="${esc(f.uid)}"></div>`;
+    d.innerHTML=`<div class="fi-av" style="background:${c}18;color:${c}">${avInner(f.photoUrl,f.n)}</div><div class="cp-mid"><div class="cp-name">${esc(f.n)}</div><div class="cp-sub">${f.xp} xp · <span style="display:inline-flex;align-items:center;gap:3px">${flameHTML(12)} ${f.str} j</span></div></div><div class="cp-pill" data-uid="${esc(f.uid)}"></div>`;
     el.appendChild(d);
   });
   applyStagger(el);
@@ -2855,7 +2880,7 @@ async function openFriendProfile(f){
   if(!f)return;
   const idx=(S.friends||[]).findIndex(x=>x.uid===f.uid),col=AVC[(idx<0?0:idx)%AVC.length];
   const body=document.getElementById('fp-body');
-  body.innerHTML=`<div class="fpr-head"><div class="fi-av fpr-av" style="background:${col}18;color:${col}">${avInner(f.photoUrl,f.n)}</div><div class="fpr-name">${esc(f.n)}</div><div class="fpr-meta"><span>${f.xp||0} xp</span><span>·</span><span style="display:inline-flex;align-items:center;gap:3px">${icon('fire',{size:13})} ${f.str||0} j</span></div></div>
+  body.innerHTML=`<div class="fpr-head"><div class="fi-av fpr-av" style="background:${col}18;color:${col}">${avInner(f.photoUrl,f.n)}</div><div class="fpr-name">${esc(f.n)}</div><div class="fpr-meta"><span>${f.xp||0} xp</span><span>·</span><span style="display:inline-flex;align-items:center;gap:3px">${flameHTML(13)} ${f.str||0} j</span></div></div>
     <div class="fpr-card" id="fp-compat"><div class="rv-skel"><div class="rv-bar" style="height:44px"></div></div></div>
     <button class="fpr-btn" onclick="openChatFor(S.friends.find(x=>x.uid==='${esc(f.uid)}'))">Envoyer un message</button>`;
   goTo('fprofile');
@@ -3437,6 +3462,7 @@ S.mode=S.mode||'hook';S.sv=S.sv||null;S.brandBack=S.brandBack||'home';
 function fillQuestion(q,opts){
   S._qShownAt = Date.now();
   document.getElementById('question').classList.toggle('qfull',qMode(q)==='full');   // « bulle » ou « plein écran » (voir qMode)
+  applyQuestionBg(q);
   setQPtsTag(q);
   beginQuestionOnServer(q);
   startAnswerLock();
@@ -5929,6 +5955,8 @@ submitAns = function() {
       const rwTotalEl = document.getElementById('rw-total');
       const rwLbl = document.querySelector('#reward .pe-lbl');
       const rwSub = document.querySelector('#reward .rw-sub');
+      const rwCoin = document.getElementById('rw-coin');
+      if (rwCoin) rwCoin.style.display = 'none';   // NOOVS et points sont deux monnaies différentes : la pièce ne s'affiche que quand des NOOVS sont gagnés
       if (data.flagged) {
         if (rwPtsEl) rwPtsEl.textContent = 0;
         if (rwSub) rwSub.textContent = 'Réponse enregistrée. Prends le temps de lire : les réponses trop rapides ne rapportent rien.';
@@ -5936,17 +5964,19 @@ submitAns = function() {
         if (rwPtsEl) rwPtsEl.textContent = 0;
         if (rwLbl) rwLbl.textContent = 'NOOVS · total';
         if (rwTotalEl) rwTotalEl.textContent = S.noovs + ' NOOVS';
+        if (rwCoin) rwCoin.style.display = 'flex';
         if (rwSub) rwSub.textContent = data.noovsWithheld === 'cap' ? 'Merci pour ton avis. Plafond de NOOVS du jour atteint : reviens demain.' : 'Merci pour ton avis. Les réponses lues très vite ne rapportent pas de NOOVS.';
       } else if (noovsGot > 0) {
         if (rwPtsEl) rwPtsEl.textContent = noovsGot;
         if (rwLbl) rwLbl.textContent = 'NOOVS · total';
         if (rwTotalEl) rwTotalEl.textContent = S.noovs + ' NOOVS';
-        flyNoovToHeader(document.querySelector('#reward .pts-earned'));
+        if (rwCoin) rwCoin.style.display = 'flex';
+        flyNoovToHeader(document.querySelector('#reward .pts-earned'));   // la pièce s'envole vers les NOOVS
         if (rwSub) rwSub.textContent = 'Merci pour ton avis.';
       } else {
         if (rwPtsEl) rwPtsEl.textContent = (touchesSurvey && S.sv) ? S.sv.earned : totalEarned;
         if (rwTotalEl) rwTotalEl.textContent = S.pts + ' pts';
-        flyNoovToHeader(document.querySelector('#reward .pts-earned'), '.hdr-pts-wrap-el');
+        flyPointsToHeader(document.querySelector('#reward .pts-earned'));   // l'étoile des points s'envole vers les points, jamais la pièce
         const disc = data.discoveryBonus > 0 ? 'Dont +' + data.discoveryBonus + ' pts de bonus découverte. ' : '';
         const left = typeof data.pointAnswersLeft === 'number' ? data.pointAnswersLeft : null;
         // Fin de palier : présenté comme un palier débloqué, pas comme une interdiction.
