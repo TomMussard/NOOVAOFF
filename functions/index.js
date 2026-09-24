@@ -26,6 +26,8 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./quota")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./points")));
 // Zone de correspondance (25 km) autour d'une ville NOOVA : voir cityZones.js.
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./cityZones")));
+// Comptes de démo (présentation investisseurs / mairie) — à retirer après usage, voir seedDemo.js.
+Object.assign(exports, require("./seedDemo"));
 
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.

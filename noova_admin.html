@@ -293,7 +293,8 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
   <!-- ══════════════ TAB UTILISATEURS ══════════════ -->
   <div id="tab-utilisateurs" style="display:none">
-    <div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between"><div><h2>Utilisateurs</h2><p>Aperçu de la communauté Noova — données agrégées en temps réel.</p></div><button onclick="_usersLoaded=false;loadUsers(true)" style="padding:8px 16px;background:var(--grad);color:var(--brown);border:none;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--fb);white-space:nowrap">↻ Actualiser</button></div>
+    <div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between"><div><h2>Utilisateurs</h2><p>Aperçu de la communauté Noova — données agrégées en temps réel.</p></div><div style="display:flex;gap:8px"><button onclick="seedDemoUsers(this)" style="padding:8px 16px;background:var(--ink);color:#fff;border:none;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--fb);white-space:nowrap">✨ Créer 15 comptes démo (Le Mans)</button><button onclick="_usersLoaded=false;loadUsers(true)" style="padding:8px 16px;background:var(--grad);color:var(--brown);border:none;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--fb);white-space:nowrap">↻ Actualiser</button></div></div>
+    <div id="seed-demo-status" style="display:none;margin-bottom:14px;padding:12px 16px;border-radius:10px;font-size:12.5px;line-height:1.6"></div>
 
     <div id="u-cap-warn" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.25);border-radius:10px;font-size:12.5px;color:#B91C1C">⚠️ 500 utilisateurs ou plus : ces stats et le classement ci-dessous sont un échantillon, pas le total réel.</div>
     <div class="stats">
@@ -642,6 +643,24 @@ const fx  = firebase.app().functions('europe-west1');
 const callAdminResetAllData  = fx.httpsCallable('adminResetAllData');
 const callAdminDeleteAccount = fx.httpsCallable('adminDeleteAccount');
 const callAdminCreateNoovaCampaign = fx.httpsCallable('adminCreateNoovaCampaign');
+const callAdminSeedDemoUsers = fx.httpsCallable('adminSeedDemoUsers');
+async function seedDemoUsers(btn) {
+  const el = document.getElementById('seed-demo-status');
+  el.style.display = 'block'; el.style.background = 'var(--bg)'; el.style.color = 'var(--ink2)';
+  el.textContent = 'Création des 15 comptes en cours…';
+  btn.disabled = true;
+  try {
+    const res = await callAdminSeedDemoUsers();
+    const d = res.data;
+    el.style.background = 'rgba(11,171,132,.1)'; el.style.color = 'var(--mint-text)';
+    el.innerHTML = `<strong>${d.created.length} comptes prêts</strong> (mot de passe : Demo2026!) — ${d.merchantsFound} commerce(s) vérifié(s) au Mans trouvé(s), ${d.answersWritten} réponse(s) ajoutée(s) sur de vraies campagnes.<br>${d.created.map(c=>esc(c.name)+' — '+esc(c.email)).join(' · ')}`;
+    _usersLoaded = false; loadUsers(true);
+  } catch(e) {
+    el.style.background = 'rgba(239,68,68,.1)'; el.style.color = '#EF4444';
+    el.textContent = 'Erreur : ' + e.message;
+  }
+  btn.disabled = false;
+}
 
 let allMerchants = [];
 let currentFilter = 'all';
