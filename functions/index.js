@@ -452,6 +452,66 @@ exports.adminResetAllData = onCall({ timeoutSeconds: 300 }, async (request) => {
 });
 
 /**
+ * adminCreateNoovaCampaign — crée une campagne « posée par NOOVA » : pas de commerce
+ * (merchantId: null), visible comme suivie par défaut chez tous les habitants de la ou
+ * des villes ciblées (voir recomputeCampaignFeed côté client, qui traite l'absence de
+ * merchantId comme "déjà suivi"). Les règles Firestore n'autorisent la création de
+ * campagne qu'avec merchantId == uid du commerçant qui la crée, donc ce cas — sans aucun
+ * commerçant — passe forcément par le SDK Admin, jamais par une écriture cliente directe.
+ */
+exports.adminCreateNoovaCampaign = onCall(async (request) => {
+  const email = request.auth && request.auth.token && request.auth.token.email;
+  if (!email || !ADMIN_EMAILS.includes(email)) {
+    throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
+  }
+  const { question, format, options, items, cities: cityIds, durationDays } = request.data || {};
+  if (!question || String(question).trim().length < 5) {
+    throw new HttpsError("invalid-argument", "Question manquante ou trop courte.");
+  }
+  const fmt = ["mcq", "text", "scale", "rank"].includes(format) ? format : "text";
+  const opts = fmt === "mcq" ? (options || []).filter(Boolean)
+    : fmt === "rank" ? (items || []).filter(Boolean) : [];
+  if (fmt === "mcq" && opts.length < 2) throw new HttpsError("invalid-argument", "Au moins 2 options pour un choix multiple.");
+  if (fmt === "rank" && opts.length < 2) throw new HttpsError("invalid-argument", "Au moins 2 éléments à classer.");
+  if (!Array.isArray(cityIds) || !cityIds.length) throw new HttpsError("invalid-argument", "Choisissez au moins une ville.");
+
+  const citiesSnap = await db.collection("cities").get();
+  const cityMap = {};
+  citiesSnap.forEach((d) => { cityMap[d.id] = d.data(); });
+
+  const created = [];
+  for (const cityId of cityIds) {
+    const cityLabel = (cityMap[cityId] && cityMap[cityId].label) || cityId;
+    const ref = await db.collection("campaigns").add({
+      merchantId: null,
+      merchantName: "NOOVA",
+      merchantTheme: "NOOVA",
+      brandEmoji: "✨",
+      postedByNoova: true,
+      name: String(question).slice(0, 60),
+      sector: "NOOVA",
+      question,
+      questions: [{ q: question, format: fmt, options: opts }],
+      questionsSchema: 2,
+      format: fmt,
+      options: opts,
+      city: cityId,
+      cityLabel,
+      targetCity: cityId,
+      pointsPerAnswer: 20,
+      answersCount: 0,
+      responsesCount: 0,
+      status: "active",
+      ...(durationDays ? { durationDays, endsAt: Timestamp.fromMillis(Date.now() + durationDays * 86400000) } : {}),
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    created.push({ id: ref.id, city: cityId });
+  }
+  return { created };
+});
+
+/**
  * adminDeleteAccount — supprime un seul compte (commerçant ou habitant), Firestore
  * (données liées comprises) ET le compte Auth associé. Réservé admin.
  */

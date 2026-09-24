@@ -299,6 +299,12 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dtoday-card.disc .disc-pill{display:inline-block}
 .q-card.disc{background:var(--md);box-shadow:none;border:1.5px dashed rgba(38,79,60,.55)}
 .disc-tag{font-size:10px;font-weight:800;color:#fff;background:var(--mint);padding:2px 8px;border-radius:99px}
+/* Question posée par NOOVA (pas un commerce) : carte sombre premium dans la rangée « À répondre »,
+   pour qu'elle se distingue d'un coup d'œil des questions de commerces. */
+.q-card.noova{background:linear-gradient(155deg,#2A2013 0%,#1C1917 100%);box-shadow:0 6px 16px rgba(28,25,23,.22)}
+.q-card.noova .q-br,.q-card.noova .q-prev{color:#FFFBD7!important}
+.q-card.noova .q-type-t{background:rgba(255,251,215,.14);color:#FFFBD7}
+.noova-tag{font-size:10px;font-weight:800;color:var(--nv-black);background:var(--nv-yellow);padding:2px 8px;border-radius:99px}
 .disc-note{margin:0 0 14px;padding:12px 14px;background:var(--md);border:1.5px dashed rgba(38,79,60,.55);border-radius:14px;font-size:12px;line-height:1.55;color:var(--ink)}
 .disc-note b{color:var(--mint)}
 .follow-card{width:100%;margin:0 0 12px;padding:16px;background:var(--md);border:1.5px solid rgba(38,79,60,.35);border-radius:18px;text-align:left}
@@ -477,6 +483,42 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 #question.qmode-noovs{background:linear-gradient(165deg,#FFF3D1 0%,#FFC300 58%,#F29715 100%)}
 #question.qmode-noovs.qfull{background:linear-gradient(165deg,#FFC300 0%,#F29715 100%)}
 #question.qmode-classique.qfull{background:var(--bg)}
+/* Question posée par NOOVA (pas un commerce) : toujours en plein cadre, fond sombre premium plutôt que la
+   couleur pièce — pour qu'on la distingue d'un coup d'œil d'une question classique ou « à NOOVS ». Comme le
+   fond change de famille de couleur (sombre au lieu de clair), chaque élément texte/pastille du plein-écran
+   générique est réinversé ici plutôt que réutilisé tel quel. */
+#question.qmode-noova.qfull{background:linear-gradient(165deg,#2A2013 0%,#1C1917 65%,#120F0A 100%)}
+#question.qmode-noova.qfull .q-close{background:rgba(255,251,215,.12);color:#FFFBD7;box-shadow:none}
+#question.qmode-noova.qfull .q-seg{background:rgba(255,251,215,.16)}
+#question.qmode-noova.qfull .q-seg.done{background:var(--nv-yellow)}
+#question.qmode-noova.qfull .q-pts{background:var(--nv-yellow);color:var(--nv-black)}
+#question.qmode-noova.qfull .bh-name,#question.qmode-noova.qfull .bh-usage,#question.qmode-noova.qfull .q-hint{color:#FFFBD7}
+#question.qmode-noova.qfull .bh-tag{display:none}
+#question.qmode-noova.qfull .brand-hdr{cursor:default;pointer-events:none}
+#question.qmode-noova.qfull .brand-hdr>div:last-child{display:none}
+#question.qmode-noova.qfull .q-text{font-size:34px;line-height:1.08;letter-spacing:-1.3px;margin:5vh 0 12px;color:#FFFBD7}
+#question.qmode-noova.qfull .disc-note{background:rgba(255,251,215,.08);border:none;color:#FFFBD7}
+#question.qmode-noova.qfull .mcq-list{counter-reset:qo;gap:10px}
+#question.qmode-noova.qfull .mcq-opt{background:rgba(255,251,215,.08);border:1.5px solid rgba(255,251,215,.18);color:#FFFBD7;border-radius:22px;padding:19px 20px;font-size:17px;font-weight:700}
+#question.qmode-noova.qfull .mcq-opt::before{counter-increment:qo;content:counter(qo,upper-alpha);width:30px;height:30px;border-radius:9px;background:rgba(255,251,215,.14);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#question.qmode-noova.qfull .mcq-ck{display:none}
+#question.qmode-noova.qfull .mcq-opt.sel{background:var(--nv-yellow);border-color:var(--nv-yellow);color:var(--nv-black);box-shadow:none}
+#question.qmode-noova.qfull .mcq-opt.sel::before{background:var(--nv-black);color:var(--nv-yellow)}
+#question.qmode-noova.qfull .ans-ta{background:rgba(255,251,215,.08);border:1.5px solid rgba(255,251,215,.18);color:#FFFBD7;border-radius:24px;font-size:18px;padding:20px}
+#question.qmode-noova.qfull .ans-ta::placeholder{color:rgba(255,251,215,.4)}
+#question.qmode-noova.qfull .char-ct{color:rgba(255,251,215,.55)}
+#question.qmode-noova.qfull .scale-val{font-size:120px;color:#FFFBD7;margin:6vh 0 14px}
+#question.qmode-noova.qfull .scale-labels{color:rgba(255,251,215,.7);font-weight:700}
+#question.qmode-noova.qfull .scale-inp{height:10px;background:rgba(255,251,215,.16)!important}
+#question.qmode-noova.qfull .scale-inp::-webkit-slider-thumb{background:var(--nv-yellow);width:34px;height:34px;box-shadow:none}
+#question.qmode-noova.qfull .rank-item{background:rgba(255,251,215,.08);border:1.5px solid rgba(255,251,215,.18);border-radius:22px;padding:15px}
+#question.qmode-noova.qfull .rank-txt{color:#FFFBD7;font-size:15px;font-weight:700}
+#question.qmode-noova.qfull .rank-num{background:var(--nv-yellow);color:var(--nv-black)}
+#question.qmode-noova.qfull .rank-arr{background:rgba(255,251,215,.12);border:none;color:#FFFBD7}
+#question.qmode-noova.qfull #lock-fill{background:var(--nv-yellow)}
+#question.qmode-noova.qfull .skip-btn{background:rgba(255,251,215,.12);color:#FFFBD7}
+#question.qmode-noova.qfull .btn-sub{background:var(--nv-yellow);color:var(--nv-black);box-shadow:none}
+#question.qmode-noova.qfull .btn-sub:disabled,#question.qmode-noova.qfull .btn-sub.locked{opacity:1;background:rgba(255,251,215,.14);color:#FFFBD7}
 .qw{padding:52px 20px 22px;min-height:100%;display:flex;flex-direction:column}
 .q-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .q-close{width:38px;height:38px;border-radius:var(--r-pill);background:var(--surface);border:none;box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--ink)}
@@ -2183,8 +2225,12 @@ function flameHTML(size){return NV_ASSETS.flame?'<img src="'+esc(NV_ASSETS.flame
 function applyQuestionBg(q){
   const el=document.getElementById('question');
   if(!el) return;
-  el.classList.remove('qmode-classique','qmode-noovs');
-  el.classList.add(isFreeMode()?'qmode-noovs':'qmode-classique');
+  const byNoova=!!(q&&q._byNoova);
+  // Une question posée par NOOVA est toujours en plein cadre (jamais « bulle ») : c'est ce
+  // format, plus premium/sombre, qui la distingue au premier coup d'œil d'une question de commerce.
+  el.classList.toggle('qfull', byNoova||qMode(q)==='full');
+  el.classList.remove('qmode-classique','qmode-noovs','qmode-noova');
+  el.classList.add(byNoova?'qmode-noova':(isFreeMode()?'qmode-noovs':'qmode-classique'));
 }
 // Petit effet « gain » : une pastille s'envole jusqu'au score visible à l'écran — le bandeau
 // NOOVS/série/points est répété en haut de l'accueil, de la question et de la récompense (mêmes
@@ -2272,7 +2318,7 @@ function renderQueue(){
   const clrs=['#f29715','#A14E08','#0BAB84','#5C3BF5','#F5A623'];
   let cnt=0;
   S.qs.slice(1).forEach((q,i)=>{
-    const d=document.createElement('div');d.className='q-card'+(q._discovery?' disc':'');d.onclick=()=>openQ(i+1);
+    const d=document.createElement('div');d.className='q-card'+(q._discovery?' disc':'')+(q._byNoova?' noova':'');d.onclick=()=>openQ(i+1);
     const tc={text:'Texte libre',mcq:'Choix multiple',scale:'Échelle',rank:'Classement'}[q.type];
     const friendArr=(S._friendAnswers||{})[q._firestoreId]||[];
     let badge='';
@@ -2283,7 +2329,7 @@ function renderQueue(){
       const verb=friendArr.length>1?'ont répondu':'a répondu';
       badge=`<div class="friend-badge"><div class="fb-av" style="background:${c}22;color:${c}">${(fn||'?')[0]}</div>${esc(fn)}${more>0?` + ${more} ami${more>1?'s':''}`:''} ${verb}</div>`;
     }
-    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta">${q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:10.5px;color:var(--ink2);margin-top:5px">Nouveau près de chez toi · tu ne le suis pas encore</div>':''}${badge}</div>`;
+    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta">${q._byNoova?'<span class="noova-tag">✨ NOOVA</span>':q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:10.5px;color:var(--ink2);margin-top:5px">Nouveau près de chez toi · tu ne le suis pas encore</div>':''}${badge}</div>`;
     el.appendChild(d);cnt++;
     if(cnt%3===0){const sc=buildSocialCard();if(sc)el.appendChild(sc);}
   });
@@ -2296,7 +2342,7 @@ function defaultHint(type){return {mcq:'Choisis la réponse qui te ressemble.',t
 function qMode(q){return hash01(String((q&&(q._firestoreId||q.q))||''))<0.5?'full':'bubble';}
 function openQ(idx){
   S.qIdx=idx;S.curQ=S.qs[idx];if(!S.curQ)return;const q=S.curQ;
-  document.getElementById('question').classList.toggle('qfull',qMode(q)==='full');
+  applyQuestionBg(q);
   const pg=document.getElementById('q-prog');pg.innerHTML='';
   S.qs.forEach((_,i)=>{const s=document.createElement('div');s.className='q-seg'+(i<idx?' done':i===idx?' cur':'');pg.appendChild(s)});
   setQPtsTag(q);
@@ -3496,8 +3542,7 @@ S.mode=S.mode||'hook';S.sv=S.sv||null;S.brandBack=S.brandBack||'home';
 /* --- Rendu d'une question (commun hook + suivi) --- */
 function fillQuestion(q,opts){
   S._qShownAt = Date.now();
-  document.getElementById('question').classList.toggle('qfull',qMode(q)==='full');   // « bulle » ou « plein écran » (voir qMode)
-  applyQuestionBg(q);
+  applyQuestionBg(q);   // pose .qfull (« bulle » ou « plein écran », voir qMode) + le dégradé du bon type de question
   setQPtsTag(q);
   beginQuestionOnServer(q);
   startAnswerLock();
@@ -3734,7 +3779,7 @@ function startCampaignById(campId) {
 
 function openBrandFromQ(){
   const q=curQuestion();
-  if(!q)return;
+  if(!q||q._byNoova)return;   // question posée par NOOVA : pas de fiche commerce à ouvrir
   S.brandBack='question';
   if(q._merchantId) openBrandById(q._merchantId,q.brand);
   else if(q.brand) openBrand(q.brand,'question');
@@ -5858,18 +5903,23 @@ function recomputeCampaignFeed(city) {
     const myUid = (auth.currentUser && auth.currentUser.uid) || '';
     _campaignsCache.forEach(({ id, data: d }) => {
       if (answered.includes(id)) return;
+      // Question posée par NOOVA elle-même (pas un commerce) : pas de merchantId, donc pas de fiche
+      // commerce à vérifier — toujours « déjà suivie », visible de tous dans la ville ciblée.
+      const byNoova = !d.merchantId;
       const campaignCity = getCampaignCity(d);
-      const merchantData = _verifiedMerchantsCache[d.merchantId] || null;
-      const merchantCity = normalizeCity(merchantData?.city || d.city || '');
+      const merchantData = byNoova ? null : (_verifiedMerchantsCache[d.merchantId] || null);
+      const merchantCity = normalizeCity((merchantData && merchantData.city) || d.city || '');
       if (city && campaignCity && campaignCity !== city) return;
-      if (city && merchantCity && merchantCity !== city) return;
-      if (!merchantData) return;
+      if (!byNoova) {
+        if (city && merchantCity && merchantCity !== city) return;
+        if (!merchantData) return;
+      }
       if (getCampaignTargetVolume(d) && (d.responsesCount || d.answersCount || 0) >= getCampaignTargetVolume(d)) return;
       if (d.endsAt && d.endsAt.toMillis && d.endsAt.toMillis() < Date.now()) return; // campagne terminée
       const ageRanges = getCampaignAgeRanges(d).map(normalizeAgeRange);
       if (ageRanges.length && userAge && !ageRanges.includes(userAge)) return;
       // Commerce pas encore suivi : question « découverte », proposée selon les centres d'intérêt, ou à une petite part au hasard.
-      const followed = !d.merchantId || authorized.includes(d.merchantId);
+      const followed = byNoova || authorized.includes(d.merchantId);
       let discoveryReason = '';
       if (!followed) {
         if (declined.includes(d.merchantId)) return;                              // écarté par l'habitant : plus jamais proposé
@@ -5879,27 +5929,29 @@ function recomputeCampaignFeed(city) {
         discoveryMerchants[d.merchantId] = { id: d.merchantId, ...merchantData };
       }
 
+      const brandName = byNoova ? 'NOOVA' : (d.merchantName || 'Commerce');
+      const usageTxt = byNoova ? (d.usage || 'Ta réponse aide NOOVA à améliorer l’app pour tout le monde.') : ('Ta réponse aide ' + (d.merchantName || 'ce commerce'));
       const allQs = getCampaignQuestions(d);
       const surveyList = allQs.slice(1).map((sq, idx) => ({
-        _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: idx + 1,
-        brand: d.merchantName || 'Commerce', ico: d.brandEmoji || '🏪',
-        theme: d.sector || 'Commerce local', pts: ENGAGEMENT.PTS_PER_ANSWER,
+        _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: idx + 1, _byNoova: byNoova,
+        brand: brandName, ico: d.brandEmoji || (byNoova ? '✨' : '🏪'),
+        theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: ENGAGEMENT.PTS_PER_ANSWER,
         type: sq.format || 'text', q: sq.q, hint: '',
         opts: sq.options || [], items: sq.options || [],
-        usage: 'Ta réponse aide ' + (d.merchantName || 'ce commerce')
+        usage: usageTxt
       }));
       campaigns.push({
-        _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: 0,
+        _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: 0, _byNoova: byNoova,
         _surveyCount: allQs.length,
-        brand: d.merchantName || 'Commerce', ico: d.brandEmoji || '🏪',
-        photoUrl: merchantData.coverUrl || null, logoUrl: merchantData.logoUrl || null,
-        _discovery: !followed, _reason: discoveryReason, _strict: interestMatch(merchantData) ? 1 : 0, _followed: followed ? 1 : 0,
+        brand: brandName, ico: d.brandEmoji || (byNoova ? '✨' : '🏪'),
+        photoUrl: merchantData ? merchantData.coverUrl || null : null, logoUrl: merchantData ? merchantData.logoUrl || null : null,
+        _discovery: !followed, _reason: discoveryReason, _strict: (merchantData && interestMatch(merchantData)) ? 1 : 0, _followed: followed ? 1 : 0,
         _createdMs: (d.createdAt && d.createdAt.toMillis ? d.createdAt.toMillis() : 0),
-        theme: d.sector || 'Commerce local', pts: 10,
+        theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: 10,
         type: allQs[0].format || d.format || 'text',
         q: allQs[0].q || d.question, hint: '',
         opts: allQs[0].options || d.options || [], items: allQs[0].options || d.options || [],
-        usage: 'Ta réponse aide ' + (d.merchantName || 'ce commerce'),
+        usage: usageTxt,
         survey: surveyList
       });
     });

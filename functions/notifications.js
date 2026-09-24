@@ -472,6 +472,9 @@ const notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (eve
   // Quota mensuel de questions : comptabilisé pour toute nouvelle campagne ; au-delà, elle est bloquée et jamais notifiée.
   if (!(await require("./quota")._t.accountCampaign(event.params.campaignId, camp))) return;
   if (camp.status !== "active") return;
+  // Question posée par NOOVA elle-même (pas un commerce) : pas de fiche commerce à notifier
+  // comme « nouveau commerce » — ce type de notification ne s'applique qu'aux campagnes de commerçants.
+  if (!camp.merchantId) return;
   const city = String(camp.targetCity || camp.city || "").toLowerCase();
   if (!city) return;
   const m = await db().collection("merchants").doc(camp.merchantId).get();

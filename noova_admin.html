@@ -438,6 +438,42 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
         <div id="wq-active" style="padding:20px"><div class="empty">Aucune question active.</div></div>
       </div>
     </div>
+
+    <!-- Question NOOVA : une vraie campagne (points/NOOVS), sans commerce derrière — différente de la
+         « Question de la semaine » ci-dessus, qui est un simple sondage du feed communauté sans enjeu. -->
+    <div class="sec-hdr" style="margin-top:32px"><h2 style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/></svg> Question NOOVA</h2><p>Crée une campagne posée par NOOVA elle-même (pas un commerce) : elle rapporte des points/NOOVS comme une question de commerce, et apparaît dans le fil « À répondre » avec un habillage sombre distinct — toujours en plein écran.</p></div>
+    <div class="card" style="margin-bottom:20px;max-width:480px">
+      <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20l1-4.5L15.5 5 19 8.5 8.5 19z"/><path d="M13.5 6.5 17.5 10.5"/></svg> Nouvelle question NOOVA</div>
+      <div style="padding:20px">
+        <div style="margin-bottom:14px">
+          <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Type de réponse</label>
+          <select id="nq-format" onchange="nqFormatChanged()" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+            <option value="mcq">Choix multiple</option>
+            <option value="text">Texte libre</option>
+            <option value="scale">Échelle (1 à 10)</option>
+            <option value="rank">Classement</option>
+          </select>
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Question</label>
+          <textarea id="nq-text" maxlength="150" placeholder="Ex : Qu'est-ce qui te ferait répondre plus souvent sur Noova ?" style="width:100%;height:70px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:14px;color:var(--ink);resize:none;outline:none;line-height:1.5"></textarea>
+        </div>
+        <div id="nq-opts-wrap" style="margin-bottom:14px">
+          <label id="nq-opts-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Réponses possibles</label>
+          <div id="nq-opts-list" style="display:flex;flex-direction:column;gap:8px">
+            <input class="nq-opt-inp" placeholder="Option 1" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+            <input class="nq-opt-inp" placeholder="Option 2" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+          </div>
+          <button type="button" onclick="addNqOpt()" style="margin-top:8px;background:none;border:none;padding:0;font-size:12px;font-weight:700;color:var(--coral-text);cursor:pointer">+ Ajouter une option (6 max)</button>
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Ville(s) ciblée(s)</label>
+          <div id="nq-cities-list" style="display:flex;flex-direction:column;gap:6px"><div class="loading">Chargement</div></div>
+        </div>
+        <button onclick="createNoovaCampaign()" style="width:100%;padding:12px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--cg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 4v16M4 12h16"/></svg> Créer la campagne</button>
+        <div id="nq-status" style="margin-top:12px;font-size:13px;font-weight:600;text-align:center;min-height:20px;color:var(--ink2)"></div>
+      </div>
+    </div>
   </div>
 
   <!-- ══════════════ TAB LANCEMENT ══════════════ -->
@@ -605,6 +641,7 @@ const db = firebase.firestore();
 const fx  = firebase.app().functions('europe-west1');
 const callAdminResetAllData  = fx.httpsCallable('adminResetAllData');
 const callAdminDeleteAccount = fx.httpsCallable('adminDeleteAccount');
+const callAdminCreateNoovaCampaign = fx.httpsCallable('adminCreateNoovaCampaign');
 
 let allMerchants = [];
 let currentFilter = 'all';
@@ -1465,6 +1502,7 @@ async function initDiffusion() {
     _broadcastHistory = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderBroadcastHistory();
     initWeeklyQuestion();
+    initNoovaCampaignForm();
   } catch(e) {
     statusEl.textContent = 'Erreur : ' + e.message;
   }
@@ -1520,6 +1558,61 @@ async function publishWeeklyQuestion() {
     statusEl.textContent = 'Question publiée !';
     setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 4000);
     renderActiveWeeklyQuestion();
+  } catch(e) {
+    statusEl.style.color = '#EF4444';
+    statusEl.textContent = 'Erreur : ' + e.message;
+  }
+}
+// ── Question NOOVA (vraie campagne, sans commerce) ──────────────────────────
+async function initNoovaCampaignForm() {
+  const el = document.getElementById('nq-cities-list');
+  if (!el) return;
+  try {
+    const citiesSnap = await db.collection('cities').get();
+    const cities = citiesSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (a.label||a.id).localeCompare(b.label||b.id));
+    if (!cities.length) { el.innerHTML = '<div class="empty">Aucune ville enregistrée.</div>'; return; }
+    el.innerHTML = cities.map((c,i) => `<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer"><input type="checkbox" class="nq-city-chk" value="${esc(c.id)}"${i===0?' checked':''}> ${esc(c.label||c.id)}</label>`).join('');
+  } catch(e) { el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`; }
+}
+function nqFormatChanged() {
+  const fmt = document.getElementById('nq-format').value;
+  const wrap = document.getElementById('nq-opts-wrap');
+  const label = document.getElementById('nq-opts-label');
+  wrap.style.display = (fmt === 'mcq' || fmt === 'rank') ? 'block' : 'none';
+  label.textContent = fmt === 'rank' ? 'Éléments à classer' : 'Réponses possibles';
+  document.querySelectorAll('.nq-opt-inp').forEach((inp,i) => { inp.placeholder = (fmt === 'rank' ? 'Élément ' : 'Option ') + (i+1); });
+}
+function addNqOpt() {
+  const list = document.getElementById('nq-opts-list');
+  if (list.children.length >= 6) { showToast('6 maximum', 'warning'); return; }
+  const fmt = document.getElementById('nq-format').value;
+  const inp = document.createElement('input');
+  inp.className = 'nq-opt-inp';
+  inp.placeholder = (fmt === 'rank' ? 'Élément ' : 'Option ') + (list.children.length + 1);
+  inp.style.cssText = 'width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none';
+  list.appendChild(inp);
+}
+async function createNoovaCampaign() {
+  const question = document.getElementById('nq-text').value.trim();
+  const format = document.getElementById('nq-format').value;
+  const opts = Array.from(document.querySelectorAll('.nq-opt-inp')).map(i => i.value.trim()).filter(Boolean);
+  const cities = Array.from(document.querySelectorAll('.nq-city-chk:checked')).map(c => c.value);
+  const statusEl = document.getElementById('nq-status');
+  if (!question || question.length < 5) { statusEl.style.color = '#EF4444'; statusEl.textContent = 'Question manquante ou trop courte.'; return; }
+  if ((format === 'mcq' || format === 'rank') && opts.length < 2) { statusEl.style.color = '#EF4444'; statusEl.textContent = 'Au moins 2 ' + (format === 'rank' ? 'éléments' : 'options') + ' requis.'; return; }
+  if (!cities.length) { statusEl.style.color = '#EF4444'; statusEl.textContent = 'Choisis au moins une ville.'; return; }
+  if (!confirm(`Créer cette campagne NOOVA pour ${cities.length} ville(s) ?`)) return;
+  statusEl.style.color = 'var(--ink2)'; statusEl.textContent = 'Création…';
+  try {
+    const payload = { question, format, cities };
+    if (format === 'mcq') payload.options = opts;
+    if (format === 'rank') payload.items = opts;
+    const res = await callAdminCreateNoovaCampaign(payload);
+    document.getElementById('nq-text').value = '';
+    document.getElementById('nq-opts-list').innerHTML = '<input class="nq-opt-inp" placeholder="Option 1" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none"><input class="nq-opt-inp" placeholder="Option 2" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">';
+    statusEl.style.color = 'var(--mint)';
+    statusEl.textContent = (res.data.created || []).length + ' campagne(s) créée(s) !';
+    setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 4000);
   } catch(e) {
     statusEl.style.color = '#EF4444';
     statusEl.textContent = 'Erreur : ' + e.message;
