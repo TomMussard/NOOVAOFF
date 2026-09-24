@@ -880,8 +880,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <div class="page active" id="page-dashboard">
         <div id="quota-card" style="display:none"></div>
         <div id="acq-card" style="display:none"></div>
-        <!-- Clients ramenés par NOOVA (bons validés ce mois-ci) -->
-        <div class="kpi-row" id="bring-row" style="grid-template-columns:repeat(3,1fr)">
+        <!-- Clients ramenés par NOOVA (bons validés ce mois-ci). Le panier moyen a été retiré : basé sur une
+             saisie manuelle facultative au comptoir, la base était trop faible pour être fiable au lancement. -->
+        <div class="kpi-row" id="bring-row" style="grid-template-columns:repeat(2,1fr)">
           <div class="kpi-card">
             <div class="kpi-top"><span class="kpi-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></svg></span></div>
             <div class="kpi-val" id="bring-val-0">0</div>
@@ -891,11 +892,6 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div class="kpi-top"><span class="kpi-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></span></div>
             <div class="kpi-val" id="bring-val-1">0</div>
             <div class="kpi-lbl">dont nouveaux clients</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-top"><span class="kpi-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6"/></svg></span></div>
-            <div class="kpi-val" id="bring-val-2">—</div>
-            <div class="kpi-lbl">Panier moyen des clients NOOVA</div>
           </div>
         </div>
         <!-- KPIs -->
@@ -3854,8 +3850,8 @@ async function validateVoucher() {
         ${d.minPurchase ? `<div style="display:flex;align-items:center;gap:5px">${icon('document',{size:13})} Avec achat : minimum ${rwEur(d.minPurchase)}</div>` : '<div></div>'}
       </div>
       <div style="border-top:1px solid rgba(11,171,132,.25);padding-top:14px;margin-bottom:16px">
-        <label for="vch-basket" style="font-size:12px;font-weight:700;color:var(--ink2);display:block;margin-bottom:6px">Montant du panier (€)${d.minPurchase ? ' *' : ' (facultatif, pour suivre le panier moyen)'}</label>
-        <input class="field-inp" id="vch-basket" type="number" min="0.5" max="5000" step="0.1" placeholder="ex. 12,50" style="max-width:180px;margin-bottom:12px">
+        ${d.minPurchase ? `<label for="vch-basket" style="font-size:12px;font-weight:700;color:var(--ink2);display:block;margin-bottom:6px">Montant du panier (€) *</label>
+        <input class="field-inp" id="vch-basket" type="number" min="0.5" max="5000" step="0.1" placeholder="ex. 12,50" style="max-width:180px;margin-bottom:12px">` : ''}
         <label style="display:flex;gap:9px;align-items:center;font-size:13px;color:var(--ink);cursor:pointer"><input type="checkbox" id="vch-new"> C'est un nouveau client (première visite chez nous)</label>
       </div>
       <button class="tb-btn tb-btn-primary" style="width:100%;padding:12px" onclick="confirmValidateVoucher('${doc.id}',this,${d.minPurchase||0})">Confirmer l'utilisation</button>
@@ -3999,17 +3995,15 @@ function loadBringKpis(uid){
   if(_bringUnsub) _bringUnsub();
   _bringUnsub = db.collection('redemptions').where('merchantId','==',uid).where('status','==','used').onSnapshot(snap => {
     const now = new Date(), m0 = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-    const users = new Set(), fresh = new Set(); let sum = 0, n = 0;
+    const users = new Set(), fresh = new Set();
     snap.forEach(doc => {
       const d = doc.data(), ms = d.usedAt && d.usedAt.toMillis ? d.usedAt.toMillis() : 0;
       if(ms < m0) return;
       users.add(d.userId);
       if(d.newCustomer === true) fresh.add(d.userId);
-      if(typeof d.basketEuros === 'number') { sum += d.basketEuros; n++; }
     });
     const set = (i, v) => { const el = document.getElementById('bring-val-' + i); if(el) el.textContent = v; };
     set(0, users.size); set(1, fresh.size);
-    set(2, n ? (sum / n).toFixed(2).replace('.', ',') + ' €' : '—');
   }, e => console.warn('bring kpis:', e));
 }
 async function loadQuota(){
