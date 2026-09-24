@@ -3552,7 +3552,7 @@ function fillQuestion(q,opts){
   document.getElementById('bh-tag').textContent=q.theme||'';
   document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||defaultHint(q.type);
   const sk=document.getElementById('skip-btn');if(sk){sk.textContent=opts.skipLabel;sk.setAttribute('onclick',opts.skipFn);}
-  {const dn=document.getElementById('q-disc-note');if(dn){const on=!!(q._discovery&&S.mode!=='survey');dn.style.display=on?'block':'none';if(on)dn.innerHTML='<b>Découverte</b> : tu ne suis pas encore '+esc(q.brand)+'. Tu peux répondre ou passer. Si tu réponds, ce commerce reçoit ta réponse, <b>sans ton âge ni tes centres d\'intérêt</b>. Ensuite, tu choisis de le suivre ou non.';}}
+  {const dn=document.getElementById('q-disc-note');if(dn)dn.style.display='none';}
   document.getElementById('sub-btn').disabled=true;buildAns(q);
 }
 function curQuestion(){return S.mode==='survey'&&S.sv?S.sv.list[S.sv.idx]:S.curQ;}
@@ -4775,14 +4775,13 @@ async function declineMerchant(mid){
 // ─── Reveal : comment les autres ont répondu (questions à choix, après avoir répondu) ───
 function closeRevealSheet(){const sh=document.getElementById('reveal-sheet');if(sh)sh.style.display='none';}
 function revealCardHTML(r,compact){
-  const showPct=!r.belowThreshold;
   const friendsBy={};(r.friends||[]).forEach(f=>{if(f.optionIdx>=0)(friendsBy[f.optionIdx]=friendsBy[f.optionIdx]||[]).push(f);});
   const rows=r.options.map((o,i)=>{
     const mine=i===r.myIdx;
     const av=(friendsBy[i]||[]).map(f=>`<div class="rv-av" title="${esc(f.name)}">${avInner(f.photoUrl,f.name)}</div>`).join('');
-    return `<div class="rv-row${mine?' mine':''}"><div class="rv-top"><span class="rv-l">${mine?icon('check',{size:14}):''}${esc(o.text)}</span>${showPct?`<span class="rv-p">${o.pct} %</span>`:''}</div><div class="rv-bar"><div style="width:${showPct?o.pct:0}%"></div></div>${av?`<div class="rv-fr">${av}</div>`:''}</div>`;
+    return `<div class="rv-row${mine?' mine':''}"><div class="rv-top"><span class="rv-l">${mine?icon('check',{size:14}):''}${esc(o.text)}</span><span class="rv-p">${o.pct} %</span></div><div class="rv-bar"><div style="width:${o.pct}%"></div></div>${av?`<div class="rv-fr">${av}</div>`:''}</div>`;
   }).join('');
-  const note=r.belowThreshold?`<div class="rv-note">Encore ${r.needed} réponse${r.needed>1?'s':''} avant de voir les résultats.</div>`:`<div class="rv-foot">${r.n} réponse${r.n>1?'s':''}</div>`;
+  const note=`<div class="rv-foot">${r.n} réponse${r.n>1?'s':''}</div>`;
   let info='';
   try{if(!localStorage.getItem('nv_reveal_info')){localStorage.setItem('nv_reveal_info','1');info=`<div class="rv-info"><span style="flex:1">Tes amis voient ce que tu réponds. Tu comptes toujours dans les résultats, même si tu coupes ce partage.</span><button onclick="closeRevealSheet();openPrivacySettings()">Régler</button></div>`;}}catch(e){}
   return `<div class="rv"><div class="rv-h">${compact?'Les autres ont répondu':'Comment les autres ont répondu'}</div>${rows}${note}${info}</div>`;
@@ -4869,9 +4868,8 @@ function renderDailyTrack(){
   const n=Math.min(MAX_POINT_ANSWERS,getAnswersToday());
   const left=MAX_POINT_ANSWERS-n;
   el.className='dtrack';
-  el.innerHTML='<div class="dt-dots">'+[0,1,2].map(i=>'<div class="dt-dot'+(i<n?' on':'')+'"></div>').join('')+'</div><div class="dt-txt">'
-    +(left>0?'Encore '+left+' réponse'+(left>1?'s':'')+' pour tes points et ta série':'Tes '+(S._pointsToday||0)+' pts du jour sont validés')
-    +'</div>';
+  el.innerHTML='<div class="dt-dots">'+[0,1,2].map(i=>'<div class="dt-dot'+(i<n?' on':'')+'"></div>').join('')+'</div>'
+    +(left<=0?'<div class="dt-txt">Tes '+(S._pointsToday||0)+' pts du jour sont validés</div>':'');
 }
 function renderHomeState(){
   const el=document.getElementById('home-state'),card=document.getElementById('today-card');
@@ -6068,7 +6066,7 @@ submitAns = function() {
         const left = typeof data.pointAnswersLeft === 'number' ? data.pointAnswersLeft : null;
         // Fin de palier : présenté comme un palier débloqué, pas comme une interdiction.
         if (rwSub && left !== null) {
-          if (left > 0) rwSub.textContent = disc + 'Encore ' + left + ' réponse' + (left > 1 ? 's' : '') + ' en points aujourd\'hui.';
+          if (left > 0) rwSub.textContent = disc ? disc.trim() : 'Ta réponse a été envoyée';
           else rwSub.innerHTML = disc + 'Tes ' + (S._pointsToday || 0) + ' pts du jour sont validés ' + icon('check', { size: 15 });
         }
       }
