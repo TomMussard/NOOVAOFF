@@ -65,6 +65,7 @@ async function friendsWhoAnswered(uid, user, campaignId, qIdx, options) {
     const f = fu.data();
     if (!(f.friendUids || []).includes(uid)) return;       // amitié non réciproque
     if (f.shareAnswers === false) return;                  // a coupé « Montrer mes réponses à mes amis »
+    if (!CFG.REVEAL.COUNT_FLAGGED && fa.data().flagged) return;   // réponse trop rapide pour avoir été lue : pas affichée comme un vrai avis d'ami
     const ans = String(fa.data().answer || "");
     out.push({ uid: fid, name: f.name || "Ami", photoUrl: f.photoUrl || null, optionIdx: options.indexOf(ans), answer: ans });
   });
@@ -199,9 +200,11 @@ const pairId = (a, b) => [a, b].sort().join("_");
 
 async function answersOf(uid) {
   const snap = await db().collection("answers").where("userId", "==", uid)
-    .select("campaignId", "questionIdx", "answer", "category").limit(CFG.COMPAT.MAX_ANSWERS_SCAN).get();
+    .select("campaignId", "questionIdx", "answer", "category", "flagged").limit(CFG.COMPAT.MAX_ANSWERS_SCAN).get();
   const m = new Map();
-  snap.forEach((d) => { const a = d.data(); m.set(`${a.campaignId}#${a.questionIdx || 0}`, a); });
+  // Une réponse trop rapide pour avoir été lue ne doit pas compter dans la compatibilité (ni comme un
+  // point d'accord, ni comme un point de désaccord) : même logique que pour le reveal (CFG.REVEAL.COUNT_FLAGGED).
+  snap.forEach((d) => { const a = d.data(); if (!CFG.REVEAL.COUNT_FLAGGED && a.flagged) return; m.set(`${a.campaignId}#${a.questionIdx || 0}`, a); });
   return m;
 }
 

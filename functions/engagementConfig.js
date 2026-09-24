@@ -49,8 +49,8 @@ module.exports = {
     FORMATS: ["mcq"],            // formats de question concernés (choix multiple uniquement)
     MIN_ANSWERS: 1,              // pas de seuil : dès qu'il y a une réponse, le pourcentage s'affiche
     MAX_FRIENDS: 30,             // amis regardés au maximum
-    COUNT_SUSPECT: true,         // les réponses « suspectes » comptent dans les pourcentages
-    COUNT_FLAGGED: true,         // les réponses « flaggées » (< MIN_FOR_GAIN_MS) aussi, pour l'instant
+    COUNT_SUSPECT: true,         // les réponses « suspectes » comptent dans les pourcentages (seuil large, pour ne pas exclure un vrai lecteur rapide)
+    COUNT_FLAGGED: false,        // les réponses « flaggées » (trop rapides pour avoir été lues, < MIN_FOR_GAIN_MS) N'entrent PAS dans les résultats — sinon une réponse déjà repérée comme non lue fausse quand même ce que voit le commerçant
   },
 
   // ─── Mode prédiction ─── (étape 3)

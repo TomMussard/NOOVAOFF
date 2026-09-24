@@ -71,10 +71,10 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     await db.doc('campaignStats/c2').delete();
     r=await reveal('me','c2',1);
     check('Reveal : une réponse à une option supprimée est ignorée (pas de crash)',r.n===5);
-    // suspectes / flaggées incluses
+    // suspectes comptées, flaggées (trop rapides pour avoir été lues) exclues des résultats du commerçant
     await mkCampaign('c3');for(const [u,a,f,s] of [['me','Café',0,0],['a','Café',0,1],['b','Thé',1,1],['c','Thé',0,0],['d','Café',0,0],['e','Thé',0,0]]) await ans(u,'c3',a,{flagged:f,suspect:s});
     r=await reveal('me','c3');
-    check('Reveal : les réponses suspectes ou flaggées sont comptées (rien n\'est exclu pour l\'instant)',r.n===6,r.n);
+    check('Reveal : les réponses suspectes comptent, la flaggée (b) est exclue (5 sur 6 écrites)',r.n===5,r.n);
     check('Reveal : campagne inconnue = refusé (pas de réponse à cette question)',await err(()=>E.revealCore('me',{campaignId:'zzz',questionIdx:0}))==='permission-denied');
     check('Reveal : entrée invalide refusée',await err(()=>E.revealCore('me',{}))==='invalid-argument');
     check('Config : le seuil vient de engagementConfig.js',CFG.REVEAL.MIN_ANSWERS===1&&CFG.RESPONSE_TIME.SUSPECT_MS===4000);
@@ -130,7 +130,7 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     let u=(await db.doc('users/u1').get()).data();
     check('Points du jour cumulés côté serveur',u.dailyPoints===15&&u.dailyPointsDate,{p:u.dailyPoints});
     const sub1=await p.$eval('#reward .rw-sub',e=>e.textContent);
-    check('1re réponse : « Encore 2 réponses en points aujourd\'hui »',/Encore 2 réponses/.test(sub1),sub1);
+    check('1re réponse : le bonus découverte est annoncé, plus de compte à rebours « encore X réponses »',/bonus découverte/.test(sub1)&&!/Encore \d+ réponse/.test(sub1),sub1);
     // 2e visite : l'info ne réapparaît pas
     await answerFirst(0,'Non');
     await wf(p,()=>document.querySelector('#rw-reveal .rv:not(.rv-skel) .rv-row'),null,15000);await sleep(500);
