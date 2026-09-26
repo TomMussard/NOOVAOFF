@@ -181,9 +181,12 @@ service cloud.firestore {
         isAdmin() ||
         (resource.data.merchantId == request.auth.uid &&
          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['answersCount', 'responsesCount', 'merchantId', 'blockedReason']) &&
-         // Quota mensuel : une campagne bloquée le reste, et on ne peut pas ajouter de questions après coup.
+         // Quota mensuel : une campagne bloquée le reste, et on ne peut pas ajouter de questions après coup —
+         // mais un BROUILLON (jamais lancé, jamais compté dans le quota) reste librement modifiable, y
+         // compris pour y ajouter des questions au fil de la rédaction (autosave, voir noova_dashboard.html).
          resource.data.status != 'blocked' && request.resource.data.status != 'blocked' &&
-         request.resource.data.get('questions', []).size() <= resource.data.get('questions', []).size() &&
+         (resource.data.status == 'draft' ||
+          request.resource.data.get('questions', []).size() <= resource.data.get('questions', []).size()) &&
          // Archivage : seulement une campagne terminée (jamais une campagne encore diffusée).
          (request.resource.data.get('archived', false) != true || request.resource.data.status == 'completed'))
       );

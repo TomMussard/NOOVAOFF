@@ -277,6 +277,8 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 /* ═══ CAMPAIGN CREATION WIZARD ══════════════════════════════ */
 .wizard-wrap { max-width: 760px; margin: 0 auto; }
 .wizard-steps { display: flex; gap: 0; margin-bottom: 32px; position: relative; }
+#draft-indicator{display:flex;align-items:center;gap:10px;justify-content:center;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rx);padding:9px 14px;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:20px}
+.draft-discard{font-size:11.5px;font-weight:700;color:var(--coral-text);text-decoration:underline;cursor:pointer}
 .wizard-steps::before { content: ''; position: absolute; top: 20px; left: 20px; right: 20px; height: 1px; background: var(--border); z-index: 0; }
 .wiz-step-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; position: relative; z-index: 1; cursor: pointer; }
 .wiz-circle {
@@ -962,6 +964,10 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div class="wiz-step-btn" data-step="2"><div class="wiz-circle">3</div><div class="wiz-step-lbl">Durée</div></div>
             <div class="wiz-step-btn" data-step="3"><div class="wiz-circle">4</div><div class="wiz-step-lbl">Validation</div></div>
           </div>
+
+          <!-- Enregistrement automatique en brouillon : plus jamais de travail perdu sur un refresh
+               ou en changeant d'onglet — voir scheduleDraftSave/restoreDraftIfAny. -->
+          <div id="draft-indicator" style="display:none"></div>
 
           <!-- Step 0 : Questions (rédaction + format + options, question par question) -->
           <div class="step-panel active" id="wz-panel-0">
@@ -1887,7 +1893,7 @@ async function navTo(page, btn){
   document.getElementById('topbar-title').textContent=t[0];
   document.getElementById('topbar-sub').textContent=t[1];
   if(page==='results'){renderResultsPage()}
-  if(page==='create'){wzCur=0;resetWizard();wzSync()}
+  if(page==='create'){wzCur=0;await restoreDraftIfAny();wzSync()}
 }
 
 // ═══ WIZARD ══════════════════════════════════════════════════
@@ -1948,6 +1954,108 @@ function resetWizard(){
   if(mcqCard) selFmt(mcqCard,'mcq');
   const mb = document.getElementById('mcq-builder'); if(mb) mb.style.display='block';
 }
+
+// ═══ BROUILLON AUTOMATIQUE ═══════════════════════════════════
+// Une campagne en cours de rédaction ne doit JAMAIS se perdre (refresh, changement d'onglet,
+// navigation accidentelle) : enregistrée en continu comme document Firestore status:'draft'
+// (un seul brouillon actif par commerçant, id déterministe {uid}_draft), restauré à l'arrivée
+// sur la page au lieu d'un reset systématique. Devient la vraie campagne (status:'active')
+// uniquement au clic sur "Lancer" ; le brouillon est alors supprimé.
+const FMT_ORDER = ['mcq','scale','rank'];
+let _draftSaveTimer = null, _draftSeenCount = 0;
+function fillOptionRows(containerId, values, removeFnName) {
+  const c = document.getElementById(containerId); if(!c) return;
+  const vals = (values && values.length) ? values : ['',''];
+  c.innerHTML = vals.map(v => '<div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option…" value="' + esc(v) + '"><button class="mcq-remove" onclick="' + removeFnName + '(this)">×</button></div>').join('');
+}
+function setFmt1ByName(fmt) {
+  const idx = FMT_ORDER.indexOf(fmt); if(idx < 0) return;
+  const el = document.querySelectorAll('#fmt-grid .fmt-card')[idx]; if(el) selFmt(el, fmt);
+}
+function setFmtNByName(qNum, fmt) {
+  const idx = FMT_ORDER.indexOf(fmt); if(idx < 0) return;
+  const el = document.querySelectorAll('#q' + qNum + '-fmt .fmt-card')[idx]; if(el) setQFmt(qNum, fmt, el);
+}
+function collectWizFormState() {
+  const q1opts = needsOptions(curFmt) ? collectOptions('#mcq-options') : [];
+  const questions = [{ q: (document.getElementById('q-text-inp') || {}).value || '', format: curFmt, options: q1opts }];
+  for(let i = 2; i <= 3; i++) {
+    const block = document.getElementById('wz-q-extra-' + i);
+    if(block && block.style.display !== 'none') {
+      const fmt = (document.getElementById('q' + i + '-fmt-sel') || {}).value || 'mcq';
+      const qText = (document.getElementById('q' + i + '-text-inp') || {}).value || '';
+      const qOpts = needsOptions(fmt) ? collectOptions('#q' + i + '-mcq-opts') : [];
+      questions.push({ q: qText, format: fmt, options: qOpts });
+    }
+  }
+  return {
+    name: (document.getElementById('camp-name-inp') || {}).value || '',
+    questions,
+    themes: [...document.querySelectorAll('.th-chip.sel')].map(e => e.textContent.replace(/[^\w\s\-éèêàùç]/gi, '').trim()),
+    ageRanges: [...document.querySelectorAll('.age-chip.sel')].map(e => e.textContent.trim()),
+    days: _wzDays
+  };
+}
+function scheduleDraftSave() { clearTimeout(_draftSaveTimer); _draftSaveTimer = setTimeout(saveDraftNow, 1200); }
+async function saveDraftNow() {
+  const u = auth.currentUser; if(!u || !_mData) return;
+  const st = collectWizFormState();
+  if(!st.questions[0].q.trim() && !st.name.trim()) return;   // rien à sauver encore
+  const city = normalizeCity(_mData.city || _mData.cityLabel || '');
+  const el = document.getElementById('draft-indicator');
+  if(el) { el.style.display = 'flex'; el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg> Enregistrement du brouillon…'; }
+  try {
+    await db.collection('campaigns').doc(u.uid + '_draft').set({
+      merchantId: u.uid, merchantName: _mData.brandName || '', merchantTheme: _mData.sector || 'Commerce', brandEmoji: '🏪',
+      name: st.name || st.questions[0].q.slice(0, 60) || 'Brouillon sans titre',
+      sector: _mData.sector || 'Commerce',
+      question: st.questions[0].q, questions: st.questions,
+      questionsSchema: 2, format: st.questions[0].format, options: st.questions[0].options,
+      city, cityLabel: _mData.cityLabel || _mData.city || '', targetCity: city,
+      ageRanges: st.ageRanges, targetInterests: st.themes, draftDays: st.days,
+      pointsPerAnswer: 20, answersCount: 0, responsesCount: 0,
+      status: 'draft', archived: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    if(el) { el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.3 9"/></svg> Brouillon enregistré <span class="draft-discard" onclick="discardDraft()">Recommencer à zéro</span>'; }
+  } catch(e) { console.warn('draft autosave:', e); if(el) el.style.display = 'none'; }
+}
+async function restoreDraftIfAny() {
+  const u = auth.currentUser; if(!u) { resetWizard(); return; }
+  let snap = null;
+  try { snap = await db.collection('campaigns').doc(u.uid + '_draft').get(); } catch(e) {}
+  if(!snap || !snap.exists) { resetWizard(); return; }
+  const d = snap.data();
+  resetWizard();   // état propre, puis ré-injection : plus sûr que de patcher un formulaire déjà rempli
+  const ni = document.getElementById('camp-name-inp'); if(ni) ni.value = (d.name && d.name !== 'Brouillon sans titre') ? d.name : '';
+  const qs = (Array.isArray(d.questions) && d.questions.length) ? d.questions : [{ q: d.question || '', format: d.format || 'mcq', options: d.options || [] }];
+  const ta = document.getElementById('q-text-inp'); if(ta) ta.value = qs[0].q || '';
+  setFmt1ByName(qs[0].format || 'mcq');
+  if(needsOptions(qs[0].format || 'mcq')) fillOptionRows('mcq-options', qs[0].options, 'removeOpt');
+  updatePreview(); renderPreviewAnswer();
+  for(let i = 1; i < qs.length && i < 3; i++) {
+    addWizQ();
+    const qn = i + 1;
+    const qta = document.getElementById('q' + qn + '-text-inp'); if(qta) qta.value = qs[i].q || '';
+    setFmtNByName(qn, qs[i].format || 'mcq');
+    if(needsOptions(qs[i].format || 'mcq')) fillOptionRows('q' + qn + '-mcq-opts', qs[i].options, 'removeQOpt');
+  }
+  (d.targetInterests || []).forEach(t => document.querySelectorAll('.th-chip').forEach(c => { if(c.textContent.replace(/[^\w\s\-éèêàùç]/gi, '').trim() === t) c.classList.add('sel'); }));
+  (d.ageRanges || []).forEach(a => document.querySelectorAll('.age-chip').forEach(c => { if(c.textContent.trim() === a) c.classList.add('sel'); }));
+  _wzDays = (typeof d.draftDays === 'number') ? d.draftDays : null; renderDuration();
+  const el = document.getElementById('draft-indicator');
+  if(el) { el.style.display = 'flex'; el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20l1-4.5L15.5 5 19 8.5 8.5 19z"/></svg> Brouillon restauré <span class="draft-discard" onclick="discardDraft()">Recommencer à zéro</span>'; }
+}
+function discardDraft() {
+  if(!confirm('Effacer ce brouillon et repartir d\'une page vierge ?')) return;
+  const u = auth.currentUser;
+  if(u) db.collection('campaigns').doc(u.uid + '_draft').delete().catch(() => {});
+  resetWizard();
+  const el = document.getElementById('draft-indicator'); if(el) el.style.display = 'none';
+}
+document.addEventListener('input', e => { if(e.target.closest && e.target.closest('#page-create')) scheduleDraftSave(); });
+document.addEventListener('click', e => { if(e.target.closest && e.target.closest('#page-create')) scheduleDraftSave(); });
 
 // ═══ FORMAT ══════════════════════════════════════════════════
 function selFmt(el, fmt){
@@ -3272,6 +3380,10 @@ launchCampaign = async function() {
       createdAt:       firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt:       firebase.firestore.FieldValue.serverTimestamp()
     });
+    // La campagne est bien lancée : le brouillon qui a servi à la rédiger n'a plus lieu d'être.
+    clearTimeout(_draftSaveTimer);
+    db.collection('campaigns').doc(u.uid + '_draft').delete().catch(() => {});
+    const di = document.getElementById('draft-indicator'); if(di) di.style.display = 'none';
     _origLaunchCampaign();
   } catch(e) {
     showToast('Erreur : ' + e.message, 'error');
