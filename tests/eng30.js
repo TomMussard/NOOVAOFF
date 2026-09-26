@@ -61,6 +61,9 @@ const rw=(mid,t,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-mans'
     await sleep(3300);   // ANSWER_LOCK_MS = 3000 : délai de lecture minimum avant que submitAns() accepte quoi que ce soit
     await up.evaluate(()=>submitAns());
     await wf(up,()=>document.getElementById('reward').classList.contains('active'),null,10000);
+    if(await up.evaluate(()=>document.getElementById('card-unlock').classList.contains('open'))){
+      await up.evaluate(()=>document.getElementById('cu-continue').click());
+    }
     await sleep(600);
     const rw=await up.$eval('#reward',e=>e.innerText.replace(/\s+/g,' '));
     check('Écran de récompense affiché avec le total de points',/pts/.test(rw),rw.slice(0,200));

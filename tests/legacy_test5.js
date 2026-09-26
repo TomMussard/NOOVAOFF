@@ -31,7 +31,8 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
  await T('daily tracker',async()=>{
    await p.evaluate(()=>{refreshHome();});
    const t=await p.$eval('#daily-track',e=>e.textContent);
-   check('Accueil : suivi « Encore 3 réponses pour tes points et ta série » (les NOOVS sont dans l\'en-tête)',/Encore 3 réponses pour tes points et ta série/.test(t)&&!/NOOVS/.test(t),t);
+   const dots=await p.evaluate(()=>document.querySelectorAll('#daily-track .dt-dot').length);
+   check('Accueil : pastilles de progression du jour (le compte à rebours textuel a été retiré, cf. retour mairie)',dots===3&&!/NOOVS/.test(t)&&!/Encore \d+ réponse/.test(t),t);
  });
  await T('lock ui',async()=>{
    await p.evaluate(()=>openQ(0));
@@ -50,13 +51,18 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
    check('Après 3 s : verrou levé, bouton actif',!st3.locked&&!st3.bar&&!st3.dis,JSON.stringify(st3));
    await p.evaluate(()=>submitAns());
    await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);
+   if(await p.evaluate(()=>document.getElementById('card-unlock').classList.contains('open'))){
+     await p.evaluate(()=>document.getElementById('cu-continue').click());
+   }
    const u=(await adb.doc('users/uA').get()).data();
    check('Réponse 1 : points crédités (10 + 5 bonus découverte)',u.points===15&&!u.noovs&&u.dailyAnswerCount===1,'points='+u.points+' count='+u.dailyAnswerCount);
    const sub=await p.$eval('#reward .rw-sub',e=>e.textContent);
-   check('Écran de récompense : « encore 2 réponses en points »',/Encore 2 réponses/.test(sub),sub);
+   check('Écran de récompense : le compte à rebours textuel a été retiré (juste le bonus découverte s\'il y en a un)',!/Encore \d+ réponse/.test(sub),sub);
  });
  await T('answers 2-3 points',async()=>{
-   await answerOne(3300);await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);await sleep(1200);
+   await answerOne(3300);await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);
+   if(await p.evaluate(()=>document.getElementById('card-unlock').classList.contains('open'))){await p.evaluate(()=>document.getElementById('cu-continue').click());}
+   await sleep(1200);
    await p.evaluate(()=>goNav('home'));
    await answerOne(3300);await sleep(2500);
    const u=(await adb.doc('users/uA').get()).data();
@@ -70,7 +76,9 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
    const tag=await p.$eval('#q-pts-tag',e=>e.textContent);const hint=await p.$eval('#q-hint',e=>e.textContent);
    check('Question suivante annoncée en NOOV (pas en points)',/\+1 NOOV/.test(tag)&&!/mode libre/i.test(hint),tag+' | '+hint);
    await p.evaluate(()=>goNav('home'));
-   await answerOne(3300);await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);await sleep(1500);
+   await answerOne(3300);await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);
+   if(await p.evaluate(()=>document.getElementById('card-unlock').classList.contains('open'))){await p.evaluate(()=>document.getElementById('cu-continue').click());}
+   await sleep(1500);
    const rw=await p.evaluate(()=>({lbl:document.querySelector('#reward .pe-lbl').textContent,num:document.getElementById('rw-pts').textContent,tot:document.getElementById('rw-total').textContent,sub:document.querySelector('#reward .rw-sub').textContent}));
    await p.screenshot({path:'/tmp/shots/noov_reward.png'});
    check('Écran de récompense en NOOVS',/NOOVS/.test(rw.lbl)&&rw.num==='1'&&/1 NOOVS/.test(rw.tot),JSON.stringify(rw));

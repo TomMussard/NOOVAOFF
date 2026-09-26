@@ -70,6 +70,7 @@
     // ── Thèmes commerçants (union résident + dashboard) ──────────────────
     food: `<svg ${S}><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg>`,
     cafe: `<svg ${S}><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg>`,
+    bakery: `<svg ${S}><path d="M5 20 7 9c.4-2.5 2.4-4.5 5-4.5S16.6 6.5 17 9l2 11z"/><path d="M8 14c1-1 2-1 3 0s2 1 3 0 2-1 3 0"/></svg>`,
     sport: `<svg ${S}><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.3 3.6 5.6 3.6 9s-1.2 6.7-3.6 9c-2.4-2.3-3.6-5.6-3.6-9S9.6 5.3 12 3z"/></svg>`,
     wellness: `<svg ${S}><path d="M12 20s-7-4.4-7-9.8A4.2 4.2 0 0 1 12 7.5a4.2 4.2 0 0 1 7 2.7C19 15.6 12 20 12 20z"/></svg>`,
     culture: `<svg ${S}><path d="M4 8l8-4.5L20 8l-8 4.5z"/><path d="M6.5 9.5v6L12 18l5.5-2.5v-6"/><path d="M20 8v6.5"/></svg>`,

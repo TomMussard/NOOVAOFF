@@ -1041,6 +1041,46 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dsec-title{font-family:var(--fd);font-weight:800;font-size:19px;letter-spacing:-.5px;color:var(--ink)}
 .dsec-link{font-size:12px;font-weight:700;color:var(--ink2);cursor:pointer;white-space:nowrap}
 
+/* — Mode collection : progression par secteur (accueil) — */
+.sect-row{display:flex;align-items:center;gap:10px}
+.sect-ico{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sect-name{font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.sect-bar{height:6px;border-radius:99px;background:var(--bg3);overflow:hidden}
+.sect-bar>div{height:100%;border-radius:99px;transition:width .5s ease}
+.sect-n{font-size:12px;font-weight:800;color:var(--ink);flex-shrink:0;display:flex;align-items:center;gap:4px}
+
+/* — Cartes (accueil : dernières cartes ; classeur : collection complète) — */
+.card-slot{width:88px;height:112px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;flex-shrink:0;cursor:pointer;transition:transform .13s}
+.card-slot:active{transform:scale(.96)}
+.card-slot.on{background:var(--card);border:2px solid var(--ink);box-shadow:0 3px 12px rgba(0,0,0,.07)}
+.card-slot.off{background:var(--bg3);border:1.5px dashed var(--line-strong);color:var(--ink3);cursor:default}
+.card-slot-name{font-size:9.5px;font-weight:700;color:var(--ink);text-align:center;padding:0 6px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.card-slot.off .card-slot-name{color:var(--ink3)}
+
+/* — Écran « Mon classeur » — */
+.cl-hdr{padding:52px 22px 18px;flex-shrink:0}
+.cl-title{font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.6px;color:var(--ink);margin-bottom:14px}
+.cl-bar-track{flex:1;height:9px;border-radius:99px;background:var(--bg3);overflow:hidden}
+.cl-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,#F29715,#FFDA09);transition:width .6s ease}
+.cl-count{font-size:13px;font-weight:800;color:var(--ink);flex-shrink:0;white-space:nowrap}
+.cl-body{padding:6px 22px 24px}
+
+/* — Interstitiel « carte débloquée » (avant la récompense, 1re réponse à un commerce) — */
+#card-unlock{position:fixed;inset:0;z-index:9500;display:none;overflow-y:auto;background:linear-gradient(165deg,#2A2013 0%,#1C1917 65%,#120F0A 100%)}
+#card-unlock.open{display:block}
+.cu-wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:60px 26px 34px;text-align:center}
+.cu-eyebrow{color:var(--nv-yellow);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}
+.cu-title{font-family:var(--fd);font-weight:800;font-size:22px;color:#FFFBD7;letter-spacing:-.4px;margin-bottom:4px}
+.cu-sub{font-size:12.5px;color:rgba(255,251,215,.55);margin-bottom:32px}
+.cu-card-wrap{position:relative;width:230px;height:310px;display:flex;align-items:center;justify-content:center;margin-bottom:30px}
+.cu-glow{position:absolute;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle,rgba(255,195,0,.22) 0%,rgba(255,195,0,0) 70%)}
+.cu-card{position:relative;width:220px;height:300px;border-radius:22px;background:#FFFBD7;border:3px solid var(--nv-yellow);box-shadow:0 24px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow:hidden;padding:20px}
+.cu-badge{position:absolute;top:0;left:0;right:0;color:#fff;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:9px 14px;display:flex;align-items:center;gap:6px;justify-content:center}
+.cu-logo{margin-top:10px}
+.cu-logo>div{width:76px!important;height:76px!important;font-size:28px!important;box-shadow:0 8px 20px rgba(0,0,0,.22)!important}
+.cu-foot{font-size:11px;font-weight:700;color:var(--ink2)}
+.cu-continue{width:100%;max-width:340px;background:var(--nv-yellow);color:var(--nv-black);border:none;border-radius:16px;padding:16px;font-family:var(--fd);font-weight:800;font-size:15px;cursor:pointer;margin-top:auto}
+
 /* — Carte carte (mini-map preview) — */
 .dmap-card{margin:0 22px 22px;border-radius:20px;overflow:hidden;height:172px;position:relative;background:var(--bg2);cursor:pointer}
 .dmap-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:18px;text-align:center;color:var(--ink2);font-size:12px;line-height:1.5;z-index:2;background:var(--bg2)}
@@ -1446,9 +1486,14 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
     <div id="home-requests"></div>
     <div id="daily-track"></div>
+    <div id="sector-progress" style="display:none;margin-top:6px"></div>
     <div class="sec-lbl">À répondre</div>
-    <div class="q-list" id="queue-list"></div>
+    <div class="q-list" id="queue-list" tabindex="0" role="group" aria-label="Autres questions à répondre"></div>
     <div style="height:6px"></div>
+    <div id="recent-cards-wrap" style="display:none;margin-bottom:22px">
+      <div class="dsec-row"><div class="dsec-title">Tes cartes <span id="recent-cards-count" style="color:var(--ink3);font-weight:600;font-size:13px"></span></div><div class="dsec-link" onclick="openClasseur()">Voir le classeur ›</div></div>
+      <div id="recent-cards" style="display:flex;gap:10px;padding-left:22px;overflow-x:auto" tabindex="0" role="group" aria-label="Tes dernières cartes débloquées"></div>
+    </div>
     <div id="dpat-wrap"></div>
     <div class="dsec-row"><div class="dsec-title">À deux pas</div><div class="dsec-link" onclick="openFullMap()">Voir la carte ›</div></div>
     <div class="dmap-card" id="dmap-card" onclick="openFullMap()">
@@ -1528,6 +1573,39 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   <div id="rw-follow" style="width:100%;position:relative;z-index:1"></div>
   <div id="rw-invite" style="width:100%;position:relative;z-index:1"></div>
   <div id="rw-actions" style="width:100%;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1"></div>
+</div>
+
+<!-- CARTE DÉBLOQUÉE : superposition affichée AU-DESSUS de la récompense (jamais un changement d'écran :
+     plusieurs rendus de l'écran récompense se basent sur cur==='reward', ex. showReveal/showLinkedNews —
+     y naviguer ailleurs, même temporairement, les fait rater leur cible), la 1re fois qu'on répond à un commerce -->
+<div id="card-unlock">
+  <div class="cu-wrap">
+    <div class="cu-eyebrow">Nouvelle carte débloquée</div>
+    <div class="cu-title" id="cu-name">Commerce</div>
+    <div class="cu-sub" id="cu-sub"></div>
+    <div class="cu-card-wrap">
+      <div class="cu-glow"></div>
+      <div class="cu-card" id="cu-card">
+        <div class="cu-badge" id="cu-badge"><span id="cu-badge-ico"></span><span id="cu-badge-txt"></span></div>
+        <div class="cu-logo" id="cu-logo"></div>
+        <div class="cu-foot" id="cu-foot"></div>
+      </div>
+    </div>
+    <button class="cu-continue" id="cu-continue">Continuer</button>
+  </div>
+</div>
+
+<!-- MON CLASSEUR : la collection complète, par secteur -->
+<div id="classeur" class="screen">
+  <div class="cl-hdr">
+    <div class="back-btn" style="margin-bottom:14px" onclick="goNav('home')">←</div>
+    <div class="cl-title">Mon classeur</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="cl-bar-track"><div class="cl-bar" id="cl-bar" style="width:0%"></div></div>
+      <div class="cl-count" id="cl-count">0 / 0 cartes</div>
+    </div>
+  </div>
+  <div class="cl-body" id="cl-sectors"></div>
 </div>
 
 <!-- SOCIAL -->
@@ -2307,7 +2385,9 @@ function refreshHome(){
   renderHomeState();
   renderRequests();
   renderDailyTrack();
+  renderSectorProgress();
   renderQueue();
+  renderRecentCards();
   renderAlmostReward();
   renderNearbyMap();
 }
@@ -2329,7 +2409,8 @@ function renderQueue(){
       const verb=friendArr.length>1?'ont répondu':'a répondu';
       badge=`<div class="friend-badge"><div class="fb-av" style="background:${c}22;color:${c}">${(fn||'?')[0]}</div>${esc(fn)}${more>0?` + ${more} ami${more>1?'s':''}`:''} ${verb}</div>`;
     }
-    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta">${q._byNoova?'<span class="noova-tag">✨ NOOVA</span>':q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:10.5px;color:var(--ink2);margin-top:5px">Nouveau près de chez toi · tu ne le suis pas encore</div>':''}${badge}</div>`;
+    const newCard=!q._byNoova&&q._merchantId&&!(S._answeredMerchants||[]).includes(q._merchantId);
+    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta">${q._byNoova?'<span class="noova-tag">✨ NOOVA</span>':newCard?'<span class="disc-tag" style="background:var(--nv-black)">✨ Nouvelle carte</span>':q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:10.5px;color:var(--ink2);margin-top:5px">Nouveau près de chez toi · tu ne le suis pas encore</div>':''}${badge}</div>`;
     el.appendChild(d);cnt++;
     if(cnt%3===0){const sc=buildSocialCard();if(sc)el.appendChild(sc);}
   });
@@ -3812,6 +3893,96 @@ async function loadNearbyMerchants(merchantIds) {
 // "a une question active" — source commune pour le rail (legacy), la grille de
 // l'accueil et les pins de la carte.
 const CAT_LABELS={restauration:'Restauration',boulangerie:'Boulangerie',sport:'Sport',beaute:'Beauté',culture:'Culture',commerce:'Commerce',services:'Ville et services'};
+
+// ── Mode collection : un commerce dont on a déjà répondu à une question = une « carte » débloquée ──
+// (S._answeredMerchants, entretenu côté serveur par submitAnswer — jamais écrit par le client). Le
+// catalogue (combien de commerces existent par secteur dans la ville) vient de _verifiedMerchantsCache,
+// déjà chargé pour le fil de l'accueil : aucune donnée ni requête supplémentaire nécessaire.
+const SECTOR_ICON={restauration:'food',boulangerie:'bakery',sport:'sport',beaute:'wellness',culture:'culture',commerce:'shopping',services:'wrench'};
+const SECTOR_COLOR={restauration:'#E07D0A',boulangerie:'#A14E08',sport:'#0BAB84',beaute:'#C0447D',culture:'#5C3BF5',commerce:'#1C7ED6',services:'#6B4E00'};
+function computeCollection(){
+  const unlocked=new Set(S._answeredMerchants||[]);
+  const bySector={};
+  CAT_KEYS.forEach(k=>{bySector[k]={key:k,label:CAT_LABELS[k],icon:SECTOR_ICON[k],color:SECTOR_COLOR[k],total:0,unlocked:0,merchants:[]};});
+  Object.entries(_verifiedMerchantsCache||{}).forEach(([id,m])=>{
+    const cat=sectorCat(m.sector||m.theme||'');
+    const b=bySector[cat]||bySector.commerce;
+    b.total++;
+    const on=unlocked.has(id);
+    if(on)b.unlocked++;
+    b.merchants.push({id,name:m.brandName||'Commerce',logoUrl:m.logoUrl||null,unlocked:on});
+  });
+  const sectors=CAT_KEYS.map(k=>bySector[k]).filter(s=>s.total>0)
+    .sort((a,b)=>(b.unlocked/b.total||0)-(a.unlocked/a.total||0)||b.total-a.total);
+  const total=sectors.reduce((s,x)=>s+x.total,0);
+  const totalUnlocked=sectors.reduce((s,x)=>s+x.unlocked,0);
+  return {total,unlocked:totalUnlocked,sectors};
+}
+function renderSectorProgress(){
+  const el=document.getElementById('sector-progress');if(!el)return;
+  const {sectors,total}=computeCollection();
+  if(!total){el.style.display='none';return;}
+  el.style.display='block';
+  el.innerHTML='<div class="sec-lbl" style="margin-bottom:12px">Tes secteurs</div><div style="display:flex;flex-direction:column;gap:11px;padding:0 22px 22px">'
+    +sectors.map(s=>{const pct=s.total?Math.round(s.unlocked/s.total*100):0;const done=s.unlocked>=s.total;
+      return '<div class="sect-row"><div class="sect-ico" style="background:'+s.color+'18;color:'+s.color+'">'+icon(s.icon,{size:15})+'</div>'
+        +'<div style="flex:1;min-width:0"><div class="sect-name">'+esc(s.label)+'</div><div class="sect-bar"><div style="width:'+pct+'%;background:'+s.color+'"></div></div></div>'
+        +'<div class="sect-n" style="color:'+(done?s.color:'var(--ink)')+'">'+s.unlocked+'/'+s.total+(done?' '+icon('check',{size:10}):'')+'</div></div>';
+    }).join('')+'</div>';
+}
+function renderRecentCards(){
+  const el=document.getElementById('recent-cards');if(!el)return;
+  const {sectors,unlocked}=computeCollection();
+  const all=sectors.flatMap(s=>s.merchants.filter(m=>m.unlocked).map(m=>Object.assign({},m,{color:s.color})));
+  const recent=all.slice(-6).reverse();
+  const wrap=document.getElementById('recent-cards-wrap');
+  if(!recent.length){if(wrap)wrap.style.display='none';return;}
+  if(wrap)wrap.style.display='block';
+  const cntEl=document.getElementById('recent-cards-count');if(cntEl)cntEl.textContent=unlocked+' carte'+(unlocked>1?'s':'');
+  el.innerHTML=recent.map(m=>'<div class="card-slot on" style="border-color:'+m.color+'" onclick="openClasseur()">'
+    +logoHTML(m.name,32,m.logoUrl)+'<div class="card-slot-name">'+esc(m.name)+'</div></div>').join('');
+}
+// ── Écran « Mon classeur » : la collection complète, groupée par secteur ──
+function openClasseur(){
+  const {sectors,total,unlocked}=computeCollection();
+  const bar=document.getElementById('cl-bar');if(bar)bar.style.width=(total?Math.round(unlocked/total*100):0)+'%';
+  const cnt=document.getElementById('cl-count');if(cnt)cnt.textContent=unlocked+' / '+total+' cartes';
+  const el=document.getElementById('cl-sectors');
+  el.innerHTML=sectors.map(s=>{
+    const done=s.unlocked>=s.total;
+    const slots=s.merchants.map(m=>m.unlocked
+      ?'<div class="card-slot on" style="border-color:'+s.color+'" onclick="openBrandById(\''+m.id+'\',\''+esc(m.name).replace(/'/g,"&#39;")+'\')">'+logoHTML(m.name,32,m.logoUrl)+'<div class="card-slot-name">'+esc(m.name)+'</div></div>'
+      :'<div class="card-slot off">'+icon('lock',{size:20})+'<div class="card-slot-name">?</div></div>'
+    ).join('');
+    return '<div style="margin-bottom:22px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+      +'<div style="display:flex;align-items:center;gap:8px"><div class="sect-ico" style="background:'+s.color+'18;color:'+s.color+'">'+icon(s.icon,{size:13})+'</div><div style="font-weight:800;font-size:15px;color:var(--ink)">'+esc(s.label)+'</div></div>'
+      +(done?'<div style="display:flex;align-items:center;gap:5px;background:'+s.color+'18;color:'+s.color+';font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px">'+icon('check',{size:11})+' Secteur complet</div>'
+             :'<div style="font-size:12px;font-weight:700;color:var(--ink3)">'+s.unlocked+' / '+s.total+'</div>')
+      +'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+slots+'</div></div>';
+  }).join('');
+  goTo('classeur');
+}
+// ── Interstitiel « nouvelle carte débloquée » : affiché avant l'écran de récompense, la toute
+// première fois qu'on répond à un commerce donné (voir le patch de submitAns). ──
+function showCardUnlock(q){
+  const m=_verifiedMerchantsCache[q._merchantId]||{};
+  const cat=sectorCat(m.sector||q.theme||'');
+  const color=SECTOR_COLOR[cat]||SECTOR_COLOR.commerce;
+  const {sectors}=computeCollection();
+  const sec=sectors.find(s=>s.key===cat);
+  const nth=sec?sec.unlocked:1;
+  document.getElementById('cu-logo').innerHTML=logoHTML(q.brand,72,q.logoUrl);
+  document.getElementById('cu-name').textContent=q.brand;
+  document.getElementById('cu-sub').textContent=(CAT_LABELS[cat]||'Commerce')+(m.city?' · '+ (S._cityLabel||''):'');
+  document.getElementById('cu-badge-ico').innerHTML=icon(SECTOR_ICON[cat]||'store',{size:11});
+  document.getElementById('cu-badge-txt').textContent=CAT_LABELS[cat]||'Commerce';
+  document.getElementById('cu-foot').textContent=nth<=1?'1re carte de ce secteur':nth+'e carte de ce secteur';
+  const card=document.getElementById('cu-card');if(card)card.style.borderColor=color;
+  const badge=document.getElementById('cu-badge');if(badge)badge.style.background=color;
+  const el=document.getElementById('card-unlock');
+  document.getElementById('cu-continue').onclick=()=>el.classList.remove('open');
+  el.classList.add('open');
+}
 // Tous les commerces vérifiés de la ville (pas seulement les autorisés) : la carte est un outil de
 // découverte, chaque commerce porte son état (question active, autorisé, demande, à venir).
 function mapMerchants(){
@@ -5552,6 +5723,9 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   S._answered        = data.answeredCampaigns || [];
   S._authorizedMerchants = data.authorizedMerchants || [];
   S._declinedMerchants = data.declinedMerchants || [];
+  // Mode collection : commerces dont l'habitant a déjà répondu à une question au moins une fois = ses
+  // « cartes » débloquées. Entretenu côté serveur (submitAnswer), jamais écrit par le client.
+  S._answeredMerchants = data.answeredMerchants || [];
   const _prevFriendKey = JSON.stringify([...(S._friendUids||[])].sort());
   S._friendUids      = [...new Set(data.friendUids || [])];
   const _friendsChanged = JSON.stringify([...S._friendUids].sort()) !== _prevFriendKey;
@@ -6000,6 +6174,10 @@ submitAns = function() {
   if(q._firestoreId && (S._answeredQ.includes(qKey) || (qIdx === 0 && (S._answered||[]).includes(q._firestoreId)))) return;
 
   const answerValue = getAnswerValue();
+  // Capturé AVANT l'appel réseau (mode collection) : S._answeredMerchants peut être mis à jour entre-temps
+  // par l'écouteur Firestore temps réel du document utilisateur (même transaction submitAnswer, chemin
+  // indépendant) — comparer après coup donnerait parfois « déjà débloqué » à tort.
+  const wasUnlockedBefore = !!(q._merchantId && (S._answeredMerchants || []).includes(q._merchantId));
 
   if(!q._firestoreId) { _origSubmitAns(); return; } // question locale sans campagne réelle (aucun cas connu), pas de crédit serveur possible
 
@@ -6023,6 +6201,17 @@ submitAns = function() {
       const touchesSurvey = (S.mode === 'survey') || !!(q && q.survey && q.survey.length);
       const totalEarned = typeof data.pointsAwarded === 'number' ? data.pointsAwarded : q.pts;
       _origSubmitAns(); // affiche l'écran de récompense/confettis (ajoute optimistiquement q.pts)
+
+      // Mode collection : 1re réponse à CE commerce → superposition « carte débloquée » au-dessus de la
+      // récompense (jamais en survey : le commerce est déjà débloqué depuis la question hook qui a précédé
+      // celle-ci). wasUnlockedBefore est capturé de façon synchrone AVANT l'appel réseau — S._answeredMerchants
+      // peut déjà avoir été mis à jour ici par l'écouteur Firestore temps réel (même transaction, chemin
+      // indépendant). Une superposition, jamais un changement d'écran (goTo) : showReveal/showLinkedNews plus
+      // bas se basent sur cur==='reward' pour savoir où s'afficher.
+      if (!touchesSurvey && !data.flagged && q._merchantId && !wasUnlockedBefore) {
+        S._answeredMerchants = (S._answeredMerchants || []).includes(q._merchantId) ? S._answeredMerchants : [...(S._answeredMerchants || []), q._merchantId];
+        showCardUnlock(q);
+      }
 
       // Corrige l'affichage optimiste avec les totaux qui font foi (serveur).
       const correction = totalEarned - q.pts;

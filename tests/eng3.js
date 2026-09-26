@@ -140,6 +140,9 @@ const ps=async u=>((await db.doc('users/'+u).get()).data()||{}).predStats||{};
       await p.evaluate(c=>{[...document.querySelectorAll('#ans-area .mcq-opt')].find(o=>o.textContent.trim()===c).click();},choice);
       await sleep(3300);await p.evaluate(()=>submitAns());
       await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,15000);
+      if(await p.evaluate(()=>document.getElementById('card-unlock').classList.contains('open'))){
+        await p.evaluate(()=>document.getElementById('cu-continue').click());
+      }
     };
     // u1 : se trompe
     let {browser,p,errs}=await login('u1');

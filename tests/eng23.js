@@ -101,11 +101,14 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
 
   await T('KPIs et validation au comptoir',async()=>{
     const now=Date.now(),monthAgo=Date.now()-40*DAY;
-    const used=(id,uid,basket,fresh,at)=>db.doc('redemptions/'+id).set({userId:uid,merchantId:'m1',rewardId:'m1_p1',tier:1,cost:150,label:'x',code:id.toUpperCase().slice(0,4),status:'used',createdAt:Timestamp.fromMillis(at),usedAt:Timestamp.fromMillis(at),...(basket?{basketEuros:basket}:{}),...(fresh===null?{}:{newCustomer:fresh})});
-    await used('ua1','u1',10,true,now-3600000);await used('ub2','u2',12,false,now-7200000);await used('uc3','u1',11,false,now-1800000);await used('ud4','u3',20,true,monthAgo);
+    // Le panier moyen a été retiré du dashboard (base trop faible / peu fiable au lancement) : bring-row
+    // ne porte plus que 2 KPI (clients ramenés, dont nouveaux) ; « cartes débloquées » (mode collection,
+    // basé sur les réponses, pas les bons échangés) est une 3e carte distincte, testée à part.
+    const used=(id,uid,fresh,at)=>db.doc('redemptions/'+id).set({userId:uid,merchantId:'m1',rewardId:'m1_p1',tier:1,cost:150,label:'x',code:id.toUpperCase().slice(0,4),status:'used',createdAt:Timestamp.fromMillis(at),usedAt:Timestamp.fromMillis(at),...(fresh===null?{}:{newCustomer:fresh})});
+    await used('ua1','u1',true,now-3600000);await used('ub2','u2',false,now-7200000);await used('uc3','u1',false,now-1800000);await used('ud4','u3',true,monthAgo);
     await wf(p,()=>document.getElementById('bring-val-0').textContent==='2',null,10000);
-    const k=await p.evaluate(()=>({v:[0,1,2].map(i=>document.getElementById('bring-val-'+i).textContent),l:[...document.querySelectorAll('#bring-row .kpi-lbl')].map(x=>x.textContent)}));
-    check('Tableau de bord : 2 clients ramenés ce mois (le bon d\'il y a 40 jours n\'est pas compté), dont 1 nouveau client, panier moyen 11,00 €',k.v.join('|')==='2|1|11,00 €'&&k.l.join('|')==='Clients ramenés ce mois|dont nouveaux clients|Panier moyen des clients NOOVA',k);
+    const k=await p.evaluate(()=>({v:[0,1].map(i=>document.getElementById('bring-val-'+i).textContent),l:[...document.querySelectorAll('#bring-row .kpi-lbl')].map(x=>x.textContent)}));
+    check('Tableau de bord : 2 clients ramenés ce mois (le bon d\'il y a 40 jours n\'est pas compté), dont 1 nouveau client',k.v.join('|')==='2|1'&&k.l.join('|')==='Clients ramenés ce mois|dont nouveaux clients|Votre carte débloquée par',k);
     await db.doc('redemptions/rd1').set({userId:'u9',merchantId:'m1',rewardId:'m1_p2',tier:2,cost:300,label:'Formule',code:'ABCD',status:'pending',minPurchase:8,createdAt:Timestamp.now(),expiresAt:Timestamp.fromMillis(Date.now()+3600000),usedAt:null});
     await p.evaluate(()=>navTo('validate',document.getElementById('nav-validate')));
     await setVal(p,'#voucher-code-inp','abcd');await p.evaluate(()=>validateVoucher());await wf(p,()=>/Confirmer l/.test(document.getElementById('voucher-result').innerHTML),null,8000);
@@ -119,7 +122,7 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
     const r=(await db.doc('redemptions/rd1').get()).data();
     check('Panier de 9,50 € + nouveau client : bon validé avec le montant et l\'indicateur',r.status==='used'&&r.basketEuros===9.5&&r.newCustomer===true,r);
     await wf(p,()=>document.getElementById('bring-val-0').textContent==='3'&&document.getElementById('bring-val-1').textContent==='2',null,10000);
-    check('Les KPIs suivent en direct (3 clients dont 2 nouveaux, panier moyen des 4 bons)',/^3\|2\|10,6[23] €$/.test(await p.evaluate(()=>[0,1,2].map(i=>document.getElementById('bring-val-'+i).textContent).join('|'))));
+    check('Les KPIs suivent en direct (3 clients dont 2 nouveaux)',(await p.evaluate(()=>[0,1].map(i=>document.getElementById('bring-val-'+i).textContent).join('|')))==='3|2');
   });
   check('Aucune erreur JavaScript dans le dashboard',errs.length===0,errs);
 

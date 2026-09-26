@@ -109,6 +109,11 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
       await sleep(3300);
       await p.evaluate(()=>submitAns());
       await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,15000);
+      // Mode collection : 1re réponse à un commerce jamais répondu → superposition « carte débloquée »
+      // au-dessus de la récompense ; on la referme pour retrouver le comportement attendu par ce test.
+      if(await p.evaluate(()=>document.getElementById('card-unlock').classList.contains('open'))){
+        await p.evaluate(()=>document.getElementById('cu-continue').click());
+      }
     };
     // 1re réponse : k1 (sur laquelle il y a déjà 6 réponses + 1 = 7)
     const qid0=await p.evaluate(()=>S.qs[0]._firestoreId);

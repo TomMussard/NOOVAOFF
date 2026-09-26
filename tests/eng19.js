@@ -55,7 +55,9 @@ const H=3600000;
     const f=await p.evaluate(()=>({order:S.qs.map(q=>q._firestoreId+':'+(q._discovery?'D':'F')),reasons:S.qs.map(q=>q._reason),today:document.getElementById('today-card').className,pill:getComputedStyle(document.getElementById('tc-disc')).display,todayBrand:document.getElementById('tc-brand').textContent,rows:[...document.querySelectorAll('#queue-list .q-card')].map(r=>({disc:r.classList.contains('disc'),tag:(r.querySelector('.disc-tag')||{}).textContent||'',txt:r.textContent.replace(/\s+/g,' ')})),req:document.getElementById('home-requests').textContent.trim(),btns:[...document.querySelectorAll('#home button')].map(b=>b.textContent).join('|')}));
     check('Un commerce non suivi arrive DIRECTEMENT dans les questions à répondre : Studio Fit (sport, intérêt de l\'habitant) en tête, avant le commerce suivi (Le Bar), puis un commerce tiré au hasard',f.order.join()==='cS:D,cF:F,'+idShow+':D',f.order);
     check('Raisons : intérêt pour Studio Fit, hasard pour Le Fournil (il n\'aime pas la boulangerie) ; le commerce que l\'habitant a écarté (Gym Refusé) et celui du hasard non tiré ne sont pas proposés',f.reasons[0]==='interest'&&f.reasons[2]==='random'&&!f.order.some(x=>x.startsWith('cX')||x.startsWith(idHide+':')),f);
-    check('La carte du jour est « découverte » (autre couleur, pastille), la liste marque les découvertes d\'une autre couleur (« Découverte ») et pas le commerce suivi',/disc/.test(f.today)&&f.pill!=='none'&&f.todayBrand==='Studio Fit'&&f.rows.length===2&&!f.rows[0].disc&&f.rows[1].disc&&f.rows[1].tag==='Découverte'&&/tu ne le suis pas encore/.test(f.rows[1].txt),f);
+    // Mode collection : un commerce découverte est aussi, par définition, un commerce jamais répondu — le badge
+    // « Nouvelle carte » (ajouté depuis) prend le pas sur « Découverte » dans la file (même logique, cadrage plus engageant).
+    check('La carte du jour est « découverte » (autre couleur, pastille), la liste marque les découvertes d\'une autre couleur (« Nouvelle carte ») et pas le commerce suivi',/disc/.test(f.today)&&f.pill!=='none'&&f.todayBrand==='Studio Fit'&&f.rows.length===2&&!f.rows[0].disc&&f.rows[1].disc&&/Nouvelle carte/.test(f.rows[1].tag)&&/tu ne le suis pas encore/.test(f.rows[1].txt),f);
     check('Plus de section « Demandes » ni de boutons Autoriser / Non merci sur l\'accueil',f.req===''&&!/Autoriser|Non merci/.test(f.btns),f.btns);
     const bg=await p.evaluate(()=>[getComputedStyle(document.querySelector('#today-card .dtoday-body')).backgroundColor,getComputedStyle(document.querySelector('#queue-list .q-card.disc')).backgroundColor,getComputedStyle(document.querySelector('#queue-list .q-card:not(.disc)')).backgroundColor]);
     check('Couleurs distinctes : carte du jour verte (découverte), carte découverte verte claire, carte suivie blanche',bg[0]!==bg[1]&&bg[1]!==bg[2]&&bg[0]!=='rgb(255, 255, 255)',bg);
@@ -71,10 +73,12 @@ const H=3600000;
   await T7('répondre à une question découverte, puis suivre',async()=>{
     await p.evaluate(()=>openQ(0));await sleep(500);
     await axeCheck(p,'écran de question découverte');
-    const n=await p.evaluate(()=>({disp:getComputedStyle(document.getElementById('q-disc-note')).display,txt:document.getElementById('q-disc-note').textContent}));
-    check('Écran de la question : encart « Découverte » qui explique le partage (réponse envoyée sans âge ni centres d\'intérêt, choix ensuite de suivre)',n.disp==='block'&&/Studio Fit/.test(n.txt)&&/sans ton âge ni tes centres d'intérêt/.test(n.txt)&&/suivre ou non/.test(n.txt),n);
+    check('Écran de la question : plus d\'encart « Découverte » qui explique le partage (retiré, cf. retour mairie sur la clarté)',await p.evaluate(()=>getComputedStyle(document.getElementById('q-disc-note')).display==='none'));
     await p.evaluate(()=>document.querySelector('#ans-area .mcq-opt').click());await sleep(3600);await p.evaluate(()=>submitAns());
     await wf(p,()=>document.getElementById('reward').classList.contains('active')&&document.querySelector('#rw-follow .follow-card'),null,15000);
+    if(await p.evaluate(()=>document.getElementById('card-unlock').classList.contains('open'))){
+      await p.evaluate(()=>document.getElementById('cu-continue').click());
+    }
     const ans=(await db.doc('answers/me_cS_q0').get()).data();
     check('Réponse enregistrée pour un commerce non suivi : marquée « découverte », SANS âge ni centres d\'intérêt (ville seulement)',ans&&ans.discovery===true&&ans.respondentAge===''&&Array.isArray(ans.respondentInterests)&&ans.respondentInterests.length===0&&ans.respondentCity==='le-mans',ans);
     check('Après la réponse : proposition « Tu veux suivre Studio Fit ? » avec Suivre / Pas maintenant / Ne plus voir ce commerce',await p.evaluate(()=>{const c=document.querySelector('#rw-follow .follow-card');return !!c&&/Tu veux suivre Studio Fit/.test(c.textContent)&&/Suivre/.test(c.textContent)&&/Pas maintenant/.test(c.textContent)&&/Ne plus voir ce commerce/.test(c.textContent);}));

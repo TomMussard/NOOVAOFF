@@ -50,7 +50,7 @@ const ADMIN='http://localhost:8950/admin.html';
     // accueil
     const h=await p.evaluate(()=>({sec:[...document.querySelectorAll('#home .sec-lbl')].map(e=>e.textContent),streak:document.getElementById('home-streak').textContent,label:document.getElementById('hdr-streak').getAttribute('aria-label'),greet:!!document.getElementById('home-greet')||!!document.getElementById('home-name'),bar:[...document.querySelectorAll('#home .dh-hdr > *')].map(e=>e.className)}));
     check('Accueil : section « À répondre » (plus « En attente »)',h.sec.includes('À répondre')&&!h.sec.includes('En attente'),h.sec);
-    check('En-tête : NOOVS à gauche, série (flamme) au centre, points à droite ; plus de « Bonjour » ni de prénom',h.bar.join('|')==='dh-noov|dh-streak|dh-pts'&&!h.greet&&h.streak==='0'&&/3 questions/.test(h.label),h);
+    check('En-tête : NOOVS à gauche, série (flamme) au centre, points à droite ; plus de « Bonjour » ni de prénom',h.bar.join('|')==='dh-noov|dh-streak hdr-streak-wrap-el|dh-pts hdr-pts-wrap-el'&&!h.greet&&h.streak==='0'&&/3 questions/.test(h.label),h);
     const st=await p.evaluate(()=>{const out=[];for(const n of [1,2,7]){S.streak=n;refreshHome();out.push(document.getElementById('home-streak').textContent+'|'+document.getElementById('hdr-streak').getAttribute('aria-label').replace(/[.:].*$/,''));}return out;});
     check('Série 1 / 2 / 7 : seul le nombre est affiché, accord singulier-pluriel correct pour les lecteurs d\'écran',st.join(';')==='1|Série de 1 jour;2|Série de 2 jours;7|Série de 7 jours',st);
     const chip=await p.evaluate(()=>{const e=document.querySelector('#home .q-type-t');return e?getComputedStyle(e).color:null;});
