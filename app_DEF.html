@@ -481,7 +481,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
    l'en-tête) quand la réponse rapportera des NOOVS. */
 #question.qmode-noovs{background:linear-gradient(165deg,#FFF3D1 0%,#FFC300 58%,#F29715 100%)}
 #question.qmode-noovs.qfull{background:linear-gradient(165deg,#FFC300 0%,#F29715 100%)}
-#question.qmode-classique.qfull{background:var(--bg)}
+/* Repéré en prod (question à curseur/classement/texte libre, jamais NOOVS, jamais posée par
+   NOOVA) : seul cas resté sur un aplat --bg strictement identique au reste de l'app — aucune
+   des trois familles de couleur (sombre premium, or NOOVS) ne s'y applique. Même dégradé crème
+   que partout ailleurs (portefeuille, etc.), pour que le plein écran reste un vrai moment. */
+#question.qmode-classique.qfull{background:linear-gradient(165deg,var(--bg) 0%,var(--bg2) 55%,var(--bg3) 100%)}
 /* En mode « bulle » (jamais plein écran, déjà traité ci-dessus) : le motif de marque derrière la
    question plutôt qu'un aplat — le shell reste toujours à taille fixe (390px, cf. #shell), donc
    l'image (521px de large) ne remonte jamais en dessous de sa résolution native. Un dégradé vers
