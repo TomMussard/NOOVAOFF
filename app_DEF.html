@@ -820,6 +820,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .set-ico svg{width:18px;height:18px}
 .set-ico.mint{background:var(--md);color:var(--mint)}
 .sc-ico{width:34px;height:34px;border-radius:11px;background:var(--nv-black);color:var(--nv-yellow);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+/* Repéré en prod : les 6 en-têtes de section du profil sont un mur de carrés noirs identiques,
+   aucun repère visuel pour s'orienter d'un coup d'œil. Alterne noir/jaune (les deux seules
+   couleurs de la charte) plutôt que d'inventer une teinte hors palette. */
+.sc-ico.alt{background:var(--nv-yellow);color:var(--nv-black)}
 .sc-ico svg{width:17px;height:17px}
 .set-eyebrow{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin:22px 4px 10px;padding:0 2px}
 .consent-it:last-child{border-bottom:none}
@@ -1022,8 +1026,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dtoday-q{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.28;color:var(--nv-yellow-ink);margin-bottom:18px;letter-spacing:-.4px}
 .dtoday-cta{display:inline-flex;align-items:center;gap:9px;background:var(--nv-black);color:#fff;font-size:12.5px;font-weight:700;padding:11px 8px 11px 16px;border-radius:99px}
 .dtoday-cta .tc-arr{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:12px}
-/* Filigrane de marque — signature visuelle sur chaque surface jaune */
-.mark{position:absolute;right:-14px;bottom:-40px;font-size:128px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.3);pointer-events:none;z-index:0}
+/* Filigrane de marque — signature visuelle sur chaque surface jaune. Repéré en prod : coupé de
+   moitié par le cadrage précédent (right/bottom trop négatifs), le « ?! » devenait illisible —
+   une forme pâle sans signification, plutôt qu'un vrai filigrane de marque. */
+.mark{position:absolute;right:2px;bottom:-14px;font-size:128px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.35);pointer-events:none;z-index:0}
 
 /* — Streak (noir) — */
 
@@ -1736,7 +1742,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <div id="profile" class="screen">
   <div class="profile-wrap" style="padding-top:0">
     <div class="dprof-hdr">
-      <div class="mark" style="font-size:148px;bottom:-44px;right:-16px">?!</div>
+      <div class="mark" style="font-size:148px;bottom:-16px;right:2px">?!</div>
       <div class="dprof-title" style="position:relative">Ton profil</div>
       <div class="dprof-id">
         <div class="dprof-av" id="prof-av" onclick="document.getElementById('avatar-file-inp').click()">
@@ -1797,7 +1803,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     </div>
     <div class="set-eyebrow">Confidentialité</div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="event.stopPropagation();openManageMerchants()">Gérer</span><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico alt"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="sc-title">Commerces autorisés</div><span style="font-size:11px;color:var(--ink);font-weight:800;text-decoration:underline;cursor:pointer" onclick="event.stopPropagation();openManageMerchants()">Gérer</span><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div id="consent-mgmt"></div>
       </div>
@@ -1818,7 +1824,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     </div>
     <div class="set-eyebrow">Préférences</div>
     <div class="sec-card acc" id="notif-section">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div class="sc-title">Notifications</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico alt"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></span><div class="sc-title">Notifications</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
         <div id="notif-device"></div>
         <div id="notif-switches"></div>
@@ -1833,7 +1839,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       </div>
     </div>
     <div class="sec-card acc">
-      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg></span><div class="sc-title">Historique des réponses</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico alt"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg></span><div class="sc-title">Historique des réponses</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div id="hist-list"></div>
       </div>
