@@ -1041,7 +1041,18 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dsec-title{font-family:var(--fd);font-weight:800;font-size:19px;letter-spacing:-.5px;color:var(--ink)}
 .dsec-link{font-size:12px;font-weight:700;color:var(--ink2);cursor:pointer;white-space:nowrap}
 
-/* — Mode collection : progression par secteur (accueil) — */
+/* — Mode collection : un seul bloc « Ta collection » sur l'accueil (jamais masqué en entier, même à 0
+   carte : sinon plus aucun moyen d'atteindre le classeur ni de comprendre le système). Fond doré distinct
+   du blanc des autres cartes de l'accueil, pour que ce bloc se reconnaisse comme SON PROPRE système. */
+#collection-card{background:linear-gradient(140deg,#FFF3D1 0%,#FFEC96 100%);border-radius:22px;padding:18px 20px 16px;cursor:pointer;box-shadow:0 3px 14px rgba(107,78,0,.08)}
+.cc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.cc-title{font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-.3px}
+.cc-count{font-size:12.5px;font-weight:800;color:var(--gold-deep)}
+.cc-sub{font-size:12px;color:var(--ink2);line-height:1.5;margin-bottom:16px}
+.cc-sectors{display:flex;flex-direction:column;gap:11px;margin-bottom:16px}
+.cc-cards{display:flex;gap:10px;overflow-x:auto}
+.cc-empty{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.55);border:1.5px dashed rgba(107,78,0,.3);border-radius:14px;padding:12px 14px;font-size:12.5px;font-weight:600;color:var(--gold-deep);width:100%}
+.cc-link{margin-top:14px;text-align:center;font-size:12.5px;font-weight:800;color:var(--ink);text-decoration:underline;text-decoration-color:rgba(28,25,23,.3);text-underline-offset:3px}
 .sect-row{display:flex;align-items:center;gap:10px}
 .sect-ico{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sect-name{font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:4px}
@@ -1478,7 +1489,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="dt-pts" id="tc-pts">+pts</div>
       <div class="dtoday-body">
         <div class="mark">?!</div>
-        <div class="disc-pill" id="tc-disc">Découverte · nouveau près de chez toi</div>
+        <div class="disc-pill" id="tc-disc">Nouveau près de chez toi · débloque sa carte 🎴</div>
         <div class="dtoday-q" id="tc-q">Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?</div>
         <div class="dtoday-cta">Répondre en 30 secondes <div class="tc-arr">→</div></div>
       </div>
@@ -1486,14 +1497,19 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
     <div id="home-requests"></div>
     <div id="daily-track"></div>
-    <div id="sector-progress" style="display:none;margin-top:6px"></div>
+    <div id="collection-card" style="display:none;margin:6px 22px 22px" onclick="if(!event.target.closest('.cc-slot,.cc-link'))openClasseur()">
+      <div class="cc-top">
+        <div class="cc-title">🎴 Ta collection</div>
+        <div class="cc-count" id="cc-count"></div>
+      </div>
+      <div class="cc-sub">Chaque commerce à qui tu réponds devient une carte à débloquer.</div>
+      <div class="cc-sectors" id="cc-sectors"></div>
+      <div class="cc-cards" id="cc-cards" tabindex="0" role="group" aria-label="Tes dernières cartes débloquées"></div>
+      <div class="cc-link" onclick="openClasseur()">Voir mon classeur complet ›</div>
+    </div>
     <div class="sec-lbl">À répondre</div>
     <div class="q-list" id="queue-list" tabindex="0" role="group" aria-label="Autres questions à répondre"></div>
     <div style="height:6px"></div>
-    <div id="recent-cards-wrap" style="display:none;margin-bottom:22px">
-      <div class="dsec-row"><div class="dsec-title">Tes cartes <span id="recent-cards-count" style="color:var(--ink3);font-weight:600;font-size:13px"></span></div><div class="dsec-link" onclick="openClasseur()">Voir le classeur ›</div></div>
-      <div id="recent-cards" style="display:flex;gap:10px;padding-left:22px;overflow-x:auto" tabindex="0" role="group" aria-label="Tes dernières cartes débloquées"></div>
-    </div>
     <div id="dpat-wrap"></div>
     <div class="dsec-row"><div class="dsec-title">À deux pas</div><div class="dsec-link" onclick="openFullMap()">Voir la carte ›</div></div>
     <div class="dmap-card" id="dmap-card" onclick="openFullMap()">
@@ -2385,9 +2401,8 @@ function refreshHome(){
   renderHomeState();
   renderRequests();
   renderDailyTrack();
-  renderSectorProgress();
+  renderCollectionCard();
   renderQueue();
-  renderRecentCards();
   renderAlmostReward();
   renderNearbyMap();
 }
@@ -3918,29 +3933,28 @@ function computeCollection(){
   const totalUnlocked=sectors.reduce((s,x)=>s+x.unlocked,0);
   return {total,unlocked:totalUnlocked,sectors};
 }
-function renderSectorProgress(){
-  const el=document.getElementById('sector-progress');if(!el)return;
-  const {sectors,total}=computeCollection();
+// Un seul bloc « Ta collection » (secteurs + dernières cartes + accès au classeur), plutôt que deux sections
+// séparées : sinon rien ne dit que c'est LE MÊME système, et la 1re fois (0 carte), il n'y avait plus aucun
+// moyen visible d'atteindre le classeur — exactement ce qui rendait le nouveau mode incompréhensible.
+function renderCollectionCard(){
+  const el=document.getElementById('collection-card');if(!el)return;
+  const {sectors,total,unlocked}=computeCollection();
   if(!total){el.style.display='none';return;}
   el.style.display='block';
-  el.innerHTML='<div class="sec-lbl" style="margin-bottom:12px">Tes secteurs</div><div style="display:flex;flex-direction:column;gap:11px;padding:0 22px 22px">'
-    +sectors.map(s=>{const pct=s.total?Math.round(s.unlocked/s.total*100):0;const done=s.unlocked>=s.total;
-      return '<div class="sect-row"><div class="sect-ico" style="background:'+s.color+'18;color:'+s.color+'">'+icon(s.icon,{size:15})+'</div>'
-        +'<div style="flex:1;min-width:0"><div class="sect-name">'+esc(s.label)+'</div><div class="sect-bar"><div style="width:'+pct+'%;background:'+s.color+'"></div></div></div>'
-        +'<div class="sect-n" style="color:'+(done?s.color:'var(--ink)')+'">'+s.unlocked+'/'+s.total+(done?' '+icon('check',{size:10}):'')+'</div></div>';
-    }).join('')+'</div>';
-}
-function renderRecentCards(){
-  const el=document.getElementById('recent-cards');if(!el)return;
-  const {sectors,unlocked}=computeCollection();
+  document.getElementById('cc-count').textContent=unlocked+' / '+total+' cartes';
+  document.getElementById('cc-sectors').innerHTML=sectors.map(s=>{
+    const pct=s.total?Math.round(s.unlocked/s.total*100):0;const done=s.unlocked>=s.total;
+    return '<div class="sect-row"><div class="sect-ico" style="background:'+s.color+'18;color:'+s.color+'">'+icon(s.icon,{size:15})+'</div>'
+      +'<div style="flex:1;min-width:0"><div class="sect-name">'+esc(s.label)+'</div><div class="sect-bar"><div style="width:'+pct+'%;background:'+s.color+'"></div></div></div>'
+      +'<div class="sect-n" style="color:'+(done?s.color:'var(--ink)')+'">'+s.unlocked+'/'+s.total+(done?' '+icon('check',{size:10}):'')+'</div></div>';
+  }).join('');
   const all=sectors.flatMap(s=>s.merchants.filter(m=>m.unlocked).map(m=>Object.assign({},m,{color:s.color})));
   const recent=all.slice(-6).reverse();
-  const wrap=document.getElementById('recent-cards-wrap');
-  if(!recent.length){if(wrap)wrap.style.display='none';return;}
-  if(wrap)wrap.style.display='block';
-  const cntEl=document.getElementById('recent-cards-count');if(cntEl)cntEl.textContent=unlocked+' carte'+(unlocked>1?'s':'');
-  el.innerHTML=recent.map(m=>'<div class="card-slot on" style="border-color:'+m.color+'" onclick="openClasseur()">'
-    +logoHTML(m.name,32,m.logoUrl)+'<div class="card-slot-name">'+esc(m.name)+'</div></div>').join('');
+  const cards=document.getElementById('cc-cards');
+  cards.innerHTML=recent.length
+    ? recent.map(m=>'<div class="card-slot on cc-slot" style="border-color:'+m.color+'" onclick="openClasseur()">'
+        +logoHTML(m.name,32,m.logoUrl)+'<div class="card-slot-name">'+esc(m.name)+'</div></div>').join('')
+    : '<div class="cc-empty">'+icon('lock',{size:16})+' Ta 1<sup>re</sup> carte t’attend juste en dessous ↓</div>';
 }
 // ── Écran « Mon classeur » : la collection complète, groupée par secteur ──
 function openClasseur(){
