@@ -13,7 +13,7 @@
     },
     {
       "source": "/app-v2",
-      "destination": "/app_DEF.html"
+      "destination": "/app_rebrand.html"
     },
     {
       "source": "/dashboard",
