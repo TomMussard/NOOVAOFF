@@ -45,16 +45,12 @@
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
-<!-- Police auto-hébergée (Plus Jakarta Sans, licence SIL OFL, police variable) : plus de feuille de style externe bloquant l'affichage -->
+<!-- Polices auto-hébergées (licence SIL OFL, variables — un seul fichier par police couvre toutes les
+     graisses), communes à tout l'écosystème Noova (dashboard, back-office, site vitrine) : Plus Jakarta
+     Sans en texte courant, Bricolage Grotesque en display (titres, gros chiffres, logos de marque). -->
 <link rel="preload" as="font" type="font/woff2" href="/fonts/plus-jakarta-sans-latin.woff2" crossorigin>
-<!-- Police d'accent (Bricolage Grotesque, licence SIL OFL, auto-hébergée comme la précédente), réservée
-     aux gros chiffres clés (score du jour, points gagnés) pour casser la monotonie visuelle — jamais en texte courant -->
-<link rel="preload" as="font" type="font/woff2" href="/fonts/bricolage-grotesque-800-latin.woff2" crossorigin>
-<style>
-@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:400 800;font-display:swap;src:url(/fonts/plus-jakarta-sans-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:400 800;font-display:swap;src:url(/fonts/plus-jakarta-sans-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:800;font-display:swap;src:url(/fonts/bricolage-grotesque-800-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-</style>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/bricolage-grotesque-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/noova-fonts.css">
 
 <!-- Données structurées JSON-LD -->
 <script type="application/ld+json">
@@ -104,7 +100,7 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
   --nav-off:var(--ink3);
   --r-card:24px;--r-media:16px;--r-icon:14px;--r-pill:999px;
   --shadow-card:0 8px 22px rgba(28,25,23,.09);--shadow-raised:0 10px 26px rgba(28,25,23,.10);--shadow-nav:0 8px 24px rgba(28,25,23,.22);
-  --r:24px;--rs:16px;--fd:'Plus Jakarta Sans',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
+  --r:24px;--rs:16px;--fd:'Bricolage Grotesque',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-webkit-font-smoothing:antialiased}
@@ -112,6 +108,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
    shell fixe ci-dessous) est décalé de sa hauteur — jamais recouvert, jamais à retirer écran par écran. */
 .test-banner{position:fixed;top:0;left:0;right:0;z-index:100000;background:#DC2626;color:#fff;font-family:var(--fb);font-weight:800;font-size:11px;letter-spacing:.3px;text-align:center;line-height:24px;padding-top:env(safe-area-inset-top,0px)}
 #shell{position:fixed;top:calc(24px + env(safe-area-inset-top,0px));right:0;bottom:0;left:0;background:var(--bg);overflow:hidden}
+/* Grain léger sur tout le fond crème (même motif que le site vitrine) : casse l'aplat, jamais perceptible
+   consciemment, mais évite l'effet « à plat » d'une couleur unie sur de grandes surfaces. */
+#shell::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:500;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 @media(min-width:520px){
   #shell{inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:390px;height:844px;border-radius:50px;box-shadow:0 60px 120px rgba(0,0,0,.55),0 0 0 12px #2A2535,0 0 0 13px #1A1820}
   #shell::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:37px;background:#17141A;border-radius:0 0 22px 22px;z-index:999}
@@ -915,7 +914,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 :root{
   --nv-yellow:var(--yellow);--nv-yellow-ink:var(--ink);
   --nv-black:var(--ink);--nv-black2:#241C11;
-  --nv-photo:linear-gradient(160deg,#CDAC71 0%,#8A6A3A 100%);
+  /* Remplace un commerce sans photo : le motif de marque plutôt qu'un dégradé brun générique. */
+  --nv-photo:center 12%/cover no-repeat url(/bg-question_-noova.png), linear-gradient(160deg,#CDAC71 0%,#8A6A3A 100%);
 }
 /* — Nav du bas : pilule noire flottante, icône active en cercle jaune — */
 .bnav{background:var(--nv-black);border-top:none;left:14px;right:14px;bottom:calc(10px + env(safe-area-inset-bottom,0px));border-radius:26px;padding:9px 10px;box-shadow:0 16px 36px rgba(0,0,0,.32);backdrop-filter:none;-webkit-backdrop-filter:none}
@@ -3994,7 +3994,12 @@ function showCardUnlock(q){
   const card=document.getElementById('cu-card');if(card)card.style.borderColor=color;
   const badge=document.getElementById('cu-badge');if(badge)badge.style.background=color;
   const el=document.getElementById('card-unlock');
-  document.getElementById('cu-continue').onclick=()=>el.classList.remove('open');
+  document.getElementById('cu-continue').onclick=()=>{
+    el.classList.remove('open');
+    // Une célébration (badge/palier) mise en file pendant que cette carte était ouverte : on
+    // l'affiche maintenant, juste après — jamais superposée à la carte (cf. showCelebration).
+    if(S._pendingCelebration){const c=S._pendingCelebration;S._pendingCelebration=null;setTimeout(()=>showCelebration(c),260);}
+  };
   el.classList.add('open');
 }
 // Tous les commerces vérifiés de la ville (pas seulement les autorisés) : la carte est un outil de
@@ -6192,6 +6197,12 @@ submitAns = function() {
   // par l'écouteur Firestore temps réel du document utilisateur (même transaction submitAnswer, chemin
   // indépendant) — comparer après coup donnerait parfois « déjà débloqué » à tort.
   const wasUnlockedBefore = !!(q._merchantId && (S._answeredMerchants || []).includes(q._merchantId));
+  // Posé ici, avant tout appel réseau : dès que showCardUnlock est probable, on bloque toute
+  // célébration (badge/palier) concurrente — qu'elle vienne de _origSubmitAns() plus bas ou de
+  // l'écouteur Firestore temps réel du document utilisateur, qui peut se déclencher entre-temps
+  // (cf. handleUserSnapshot) et gagnerait sinon la course contre ce même flag posé trop tard.
+  const touchesSurveyEarly = (S.mode === 'survey') || !!(q && q.survey && q.survey.length);
+  if (!touchesSurveyEarly && q._merchantId && !wasUnlockedBefore) S._cardUnlockIncoming = true;
 
   if(!q._firestoreId) { _origSubmitAns(); return; } // question locale sans campagne réelle (aucun cas connu), pas de crédit serveur possible
 
@@ -6214,7 +6225,10 @@ submitAns = function() {
       // Capturé avant _origSubmitAns() : détermine si cette soumission alimente S.sv.earned.
       const touchesSurvey = (S.mode === 'survey') || !!(q && q.survey && q.survey.length);
       const totalEarned = typeof data.pointsAwarded === 'number' ? data.pointsAwarded : q.pts;
+      const willUnlockCard = !touchesSurvey && !data.flagged && q._merchantId && !wasUnlockedBefore;
+      if (!willUnlockCard) S._cardUnlockIncoming = false; // posé plus haut de façon optimiste : annulé ici si la réponse est flaggée
       _origSubmitAns(); // affiche l'écran de récompense/confettis (ajoute optimistiquement q.pts)
+      if (!willUnlockCard && S._pendingCelebration) { const c = S._pendingCelebration; S._pendingCelebration = null; showCelebration(c); }
 
       // Mode collection : 1re réponse à CE commerce → superposition « carte débloquée » au-dessus de la
       // récompense (jamais en survey : le commerce est déjà débloqué depuis la question hook qui a précédé
@@ -6222,7 +6236,7 @@ submitAns = function() {
       // peut déjà avoir été mis à jour ici par l'écouteur Firestore temps réel (même transaction, chemin
       // indépendant). Une superposition, jamais un changement d'écran (goTo) : showReveal/showLinkedNews plus
       // bas se basent sur cur==='reward' pour savoir où s'afficher.
-      if (!touchesSurvey && !data.flagged && q._merchantId && !wasUnlockedBefore) {
+      if (willUnlockCard) {
         S._answeredMerchants = (S._answeredMerchants || []).includes(q._merchantId) ? S._answeredMerchants : [...(S._answeredMerchants || []), q._merchantId];
         showCardUnlock(q);
       }
@@ -6631,6 +6645,11 @@ auth.onAuthStateChanged(user => {
 </div>
 <script>
 function showCelebration({icon:iconName,title,subtitle}){
+  // Jamais en même temps que la superposition « carte débloquée » (même moment post-réponse) :
+  // deux célébrations à la fois se marchent dessus visuellement. On la met en file, elle
+  // s'affiche juste après que card-unlock soit refermé (cf. showCardUnlock).
+  const cu=document.getElementById('card-unlock');
+  if(S._cardUnlockIncoming||(cu&&cu.classList.contains('open'))){S._pendingCelebration={icon:iconName,title,subtitle};return;}
   const sheet=document.getElementById('celebrate-sheet');if(!sheet)return;
   document.getElementById('celebrate-ico').innerHTML=icon(iconName,{size:44});
   document.getElementById('celebrate-title').textContent=title||'';
