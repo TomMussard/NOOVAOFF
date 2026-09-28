@@ -86,13 +86,13 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
      maquette noova-app-ecrans.html. Un seul jeu de tokens pour tout l'app —
      les anciens noms sont conservés en alias pour ne pas casser les usages
      existants, mais pointent tous vers les mêmes valeurs de référence. */
-  --bg:#FFFBD7;--bg2:#FFF6B8;--bg3:#FFEC96;--card:#FFFFFF;
-  --ink:#1C1917;--ink2:#5F594E;--ink3:#71695D;--icon-gray:#5F594E;
-  --coral:#FFC300;--cd:rgba(255,195,0,.16);--cg:rgba(255,195,0,.4);
-  --violet:#1C1917;--vd:rgba(28,25,23,.06);--vg:rgba(28,25,23,.14);
-  --amber:#FFC300;--mint:#264F3C;--md:#E7F0E9;--mg:rgba(38,79,60,.18);
-  --grad:#FFC300;--grad-soft:#FFF3D1;--gi:#1C1917;--danger:#C4453D;
-  --noova-brown:#1c0e02;--noova-cream:#fffbd7;--noova-gold:#ffc300;
+  --bg:#F7F6F2;--bg2:#EEECEA;--bg3:#E0DDD8;--card:#FFFFFF;
+  --ink:#17141A;--ink2:#5A5462;--ink3:#6B6570;--icon-gray:#5A5462;
+  --coral:#E07D0A;--cd:rgba(224,125,10,.09);--cg:rgba(224,125,10,.22);
+  --violet:#A14E08;--vd:rgba(161,78,8,.09);--vg:rgba(161,78,8,.2);
+  --amber:#F5A623;--mint:#0BAB84;--md:rgba(11,171,132,.1);--mg:rgba(11,171,132,.2);
+  --grad:linear-gradient(135deg,#F59E0B 0%,#FBBF24 50%,#FFD60A 100%);--grad-soft:linear-gradient(135deg,#FFF3D6,#FFFAEC);--gi:#2A1E08;--danger:#C4453D;
+  --noova-brown:#1c0e02;--noova-cream:#f7f6f2;--noova-gold:#e07d0a;
   /* Tokens de la maquette, pour les écrans reconstruits avec son vocabulaire */
   --cream:var(--bg);--surface:var(--card);--ink-soft:#3D3830;--muted:var(--ink2);
   --line:var(--bg2);--line-strong:var(--bg3);--yellow:var(--coral);--yellow-soft:var(--grad-soft);
@@ -280,7 +280,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .mm-sum button[hidden]{display:none}
 .mm-search{width:100%;padding:13px 18px;border-radius:var(--r-pill);border:1.5px solid var(--bg3);background:var(--surface);font-size:14px;font-family:var(--fb);color:var(--ink);outline:none}
 .mm-search:focus{border-color:var(--ink)}
-.mm-savebar{position:sticky;bottom:0;padding:16px 18px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(rgba(255,251,215,0),var(--bg) 38%)}
+.mm-savebar{position:sticky;bottom:0;padding:16px 18px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(rgba(247,246,242,0),var(--bg) 38%)}
 .mm-savebar .btn-p:disabled{opacity:.5;cursor:default}
 .pd-h{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink);margin:20px 20px 8px}
 .pd-card{background:var(--surface);border-radius:var(--r-card);box-shadow:var(--shadow-card);margin:0 18px 12px;padding:4px 16px}
@@ -301,8 +301,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 /* Question posée par NOOVA (pas un commerce) : carte sombre premium dans la rangée « À répondre »,
    pour qu'elle se distingue d'un coup d'œil des questions de commerces. */
 .q-card.noova{background:linear-gradient(155deg,#2A2013 0%,#1C1917 100%);box-shadow:0 6px 16px rgba(28,25,23,.22)}
-.q-card.noova .q-br,.q-card.noova .q-prev{color:#FFFBD7!important}
-.q-card.noova .q-type-t{background:rgba(255,251,215,.14);color:#FFFBD7}
+.q-card.noova .q-br,.q-card.noova .q-prev{color:#F7F6F2!important}
+.q-card.noova .q-type-t{background:rgba(247,246,242,.14);color:#F7F6F2}
 .noova-tag{font-size:10px;font-weight:800;color:var(--nv-black);background:var(--nv-yellow);padding:2px 8px;border-radius:99px}
 .disc-note{margin:0 0 14px;padding:12px 14px;background:var(--bg2);border:1.5px dashed var(--nv-black);border-radius:14px;font-size:12px;line-height:1.55;color:var(--ink)}
 .disc-note b{color:var(--nv-black)}
@@ -479,8 +479,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 /* Fond par type de question — dégradé plat par défaut (repli sûr, ne pixellise jamais) : crème
    neutre pour une question classique, dégradé jaune pièce (mêmes teintes que la pièce NOOVS de
    l'en-tête) quand la réponse rapportera des NOOVS. */
-#question.qmode-noovs{background:linear-gradient(165deg,#FFF3D1 0%,#FFC300 58%,#F29715 100%)}
-#question.qmode-noovs.qfull{background:linear-gradient(165deg,#FFC300 0%,#F29715 100%)}
+#question.qmode-noovs{background:linear-gradient(165deg,#FFF3D6 0%,#FBBF24 58%,#F59E0B 100%)}
+#question.qmode-noovs.qfull{background:linear-gradient(165deg,#FBBF24 0%,#F59E0B 100%)}
 /* Repéré en prod (question à curseur/classement/texte libre, jamais NOOVS, jamais posée par
    NOOVA) : seul cas resté sur un aplat --bg strictement identique au reste de l'app — aucune
    des trois familles de couleur (sombre premium, or NOOVS) ne s'y applique. Même dégradé crème
@@ -497,37 +497,37 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
    fond change de famille de couleur (sombre au lieu de clair), chaque élément texte/pastille du plein-écran
    générique est réinversé ici plutôt que réutilisé tel quel. */
 #question.qmode-noova.qfull{background:linear-gradient(165deg,#2A2013 0%,#1C1917 65%,#120F0A 100%)}
-#question.qmode-noova.qfull .q-close{background:rgba(255,251,215,.12);color:#FFFBD7;box-shadow:none}
-#question.qmode-noova.qfull .q-seg{background:rgba(255,251,215,.16)}
+#question.qmode-noova.qfull .q-close{background:rgba(247,246,242,.12);color:#F7F6F2;box-shadow:none}
+#question.qmode-noova.qfull .q-seg{background:rgba(247,246,242,.16)}
 #question.qmode-noova.qfull .q-seg.done{background:var(--nv-yellow)}
 #question.qmode-noova.qfull .q-pts{background:var(--nv-yellow);color:var(--nv-black)}
-#question.qmode-noova.qfull .bh-name,#question.qmode-noova.qfull .bh-usage,#question.qmode-noova.qfull .q-hint{color:#FFFBD7}
+#question.qmode-noova.qfull .bh-name,#question.qmode-noova.qfull .bh-usage,#question.qmode-noova.qfull .q-hint{color:#F7F6F2}
 #question.qmode-noova.qfull .bh-tag{display:none}
 #question.qmode-noova.qfull .brand-hdr{cursor:default;pointer-events:none}
 #question.qmode-noova.qfull .brand-hdr>div:last-child{display:none}
-#question.qmode-noova.qfull .q-text{font-size:34px;line-height:1.08;letter-spacing:-1.3px;margin:5vh 0 12px;color:#FFFBD7}
-#question.qmode-noova.qfull .disc-note{background:rgba(255,251,215,.08);border:none;color:#FFFBD7}
+#question.qmode-noova.qfull .q-text{font-size:34px;line-height:1.08;letter-spacing:-1.3px;margin:5vh 0 12px;color:#F7F6F2}
+#question.qmode-noova.qfull .disc-note{background:rgba(247,246,242,.08);border:none;color:#F7F6F2}
 #question.qmode-noova.qfull .mcq-list{counter-reset:qo;gap:10px}
-#question.qmode-noova.qfull .mcq-opt{background:rgba(255,251,215,.08);border:1.5px solid rgba(255,251,215,.18);color:#FFFBD7;border-radius:22px;padding:19px 20px;font-size:17px;font-weight:700}
-#question.qmode-noova.qfull .mcq-opt::before{counter-increment:qo;content:counter(qo,upper-alpha);width:30px;height:30px;border-radius:9px;background:rgba(255,251,215,.14);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#question.qmode-noova.qfull .mcq-opt{background:rgba(247,246,242,.08);border:1.5px solid rgba(247,246,242,.18);color:#F7F6F2;border-radius:22px;padding:19px 20px;font-size:17px;font-weight:700}
+#question.qmode-noova.qfull .mcq-opt::before{counter-increment:qo;content:counter(qo,upper-alpha);width:30px;height:30px;border-radius:9px;background:rgba(247,246,242,.14);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 #question.qmode-noova.qfull .mcq-ck{display:none}
 #question.qmode-noova.qfull .mcq-opt.sel{background:var(--nv-yellow);border-color:var(--nv-yellow);color:var(--nv-black);box-shadow:none}
 #question.qmode-noova.qfull .mcq-opt.sel::before{background:var(--nv-black);color:var(--nv-yellow)}
-#question.qmode-noova.qfull .ans-ta{background:rgba(255,251,215,.08);border:1.5px solid rgba(255,251,215,.18);color:#FFFBD7;border-radius:24px;font-size:18px;padding:20px}
-#question.qmode-noova.qfull .ans-ta::placeholder{color:rgba(255,251,215,.4)}
-#question.qmode-noova.qfull .char-ct{color:rgba(255,251,215,.55)}
-#question.qmode-noova.qfull .scale-val{font-size:120px;color:#FFFBD7;margin:6vh 0 14px}
-#question.qmode-noova.qfull .scale-labels{color:rgba(255,251,215,.7);font-weight:700}
-#question.qmode-noova.qfull .scale-inp{height:10px;background:rgba(255,251,215,.16)!important}
+#question.qmode-noova.qfull .ans-ta{background:rgba(247,246,242,.08);border:1.5px solid rgba(247,246,242,.18);color:#F7F6F2;border-radius:24px;font-size:18px;padding:20px}
+#question.qmode-noova.qfull .ans-ta::placeholder{color:rgba(247,246,242,.4)}
+#question.qmode-noova.qfull .char-ct{color:rgba(247,246,242,.55)}
+#question.qmode-noova.qfull .scale-val{font-size:120px;color:#F7F6F2;margin:6vh 0 14px}
+#question.qmode-noova.qfull .scale-labels{color:rgba(247,246,242,.7);font-weight:700}
+#question.qmode-noova.qfull .scale-inp{height:10px;background:rgba(247,246,242,.16)!important}
 #question.qmode-noova.qfull .scale-inp::-webkit-slider-thumb{background:var(--nv-yellow);width:34px;height:34px;box-shadow:none}
-#question.qmode-noova.qfull .rank-item{background:rgba(255,251,215,.08);border:1.5px solid rgba(255,251,215,.18);border-radius:22px;padding:15px}
-#question.qmode-noova.qfull .rank-txt{color:#FFFBD7;font-size:15px;font-weight:700}
+#question.qmode-noova.qfull .rank-item{background:rgba(247,246,242,.08);border:1.5px solid rgba(247,246,242,.18);border-radius:22px;padding:15px}
+#question.qmode-noova.qfull .rank-txt{color:#F7F6F2;font-size:15px;font-weight:700}
 #question.qmode-noova.qfull .rank-num{background:var(--nv-yellow);color:var(--nv-black)}
-#question.qmode-noova.qfull .rank-arr{background:rgba(255,251,215,.12);border:none;color:#FFFBD7}
+#question.qmode-noova.qfull .rank-arr{background:rgba(247,246,242,.12);border:none;color:#F7F6F2}
 #question.qmode-noova.qfull #lock-fill{background:var(--nv-yellow)}
-#question.qmode-noova.qfull .skip-btn{background:rgba(255,251,215,.12);color:#FFFBD7}
+#question.qmode-noova.qfull .skip-btn{background:rgba(247,246,242,.12);color:#F7F6F2}
 #question.qmode-noova.qfull .btn-sub{background:var(--nv-yellow);color:var(--nv-black);box-shadow:none}
-#question.qmode-noova.qfull .btn-sub:disabled,#question.qmode-noova.qfull .btn-sub.locked{opacity:1;background:rgba(255,251,215,.14);color:#FFFBD7}
+#question.qmode-noova.qfull .btn-sub:disabled,#question.qmode-noova.qfull .btn-sub.locked{opacity:1;background:rgba(247,246,242,.14);color:#F7F6F2}
 .qw{padding:52px 20px 22px;min-height:100%;display:flex;flex-direction:column}
 .q-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .q-close{width:38px;height:38px;border-radius:var(--r-pill);background:var(--surface);border:none;box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--ink)}
@@ -990,8 +990,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dh-flame{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#B9B1A2}
 .dh-flame svg{width:100%;height:100%}
 .dh-streak.on .dh-flame{color:#E07D0A}
-.dh-flame .fo{fill:currentColor}.dh-flame .fi{fill:#FFF3D1}
-.dh-streak.on .dh-flame .fi{fill:#FFC300}
+.dh-flame .fo{fill:currentColor}.dh-flame .fi{fill:#FFF3D6}
+.dh-streak.on .dh-flame .fi{fill:#F5A623}
 .dh-flame img{filter:grayscale(1) opacity(.4);transition:filter .2s}
 .dh-streak.on .dh-flame img{filter:none}
 .dh-pts-n{font-family:var(--fd);font-weight:800;font-size:15px}
@@ -1000,11 +1000,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 /* — Header « plein » de l'accueil : bandeau à-plat sombre, pour marquer le moment d'entrée
    dans l'app plutôt que de répéter le même en-tête discret partout (cf. écrans Question/Récompense,
    qui gardent .dh-hdr-compact, transparent, sur fond crème). */
-#home .dh-hdr{background-image:radial-gradient(rgba(255,251,215,.05) 1px,transparent 1.5px),linear-gradient(155deg,#1C1917 0%,#2A2013 100%);background-size:13px 13px,100% 100%;border-radius:0;box-shadow:0 4px 14px rgba(28,25,23,.14);margin:0 0 30px;padding:18px 22px 14px}
-#home .dh-hdr .dh-noov,#home .dh-hdr .dh-pts{background:rgba(255,251,215,.12)}
-#home .dh-hdr .dh-pts-l{color:rgba(255,251,215,.55)}
+#home .dh-hdr{background-image:radial-gradient(rgba(247,246,242,.05) 1px,transparent 1.5px),linear-gradient(155deg,#1C1917 0%,#2A2013 100%);background-size:13px 13px,100% 100%;border-radius:0;box-shadow:0 4px 14px rgba(28,25,23,.14);margin:0 0 30px;padding:18px 22px 14px}
+#home .dh-hdr .dh-noov,#home .dh-hdr .dh-pts{background:rgba(247,246,242,.12)}
+#home .dh-hdr .dh-pts-l{color:rgba(247,246,242,.55)}
 #home .dh-hdr .dh-streak{color:var(--bg)}
-#home .dh-hdr .dh-flame{color:rgba(255,251,215,.32)}
+#home .dh-hdr .dh-flame{color:rgba(247,246,242,.32)}
 #home .dh-hdr .dh-streak.on .dh-flame{color:var(--nv-yellow)}
 
 /* — Carte question du jour (photo + bandeau jaune) — */
@@ -1478,8 +1478,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
         <rect x="252" y="10" width="54" height="22" rx="6" fill="#DCD6C4"/>
         <circle cx="170" cy="66" r="20" fill="#3F7BD6" opacity=".18"/>
         <circle cx="170" cy="66" r="7" fill="#3F7BD6" stroke="#fff" stroke-width="3"/>
-        <circle cx="92" cy="42" r="17" fill="#FFC300"/><circle cx="92" cy="42" r="6" fill="#1C1917"/>
-        <circle cx="238" cy="94" r="13" fill="#1C1917"/><circle cx="238" cy="94" r="4" fill="#FFC300"/>
+        <circle cx="92" cy="42" r="17" fill="#F5A623"/><circle cx="92" cy="42" r="6" fill="#17141A"/>
+        <circle cx="238" cy="94" r="13" fill="#17141A"/><circle cx="238" cy="94" r="4" fill="#F5A623"/>
       </svg>
       <div class="dmap-label" id="dmap-label"></div>
       <div class="dmap-empty" id="dmap-empty" style="display:none" onclick="event.stopPropagation()"></div>
@@ -1895,7 +1895,7 @@ function setQPtsTag(q){const el=document.getElementById('q-pts-tag');if(!el)retu
 const BRANDMETA={};
 function logoFallbackHTML(name,size){
   const s=size||44;const r=Math.round(s*0.27);
-  const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#1C1917',t:'#FFC300'};const fs=Math.round(s*0.44);
+  const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#17141A',t:'#F5A623'};const fs=Math.round(s*0.44);
   return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:${m.t||'#fff'};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;
 }
 // Si logoUrl échoue à charger (URL cassée, fichier supprimé du Storage...), l'onerror
@@ -2404,7 +2404,7 @@ function buildAns(q){
 function nextQ(){if(S.qs&&S.qs.length>0)openQ(0);else{refreshHome();goNav('home')}}
 function spawnConfetti(targetId){
   const el=document.getElementById(targetId||'conf-layer');if(!el)return;el.innerHTML='';
-  const clrs=['#FFC300','#1C1917','#FFF3D1','#FFE07A'];
+  const clrs=['#E07D0A','#17141A','#F7F6F2','#F5A623'];
   for(let i=0;i<36;i++){const p=document.createElement('div');p.className='conf-p';const c=clrs[Math.floor(Math.random()*clrs.length)];const w=Math.random()*10+4,h=Math.random()*10+4;p.style.cssText=`width:${w}px;height:${h}px;background:${c};left:${Math.random()*100}%;animation-duration:${Math.random()*1.5+1}s;animation-delay:${Math.random()*.5}s`;el.appendChild(p)}
 }
 function shareReward(){
@@ -6396,7 +6396,7 @@ function hideAppLoader() {
   el.style.opacity = '0';
   el.style.pointerEvents = 'none';
   const tc = document.querySelector('meta[name="theme-color"]');
-  if(tc) tc.content = '#FFC300';
+  if(tc) tc.content = '#E07D0A';
   setTimeout(() => { try { el.remove(); } catch(e){} }, 650);
 }
 
