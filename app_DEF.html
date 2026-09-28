@@ -121,18 +121,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .22s ease,transform .22s ease,visibility 0s linear .23s;transform:translateX(26px);-webkit-overflow-scrolling:touch;background:var(--bg)}
 .screen.active{opacity:1;pointer-events:all;visibility:visible;transition-delay:0s;transform:translateX(0)}
 .screen.exit{opacity:0;transform:translateX(-26px);pointer-events:none;visibility:visible;transition-delay:0s}
-/* Repéré en retour : les 4 écrans principaux (accueil, communauté, cadeaux, profil) partagent
-   TOUS le même aplat crème — rien ne les distingue au premier coup d'œil. Un motif de marque
-   différent en haut de chacun (même trio d'illustrations que l'écran de question), fondu vers
-   l'aplat habituel avant la fin du premier écran — jamais un vrai fond qui suit tout le scroll. */
-/* 1re tentative : fenêtre de transparence à hauteur fixe — sur un écran au contenu variable
-   (état vide, liste courte...), le texte qui tombe dedans devenait illisible (repéré en test).
-   Lavis quasi opaque constant à la place : le motif reste visible à ~6 % partout, jamais assez
-   fort pour gêner un texte, quelle que soit sa position — juste assez pour distinguer les écrans. */
-#home{background:linear-gradient(rgba(255,251,215,.94),rgba(255,251,215,.94)),center top/390px 420px no-repeat url(/bg-question_-noova.png),var(--bg)}
-#social{background:linear-gradient(rgba(255,251,215,.94),rgba(255,251,215,.94)),center top/390px 420px no-repeat url(/bg-question_-classique.png),var(--bg)}
-#rewards-tab{background:linear-gradient(rgba(255,251,215,.94),rgba(255,251,215,.94)),center top/390px 420px no-repeat url(/bg-question_-noovs.png),var(--bg)}
-#profile{background:linear-gradient(rgba(255,251,215,.94),rgba(255,251,215,.94)),center top/390px 420px no-repeat url(/bg-question_-noova.png),var(--bg)}
 .si{min-height:100%;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{from{opacity:0;transform:scale(.2) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
@@ -309,13 +297,13 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .disc-pill{display:none;background:var(--nv-yellow);color:var(--nv-black);font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:99px;margin-bottom:10px}
 .dtoday-card.disc .disc-pill{display:inline-block}
 .q-card.disc{background:var(--card);box-shadow:none;border:1.5px dashed var(--nv-black)}
-.disc-tag{font-size:10px;font-weight:800;color:var(--nv-yellow);background:var(--nv-black);padding:2px 8px;border-radius:7px}
+.disc-tag{font-size:10px;font-weight:800;color:var(--nv-yellow);background:var(--nv-black);padding:2px 8px;border-radius:99px}
 /* Question posée par NOOVA (pas un commerce) : carte sombre premium dans la rangée « À répondre »,
    pour qu'elle se distingue d'un coup d'œil des questions de commerces. */
 .q-card.noova{background:linear-gradient(155deg,#2A2013 0%,#1C1917 100%);box-shadow:0 6px 16px rgba(28,25,23,.22)}
 .q-card.noova .q-br,.q-card.noova .q-prev{color:#FFFBD7!important}
 .q-card.noova .q-type-t{background:rgba(255,251,215,.14);color:#FFFBD7}
-.noova-tag{font-size:10px;font-weight:800;color:var(--nv-black);background:var(--nv-yellow);padding:2px 8px;border-radius:7px}
+.noova-tag{font-size:10px;font-weight:800;color:var(--nv-black);background:var(--nv-yellow);padding:2px 8px;border-radius:99px}
 .disc-note{margin:0 0 14px;padding:12px 14px;background:var(--bg2);border:1.5px dashed var(--nv-black);border-radius:14px;font-size:12px;line-height:1.55;color:var(--ink)}
 .disc-note b{color:var(--nv-black)}
 .follow-card{width:100%;margin:0 0 12px;padding:16px;background:var(--bg2);border:1.5px solid var(--bg3);border-radius:18px;text-align:left}
@@ -482,8 +470,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .q-br{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px}
 .q-prev{font-size:12px;color:var(--ink2);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .q-meta{display:flex;gap:6px;margin-top:5px}
-.q-pts-t{font-size:10px;font-weight:700;padding:2px 7px;border-radius:7px;background:var(--vd);color:var(--violet)}
-.q-type-t{font-size:10px;font-weight:600;color:var(--ink2);padding:2px 7px;border-radius:7px;background:rgba(24,20,16,.08)}
+.q-pts-t{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--vd);color:var(--violet)}
+.q-type-t{font-size:10px;font-weight:600;color:var(--ink2);padding:2px 7px;border-radius:99px;background:rgba(24,20,16,.08)}
 /* QUESTION */
 /* Fond illustré derrière une question « bulle » (jamais en mode « plein écran », déjà jaune plat à dessein) : image posée
    par JS (applyQuestionBg), toujours avec ce cadrage — un dégradé vers --bg est ajouté en même temps pour garder le
@@ -574,7 +562,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .mcq-list{display:flex;flex-direction:column;gap:8px}
 .mcq-opt{padding:16px;border-radius:18px;background:var(--surface);border:1.5px solid var(--line-strong);cursor:pointer;font-size:16px;font-weight:500;color:var(--ink);transition:all .13s;display:flex;align-items:center;gap:13px}
 .mcq-opt.sel{border-color:var(--ink);background:var(--cd);color:var(--ink);font-weight:700}
-.mcq-ck{width:22px;height:22px;border-radius:var(--r-pill);border:2px solid var(--line-strong);background:var(--bg2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0;transition:all .13s}
+.mcq-ck{width:22px;height:22px;border-radius:var(--r-pill);border:2px solid #C9C3B5;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0;transition:all .13s}
 .mcq-opt.sel .mcq-ck{background:var(--ink);border:7px solid var(--yellow);color:transparent}
 .scale-val{font-family:'Bricolage Grotesque',var(--fd);font-weight:800;font-size:72px;text-align:center;color:var(--ink);line-height:1;margin:10px 0;font-variant-numeric:tabular-nums}
 .scale-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-bottom:7px}
@@ -1907,15 +1895,9 @@ function isFreeMode(){return getAnswersToday()>=MAX_POINT_ANSWERS;}
 function ptsTag(q){return isFreeMode()?'+1 NOOV':'+'+q.pts+' pts';}
 function setQPtsTag(q){const el=document.getElementById('q-pts-tag');if(!el)return;el.textContent=ptsTag(q);}
 const BRANDMETA={};
-// Sans logo réel, tous les commerces tombaient sur le même carré noir+jaune — reconnaissable au premier
-// coup d'œil comme un repli générique. Même palette et même logique de hash que les avatars d'amis
-// (cf. renderQueue) : une couleur stable par nom, pas de nouvelle teinte hors charte.
-const LOGO_FALLBACK_CLRS=[['#f29715','#1C1917'],['#A14E08','#FFC300'],['#0BAB84','#fff'],['#5C3BF5','#fff'],['#F5A623','#1C1917'],['#1C1917','#FFC300']];
 function logoFallbackHTML(name,size){
   const s=size||44;const r=Math.round(s*0.27);
-  let h=0;for(let i=0;i<(name||'?').length;i++)h=(h*31+(name||'?').charCodeAt(i))>>>0;
-  const [hashBg,hashText]=LOGO_FALLBACK_CLRS[h%LOGO_FALLBACK_CLRS.length];
-  const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:hashBg,t:hashText};const fs=Math.round(s*0.44);
+  const m=BRANDMETA[name]||{ab:(name||'?')[0].toUpperCase(),c:'#1C1917',t:'#FFC300'};const fs=Math.round(s*0.44);
   return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;background:${m.c};color:${m.t||'#fff'};display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:${fs}px;flex-shrink:0;letter-spacing:-.5px;box-shadow:0 2px 8px rgba(0,0,0,.14)">${m.ab}</div>`;
 }
 // Si logoUrl échoue à charger (URL cassée, fichier supprimé du Storage...), l'onerror
