@@ -697,7 +697,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .tab-btn.on{background:var(--ink);color:#fff;font-weight:700;box-shadow:none}
 .feed-post{margin:0 0 10px;background:var(--surface);border:none;border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-card)}
 .fp-hdr{padding:14px 14px 10px;display:flex;align-items:center;gap:9px}
-.fp-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:14px;flex-shrink:0}
+.fp-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:14px;flex-shrink:0;position:relative;overflow:hidden}
+.fp-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .fp-name{font-size:15px;font-weight:700;color:var(--ink)}
 .fp-tag{display:inline-block;vertical-align:1px;margin-left:6px;padding:2px 8px;border-radius:99px;background:var(--ink);color:var(--yellow);font-size:9.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase}
 .fp-time{font-size:11px;color:var(--muted);margin-top:1px;font-weight:500}
@@ -2599,18 +2600,20 @@ async function renderFeedDocs(el, docs) {
     const isNews = ev.type === 'merchant_post', isStreak = ev.type === 'streak', isLevel = ev.type === 'levelup';
     const kind = isNews ? (FEED_KINDS[ev.kind] ? ev.kind : 'impact') : '';
     const mine = ev.userId === myUid;
+    // Un jalon (série, palier) reste une publication D'UNE PERSONNE — sa vraie photo (ou son
+    // initiale) doit s'afficher, pas une icône générique flamme/trophée à la place du visage.
+    const evPhoto = mine ? (S.user && S.user.photoUrl) : ((S.friends || []).find(f => f.uid === ev.userId) || {}).photoUrl;
     let avatar, action, cls = 'feed-post';
     if (isNews) {
       avatar = `<div class="fp-av cm-av-news">${logoHTML(name, 36, null)}</div>`;
       action = `<div class="cm-news-t">${esc(ev.text || '')}</div>`;
       cls += ' cm-news cm-k-' + kind;
     } else if (isLevel) {
-      const tier = TIERS.find(t => t.n === ev.level) || TIERS[0];
-      avatar = `<div class="fp-av cm-av-level" style="background:${tier.c}">${icon(tier.ico, { size: 20 })}</div>`;
+      avatar = `<div class="fp-av cm-av-level" style="background:${c}18;color:${c}">${avInner(evPhoto, name)}</div>`;
       action = `<div class="cm-level-t">${mine ? 'Tu as atteint' : 'a atteint'} le palier <b>${esc(ev.level || '')}</b></div>`;
       cls += ' cm-level';
     } else {
-      avatar = `<div class="fp-av cm-av-streak">${flameHTML(20)}</div>`;
+      avatar = `<div class="fp-av cm-av-streak" style="background:${c}18;color:${c}">${avInner(evPhoto, name)}</div>`;
       action = `<div class="cm-streak-t">${esc(ev.text || '')}</div>`;
       cls += ' cm-streak';
     }
