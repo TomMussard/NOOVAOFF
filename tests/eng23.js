@@ -108,7 +108,7 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
     await used('ua1','u1',true,now-3600000);await used('ub2','u2',false,now-7200000);await used('uc3','u1',false,now-1800000);await used('ud4','u3',true,monthAgo);
     await wf(p,()=>document.getElementById('bring-val-0').textContent==='2',null,10000);
     const k=await p.evaluate(()=>({v:[0,1].map(i=>document.getElementById('bring-val-'+i).textContent),l:[...document.querySelectorAll('#bring-row .kpi-lbl')].map(x=>x.textContent)}));
-    check('Tableau de bord : 2 clients ramenés ce mois (le bon d\'il y a 40 jours n\'est pas compté), dont 1 nouveau client',k.v.join('|')==='2|1'&&k.l.join('|')==='Clients ramenés ce mois|dont nouveaux clients|Votre carte débloquée par',k);
+    check('Tableau de bord : 2 clients ramenés ce mois (le bon d\'il y a 40 jours n\'est pas compté), dont 1 nouveau client',k.v.join('|')==='2|1'&&k.l.join('|')==='Clients ramenés ce mois|dont nouveaux clients',k);
     await db.doc('redemptions/rd1').set({userId:'u9',merchantId:'m1',rewardId:'m1_p2',tier:2,cost:300,label:'Formule',code:'ABCD',status:'pending',minPurchase:8,createdAt:Timestamp.now(),expiresAt:Timestamp.fromMillis(Date.now()+3600000),usedAt:null});
     await p.evaluate(()=>navTo('validate',document.getElementById('nav-validate')));
     await setVal(p,'#voucher-code-inp','abcd');await p.evaluate(()=>validateVoucher());await wf(p,()=>/Confirmer l/.test(document.getElementById('voucher-result').innerHTML),null,8000);

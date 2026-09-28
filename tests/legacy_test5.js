@@ -51,9 +51,6 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
    check('Après 3 s : verrou levé, bouton actif',!st3.locked&&!st3.bar&&!st3.dis,JSON.stringify(st3));
    await p.evaluate(()=>submitAns());
    await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);
-   if(await p.evaluate(()=>document.getElementById('card-unlock').classList.contains('open'))){
-     await p.evaluate(()=>document.getElementById('cu-continue').click());
-   }
    const u=(await adb.doc('users/uA').get()).data();
    check('Réponse 1 : points crédités (10 + 5 bonus découverte)',u.points===15&&!u.noovs&&u.dailyAnswerCount===1,'points='+u.points+' count='+u.dailyAnswerCount);
    const sub=await p.$eval('#reward .rw-sub',e=>e.textContent);
@@ -61,7 +58,6 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
  });
  await T('answers 2-3 points',async()=>{
    await answerOne(3300);await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);
-   if(await p.evaluate(()=>document.getElementById('card-unlock').classList.contains('open'))){await p.evaluate(()=>document.getElementById('cu-continue').click());}
    await sleep(1200);
    await p.evaluate(()=>goNav('home'));
    await answerOne(3300);await sleep(2500);
@@ -77,7 +73,6 @@ const T=async(n,fn)=>{try{await fn();}catch(e){check(n+' (exception)',false,Stri
    check('Question suivante annoncée en NOOV (pas en points)',/\+1 NOOV/.test(tag)&&!/mode libre/i.test(hint),tag+' | '+hint);
    await p.evaluate(()=>goNav('home'));
    await answerOne(3300);await wf(p,()=>document.getElementById('reward').classList.contains('active'),null,10000);
-   if(await p.evaluate(()=>document.getElementById('card-unlock').classList.contains('open'))){await p.evaluate(()=>document.getElementById('cu-continue').click());}
    await sleep(1500);
    const rw=await p.evaluate(()=>({lbl:document.querySelector('#reward .pe-lbl').textContent,num:document.getElementById('rw-pts').textContent,tot:document.getElementById('rw-total').textContent,sub:document.querySelector('#reward .rw-sub').textContent}));
    await p.screenshot({path:'/tmp/shots/noov_reward.png'});
