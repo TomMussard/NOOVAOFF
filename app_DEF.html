@@ -122,18 +122,17 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .screen.active{opacity:1;pointer-events:all;visibility:visible;transition-delay:0s;transform:translateX(0)}
 .screen.exit{opacity:0;transform:translateX(-26px);pointer-events:none;visibility:visible;transition-delay:0s}
 .si{min-height:100%;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-/* DA par onglet — un fond illustré distinct par écran principal (au lieu d'un aplat
-   identique partout). background-attachment:fixed + le transform déjà posé sur .screen
-   ancrent l'image au cadre de l'écran (jamais à la hauteur totale, scrollable, du contenu),
-   donc elle ne s'étire jamais : cf. .screen{transform:...} plus haut. */
 /* DA par onglet — un fond illustré distinct par écran principal (au lieu d'un aplat identique
    partout), posé sur un calque position:fixed à l'intérieur de chaque .screen : comme .screen a
    toujours un transform (cf. plus haut), ce calque reste ancré au cadre de l'écran (jamais à la
    hauteur totale, scrollable, du contenu) — testé : ne s'étire jamais, quelle que soit la
    longueur de la liste en dessous. z-index:-1 le passe derrière le contenu (chaque carte a son
-   propre fond opaque par-dessus). */
+   propre fond opaque par-dessus). Image affichée telle quelle, sans dégradé de voile dessus. */
 .scr-bg{position:fixed;inset:0;z-index:-1;pointer-events:none}
-#home .scr-bg{background:linear-gradient(180deg,rgba(255,251,215,0) 0%,rgba(255,251,215,.65) 62%,var(--bg) 78%),center top/cover no-repeat url(/bg-accueil.svg)}
+/* Accueil : l'image a une moitié sombre (diagonale) — un contenu qui scroll peut passer
+   dessus. Plutôt qu'un voile par-dessus (retiré, l'image doit se voir telle quelle), on limite
+   sa hauteur à la zone d'en-tête (toujours au même endroit, jamais de texte en dessous). */
+#home .scr-bg{bottom:auto;height:480px;background:center top/cover no-repeat url(/bg-accueil.svg)}
 #social .scr-bg{background:center top/cover no-repeat url(/bg-communaute.svg)}
 #rewards-tab .scr-bg{background:center top/cover no-repeat url(/bg-recompenses.svg)}
 /* Fond sombre en continu sur Récompenses : les libellés posés à même le fond (pas dans une
@@ -508,46 +507,48 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
    question plutôt qu'un aplat — le shell reste toujours à taille fixe (390px, cf. #shell), donc
    l'image (521px de large) ne remonte jamais en dessous de sa résolution native. Un dégradé vers
    --bg est posé par-dessus pour que la carte de réponse (.q-content-card) reste bien lisible. */
-#question.qbg-on.qmode-classique{background:linear-gradient(180deg,rgba(28,25,23,0) 0%,var(--bg) 82%),center top/cover no-repeat url(/bg-question-classique.svg)}
-#question.qbg-on.qmode-noovs{background:linear-gradient(180deg,rgba(28,25,23,0) 0%,var(--bg) 82%),center top/cover no-repeat url(/bg-question-noovs.svg)}
+#question.qbg-on.qmode-classique{background:center top/cover no-repeat url(/bg-question-classique.svg)}
+#question.qbg-on.qmode-noovs{background:center top/cover no-repeat url(/bg-question-noovs.svg)}
 /* Question posée par NOOVA (pas un commerce) : toujours en plein cadre, fond sombre premium plutôt que la
    couleur pièce — pour qu'on la distingue d'un coup d'œil d'une question classique ou « à NOOVS ». Comme le
    fond change de famille de couleur (sombre au lieu de clair), chaque élément texte/pastille du plein-écran
    générique est réinversé ici plutôt que réutilisé tel quel. Le 3e fond illustré (bg-question_-noova.png,
    prévu pour ce cas précis) était resté posé mais jamais branché — assombri pour garder le texte clair
    lisible, avec le dégradé plat en repli si l'image ne charge pas. */
-#question.qmode-noova.qfull{background:linear-gradient(165deg,rgba(42,32,19,.88) 0%,rgba(28,25,23,.92) 65%,rgba(18,15,10,.95) 100%),center 30%/cover no-repeat url(/bg-question-noova.svg),linear-gradient(165deg,#2A2013 0%,#1C1917 65%,#120F0A 100%)}
-#question.qmode-noova.qfull .q-close{background:rgba(255,251,215,.12);color:#FFFBD7;box-shadow:none}
-#question.qmode-noova.qfull .q-seg{background:rgba(255,251,215,.16)}
-#question.qmode-noova.qfull .q-seg.done{background:var(--nv-yellow)}
-#question.qmode-noova.qfull .q-pts{background:var(--nv-yellow);color:var(--nv-black)}
-#question.qmode-noova.qfull .bh-name,#question.qmode-noova.qfull .bh-usage,#question.qmode-noova.qfull .q-hint{color:#FFFBD7}
+/* Image de fond claire (crème/jaune) : texte et panneaux repassés en sombre — l'ancien
+   traitement clair-sur-sombre ne se lisait plus une fois le voile retiré. */
+#question.qmode-noova.qfull{background:center 30%/cover no-repeat url(/bg-question-noova.svg),linear-gradient(165deg,#2A2013 0%,#1C1917 65%,#120F0A 100%)}
+#question.qmode-noova.qfull .q-close{background:rgba(28,25,23,.85);color:var(--nv-yellow);box-shadow:none}
+#question.qmode-noova.qfull .q-seg{background:rgba(28,25,23,.16)}
+#question.qmode-noova.qfull .q-seg.done{background:var(--nv-black)}
+#question.qmode-noova.qfull .q-pts{background:var(--nv-black);color:var(--nv-yellow)}
+#question.qmode-noova.qfull .bh-name,#question.qmode-noova.qfull .bh-usage,#question.qmode-noova.qfull .q-hint{color:var(--ink)}
 #question.qmode-noova.qfull .bh-tag{display:none}
 #question.qmode-noova.qfull .brand-hdr{cursor:default;pointer-events:none}
 #question.qmode-noova.qfull .brand-hdr>div:last-child{display:none}
-#question.qmode-noova.qfull .q-text{font-size:34px;line-height:1.08;letter-spacing:-1.3px;margin:5vh 0 12px;color:#FFFBD7}
-#question.qmode-noova.qfull .disc-note{background:rgba(255,251,215,.08);border:none;color:#FFFBD7}
+#question.qmode-noova.qfull .q-text{font-size:34px;line-height:1.08;letter-spacing:-1.3px;margin:5vh 0 12px;color:var(--ink)}
+#question.qmode-noova.qfull .disc-note{background:rgba(255,255,255,.55);border:none;color:var(--ink)}
 #question.qmode-noova.qfull .mcq-list{counter-reset:qo;gap:10px}
-#question.qmode-noova.qfull .mcq-opt{background:rgba(255,251,215,.08);border:1.5px solid rgba(255,251,215,.18);color:#FFFBD7;border-radius:22px;padding:19px 20px;font-size:17px;font-weight:700}
-#question.qmode-noova.qfull .mcq-opt::before{counter-increment:qo;content:counter(qo,upper-alpha);width:30px;height:30px;border-radius:9px;background:rgba(255,251,215,.14);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#question.qmode-noova.qfull .mcq-opt{background:rgba(255,255,255,.6);border:1.5px solid rgba(28,25,23,.14);color:var(--ink);border-radius:22px;padding:19px 20px;font-size:17px;font-weight:700}
+#question.qmode-noova.qfull .mcq-opt::before{counter-increment:qo;content:counter(qo,upper-alpha);width:30px;height:30px;border-radius:9px;background:rgba(28,25,23,.85);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 #question.qmode-noova.qfull .mcq-ck{display:none}
-#question.qmode-noova.qfull .mcq-opt.sel{background:var(--nv-yellow);border-color:var(--nv-yellow);color:var(--nv-black);box-shadow:none}
-#question.qmode-noova.qfull .mcq-opt.sel::before{background:var(--nv-black);color:var(--nv-yellow)}
-#question.qmode-noova.qfull .ans-ta{background:rgba(255,251,215,.08);border:1.5px solid rgba(255,251,215,.18);color:#FFFBD7;border-radius:24px;font-size:18px;padding:20px}
-#question.qmode-noova.qfull .ans-ta::placeholder{color:rgba(255,251,215,.4)}
-#question.qmode-noova.qfull .char-ct{color:rgba(255,251,215,.55)}
-#question.qmode-noova.qfull .scale-val{font-size:120px;color:#FFFBD7;margin:6vh 0 14px}
-#question.qmode-noova.qfull .scale-labels{color:rgba(255,251,215,.7);font-weight:700}
-#question.qmode-noova.qfull .scale-inp{height:10px;background:rgba(255,251,215,.16)!important}
-#question.qmode-noova.qfull .scale-inp::-webkit-slider-thumb{background:var(--nv-yellow);width:34px;height:34px;box-shadow:none}
-#question.qmode-noova.qfull .rank-item{background:rgba(255,251,215,.08);border:1.5px solid rgba(255,251,215,.18);border-radius:22px;padding:15px}
-#question.qmode-noova.qfull .rank-txt{color:#FFFBD7;font-size:15px;font-weight:700}
-#question.qmode-noova.qfull .rank-num{background:var(--nv-yellow);color:var(--nv-black)}
-#question.qmode-noova.qfull .rank-arr{background:rgba(255,251,215,.12);border:none;color:#FFFBD7}
-#question.qmode-noova.qfull #lock-fill{background:var(--nv-yellow)}
-#question.qmode-noova.qfull .skip-btn{background:rgba(255,251,215,.12);color:#FFFBD7}
-#question.qmode-noova.qfull .btn-sub{background:var(--nv-yellow);color:var(--nv-black);box-shadow:none}
-#question.qmode-noova.qfull .btn-sub:disabled,#question.qmode-noova.qfull .btn-sub.locked{opacity:1;background:rgba(255,251,215,.14);color:#FFFBD7}
+#question.qmode-noova.qfull .mcq-opt.sel{background:var(--nv-black);border-color:var(--nv-black);color:var(--nv-yellow);box-shadow:none}
+#question.qmode-noova.qfull .mcq-opt.sel::before{background:var(--nv-yellow);color:var(--nv-black)}
+#question.qmode-noova.qfull .ans-ta{background:rgba(255,255,255,.6);border:1.5px solid rgba(28,25,23,.14);color:var(--ink);border-radius:24px;font-size:18px;padding:20px}
+#question.qmode-noova.qfull .ans-ta::placeholder{color:var(--ink3)}
+#question.qmode-noova.qfull .char-ct{color:var(--ink2)}
+#question.qmode-noova.qfull .scale-val{font-size:120px;color:var(--ink);margin:6vh 0 14px}
+#question.qmode-noova.qfull .scale-labels{color:var(--ink2);font-weight:700}
+#question.qmode-noova.qfull .scale-inp{height:10px;background:rgba(28,25,23,.16)!important}
+#question.qmode-noova.qfull .scale-inp::-webkit-slider-thumb{background:var(--nv-black);width:34px;height:34px;box-shadow:none}
+#question.qmode-noova.qfull .rank-item{background:rgba(255,255,255,.6);border:1.5px solid rgba(28,25,23,.14);border-radius:22px;padding:15px}
+#question.qmode-noova.qfull .rank-txt{color:var(--ink);font-size:15px;font-weight:700}
+#question.qmode-noova.qfull .rank-num{background:var(--nv-black);color:var(--nv-yellow)}
+#question.qmode-noova.qfull .rank-arr{background:rgba(28,25,23,.85);border:none;color:var(--nv-yellow)}
+#question.qmode-noova.qfull #lock-fill{background:var(--nv-black)}
+#question.qmode-noova.qfull .skip-btn{background:rgba(28,25,23,.85);color:var(--nv-yellow)}
+#question.qmode-noova.qfull .btn-sub{background:var(--nv-black);color:var(--nv-yellow);box-shadow:none}
+#question.qmode-noova.qfull .btn-sub:disabled,#question.qmode-noova.qfull .btn-sub.locked{opacity:1;background:rgba(28,25,23,.14);color:var(--ink3)}
 .qw{padding:52px 20px 22px;min-height:100%;display:flex;flex-direction:column}
 .q-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .q-close{width:38px;height:38px;border-radius:var(--r-pill);background:var(--surface);border:none;box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--ink)}
