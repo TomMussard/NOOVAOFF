@@ -122,17 +122,28 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .screen.active{opacity:1;pointer-events:all;visibility:visible;transition-delay:0s;transform:translateX(0)}
 .screen.exit{opacity:0;transform:translateX(-26px);pointer-events:none;visibility:visible;transition-delay:0s}
 .si{min-height:100%;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-/* Identité de marque (voir NOOVA_DESIGN.md §2-3) : Accueil porte le dégradé or NOOVA plein écran ;
-   Récompenses garde l'illustration de marque (voile sombre pour la lisibilité) ; Communauté et
-   Profil portent le fond marron à carreaux. Les cartes par-dessus restent sombres/plates. */
-#home.screen{background:linear-gradient(90deg,#f29715,#ffda09 79%)}
-#home .sec-lbl,#home .dsec-title{color:var(--jaune-ink)}
-#home .dsec-link{color:rgba(18,16,22,.7)}
-.scr-bg{position:fixed;inset:0;background-size:cover;background-position:center top;background-repeat:no-repeat;pointer-events:none}
-#rewards-tab.screen{background:var(--jaune-ink)}
-#rewards-tab .scr-bg{background-image:linear-gradient(rgba(18,16,22,.6),rgba(18,16,22,.6)),url('bg-recompenses.svg')}
-#rewards-tab .wallet-wrap{position:relative}
+/* Identité de marque (voir NOOVA_DESIGN.md §2-3). Accueil : thème beige/crème, cartes et texte
+   recolorés via les tokens (donc tous les composants existants suivent sans être réécrits un par
+   un). Récompenses : dégradé or NOOVA plein écran, cartes inchangées (déjà testées). Communauté et
+   Profil : fond marron à carreaux ; sur Profil, l'en-tête (photo) reprend le dégradé or NOOVA et le
+   reste des éléments passe en crème, comme les autres tokens crème/marron. */
+/* --ink/--card/--cream/etc. (voir bloc :root plus haut) sont des ALIAS vers --text/--surface/--bg :
+   un var() imbriqué se résout au niveau de l'élément où l'alias est DÉCLARÉ (ici :root), pas au
+   niveau de l'élément qui le consomme. Redéfinir --text/--surface ici ne suffit donc pas : il faut
+   aussi redéclarer chaque alias directement pour que les composants existants (qui utilisent
+   var(--ink), var(--card)…) suivent le thème crème. */
+#home,#profile{
+  --surface:#FFFBD7;--surface-2:#FFF3B0;--text:#2B1B10;--text-2:#6B5744;--trait:rgba(43,27,16,.18);
+  --bg2:#FFFBD7;--bg3:#FFF3B0;--card:#FFFBD7;--ink:#2B1B10;--ink2:#6B5744;--ink3:#6B5744;--icon-gray:#6B5744;
+  --violet:#2B1B10;--noova-brown:#FFFBD7;--noova-cream:#F7E7B4;--cream:#F7E7B4;--ink-soft:#2B1B10;
+  --muted:#6B5744;--line:rgba(43,27,16,.18);--line-strong:rgba(43,27,16,.18);--nav-off:#6B5744;
+}
+#home.screen{background:#F7E7B4}
+#rewards-tab.screen{background:linear-gradient(90deg,#f29715,#ffda09 79%)}
+#rewards-tab .dwal-title,#rewards-tab .dsec-h{color:var(--jaune-ink)}
 #social.screen,#profile.screen{background-color:#1c0e02;background-image:linear-gradient(rgba(247,244,241,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(247,244,241,.06) 1px,transparent 1px);background-size:24px 24px}
+#profile .dprof-hdr{background:linear-gradient(90deg,#f29715,#ffda09 79%)}
+#profile .set-eyebrow{color:rgba(247,244,241,.55)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{from{opacity:0;transform:scale(.2) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes confFall{to{transform:translateY(120vh) rotate(720deg);opacity:0}}
@@ -1001,7 +1012,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dtoday-body{background:var(--surface);padding:22px;position:relative;overflow:hidden}
 .dtoday-body>*{position:relative;z-index:1}
 .dtoday-q{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.28;color:var(--text);margin-bottom:18px;letter-spacing:-.4px}
-.dtoday-cta{display:inline-flex;align-items:center;gap:9px;background:var(--surface-2);color:#fff;font-size:12.5px;font-weight:700;padding:11px 8px 11px 16px;border-radius:var(--r-btn)}
+.dtoday-cta{display:inline-flex;align-items:center;gap:9px;background:var(--surface-2);color:var(--ink);font-size:12.5px;font-weight:700;padding:11px 8px 11px 16px;border-radius:var(--r-btn)}
 /* Filigrane de marque — signature visuelle sur chaque surface jaune. Repéré en prod : coupé de
    moitié par le cadrage précédent (right/bottom trop négatifs), le « ?! » devenait illisible —
    une forme pâle sans signification, plutôt qu'un vrai filigrane de marque. */
@@ -1565,7 +1576,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 <!-- WALLET -->
 <div id="rewards-tab" class="screen" tabindex="0" style="outline:none">
-  <div class="scr-bg" aria-hidden="true"></div>
   <div class="wallet-wrap" style="padding-top:0">
     <div class="dwal-hdr">
       <div class="dwal-title">Tes cadeaux</div>
@@ -5082,7 +5092,7 @@ function renderInProgressRewards(){
     .sort((a,b) => (rewardCost(a)-S.pts) - (rewardCost(b)-S.pts)).slice(0,5);
   if(countEl) countEl.textContent = rewards.length ? '· '+rewards.length : '';
   renderTierTrack();
-  if(!rewards.length){ el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:12.5px">Tout est disponible dès maintenant.</div>'; return; }
+  if(!rewards.length){ el.innerHTML='<div style="text-align:center;padding:16px;color:rgba(18,16,22,.65);font-size:12.5px">Tout est disponible dès maintenant.</div>'; return; }
   el.innerHTML = rewards.map(r => {
     const pct = Math.max(0, Math.min(100, (S.pts / rewardCost(r)) * 100));
     const circ = 2*Math.PI*20;
