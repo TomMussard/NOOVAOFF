@@ -122,10 +122,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .screen.active{opacity:1;pointer-events:all;visibility:visible;transition-delay:0s;transform:translateX(0)}
 .screen.exit{opacity:0;transform:translateX(-26px);pointer-events:none;visibility:visible;transition-delay:0s}
 .si{min-height:100%;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-/* Identité de marque (voir NOOVA_DESIGN.md §2-3). Accueil, Question et Profil : retour exact à la
-   palette/mise en page d'avant la refonte (jugée plus lisible), via les valeurs exactes de l'ancien
-   bloc :root — crème #FFFBD7, cartes blanches, encre #1C1917. Récompenses : dégradé or NOOVA plein
-   écran, cartes inchangées. Communauté : fond marron à carreaux. */
+/* Identité de marque (voir NOOVA_DESIGN.md §2-3). Accueil, Question, Profil, Récompenses : fond
+   crème #FFFBD7, cartes blanches, encre #1C1917 — calme partout sauf l'endroit précis où la marque
+   doit être visible : l'illustration reste CONTENUE à un bandeau (en-tête, carte du jour, ticket),
+   jamais étalée sur tout l'écran, pour ne jamais passer sous du texte posé à même le fond.
+   Communauté : fond marron à carreaux, cartes crème par-dessus. */
 /* --ink/--card/--cream/etc. (voir bloc :root plus haut) sont des ALIAS vers --text/--surface/--bg :
    un var() imbriqué se résout au niveau de l'élément où l'alias est DÉCLARÉ (ici :root), pas au
    niveau de l'élément qui le consomme. Redéfinir --text/--surface ici ne suffit donc pas : il faut
@@ -150,8 +151,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   --bg2:#1B1721;--bg3:#241F2C;--muted:#A49CAE;--r-tag:999px;--r-btn:10px;--r-card:14px}
 /* Fonds illustrés plein écran, ancrés à la fenêtre (pas au contenu qui scrolle). */
 .scr-bg{position:fixed;inset:0;background-size:cover;background-position:center top;background-repeat:no-repeat;pointer-events:none}
-#profile .scr-bg{background-image:url('cadre-ref-4.svg')}
-#profile .profile-wrap{position:relative}
 /* Motif de marque en fond de la question, selon son type — seulement quand la carte est visible
    par-dessus (.qbg-on, mode « bulle ») ou en plein écran (.qfull), jamais les deux superposés. */
 #question.qbg-on.qmode-classique,#question.qmode-classique.qfull{background-image:url('cadre-ref-1.svg');background-size:cover;background-position:center top}
@@ -250,7 +249,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .bp-news-t{font-size:11px;color:var(--ink3);margin-top:3px}
 
 /* ─── Communauté ─── */
-.cm-sec{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(247,244,241,.55);margin:18px 0 10px}
+.cm-sec{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(247,244,241,.7);margin:18px 0 10px}
 .cm-link{background:none;border:none;color:var(--ink);font-weight:800;font-size:12px;cursor:pointer;font-family:var(--fb);padding:2px 0;text-decoration:underline}
 .cm-hero{margin:0 18px 14px;background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-card);padding:16px 18px;color:var(--ink)}
 .cm-hero-t{font-family:var(--fd);font-weight:800;font-size:15px;display:flex;align-items:center;gap:6px;margin-bottom:10px}
@@ -715,7 +714,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .notif-btn.decline{background:var(--bg2);color:var(--ink2)}
 .tab-bar{display:flex;margin:0 18px 16px;background:var(--bg2);border-radius:var(--r-pill);padding:4px;gap:2px}
 .tab-btn{flex:1;padding:9px 4px;border-radius:var(--r-pill);font-size:12px;font-weight:700;text-align:center;cursor:pointer;color:var(--muted);transition:all .16s;background:none;border:none;font-family:var(--fb)}
-.tab-btn.on{background:var(--surface-2);color:var(--ink);font-weight:700;}
+.tab-btn.on{background:var(--jaune);color:var(--jaune-ink);font-weight:700;}
 .feed-post{margin:0 0 10px;background:var(--surface);border:none;border-radius:var(--r-card);overflow:hidden;}
 .fp-hdr{padding:14px 14px 10px;display:flex;align-items:center;gap:9px}
 .fp-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:14px;flex-shrink:0;position:relative;overflow:hidden}
@@ -1229,7 +1228,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .tier-lbl{font-size:9px;font-weight:700;color:var(--ink2);text-align:center}
 
 /* — Profil : commerces autorisés avec toggle — */
-.dprof-hdr{padding:64px 18px 26px;background:var(--nv-yellow);border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+.dprof-hdr{padding:64px 18px 26px;background:var(--nv-yellow) url('cadre-ref-4.svg') center/cover;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
 .dprof-id{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;position:relative;z-index:1}
 .dprof-av{width:84px;height:84px;border-radius:50%;background:rgba(28,25,23,.88);border:3px solid rgba(255,255,255,.55);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:30px;color:var(--nv-yellow);position:relative;overflow:hidden;cursor:pointer}
 .dprof-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -1664,7 +1663,6 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 <!-- PROFILE -->
 <div id="profile" class="screen">
-  <div class="scr-bg" aria-hidden="true"></div>
   <div class="profile-wrap" style="padding-top:0">
     <div class="dprof-hdr">
       <div class="dprof-id">
@@ -2571,10 +2569,11 @@ async function renderFeedDocs(el, docs) {
   const mine = feedImpactCard();
   if (token !== _feedRenderToken) return;
   if (!docs.length && !compat.length && !mine) {
-    el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:rgba(247,244,241,.65);font-size:13px;line-height:1.7">
-        Le fil s'anime avec les nouveautés des commerces que tu autorises et les progrès de tes amis.<br>
-        <span style="color:#fff;font-weight:700">Autorise des commerces ou invite des amis pour le remplir.</span><br>
-        <button onclick="shareInvite()" style="margin-top:14px;padding:11px 22px;background:var(--yellow);color:var(--jaune-ink);font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:var(--r-btn);cursor:pointer">Inviter un ami</button>
+    el.innerHTML = `<div style="text-align:center;background:#fff;border-radius:var(--r-card);margin:6px 18px 0;padding:32px 22px;box-shadow:var(--shadow-card)">
+        <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,195,0,.15);color:var(--jaune-ink);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M17 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="10" cy="7" r="4"/><path d="M22 20v-1a4 4 0 0 0-3-3.87"/><path d="M15.5 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div style="font-family:var(--fd);font-weight:800;font-size:15.5px;color:var(--ink);margin-bottom:6px">Ton fil est encore vide</div>
+        <div style="font-size:13px;color:var(--ink2);line-height:1.6">Il s'anime avec les nouveautés des commerces que tu autorises et les progrès de tes amis.</div>
+        <button onclick="shareInvite()" style="margin-top:18px;width:100%;padding:13px;background:var(--yellow);color:var(--jaune-ink);font-family:var(--fd);font-weight:800;font-size:14px;border:none;border-radius:var(--r-btn);cursor:pointer">Inviter un ami</button>
       </div>`;
     return;
   }
