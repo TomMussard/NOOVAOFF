@@ -58,7 +58,7 @@ const H=3600000;
     check('La carte du jour est « découverte » (autre couleur, pastille), la liste marque les découvertes (« Découverte ») et pas le commerce suivi',/disc/.test(f.today)&&f.pill!=='none'&&f.todayBrand==='Studio Fit'&&f.rows.length===2&&!f.rows[0].disc&&f.rows[1].disc&&/Découverte/.test(f.rows[1].tag)&&/tu ne le suis pas encore/.test(f.rows[1].txt),f);
     check('Plus de section « Demandes » ni de boutons Autoriser / Non merci sur l\'accueil',f.req===''&&!/Autoriser|Non merci/.test(f.btns),f.btns);
     const bg=await p.evaluate(()=>[getComputedStyle(document.querySelector('#today-card .dtoday-body')).backgroundColor,getComputedStyle(document.querySelector('#queue-list .q-card.disc')).borderStyle,getComputedStyle(document.querySelector('#queue-list .q-card:not(.disc)')).borderStyle]);
-    check('Distinction visuelle : carte du jour noire (découverte, pas le dégradé or habituel), carte découverte en pointillés, carte suivie sans bordure',bg[0]==='rgb(36, 31, 44)'&&bg[1]==='dashed'&&bg[2]!=='dashed',bg);
+    check('Distinction visuelle : carte du jour noire (découverte, pas le dégradé or habituel), carte découverte en pointillés, carte suivie sans bordure',bg[0]==='rgb(18, 16, 22)'&&bg[1]==='dashed'&&bg[2]!=='dashed',bg);
     await p.screenshot({path:'/tmp/shots/disc_home.png'});await axeCheck(p,'accueil avec questions découverte');
     // plafond
     for(let i=0;i<4;i++)await camp('cap'+i,'m7','Zen Sport','Sport',(10+i)*60000);

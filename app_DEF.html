@@ -122,28 +122,35 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .screen.active{opacity:1;pointer-events:all;visibility:visible;transition-delay:0s;transform:translateX(0)}
 .screen.exit{opacity:0;transform:translateX(-26px);pointer-events:none;visibility:visible;transition-delay:0s}
 .si{min-height:100%;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-/* Identité de marque (voir NOOVA_DESIGN.md §2-3). Accueil : thème beige/crème, cartes et texte
-   recolorés via les tokens (donc tous les composants existants suivent sans être réécrits un par
-   un). Récompenses : dégradé or NOOVA plein écran, cartes inchangées (déjà testées). Communauté et
-   Profil : fond marron à carreaux ; sur Profil, l'en-tête (photo) reprend le dégradé or NOOVA et le
-   reste des éléments passe en crème, comme les autres tokens crème/marron. */
+/* Identité de marque (voir NOOVA_DESIGN.md §2-3). Accueil, Question et Profil : retour exact à la
+   palette/mise en page d'avant la refonte (jugée plus lisible), via les valeurs exactes de l'ancien
+   bloc :root — crème #FFFBD7, cartes blanches, encre #1C1917. Récompenses : dégradé or NOOVA plein
+   écran, cartes inchangées. Communauté : fond marron à carreaux. */
 /* --ink/--card/--cream/etc. (voir bloc :root plus haut) sont des ALIAS vers --text/--surface/--bg :
    un var() imbriqué se résout au niveau de l'élément où l'alias est DÉCLARÉ (ici :root), pas au
    niveau de l'élément qui le consomme. Redéfinir --text/--surface ici ne suffit donc pas : il faut
    aussi redéclarer chaque alias directement pour que les composants existants (qui utilisent
    var(--ink), var(--card)…) suivent le thème crème. */
-#home,#profile{
-  --surface:#FFFBD7;--surface-2:#FFF3B0;--text:#2B1B10;--text-2:#6B5744;--trait:rgba(43,27,16,.18);
-  --bg2:#FFFBD7;--bg3:#FFF3B0;--card:#FFFBD7;--ink:#2B1B10;--ink2:#6B5744;--ink3:#6B5744;--icon-gray:#6B5744;
-  --violet:#2B1B10;--noova-brown:#FFFBD7;--noova-cream:#F7E7B4;--cream:#F7E7B4;--ink-soft:#2B1B10;
-  --muted:#6B5744;--line:rgba(43,27,16,.18);--line-strong:rgba(43,27,16,.18);--nav-off:#6B5744;
+#home,#question,#profile{
+  --bg:#FFFBD7;--surface:#FFFFFF;--surface-2:#FFEC96;--text:#1C1917;--text-2:#5F594E;--trait:#FFF6B8;
+  --bg2:#FFF6B8;--bg3:#FFEC96;--card:#FFFFFF;--ink:#1C1917;--ink2:#5F594E;--ink3:#71695D;--icon-gray:#5F594E;
+  --violet:#1C1917;--noova-brown:#1c0e02;--noova-cream:#fffbd7;--cream:#FFFBD7;--ink-soft:#3D3830;
+  --r-card:24px;--r-media:16px;--r-icon:14px;--r-tag:3px;--r-btn:16px;--r-crisp:8px;
+  --nv-photo:#FFF6B8;
+  --muted:#5F594E;--line:#FFF6B8;--line-strong:#FFEC96;--nav-off:#71695D;
+  --cd:rgba(255,195,0,.16);--cg:rgba(255,195,0,.4);--vd:rgba(28,25,23,.06);--vg:rgba(28,25,23,.14);
+  --md:#E7F0E9;--mg:rgba(38,79,60,.18);--shadow-card:0 8px 22px rgba(28,25,23,.09);
 }
-#home.screen{background:#F7E7B4}
+#home.screen,#question.screen,#profile.screen{background:#FFFBD7}
+/* Le mode « plein écran » de la question (qfull) est une présentation sombre autonome, déjà
+   cohérente avant ce retour en arrière — elle ne fait pas partie de la demande, donc elle garde
+   les tokens sombres plutôt que d'hériter du crème du reste de #question. */
+#question.qfull{--bg:#121016;--surface:#1B1721;--surface-2:#241F2C;--text:#F7F4F1;--text-2:#A49CAE;
+  --text-3:#6F6779;--trait:#2F2937;--ink:#F7F4F1;--ink2:#A49CAE;--ink3:#A49CAE;--card:#1B1721;
+  --bg2:#1B1721;--bg3:#241F2C;--muted:#A49CAE;--r-tag:999px;--r-btn:10px;--r-card:14px}
 #rewards-tab.screen{background:linear-gradient(90deg,#f29715,#ffda09 79%)}
 #rewards-tab .dwal-title,#rewards-tab .dsec-h{color:var(--jaune-ink)}
-#social.screen,#profile.screen{background-color:#1c0e02;background-image:linear-gradient(rgba(247,244,241,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(247,244,241,.06) 1px,transparent 1px);background-size:24px 24px}
-#profile .dprof-hdr{background:linear-gradient(90deg,#f29715,#ffda09 79%)}
-#profile .set-eyebrow{color:rgba(247,244,241,.55)}
+#social.screen{background-color:#1c0e02;background-image:linear-gradient(rgba(247,244,241,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(247,244,241,.06) 1px,transparent 1px);background-size:24px 24px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{from{opacity:0;transform:scale(.2) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes confFall{to{transform:translateY(120vh) rotate(720deg);opacity:0}}
@@ -312,13 +319,14 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .pd-d{font-size:12.5px;color:var(--ink2);line-height:1.6;margin-top:3px}
 .pd-act{display:inline-block;margin-top:8px;background:none;border:none;padding:6px 0;font-family:var(--fb);font-size:12.5px;font-weight:800;color:var(--ink);text-decoration:underline;cursor:pointer}
 .pd-tgl{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:12px;font-size:12.5px;font-weight:700;color:var(--ink)}
-.dtoday-card.disc .dtoday-body{background:var(--surface-2)}
+.dtoday-card.disc .dtoday-body{background:var(--nv-black)}
 .dtoday-card.disc .dtoday-q{color:#fff}
 .dtoday-card.disc .dtoday-cta{background:var(--nv-yellow);color:var(--nv-black)}
-.disc-pill{display:none;background:var(--surface-2);color:var(--text);font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:4px 10px;border-radius:var(--r-tag);margin-bottom:10px}
+.dtoday-card.disc .tc-arr{background:rgba(255,255,255,.14)}
+.disc-pill{display:none;background:var(--nv-yellow);color:var(--nv-black);font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:var(--r-tag);margin-bottom:10px}
 .dtoday-card.disc .disc-pill{display:inline-block}
 .q-card.disc{background:var(--card);border:1.5px dashed var(--nv-black)}
-.disc-tag{font-size:10px;font-weight:800;color:var(--nv-yellow);background:var(--surface-2);padding:2px 8px;border-radius:var(--r-tag)}
+.disc-tag{font-size:10px;font-weight:800;color:var(--nv-yellow);background:var(--nv-black);padding:2px 8px;border-radius:var(--r-tag)}
 /* Question posée par NOOVA (pas un commerce) : carte sombre premium dans la rangée « À répondre »,
    pour qu'elle se distingue d'un coup d'œil des questions de commerces. */
 .q-card.noova{background:#1C1917;}
@@ -336,7 +344,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .rv-skel .rv-bar{background:var(--bg2);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
 #lock-bar{height:6px;border-radius:99px;overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
 #lock-bar.on{opacity:1}
-#lock-fill{height:100%;width:100%;background:var(--text-3);border-radius:99px}
+#lock-fill{height:100%;width:100%;background:var(--yellow);border-radius:99px}
 #lock-bar.on #lock-fill{animation:lockDrain 3s linear forwards}
 @keyframes lockDrain{from{width:100%}to{width:0}}
 .btn-sub.locked{pointer-events:none;opacity:.27;}
@@ -527,11 +535,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 #question.qmode-noova.qfull .btn-sub:disabled,#question.qmode-noova.qfull .btn-sub.locked{opacity:1;background:rgba(255,251,215,.14);color:#FFFBD7}
 .qw{padding:52px 20px 22px;min-height:100%;display:flex;flex-direction:column}
 .q-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.q-close{width:38px;height:38px;border-radius:var(--r-btn);background:var(--surface);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--ink)}
+.q-close{width:38px;height:38px;border-radius:var(--r-btn);background:var(--surface);border:none;box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--ink)}
 .q-prog{display:flex;gap:5px;flex:1;margin:0 11px}
 .q-seg{height:5px;flex:1;border-radius:var(--r-pill);background:var(--line-strong);transition:background .28s}
 .q-seg.done{background:var(--surface-2)}.q-seg.cur{background:var(--line-strong)}
-.q-pts{font-size:11px;font-weight:800;background:var(--yellow);color:var(--jaune-ink);border:none;padding:5px 10px;border-radius:var(--r-pill)}
+.q-pts{font-size:11px;font-weight:800;background:var(--yellow);color:var(--ink);border:none;padding:5px 10px;border-radius:var(--r-pill)}
 .brand-hdr{background:none;border:none;border-radius:0;padding:0;display:flex;align-items:center;gap:11px;margin-bottom:20px}
 /* Le fond illustré (bg-question_-*) se voit en entier, sans aucun dégradé dessus (voulu) : le texte a donc
    sa propre carte, plutôt qu'un assombrissement de l'image, pour rester lisible quelle que soit la zone
@@ -554,14 +562,15 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .ans-ta:focus{border-color:var(--coral);}
 .ans-ta::placeholder{color:var(--ink3)}
 .char-ct{font-size:11px;color:var(--ink3);text-align:right}
-.mcq-list{display:flex;flex-direction:column;gap:var(--s2)}
-.mcq-opt{min-height:var(--h-option);padding:var(--s4);border-radius:var(--r-md);background:var(--surface);border:1px solid var(--trait);cursor:pointer;font-size:16px;font-weight:500;color:var(--text);transition:border-color .13s,background .13s;display:flex;align-items:center;text-align:left}
-.mcq-opt.sel{border-color:var(--jaune);background:var(--surface-2);color:var(--text);font-weight:700}
-.mcq-ck{display:none}
+.mcq-list{display:flex;flex-direction:column;gap:8px}
+.mcq-opt{padding:16px;border-radius:18px;background:var(--surface);border:1.5px solid var(--line-strong);cursor:pointer;font-size:16px;font-weight:500;color:var(--ink);transition:all .13s;display:flex;align-items:center;gap:13px}
+.mcq-opt.sel{border-color:var(--ink);background:var(--cd);color:var(--ink);font-weight:700}
+.mcq-ck{width:22px;height:22px;border-radius:var(--r-pill);border:2px solid #C9C3B5;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0;transition:all .13s}
+.mcq-opt.sel .mcq-ck{background:var(--ink);border:7px solid var(--yellow);color:transparent}
 .scale-val{font-family:'Bricolage Grotesque',var(--fd);font-weight:800;font-size:72px;text-align:center;color:var(--ink);line-height:1;margin:10px 0;font-variant-numeric:tabular-nums}
 .scale-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-bottom:7px}
 .scale-inp{width:100%;-webkit-appearance:none;height:6px;border-radius:99px;background:linear-gradient(to right,var(--coral) 41%, var(--bg3) 41%);outline:none;cursor:pointer}
-.scale-inp::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--coral);cursor:pointer;transition:transform .12s}
+.scale-inp::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--coral);box-shadow:0 4px 12px var(--cg);cursor:pointer;transition:transform .12s}
 .scale-inp::-webkit-slider-thumb:active{transform:scale(1.2)}
 .rank-list{display:flex;flex-direction:column;gap:7px}
 .rank-item{padding:13px;border-radius:18px;background:var(--surface);border:1.5px solid var(--line-strong);display:flex;align-items:center;gap:10px;cursor:default;user-select:none}
@@ -796,7 +805,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .stat-c{background:var(--card);border:1.5px solid var(--bg3);border-radius:var(--r);padding:13px 9px;text-align:center}
 .stat-n{font-family:var(--fd);font-weight:800;font-size:23px;line-height:1}
 .stat-l{font-size:10px;color:var(--ink2);margin-top:2px}
-.sec-card{background:var(--surface);border-radius:var(--r-card);margin-bottom:16px;overflow:hidden;}
+.sec-card{background:var(--surface);border-radius:var(--r-card);margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow-card)}
 .sc-hdr{padding:14px 16px;border-bottom:1px solid var(--bg3);display:flex;align-items:center;gap:12px}
 .sec-card.acc .sc-hdr{cursor:pointer;border-bottom:none;padding:18px 16px;user-select:none}
 .sec-card.acc.open .sc-hdr{border-bottom:1px solid var(--bg3)}
@@ -815,7 +824,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .set-ico{width:36px;height:36px;border-radius:12px;background:var(--bg2);color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .set-ico svg{width:18px;height:18px}
 .set-ico.mint{background:var(--md);color:var(--mint)}
-.sc-ico{width:34px;height:34px;border-radius:11px;background:var(--surface-2);color:var(--nv-yellow);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc-ico{width:34px;height:34px;border-radius:11px;background:var(--nv-black);color:var(--nv-yellow);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 /* Repéré en prod : les 6 en-têtes de section du profil sont un mur de carrés noirs identiques,
    aucun repère visuel pour s'orienter d'un coup d'œil. Alterne noir/jaune (les deux seules
    couleurs de la charte) plutôt que d'inventer une teinte hors palette. */
@@ -965,38 +974,49 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .si{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 
 /* — En-tête accueil — */
-.dh-hdr{display:flex;align-items:center;justify-content:space-between;min-height:var(--h-barre);padding:0 var(--s4);background:var(--surface);border-bottom:1px solid var(--trait)}
+.dh-hdr{padding:52px 22px 28px;display:flex;align-items:center;justify-content:space-between}
 /* Même bandeau NOOVS/série/points, répété en haut des écrans Question et Récompense (pour qu'il
    reste visible pendant tout le parcours et que l'animation « pièce gagnée » ait une vraie cible à l'écran). */
-.dh-hdr-compact{flex-shrink:0}
+.dh-hdr-compact{padding:0 2px 18px;flex-shrink:0}
 .dh-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:16px;flex-shrink:0;position:relative;overflow:hidden}
 .dh-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .dh-greet{font-size:12px;color:var(--ink2);margin-bottom:2px}
 .dh-name{font-family:var(--fd);font-weight:800;font-size:24px;letter-spacing:-.8px;color:var(--ink)}
-.dh-pts{display:flex;align-items:center;gap:6px;background:none;color:var(--text);padding:0;border-radius:0;cursor:pointer;border:none}
-/* En-tête : NOOVS (pièce) à gauche, série (flamme) au centre, points à droite — une seule barre
-   plate (fond --surface, bordure basse), trois valeurs, plus de pastille autour de chacune. */
-.dh-noov{display:flex;align-items:center;gap:8px;background:none;color:var(--text);padding:0;border-radius:0;cursor:pointer;border:none}
-.dh-coin{width:26px;height:26px;border-radius:50%;background:var(--jaune);color:var(--jaune-ink);font-family:var(--fd);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.dh-pts{display:flex;align-items:center;gap:6px;background:var(--nv-black);color:var(--nv-yellow);padding:9px 15px;border-radius:var(--r-btn);cursor:pointer;transition:transform .13s;border:none}
+.dh-pts:active{transform:scale(.94)}
+/* En-tête de l'accueil : NOOVS (pièce) à gauche, série (flamme) au centre, points à droite — uniquement des chiffres */
+.dh-noov{display:flex;align-items:center;gap:8px;background:var(--nv-black);color:var(--nv-yellow);padding:5px 15px 5px 5px;border-radius:var(--r-btn);cursor:pointer;transition:transform .13s;border:none}
+.dh-noov:active{transform:scale(.94)}
+.dh-coin{width:30px;height:30px;border-radius:50%;background:var(--nv-yellow);color:var(--nv-black);font-family:var(--fd);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 3px rgba(28,25,23,.22);flex-shrink:0;overflow:hidden}
 .dh-coin img,.dh-flame img{width:100%;height:100%;object-fit:contain}
 .dh-coin.bump,.dh-pts.bump{animation:coinBump .42s ease}
 @keyframes coinBump{0%{transform:scale(1)}35%{transform:scale(1.35)}60%{transform:scale(.9)}100%{transform:scale(1)}}
-.noov-fly{position:fixed;width:34px;height:34px;border-radius:50%;background:var(--jaune);color:var(--jaune-ink);display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;z-index:9999;opacity:1;transition:transform 1.35s cubic-bezier(.3,.75,.3,1),opacity .35s ease 1.05s;will-change:transform,opacity}
+.noov-fly{position:fixed;width:34px;height:34px;border-radius:50%;background:var(--nv-yellow);color:var(--nv-black);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 0 0 3px rgba(28,25,23,.22);pointer-events:none;z-index:9999;opacity:1;transition:transform 1.35s cubic-bezier(.3,.75,.3,1),opacity .35s ease 1.05s;will-change:transform,opacity}
 .noov-fly img{width:100%;height:100%;object-fit:contain}
 .dh-noov-n{font-family:var(--fd);font-weight:800;font-size:15px;font-variant-numeric:tabular-nums}
-.dh-streak{display:flex;align-items:center;gap:3px;font-family:var(--fd);font-weight:800;font-size:19px;color:var(--text);letter-spacing:-.4px;font-variant-numeric:tabular-nums}
-.dh-flame{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--text-3)}
+.dh-streak{display:flex;align-items:center;gap:3px;font-family:var(--fd);font-weight:800;font-size:19px;color:var(--ink);letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+.dh-flame{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#B9B1A2}
 .dh-flame svg{width:100%;height:100%}
-.dh-streak.on .dh-flame{color:var(--jaune)}
-.dh-flame .fo{fill:currentColor}.dh-flame .fi{fill:var(--surface-2)}
-.dh-streak.on .dh-flame .fi{fill:var(--jaune-ink)}
+.dh-streak.on .dh-flame{color:#E07D0A}
+.dh-flame .fo{fill:currentColor}.dh-flame .fi{fill:#FFF3D1}
+.dh-streak.on .dh-flame .fi{fill:#FFC300}
 .dh-flame img{filter:grayscale(1) opacity(.4);transition:filter .2s}
 .dh-streak.on .dh-flame img{filter:none}
 .dh-pts-n{font-family:var(--fd);font-weight:800;font-size:15px;font-variant-numeric:tabular-nums}
-.dh-pts-l{font-size:10px;color:var(--text-2);font-weight:600}
+.dh-pts-l{font-size:10px;color:rgba(255,255,255,.55);font-weight:600}
+
+/* — Header « plein » de l'accueil : bandeau à-plat sombre, pour marquer le moment d'entrée
+   dans l'app plutôt que de répéter le même en-tête discret partout (cf. écrans Question/Récompense,
+   qui gardent .dh-hdr-compact, transparent, sur fond crème). */
+#home .dh-hdr{background-image:radial-gradient(rgba(255,251,215,.05) 1px,transparent 1.5px),linear-gradient(155deg,#1C1917 0%,#2A2013 100%);background-size:13px 13px,100% 100%;border-radius:0;box-shadow:0 4px 14px rgba(28,25,23,.14);margin:0 0 30px;padding:18px 22px 14px}
+#home .dh-hdr .dh-noov,#home .dh-hdr .dh-pts{background:rgba(255,251,215,.12)}
+#home .dh-hdr .dh-pts-l{color:rgba(255,251,215,.55)}
+#home .dh-hdr .dh-streak{color:var(--bg)}
+#home .dh-hdr .dh-flame{color:rgba(255,251,215,.32)}
+#home .dh-hdr .dh-streak.on .dh-flame{color:var(--nv-yellow)}
 
 /* — Carte question du jour (photo + bandeau jaune) — */
-.dtoday-card{margin:0 22px 28px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);transition:transform .13s}
+.dtoday-card{margin:0 22px 28px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
 .dtoday-card>.dtoday-photo{border-radius:26px 26px 0 0;overflow:hidden}
 .dtoday-card>.dtoday-body{border-radius:0 0 26px 26px;overflow:hidden}
 .dtoday-card:active{transform:scale(.98)}
@@ -1004,36 +1024,35 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dtoday-photo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
 .dtoday-photo::after{content:'';position:absolute;inset:0;z-index:0;background:linear-gradient(0deg,rgba(20,12,4,.72) 0%,rgba(20,12,4,.08) 60%,rgba(20,12,4,0) 100%);pointer-events:none}
 .dtoday-photo>*:not(img){position:relative;z-index:1}
-#dtoday-logo>div{}
-.dt-pts{position:absolute;top:134px;right:14px;background:var(--surface-2);color:var(--nv-yellow);font-size:12px;font-weight:800;padding:8px 14px;border-radius:var(--r-tag);transform:rotate(-4deg);z-index:3;}
+#dtoday-logo>div{box-shadow:0 0 0 2px rgba(255,255,255,.9),0 4px 10px rgba(0,0,0,.3)!important}
+.dt-pts{position:absolute;top:134px;right:14px;background:var(--nv-black);color:var(--nv-yellow);font-size:12px;font-weight:800;padding:8px 14px;border-radius:var(--r-tag);transform:rotate(-4deg);z-index:3;box-shadow:0 6px 16px rgba(28,25,23,.25)}
 .dtoday-info{display:flex;align-items:center;gap:10px}
 .dtoday-brand{color:#fff;font-family:var(--fd);font-weight:800;font-size:15.5px;letter-spacing:-.3px;text-shadow:0 1px 3px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dtoday-sub{color:rgba(255,255,255,.8);font-size:11px;margin-top:1px}
-.dtoday-body{background:var(--surface);padding:22px;position:relative;overflow:hidden}
+.dtoday-body{background:var(--nv-yellow);padding:22px;position:relative;overflow:hidden}
 .dtoday-body>*{position:relative;z-index:1}
-.dtoday-q{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.28;color:var(--text);margin-bottom:18px;letter-spacing:-.4px}
-.dtoday-cta{display:inline-flex;align-items:center;gap:9px;background:var(--surface-2);color:var(--ink);font-size:12.5px;font-weight:700;padding:11px 8px 11px 16px;border-radius:var(--r-btn)}
-/* Filigrane de marque — signature visuelle sur chaque surface jaune. Repéré en prod : coupé de
-   moitié par le cadrage précédent (right/bottom trop négatifs), le « ?! » devenait illisible —
-   une forme pâle sans signification, plutôt qu'un vrai filigrane de marque. */
-
-/* — Streak (noir) — */
+.dtoday-q{font-family:var(--fd);font-weight:800;font-size:18px;line-height:1.28;color:var(--nv-yellow-ink);margin-bottom:18px;letter-spacing:-.4px}
+.dtoday-cta{display:inline-flex;align-items:center;gap:9px;background:var(--nv-black);color:#fff;font-size:12.5px;font-weight:700;padding:11px 8px 11px 16px;border-radius:var(--r-btn)}
+.dtoday-cta .tc-arr{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:12px}
+/* Filigrane de marque — signature visuelle sur chaque surface jaune. */
+.mark{position:absolute;right:2px;bottom:-14px;font-size:128px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.35);pointer-events:none;z-index:0}
 
 /* — Presque à toi (même langage visuel que la carte question du jour : photo + bandeau) — */
-.dpat-card{margin:0 22px 22px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);transition:transform .13s}
+.dpat-card{margin:0 22px 22px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
 .dpat-card:active{transform:scale(.98)}
 .dpat-card>.dpat-photo{border-radius:26px 26px 0 0;overflow:hidden}
 .dpat-card>.dpat-body{border-radius:0 0 26px 26px;overflow:hidden}
 .dpat-photo{height:96px;background:var(--nv-photo);position:relative}
 .dpat-photo img{width:100%;height:100%;object-fit:cover;display:block}
 .dpat-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(20,12,4,.18) 0%,rgba(20,12,4,0) 45%)}
-.dpat-pct{position:absolute;top:12px;right:12px;background:var(--surface-2);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:13px;padding:7px 13px;border-radius:var(--r-tag);z-index:2;}
-.dpat-body{background:var(--surface);padding:14px 16px 16px;position:relative;overflow:hidden}
+.dpat-pct{position:absolute;top:12px;right:12px;background:var(--nv-black);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:13px;padding:7px 13px;border-radius:var(--r-tag);z-index:2;box-shadow:0 6px 16px rgba(28,25,23,.25)}
+.dpat-body{background:var(--nv-yellow);padding:14px 16px 16px;position:relative;overflow:hidden}
 .dpat-body>*:not(.mark){position:relative;z-index:1}
+.dpat-body .mark{font-size:84px;bottom:-26px;right:-8px;color:rgba(28,25,23,.1)}
 .dpat-name{font-family:var(--fd);font-weight:800;font-size:16px;color:var(--nv-yellow-ink);letter-spacing:-.3px}
 .dpat-sub{font-size:12px;color:rgba(28,25,23,.65);margin-top:1px;margin-bottom:10px}
-.dpat-bar{height:8px;background:rgba(255,255,255,.16);border-radius:99px;overflow:hidden;margin-bottom:9px}
-.dpat-bar-fill{height:100%;background:var(--text-3);border-radius:99px;transition:width .6s ease}
+.dpat-bar{height:8px;background:rgba(28,25,23,.16);border-radius:99px;overflow:hidden;margin-bottom:9px}
+.dpat-bar-fill{height:100%;background:var(--nv-black);border-radius:99px;transition:width .6s ease}
 .dpat-txt{font-size:12px;color:rgba(28,25,23,.75)}
 .dpat-txt strong{color:var(--nv-black)}
 
@@ -1046,18 +1065,18 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dmap-card{margin:0 22px 22px;border-radius:20px;overflow:hidden;height:172px;position:relative;background:var(--bg2);cursor:pointer}
 .dmap-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:18px;text-align:center;color:var(--ink2);font-size:12px;line-height:1.5;z-index:2;background:var(--bg2)}
 .dmap-empty svg{color:var(--ink3)}
-.dmap-empty button{background:var(--surface-2);color:#fff;border:none;padding:9px 18px;border-radius:var(--r-btn);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fb)}
+.dmap-empty button{background:var(--nv-black);color:#fff;border:none;padding:9px 18px;border-radius:var(--r-btn);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fb)}
 .dmap-illo{position:absolute;inset:0;width:100%;height:100%;display:block}
-.dmap-label{position:absolute;left:14px;bottom:12px;background:var(--surface);border-radius:var(--r-tag);padding:8px 14px;font-size:12px;font-weight:800;color:var(--ink);z-index:1}
+.dmap-label{position:absolute;left:14px;bottom:12px;background:var(--surface);border-radius:var(--r-tag);padding:8px 14px;font-size:12px;font-weight:800;color:var(--ink);box-shadow:var(--shadow-card);z-index:1}
 
 /* — Cartes commerces proches (grille 2 col., texte incrusté sur la photo) — */
 .dnearby-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 22px 10px}
-.dnb-card{background:var(--nv-photo);border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .13s;position:relative;height:148px}
+.dnb-card{background:var(--nv-photo);border-radius:18px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.08);cursor:pointer;transition:transform .13s;position:relative;height:148px}
 .dnb-card:active{transform:scale(.97)}
 .dnb-photo{position:absolute;inset:0}
 .dnb-photo img{width:100%;height:100%;object-fit:cover;display:block}
 .dnb-scrim{position:absolute;inset:0;background:linear-gradient(0deg,rgba(20,12,4,.68) 0%,rgba(20,12,4,0) 58%)}
-.dnb-badge{position:absolute;top:8px;left:8px;z-index:2;font-size:9.5px;font-weight:800;padding:4px 9px;border-radius:var(--r-tag);background:var(--surface-2);color:var(--text)}
+.dnb-badge{position:absolute;top:8px;left:8px;z-index:2;font-size:9.5px;font-weight:800;padding:4px 9px;border-radius:var(--r-tag);background:var(--nv-yellow);color:var(--nv-yellow-ink)}
 .dnb-badge.soon{background:rgba(255,255,255,.92);color:var(--ink2)}
 .dnb-body{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:9px 11px 11px}
 .dnb-name{font-family:var(--fd);font-weight:800;font-size:13.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px rgba(0,0,0,.35)}
@@ -1191,18 +1210,17 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .tier-lbl{font-size:9px;font-weight:700;color:var(--ink2);text-align:center}
 
 /* — Profil : commerces autorisés avec toggle — */
-.dprof-hdr{padding:64px 18px 26px;background:var(--bg);position:relative;overflow:hidden}
+.dprof-hdr{padding:64px 18px 26px;background:var(--nv-yellow);border-radius:0 0 28px 28px;position:relative;overflow:hidden}
 .dprof-id{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;position:relative;z-index:1}
 .dprof-av{width:84px;height:84px;border-radius:50%;background:rgba(28,25,23,.88);border:3px solid rgba(255,255,255,.55);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:30px;color:var(--nv-yellow);position:relative;overflow:hidden;cursor:pointer}
 .dprof-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .dprof-av-edit{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;background:rgba(28,25,23,.92);color:var(--nv-yellow);border:2px solid var(--nv-yellow);display:flex;align-items:center;justify-content:center;z-index:2}
 .dprof-city{font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:-.5px;color:var(--ink)}
 .dprof-lvl{display:inline-block;font-size:10.5px;font-weight:700;background:rgba(24,20,16,.12);color:var(--nv-yellow-ink);padding:4px 10px;border-radius:var(--r-tag);margin-top:6px}
-.dprof-stats{display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-md);margin:14px 18px 14px;position:relative;z-index:2}
-.dprof-stat{flex:1;padding:var(--s3) var(--s2);text-align:center;position:relative}
-.dprof-stat:not(:last-child)::after{content:'';position:absolute;right:0;top:22%;bottom:22%;width:1px;background:var(--trait)}
-.dprof-stat-n{font-family:var(--fd);font-weight:800;font-size:20px;color:var(--text);font-variant-numeric:tabular-nums}
-.dprof-stat-l{font-size:9.5px;color:var(--text-2);margin-top:2px}
+.dprof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 18px 14px;position:relative;z-index:2}
+.dprof-stat{background:var(--card);border-radius:16px;padding:12px 6px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.dprof-stat-n{font-family:var(--fd);font-weight:800;font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+.dprof-stat-l{font-size:9.5px;color:var(--ink2);margin-top:2px}
 .dimpact{margin:0 18px 14px;background:var(--surface-2);border-radius:18px;padding:14px 15px;display:flex;gap:12px;align-items:flex-start;color:#fff}
 .dimpact-ico{width:34px;height:34px;border-radius:10px;background:rgba(255,212,0,.16);color:var(--nv-yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .dimpact-txt{font-size:12.5px;line-height:1.55;color:rgba(255,255,255,.8)}
@@ -1230,9 +1248,9 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       <div class="ob-slide active" id="ob0">
         <div class="ob-illo" style="background:var(--yellow-soft);flex-direction:column;gap:9px;padding:16px">
           <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:7px">
-            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--surface-2);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">B</span>Ta boulangerie</div>
-            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--surface-2);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">R</span>Ton restaurant</div>
-            <div style="font-size:12px;font-weight:600;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--surface-2);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">S</span>Ton salon</div>
+            <div style="font-size:12px;font-weight:600;color:#1C1917;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--jaune-ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">B</span>Ta boulangerie</div>
+            <div style="font-size:12px;font-weight:600;color:#1C1917;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--jaune-ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">R</span>Ton restaurant</div>
+            <div style="font-size:12px;font-weight:600;color:#1C1917;background:#fff;border-radius:11px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:var(--jaune-ink);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center">S</span>Ton salon</div>
           </div>
           <div style="font-family:var(--fd);font-weight:800;font-size:20px;color:var(--jaune-ink);letter-spacing:-.5px;background:#fff;border-radius:14px;padding:10px 16px">Une question, 30 secondes ?</div>
         </div>
@@ -1434,10 +1452,10 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       </div>
       <div class="dt-pts" id="tc-pts">+pts</div>
       <div class="dtoday-body">
-        
+        <div class="mark">?!</div>
         <div class="disc-pill" id="tc-disc">Nouveau près de chez toi · découvre ce commerce</div>
         <div class="dtoday-q" id="tc-q">Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?</div>
-        <div class="dtoday-cta">Répondre en 30 secondes</div>
+        <div class="dtoday-cta">Répondre en 30 secondes <div class="tc-arr">→</div></div>
       </div>
     </div>
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
