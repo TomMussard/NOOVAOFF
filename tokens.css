@@ -25,7 +25,7 @@
 
   /* --- Accent unique --- */
   --jaune:      #FFC300;   /* valeur exacte du logo (favicon.svg) */
-  --jaune-ink:  #1C1917;   /* texte posé sur le jaune */
+  --jaune-ink:  #121016;   /* texte posé sur le jaune */
   --blanc:      #FFFFFF;   /* texte sur photo ou sur aplat sombre de marque */
   --jaune-faible: #3A2F00; /* fond discret d'un état jaune, jamais un bouton */
   --jaune-pale: #FFF3D1;   /* bandeau clair de marque (illustrations d’accueil), toutes ambiances */
@@ -35,6 +35,7 @@
   --ok-ink:     #0C2419;
   --erreur:     #E5484D;
   --erreur-ink: #FFFFFF;
+  --erreur-fort: #B42318;  /* aplat rouge sous texte blanc (bandeau « version test ») : AA */
 
   /* --- Rayons : quatre valeurs, pas une de plus --- */
   --r-xs:       4px;   /* étiquettes (prix, statut, palier) : l'étiquette du commerçant */
@@ -94,7 +95,7 @@
   --text-2:    #5F594E;
   --text-3:    #8A8274;
   --jaune-faible: #FFF3D1;
-  --ok:        #1E7F55;   /* vert assombri : AA sur crème et sur blanc */
+  --ok:        #17663F;   /* vert assombri : AA sur crème, blanc et jaune pâle */
   --erreur:    #C62828;
 }
 .amb-marron {
@@ -106,7 +107,7 @@
   --text-2:    #5F594E;
   --text-3:    #8A8274;
   --jaune-faible: #FFF3D1;
-  --ok:        #1E7F55;
+  --ok:        #17663F;
   --erreur:    #C62828;
 }
 

@@ -111,7 +111,7 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
 html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb);-webkit-font-smoothing:antialiased}
 /* Bandeau « en phase de test » : bloc normal (pas superposé), donc tout le reste de l'app (dont le
    shell fixe ci-dessous) est décalé de sa hauteur — jamais recouvert, jamais à retirer écran par écran. */
-.test-banner{position:fixed;top:0;left:0;right:0;z-index:100000;background:var(--erreur);color:var(--blanc);font-family:var(--fb);font-weight:800;font-size:var(--fs-1);letter-spacing:0;text-align:center;line-height:24px;padding-top:env(safe-area-inset-top,0px)}
+.test-banner{position:fixed;top:0;left:0;right:0;z-index:100000;background:var(--erreur-fort);color:var(--blanc);font-family:var(--fb);font-weight:800;font-size:var(--fs-1);letter-spacing:0;text-align:center;line-height:24px;padding-top:env(safe-area-inset-top,0px)}
 #shell{position:fixed;top:calc(24px + env(safe-area-inset-top,0px));right:0;bottom:0;left:0;background:var(--bg);overflow:hidden}
 @media(min-width:520px){
   #shell{inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:390px;height:844px;border-radius:var(--r-pill);}
@@ -299,7 +299,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .cm-compat-t{font-size:var(--fs-2);line-height:1.4;color:var(--jaune-ink)}
 .cm-compat .cp-bar{background:rgba(18,16,22,.16)}.cm-compat .cp-bar>div{background:var(--jaune-ink)}
 /* Carte « Tes avis ont aidé N commerces » : calculée localement (jamais stockée), réservée à son auteur, toujours en tête du fil. */
-.feed-post.cm-mine{background:var(--surface-2);color:var(--blanc);padding:16px 16px 17px;display:flex;gap:13px;align-items:flex-start}
+.feed-post.cm-mine{background:var(--marque-encre);color:var(--blanc);padding:16px 16px 17px;display:flex;gap:13px;align-items:flex-start}
 .cm-mine-ico{width:36px;height:36px;border-radius:var(--r-sm);background:rgba(255,195,0,.16);color:var(--nv-yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .cm-mine-t{font-size:var(--fs-2);line-height:1.55;color:rgba(255,255,255,.85)}
 .cm-mine-t strong{color:var(--nv-yellow)}
@@ -572,7 +572,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .bh-name{font-family:var(--fd);font-weight:700;font-size:var(--fs-3);color:var(--ink)}
 .bh-usage{font-size:var(--fs-1);color:var(--ink2);margin-top:2px;line-height:1.5}
 .bh-tag{font-size:var(--fs-1);font-weight:700;padding:3px 9px;border-radius:var(--r-tag);white-space:nowrap;margin-left:auto;align-self:flex-start}
-.q-text{font-family:var(--fd);font-weight:800;font-size:var(--fs-6);line-height:1.2;letter-spacing:var(--lettrage-titre);margin-bottom:7px;color:var(--ink)}
+.q-text{font-family:var(--fd);font-weight:800;font-size:var(--fs-5);line-height:1.2;letter-spacing:var(--lettrage-titre);margin-bottom:7px;color:var(--ink)}
 .q-hint{font-size:var(--fs-2);color:var(--ink2);margin-bottom:15px;line-height:1.6}
 .ans-area{flex:1;display:flex;flex-direction:column;gap:8px}
 .ans-ta{min-height:120px;background:var(--surface);border:1.5px solid var(--line-strong);border-radius:var(--r-md);padding:16px;color:var(--ink);font-size:var(--fs-4);line-height:1.6;resize:none;outline:none;transition:border-color .17s;flex:1;font-family:var(--fb)}
