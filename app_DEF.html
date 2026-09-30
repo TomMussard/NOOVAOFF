@@ -81,6 +81,9 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <!-- Leaflet (carte) : chargé à la demande, à la première ouverture de la carte (voir loadLeaflet) -->
 <link rel="stylesheet" href="/tokens.css">
+<!-- Proposition visuelle (DA NOOVA) : ?propo l'active et la mémorise sur l'appareil, ?propo=0 revient à l'app actuelle.
+     Aucun effet sur le code, Firebase ou les données : seule une feuille de style s'ajoute. -->
+<script>try{var q=location.search;if(/[?&]propo=0\b/.test(q))localStorage.removeItem('nv_propo');else if(/[?&]propo\b/.test(q))localStorage.setItem('nv_propo','1');if(localStorage.getItem('nv_propo')==='1'){document.documentElement.classList.add('propo');document.write('<link rel="stylesheet" href="/propo.css">');}}catch(e){}</script>
 <style>
 :root,.screen,.amb-creme,.amb-marron{
   /* Alias historiques du fichier → tokens.css. Ils sont redéclarés sur chaque écran (.screen) et
@@ -4183,8 +4186,8 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
 <div id="auth-wall" style="position:fixed;inset:0;z-index:9999;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;overflow-y:auto;padding-top:calc(40px + env(safe-area-inset-top,0px));padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))">
 
   <div style="text-align:center;margin-bottom:36px">
-    <img src="favicon.svg" alt="Logo Noova" style="height:64px;width:64px;border-radius:var(--r-md);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
-    <div style="font-family:var(--fd);font-weight:900;font-size:var(--fs-6);letter-spacing:var(--lettrage-titre);color:var(--ink);line-height:1">Noova</div>
+    <img class="aw-logo" src="favicon.svg" alt="Logo Noova" style="height:64px;width:64px;border-radius:var(--r-md);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
+    <div class="aw-wordmark" style="font-family:var(--fd);font-weight:900;font-size:var(--fs-6);letter-spacing:var(--lettrage-titre);color:var(--ink);line-height:1">Noova</div>
     <div style="font-size:var(--fs-3);color:var(--ink2);margin-top:8px;line-height:1.7">Les commerces du Mans te posent une question.<br>Tu réponds en 30&nbsp;secondes.</div>
   </div>
 
