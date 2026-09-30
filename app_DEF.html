@@ -662,7 +662,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 #rewards-sheet{position:fixed;inset:0;z-index:8000;display:none;align-items:flex-end}
 #rewards-sheet.open{display:flex}
 .reward-featured{margin:0 18px 14px;border-radius:var(--r-card);padding:16px;position:relative;overflow:hidden;box-shadow:var(--shadow-raised)}
-.reward-featured.on{background:var(--yellow)}
+/* La récompense qu'on peut échanger MAINTENANT est la seule chose vraiment actionnable de tout
+   l'écran — elle a la même silhouette (rectangle arrondi) que le portefeuille, les paliers, les
+   lignes "en cours" juste en dessous. Découpe façon ticket/coupon (coins du haut en biseau au
+   lieu d'arrondis) pour qu'elle se distingue au premier coup d'œil du reste de la pile. */
+.reward-featured.on{background:var(--yellow);border-radius:0 0 var(--r-card) var(--r-card);clip-path:polygon(22px 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%,0 22px)}
 .reward-featured.off{background:var(--surface);box-shadow:var(--shadow-card)}
 .rf-top{display:flex;align-items:center;gap:13px;margin-bottom:12px;position:relative;z-index:1}
 .rf-name{font-family:var(--fd);font-weight:800;font-size:17px;letter-spacing:-.3px;color:var(--ink)}
