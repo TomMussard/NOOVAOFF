@@ -129,10 +129,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
    longueur de la liste en dessous. z-index:-1 le passe derrière le contenu (chaque carte a son
    propre fond opaque par-dessus). Image affichée telle quelle, sans dégradé de voile dessus. */
 .scr-bg{position:fixed;inset:0;z-index:-1;pointer-events:none}
-/* Accueil : l'image a une moitié sombre (diagonale) — un contenu qui scroll peut passer
-   dessus. Plutôt qu'un voile par-dessus (retiré, l'image doit se voir telle quelle), on limite
-   sa hauteur à la zone d'en-tête (toujours au même endroit, jamais de texte en dessous). */
-#home .scr-bg{bottom:auto;height:480px;background:center top/cover no-repeat url(/bg-accueil.svg)}
+#home .scr-bg{background:center top/cover no-repeat url(/bg-accueil.svg)}
+/* L'image couvre tout l'écran (fixe, jamais étirée — cf. note plus haut) ; comme sa moitié
+   basse est sombre, les libellés posés à même le fond (pas dans une carte blanche) reçoivent
+   une petite embase claire pour rester lisibles quelle que soit la portion visible derrière. */
+#home .dsec-h{display:inline-flex;padding:5px 12px;margin-left:18px;margin-right:18px;background:rgba(255,251,215,.86);border-radius:99px;backdrop-filter:blur(6px)}
 #social .scr-bg{background:center top/cover no-repeat url(/bg-communaute.svg)}
 #rewards-tab .scr-bg{background:center top/cover no-repeat url(/bg-recompenses.svg)}
 /* Fond sombre en continu sur Récompenses : les libellés posés à même le fond (pas dans une
@@ -4927,10 +4928,13 @@ function renderHomeState(){
     el.innerHTML='<div style="'+box+'"><div style="'+h+'">NOOVA arrive '+esc(cityPhrase(S._cityLabel))+'.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Aucun commerce de ta ville n\'a encore lancé de question. Dis-nous lesquels tu aimerais voir ici.</div></div>'
       +'<div style="display:flex;gap:8px;margin-bottom:10px"><input id="suggest-inp" type="text" maxlength="80" placeholder="Un commerce à suggérer" style="flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb)"><button onclick="suggestMerchant()" style="padding:0 18px;border-radius:16px;border:none;background:var(--ink);color:#fff;font-family:var(--fd);font-weight:800;font-size:14px;cursor:pointer">Suggérer</button></div>'
       +'<button class="btn-s" onclick="shareNoova()">Inviter mes amis</button>';
+  }else if((S.ans||0)>0){
+    /* Plus de questions pour l'instant, après en avoir répondu aujourd'hui : l'illustration
+       reste affichée (contrairement au cas ci-dessous, jamais retirée). */
+    el.innerHTML='<div style="border-radius:var(--r-card);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow-raised)"><img src="/illus-plus-questions.svg" alt="Plus de questions, merci pour tes réponses" style="display:block;width:100%;aspect-ratio:16/9;object-fit:cover"></div>';
   }else{
-    /* Plus de question à répondre pour l'instant (déjà répondu aujourd'hui, ou rien posté) :
-       on n'affiche rien plutôt qu'un bloc de texte — la page enchaîne directement sur la suite
-       (récompenses en cours, découverte…) au lieu d'un pavé d'explication. */
+    /* Rien à répondre du tout (aucune question postée) : rien à montrer, on n'affiche pas de
+       bloc vide — la page enchaîne directement sur la suite. */
     el.style.display='none';
   }
 }
