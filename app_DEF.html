@@ -122,8 +122,17 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .screen.active{opacity:1;pointer-events:all;visibility:visible;transition-delay:0s;transform:translateX(0)}
 .screen.exit{opacity:0;transform:translateX(-26px);pointer-events:none;visibility:visible;transition-delay:0s}
 .si{min-height:100%;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-/* Fond uni sur les 3 onglets principaux (hérité de .screen{background:var(--bg)}) : rien à
-   déclarer ici — un fond uni ne dépend jamais de la hauteur du contenu. */
+/* Identité de marque (voir NOOVA_DESIGN.md §2-3) : Accueil porte le dégradé or NOOVA plein écran ;
+   Récompenses garde l'illustration de marque (voile sombre pour la lisibilité) ; Communauté et
+   Profil portent le fond marron à carreaux. Les cartes par-dessus restent sombres/plates. */
+#home.screen{background:linear-gradient(90deg,#f29715,#ffda09 79%)}
+#home .sec-lbl,#home .dsec-title{color:var(--jaune-ink)}
+#home .dsec-link{color:rgba(18,16,22,.7)}
+.scr-bg{position:fixed;inset:0;background-size:cover;background-position:center top;background-repeat:no-repeat;pointer-events:none}
+#rewards-tab.screen{background:var(--jaune-ink)}
+#rewards-tab .scr-bg{background-image:linear-gradient(rgba(18,16,22,.6),rgba(18,16,22,.6)),url('bg-recompenses.svg')}
+#rewards-tab .wallet-wrap{position:relative}
+#social.screen,#profile.screen{background-color:#1c0e02;background-image:linear-gradient(rgba(247,244,241,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(247,244,241,.06) 1px,transparent 1px);background-size:24px 24px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{from{opacity:0;transform:scale(.2) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes confFall{to{transform:translateY(120vh) rotate(720deg);opacity:0}}
@@ -1556,6 +1565,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 <!-- WALLET -->
 <div id="rewards-tab" class="screen" tabindex="0" style="outline:none">
+  <div class="scr-bg" aria-hidden="true"></div>
   <div class="wallet-wrap" style="padding-top:0">
     <div class="dwal-hdr">
       <div class="dwal-title">Tes cadeaux</div>

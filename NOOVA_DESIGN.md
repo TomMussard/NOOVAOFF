@@ -24,11 +24,15 @@ Ton : direct, chaleureux, jamais infantilisant. Tutoiement.
 **Une seule idée forte : le ticket.**
 
 Toute récompense, tout gain de points, tout code à présenter en caisse est un
-ticket : bordure nette, coin encoché, chiffres alignés. C'est le seul endroit
-où le design a le droit d'être spectaculaire.
+ticket : bordure nette, coin encoché, chiffres alignés.
 
-Tout le reste — listes, réglages, profil, fiches — est calme, plat et
-répétitif. Si un écran hésite entre sobre et spectaculaire, il est sobre.
+Le design a le droit d'être spectaculaire à deux endroits : le ticket (ci-dessus),
+et le fond plein écran qui porte l'identité de marque sur trois écrans — Accueil
+(dégradé or NOOVA), Récompenses (illustration de marque, voile sombre pour la
+lisibilité), Communauté et Profil (fond marron à carreaux).
+
+Tout le reste — listes, réglages, fiches — est calme, plat et répétitif. Si un
+écran hésite entre sobre et spectaculaire, il est sobre.
 
 ---
 
@@ -36,6 +40,10 @@ répétitif. Si un écran hésite entre sobre et spectaculaire, il est sobre.
 
 - Formes décoratives de fond : blobs, vagues, diagonales, dégradés d'ambiance,
   SVG décoratifs. Aucun. Un fond est une couleur unie.
+  **Exception (2026-09-30) : Accueil (dégradé or plein écran `#f29715→#ffda09`),
+  Récompenses (`bg-recompenses.svg`, voile sombre), Communauté et Profil (fond
+  marron `#1c0e02` à carreaux) portent l'identité de marque. Tous les autres écrans restent sur
+  un fond uni `--bg`.**
 - `box-shadow`. Aucune, nulle part. La séparation se fait par une bordure 1px
   ou par un changement de fond.
 - Dégradés, sauf un dégradé noir vers transparent pour la lisibilité d'un
