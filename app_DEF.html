@@ -131,7 +131,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
    niveau de l'élément qui le consomme. Redéfinir --text/--surface ici ne suffit donc pas : il faut
    aussi redéclarer chaque alias directement pour que les composants existants (qui utilisent
    var(--ink), var(--card)…) suivent le thème crème. */
-#home,#question,#profile{
+#home,#question,#profile,#rewards-tab{
   --bg:#FFFBD7;--surface:#FFFFFF;--surface-2:#FFEC96;--text:#1C1917;--text-2:#5F594E;--trait:#FFF6B8;
   --bg2:#FFF6B8;--bg3:#FFEC96;--card:#FFFFFF;--ink:#1C1917;--ink2:#5F594E;--ink3:#71695D;--icon-gray:#5F594E;
   --violet:#1C1917;--noova-brown:#1c0e02;--noova-cream:#fffbd7;--cream:#FFFBD7;--ink-soft:#3D3830;
@@ -141,15 +141,34 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
   --cd:rgba(255,195,0,.16);--cg:rgba(255,195,0,.4);--vd:rgba(28,25,23,.06);--vg:rgba(28,25,23,.14);
   --md:#E7F0E9;--mg:rgba(38,79,60,.18);--shadow-card:0 8px 22px rgba(28,25,23,.09);
 }
-#home.screen,#question.screen,#profile.screen{background:#FFFBD7}
+#home.screen,#question.screen,#profile.screen,#rewards-tab.screen{background:#FFFBD7}
 /* Le mode « plein écran » de la question (qfull) est une présentation sombre autonome, déjà
    cohérente avant ce retour en arrière — elle ne fait pas partie de la demande, donc elle garde
    les tokens sombres plutôt que d'hériter du crème du reste de #question. */
 #question.qfull{--bg:#121016;--surface:#1B1721;--surface-2:#241F2C;--text:#F7F4F1;--text-2:#A49CAE;
   --text-3:#6F6779;--trait:#2F2937;--ink:#F7F4F1;--ink2:#A49CAE;--ink3:#A49CAE;--card:#1B1721;
   --bg2:#1B1721;--bg3:#241F2C;--muted:#A49CAE;--r-tag:999px;--r-btn:10px;--r-card:14px}
-#rewards-tab.screen{background:linear-gradient(90deg,#f29715,#ffda09 79%)}
-#rewards-tab .dwal-title,#rewards-tab .dsec-h{color:var(--jaune-ink)}
+/* Fonds illustrés plein écran, ancrés à la fenêtre (pas au contenu qui scrolle). */
+.scr-bg{position:fixed;inset:0;background-size:cover;background-position:center top;background-repeat:no-repeat;pointer-events:none}
+#profile .scr-bg{background-image:url('cadre-ref-4.svg')}
+#profile .profile-wrap{position:relative}
+/* Motif de marque en fond de la question, selon son type — seulement quand la carte est visible
+   par-dessus (.qbg-on, mode « bulle ») ou en plein écran (.qfull), jamais les deux superposés. */
+#question.qbg-on.qmode-classique,#question.qmode-classique.qfull{background-image:url('cadre-ref-1.svg');background-size:cover;background-position:center top}
+#question.qmode-noova.qfull{background-image:url('cadre-ref-2.svg');background-size:cover;background-position:center top}
+#question.qbg-on.qmode-noovs,#question.qmode-noovs.qfull{background-image:url('cadre-ref-3.svg');background-size:cover;background-position:center top}
+/* « Toutes les récompenses » (feuille du bas) : illustration de marque en fond. */
+#rewards-sheet .cs-box{position:relative}
+#rewards-sheet .scr-bg{position:absolute;border-radius:24px 24px 0 0}
+#rewards-sheet .cs-box>*:not(.scr-bg){position:relative;z-index:1}
+/* Communauté : le fond marron à carreaux reste (approuvé), les cartes passent en crème avec
+   quelques touches de jaune NOOVA — même recette que Accueil/Profil, sans toucher --bg (utilisé
+   par le fond d'écran lui-même, pas par les cartes). */
+#social{
+  --surface:#FFFFFF;--surface-2:#FFEC96;--text:#1C1917;--text-2:#5F594E;--trait:#FFF6B8;
+  --bg2:#FFF6B8;--bg3:#FFEC96;--card:#FFFFFF;--ink:#1C1917;--ink2:#5F594E;--ink3:#71695D;
+  --r-card:24px;--muted:#5F594E;--line:#FFF6B8;--line-strong:#FFEC96;
+}
 #social.screen{background-color:#1c0e02;background-image:linear-gradient(rgba(247,244,241,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(247,244,241,.06) 1px,transparent 1px);background-size:24px 24px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{from{opacity:0;transform:scale(.2) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
@@ -231,7 +250,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .bp-news-t{font-size:11px;color:var(--ink3);margin-top:3px}
 
 /* ─── Communauté ─── */
-.cm-sec{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--ink3);margin:18px 0 10px}
+.cm-sec{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(247,244,241,.55);margin:18px 0 10px}
 .cm-link{background:none;border:none;color:var(--ink);font-weight:800;font-size:12px;cursor:pointer;font-family:var(--fb);padding:2px 0;text-decoration:underline}
 .cm-hero{margin:0 18px 14px;background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-card);padding:16px 18px;color:var(--ink)}
 .cm-hero-t{font-family:var(--fd);font-weight:800;font-size:15px;display:flex;align-items:center;gap:6px;margin-bottom:10px}
@@ -382,7 +401,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .noov-soon .ns-t{font-family:var(--fd);font-weight:800;font-size:14.5px;color:var(--ink);letter-spacing:-.3px}
 .noov-soon .ns-d{font-size:12px;color:var(--ink2);line-height:1.45;margin-top:2px}
 .noov-soon .ns-tag{flex-shrink:0;background:var(--bg2);color:var(--ink2);border-radius:var(--r-tag);padding:6px 11px;font-size:10.5px;font-weight:800;white-space:nowrap}
-.noov-t{font-family:var(--fd);font-weight:800;font-size:20px;color:#fff;letter-spacing:-.5px}
+.noov-t{font-family:var(--fd);font-weight:800;font-size:20px;color:var(--ink);letter-spacing:-.5px}
 .noov-d{font-size:11.5px;color:rgba(255,255,255,.62);line-height:1.5;margin-top:2px}
 .ob-topbar{padding:56px 22px 0;display:flex;justify-content:flex-end}
 .ob-skip{font-size:13px;font-weight:600;color:var(--ink3);background:none;border:none;cursor:pointer;font-family:var(--fb)}
@@ -503,11 +522,11 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 /* QUESTION */
 /* Fond uni par mode de question — plus d'image ni de calque dédié : un fond uni
    ne peut jamais manquer en bas de page, quelle que soit la longueur de la question. */
-#question.qfull{background:var(--surface)}
-#question.qmode-noovs{background:var(--surface)}
-#question.qmode-noovs.qfull{background:var(--surface)}
-#question.qmode-classique.qfull{background:var(--bg)}
-#question.qmode-noova.qfull{background:#1C1917}
+#question.qfull{background-color:var(--surface)}
+#question.qmode-noovs{background-color:var(--surface)}
+#question.qmode-noovs.qfull{background-color:var(--surface)}
+#question.qmode-classique.qfull{background-color:var(--bg)}
+#question.qmode-noova.qfull{background-color:#1C1917}
 #question.qmode-noova.qfull .q-close{background:rgba(255,251,215,.12);color:#FFFBD7;}
 #question.qmode-noova.qfull .q-seg{background:rgba(255,251,215,.16)}
 #question.qmode-noova.qfull .q-seg.done{background:var(--nv-yellow)}
@@ -618,7 +637,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .rw-title{font-family:var(--fd);font-weight:800;font-size:28px;letter-spacing:-1px;text-align:center;color:var(--ink);margin-bottom:6px;position:relative;z-index:1}
 .rw-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;line-height:1.6;position:relative;z-index:1}
 .pts-earned{width:100%;background:var(--yellow);border:none;border-radius:var(--r-card);padding:18px;display:flex;align-items:center;margin-bottom:10px;position:relative;z-index:1;overflow:hidden;}
-.pts-earned::after{content:'?!';position:absolute;right:-10px;bottom:-30px;font-size:96px;font-weight:800;font-style:italic;line-height:1;color:rgba(28,25,23,.12);pointer-events:none}
+.pts-earned::after{content:url('logo-mark-white.svg');display:block;position:absolute;right:-10px;bottom:-20px;width:96px;height:96px;opacity:.16;pointer-events:none}
 .pe-plus{font-family:var(--fd);font-weight:700;font-size:22px;color:var(--jaune-ink);align-self:flex-start;padding-top:5px;margin-right:2px}
 .pe-num{font-family:'Bricolage Grotesque',var(--fd);font-weight:800;font-size:50px;color:var(--jaune-ink);line-height:1;font-variant-numeric:tabular-nums}
 .pe-right{margin-left:auto;text-align:right}
@@ -678,8 +697,8 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .celebrate-title{position:relative;z-index:1;font-family:var(--fd);font-weight:800;font-size:21px;letter-spacing:-.5px;color:var(--ink);margin-bottom:6px}
 .celebrate-sub{position:relative;z-index:1;font-size:13px;color:var(--ink2);line-height:1.6;padding:0 12px}
 .soc-hdr{padding:0 20px 11px;display:flex;align-items:center;justify-content:space-between}
-.soc-title{font-family:var(--fd);font-weight:800;font-size:25px;letter-spacing:-.8px;color:var(--ink)}
-.soc-bell{width:40px;height:40px;border-radius:var(--r-btn);background:var(--surface);border:none;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative}
+.soc-title{font-family:var(--fd);font-weight:800;font-size:25px;letter-spacing:-.8px;color:#fff}
+.soc-bell{width:40px;height:40px;border-radius:var(--r-btn);background:var(--surface);color:var(--ink);border:none;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative}
 .bell-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--coral);border:2px solid var(--card);display:none}
 .notif-panel{position:fixed;top:60px;right:16px;width:min(320px,calc(100vw - 32px));max-height:420px;background:var(--surface);border:none;border-radius:var(--r-card);overflow-y:auto;z-index:9000;display:none}
 .notif-panel.open{display:block}
@@ -696,7 +715,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .notif-btn.decline{background:var(--bg2);color:var(--ink2)}
 .tab-bar{display:flex;margin:0 18px 16px;background:var(--bg2);border-radius:var(--r-pill);padding:4px;gap:2px}
 .tab-btn{flex:1;padding:9px 4px;border-radius:var(--r-pill);font-size:12px;font-weight:700;text-align:center;cursor:pointer;color:var(--muted);transition:all .16s;background:none;border:none;font-family:var(--fb)}
-.tab-btn.on{background:var(--surface-2);color:#fff;font-weight:700;}
+.tab-btn.on{background:var(--surface-2);color:var(--ink);font-weight:700;}
 .feed-post{margin:0 0 10px;background:var(--surface);border:none;border-radius:var(--r-card);overflow:hidden;}
 .fp-hdr{padding:14px 14px 10px;display:flex;align-items:center;gap:9px}
 .fp-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:14px;flex-shrink:0;position:relative;overflow:hidden}
@@ -1035,7 +1054,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dtoday-cta{display:inline-flex;align-items:center;gap:9px;background:var(--nv-black);color:#fff;font-size:12.5px;font-weight:700;padding:11px 8px 11px 16px;border-radius:var(--r-btn)}
 .dtoday-cta .tc-arr{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:12px}
 /* Filigrane de marque — signature visuelle sur chaque surface jaune. */
-.mark{position:absolute;right:2px;bottom:-14px;font-size:128px;font-weight:800;font-style:italic;line-height:1;color:rgba(255,255,255,.35);pointer-events:none;z-index:0}
+.mark{position:absolute;right:-8px;bottom:-16px;width:108px;height:108px;opacity:.28;pointer-events:none;z-index:0}
 
 /* — Presque à toi (même langage visuel que la carte question du jour : photo + bandeau) — */
 .dpat-card{margin:0 22px 22px;border-radius:26px;overflow:visible;position:relative;cursor:pointer;background:var(--card);box-shadow:0 10px 26px rgba(0,0,0,.09);transition:transform .13s}
@@ -1048,7 +1067,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dpat-pct{position:absolute;top:12px;right:12px;background:var(--nv-black);color:var(--nv-yellow);font-family:var(--fd);font-weight:800;font-size:13px;padding:7px 13px;border-radius:var(--r-tag);z-index:2;box-shadow:0 6px 16px rgba(28,25,23,.25)}
 .dpat-body{background:var(--nv-yellow);padding:14px 16px 16px;position:relative;overflow:hidden}
 .dpat-body>*:not(.mark){position:relative;z-index:1}
-.dpat-body .mark{font-size:84px;bottom:-26px;right:-8px;color:rgba(28,25,23,.1)}
+.dpat-body .mark{width:72px;height:72px;bottom:-16px;right:-8px;opacity:.14}
 .dpat-name{font-family:var(--fd);font-weight:800;font-size:16px;color:var(--nv-yellow-ink);letter-spacing:-.3px}
 .dpat-sub{font-size:12px;color:rgba(28,25,23,.65);margin-top:1px;margin-bottom:10px}
 .dpat-bar{height:8px;background:rgba(28,25,23,.16);border-radius:99px;overflow:hidden;margin-bottom:9px}
@@ -1452,7 +1471,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
       </div>
       <div class="dt-pts" id="tc-pts">+pts</div>
       <div class="dtoday-body">
-        <div class="mark">?!</div>
+        <img class="mark" src="logo-mark-white.svg" alt="" aria-hidden="true">
         <div class="disc-pill" id="tc-disc">Nouveau près de chez toi · découvre ce commerce</div>
         <div class="dtoday-q" id="tc-q">Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?</div>
         <div class="dtoday-cta">Répondre en 30 secondes <div class="tc-arr">→</div></div>
@@ -1645,6 +1664,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 <!-- PROFILE -->
 <div id="profile" class="screen">
+  <div class="scr-bg" aria-hidden="true"></div>
   <div class="profile-wrap" style="padding-top:0">
     <div class="dprof-hdr">
       <div class="dprof-id">
@@ -2551,10 +2571,10 @@ async function renderFeedDocs(el, docs) {
   const mine = feedImpactCard();
   if (token !== _feedRenderToken) return;
   if (!docs.length && !compat.length && !mine) {
-    el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--ink2);font-size:13px;line-height:1.7">
+    el.innerHTML = `<div style="text-align:center;padding:40px 24px;color:rgba(247,244,241,.65);font-size:13px;line-height:1.7">
         Le fil s'anime avec les nouveautés des commerces que tu autorises et les progrès de tes amis.<br>
-        <span style="color:var(--ink);font-weight:700">Autorise des commerces ou invite des amis pour le remplir.</span><br>
-        <button onclick="shareInvite()" style="margin-top:14px;padding:11px 22px;background:var(--surface-2);color:var(--yellow);font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:var(--r-btn);cursor:pointer">Inviter un ami</button>
+        <span style="color:#fff;font-weight:700">Autorise des commerces ou invite des amis pour le remplir.</span><br>
+        <button onclick="shareInvite()" style="margin-top:14px;padding:11px 22px;background:var(--yellow);color:var(--jaune-ink);font-family:var(--fd);font-weight:800;font-size:13px;border:none;border-radius:var(--r-btn);cursor:pointer">Inviter un ami</button>
       </div>`;
     return;
   }
@@ -6447,6 +6467,7 @@ auth.onAuthStateChanged(user => {
 <div id="rewards-sheet">
   <div class="cs-ov" onclick="closeRewardsSheet()"></div>
   <div class="cs-box">
+    <div class="scr-bg" aria-hidden="true" style="background-image:url('bg-recompenses.svg')"></div>
     <div class="cs-handle"></div>
     <div class="cs-close-bar"><div class="back-btn" onclick="closeRewardsSheet()">✕</div></div>
     <div class="dsec-h" style="padding:0">Récompenses près de toi</div>
