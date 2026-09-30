@@ -205,7 +205,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     await up.evaluate(r => { window.__p = redeemReward(r); }, rdata);
     await waitFn(up, () => document.getElementById('redeem-confirm'), null, 8000);
     const conf = await up.$eval('#redeem-confirm', e => e.textContent);
-    check('Confirmation d\'échange maison (« Palier 1 · 150 pts », solde restant, validité), sans aucun euro', /Débité/.test(conf) && /Palier 1 · 150 pts/.test(conf) && /250 pts/.test(conf) && /24 h/.test(conf) && !/€/.test(conf), conf.replace(/\s+/g, ' ').slice(0, 120));
+    check('Confirmation d\'échange maison (« Palier 1, 150 pts », solde restant, validité), sans aucun euro', /Débité/.test(conf) && /Palier 1, 150 pts/.test(conf) && /250 pts/.test(conf) && /24 h/.test(conf) && !/€/.test(conf), conf.replace(/\s+/g, ' ').slice(0, 120));
     await up.evaluate(() => document.getElementById('rc-yes').click());
     await waitFn(up, () => document.getElementById('voucher-full'), null, 10000);
     const red = await adb.collection('redemptions').where('userId', '==', uuid).get();

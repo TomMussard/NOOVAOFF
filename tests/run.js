@@ -30,6 +30,17 @@ function buildSite() {
     if (dst === "admin.html") out = out.replace("const fx  = firebase.app().functions('europe-west1');", "const fx  = firebase.app().functions('europe-west1');fx.useEmulator('127.0.0.1',5001);");
     fs.writeFileSync(path.join(SITE, dst), out);
   });
+  // Réseau restreint (bac à sable sans accès à gstatic.com) : FIREBASE_SDK_DIR pointe vers une copie locale du SDK
+  // (npm pack firebase@10.12.2), servie sous /firebasejs/ à la place du CDN.
+  if (process.env.FIREBASE_SDK_DIR) {
+    fs.mkdirSync(path.join(SITE, "firebasejs"), { recursive: true });
+    fs.readdirSync(process.env.FIREBASE_SDK_DIR).filter((f) => /^firebase-.*\.js$/.test(f)).forEach((f) => fs.copyFileSync(path.join(process.env.FIREBASE_SDK_DIR, f), path.join(SITE, "firebasejs", f)));
+    fs.readdirSync(SITE).filter((f) => /\.(html|js)$/.test(f)).forEach((f) => {
+      const file = path.join(SITE, f), txt = fs.readFileSync(file, "utf8");
+      const out = txt.replace(/https:\/\/www\.gstatic\.com\/firebasejs\/[0-9.]+\//g, "/firebasejs/");
+      if (out !== txt) fs.writeFileSync(file, out);
+    });
+  }
 }
 
 function serve(port) {

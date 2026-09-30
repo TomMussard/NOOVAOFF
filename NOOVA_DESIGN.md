@@ -26,33 +26,57 @@ Ton : direct, chaleureux, jamais infantilisant. Tutoiement.
 Toute récompense, tout gain de points, tout code à présenter en caisse est un
 ticket : bordure nette, coin encoché, chiffres alignés.
 
-Le design a le droit d'être spectaculaire à deux endroits : le ticket (ci-dessus),
-et le fond plein écran qui porte l'identité de marque sur trois écrans — Accueil
-(dégradé or NOOVA), Récompenses (illustration de marque, voile sombre pour la
-lisibilité), Communauté et Profil (fond marron à carreaux).
+### Une app mixte, assumée
 
-Tout le reste — listes, réglages, fiches — est calme, plat et répétitif. Si un
-écran hésite entre sobre et spectaculaire, il est sobre.
+NOOVA ne vit pas dans une seule couleur. Chaque écran a une **ambiance**, choisie
+pour ce qu'il raconte, et c'est voulu : une app de quartier n'a pas l'uniformité
+d'un produit sorti d'un générateur.
+
+| Ambiance | Classe | Écrans |
+|---|---|---|
+| Crème | `amb-creme` | Accueil, Question (bulle), Récompenses, Profil |
+| Marron à carreaux | `amb-marron` | Communauté |
+| Sombre (par défaut) | aucune | Bienvenue, connexion, sous-pages et réglages, page commerce, question plein écran |
+
+Une ambiance ne change **que les couleurs** (fond, surface, texte, trait).
+Tout le reste est identique partout, et c'est ce qui fait que l'app reste une
+seule app : la même police, la même échelle de tailles, les quatre mêmes rayons,
+les mêmes boutons, les mêmes libellés, les mêmes marges.
+
+Le design a le droit d'être spectaculaire à deux endroits : le ticket (ci-dessus)
+et le fond de marque plein écran (illustrations de question, bandeau du profil,
+feuille des récompenses). Tout le reste — listes, réglages, fiches — est calme,
+plat et répétitif. Si un écran hésite entre sobre et spectaculaire, il est sobre.
+
+### Ce qui trahit une app « faite par une IA » — à ne jamais faire
+
+- Des cartes très arrondies (20px et plus) partout, avec une ombre douce.
+- De petits sur-titres espacés (`letter-spacing`) au-dessus de chaque titre.
+- Des pastilles de toutes les couleurs (violet, rose, bleu, vert) pour des catégories.
+- Des listes qui apparaissent en fondu, carte après carte.
+- Des emojis à la place des icônes, des `✨` pour dire « nouveau ».
+- Des flèches `→` dans chaque bouton.
+- Des méta-infos enfilées avec des `·`.
 
 ---
 
 ## 3. Interdits absolus
 
 - Formes décoratives de fond : blobs, vagues, diagonales, dégradés d'ambiance,
-  SVG décoratifs. Aucun. Un fond est une couleur unie.
-  **Exception (2026-09-30) : Accueil (dégradé or plein écran `#f29715→#ffda09`),
-  Récompenses (`bg-recompenses.svg`, voile sombre), Communauté et Profil (fond
-  marron `#1c0e02` à carreaux) portent l'identité de marque. Tous les autres écrans restent sur
-  un fond uni `--bg`.**
+  SVG décoratifs. Un fond est une couleur unie (celle de son ambiance).
+  **Exceptions : les fonds de marque listés au §2** (illustrations de question
+  `bg-question-*.svg`, feuille des récompenses `bg-recompenses.svg`, carreaux de
+  Communauté, bandeau du profil).
 - `box-shadow`. Aucune, nulle part. La séparation se fait par une bordure 1px
   ou par un changement de fond.
 - Dégradés, sauf un dégradé noir vers transparent pour la lisibilité d'un
   texte posé sur une image.
 - Le jaune en fond d'écran ou en fond de grande zone.
 - Plus d'un bouton jaune par écran.
-- `border-radius` supérieur à 14px sur une carte, 10px sur un bouton.
-  Le 999px est réservé aux puces de statut et aux avatars.
-- Libellés en majuscules (`text-transform: uppercase`).
+- Un rayon hors de l'échelle : `--r-xs` 4px (étiquettes), `--r-sm` 10px
+  (boutons, champs), `--r-md` 14px (cartes), `--r-lg` 20px (feuilles du bas et
+  bandeaux de marque uniquement). `--r-pill` est réservé aux avatars et interrupteurs.
+- Libellés en majuscules (`text-transform: uppercase`) ou espacés (`letter-spacing` positif).
 - Flèches `→` ou `›` collées au texte d'un bouton.
 - Méta-informations jointes par des points médians (`Boulangerie · le-mans`).
 - Emojis en guise d'icônes.
@@ -69,6 +93,15 @@ Pour ajouter une couleur, ajoute un token — ne l'écris jamais dans un composa
 
 Espacements : uniquement des multiples de 4px, via `--s1` à `--s7`.
 
+Typographie : deux familles auto-hébergées, `--font-titre` (Bricolage Grotesque,
+titres et chiffres) et `--font` (Plus Jakarta Sans, texte). Neuf tailles, pas une
+de plus : `--fs-1` 11px, `--fs-2` 13px, `--fs-3` 15px, `--fs-4` 17px, `--fs-5` 21px,
+`--fs-6` 28px, `--fs-7` 34px, `--fs-8` 48px, `--fs-9` 72px.
+
+Couleurs de marque brutes (`--marque-creme`, `--marque-encre`, `--marque-marron`,
+`--marque-or-1/2`, `--marque-brule`) : pour les fonds de marque et les ambiances,
+jamais directement dans un composant.
+
 ---
 
 ## 5. Usage de la couleur
@@ -79,7 +112,8 @@ Le jaune sert à trois choses, et à rien d'autre :
 2. les points et les compteurs de gain ;
 3. l'élément actif : onglet en cours, option sélectionnée.
 
-Le vert sert uniquement à confirmer une action réussie.
+Le vert sert uniquement à confirmer une action réussie. Un encadré
+d'information (« Tu gardes le contrôle ») est neutre : `--surface-2`, texte `--text-2`.
 Le rouge sert uniquement à une erreur ou une suppression.
 Tout le reste vit en noir, gris et blanc cassé.
 
@@ -140,8 +174,16 @@ Plate, fond `--surface`, bordure basse 1px `--trait`, hauteur 56px.
 Trois valeurs maximum. Les chiffres en `--blanc`, les libellés en `--text-2`.
 
 ### Libellé de section
-Sentence case, `--t-label`, couleur `--text-2`. Pas de majuscules.
-« Confidentialité », pas « CONFIDENTIALITÉ ».
+Sentence case, `--t-label`, couleur `--text-2`. Pas de majuscules, pas
+d'espacement de lettres. « Confidentialité », pas « CONFIDENTIALITÉ ».
+
+### Sur-titre d'écran (`.auth-badge`)
+Une seule forme : étiquette `--r-xs`, fond `--surface-2`, texte `--text-2`,
+`--fs-2`. Jamais colorée selon l'écran.
+
+### Avatars et pastilles de catégorie
+Tons chauds de la marque uniquement (or brûlé, ocre, brun, encre).
+Jamais de violet, de rose, de bleu ou de vert.
 
 ---
 
@@ -192,6 +234,8 @@ cartes. Respecter `prefers-reduced-motion`.
 - Un seul bouton jaune par écran.
 - Aucune ombre dans le CSS produit.
 - Aucune valeur en dur hors de `tokens.css`.
+- Espace insécable avant `?`, `!`, `:` et `;` (typographie française).
+- Captures avant / après : `SUITES=visual_shots sh tests/run.sh` (images dans `/tmp/shots/visual`).
 - Le nombre de points affiché est le même partout pour une même action.
 - Chaque commerce affiche sa vraie catégorie.
 - Aucun texte de remplissage générique n'est resté à l'écran.

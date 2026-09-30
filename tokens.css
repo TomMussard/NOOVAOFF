@@ -3,8 +3,17 @@
    Aucune valeur en dur ailleurs dans le projet. */
 
 :root {
-  /* --- Fonds --- */
-  --bg:         #121016;   /* fond d'écran, partout */
+  /* --- Couleurs de marque (valeurs brutes, à ne consommer que via les ambiances ci-dessous,
+         ou pour les fonds plein écran de marque) --- */
+  --marque-creme:  #FFFBD7;  /* fond crème des écrans Accueil, Question, Récompenses, Profil */
+  --marque-encre:  #1C1917;  /* texte sur crème et sur jaune */
+  --marque-marron: #1C0E02;  /* fond à carreaux de Communauté */
+  --marque-or-1:   #F29715;  /* dégradé or : départ */
+  --marque-or-2:   #FFDA09;  /* dégradé or : arrivée */
+  --marque-brule:  #A14E08;  /* or brûlé : pastille de points, carte portefeuille, avatars */
+
+  /* --- Fonds (ambiance sombre, par défaut) --- */
+  --bg:         #121016;   /* fond d'écran */
   --surface:    #1B1721;   /* cartes, barres */
   --surface-2:  #241F2C;   /* carte sélectionnée ou active */
   --trait:      #2F2937;   /* bordures et séparateurs, 1px */
@@ -17,17 +26,23 @@
   /* --- Accent unique --- */
   --jaune:      #FFC300;   /* valeur exacte du logo (favicon.svg) */
   --jaune-ink:  #121016;   /* texte posé sur le jaune */
+  --blanc:      #FFFFFF;   /* texte sur photo ou sur aplat sombre de marque */
   --jaune-faible: #3A2F00; /* fond discret d'un état jaune, jamais un bouton */
+  --jaune-pale: #FFF3D1;   /* bandeau clair de marque (illustrations d’accueil), toutes ambiances */
 
   /* --- États --- */
   --ok:         #3FBF87;
   --ok-ink:     #0C2419;
   --erreur:     #E5484D;
+  --erreur-ink: #FFFFFF;
+  --erreur-fort: #B42318;  /* aplat rouge sous texte blanc (bandeau « version test ») : AA */
 
-  /* --- Rayons --- */
-  --r-sm:       10px;  /* boutons, champs */
+  /* --- Rayons : quatre valeurs, pas une de plus --- */
+  --r-xs:       4px;   /* étiquettes (prix, statut, palier) : l'étiquette du commerçant */
+  --r-sm:       10px;  /* boutons, champs, vignettes */
   --r-md:       14px;  /* cartes */
-  --r-pill:     999px; /* puces de statut, avatars uniquement */
+  --r-lg:       20px;  /* feuilles du bas et grands bandeaux de marque uniquement */
+  --r-pill:     999px; /* avatars et interrupteurs uniquement */
 
   /* --- Espacements (multiples de 4) --- */
   --s1: 4px;
@@ -38,14 +53,26 @@
   --s6: 32px;
   --s7: 48px;
 
-  /* --- Typographie --- */
-  --font: 'Nunito', system-ui, -apple-system, sans-serif; /* remplacer par la police du projet */
+  /* --- Typographie : deux familles, auto-hébergées (fonts/noova-fonts.css) --- */
+  --font-titre: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif; /* titres, chiffres */
+  --font:       'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;   /* texte courant */
 
-  --t-display: 700 32px/1.1  var(--font);
-  --t-title:   700 21px/1.25 var(--font);
-  --t-body:    400 15px/1.5  var(--font);
-  --t-label:   500 13px/1.3  var(--font);
-  --t-chiffre: 700 15px/1    var(--font);
+  /* Échelle de tailles : neuf crans. Toute taille de police vient d'ici. */
+  --fs-1: 11px;  /* micro : étiquettes, badges */
+  --fs-2: 13px;  /* libellés, méta, légendes */
+  --fs-3: 15px;  /* texte courant */
+  --fs-4: 17px;  /* titre de carte, bouton */
+  --fs-5: 21px;  /* titre d'écran */
+  --fs-6: 28px;  /* grand chiffre */
+  --fs-7: 34px;  /* titre d'accueil, question plein écran */
+  --fs-8: 48px;  /* solde de points */
+  --fs-9: 72px;  /* code en caisse, curseur */
+
+  --t-display: 800 var(--fs-7)/1.08 var(--font-titre);
+  --t-title:   800 var(--fs-5)/1.2  var(--font-titre);
+  --t-body:    400 var(--fs-3)/1.5  var(--font);
+  --t-label:   600 var(--fs-2)/1.3  var(--font);
+  --t-chiffre: 800 var(--fs-3)/1    var(--font-titre);
 
   --lettrage-titre: -0.02em;
 
@@ -54,6 +81,34 @@
   --h-option:   56px;
   --h-barre:    56px;
   --tactile-min: 44px;
+}
+
+/* --- Ambiances : l'app est volontairement mixte (voir NOOVA_DESIGN.md §2).
+       Une ambiance ne change QUE les couleurs. Rayons, typo, espacements et composants
+       sont identiques partout : c'est ce qui fait que l'app reste une seule app. --- */
+.amb-creme {
+  --bg:        var(--marque-creme);
+  --surface:   #FFFFFF;
+  --surface-2: #FFEC96;
+  --trait:     #EDE3B3;
+  --text:      var(--marque-encre);
+  --text-2:    #5F594E;
+  --text-3:    #8A8274;
+  --jaune-faible: #FFF3D1;
+  --ok:        #17663F;   /* vert assombri : AA sur crème, blanc et jaune pâle */
+  --erreur:    #C62828;
+}
+.amb-marron {
+  --bg:        var(--marque-marron);
+  --surface:   #FFFFFF;
+  --surface-2: #FFEC96;
+  --trait:     #EDE3B3;
+  --text:      var(--marque-encre);
+  --text-2:    #5F594E;
+  --text-3:    #8A8274;
+  --jaune-faible: #FFF3D1;
+  --ok:        #17663F;
+  --erreur:    #C62828;
 }
 
 /* Le fond couvre tout l'écran, encoches comprises */
