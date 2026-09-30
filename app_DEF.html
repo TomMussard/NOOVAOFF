@@ -122,6 +122,24 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .screen.active{opacity:1;pointer-events:all;visibility:visible;transition-delay:0s;transform:translateX(0)}
 .screen.exit{opacity:0;transform:translateX(-26px);pointer-events:none;visibility:visible;transition-delay:0s}
 .si{min-height:100%;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+/* DA par onglet — un fond illustré distinct par écran principal (au lieu d'un aplat
+   identique partout). background-attachment:fixed + le transform déjà posé sur .screen
+   ancrent l'image au cadre de l'écran (jamais à la hauteur totale, scrollable, du contenu),
+   donc elle ne s'étire jamais : cf. .screen{transform:...} plus haut. */
+/* DA par onglet — un fond illustré distinct par écran principal (au lieu d'un aplat identique
+   partout), posé sur un calque position:fixed à l'intérieur de chaque .screen : comme .screen a
+   toujours un transform (cf. plus haut), ce calque reste ancré au cadre de l'écran (jamais à la
+   hauteur totale, scrollable, du contenu) — testé : ne s'étire jamais, quelle que soit la
+   longueur de la liste en dessous. z-index:-1 le passe derrière le contenu (chaque carte a son
+   propre fond opaque par-dessus). */
+.scr-bg{position:fixed;inset:0;z-index:-1;pointer-events:none}
+#home .scr-bg{background:linear-gradient(180deg,rgba(255,251,215,0) 0%,rgba(255,251,215,.65) 62%,var(--bg) 78%),center top/cover no-repeat url(/bg-accueil.svg)}
+#social .scr-bg{background:center top/cover no-repeat url(/bg-communaute.svg)}
+#rewards-tab .scr-bg{background:center top/cover no-repeat url(/bg-recompenses.svg)}
+/* Fond sombre en continu sur Récompenses : les libellés posés à même le fond (pas dans une
+   carte blanche) doivent repasser en clair, sinon texte sombre illisible sur fond sombre. */
+#rewards-tab .dwal-title,#rewards-tab .dsec-h{color:#FFFBD7}
+#rewards-tab .dsec-h span{color:rgba(255,251,215,.6)!important}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{from{opacity:0;transform:scale(.2) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes confFall{to{transform:translateY(120vh) rotate(720deg);opacity:0}}
@@ -490,15 +508,15 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
    question plutôt qu'un aplat — le shell reste toujours à taille fixe (390px, cf. #shell), donc
    l'image (521px de large) ne remonte jamais en dessous de sa résolution native. Un dégradé vers
    --bg est posé par-dessus pour que la carte de réponse (.q-content-card) reste bien lisible. */
-#question.qbg-on.qmode-classique{background:linear-gradient(180deg,rgba(28,25,23,0) 0%,var(--bg) 82%),center top/cover no-repeat url(/bg-question_-classique.png)}
-#question.qbg-on.qmode-noovs{background:linear-gradient(180deg,rgba(28,25,23,0) 0%,var(--bg) 82%),center top/cover no-repeat url(/bg-question_-noovs.png)}
+#question.qbg-on.qmode-classique{background:linear-gradient(180deg,rgba(28,25,23,0) 0%,var(--bg) 82%),center top/cover no-repeat url(/bg-question-classique.svg)}
+#question.qbg-on.qmode-noovs{background:linear-gradient(180deg,rgba(28,25,23,0) 0%,var(--bg) 82%),center top/cover no-repeat url(/bg-question-noovs.svg)}
 /* Question posée par NOOVA (pas un commerce) : toujours en plein cadre, fond sombre premium plutôt que la
    couleur pièce — pour qu'on la distingue d'un coup d'œil d'une question classique ou « à NOOVS ». Comme le
    fond change de famille de couleur (sombre au lieu de clair), chaque élément texte/pastille du plein-écran
    générique est réinversé ici plutôt que réutilisé tel quel. Le 3e fond illustré (bg-question_-noova.png,
    prévu pour ce cas précis) était resté posé mais jamais branché — assombri pour garder le texte clair
    lisible, avec le dégradé plat en repli si l'image ne charge pas. */
-#question.qmode-noova.qfull{background:linear-gradient(165deg,rgba(42,32,19,.88) 0%,rgba(28,25,23,.92) 65%,rgba(18,15,10,.95) 100%),center 30%/cover no-repeat url(/bg-question_-noova.png),linear-gradient(165deg,#2A2013 0%,#1C1917 65%,#120F0A 100%)}
+#question.qmode-noova.qfull{background:linear-gradient(165deg,rgba(42,32,19,.88) 0%,rgba(28,25,23,.92) 65%,rgba(18,15,10,.95) 100%),center 30%/cover no-repeat url(/bg-question-noova.svg),linear-gradient(165deg,#2A2013 0%,#1C1917 65%,#120F0A 100%)}
 #question.qmode-noova.qfull .q-close{background:rgba(255,251,215,.12);color:#FFFBD7;box-shadow:none}
 #question.qmode-noova.qfull .q-seg{background:rgba(255,251,215,.16)}
 #question.qmode-noova.qfull .q-seg.done{background:var(--nv-yellow)}
@@ -1210,15 +1228,15 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .tier-lbl{font-size:9px;font-weight:700;color:var(--ink2);text-align:center}
 
 /* — Profil : commerces autorisés avec toggle — */
-.dprof-hdr{padding:52px 18px 16px;background:var(--nv-yellow);border-radius:0 0 28px 28px;position:relative;overflow:hidden}
-.dprof-title{font-family:var(--fd);font-weight:800;font-size:24px;color:var(--nv-yellow-ink);letter-spacing:-.6px;margin-bottom:14px}
-.dprof-id{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
-.dprof-av{width:56px;height:56px;border-radius:50%;background:rgba(28,25,23,.88);border:2.5px solid rgba(255,255,255,.5);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:21px;color:var(--nv-yellow);position:relative;overflow:hidden;cursor:pointer}
+.dprof-hdr{padding:64px 18px 26px;background:var(--nv-yellow);border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+.dprof-hdr::before{content:'';position:absolute;left:-8%;right:-8%;bottom:-6%;height:130px;background:center/cover no-repeat url(/element-noova.svg);opacity:.28;pointer-events:none}
+.dprof-id{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;position:relative;z-index:1}
+.dprof-av{width:84px;height:84px;border-radius:50%;background:rgba(28,25,23,.88);border:3px solid rgba(255,255,255,.55);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:30px;color:var(--nv-yellow);position:relative;overflow:hidden;cursor:pointer}
 .dprof-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .dprof-av-edit{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;background:rgba(28,25,23,.92);color:var(--nv-yellow);border:2px solid var(--nv-yellow);display:flex;align-items:center;justify-content:center;z-index:2}
-.dprof-city{font-family:var(--fd);font-weight:800;font-size:21px;letter-spacing:-.5px;color:var(--ink);margin-bottom:5px}
-.dprof-lvl{display:inline-block;font-size:10.5px;font-weight:700;background:rgba(24,20,16,.12);color:var(--nv-yellow-ink);padding:4px 10px;border-radius:99px}
-.dprof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:-18px 18px 14px;position:relative;z-index:2}
+.dprof-city{font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:-.5px;color:var(--ink)}
+.dprof-lvl{display:inline-block;font-size:10.5px;font-weight:700;background:rgba(24,20,16,.12);color:var(--nv-yellow-ink);padding:4px 10px;border-radius:99px;margin-top:6px}
+.dprof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 18px 14px;position:relative;z-index:2}
 .dprof-stat{background:var(--card);border-radius:16px;padding:12px 6px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.08)}
 .dprof-stat.on{background:var(--nv-black);color:#fff}
 .dprof-stat-n{font-family:var(--fd);font-weight:800;font-size:20px;color:var(--ink)}
@@ -1440,6 +1458,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 <!-- HOME -->
 <div id="home" class="screen">
+  <div class="scr-bg" aria-hidden="true"></div>
   <div class="ptr-bar" id="ptr-home">↻ Actualisation…</div>
   <div class="si">
     <div class="dh-hdr">
@@ -1551,6 +1570,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 <!-- SOCIAL -->
 <div id="social" class="screen">
+  <div class="scr-bg" aria-hidden="true"></div>
   <div class="ptr-bar" id="ptr-social">↻ Actualisation…</div>
   <div class="social-wrap">
     <div class="soc-hdr">
@@ -1598,6 +1618,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 
 <!-- WALLET -->
 <div id="rewards-tab" class="screen" tabindex="0" style="outline:none">
+  <div class="scr-bg" aria-hidden="true"></div>
   <div class="wallet-wrap" style="padding-top:0">
     <div class="dwal-hdr">
       <div class="dwal-title">Tes cadeaux</div>
@@ -1651,18 +1672,14 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 <div id="profile" class="screen">
   <div class="profile-wrap" style="padding-top:0">
     <div class="dprof-hdr">
-      <div class="mark" style="font-size:148px;bottom:-16px;right:2px">?!</div>
-      <div class="dprof-title" style="position:relative">Ton profil</div>
       <div class="dprof-id">
         <div class="dprof-av" id="prof-av" onclick="document.getElementById('avatar-file-inp').click()">
           <span id="prof-av-letter">A</span>
           <div class="dprof-av-edit"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><circle cx="12" cy="13.5" r="3.2"/></svg></div>
         </div>
         <input type="file" id="avatar-file-inp" accept="image/*" style="display:none" onchange="changeMyAvatar(this.files[0])">
-        <div>
-          <div class="dprof-city" id="prof-email">alex@noova.app</div>
-          <div class="dprof-lvl" id="pl-name">Niveau 1 · Curieux</div>
-        </div>
+        <div class="dprof-city" id="prof-email">alex@noova.app</div>
+        <div class="dprof-lvl" id="pl-name">Niveau 1 · Curieux</div>
       </div>
       <div style="display:none" id="prof-name">Alex</div>
       <div style="display:none" id="pl-xp">0 / 1000 pts</div>
@@ -4909,10 +4926,11 @@ function renderHomeState(){
     el.innerHTML='<div style="'+box+'"><div style="'+h+'">NOOVA arrive '+esc(cityPhrase(S._cityLabel))+'.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Aucun commerce de ta ville n\'a encore lancé de question. Dis-nous lesquels tu aimerais voir ici.</div></div>'
       +'<div style="display:flex;gap:8px;margin-bottom:10px"><input id="suggest-inp" type="text" maxlength="80" placeholder="Un commerce à suggérer" style="flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb)"><button onclick="suggestMerchant()" style="padding:0 18px;border-radius:16px;border:none;background:var(--ink);color:#fff;font-family:var(--fd);font-weight:800;font-size:14px;cursor:pointer">Suggérer</button></div>'
       +'<button class="btn-s" onclick="shareNoova()">Inviter mes amis</button>';
-  }else if((S.ans||0)>0){
-    el.innerHTML='<div style="'+box+'"><div style="'+h+'">C\'est fait pour aujourd\'hui.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Merci pour tes réponses. Reviens demain pour de nouvelles questions.</div></div>';
   }else{
-    el.innerHTML='<div style="'+box+'"><div style="'+h+'">Pas encore de question.</div><div style="font-size:13px;color:var(--ink);line-height:1.6">Les commerces de ta ville n\'ont rien posé pour l\'instant. Reviens bientôt.</div></div>';
+    /* Plus de question à répondre pour l'instant (déjà répondu aujourd'hui, ou rien posté) :
+       on n'affiche rien plutôt qu'un bloc de texte — la page enchaîne directement sur la suite
+       (récompenses en cours, découverte…) au lieu d'un pavé d'explication. */
+    el.style.display='none';
   }
 }
 async function suggestMerchant(){
@@ -5001,7 +5019,7 @@ async function loadRewardsFromFirestore() {
       gg.innerHTML = '';
       if(!rewards.length) {
         gg.style.gridTemplateColumns = '1fr';
-        gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px;line-height:1.6">Les récompenses arrivent bientôt dans ta ville !<br>Continue de répondre pour accumuler des points</div>';
+        gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:13px">Récompenses bientôt disponibles.</div>';
       } else {
         // Grille de carrés simples, une carte par récompense (jusqu'à 5 par commerce, du moins
         // cher au plus cher) — le solde s'utilise chez n'importe quel commerce visible de la ville.
@@ -5114,7 +5132,7 @@ function renderInProgressRewards(){
     .sort((a,b) => (rewardCost(a)-S.pts) - (rewardCost(b)-S.pts)).slice(0,5);
   if(countEl) countEl.textContent = rewards.length ? '· '+rewards.length : '';
   renderTierTrack();
-  if(!rewards.length){ el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:12.5px">Tu peux échanger tous tes points dès maintenant !</div>'; return; }
+  if(!rewards.length){ el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:12.5px">Tout est disponible dès maintenant.</div>'; return; }
   el.innerHTML = rewards.map(r => {
     const pct = Math.max(0, Math.min(100, (S.pts / rewardCost(r)) * 100));
     const circ = 2*Math.PI*20;
@@ -6483,11 +6501,10 @@ function closeCelebration(){
 </script>
 
 <!-- Loader initial — seul écran visible au démarrage -->
-<div id="app-loader" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:38px;background:radial-gradient(130% 120% at 55% -5%,#241F1C 0%,#1C1917 60%);transition:opacity .7s ease">
-  <img src="favicon.svg" alt="Logo Noova" style="width:136px;height:136px;border-radius:31px;box-shadow:0 22px 54px rgba(0,0,0,.4);animation:pop .65s cubic-bezier(.34,1.56,.64,1) .2s both">
-  <div style="transform:skewX(-9deg);background:linear-gradient(100deg,#f29715 0%,#ffda09 100%);padding:12px 24px;border-radius:9px;box-shadow:0 10px 26px rgba(0,0,0,.3);animation:fadeUp .5s ease .95s both">
-    <div style="transform:skewX(9deg);font-family:var(--fd);font-weight:800;font-style:italic;font-size:13px;letter-spacing:.3px;color:#1C1917;text-align:center;white-space:nowrap">LÀ OÙ TES AVIS ONT DE LA VALEUR.</div>
-  </div>
+<div id="app-loader" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(130% 120% at 55% -5%,#241F1C 0%,#1C1917 60%);transition:opacity .7s ease">
+  <img src="favicon.svg" alt="" style="width:120px;height:120px;border-radius:27px;box-shadow:0 22px 54px rgba(0,0,0,.4);animation:pop .65s cubic-bezier(.34,1.56,.64,1) .2s both">
+  <img src="texte-noova-jaune.svg" alt="Noova" style="width:168px;height:auto;animation:fadeUp .5s ease .5s both">
+  <div style="font-family:var(--fb);font-weight:600;font-size:12.5px;letter-spacing:.2px;color:rgba(255,255,255,.55);text-align:center;animation:fadeUp .5s ease .8s both">Là où tes avis ont de la valeur.</div>
 </div>
 </body>
 </html>
