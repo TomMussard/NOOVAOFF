@@ -1,0 +1,87 @@
+/* NOOVA — tokens
+   Source unique de vérité pour couleur, espacement, rayon, typo.
+   Aucune valeur en dur ailleurs dans le projet. */
+
+:root {
+  /* --- Fonds --- */
+  --bg:         #121016;   /* fond d'écran, partout */
+  --surface:    #1B1721;   /* cartes, barres */
+  --surface-2:  #241F2C;   /* carte sélectionnée ou active */
+  --trait:      #2F2937;   /* bordures et séparateurs, 1px */
+
+  /* --- Texte --- */
+  --text:       #F7F4F1;
+  --text-2:     #A49CAE;   /* secondaire, libellés */
+  --text-3:     #6F6779;   /* désactivé */
+
+  /* --- Accent unique --- */
+  --jaune:      #FFC400;   /* remplacer par la valeur exacte du logo SVG */
+  --jaune-ink:  #121016;   /* texte posé sur le jaune */
+  --jaune-faible: #3A2F00; /* fond discret d'un état jaune, jamais un bouton */
+
+  /* --- États --- */
+  --ok:         #3FBF87;
+  --ok-ink:     #0C2419;
+  --erreur:     #E5484D;
+
+  /* --- Rayons --- */
+  --r-sm:       10px;  /* boutons, champs */
+  --r-md:       14px;  /* cartes */
+  --r-pill:     999px; /* puces de statut, avatars uniquement */
+
+  /* --- Espacements (multiples de 4) --- */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;   /* marge latérale de l'écran */
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  /* --- Typographie --- */
+  --font: 'Nunito', system-ui, -apple-system, sans-serif; /* remplacer par la police du projet */
+
+  --t-display: 700 32px/1.1  var(--font);
+  --t-title:   700 21px/1.25 var(--font);
+  --t-body:    400 15px/1.5  var(--font);
+  --t-label:   500 13px/1.3  var(--font);
+  --t-chiffre: 700 15px/1    var(--font);
+
+  --lettrage-titre: -0.02em;
+
+  /* --- Hauteurs --- */
+  --h-bouton:   52px;
+  --h-option:   56px;
+  --h-barre:    56px;
+  --tactile-min: 44px;
+}
+
+/* Le fond couvre tout l'écran, encoches comprises */
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font: var(--t-body);
+  min-height: 100%;
+}
+
+body {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Aucune ombre dans l'app */
+* { box-shadow: none; }
+
+h1 { font: var(--t-display); letter-spacing: var(--lettrage-titre); }
+h2 { font: var(--t-title);   letter-spacing: var(--lettrage-titre); }
+
+.points, .stat, .compteur, .prix {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
