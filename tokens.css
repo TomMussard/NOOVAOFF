@@ -15,7 +15,7 @@
   --text-3:     #6F6779;   /* désactivé */
 
   /* --- Accent unique --- */
-  --jaune:      #FFC400;   /* remplacer par la valeur exacte du logo SVG */
+  --jaune:      #FFC300;   /* valeur exacte du logo (favicon.svg) */
   --jaune-ink:  #121016;   /* texte posé sur le jaune */
   --jaune-faible: #3A2F00; /* fond discret d'un état jaune, jamais un bouton */
 

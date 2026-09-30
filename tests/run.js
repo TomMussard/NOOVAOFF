@@ -11,7 +11,7 @@ const ROOT = path.join(__dirname, ".."), SITE = path.join(__dirname, ".site");
 function buildSite() {
   fs.rmSync(SITE, { recursive: true, force: true });
   fs.mkdirSync(SITE, { recursive: true });
-  fs.readdirSync(ROOT).filter((f) => /\.(png|svg)$/.test(f)).concat(["icons.js", "firebase-messaging-sw.js", "manifest.json", "consent.js", "tiers.js", "legal.css", "robots.txt", "sitemap.xml", "llms.txt", "index.html"])
+  fs.readdirSync(ROOT).filter((f) => /\.(png|svg)$/.test(f)).concat(["icons.js", "firebase-messaging-sw.js", "manifest.json", "consent.js", "tiers.js", "legal.css", "tokens.css", "robots.txt", "sitemap.xml", "llms.txt", "index.html"])
     .concat(fs.readdirSync(ROOT).filter((f) => /\.html$/.test(f) && !/^(app_DEF|noova_dashboard|noova_admin|index)\.html$/.test(f)))
     .forEach((f) => fs.copyFileSync(path.join(ROOT, f), path.join(SITE, f)));
   fs.cpSync(path.join(ROOT, "fonts"), path.join(SITE, "fonts"), { recursive: true });
