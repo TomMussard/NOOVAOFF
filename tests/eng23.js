@@ -147,7 +147,7 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
     await a.close();
   });
 
-  await T('app habitant : Palier N · X pts, aucun euro',async()=>{
+  await T('app habitant : Palier N, X pts, aucun euro',async()=>{
     await wipe();
     await db.doc('merchants/m1').set({role:'merchant',ownerUid:'m1',brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:'m1@shop.fr'});
     await db.doc('users/me').set({role:'user',welcomeClaimed:true,name:'Alex',email:'me@t.fr',city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:400,xp:400,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true});
@@ -159,16 +159,16 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
     await wf(u,()=>document.getElementById('home').classList.contains('active')&&S.user&&(S._rewardsCache||[]).length===5,null,30000);
     await u.evaluate(()=>{document.querySelectorAll('[id*=tour],.tour-ov').forEach(e=>e.remove());openRewardsSheet();});await sleep(800);
     const g=await u.evaluate(()=>({cards:[...document.querySelectorAll('#gift-grid .gift-c')].map(c=>c.textContent.replace(/\s+/g,' ').trim()),sheet:document.getElementById('rewards-sheet').innerText,locked:document.querySelectorAll('#gift-grid .gift-c.locked').length}));
-    check('Cartes : « Palier N · X pts » pour chaque récompense (150, 300, 500 débloquées avec 400 pts : 2 ; 900 et 1500 verrouillées)',g.cards.length===5&&g.cards[0].includes('Palier 1 · 150 pts')&&g.cards[4].includes('Palier 5 · 1500 pts')&&g.locked===3,g);
+    check('Cartes : « Palier N, X pts » pour chaque récompense (150, 300, 500 débloquées avec 400 pts : 2 ; 900 et 1500 verrouillées)',g.cards.length===5&&g.cards[0].includes('Palier 1, 150 pts')&&g.cards[4].includes('Palier 5, 1500 pts')&&g.locked===3,g);
     check('Aucun euro nulle part côté habitant (feuille des récompenses)',!/€|euro/i.test(g.sheet),g.sheet.match(/.{15}(€|euro).{15}/i));
     await u.evaluate(()=>closeRewardsSheet&&closeRewardsSheet());
     await u.evaluate(()=>goNav('rewards-tab'));await sleep(800);
     const rt=await u.$eval('#rewards-tab',e=>e.innerText);
-    check('Écran Récompenses : « Palier … » et aucun euro',/Palier \d · \d+ pts|Échanger/.test(rt)&&!/€|euro/i.test(rt),rt.match(/.{15}(€|euro).{15}/i));
+    check('Écran Récompenses : « Palier … » et aucun euro',/Palier \d, \d+ pts|Échanger/.test(rt)&&!/€|euro/i.test(rt),rt.match(/.{15}(€|euro).{15}/i));
     // échange puis limite hebdomadaire
     await u.evaluate(()=>{window.__r=redeemReward((S._rewardsCache||[]).find(r=>r.tier===2));});await wf(u,()=>document.getElementById('redeem-confirm'),null,8000);
     const conf=await u.$eval('#redeem-confirm',e=>e.innerText.replace(/\s+/g,' '));
-    check('Confirmation : Palier 2 · 300 pts, il reste 100 pts, sans euro',/Palier 2 · 300 pts/.test(conf)&&/100 pts/.test(conf)&&!/€/.test(conf),conf);
+    check('Confirmation : Palier 2, 300 pts, il reste 100 pts, sans euro',/Palier 2, 300 pts/.test(conf)&&/100 pts/.test(conf)&&!/€/.test(conf),conf);
     await u.evaluate(()=>document.getElementById('rc-yes').click());await wf(u,()=>document.getElementById('voucher-full'),null,15000);
     const vt=await u.$eval('#voucher-full',e=>e.innerText.replace(/\s+/g,' '));
     check('Bon plein écran : le code, la condition « avec un achat » SANS montant en euros',/Valable avec un achat/.test(vt)&&!/€/.test(vt)&&/^[A-Z2-9]{4}$/.test((await db.collection('redemptions').where('userId','==','me').get()).docs[0].data().code),vt);

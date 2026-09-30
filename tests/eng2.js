@@ -98,7 +98,7 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     await shot('compat_list');
     check('Liste d\'amis unique : triée par compatibilité (100 → 78 → 50 → encore N → privé → en attente)',rows.map(r=>r.n).join()==='User fB,User fA,User fE,User fF,User fC,User fD',rows);
     check('Liste : pastille de compatibilité (100 %, 78 %)',rows[0].p==='100 %'&&rows[1].p==='78 %',rows.slice(0,2));
-    check('Liste : « encore 1 » sous le seuil (détail dans l\'infobulle)',rows[3].p==='encore 1'&&/Répondez à 1 question de plus/.test(rows[3].t),rows[3]);
+    check('Liste : « encore 1 » sous le seuil (détail dans l\'infobulle)',rows[3].p==='encore 1'&&/Réponds à 1 question de plus/.test(rows[3].t),rows[3]);
     check('Liste : « privé » pour l\'ami qui ne partage pas',rows[4].p==='privé'&&/Ne partage pas/.test(rows[4].t),rows[4]);
     check('Chaque ligne affiche ses xp et sa série',rows.every(r=>/xp/.test(r.s)&&/ j/.test(r.s)),rows.map(r=>r.s));
     check('Liste : l\'ami non réciproque apparaît « en attente » (jamais comparé)',rows.some(r=>r.n==='User fD'&&r.p==='en attente'),rows.filter(r=>r.n==='User fD'));
@@ -117,7 +117,7 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     await p.evaluate(()=>openFriendProfile(S.friends.find(f=>f.uid==='fF')));
     await wf(p,()=>document.querySelector('#fp-compat .fpr-lbl'),null,10000);
     const need=await p.$eval('#fp-compat',e=>e.textContent);
-    check('Profil d\'ami sous le seuil : « Répondez à 1 question de plus », pas de score',/Répondez à 1 question de plus/.test(need)&&!/%/.test(need),need);
+    check('Profil d\'ami sous le seuil : « Réponds à 1 question de plus », pas de score',/Réponds à 1 question de plus/.test(need)&&!/%/.test(need),need);
     await p.evaluate(()=>goTo('social'));
     // règles : réponses d'un ami qui ne partage pas
     const acc=await p.evaluate(async()=>{const t=async fn=>{try{await fn();return 'allowed';}catch(e){return e.code;}};
