@@ -1222,7 +1222,7 @@ html,body{height:100%;overflow:hidden;background:#1A1820;font-family:var(--fb);-
 .dprof-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .dprof-av-edit{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;background:rgba(28,25,23,.92);color:var(--nv-yellow);border:2px solid var(--nv-yellow);display:flex;align-items:center;justify-content:center;z-index:2}
 .dprof-city{font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:-.5px;color:var(--ink)}
-.dprof-lvl{display:inline-block;font-size:10.5px;font-weight:700;background:rgba(24,20,16,.12);color:var(--nv-yellow-ink);padding:4px 10px;border-radius:99px;margin-top:6px}
+.dprof-lvl{display:inline-block;font-size:10.5px;font-weight:700;background:rgba(24,20,16,.12);color:var(--nv-yellow-ink);padding:4px 10px;border-radius:var(--r-tag);margin-top:6px}
 .dprof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 18px 14px;position:relative;z-index:2}
 .dprof-stat{background:var(--card);border-radius:16px;padding:12px 6px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.08)}
 .dprof-stat.on{background:var(--nv-black);color:#fff}
@@ -5018,7 +5018,7 @@ async function loadRewardsFromFirestore() {
           const locked = S.pts < rewardCost(r);
           const card = document.createElement('div');
           card.className = 'gift-c' + (locked ? ' locked' : '');
-          card.innerHTML = `<div style="margin-bottom:7px">${logoHTML(r.merchantName||r.label,38)}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${esc(r.merchantName||'Commerce')}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${r.icon?esc(r.icon):icon('gift-generic',{size:12})} ${esc(r.label||'Récompense')}</div><div style="margin-top:7px;font-size:10px;font-weight:800;padding:3px 9px;border-radius:99px;background:${locked?'var(--bg2)':'var(--coral)'};color:${locked?'var(--ink3)':'var(--ink)'};display:inline-block">${esc(tierLabel(r))}</div>`;
+          card.innerHTML = `<div style="margin-bottom:7px">${logoHTML(r.merchantName||r.label,38)}</div><div style="font-size:13px;font-weight:700;color:var(--ink)">${esc(r.merchantName||'Commerce')}</div><div style="font-size:11px;color:var(--ink2);margin-top:2px">${r.icon?esc(r.icon):icon('gift-generic',{size:12})} ${esc(r.label||'Récompense')}</div><div style="margin-top:7px;font-size:10px;font-weight:800;padding:3px 9px;border-radius:var(--r-tag);background:${locked?'var(--bg2)':'var(--coral)'};color:${locked?'var(--ink3)':'var(--ink)'};display:inline-block">${esc(tierLabel(r))}</div>`;
           if(!locked) card.onclick = () => redeemReward(r);
           gg.appendChild(card);
         });
