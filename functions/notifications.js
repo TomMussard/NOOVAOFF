@@ -462,7 +462,9 @@ async function notifyEndingCampaigns(now, caches) {
 }
 
 // ─────────────────────────── Fonctions exportées ───────────────────────────
-const notifTick = onSchedule({ schedule: "every 15 minutes", timeZone: "Europe/Paris", retryCount: 0 }, async () => {
+// 9 minutes et 1 Go : à 12h30 (heure par défaut des nouveaux comptes), des milliers d'habitants peuvent recevoir leur
+// question du jour dans le même passage ; le délai par défaut (60 s) couperait l'envoi en plein milieu.
+const notifTick = onSchedule({ schedule: "every 15 minutes", timeZone: "Europe/Paris", retryCount: 0, timeoutSeconds: 540, memory: "1GiB" }, async () => {
   const r = await runTick(Date.now());
   logger.info("notifTick", r);
 });
