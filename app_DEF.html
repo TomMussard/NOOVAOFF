@@ -5,6 +5,7 @@
 <!-- Consentement aux traceurs : aucune mesure d'audience ne démarre avant un choix explicite (voir consent.js) -->
 <script src="/consent.js"></script>
 <script src="/tiers.js"></script>
+<script src="/interests.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Noova, ton quartier te pose une question</title>
 <meta name="description" content="Les commerces du Mans te posent une question. Tu réponds en 30 secondes et tu échanges tes points contre une récompense en boutique.">
@@ -1384,16 +1385,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
   <div style="width:100%;max-width:340px">
     <div style="font-family:var(--fd);font-weight:800;font-size:var(--fs-6);color:var(--ink);letter-spacing:var(--lettrage-titre);margin-bottom:8px">Ce qui t'intéresse</div>
     <div style="font-size:var(--fs-3);color:var(--ink2);margin-bottom:22px;line-height:1.7">On te proposera en priorité les questions de ces commerces.</div>
-    <div id="cat-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
-      <button type="button" class="int-chip" data-cat="restauration" onclick="toggleCat(this)">Restauration</button>
-      <button type="button" class="int-chip" data-cat="boulangerie" onclick="toggleCat(this)">Boulangerie</button>
-      <button type="button" class="int-chip" data-cat="sport" onclick="toggleCat(this)">Sport</button>
-      <button type="button" class="int-chip" data-cat="beaute" onclick="toggleCat(this)">Beauté</button>
-      <button type="button" class="int-chip" data-cat="culture" onclick="toggleCat(this)">Culture</button>
-      <button type="button" class="int-chip" data-cat="commerce" onclick="toggleCat(this)">Commerce de proximité</button>
-      <button type="button" class="int-chip" data-cat="services" onclick="toggleCat(this)">Ville et services</button>
-      <button type="button" class="int-chip" data-cat="all" onclick="toggleCat(this)">Tout m'intéresse</button>
-    </div>
+    <div id="cat-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
     <div id="cat-err" style="color:var(--erreur);font-size:var(--fs-2);display:none;margin-bottom:10px">Choisis au moins une catégorie.</div>
     <button id="cat-submit" onclick="saveCategories()" style="width:100%;padding:16px;border-radius:var(--r-md);background:var(--coral);border:none;color:var(--jaune-ink);font-size:var(--fs-4);font-weight:800;font-family:var(--fd);cursor:pointer">Continuer</button>
   </div>
@@ -1904,15 +1896,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
   <div style="background:var(--card);border-radius:var(--r-lg) var(--r-lg) 0 0;max-width:430px;width:100%;padding:22px 22px calc(24px + env(safe-area-inset-bottom,0px))">
     <div style="width:36px;height:4px;background:var(--bg3);border-radius:var(--r-pill);margin:0 auto 18px"></div>
     <div style="font-family:var(--fd);font-weight:800;font-size:var(--fs-4);color:var(--ink);margin-bottom:14px;text-align:center">Tes centres d'intérêt</div>
-    <div id="interests-edit-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'restauration')">Restauration</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'boulangerie')">Boulangerie</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'sport')">Sport</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'beaute')">Beauté</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'culture')">Culture</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'commerce')">Commerce de proximité</button>
-      <button type="button" class="int-chip" onclick="toggleSettingsInterest(this,'services')">Ville et services</button>
-    </div>
+    <div id="interests-edit-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px"></div>
     <button class="btn-p" onclick="confirmInterestsEditSheet()">Enregistrer</button>
   </div>
 </div>
@@ -2046,7 +2030,7 @@ function refreshSettingsDisplay(){
   const cEl=document.getElementById('set-u-city'); if(cEl) cEl.textContent=S._cityLabel||'\u2014';
   const AGE_LABELS={'16-17':'16\u201317 ans','18-24':'18\u201324 ans','25-34':'25\u201334 ans','35-49':'35\u201349 ans','50-64':'50\u201364 ans','65+':'65+ ans'};
   const aEl=document.getElementById('set-u-age'); if(aEl) aEl.textContent=AGE_LABELS[S._age]||'\u2014';
-  const INT_LABELS={boulangerie:'Boulangerie',beaute:'Beaut\u00e9',commerce:'Commerce de proximit\u00e9',services:'Ville et services',restauration:'Restauration',sport:'Sport',gaming:'Gaming',musique:'Musique',voyage:'Voyage',mode:'Mode',tech:'Tech',culture:'Culture',cafe:'Caf\u00e9',shopping:'Shopping'};
+  const INT_LABELS=Object.fromEntries(NOOVA_INTERESTS.INTERESTS.map(i=>[i.key,i.label]));   // interests.js
   const iEl=document.getElementById('set-u-interests'); if(iEl) iEl.textContent=(S._interests&&S._interests.length)?S._interests.map(i=>INT_LABELS[i]||i).join(', '):'\u2014';
   const eEl=document.getElementById('set-u-email'); if(eEl) eEl.textContent=(S.user&&S.user.email)||(auth.currentUser&&auth.currentUser.email)||'\u2014';
 }
@@ -2113,12 +2097,16 @@ async function confirmAgeEditSheet(){
 }
 
 let _settingsInterests=[];
+// Centres d'intérêt : une seule liste (interests.js), la même que celle du ciblage des campagnes dans le dashboard.
+function interestChipsHTML(onclick,withAll){
+  return NOOVA_INTERESTS.INTERESTS.map(i=>`<button type="button" class="int-chip" data-cat="${i.key}" onclick="${onclick}">${esc(i.label)}</button>`).join('')
+    +(withAll?`<button type="button" class="int-chip" data-cat="all" onclick="${onclick}">Tout m'intéresse</button>`:'');
+}
 function openInterestsEditSheet(){
-  _settingsInterests=(S._interests||[]).slice();
-  document.querySelectorAll('#interests-edit-grid .int-chip').forEach(b=>{
-    const val=b.getAttribute('onclick').match(/'([a-z]+)'/)[1];
-    b.classList.toggle('sel', _settingsInterests.includes(val));
-  });
+  _settingsInterests=NOOVA_INTERESTS.valid(S._interests);
+  const g=document.getElementById('interests-edit-grid');
+  g.innerHTML=interestChipsHTML('toggleSettingsInterest(this,this.dataset.cat)',false);
+  g.querySelectorAll('.int-chip').forEach(b=>b.classList.toggle('sel', _settingsInterests.includes(b.dataset.cat)));
   document.getElementById('interests-edit-sheet').style.display='flex';
 }
 function closeInterestsEditSheet(){ document.getElementById('interests-edit-sheet').style.display='none'; }
@@ -2136,6 +2124,8 @@ async function confirmInterestsEditSheet(){
     S._interests=_settingsInterests.slice();
     refreshSettingsDisplay();
     closeInterestsEditSheet();
+    // Le ciblage des campagnes dépend des centres d'intérêt : la file du jour se recalcule tout de suite.
+    loadCampaignsFromFirestore({ city:S._city, interests:S._interests, answeredCampaigns:S._answered||[], authorizedMerchants:S._authorizedMerchants||[] });
     showToast('Mis \u00e0 jour.','success');
     trackEvent('profile_field_updated', { field:'interests' });
   }catch(e){ showToast('Erreur : '+e.message,'error'); }
@@ -3933,7 +3923,7 @@ async function loadNearbyMerchants(merchantIds) {
 // Liste des commerces à proximité (autorisés + campagnes actives), avec indicateur
 // "a une question active" — source commune pour le rail (legacy), la grille de
 // l'accueil et les pins de la carte.
-const CAT_LABELS={restauration:'Restauration',boulangerie:'Boulangerie',sport:'Sport',beaute:'Beauté',culture:'Culture',commerce:'Commerce',services:'Ville et services'};
+const CAT_LABELS=Object.fromEntries(NOOVA_INTERESTS.INTERESTS.map(i=>[i.key,i.label]));   // interests.js
 
 // Tous les commerces vérifiés de la ville (pas seulement les autorisés) : la carte est un outil de
 // découverte, chaque commerce porte son état (question active, autorisé, demande, à venir).
@@ -4303,21 +4293,7 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
       </div>
     </div>
 
-    <div id="aw-interests-wrap" style="display:none">
-      <div style="font-size:var(--fs-1);font-weight:700;letter-spacing:0;color:var(--ink2);margin-bottom:7px">Centres d'intérêt <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:var(--fs-1)">(1 min.)</span></div>
-      <div style="display:flex;flex-wrap:wrap;gap:7px">
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'restauration')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg></span> Restauration</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'sport')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.3 3.6 5.6 3.6 9s-1.2 6.7-3.6 9c-2.4-2.3-3.6-5.6-3.6-9S9.6 5.3 12 3z"/></svg></span> Sport</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'gaming')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg></span> Gaming</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'musique')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/><path d="M9 17.5V5.5l10-2v10"/></svg></span> Musique</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'voyage')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l7-2-3-6 2.5-.7L14 10l6-1.6a1.6 1.6 0 0 1 2 1.5c0 .7-.4 1.3-1 1.5L4.5 17z"/><path d="M9 17.5 7 21M13 17.5l1 3.5"/></svg></span> Voyage</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'mode')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l1 3-3 2-3-2z"/><path d="M9 4 4 7l2.5 3L8 9v11h8V9l1.5-2L20 7l-5-3"/></svg></span> Mode</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'tech')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="11" rx="1.4"/><path d="M9 20h6M12 16v4"/><path d="M8 9l2 2-2 2M13 13h3"/></svg></span> Tech</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'culture')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l8-4.5L20 8l-8 4.5z"/><path d="M6.5 9.5v6L12 18l5.5-2.5v-6"/><path d="M20 8v6.5"/></svg></span> Culture</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'cafe')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 5.5c0-1 1-1 1-2M10.5 5.5c0-1 1-1 1-2"/></svg></span> Café</button>
-        <button type="button" class="int-chip" onclick="toggleInterest(this,'shopping')"><span style="display:inline-flex;width:13px;height:13px;vertical-align:-2px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span> Shopping</button>
-      </div>
-    </div>
+    <div id="aw-interests-wrap" style="display:none"></div>
 
     <datalist id="aw-city-list"><option value="Le Mans"><option value="Angers"></datalist>
     <input id="aw-email" type="email" placeholder="Email" autocomplete="email" style="width:100%;padding:14px 16px;border-radius:var(--r-md);border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:var(--fs-3);outline:none;font-family:var(--fb);box-sizing:border-box">
@@ -4795,6 +4771,7 @@ async function afterAccountCreated(uid){
 // ─── U5 : catégories ─────────────────────────────────────────
 function showCategoryWall(uid){
   const w=document.getElementById('cat-wall');w._uid=uid;
+  document.getElementById('cat-grid').innerHTML=interestChipsHTML('toggleCat(this)',true);
   const have=S._interests||[];
   w.querySelectorAll('.int-chip').forEach(c=>c.classList.toggle('sel',have.includes(c.dataset.cat)));
   document.getElementById('cat-err').style.display='none';
@@ -4821,7 +4798,7 @@ async function saveCategories(){
 }
 
 // ─── Demandes des commerces (modèle « demande d'ami ») ────────
-const CAT_KEYS=['restauration','boulangerie','sport','beaute','culture','commerce','services'];
+const CAT_KEYS=NOOVA_INTERESTS.KEYS;   // interests.js
 function sectorCat(sec){
   const s=(sec||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   if(/boulang|patiss|viennois/.test(s))return 'boulangerie';
@@ -6082,6 +6059,8 @@ function recomputeCampaignFeed(city) {
       if (d.endsAt && d.endsAt.toMillis && d.endsAt.toMillis() < Date.now()) return; // campagne terminée
       const ageRanges = getCampaignAgeRanges(d).map(normalizeAgeRange);
       if (ageRanges.length && userAge && !ageRanges.includes(userAge)) return;
+      // Centres d'intérêt ciblés par le commerçant (même règle que le serveur, interests.js).
+      if (!NOOVA_INTERESTS.targetsUser(d.targetInterests, S._interests)) return;
       // Commerce pas encore suivi : question « découverte », proposée selon les centres d'intérêt, ou à une petite part au hasard.
       const followed = byNoova || authorized.includes(d.merchantId);
       let discoveryReason = '';

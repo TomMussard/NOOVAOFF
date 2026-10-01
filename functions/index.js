@@ -1,4 +1,5 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const INTERESTS = require("./interests");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
@@ -127,6 +128,10 @@ exports.submitAnswer = onCall(async (request) => {
     const userAge = user.ageRange || user.age || "";
     if (ageRanges.length && userAge && !ageRanges.includes(userAge)) {
       throw new HttpsError("permission-denied", "Cette campagne ne cible pas ta tranche d'âge.");
+    }
+    // Centres d'intérêt ciblés par le commerçant : même règle que l'app (interests.js).
+    if (!INTERESTS.targetsUser(camp.targetInterests, user.interests)) {
+      throw new HttpsError("permission-denied", "Cette campagne ne cible pas tes centres d'intérêt.");
     }
     // Réponse valide pour le format de la question (jamais confiance au client : réponse vide ou hors liste refusée).
     {
@@ -360,7 +365,7 @@ exports.estimateReach = onCall(async (request) => {
 
 /**
  * estimateCampaign — estimation des réponses d'une campagne à partir des données réelles de la ville du commerçant :
- *  - habitants inscrits (et part qui correspond aux tranches d'âge choisies : seul filtre réellement appliqué à l'envoi),
+ *  - habitants inscrits (et part qui correspond aux tranches d'âge et aux centres d'intérêt choisis : les filtres appliqués à l'envoi),
  *  - réponses valides des 14 derniers jours dans la ville (rythme réel de l'activité) et nombre de campagnes actives
  *    qui se partagent cette attention.
  * Seuls des nombres agrégés sont renvoyés. Le client en déduit l'estimation pour la durée choisie.
@@ -375,6 +380,7 @@ exports.estimateCampaign = onCall(async (request) => {
   const city = String(m.city || "").toLowerCase();
   const d = request.data || {};
   const ageRanges = (Array.isArray(d.ageRanges) ? d.ageRanges : []).filter((a) => AGE_BUCKETS.includes(a));
+  const interests = INTERESTS.valid(d.interests);
   const questions = Math.max(1, Math.min(3, parseInt(d.questions, 10) || 1));
   if (!city) return { city: "", cityLabel: "", totalUsers: 0, pool: 0, questions, enoughData: false, perDay: 0, cityAnswersPerDay: 0, activeCampaigns: 0 };
 
@@ -382,7 +388,7 @@ exports.estimateCampaign = onCall(async (request) => {
   const usersRef = db.collection("users").where("city", "==", city);
   const [totalUsers, sample, answers14, activeCampaigns] = await Promise.all([
     usersRef.count().get().then((r) => r.data().count),
-    usersRef.select("ageRange", "age").limit(SAMPLE).get(),
+    usersRef.select("ageRange", "age", "interests").limit(SAMPLE).get(),
     db.collection("answers").where("respondentCity", "==", city).where("flagged", "==", false)
       .where("createdAt", ">=", Timestamp.fromMillis(Date.now() - WINDOW_DAYS * 86400000)).count().get().then((r) => r.data().count).catch((e) => { logger.warn("estimateCampaign: answers", { message: e.message }); return null; }),
     db.collection("campaigns").where("targetCity", "==", city).where("status", "==", "active").count().get().then((r) => r.data().count).catch(() => 0),
@@ -390,7 +396,7 @@ exports.estimateCampaign = onCall(async (request) => {
   // Même règle que submitAnswer : un habitant sans tranche d'âge renseignée n'est jamais exclu.
   let matching = 0;
   const ages = { unknown: 0 }; AGE_BUCKETS.forEach((b) => { ages[b] = 0; });
-  sample.forEach((doc) => { const u = doc.data(), a = u.ageRange || u.age || ""; ages[AGE_BUCKETS.includes(a) ? a : "unknown"]++; if (!ageRanges.length || !a || ageRanges.includes(a)) matching++; });
+  sample.forEach((doc) => { const u = doc.data(), a = u.ageRange || u.age || ""; ages[AGE_BUCKETS.includes(a) ? a : "unknown"]++; if ((!ageRanges.length || !a || ageRanges.includes(a)) && INTERESTS.targetsUser(interests, u.interests)) matching++; });
   const share = sample.size ? matching / sample.size : 1;
   const pool = Math.round(totalUsers * share);
   const cityAnswersPerDay = answers14 == null ? 0 : answers14 / WINDOW_DAYS;

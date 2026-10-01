@@ -55,7 +55,8 @@ const GROUPS = {
   amis: ["ami"],
   actualites: ["impact"],
 };
-const CAT_KEYS = ["restauration", "boulangerie", "sport", "beaute", "culture", "commerce", "services"];
+const INTERESTS = require("./interests");
+const CAT_KEYS = INTERESTS.KEYS;   // interests.js : la même liste que l'app et le dashboard
 
 // ─────────────────────────── Temps (Paris) ───────────────────────────
 function parisParts(ms) {
@@ -341,6 +342,7 @@ function availableFor(u, list) {
   return (list || []).filter((c) => {
     if (answered.includes(c.id) || !authorized.includes(c.merchantId)) return false;
     if ((c.ageRanges || []).length && age && !c.ageRanges.includes(age)) return false;
+    if (!INTERESTS.targetsUser(c.targetInterests, u.interests)) return false;
     const target = Number(c.targetVolume ?? c.volumeTarget) || 0;   // objectif facultatif : sans valeur, pas de plafond
     return !(target > 0 && (c.answersCount || 0) >= target);
   }).sort((a, b) => toMs(b.createdAt) - toMs(a.createdAt));
@@ -482,6 +484,10 @@ const notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (eve
   const snap = await db().collection("users").where("city", "==", city).where("pushEnabled", "==", true).get();
   const work = snap.docs.filter((d) => {
     const u = d.data();
+    // Seuls les habitants que la campagne cible vraiment (tranche d'âge, centres d'intérêt) sont prévenus.
+    const age = u.ageRange || u.age || "";
+    if ((camp.ageRanges || []).length && age && !camp.ageRanges.includes(age)) return false;
+    if (!INTERESTS.targetsUser(camp.targetInterests, u.interests)) return false;
     return !(u.declinedMerchants || []).includes(camp.merchantId) && !(u.answeredCampaigns || []).includes(event.params.campaignId) && matchesCategory(u, sector);
   }).map((d) => () => deliver(d.id, "nouveau_commerce",
     copy.nouveauCommerce({ merchant: camp.merchantName, known: (d.data().authorizedMerchants || []).includes(camp.merchantId) }),
