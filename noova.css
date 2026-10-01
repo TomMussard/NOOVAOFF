@@ -172,3 +172,23 @@ html .drank-sub { color: var(--text-2) }
 html .drank-row { border: 1px solid var(--trait); border-radius: var(--r-md) }
 html .drank-list-title span { color: #FFFBD7 }
 html .drank-list-title small { color: #D9C9A8 }
+
+/* ─── 13. Écran Récompenses : deux blocs clairs (points, NOOVS), puis le palier ───────── */
+html .wsec { margin: 0 var(--s4) var(--s5); background: var(--surface); border: 1px solid var(--trait); border-radius: var(--r-lg); overflow: hidden; padding-bottom: var(--s3) }
+html .wsec .wpts-card { margin: 0 0 var(--s2); border-radius: 0; padding: var(--s4) }
+html .wsec .dsec-h { padding: var(--s3) var(--s4) var(--s2); margin: 0; font-size: var(--fs-4) }
+html .wsec #dcode-wrap .dcode-card,
+html .wsec .reward-featured { margin: 0 var(--s3) var(--s3) }
+html .wsec .dprog-scroller { padding: 0 var(--s3) var(--s1); margin-bottom: var(--s3); gap: var(--s2) }
+html .wsec .dprog-chipcard { border: 1px solid var(--trait) }
+html .wsec .dprog-row { margin: 0 var(--s3); border: 1px solid var(--trait); border-radius: var(--r-md) }
+html .wsec .noov-card { margin: 0 0 var(--s3); border: none; border-bottom: 1px solid var(--trait); border-radius: 0; background: var(--surface-2); padding: var(--s4) }
+html .noov-sub { font-size: var(--fs-2); color: var(--text-2); margin-top: 2px }
+html .wsec .noov-tiles { margin: 0 var(--s3) }
+html .wsec .noov-tile { border: 1px solid var(--trait) }
+html .tier-track { margin: 0 var(--s4) var(--s5); border: 1px solid var(--trait); border-radius: var(--r-lg) }
+html .dwal-hdr { padding-left: var(--s4); padding-right: var(--s4) }
+html .dcode-card { background: var(--marque-encre); color: #FFFBD7 }
+
+/* Bouton « Valider » verrouillé (« Prends le temps de lire… ») : lisible sur crème, sans opacité */
+html .btn-sub.locked { opacity: 1; background: var(--surface-2); color: var(--text-2) }

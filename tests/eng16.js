@@ -49,7 +49,7 @@ const T4=async(n,fn)=>{try{await fn();}catch(e){fail++;console.log('FAIL '+n+' (
         regl:(()=>{const c=document.getElementById('share-answers-card');return {rev:!!c.querySelector('button[onclick*=revokeAllConsents]'),del:!!c.querySelector('button[onclick*=deleteMyAccount]'),data:/Données et confidentialité/.test(c.textContent),friends:!!c.querySelector('#share-answers-inp'),how:/Comment ça marche/.test(c.textContent)};})()};});
     check('Profil : la « Zone danger » a disparu',!L.danger,L);
     check('Profil : « Se déconnecter » puis, tout en bas, les liens légaux (CGU, confidentialité, cookies…)',L.logout>=0&&L.legal===L.logout+1&&L.cguLast,L);
-    check('Profil : les accordéons restent Mes informations, Commerces autorisés, Réglages, Notifications, Badges, Historique',L.titles.join('|')==='Mes informations|Commerces autorisés|Réglages|Notifications|Badges|Historique des réponses',L.titles);
+    check('Profil : les accordéons restent Mes informations, Commerces autorisés, Réglages, Notifications, Badges, Historique des réponses, Historique des récompenses',L.titles.join('|')==='Mes informations|Commerces autorisés|Réglages|Notifications|Badges|Historique des réponses|Historique des récompenses',L.titles);
     check('Réglages : contient Données et confidentialité, l\'interrupteur amis, Comment ça marche, ET les deux actions sensibles',L.regl.rev&&L.regl.del&&L.regl.data&&L.regl.friends&&L.regl.how,L.regl);
     await p.evaluate(()=>{document.getElementById('share-answers-card').classList.add('open');});
     await p.evaluate(()=>document.querySelector('#share-answers-card button[onclick*=deleteMyAccount]').click());await sleep(400);

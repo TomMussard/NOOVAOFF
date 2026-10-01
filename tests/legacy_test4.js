@@ -152,7 +152,7 @@ async function loginApp(ctx, email) {
   await T('profile accordions', async () => {
     await pA.evaluate(() => goNav('profile')); await sleep(600);
     const st = await pA.evaluate(() => ({ n: document.querySelectorAll('.sec-card.acc').length, open: document.querySelectorAll('.sec-card.acc.open').length, vis: [...document.querySelectorAll('.sec-card.acc .acc-body')].filter(b => b.offsetHeight > 0).length }));
-    check('Profil : 6 sections en menus déroulants, toutes repliées', st.n === 6 && st.open === 0 && st.vis === 0, JSON.stringify(st));
+    check('Profil : 7 sections en menus déroulants, toutes repliées', st.n === 7 && st.open === 0 && st.vis === 0, JSON.stringify(st));
     await pA.evaluate(() => document.querySelectorAll('.sec-card.acc .sc-hdr')[0].click()); await sleep(300);
     const o = await pA.evaluate(() => [...document.querySelectorAll('.sec-card.acc .acc-body')].filter(b => b.offsetHeight > 0).length);
     check('Profil : un clic déroule la section', o === 1, 'ouvertes=' + o);

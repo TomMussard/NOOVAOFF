@@ -44,7 +44,7 @@ const mkCamp=(id,o={})=>db.doc('campaigns/'+id).set({merchantId:'m1',merchantNam
     });
     check('« Tes avis ont aidé » n\'apparaît plus dans le profil',!/Tes avis ont aidé|commencer à aider les commerces/.test(closed.txt),closed.txt.slice(0,200));
     check('Groupes d\'accordéons introduits par une étiquette (Compte, Confidentialité, Préférences, Activité)',closed.eyebrows.join('|')==='Compte|Confidentialité|Préférences|Activité',closed.eyebrows);
-    check('Chaque en-tête d\'accordéon porte un badge d\'icône noir (6)',closed.headerBadges===6,closed.headerBadges);
+    check('Chaque en-tête d\'accordéon porte un badge d\'icône noir (7)',closed.headerBadges===7,closed.headerBadges);
     check('Les lignes portent un badge d\'icône clair, plus de simples traits d\'icône nus (7)',closed.rowBadges===7,closed.rowBadges);
     check('Plus d\'air entre les blocs (au moins 14 px entre deux accordéons)',closed.gaps.every(g=>g>=14),closed.gaps);
     await p.screenshot({path:'/tmp/shots/profile_settings.png'});
