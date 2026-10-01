@@ -98,7 +98,7 @@ const login=async(p,email)=>{await p.goto(APP,{waitUntil:'load'});await wf(p,()=
     // qui rapporte des NOOVS — voir applyQuestionBg) : on vérifie la classe posée plutôt qu'une couleur figée,
     // le dégradé ne se lit de toute façon pas sur background-color (c'est background-image).
     const f=await p.evaluate(()=>{const q=document.getElementById('question');const o=document.querySelector('#ans-area .mcq-opt');const t=document.getElementById('q-text');return {cls:q.classList.contains('qfull'),qmode:q.classList.contains('qmode-classique')?'classique':q.classList.contains('qmode-noovs')?'noovs':'?',opt:getComputedStyle(o).backgroundColor,optColor:getComputedStyle(o).color,fs:parseFloat(getComputedStyle(t).fontSize),n:document.querySelectorAll('#ans-area .mcq-opt').length,letter:getComputedStyle(o,'::before').content};});
-    check('Plein écran : fond du bon type de question posé (classique ou NOOVS), gros texte de question (34 px), options plates sans coche ni lettre (la bordure suffit)',f.cls&&(f.qmode==='classique'||f.qmode==='noovs')&&f.fs>=32&&f.n===3&&/rgb\(27, 23, 33\)/.test(f.opt),f);
+    check('Plein écran : fond du bon type de question posé (classique ou NOOVS), gros texte de question (34 px), options plates sans coche ni lettre (la bordure suffit)',f.cls&&(f.qmode==='classique'||f.qmode==='noovs')&&f.fs>=32&&f.n===3&&/^rgb\((255, 255, 255|42, 26, 11)\)$/.test(f.opt),f);   // classique : crème (cartes blanches) ; sinon brun NOOVA
     await p.evaluate(()=>document.querySelector('#ans-area .mcq-opt').click());await sleep(300);
     await p.screenshot({path:'/tmp/shots/q_full.png'});await axeCheck(p,'question plein écran (choix sélectionné)');
     check('Question « bulle » ouverte',await pickQ('bubble','mcq'));await sleep(700);

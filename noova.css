@@ -37,7 +37,6 @@ html .auth-badge { font: 600 var(--fs-2)/1.3 var(--font); color: var(--text-2) }
 html .auth-badge { background: var(--surface-2); padding: var(--s1) var(--s2); border-radius: var(--r-xs) }
 
 /* ─── 4. Cartes : fond surface, trait 1px, rayon 14 — partout pareil ──────────────────── */
-html .q-card,
 html .gift-c,
 html .dpat-mini,
 html .feed-post,
@@ -46,6 +45,7 @@ html .rv,
 html .how-row,
 html .ob-step,
 html .bp-survey { border: 1px solid var(--trait); border-radius: var(--r-md) }
+html .q-card { border: none; border-radius: var(--r-md) }   /* commerce suivi : carte pleine, sans bordure */
 html .q-card.disc { border: 1.5px dashed var(--text) }
 html .q-card.noova { border-color: transparent }
 html .dmap-card { border: 1px solid var(--trait); border-radius: var(--r-md) }

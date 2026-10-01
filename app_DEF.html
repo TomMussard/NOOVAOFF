@@ -3701,9 +3701,9 @@ function openReward(o){
   renderFollowPrompt(o.merchantId,o.brandName);
   const t=document.querySelector('#reward .rw-title');if(t)t.textContent=o.title||'Bien joué !';
   const s=document.querySelector('#reward .rw-sub');if(s)s.textContent=o.sub||'Ta réponse a été envoyée';
-  document.getElementById('rw-pts').textContent=o.pts;
+  document.getElementById('rw-pts').textContent=Number(o.pts)||0;
   {const l=document.querySelector('#reward .pe-lbl');if(l)l.textContent='Total cumulé';}
-  document.getElementById('rw-total').textContent=o.total+' pts';
+  document.getElementById('rw-total').textContent=(Number(o.total??S.pts)||0)+' pts';
   // Le texte d'usage des questions commence déjà par « Ta réponse aide … » : on ne le répète pas.
   document.getElementById('rw-usage').innerHTML=/^Ta réponse aide /.test(o.usage||'')?esc(o.usage).replace(esc(o.brand),'<strong>'+esc(o.brand)+'</strong>'):'Ta réponse aide <strong>'+esc(o.brand)+'</strong>, '+(o.usage||'à mieux servir le quartier.');
   const act=document.getElementById('rw-actions');act.innerHTML='';
