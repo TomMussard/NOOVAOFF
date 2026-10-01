@@ -12,6 +12,9 @@
   --marque-or-2:   #FFDA09;  /* dégradé or : arrivée */
   --or:  linear-gradient(100deg, var(--marque-or-1) 0%, var(--marque-or-2) 100%); /* moments forts uniquement */
   --marque-brule:  #A14E08;  /* or brûlé : pastille de points, carte portefeuille, avatars */
+  --marque-brun-2: #2A1A0B;  /* carte sombre de marque posée sur un fond clair ou à carreaux */
+  --marque-brun-3: #4A3420;  /* bordure de cette carte sombre */
+  --marque-creme-2:#D9C9A8;  /* texte secondaire crème sur brun */
 
   /* --- Fonds (ambiance brune, par défaut) --- */
   --bg:         #1C0E02;   /* fond d'écran : le brun NOOVA */

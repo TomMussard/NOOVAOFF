@@ -763,16 +763,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .fpc-inp{flex:1;min-width:0;padding:11px 14px;border-radius:var(--r-btn);border:1.5px solid var(--line-strong);background:var(--surface);font-size:var(--fs-2);outline:none;font-family:var(--fb);color:var(--ink)}
 .fpc-send{padding:0 16px;border-radius:var(--r-btn);border:none;background:var(--surface-2);color:var(--blanc);font-weight:800;font-size:var(--fs-2);cursor:pointer;font-family:var(--fd)}
 /* Question de la semaine : carte « jeu » vert foncé, texte crème — lisible sur le fond brun de Communauté */
-.wq-card{margin:0 16px 16px;background:#1F3D31;border:1px solid #2E5444;border-radius:var(--r-lg);padding:18px 18px 16px;color:#FFFBD7}
-.wq-tag{display:flex;align-items:center;gap:7px;font:800 var(--fs-1)/1.2 var(--font-titre);color:#8FE0B9}
+.wq-card{margin:0 16px 16px;background:var(--marque-brun-2);border:1px solid var(--marque-brun-3);border-radius:var(--r-lg);padding:18px 18px 16px;color:#FFFBD7}
+.wq-tag{display:flex;align-items:center;gap:7px;font:800 var(--fs-1)/1.2 var(--font-titre);color:var(--jaune)}
 .wq-tag svg{width:16px;height:16px;flex-shrink:0}
 .wq-text{font:800 var(--fs-5)/1.25 var(--font-titre);letter-spacing:var(--lettrage-titre);margin:10px 0 16px;color:#FFFBD7}
 .wq-foot{display:flex;align-items:center;gap:10px}
 .wq-avs{display:flex;flex-shrink:0}
-.wq-av{width:30px;height:30px;border-radius:50%;border:2px solid #1F3D31;display:flex;align-items:center;justify-content:center;font:800 var(--fs-2)/1 var(--font-titre);color:#FFFBD7;overflow:hidden;position:relative}
+.wq-av{width:30px;height:30px;border-radius:50%;border:2px solid var(--marque-brun-2);display:flex;align-items:center;justify-content:center;font:800 var(--fs-2)/1 var(--font-titre);color:#FFFBD7;overflow:hidden;position:relative}
 .wq-av+.wq-av{margin-left:-8px}
 .wq-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.wq-played{flex:1;min-width:0;font-size:var(--fs-2);color:#CFE6DA}
+.wq-played{flex:1;min-width:0;font-size:var(--fs-2);color:var(--marque-creme-2)}
 .wq-play{flex-shrink:0;min-height:var(--tactile-min);padding:0 20px;border:none;border-radius:var(--r-sm);background:rgba(255,251,215,.14);color:#FFFBD7;font:800 var(--fs-3)/1 var(--font-titre);cursor:pointer}
 .wq-play:active{background:rgba(255,251,215,.24)}
 .wq-opts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
@@ -781,12 +781,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .wq-results{display:flex;flex-direction:column;gap:10px}
 .wq-result-row{display:flex;align-items:center;gap:10px}
 .wq-result-lbl{width:42%;font-size:var(--fs-2);font-weight:600;color:#FFFBD7}
-.wq-result-row.mine .wq-result-lbl{color:#8FE0B9;font-weight:800}
+.wq-result-row.mine .wq-result-lbl{color:var(--jaune);font-weight:800}
 .wq-result-bar{flex:1;height:8px;background:rgba(255,251,215,.14);border-radius:var(--r-pill);overflow:hidden}
-.wq-result-fill{height:100%;background:#CFE6DA;border-radius:var(--r-pill);transition:width .5s}
-.wq-result-row.mine .wq-result-fill{background:#8FE0B9}
-.wq-result-pct{width:40px;text-align:right;font-size:var(--fs-2);font-weight:700;color:#CFE6DA;font-variant-numeric:tabular-nums}
-.wq-total{margin-top:12px;font-size:var(--fs-2);color:#CFE6DA}
+.wq-result-fill{height:100%;background:var(--marque-creme-2);border-radius:var(--r-pill);transition:width .5s}
+.wq-result-row.mine .wq-result-fill{background:var(--jaune)}
+.wq-result-pct{width:40px;text-align:right;font-size:var(--fs-2);font-weight:700;color:var(--marque-creme-2);font-variant-numeric:tabular-nums}
+.wq-total{margin-top:12px;font-size:var(--fs-2);color:var(--marque-creme-2)}
 .fi{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--bg3);cursor:pointer;transition:opacity .13s}
 .fi:last-child{border-bottom:none}.fi:active{opacity:.6}
 .fi-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:var(--fs-4);flex-shrink:0;position:relative}
@@ -847,7 +847,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .req-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .gift-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
 .gift-c{background:var(--surface);border-radius:var(--r-crisp);padding:13px;cursor:pointer;transition:all .13s;}
-.gift-c:active{transform:scale(.95)}.gift-c.locked{opacity:.45;pointer-events:none}
+.gift-c:active{transform:scale(.95)}.gift-c.locked{pointer-events:none}
 /* PROFILE */
 .profile-wrap{padding:52px 18px;padding-bottom:112px}
 .prof-hero{background:var(--card);border:1.5px solid var(--bg3);border-radius:var(--r);padding:18px;margin-bottom:11px;text-align:center}
@@ -4980,7 +4980,7 @@ function renderDailyTrack(){
   const left=MAX_POINT_ANSWERS-n;
   el.className='dtrack';
   el.innerHTML='<div class="dt-dots">'+[0,1,2].map(i=>'<div class="dt-dot'+(i<n?' on':'')+'"></div>').join('')+'</div>'
-    +(left<=0?'<div class="dt-txt">Tes '+(S._pointsToday||0)+' pts du jour sont validés</div>':'');
+    +'<div class="dt-txt">'+(left<=0?'Tes '+(S._pointsToday||0)+' pts du jour sont validés':'Encore '+left+' réponse'+(left>1?'s':'')+' pour tes points du jour')+'</div>';
 }
 function renderHomeState(){
   const el=document.getElementById('home-state'),card=document.getElementById('today-card');
@@ -5098,7 +5098,7 @@ async function loadRewardsFromFirestore() {
           const locked = S.pts < rewardCost(r);
           const card = document.createElement('div');
           card.className = 'gift-c' + (locked ? ' locked' : '');
-          card.innerHTML = `<div style="margin-bottom:7px">${logoHTML(r.merchantName||r.label,38)}</div><div style="font-size:var(--fs-2);font-weight:700;color:var(--ink)">${esc(r.merchantName||'Commerce')}</div><div style="font-size:var(--fs-1);color:var(--ink2);margin-top:2px">${r.icon?esc(r.icon):icon('gift-generic',{size:12})} ${esc(r.label||'Récompense')}</div><div style="margin-top:7px;font-size:var(--fs-1);font-weight:800;padding:3px 9px;border-radius:var(--r-tag);background:${locked?'var(--bg2)':'var(--coral)'};color:${locked?'var(--ink3)':'var(--ink)'};display:inline-block">${esc(tierLabel(r))}</div>`;
+          card.innerHTML = `<div style="margin-bottom:7px">${logoHTML(r.merchantName||r.label,38)}</div><div style="font-size:var(--fs-2);font-weight:700;color:var(--ink)">${esc(r.merchantName||'Commerce')}</div><div style="font-size:var(--fs-1);color:var(--ink2);margin-top:2px">${r.icon?esc(r.icon):icon('gift-generic',{size:12})} ${esc(r.label||'Récompense')}</div><div style="margin-top:7px;font-size:var(--fs-1);font-weight:800;padding:3px 9px;border-radius:var(--r-tag);background:${locked?'var(--surface-2)':'var(--jaune)'};color:${locked?'var(--text-2)':'var(--jaune-ink)'};display:inline-flex;align-items:center;gap:4px">${locked?icon('lock',{size:11}):''}${esc(tierLabel(r))}</div>`;
           if(!locked) card.onclick = () => redeemReward(r);
           gg.appendChild(card);
         });
