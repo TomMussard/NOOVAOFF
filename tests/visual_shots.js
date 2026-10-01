@@ -43,6 +43,9 @@ async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/no
     const shot=async(name,full)=>{await sleep(900);await p.screenshot({path:`${OUT}/${label}_${name}.png`,fullPage:false});if(full){const el=await p.$('.screen.active');if(el){const H=await p.evaluate(e=>e.scrollHeight,el);let y=h;let k=1;while(y<H&&k<5){await p.evaluate((e,y)=>e.scrollTop=y,el,y);await sleep(400);await p.screenshot({path:`${OUT}/${label}_${name}_${k}.png`});y+=h-80;k++;}await p.evaluate(e=>e.scrollTop=0,el);}}};
     await p.goto(APP,{waitUntil:'load'});await wf(p,()=>document.getElementById('onboard').classList.contains('active'));
     await shot('onboard');
+    await p.evaluate(()=>startDemo());await sleep(1200);await shot('demo-q');
+    await p.evaluate(()=>{const o=document.querySelector('#demo-q .mcq-opt');if(o)o.click();});await sleep(600);await shot('demo-q-selected');
+    await p.goto(APP,{waitUntil:'load'});await wf(p,()=>document.getElementById('onboard').classList.contains('active'));
     await p.evaluate(()=>showAuthWall('login'));await shot('auth');
     await setVal(p,'#aw-email','me@t.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());
     await wf(p,()=>document.getElementById('home').classList.contains('active'));await sleep(2500);
@@ -67,6 +70,8 @@ async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/no
     await p.evaluate(()=>{try{closeCelebration()}catch(e){}goNav('home')});await sleep(800);
     await p.evaluate(()=>openQ(0));await sleep(2000);await shot('question');
     await p.evaluate(()=>{const b=document.querySelector('#question .qopt, #question [class*="opt"]:not([class*="opts"])');if(b)b.click();});await sleep(800);await shot('question-selected');
+    await p.evaluate(()=>openReward({title:'Bien joué !',sub:'Ta réponse aide Le Fournil.'}));await sleep(1200);await shot('reward');
+    await p.evaluate(()=>showVoucherModal({id:'x',code:'A7K2',label:'Croissant offert',merchantName:'Le Fournil',cost:300,purchaseCondition:null,expiresAt:new Date(Date.now()+86400000)}));await sleep(900);await shot('voucher');
     await ctx.close();
   }
   await browser.close();
