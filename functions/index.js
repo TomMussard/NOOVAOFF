@@ -81,10 +81,21 @@ exports.submitAnswer = onCall(async (request) => {
   const userRef = db.collection("users").doc(uid);
   const campaignRef = db.collection("campaigns").doc(campaignId);
 
-  return db.runTransaction(async (tx) => {
-    const [userSnap, campSnap, existingAnswerSnap] = await Promise.all([
+  // Montée en charge : la campagne et le commerçant sont lus HORS transaction. Dans une transaction, chaque réponse
+  // verrouillait la fiche de la campagne : à l'heure de pointe (des milliers d'habitants sur la même question du jour),
+  // les réponses se bloquaient entre elles et échouaient. La transaction ne porte plus que sur ce qui appartient à
+  // l'habitant (sa fiche, sa réponse) ; les compteurs partagés sont incrémentés juste après, sans verrou (voir `shared`).
+  const [campSnap0] = await Promise.all([campaignRef.get()]);
+  const camp0 = campSnap0.exists ? campSnap0.data() : null;
+  const merchantRef0 = camp0 && camp0.merchantId ? db.collection("merchants").doc(String(camp0.merchantId)) : null;
+  const merchantSnap0 = merchantRef0 ? await merchantRef0.get() : null;
+  const shared = [];   // écritures sur des documents partagés, faites après la transaction
+
+  const result = await db.runTransaction(async (tx) => {
+    shared.length = 0;   // la transaction peut être rejouée : on repart de zéro à chaque essai
+    const campSnap = campSnap0;
+    const [userSnap, existingAnswerSnap] = await Promise.all([
       tx.get(userRef),
-      tx.get(campaignRef),
       tx.get(answerRef),
     ]);
 
@@ -97,8 +108,8 @@ exports.submitAnswer = onCall(async (request) => {
     const user = userSnap.data();
     const camp = campSnap.data();
     // Commerçant lu AVANT toute écriture (transaction) : compteur « points générés par ses questions ».
-    const merchantRef = camp.merchantId ? db.collection("merchants").doc(String(camp.merchantId)) : null;
-    const merchantSnap = merchantRef ? await tx.get(merchantRef) : null;
+    const merchantRef = merchantRef0;
+    const merchantSnap = merchantSnap0;
 
     // ── Re-vérification serveur de l'éligibilité (jamais confiance au client) ──
     if (camp.status !== "active" || (camp.endsAt && camp.endsAt.toMillis && camp.endsAt.toMillis() < Date.now())) {
@@ -233,7 +244,7 @@ exports.submitAnswer = onCall(async (request) => {
     // ── Écritures (transaction atomique) ──
     if (counted) {
       // Compteur serveur-seul par option : le client ne peut jamais lire la répartition avant d'avoir répondu.
-      tx.set(db.collection("campaignStats").doc(campaignId), { [`q${qIdx}`]: { n: FieldValue.increment(1), c: { [String(optionIdx)]: FieldValue.increment(1) } } }, { merge: true });
+      shared.push(() => db.collection("campaignStats").doc(campaignId).set({ [`q${qIdx}`]: { n: FieldValue.increment(1), c: { [String(optionIdx)]: FieldValue.increment(1) } } }, { merge: true }));
     }
     tx.set(answerRef, {
       campaignId,
@@ -286,12 +297,12 @@ exports.submitAnswer = onCall(async (request) => {
     if (qIdx === 0) userUpdate.answeredCampaigns = FieldValue.arrayUnion(campaignId);
     tx.update(userRef, userUpdate);
 
-    tx.update(campaignRef, {
+    shared.push(() => campaignRef.update({
       answersCount: FieldValue.increment(1),
       responsesCount: FieldValue.increment(1),
-    });
+    }));
     // Points générés par les questions de ce commerçant (affichés dans l'admin).
-    if (merchantSnap && merchantSnap.exists && totalEarned > 0) tx.update(merchantRef, { pointsGenerated: FieldValue.increment(totalEarned) });
+    if (merchantSnap && merchantSnap.exists && totalEarned > 0) shared.push(() => merchantRef.update({ pointsGenerated: FieldValue.increment(totalEarned) }));
 
     // Jalon de série (3, 7, 14… jours d'affilée) : annoncé aux amis dans le fil, une seule fois, à la 1re réponse du jour.
     if (user.city && streakValidatedNow && CFG.COMMUNITY.STREAK_MILESTONES.includes(newStreak)) {
@@ -325,6 +336,28 @@ exports.submitAnswer = onCall(async (request) => {
       flagged,
     };
   });
+  // Compteurs partagés : incréments sans lecture (aucun verrou). Un échec ici n'annule jamais la réponse de
+  // l'habitant, déjà enregistrée ; il est seulement journalisé, avec un nouvel essai.
+  await Promise.all(shared.map(async (w) => {
+    for (let i = 0; i < 3; i++) {
+      try { await w(); return; } catch (e) { if (i === 2) logger.error("submitAnswer: compteur partagé", { campaignId, message: e.message }); else await new Promise((r) => setTimeout(r, 150 * (i + 1))); }
+    }
+  }));
+  return result;
+});
+
+/**
+ * onWeeklyVote — totaux de la question de la semaine tenus sur la question elle-même (voteCounts, voteTotal).
+ * L'app affichait les résultats en lisant TOUS les votes un par un : à 50 000 votants, 50 000 lectures par
+ * habitant. Désormais elle lit un seul document. Incréments sans lecture : aucun verrou, aucune contention.
+ */
+exports.onWeeklyVote = onDocumentCreated("weeklyQuestions/{qId}/votes/{uid}", async (event) => {
+  const v = event.data && event.data.data();
+  if (!v || !Number.isInteger(v.optionIndex) || v.optionIndex < 0) return;
+  await db.collection("weeklyQuestions").doc(event.params.qId).set({
+    voteCounts: { [String(v.optionIndex)]: FieldValue.increment(1) },
+    voteTotal: FieldValue.increment(1),
+  }, { merge: true });
 });
 
 /**
