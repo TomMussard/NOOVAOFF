@@ -29,6 +29,8 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./points")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./cityZones")));
 // Comptes de démo (présentation investisseurs / mairie) — à retirer après usage, voir seedDemo.js.
 Object.assign(exports, require("./seedDemo"));
+// Mois de test : commerces fictifs autonomes (voir testMonth.js).
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./testMonth")));
 
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.

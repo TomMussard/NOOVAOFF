@@ -479,6 +479,23 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
   <!-- ══════════════ TAB LANCEMENT ══════════════ -->
   <div id="tab-lancement" style="display:none">
+    <div class="card" id="test-month-card" style="margin-bottom:20px">
+      <div class="card-title">Mois de test : commerces fictifs</div>
+      <div style="padding:14px 18px;font-size:13px;color:var(--ink2);line-height:1.6">
+        45 commerces fictifs (café, coiffeur, fleuriste, supérette, bar) dans 9 villes : Le Mans, Angers, Paris, Nantes, Bordeaux, Marseille, Toulouse, Lille, Dijon.
+        Chacun pose une question le lundi, le mercredi et le vendredi à 9h, toute seule. Les habitants voient l'étiquette « Commerce test » et les bons échangés sont marqués « sans valeur ».
+        <div id="tm-status" style="margin:12px 0;font-weight:700;color:var(--ink)">Chargement…</div>
+        <label style="display:flex;gap:8px;align-items:flex-start;margin:10px 0"><input type="checkbox" id="tm-delete" onchange="document.getElementById('tm-confirm-wrap').style.display=this.checked?'block':'none'">
+          <span>Supprimer définitivement les commerces réels (<span id="tm-real-n">…</span>) : <span id="tm-real-names" style="color:var(--ink3)"></span></span></label>
+        <div id="tm-confirm-wrap" style="display:none;margin:8px 0">Pour confirmer, tape <b>SUPPRIMER</b> : <input id="tm-confirm" autocomplete="off" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+          <button class="btn-approve" id="tm-setup-btn" onclick="setupTestMonth(this)">Préparer et lancer le mois de test</button>
+          <button class="btn-reject" onclick="stopTestMonth(false)">Arrêter les questions automatiques</button>
+          <button class="btn-reject" onclick="stopTestMonth(true)">Fin du test : masquer les commerces fictifs</button>
+        </div>
+        <div id="tm-result" style="margin-top:12px;font-size:12.5px;color:var(--ink2)"></div>
+      </div>
+    </div>
     <div class="sec-hdr"><h2>Lancement</h2><p>Combien de commerçants sont réellement opérationnels par ville — vérifié, avec au moins une campagne active et une récompense active. C'est ce qu'un nouvel utilisateur voit en arrivant sur l'app.</p></div>
     <div class="card" style="margin-bottom:20px">
       <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z"/></svg> Villes — ouverture aux habitants</div>
@@ -644,6 +661,36 @@ const callAdminResetAllData  = fx.httpsCallable('adminResetAllData');
 const callAdminDeleteAccount = fx.httpsCallable('adminDeleteAccount');
 const callAdminCreateNoovaCampaign = fx.httpsCallable('adminCreateNoovaCampaign');
 const callAdminSeedDemoUsers = fx.httpsCallable('adminSeedDemoUsers');
+// ── Mois de test ─────────────────────────────────────────────────────────
+async function loadTestMonth() {
+  try {
+    const [cfg, ms] = await Promise.all([db.collection('config').doc('testMonth').get(), db.collection('merchants').get()]);
+    const real = ms.docs.filter(d => d.data().isTest !== true), fake = ms.docs.filter(d => d.data().isTest === true);
+    const on = cfg.exists && cfg.data().active === true;
+    document.getElementById('tm-status').textContent = (on ? 'Actif' : 'Inactif') + ' : ' + fake.filter(d => d.data().status === 'verified').length + ' commerces fictifs visibles, ' + real.length + ' commerces réels.';
+    document.getElementById('tm-real-n').textContent = real.length;
+    document.getElementById('tm-real-names').textContent = real.map(d => d.data().brandName || d.data().name || d.id).join(', ') || 'aucun';
+  } catch (e) { document.getElementById('tm-status').textContent = 'Erreur : ' + e.message; }
+}
+async function setupTestMonth(btn) {
+  const del = document.getElementById('tm-delete').checked;
+  const confirmTxt = (document.getElementById('tm-confirm').value || '').trim();
+  if (del && confirmTxt !== 'SUPPRIMER') { showToast('Tape SUPPRIMER pour confirmer la suppression.', 'warning'); return; }
+  if (!confirm(del ? 'Supprimer définitivement les commerces réels, puis lancer le mois de test ?' : 'Lancer le mois de test (sans supprimer de commerce réel) ?')) return;
+  btn.disabled = true; const out = document.getElementById('tm-result'); out.textContent = 'En cours… (jusqu\'à quelques minutes)';
+  try {
+    const r = (await fx.httpsCallable('adminSetupTestMonth')({ deleteReal: del, confirm: confirmTxt })).data;
+    out.textContent = `Fait : ${r.merchants} commerces fictifs dans ${r.cities} villes, ${r.questions} premières questions posées` + (r.deleted.length ? `, ${r.deleted.length} commerces réels supprimés (${r.deleted.join(', ')}).` : '.');
+    showToast('Mois de test lancé.');
+  } catch (e) { out.textContent = 'Erreur : ' + e.message; }
+  btn.disabled = false; loadTestMonth();
+}
+async function stopTestMonth(hide) {
+  if (!confirm(hide ? 'Fin du test : arrêter les questions, clore les questions en cours et masquer les commerces fictifs ?' : 'Arrêter les questions automatiques (les commerces fictifs restent visibles) ?')) return;
+  try { const r = (await fx.httpsCallable('adminStopTestMonth')({ hide })).data; document.getElementById('tm-result').textContent = hide ? `Arrêté : ${r.hidden} commerces masqués, ${r.closed} questions closes.` : 'Questions automatiques arrêtées.'; }
+  catch (e) { document.getElementById('tm-result').textContent = 'Erreur : ' + e.message; }
+  loadTestMonth();
+}
 async function seedDemoUsers(btn) {
   const el = document.getElementById('seed-demo-status');
   el.style.display = 'block'; el.style.background = 'var(--bg)'; el.style.color = 'var(--ink2)';
@@ -779,7 +826,7 @@ function switchTab(tab, btn) {
   if (tab === 'entreprises') loadMerchants();
   if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
   if (tab === 'diffusion') initDiffusion();
-  if (tab === 'lancement') loadReadiness();
+  if (tab === 'lancement') { loadReadiness(); loadTestMonth(); }
   if (tab === 'moderation') { loadModeration(); loadResponseQuality(); }
   if (tab === 'notifications') loadNotifMetrics();
   if (tab === 'danger') loadDangerZone();

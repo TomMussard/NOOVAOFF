@@ -192,3 +192,8 @@ html .dcode-card { background: var(--marque-encre); color: #FFFBD7 }
 
 /* Bouton « Valider » verrouillé (« Prends le temps de lire… ») : lisible sur crème, sans opacité */
 html .btn-sub.locked { opacity: 1; background: var(--surface-2); color: var(--text-2) }
+
+/* ─── 14. Mois de test : étiquette « Commerce test » et mention sur le bon ───────────────── */
+html .test-tag { display: inline-block; margin-left: 6px; padding: 3px 6px; border-radius: var(--r-xs); background: var(--surface-2); color: var(--text-2); font: 700 var(--fs-1)/1 var(--font); vertical-align: 2px; white-space: nowrap }
+html .dtoday-brand .test-tag, html .dnb-name .test-tag { background: rgba(255,251,215,.9); color: var(--marque-encre) }
+html .vf-test { margin-top: 14px; max-width: 320px; padding: 10px 12px; border-radius: var(--r-sm); background: var(--surface-2); color: var(--text); font-size: var(--fs-2); line-height: 1.45 }
