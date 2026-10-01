@@ -189,3 +189,6 @@ html .wsec .noov-tile { border: 1px solid var(--trait) }
 html .tier-track { margin: 0 var(--s4) var(--s5); border: 1px solid var(--trait); border-radius: var(--r-lg) }
 html .dwal-hdr { padding-left: var(--s4); padding-right: var(--s4) }
 html .dcode-card { background: var(--marque-encre); color: #FFFBD7 }
+
+/* Bouton « Valider » verrouillé (« Prends le temps de lire… ») : lisible sur crème, sans opacité */
+html .btn-sub.locked { opacity: 1; background: var(--surface-2); color: var(--text-2) }

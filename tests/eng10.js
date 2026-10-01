@@ -68,7 +68,7 @@ const ADMIN='http://localhost:8950/admin.html';
     // cadeaux + profil
     await p.evaluate(()=>{goNav('rewards-tab');});await sleep(800);
     const rw=await p.evaluate(()=>({noov:document.querySelector('.noov-card').textContent.replace(/\s+/g,' ').trim(),lbl:(document.getElementById('reward-featured-label')||{}).textContent||''}));
-    check('Cadeaux : le bloc NOOVS ne contient que le nombre et « NOOVS » (plus de paragraphe)',/^\d+ NOOVS$/.test(rw.noov.replace(/^N\s*/,'')),rw.noov);
+    check('Cadeaux : le bloc NOOVS ne contient que le nombre, « NOOVS » et une ligne courte (plus de paragraphe)',/^\d+ NOOVSBientôt échangeables contre$/.test(rw.noov.replace(/^N\s*/,'')),rw.noov);
     check('Cadeaux : plus d\'emoji dans le titre de section',!/\p{Extended_Pictographic}/u.test(rw.lbl),rw.lbl);
     await p.evaluate(()=>{S.friends=[{uid:'f1',n:'Léa',xp:410,str:1},{uid:'f2',n:'Tom',xp:20,str:0}];goNav('social');socTab('ranking',document.querySelector('.tab-btn[onclick*="ranking"]'));renderRanking();});await sleep(600);
     const rk=await p.$eval('#ranking-list',e=>e.textContent);
