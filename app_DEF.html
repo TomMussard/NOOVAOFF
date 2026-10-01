@@ -761,20 +761,31 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .fpc-form{display:flex;gap:8px;margin-top:6px}
 .fpc-inp{flex:1;min-width:0;padding:11px 14px;border-radius:var(--r-btn);border:1.5px solid var(--line-strong);background:var(--surface);font-size:var(--fs-2);outline:none;font-family:var(--fb);color:var(--ink)}
 .fpc-send{padding:0 16px;border-radius:var(--r-btn);border:none;background:var(--surface-2);color:var(--blanc);font-weight:800;font-size:var(--fs-2);cursor:pointer;font-family:var(--fd)}
-.wq-card{margin:0 18px 14px;background:var(--surface-2);border-radius:var(--r-card);padding:16px 17px;color:var(--blanc);position:relative;overflow:hidden}
-.wq-tag{font-family:var(--fd);font-weight:700;font-size:var(--fs-1);letter-spacing:0;color:var(--coral)}
-.wq-text{font-family:var(--fd);font-weight:800;font-size:var(--fs-4);line-height:1.22;letter-spacing:var(--lettrage-titre);margin:9px 0 13px}
-.wq-opts{display:flex;flex-direction:column;gap:8px}
-.wq-opt-btn{width:100%;text-align:left;padding:11px 14px;border-radius:var(--r-sm);background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.14);color:var(--blanc);font-family:var(--fb);font-size:var(--fs-2);font-weight:600;cursor:pointer;transition:background .13s}
-.wq-opt-btn:active{background:rgba(255,255,255,.18)}
-.wq-results{display:flex;flex-direction:column;gap:9px}
-.wq-result-row{display:flex;align-items:center;gap:9px}
-.wq-result-lbl{width:42%;font-size:var(--fs-2);font-weight:600;color:rgba(255,255,255,.85)}
-.wq-result-row.mine .wq-result-lbl{color:var(--coral)}
-.wq-result-bar{flex:1;height:8px;background:rgba(255,255,255,.12);border-radius:var(--r-pill);overflow:hidden}
-.wq-result-fill{height:100%;background:var(--text-3);border-radius:var(--r-pill);transition:width .5s}
-.wq-result-pct{width:34px;text-align:right;font-size:var(--fs-1);font-weight:700;color:rgba(255,255,255,.7)}
-.wq-total{margin-top:10px;font-size:var(--fs-1);color:rgba(255,255,255,.45)}
+/* Question de la semaine : carte « jeu » vert foncé, texte crème — lisible sur le fond brun de Communauté */
+.wq-card{margin:0 16px 16px;background:#1F3D31;border:1px solid #2E5444;border-radius:var(--r-lg);padding:18px 18px 16px;color:#FFFBD7}
+.wq-tag{display:flex;align-items:center;gap:7px;font:800 var(--fs-1)/1.2 var(--font-titre);color:#8FE0B9}
+.wq-tag svg{width:16px;height:16px;flex-shrink:0}
+.wq-text{font:800 var(--fs-5)/1.25 var(--font-titre);letter-spacing:var(--lettrage-titre);margin:10px 0 16px;color:#FFFBD7}
+.wq-foot{display:flex;align-items:center;gap:10px}
+.wq-avs{display:flex;flex-shrink:0}
+.wq-av{width:30px;height:30px;border-radius:50%;border:2px solid #1F3D31;display:flex;align-items:center;justify-content:center;font:800 var(--fs-2)/1 var(--font-titre);color:#FFFBD7;overflow:hidden;position:relative}
+.wq-av+.wq-av{margin-left:-8px}
+.wq-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.wq-played{flex:1;min-width:0;font-size:var(--fs-2);color:#CFE6DA}
+.wq-play{flex-shrink:0;min-height:var(--tactile-min);padding:0 20px;border:none;border-radius:var(--r-sm);background:rgba(255,251,215,.14);color:#FFFBD7;font:800 var(--fs-3)/1 var(--font-titre);cursor:pointer}
+.wq-play:active{background:rgba(255,251,215,.24)}
+.wq-opts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.wq-opt-btn{width:100%;min-height:48px;text-align:left;padding:12px 14px;border-radius:var(--r-sm);background:rgba(255,251,215,.08);border:1px solid rgba(255,251,215,.22);color:#FFFBD7;font:600 var(--fs-3)/1.3 var(--font);cursor:pointer}
+.wq-opt-btn:active{background:rgba(255,251,215,.18)}
+.wq-results{display:flex;flex-direction:column;gap:10px}
+.wq-result-row{display:flex;align-items:center;gap:10px}
+.wq-result-lbl{width:42%;font-size:var(--fs-2);font-weight:600;color:#FFFBD7}
+.wq-result-row.mine .wq-result-lbl{color:#8FE0B9;font-weight:800}
+.wq-result-bar{flex:1;height:8px;background:rgba(255,251,215,.14);border-radius:var(--r-pill);overflow:hidden}
+.wq-result-fill{height:100%;background:#CFE6DA;border-radius:var(--r-pill);transition:width .5s}
+.wq-result-row.mine .wq-result-fill{background:#8FE0B9}
+.wq-result-pct{width:40px;text-align:right;font-size:var(--fs-2);font-weight:700;color:#CFE6DA;font-variant-numeric:tabular-nums}
+.wq-total{margin-top:12px;font-size:var(--fs-2);color:#CFE6DA}
 .fi{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--bg3);cursor:pointer;transition:opacity .13s}
 .fi:last-child{border-bottom:none}.fi:active{opacity:.6}
 .fi-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:var(--fs-4);flex-shrink:0;position:relative}
@@ -873,6 +884,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .consent-it:last-child{border-bottom:none}
 .hist-it{display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--bg3)}
 .hist-it:last-child{border-bottom:none}
+.rwh-it{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--trait)}
+.rwh-it:last-child{border-bottom:none}
+.rwh-main{flex:1;min-width:0}
+.rwh-t{font:800 var(--fs-3)/1.3 var(--font-titre);color:var(--text)}
+.rwh-s{font-size:var(--fs-2);color:var(--text-2);margin-top:2px}
+.rwh-r{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.rwh-pts{font:800 var(--fs-2)/1 var(--font-titre);color:var(--text);font-variant-numeric:tabular-nums}
+.rwh-st{font-size:var(--fs-1);font-weight:700;padding:3px 8px;border-radius:var(--r-xs)}
+.rwh-st.ok{background:#E3F2EA;color:#17663F}.rwh-st.on{background:var(--marque-encre);color:var(--jaune)}.rwh-st.off{background:var(--surface-2);color:var(--text-2)}
+.rwh-empty{padding:14px;font-size:var(--fs-2);color:var(--text-2);line-height:1.5}
 .danger-c{background:var(--card);border-radius:var(--r-md);padding:13px;margin-bottom:11px;}
 .dbtn{width:100%;padding:13px;border-radius:var(--r-btn);background:var(--cream);border:none;color:var(--muted);font-size:var(--fs-2);font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .13s;margin-bottom:9px}
 .dbtn:last-child{margin:0;border-color:rgba(229,72,77,.3);color:var(--erreur)}
@@ -1110,6 +1131,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 
 /* — Cartes commerces proches (grille 2 col., texte incrusté sur la photo) — */
 .dnearby-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 22px 10px}
+.dnearby-grid .dnb-extra{display:none}.dnearby-grid.all .dnb-extra{display:block}
+.dnb-more-wrap{padding:4px 16px 12px}
 .dnb-card{background:var(--nv-photo);border-radius:var(--r-md);overflow:hidden;box-shadow:none;cursor:pointer;transition:transform .13s;position:relative;height:148px}
 .dnb-card:active{transform:scale(.97)}
 .dnb-photo{position:absolute;inset:0}
@@ -1210,11 +1233,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .dwal-title{font-family:var(--fd);font-weight:800;font-size:var(--fs-6);letter-spacing:var(--lettrage-titre);color:var(--ink)}
 .dcode-card{margin:0 18px 16px;background:var(--surface-2);border-radius:var(--r-lg);padding:18px;color:var(--blanc)}
 .dcode-name{font-family:var(--fd);font-weight:700;font-size:var(--fs-3);margin-bottom:2px}
-.dcode-sub{font-size:var(--fs-1);color:rgba(255,255,255,.55);margin-bottom:14px}
+.dcode-sub{font-size:var(--fs-2);color:rgba(255,251,215,.8);margin-bottom:14px}
 .dcode-box{background:rgba(255,255,255,.06);border:1.5px dashed rgba(255,255,255,.28);border-radius:var(--r-md);padding:15px;text-align:center;margin-bottom:14px}
-.dcode-lbl{font-size:var(--fs-1);font-weight:700;letter-spacing:0;color:rgba(255,255,255,.42);margin-bottom:8px}
+.dcode-lbl{font-size:var(--fs-2);font-weight:700;letter-spacing:0;color:rgba(255,251,215,.8);margin-bottom:8px}
 .dcode-val{font-family:monospace;font-size:var(--fs-6);font-weight:800;letter-spacing:5px;color:var(--nv-yellow)}
-.dcode-btn{width:100%;background:transparent;color:var(--text);border:1px solid var(--trait);padding:13px;border-radius:var(--r-btn);font-family:var(--fd);font-weight:800;font-size:var(--fs-3);cursor:pointer}
+.dcode-btn{width:100%;min-height:var(--h-bouton);background:var(--jaune);color:var(--marque-encre);border:none;padding:13px;border-radius:var(--r-btn);font-family:var(--fd);font-weight:800;font-size:var(--fs-3);cursor:pointer}
 .dcode-more{text-align:center;font-size:var(--fs-1);color:var(--ink2);margin:-8px 18px 14px;cursor:pointer;font-weight:600}
 .dsec-h{padding:0 18px;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-family:var(--fd);font-weight:800;font-size:var(--fs-5);letter-spacing:var(--lettrage-titre);color:var(--ink)}
 .dprog-row{background:var(--card);border-radius:var(--r-crisp);padding:12px 13px;margin:0 18px 10px;display:flex;align-items:center;gap:12px;cursor:pointer}
@@ -1501,7 +1524,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
     <div id="home-requests"></div>
     <div id="daily-track"></div>
-    <div class="sec-lbl">À répondre</div>
+    <div class="sec-lbl" id="queue-sec">À répondre</div>
     <div class="q-list" id="queue-list" tabindex="0" role="group" aria-label="Autres questions à répondre"></div>
     <div style="height:6px"></div>
     <div id="dpat-wrap"></div>
@@ -1524,6 +1547,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
       <div class="dmap-empty" id="dmap-empty" style="display:none" onclick="event.stopPropagation()"></div>
     </div>
     <div class="dnearby-grid" id="dnearby-grid"></div>
+    <div class="dnb-more-wrap" id="dnb-more-wrap" style="display:none"><button class="btn-s" id="dnb-more" onclick="toggleNearbyAll()">Plus de commerces</button></div>
     <div style="height:10px"></div>
   </div>
 </div>
@@ -1638,7 +1662,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
     <div class="dwal-hdr">
       <div class="dwal-title">Tes cadeaux</div>
     </div>
-    <!-- 1 · Points -->
+    <!-- 1 · Points : le solde et tout ce qui s'échange avec, dans un seul bloc -->
+    <section class="wsec" aria-label="Tes points et tes récompenses">
     <div class="wpts-card">
       <div class="wpts-ico" id="wpts-ico" aria-hidden="true"></div>
       <div><div class="wpts-n" id="wc-pts-num-hdr">0</div><div class="wpts-l">points</div></div>
@@ -1670,14 +1695,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
     <div class="dprog-row" id="rewards-all-btn" onclick="openRewardsSheet()" style="cursor:pointer">
       <div id="rewards-all-ico" style="width:52px;height:52px;border-radius:var(--r-md);background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"></div>
       <div style="flex:1;min-width:0"><div class="dprog-name">Toutes les récompenses</div><div class="dprog-sub" id="rewards-all-count"></div></div>
-      <span style="color:#A9A296;font-size:var(--fs-4)" aria-hidden="true">›</span>
+      <span style="color:var(--text-2);font-size:var(--fs-4)" aria-hidden="true">›</span>
     </div>
-    <!-- 3 · NOOVS -->
+    </section>
+    <!-- 2 · NOOVS : le solde et ce qu'ils permettront d'obtenir, dans un seul bloc -->
+    <section class="wsec" aria-label="Tes NOOVS">
     <div class="noov-card">
       <div class="noov-ico" id="wnoov-ico" aria-hidden="true">N</div>
-      <div class="noov-t"><span id="noov-num">0</span> NOOVS</div>
+      <div><div class="noov-t"><span id="noov-num">0</span> NOOVS</div><div class="noov-sub">Bientôt échangeables contre</div></div>
     </div>
     <div id="noov-rewards"></div>
+    </section>
     <!-- 4 · XP -->
     <div id="tier-track-wrap"></div>
   </div>
@@ -1783,6 +1811,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
       <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico alt"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg></span><div class="sc-title">Historique des réponses</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
       <div class="acc-body">
       <div id="hist-list"></div>
+      </div>
+    </div>
+    <div class="sec-card acc" id="rw-hist-section">
+      <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico alt"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v8.5h14V12"/><path d="M12 8v12.5"/><path d="M12 8c-1.5-3.5-5-4-5-1.5S10 8 12 8zM12 8c1.5-3.5 5-4 5-1.5S14 8 12 8z"/></svg></span><div class="sc-title">Historique des récompenses</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="acc-body">
+      <div id="rw-hist-list"><div class="rwh-empty">Tu n'as encore échangé aucune récompense. Tes bons apparaîtront ici.</div></div>
       </div>
     </div>
     <div style="padding:22px 0 12px">
@@ -2277,12 +2311,13 @@ function applyQuestionBg(q){
   const el=document.getElementById('question');
   if(!el) return;
   const byNoova=!!(q&&q._byNoova);
-  // Une question posée par NOOVA est toujours en plein cadre (jamais « bulle ») : c'est ce
-  // format, plus premium/sombre, qui la distingue au premier coup d'œil d'une question de commerce.
-  const full = byNoova||qMode(q)==='full';
+  // Une question posée par NOOVA garde son plein cadre et son fond de marque. Une question de commerce est
+  // TOUJOURS sur le fond crème simple (mise en page « bulle », taille de texte normale), qu'elle rapporte des
+  // points ou des NOOVS : une seule présentation, lisible, la même à chaque fois.
+  const full = byNoova;
   el.classList.toggle('qfull', full);
   el.classList.remove('qmode-classique','qmode-noovs','qmode-noova');
-  el.classList.add(byNoova?'qmode-noova':(isFreeMode()?'qmode-noovs':'qmode-classique'));
+  el.classList.add(byNoova?'qmode-noova':'qmode-classique');
   // Motif de marque en fond, uniquement en mode « bulle » (le plein écran a déjà son propre
   // traitement, volontairement en aplat — voir les règles .qfull juste au-dessus).
   el.classList.toggle('qbg-on', !full);
@@ -2368,7 +2403,11 @@ function refreshHome(){
 }
 function renderQueue(){
   const el=document.getElementById('queue-list');el.innerHTML='';
-  if(!S.qs||S.qs.length<=1){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--ink2);font-size:var(--fs-2)">'+(S.qs&&S.qs.length===1?icon('success',{size:14})+' Plus que cette question !':icon('mail',{size:14})+' Pas d\'autres questions pour l\'instant.')+'</div>';return}
+  // « À répondre » n'existe que s'il y a vraiment une autre question en attente.
+  const pending=!!(S.qs&&S.qs.length>1);
+  el.style.display=pending?'':'none';
+  {const h=document.getElementById('queue-sec');if(h)h.style.display=pending?'':'none';}
+  if(!pending)return;
   window._scPool = {};
   const clrs=['#FFC300','#F29715','#FFDA09','#1C0E02','#A14E08'];
   let cnt=0;
@@ -2384,7 +2423,7 @@ function renderQueue(){
       const verb=friendArr.length>1?'ont répondu':'a répondu';
       badge=`<div class="friend-badge"><div class="fb-av" style="background:${c}22;color:${c}">${(fn||'?')[0]}</div>${esc(fn)}${more>0?` + ${more} ami${more>1?'s':''}`:''} ${verb}</div>`;
     }
-    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${q.brand}</div><div class="q-prev">${q.q.substring(0,55)}…</div><div class="q-meta">${q._byNoova?'<span class="noova-tag">NOOVA</span>':q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:var(--fs-1);color:var(--ink2);margin-top:5px">Nouveau près de chez toi, tu ne le suis pas encore</div>':''}${badge}</div>`;
+    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${esc(q.brand)}</div><div class="q-prev">${esc(q.q.length>55?q.q.substring(0,55)+'…':q.q)}</div><div class="q-meta">${q._byNoova?'<span class="noova-tag">NOOVA</span>':q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:var(--fs-1);color:var(--ink2);margin-top:5px">Nouveau près de chez toi, tu ne le suis pas encore</div>':''}${badge}</div>`;
     el.appendChild(d);cnt++;
     if(cnt%3===0){const sc=buildSocialCard();if(sc)el.appendChild(sc);}
   });
@@ -2476,43 +2515,63 @@ async function loadWeeklyQuestion() {
     else renderWeeklyQuestionVote(q);
   } catch(e) { console.warn('weeklyQuestion:', e); slot.innerHTML=''; }
 }
-function renderWeeklyQuestionVote(q) {
+const WQ_ICON='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.5" cy="14" r="1"/></svg>';
+function wqHead(q){return `<div class="wq-tag">${WQ_ICON}Question de la semaine</div><div class="wq-text">«\u00a0${esc(q.text||'')}\u00a0»</div>`;}
+// Amis (parmi tes amis) qui ont déjà voté : pastilles + phrase, comme une invitation à jouer.
+function wqFriendsHTML(voterUids){
+  const fr=(S.friends||[]).filter(f=>voterUids.has(f.uid));
+  const avs=fr.slice(0,3).map((f,i)=>`<div class="wq-av" style="background:${AVC[i%AVC.length]}">${avInner(f.photoUrl,f.n)}</div>`).join('');
+  const txt=fr.length?`${fr.length} ami${fr.length>1?'s ont':' a'} déjà joué`:'Sois le premier de tes amis à jouer';
+  return {avs,txt};
+}
+async function wqVoters(qId){
+  const snap=await db.collection('weeklyQuestions').doc(qId).collection('votes').get();
+  return snap;
+}
+async function renderWeeklyQuestionVote(q) {
   const slot = document.getElementById('weekly-q-slot');
   if(!slot) return;
-  const opts = (q.options||[]).map((o,i)=>`<button class="wq-opt-btn" onclick="voteWeeklyQuestion('${q.id}',${i})">${esc(o)}</button>`).join('');
-  slot.innerHTML = `<div class="wq-card">
-    <div class="wq-tag" style="display:flex;align-items:center;gap:6px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> QUESTION DE LA SEMAINE</div>
-    <div class="wq-text">${esc(q.text||'')}</div>
-    <div class="wq-opts">${opts}</div>
+  let voters=new Set();
+  try{(await wqVoters(q.id)).forEach(d=>voters.add(d.id));}catch(e){}
+  const {avs,txt}=wqFriendsHTML(voters);
+  const opts = (q.options||[]).map((o,i)=>`<button class="wq-opt-btn" onclick="voteWeeklyQuestion(${jsa(q.id)},${i})">${esc(o)}</button>`).join('');
+  slot.innerHTML = `<div class="wq-card">${wqHead(q)}
+    <div class="wq-foot" id="wq-foot"><div class="wq-avs">${avs}</div><div class="wq-played">${txt}</div><button class="wq-play" onclick="document.getElementById('wq-foot').style.display='none';document.getElementById('wq-opts').style.display='flex'">Jouer</button></div>
+    <div class="wq-opts" id="wq-opts" style="display:none">${opts}</div>
   </div>`;
 }
 async function voteWeeklyQuestion(qId, optionIndex) {
   const uid = auth.currentUser && auth.currentUser.uid;
   if(!uid) return;
+  document.querySelectorAll('.wq-opt-btn').forEach(b=>b.disabled=true);
   try {
     await db.collection('weeklyQuestions').doc(qId).collection('votes').doc(uid).set({ optionIndex, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
     const qSnap = await db.collection('weeklyQuestions').doc(qId).get();
     renderWeeklyQuestionResults({ id: qId, ...qSnap.data() }, optionIndex);
-  } catch(e) { console.warn('voteWeeklyQuestion:', e); }
+  } catch(e) {
+    console.warn('voteWeeklyQuestion:', e);
+    document.querySelectorAll('.wq-opt-btn').forEach(b=>b.disabled=false);
+    showToast("Ton vote n'a pas été enregistré. Vérifie ta connexion et réessaie.",'error');
+  }
 }
 async function renderWeeklyQuestionResults(q, myOptionIndex) {
   const slot = document.getElementById('weekly-q-slot');
   if(!slot) return;
   const opts = q.options || [];
-  const votesSnap = await db.collection('weeklyQuestions').doc(q.id).collection('votes').get();
-  const counts = opts.map((_,i) => 0);
-  votesSnap.forEach(d => { const idx = d.data().optionIndex; if(counts[idx]!==undefined) counts[idx]++; });
-  const total = counts.reduce((a,b)=>a+b,0) || 1;
+  const votesSnap = await wqVoters(q.id);
+  const counts = opts.map(() => 0);
+  const voters=new Set();
+  votesSnap.forEach(d => { voters.add(d.id); const idx = d.data().optionIndex; if(counts[idx]!==undefined) counts[idx]++; });
+  const n = counts.reduce((a,b)=>a+b,0);
   const bars = opts.map((o,i) => {
-    const pct = Math.round((counts[i]/total)*100);
+    const pct = n ? Math.round((counts[i]/n)*100) : 0;
     const mine = i===myOptionIndex;
-    return `<div class="wq-result-row${mine?' mine':''}"><div class="wq-result-lbl">${mine?'✓ ':''}${esc(o)}</div><div class="wq-result-bar"><div class="wq-result-fill" style="width:${pct}%"></div></div><div class="wq-result-pct">${pct}%</div></div>`;
+    return `<div class="wq-result-row${mine?' mine':''}"><div class="wq-result-lbl">${esc(o)}${mine?' (toi)':''}</div><div class="wq-result-bar"><div class="wq-result-fill" style="width:${pct}%"></div></div><div class="wq-result-pct">${pct} %</div></div>`;
   }).join('');
-  slot.innerHTML = `<div class="wq-card">
-    <div class="wq-tag" style="display:flex;align-items:center;gap:6px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> QUESTION DE LA SEMAINE</div>
-    <div class="wq-text">${esc(q.text||'')}</div>
+  const {avs,txt}=wqFriendsHTML(voters);
+  slot.innerHTML = `<div class="wq-card">${wqHead(q)}
     <div class="wq-results">${bars}</div>
-    <div class="wq-total">${total} réponse${total>1?'s':''}</div>
+    <div class="wq-foot" style="margin-top:14px"><div class="wq-avs">${avs}</div><div class="wq-played">${n} réponse${n>1?'s':''}${avs?', dont tes amis':''}</div></div>
   </div>`;
 }
 
@@ -3545,7 +3604,7 @@ function toggleAcc(hdr){
   const card=hdr.closest('.sec-card');if(!card)return;
   card.classList.toggle('open');
 }
-function refreshProfile(){
+function refreshProfile(){if(!_redemptionsUnsub)loadActiveRedemptions();
   if(!S.user)return;
   renderUserAvatar(document.getElementById('prof-av'), document.getElementById('prof-av-letter'), S.user.name, S.user.photoUrl);
   renderUserAvatar(document.getElementById('settings-av-thumb'), document.getElementById('settings-av-thumb-letter'), S.user.name, S.user.photoUrl);
@@ -3860,7 +3919,10 @@ async function loadNearbyMerchants(merchantIds) {
     // Promise.allSettled : un commerce inaccessible (règle refusée, ex. pas encore vérifié) ne doit pas vider tout le rail
     const results = await Promise.allSettled(merchantIds.slice(0,20).map(id => db.collection('merchants').doc(id).get()));
     const snaps = results.filter(r => r.status === 'fulfilled').map(r => r.value);
-    S._nearbyMerchants = snaps.filter(s => s.exists).map(s => ({ id: s.id, ...s.data() }));
+    // Zone : un commerce autorisé mais d'une autre ville (habitant qui a déménagé, compte ancien) n'apparaît jamais.
+    const myCity = normalizeCity(S._city||'');
+    S._nearbyMerchants = snaps.filter(s => s.exists).map(s => ({ id: s.id, ...s.data() }))
+      .filter(m => myCity && normalizeCity(m.city||'') === myCity);
     renderBrandRail();
     renderNearbyMap();
     // Recharger les récompenses avec les nouveaux marchands
@@ -4011,6 +4073,13 @@ function nvPinIcon(isMe){
 }
 
 let _fullMap=null, _fullMapMarkers=null;
+async function toggleNearbyAll(){
+  const g=document.getElementById('dnearby-grid'),b=document.getElementById('dnb-more');if(!g)return;
+  const all=g.classList.toggle('all');
+  const n=g.querySelectorAll('.dnb-extra').length;
+  if(b)b.textContent=all?'Voir moins':'Plus de commerces ('+n+')';
+  if(!all)g.scrollIntoView({block:'nearest'});
+}
 async function renderNearbyGrid(){
   const el=document.getElementById('dnearby-grid');
   if(!el) return;
@@ -4024,8 +4093,12 @@ async function renderNearbyGrid(){
       return g ? Object.assign({}, c, { _dist: distMeters(S.userLoc, g) }) : c;
     }).sort((a,b) => (a._dist??1e12) - (b._dist??1e12));
   }
-  el.innerHTML = withDist.slice(0,4).map(c => `
-    <div class="dnb-card" ${c._merchantId?`onclick="openBrandById(${jsa(c._merchantId)},${jsa(c.name)})"`:''}>
+  // Les 4 plus proches d'abord ; « Plus de commerces » déplie tous les autres, présentés de la même façon.
+  const more=document.getElementById('dnb-more-wrap');
+  if(more)more.style.display=withDist.length>4?'block':'none';
+  el.classList.remove('all');{const b=document.getElementById('dnb-more');if(b)b.textContent='Plus de commerces ('+(withDist.length-4)+')';}
+  el.innerHTML = withDist.map((c,i) => `
+    <div class="dnb-card${i>=4?' dnb-extra':''}" ${c._merchantId?`onclick="openBrandById(${jsa(c._merchantId)},${jsa(c.name)})"`:''}>
       <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="Photo de ${esc(c.name)}" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}</div>
       <div class="dnb-scrim"></div>
       <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':(c.request?'À découvrir':'Bientôt')}</div>
@@ -5177,6 +5250,8 @@ function loadActiveRedemptions(){
   // Un seul filtre (userId) : pas besoin d'index composite, on trie/filtre le reste en mémoire.
   _redemptionsUnsub = db.collection('redemptions').where('userId','==',uid).onSnapshot(snap => {
     const now = Date.now();
+    S._redemptions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderRewardHistory();
     const active = [];
     if(!snap.empty) S._everRedeemed = true;
     _redeemTimes = {};
@@ -5200,6 +5275,22 @@ function loadActiveRedemptions(){
     </div>
     ${active.length>1?`<div class="dcode-more" onclick="showToast('${active.length-1} autre${active.length>2?'s':''} code${active.length>2?'s':''} disponible${active.length>2?'s':''}','success')">+${active.length-1} autre${active.length>2?'s':''} code${active.length>2?'s':''} actif${active.length>2?'s':''}</div>`:''}`;
   }, e => { console.warn('loadActiveRedemptions:', e); wrap.innerHTML=''; });
+}
+
+// Historique des récompenses (profil) : tous les bons de l'habitant, du plus récent au plus ancien.
+function renderRewardHistory(){
+  const el=document.getElementById('rw-hist-list');if(!el)return;
+  const ms=t=>t&&t.toMillis?t.toMillis():(t&&t.seconds?t.seconds*1000:0);
+  const list=(S._redemptions||[]).slice().sort((a,b)=>ms(b.createdAt)-ms(a.createdAt));
+  if(!list.length){el.innerHTML='<div class="rwh-empty">Tu n\'as encore échangé aucune récompense. Tes bons apparaîtront ici.</div>';return;}
+  const now=Date.now();
+  el.innerHTML=list.map(r=>{
+    const used=r.status==='used';const exp=ms(r.expiresAt);const expired=!used&&exp&&exp<now;
+    const st=used?['ok','Utilisé']:expired?['off','Expiré']:['on','À utiliser'];
+    const d=ms(used&&r.usedAt?r.usedAt:r.createdAt);
+    const when=d?new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'';
+    return `<div class="rwh-it"><div class="rwh-main"><div class="rwh-t">${esc(r.label||'Récompense')}</div><div class="rwh-s">${esc(r.merchantName||'')}${when?', '+(used?'utilisé le ':'échangé le ')+when:''}</div></div><div class="rwh-r"><div class="rwh-pts">${Number(r.cost)||0} pts</div><span class="rwh-st ${st[0]}">${st[1]}</span></div></div>`;
+  }).join('');
 }
 
 async function redeemReward(reward) {

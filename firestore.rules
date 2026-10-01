@@ -364,7 +364,12 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
       match /votes/{uid} {
         allow read: if isAuth();
-        allow create: if isAuth() && uid == request.auth.uid;
+        // Un vote = un choix valide de la question, rien d'autre (pas d'index hors liste, pas de champ en plus).
+        allow create: if isAuth() && uid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['optionIndex', 'createdAt'])
+          && request.resource.data.optionIndex is int
+          && request.resource.data.optionIndex >= 0
+          && request.resource.data.optionIndex < get(/databases/$(database)/documents/weeklyQuestions/$(qId)).data.options.size();
         allow update, delete: if false;
       }
     }

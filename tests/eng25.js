@@ -1,5 +1,5 @@
 // Refonte de l'accueil, des cadeaux, des questions et du fil : en-tête NOOVS / série / points, deux prochaines récompenses côte à côte,
-// écran Cadeaux réordonné (points, en cours, NOOVS, XP), questions « bulle » et « plein écran » en alternance, fil tourné vers les commerces
+// écran Cadeaux réordonné (points, en cours, NOOVS, XP), questions de commerce sur crème simple, questions NOOVA en plein cadre, fil tourné vers les commerces
 // autorisés (nouveautés, à la une), paliers d'xp et compatibilité des amis ; côté commerçant, nature de la publication.
 process.env.FIRESTORE_EMULATOR_HOST='127.0.0.1:8080';process.env.FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:9099';process.env.FUNCTIONS_EMULATOR='true';
 const puppeteer=require('puppeteer-core');
@@ -85,30 +85,21 @@ const login=async(p,email)=>{await p.goto(APP,{waitUntil:'load'});await wf(p,()=
     await p.screenshot({path:'/tmp/shots/wallet_new.png'});await axeCheck(p,'écran Cadeaux');
   });
 
-  await T('questions bulle / plein écran',async()=>{
+  await T('questions : commerces sur crème simple, NOOVA en plein cadre',async()=>{
     await p.evaluate(()=>goNav('home'));await sleep(400);
-    const modes=await p.evaluate(()=>{const m={};for(let i=0;i<40;i++){const k=qMode({_firestoreId:'camp'+i,_questionIdx:i%3});m[k]=(m[k]||0)+1;}
-      const perCampaign=[0,1,2].map(idx=>qMode({_firestoreId:'campX',_questionIdx:idx}));
-      return {m,same:qMode({_firestoreId:'abc',_questionIdx:1})===qMode({_firestoreId:'abc',_questionIdx:1}),perCampaign};});
-    check('Les deux mises en page sont utilisées (répartition proche de moitié-moitié) et le choix est stable pour une question donnée',modes.m.full>=10&&modes.m.bubble>=10&&modes.same,modes);
-    check('Les 3 questions d\'une même campagne partagent toujours la même mise en page (jamais bulle puis plein écran au sein d\'un même commerce)',new Set(modes.perCampaign).size===1,modes.perCampaign);
-    const pickQ=async(mode,type)=>p.evaluate((mode,type)=>{for(let i=0;i<60;i++){const q={_firestoreId:'z'+i,_merchantId:'m1',brand:'Le Fournil',ico:'x',pts:10,type,q:'Quelle est ta boisson préférée du matin ?',hint:'',opts:['Café','Thé','Chocolat'],items:['Café','Thé','Chocolat'],theme:'Boulangerie',usage:'Ta réponse aide Le Fournil'};if(qMode(q)===mode){S.qs=[q];S.mode='hook';S.qIdx=0;S.curQ=q;fillQuestion(q,{skipLabel:'Passer',skipFn:"goNav('home')"});goTo('question');return true;}}return false;},mode,type);
-    check('Question « plein écran » ouverte',await pickQ('full','mcq'));await sleep(700);
-    // Le fond dépend désormais du type de question (crème pour une classique, dégradé jaune pièce pour une
-    // qui rapporte des NOOVS — voir applyQuestionBg) : on vérifie la classe posée plutôt qu'une couleur figée,
-    // le dégradé ne se lit de toute façon pas sur background-color (c'est background-image).
-    const f=await p.evaluate(()=>{const q=document.getElementById('question');const o=document.querySelector('#ans-area .mcq-opt');const t=document.getElementById('q-text');return {cls:q.classList.contains('qfull'),qmode:q.classList.contains('qmode-classique')?'classique':q.classList.contains('qmode-noovs')?'noovs':'?',opt:getComputedStyle(o).backgroundColor,optColor:getComputedStyle(o).color,fs:parseFloat(getComputedStyle(t).fontSize),n:document.querySelectorAll('#ans-area .mcq-opt').length,letter:getComputedStyle(o,'::before').content};});
-    check('Plein écran : fond du bon type de question posé (classique ou NOOVS), gros texte de question (34 px), options plates sans coche ni lettre (la bordure suffit)',f.cls&&(f.qmode==='classique'||f.qmode==='noovs')&&f.fs>=32&&f.n===3&&/^rgb\((255, 255, 255|42, 26, 11)\)$/.test(f.opt),f);   // classique : crème (cartes blanches) ; sinon brun NOOVA
+    const openQ_=async(type,o={})=>p.evaluate((type,o)=>{const q={_firestoreId:'z'+type,_merchantId:'m1',brand:'Le Fournil',ico:'x',pts:10,type,q:'Quelle est ta boisson préférée du matin ?',hint:'',opts:['Café','Thé','Chocolat'],items:['Café','Thé','Chocolat'],theme:'Boulangerie',usage:'Ta réponse aide Le Fournil',...o};S.qs=[q];S.mode='hook';S.qIdx=0;S.curQ=q;fillQuestion(q,{skipLabel:'Passer',skipFn:"goNav('home')"});goTo('question');return true;},type,o);
+    const look=()=>p.evaluate(()=>{const q=document.getElementById('question');const o=document.querySelector('#ans-area .mcq-opt');return {full:q.classList.contains('qfull'),classique:q.classList.contains('qmode-classique'),noova:q.classList.contains('qmode-noova'),bg:getComputedStyle(q).backgroundColor,img:getComputedStyle(q).backgroundImage,fs:parseFloat(getComputedStyle(document.getElementById('q-text')).fontSize),optBg:o&&getComputedStyle(o).backgroundColor};});
+    let seen=[];
+    for(let i=0;i<12;i++){await p.evaluate(i=>{const q={_firestoreId:'camp'+i,_merchantId:'m1',brand:'Le Fournil',ico:'x',pts:10,type:'mcq',q:'Q ?',hint:'',opts:['A','B']};fillQuestion(q,{skipLabel:'Passer',skipFn:"goNav('home')"});},i);seen.push(await look());}
+    check('Questions de commerce : toujours la même présentation (bulle, fond crème uni, jamais plein écran)',seen.every(x=>!x.full&&x.classique&&x.bg==='rgb(255, 251, 215)'&&x.img==='none'),seen.slice(0,2));
+    await openQ_('mcq');await sleep(700);const b=await look();
+    check('Question de commerce : texte de taille normale (moins de 26 px), cartes blanches',b.fs<26&&b.optBg==='rgb(255, 255, 255)',b);
     await p.evaluate(()=>document.querySelector('#ans-area .mcq-opt').click());await sleep(300);
-    await p.screenshot({path:'/tmp/shots/q_full.png'});await axeCheck(p,'question plein écran (choix sélectionné)');
-    check('Question « bulle » ouverte',await pickQ('bubble','mcq'));await sleep(700);
-    const b=await p.evaluate(()=>{const q=document.getElementById('question');const o=document.querySelector('#ans-area .mcq-opt');return {cls:q.classList.contains('qfull'),bg:getComputedStyle(q).backgroundColor,fs:parseFloat(getComputedStyle(document.getElementById('q-text')).fontSize),optBg:getComputedStyle(o).backgroundColor};});
-    check('Bulle : fond clair habituel (pas de jaune plein), texte de 23 px, cartes claires',!b.cls&&!/rgb\(255, 195, 0\)/.test(b.bg)&&b.fs<26&&!/^rgb\(28, 25, 23\)$/.test(b.optBg),b);
-    await p.screenshot({path:'/tmp/shots/q_bubble.png'});await axeCheck(p,'question bulle');
-    for(const t of ['scale','text','rank']){await pickQ('full',t);await sleep(500);}
-    await p.screenshot({path:'/tmp/shots/q_full_rank.png'});await axeCheck(p,'question plein écran (classement)');
-    await pickQ('full','scale');await sleep(400);await axeCheck(p,'question plein écran (échelle)');
-    await pickQ('full','text');await sleep(400);await axeCheck(p,'question plein écran (texte libre)');
+    await p.screenshot({path:'/tmp/shots/q_bubble.png'});await axeCheck(p,'question de commerce (choix sélectionné)');
+    for(const t of ['scale','text','rank']){await openQ_(t);await sleep(500);await axeCheck(p,'question de commerce ('+t+')');}
+    await openQ_('mcq',{_byNoova:true,brand:'NOOVA'});await sleep(700);const n=await look();
+    check('Question posée par NOOVA : garde son plein cadre et son fond de marque',n.full&&n.noova,n);
+    await axeCheck(p,'question NOOVA');
     await p.evaluate(()=>{S.qs=[];goNav('home');});
   });
 
