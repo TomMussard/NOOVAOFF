@@ -11,7 +11,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const wf=(p,fn,arg,t=30000)=>p.waitForFunction(fn,{timeout:t,polling:200},arg);
 const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));},v);
 const CHROME=(process.env.CHROME_PATH||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome');
-const APP='http://localhost:8950/app.html'+(process.env.PROPO?'?propo':'');
+const APP='http://localhost:8950/app.html';
 const OUT=process.env.SHOTS_DIR||'/tmp/shots/visual';
 async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/noova-366d0/databases/(default)/documents',{method:'DELETE'});await fetch('http://127.0.0.1:9099/emulator/v1/projects/noova-366d0/accounts',{method:'DELETE'});await sleep(300);}
 
@@ -27,6 +27,13 @@ async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/no
   await db.doc('merchantPosts/p1').set({merchantId:'m1',merchantName:'Le Fournil',text:'Suite à vos avis, nous ouvrons dès 6h30 le samedi. Merci à tous pour vos retours !',campaignIds:['c0'],status:'published',city:'le-mans',createdAt:Timestamp.now(),publishedAt:Timestamp.now()});
   await db.doc('users/me').set({role:'user',welcomeClaimed:true,name:'Camille',email:'me@t.fr',city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1','m2'],friendUids:[],answeredCampaigns:[],points:420,xp:1300,streak:4,interests:['restauration'],onboardingStep:'done',seenHomeTour:true});
   await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});
+  // Amis (classement), notifications (demande d'ami avec apostrophe, message NOOVA)
+  await db.doc('users/me').update({friendUids:['f1','f2'],streak:4});
+  await db.doc('users/f1').set({role:'user',name:"Inès N'Diaye",city:'le-mans',cityLabel:'Le Mans',friendUids:['me'],xp:2400,points:200,streak:9,onboardingStep:'done'});
+  await db.doc('users/f2').set({role:'user',name:'Hugo',city:'le-mans',cityLabel:'Le Mans',friendUids:['me'],xp:800,points:90,streak:2,onboardingStep:'done'});
+  await db.doc('users/f3').set({role:'user',name:"Chloé D'Amico",city:'le-mans',cityLabel:'Le Mans',friendUids:[],xp:100,onboardingStep:'done'});
+  await db.doc('users/me/notifications/friendreq_f3').set({type:'friend_request',fromUid:'f3',fromName:"Chloé D'Amico",read:false,createdAt:Timestamp.now()});
+  await db.doc('users/me/notifications/n2').set({type:'noova_message',message:'Le Fournil a publié une nouveauté suite à vos avis.',read:false,createdAt:Timestamp.now()});
   const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox'].concat(process.env.CHROME_PROXY?['--proxy-server='+process.env.CHROME_PROXY,'--proxy-bypass-list=localhost;127.0.0.1']:[])});
   for(const [w,h,label] of [[390,844,'390'],[360,640,'360']]){
     const ctx=await browser.createBrowserContext();const p=await ctx.newPage();
@@ -48,6 +55,16 @@ async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/no
     await p.evaluate(()=>{try{closeRewardsSheet()}catch(e){}goNav('home')});await sleep(800);
     await p.evaluate(()=>{try{openBrandById('m1','Le Fournil')}catch(e){}});await sleep(1500);await shot('brand-page',true);
     await p.evaluate(()=>goNav('home'));await sleep(800);
+    await p.evaluate(()=>goNav('social'));await sleep(1200);
+    await p.evaluate(()=>{const b=[...document.querySelectorAll('#social .tab-btn')].find(x=>/Classement/.test(x.textContent));if(b)b.click();});await sleep(1500);await shot('ranking',true);
+    await p.evaluate(()=>toggleNotifPanel());await sleep(900);await shot('notif-panel');
+    await p.evaluate(()=>closeNotifPanel());
+    await p.evaluate(()=>goNav('profile'));await sleep(800);
+    await p.evaluate(()=>{const h=document.querySelector('#notif-section .sc-hdr');if(h){h.click();h.scrollIntoView();}});await sleep(900);await shot('notif-settings');
+    await p.evaluate(()=>askPerm({key:'shots',force:true,title:'Être prévenu des nouvelles questions',text:'Une notification quand un commerce que tu suis pose une question.',cta:'Activer',onAccept:()=>{}}));await sleep(600);await shot('perm-sheet');
+    await p.evaluate(()=>permLater());
+    await p.evaluate(()=>showCelebration({icon:'fire',title:'7 jours d’affilée !',subtitle:'Ta régularité paie — continue comme ça.'}));await sleep(900);await shot('celebrate-streak');
+    await p.evaluate(()=>{try{closeCelebration()}catch(e){}goNav('home')});await sleep(800);
     await p.evaluate(()=>openQ(0));await sleep(2000);await shot('question');
     await p.evaluate(()=>{const b=document.querySelector('#question .qopt, #question [class*="opt"]:not([class*="opts"])');if(b)b.click();});await sleep(800);await shot('question-selected');
     await ctx.close();

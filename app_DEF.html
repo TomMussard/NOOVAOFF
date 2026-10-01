@@ -81,9 +81,6 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <!-- Leaflet (carte) : chargé à la demande, à la première ouverture de la carte (voir loadLeaflet) -->
 <link rel="stylesheet" href="/tokens.css">
-<!-- Proposition visuelle (DA NOOVA) : ?propo l'active et la mémorise sur l'appareil, ?propo=0 revient à l'app actuelle.
-     Aucun effet sur le code, Firebase ou les données : seule une feuille de style s'ajoute. -->
-<script>try{var q=location.search;if(/[?&]propo=0\b/.test(q))localStorage.removeItem('nv_propo');else if(/[?&]propo\b/.test(q))localStorage.setItem('nv_propo','1');if(localStorage.getItem('nv_propo')==='1'){document.documentElement.classList.add('propo');document.write('<link rel="stylesheet" href="/propo.css">');}}catch(e){}</script>
 <style>
 :root,.screen,.amb-creme,.amb-marron{
   /* Alias historiques du fichier → tokens.css. Ils sont redéclarés sur chaque écran (.screen) et
@@ -138,12 +135,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
    aussi redéclarer chaque alias directement pour que les composants existants (qui utilisent
    var(--ink), var(--card)…) suivent le thème crème. */
 /* Ambiance crème : Accueil, Question, Profil, Récompenses portent class="amb-creme" (tokens.css). */
-.amb-creme,.amb-marron{--cd:rgba(255,195,0,.16);--cg:rgba(255,195,0,.4);--vd:rgba(28,25,23,.06);--vg:rgba(28,25,23,.14)}
+.amb-creme,.amb-marron{--cd:rgba(255,195,0,.16);--cg:rgba(255,195,0,.4);--vd:rgba(28,14,2,.06);--vg:rgba(28,14,2,.14)}
 .amb-creme.screen{background:var(--bg)}
 /* Le mode « plein écran » de la question (qfull) est une présentation sombre autonome, déjà
    cohérente avant ce retour en arrière — elle ne fait pas partie de la demande, donc elle garde
    les tokens sombres plutôt que d'hériter du crème du reste de #question. */
-#question.qfull{--bg:#121016;--surface:#1B1721;--surface-2:#241F2C;--text:#F7F4F1;--text-2:#A49CAE;--text-3:#6F6779;--trait:#2F2937;--ok:#3FBF87;--erreur:#E5484D;--jaune-faible:#3A2F00}
+#question.qfull{--bg:#1C0E02;--surface:#2A1A0B;--surface-2:#3A2715;--text:#FFFBD7;--text-2:#D9C9A8;--text-3:#A89478;--trait:#4A3420;--ok:#5FD39B;--erreur:#FF6B5E;--jaune-faible:#3D2B08}
 /* Fonds illustrés plein écran, ancrés à la fenêtre (pas au contenu qui scrolle). */
 .scr-bg{position:fixed;inset:0;background-size:cover;background-position:center top;background-repeat:no-repeat;pointer-events:none}
 /* Motif de marque en fond de la question, selon son type — les fonds dédiés (bg-question-*), pas
@@ -154,11 +151,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
    - NOOVS : dégradé or uni du haut en bas → texte sombre (comme un bouton jaune classique).
    - NOOVA : motif organique qui alterne clair/foncé sans zone prévisible → reste sur l'aplat sombre
      existant, le motif en filigrane très discret plutôt qu'à pleine force. */
-#question.qbg-on.qmode-classique,#question.qmode-classique.qfull{background-image:url('bg-question-classique.svg');background-size:cover;background-position:center top}
+/* Questions classiques : fond crème uni (le fond diagonal brun/crème gênait la lecture). */
+#question.qbg-on.qmode-classique,#question.qmode-classique.qfull{background-image:none;background-color:var(--marque-creme)}
+#question.qmode-classique.qfull{--bg:#FFFBD7;--surface:#FFFFFF;--surface-2:#FFF0A8;--trait:#EADFB8;--text:#1C0E02;--text-2:#6B5A45;--text-3:#8C7A62;--ok:#17663F;--erreur:#B42318;--jaune-faible:#FFF3D1}
+#question.qmode-classique.qfull .q-seg{background:var(--trait)}
+#question.qmode-classique.qfull .q-seg.done{background:var(--marque-encre)}
+#question.qmode-classique.qfull .q-pts{background:var(--marque-encre);color:var(--jaune)}
+#question.qmode-classique.qfull .q-close{background:var(--surface);border:1px solid var(--trait);color:var(--text)}
+#question.qmode-classique.qfull .q-content-card,#question.qmode-classique.qfull .ans-area:has(.scale-val,.rank-list,.ans-ta){background:var(--surface);border:1px solid var(--trait)}
+#question.qmode-classique.qfull .scale-labels{color:var(--text-2);text-shadow:none}
+#question.qmode-classique.qfull .scale-inp{background:var(--trait)!important}
+#question.qmode-classique.qfull .rank-item{background:var(--surface);border:1px solid var(--trait);color:var(--text)}
+#question.qmode-classique.qfull .rank-txt{color:var(--text)}
+#question.qmode-classique.qfull .rank-arr{background:var(--surface-2);color:var(--text)}
+#question.qmode-classique.qfull .ans-ta{background:var(--surface);border:1px solid var(--trait);color:var(--text)}
+#question.qmode-classique.qfull .skip-btn{background:var(--surface);border:1px solid var(--trait);color:var(--text)}
+#question.qmode-classique.qfull .btn-sub{background:var(--jaune);color:var(--marque-encre)}
+#question.qmode-classique.qfull .btn-sub:disabled,#question.qmode-classique.qfull .btn-sub.locked{background:var(--trait);color:var(--text-2)}
+#question.qmode-classique.qfull .disc-note{background:var(--surface-2);color:var(--text)}
 #question.qbg-on.qmode-noovs,#question.qmode-noovs.qfull{background-image:url('bg-question-noovs.svg');background-size:cover;background-position:center top}
-#question.qmode-noovs.qfull{--text:var(--marque-encre);--text-2:#5F594E;--surface:#FFFFFF;--surface-2:#FFF3D1;--bg:#FFEC96;--trait:rgba(28,25,23,.14)}
-#question.qmode-noova.qfull{background-image:linear-gradient(rgba(18,16,22,.85),rgba(18,16,22,.85)),url('bg-question-noova.svg');background-size:cover;background-position:center top}
-#question.qmode-noovs.qfull{background-image:linear-gradient(rgba(18,16,22,.55),rgba(18,16,22,.55)),url('cadre-ref-3.svg');background-size:cover;background-position:center top}
+#question.qmode-noovs.qfull{--text:var(--marque-encre);--text-2:#5F594E;--surface:#FFFFFF;--surface-2:#FFF3D1;--bg:#FFEC96;--trait:rgba(28,14,2,.14)}
+#question.qmode-noova.qfull{background-image:linear-gradient(rgba(28,14,2,.85),rgba(28,14,2,.85)),url('bg-question-noova.svg');background-size:cover;background-position:center top}
+#question.qmode-noovs.qfull{background-image:linear-gradient(rgba(28,14,2,.55),rgba(28,14,2,.55)),url('cadre-ref-3.svg');background-size:cover;background-position:center top}
 /* « Toutes les récompenses » (feuille du bas) : illustration de marque en fond. */
 #rewards-sheet .cs-box{position:relative}
 #rewards-sheet .scr-bg{position:absolute;border-radius:var(--r-lg) var(--r-lg) 0 0}
@@ -278,7 +292,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .feed-post.cm-news{background:var(--surface-2)}
 .cm-news .fp-name,.cm-news .cm-news-t{color:var(--ink)}.cm-news .fp-time{color:var(--ink2)}
 .cm-news-t{font-size:var(--fs-3);line-height:1.55;font-weight:600}
-.cm-news .fp-foot{border-top-color:rgba(18,16,22,.12)}.cm-news .fp-btn{color:var(--ink2)}.cm-news .fp-btn.liked{color:var(--jaune-ink)}
+.cm-news .fp-foot{border-top-color:rgba(28,14,2,.12)}.cm-news .fp-btn{color:var(--ink2)}.cm-news .fp-btn.liked{color:var(--jaune-ink)}
 .cm-news .fp-tag{background:var(--jaune);color:var(--jaune-ink)}
 .cm-av-news{background:none;overflow:hidden}
 .cm-av-streak{background:var(--surface-2);color:var(--yellow)}
@@ -286,13 +300,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .cm-streak-t{font-size:var(--fs-3);color:var(--ink);line-height:1.5}
 /* Actualités des commerces : une couleur par nature (à la une = jaune plein, nouveauté = accent, actualité / avis = sombre) */
 .feed-post.cm-k-top{background:var(--blanc)}
-.cm-k-top .fp-name,.cm-k-top .cm-news-t{color:var(--jaune-ink)}.cm-k-top .fp-time{color:rgba(18,16,22,.65)}
+.cm-k-top .fp-name,.cm-k-top .cm-news-t{color:var(--jaune-ink)}.cm-k-top .fp-time{color:rgba(28,14,2,.65)}
 .cm-k-top .fp-tag{background:var(--surface-2);color:var(--text)}
 .cm-k-top .cm-news-t{font-family:var(--fd);font-weight:800;font-size:var(--fs-4);line-height:1.3;letter-spacing:var(--lettrage-titre)}
-.cm-k-top .fp-foot{border-top-color:rgba(18,16,22,.12)}.cm-k-top .fp-btn{color:rgba(18,16,22,.7)}.cm-k-top .fp-btn.liked{color:var(--jaune-ink)}
+.cm-k-top .fp-foot{border-top-color:rgba(28,14,2,.12)}.cm-k-top .fp-btn{color:rgba(28,14,2,.7)}.cm-k-top .fp-btn.liked{color:var(--jaune-ink)}
 .feed-post.cm-k-new{background:var(--blanc);}
-.cm-k-new .fp-name,.cm-k-new .cm-news-t{color:var(--jaune-ink)}.cm-k-new .fp-time{color:rgba(18,16,22,.65)}
-.cm-k-new .fp-foot{border-top-color:rgba(18,16,22,.12)}.cm-k-new .fp-btn{color:rgba(18,16,22,.7)}.cm-k-new .fp-btn.liked{color:var(--jaune-ink)}
+.cm-k-new .fp-name,.cm-k-new .cm-news-t{color:var(--jaune-ink)}.cm-k-new .fp-time{color:rgba(28,14,2,.65)}
+.cm-k-new .fp-foot{border-top-color:rgba(28,14,2,.12)}.cm-k-new .fp-btn{color:rgba(28,14,2,.7)}.cm-k-new .fp-btn.liked{color:var(--jaune-ink)}
 .feed-post.cm-level{background:var(--surface)}
 .cm-av-level{color:var(--blanc)}
 .cm-level-t{font-size:var(--fs-3);color:var(--ink);line-height:1.5}
@@ -300,7 +314,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .cm-compat-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .cm-compat-big{font-family:var(--fd);font-weight:800;font-size:var(--fs-7);letter-spacing:var(--lettrage-titre);color:var(--jaune-ink);line-height:1}
 .cm-compat-t{font-size:var(--fs-2);line-height:1.4;color:var(--jaune-ink)}
-.cm-compat .cp-bar{background:rgba(18,16,22,.16)}.cm-compat .cp-bar>div{background:var(--jaune-ink)}
+.cm-compat .cp-bar{background:rgba(28,14,2,.16)}.cm-compat .cp-bar>div{background:var(--jaune-ink)}
 /* Carte « Tes avis ont aidé N commerces » : calculée localement (jamais stockée), réservée à son auteur, toujours en tête du fil. */
 .feed-post.cm-mine{background:var(--marque-encre);color:var(--blanc);padding:16px 16px 17px;display:flex;gap:13px;align-items:flex-start}
 .cm-mine-ico{width:36px;height:36px;border-radius:var(--r-sm);background:rgba(255,195,0,.16);color:var(--nv-yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -593,7 +607,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
    au lieu de dépendre du fond à cet endroit précis. */
 #question.qfull .scale-val{display:inline-block;background:var(--nv-black);color:var(--nv-yellow);padding:6px 28px;border-radius:var(--r-lg);font-size:var(--fs-8)}
 .scale-labels{display:flex;justify-content:space-between;font-size:var(--fs-1);color:var(--ink3);margin-bottom:7px}
-#question.qfull .scale-labels{color:var(--blanc);font-weight:700;text-shadow:0 1px 6px rgba(18,16,22,.7)}
+#question.qfull .scale-labels{color:var(--blanc);font-weight:700;text-shadow:0 1px 6px rgba(28,14,2,.7)}
 .scale-inp{width:100%;-webkit-appearance:none;height:6px;border-radius:var(--r-pill);background:linear-gradient(to right,var(--coral) 41%, var(--bg3) 41%);outline:none;cursor:pointer}
 .scale-inp::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--coral);box-shadow:none;cursor:pointer;transition:transform .12s}
 .scale-inp::-webkit-slider-thumb:active{transform:scale(1.2)}
@@ -624,16 +638,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 #question.qfull .char-ct{color:var(--text-2)}
 #question.qfull .scale-val{font-size:var(--fs-9);color:var(--text);margin:6vh 0 14px}
 #question.qfull .scale-labels{color:var(--text-2);font-weight:700}
-#question.qfull .scale-inp{height:10px;background:rgba(28,25,23,.2)!important}
+#question.qfull .scale-inp{height:10px;background:rgba(28,14,2,.2)!important}
 #question.qfull .scale-inp::-webkit-slider-thumb{background:var(--jaune);width:34px;height:34px;}
 #question.qfull .rank-item{background:var(--surface-2);border:none;color:var(--blanc);border-radius:var(--r-lg);padding:15px}
 #question.qfull .rank-txt{color:var(--blanc);font-size:var(--fs-3);font-weight:700}
 #question.qfull .rank-num{background:var(--surface-2);color:var(--text)}
 #question.qfull .rank-arr{background:rgba(255,255,255,.14);border:none;color:var(--blanc)}
 #question.qfull #lock-fill{background:var(--text-3)}
-#question.qfull .skip-btn{background:rgba(28,25,23,.12);color:var(--nv-black)}
+#question.qfull .skip-btn{background:rgba(28,14,2,.12);color:var(--nv-black)}
 #question.qfull .btn-sub{background:var(--surface-2);color:var(--nv-yellow);}
-#question.qfull .btn-sub:disabled,#question.qfull .btn-sub.locked{opacity:1;background:rgba(28,25,23,.16);color:var(--nv-black)}
+#question.qfull .btn-sub:disabled,#question.qfull .btn-sub.locked{opacity:1;background:rgba(28,14,2,.16);color:var(--nv-black)}
 .skip-btn{padding:15px 16px;border-radius:var(--r-btn);background:var(--cream);border:none;color:var(--muted);font-size:var(--fs-3);font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .13s}
 /* REWARD */
 #reward{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;position:relative}
@@ -648,7 +662,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .pe-num{font-family:'Bricolage Grotesque',var(--fd);font-weight:800;font-size:var(--fs-8);color:var(--jaune-ink);line-height:1;font-variant-numeric:tabular-nums}
 .pe-right{margin-left:auto;text-align:right}
 .pe-coin{margin-left:8px;flex-shrink:0;align-self:center}
-.pe-lbl{font-size:var(--fs-1);color:rgba(18,16,22,.65);margin-bottom:2px;font-weight:700}
+.pe-lbl{font-size:var(--fs-1);color:rgba(28,14,2,.65);margin-bottom:2px;font-weight:700}
 .pe-tot{font-family:var(--fd);font-weight:800;font-size:var(--fs-4);color:var(--jaune-ink)}
 .usage-card{width:100%;background:var(--surface);border:none;border-radius:var(--r-card);padding:14px;display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;position:relative;z-index:1}
 .share-row{width:100%;background:var(--surface);border:none;border-radius:var(--r-card);padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .13s;margin-bottom:13px;position:relative;z-index:1}
@@ -671,7 +685,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .sc-btn{padding:11px 14px;border-radius:var(--r-btn);font-size:var(--fs-2);font-weight:800;border:none;cursor:pointer;font-family:var(--fd);flex:1;text-align:center;transition:all .13s}
 .sc-btn:active{transform:scale(.96)}
 .sc-btn.p{background:var(--surface-2);color:var(--yellow)}
-.sc-btn.g{background:rgba(28,25,23,.08);color:var(--gold-text)}
+.sc-btn.g{background:rgba(28,14,2,.08);color:var(--gold-text)}
 /* COMPARE SHEET */
 #compare-sheet{position:fixed;inset:0;z-index:8000;display:none;align-items:flex-end}
 #compare-sheet.open{display:flex}
@@ -842,7 +856,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .nf-row .nf-d{font-size:var(--fs-1);color:var(--ink2);margin-top:1px;line-height:1.4}
 .nf-dev{margin:10px 14px 4px;background:var(--bg2);border-radius:var(--r-md);padding:12px 14px;font-size:var(--fs-2);color:var(--ink);line-height:1.55}
 .nf-dev.ok{background:var(--md)}
-.nf-dev button{margin-top:9px;padding:9px 16px;border-radius:var(--r-btn);border:none;background:var(--surface-2);color:var(--blanc);font-family:var(--fd);font-weight:800;font-size:var(--fs-2);cursor:pointer}
+.nf-dev button{margin-top:9px;padding:9px 16px;min-height:var(--tactile-min);border-radius:var(--r-btn);border:none;background:var(--marque-encre);color:var(--jaune);font-family:var(--fd);font-weight:800;font-size:var(--fs-2);cursor:pointer}
 .sec-card.acc.open .acc-body{display:block}
 .sc-title{font-family:var(--fd);font-weight:700;font-size:var(--fs-3);letter-spacing:var(--lettrage-titre);color:var(--ink);flex:1}
 .consent-it{padding:14px 16px;display:flex;align-items:center;gap:13px;border-bottom:1px solid var(--bg2)}
@@ -919,12 +933,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 /* ===== brand page (Welcome-to-the-Jungle style) ===== */
 .bp-wrap{min-height:100%;padding-bottom:34px}
 .bp-cover{padding:56px 20px 46px;color:var(--blanc);position:relative}
-.bp-back{position:absolute;top:18px;left:16px;width:38px;height:38px;border-radius:var(--r-btn);background:rgba(28,25,23,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:var(--fs-4);color:var(--blanc);cursor:pointer;border:none}
+.bp-back{position:absolute;top:18px;left:16px;width:38px;height:38px;border-radius:var(--r-btn);background:rgba(28,14,2,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:var(--fs-4);color:var(--blanc);cursor:pointer;border:none}
 .bp-logo-wrap{display:flex;align-items:center;gap:13px;margin-bottom:14px}
 .bp-name{font-family:var(--fd);font-weight:800;font-size:var(--fs-6);letter-spacing:var(--lettrage-titre);color:var(--blanc);line-height:1.05}
 .bp-tag{font-size:var(--fs-2);color:rgba(255,255,255,.85);margin-top:3px}
 .bp-chips{display:flex;gap:7px;flex-wrap:wrap}
-.bp-chip{font-size:var(--fs-1);font-weight:800;background:rgba(28,25,23,.6);color:var(--blanc);padding:5px 10px;border-radius:var(--r-tag)}
+.bp-chip{font-size:var(--fs-1);font-weight:800;background:rgba(28,14,2,.6);color:var(--blanc);padding:5px 10px;border-radius:var(--r-tag)}
 .bp-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:-30px 18px 22px;position:relative;z-index:2}
 .bp-stat{background:var(--surface);border-radius:var(--r-media);padding:11px 5px;text-align:center;}
 .bp-stat-n{font-family:var(--fd);font-weight:800;font-size:var(--fs-4);color:var(--ink);letter-spacing:var(--lettrage-titre)}
@@ -979,9 +993,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .tour-txt{font-size:var(--fs-2);color:var(--jaune-ink);line-height:1.55;font-weight:600;margin-bottom:13px}
 .tour-foot{display:flex;align-items:center;justify-content:space-between}
 .tour-dots{display:flex;gap:5px}
-.tour-dot{width:6px;height:6px;border-radius:var(--r-pill);background:rgba(18,16,22,.18);transition:all .2s}
+.tour-dot{width:6px;height:6px;border-radius:var(--r-pill);background:rgba(28,14,2,.18);transition:all .2s}
 .tour-dot.on{background:var(--coral);width:16px}
-.tour-skip{font-size:var(--fs-1);color:rgba(18,16,22,.6);font-weight:600;cursor:pointer;background:none;border:none;font-family:inherit;padding:8px 6px}
+.tour-skip{font-size:var(--fs-1);color:rgba(28,14,2,.6);font-weight:600;cursor:pointer;background:none;border:none;font-family:inherit;padding:8px 6px}
 .tour-skip:focus-visible,.tour-next:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .tour-next{background:var(--surface-2);color:var(--coral);font-family:var(--fd);font-weight:800;font-size:var(--fs-2);padding:9px 16px;border-radius:var(--r-btn);border:none;cursor:pointer}
 
@@ -1075,10 +1089,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .dpat-body>*:not(.mark){position:relative;z-index:1}
 .dpat-body .mark{width:72px;height:72px;bottom:-16px;right:-8px;opacity:.14}
 .dpat-name{font-family:var(--fd);font-weight:800;font-size:var(--fs-4);color:var(--nv-yellow-ink);letter-spacing:var(--lettrage-titre)}
-.dpat-sub{font-size:var(--fs-2);color:rgba(28,25,23,.65);margin-top:1px;margin-bottom:10px}
-.dpat-bar{height:8px;background:rgba(28,25,23,.16);border-radius:var(--r-pill);overflow:hidden;margin-bottom:9px}
+.dpat-sub{font-size:var(--fs-2);color:rgba(28,14,2,.65);margin-top:1px;margin-bottom:10px}
+.dpat-bar{height:8px;background:rgba(28,14,2,.16);border-radius:var(--r-pill);overflow:hidden;margin-bottom:9px}
 .dpat-bar-fill{height:100%;background:var(--nv-black);border-radius:var(--r-pill);transition:width .6s ease}
-.dpat-txt{font-size:var(--fs-2);color:rgba(28,25,23,.75)}
+.dpat-txt{font-size:var(--fs-2);color:rgba(28,14,2,.75)}
 .dpat-txt strong{color:var(--nv-black)}
 
 /* — Section titres type "À deux pas" — */
@@ -1185,7 +1199,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .podium-slot.p1 .podium-av{width:58px;height:58px;font-size:var(--fs-5)}
 .podium-name{font-family:var(--fd);font-weight:800;font-size:var(--fs-2);color:var(--blanc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 2px}
 .podium-pts{font-size:var(--fs-1);color:rgba(255,255,255,.55);font-weight:700;margin-top:1px;margin-bottom:8px}
-.podium-bar{width:100%;border-radius:var(--r-sm) var(--r-sm) 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:7px;font-family:var(--fd);font-weight:800;font-size:var(--fs-3);color:rgba(28,25,23,.55)}
+.podium-bar{width:100%;border-radius:var(--r-sm) var(--r-sm) 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:7px;font-family:var(--fd);font-weight:800;font-size:var(--fs-3);color:rgba(28,14,2,.55)}
 .podium-slot.p1 .podium-bar{height:58px;background:#F0B400}
 .podium-slot.p2 .podium-bar{height:40px;background:#B9B2A0}
 .podium-slot.p3 .podium-bar{height:30px;background:#B97D42}
@@ -1237,9 +1251,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 /* — Profil : commerces autorisés avec toggle — */
 .dprof-hdr{padding:64px 18px 26px;background:linear-gradient(rgba(242,151,21,.45),rgba(242,151,21,.45)),var(--nv-yellow) url('cadre-ref-4.svg') center/cover;border-radius:0 0 var(--r-lg) var(--r-lg);position:relative;overflow:hidden}
 .dprof-id{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;position:relative;z-index:1}
-.dprof-av{width:84px;height:84px;border-radius:50%;background:rgba(28,25,23,.88);border:3px solid rgba(255,255,255,.55);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:var(--fs-7);color:var(--nv-yellow);position:relative;overflow:hidden;cursor:pointer}
+.dprof-av{width:84px;height:84px;border-radius:50%;background:rgba(28,14,2,.88);border:3px solid rgba(255,255,255,.55);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:var(--fs-7);color:var(--nv-yellow);position:relative;overflow:hidden;cursor:pointer}
 .dprof-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.dprof-av-edit{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;background:rgba(28,25,23,.92);color:var(--nv-yellow);border:2px solid var(--nv-yellow);display:flex;align-items:center;justify-content:center;z-index:2}
+.dprof-av-edit{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;background:rgba(28,14,2,.92);color:var(--nv-yellow);border:2px solid var(--nv-yellow);display:flex;align-items:center;justify-content:center;z-index:2}
 .dprof-city{font-family:var(--fd);font-weight:800;font-size:var(--fs-5);letter-spacing:var(--lettrage-titre);color:var(--ink)}
 .dprof-lvl{display:inline-block;font-size:var(--fs-1);font-weight:700;background:rgba(24,20,16,.12);color:var(--nv-yellow-ink);padding:4px 10px;border-radius:var(--r-tag);margin-top:6px}
 .dprof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 18px 14px;position:relative;z-index:2}
@@ -1256,6 +1270,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="/noova.css">
 </head>
 <body>
 <div class="test-banner" role="note">Version test — NOOVA n'est pas encore lancée officiellement</div>
@@ -1687,7 +1702,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
     </div>
     <div class="dprof-stats">
       <div class="dprof-stat"><div class="dprof-stat-n" id="s-ans">0</div><div class="dprof-stat-l">Avis</div></div>
-      <div class="dprof-stat"><div class="dprof-stat-n" id="s-str">1</div><div class="dprof-stat-l">Série</div></div>
+      <div class="dprof-stat"><div class="dprof-stat-n" id="s-str">1</div><div class="dprof-stat-l"><img src="noov-flame.svg" alt="" style="width:14px;height:14px;vertical-align:-2px;margin-right:3px">Série</div></div>
       <div class="dprof-stat"><div class="dprof-stat-n" id="s-friends">0</div><div class="dprof-stat-l">Amis</div></div>
     </div>
     <div style="display:none" id="s-pts">0</div>
@@ -2099,7 +2114,7 @@ async function confirmInterestsEditSheet(){
 // rattaché au slug « le-mans » pour tout l'appariement (campagnes, commerces, règles), mais garde son nom affiché
 // (cityLabel) : « Allonnes » reste écrit « Allonnes » dans son profil, seule la ville de correspondance change.
 const NOOVA_KNOWN_CITIES=[
-  {slug:'le-mans',label:'Le Mans',zone:['Aigné','Allonnes','Arnage','Champagné','Changé','Coulaines','La Chapelle-Saint-Aubin','Laigné-en-Belin','Mulsanne','Neuville-sur-Sarthe','Pruillé-le-Chétif','Ruaudin','Saint-Saturnin','Sargé-lès-Le Mans',"Savigné-l'Évêque",'Trangé',"Yvré-l'Évêque"]},
+  {slug:'le-mans',label:'Le Mans',zone:['Aigné','Allonnes','Arnage','Champagné','Changé','Chaufour-Notre-Dame','Coulaines','Fatines','Fay','La Chapelle-Saint-Aubin','Laigné-en-Belin','Mulsanne','Neuville-sur-Sarthe','Pruillé-le-Chétif','Rouillon','Ruaudin','Saint-Georges-du-Bois','Saint-Saturnin','Sargé-lès-Le Mans',"Savigné-l'Évêque",'Trangé',"Yvré-l'Évêque"]},
   {slug:'angers',label:'Angers',zone:[]}
 ];
 function normalizeCity(s){
@@ -2750,6 +2765,9 @@ function timeAgo(date) {
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+// Valeur insérée comme argument JS dans un attribut on*="…" : chaîne JSON (guillemets, antislash, apostrophes
+// gérés), puis échappée pour l'attribut. Un prénom comme « N'Diaye » ou « ');alert(1)// » reste une simple chaîne.
+function jsa(v){return esc(JSON.stringify(v==null?'':String(v)));}
 
 // ─── Micro-interactions : entrée en cascade + compteurs animés ────────────
 // Applique une entrée en fondu/translation décalée à chaque enfant direct d'un
@@ -2873,8 +2891,8 @@ function initFriendsPanel(){
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
           <div style="width:36px;height:36px;border-radius:var(--r-sm);background:var(--surface-2);color:var(--coral);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:var(--fs-3);flex-shrink:0">${(n.fromName||'?')[0].toUpperCase()}</div>
           <div style="flex:1;min-width:0"><div style="font-size:var(--fs-2);font-weight:700;color:var(--ink)">${esc(n.fromName||'Utilisateur')}</div><div style="font-size:var(--fs-1);color:var(--ink3)">veut être ton ami</div></div>
-          <button onclick="acceptFriendRequest('${n.id}','${n.fromUid}','${esc(n.fromName||'')}');this.closest('div[style]').remove()" style="padding:7px 13px;background:var(--coral);color:var(--jaune-ink);border:none;border-radius:var(--r-btn);font-size:var(--fs-2);font-weight:800;cursor:pointer;font-family:var(--fd)">Accepter</button>
-          <button onclick="declineFriendRequest('${n.id}');this.closest('div[style]').remove()" style="padding:7px 11px;background:var(--bg2);color:var(--ink2);border:none;border-radius:var(--r-btn);font-size:var(--fs-2);font-weight:700;cursor:pointer">✕</button>
+          <button onclick="acceptFriendRequest(${jsa(n.id)},${jsa(n.fromUid)},${jsa(n.fromName||'')});this.closest('div[style]').remove()" style="padding:7px 13px;background:var(--coral);color:var(--jaune-ink);border:none;border-radius:var(--r-btn);font-size:var(--fs-2);font-weight:800;cursor:pointer;font-family:var(--fd)">Accepter</button>
+          <button onclick="declineFriendRequest(${jsa(n.id)});this.closest('div[style]').remove()" style="padding:7px 11px;background:var(--bg2);color:var(--ink2);border:none;border-radius:var(--r-btn);font-size:var(--fs-2);font-weight:700;cursor:pointer">✕</button>
         </div>`).join('')}</div>
     </div>`:'' ;
   fp.innerHTML=`
@@ -3054,7 +3072,7 @@ function renderRanking(){
         const label=u.me?'Toi':esc(u.n||'Ami');
         return `<div class="podium-slot ${cls}${u.me?' me':''}">
           <div class="podium-crown">${crownByRank[rank]}</div>
-          <div class="podium-av" style="background:rgba(255,255,255,.16);color:var(--blanc)">${avInner(u.photoUrl,u.n)}</div>
+          <div class="podium-av" style="background:var(--marque-encre);color:var(--jaune)">${avInner(u.photoUrl,u.n)}</div>
           <div class="podium-name">${label}</div>
           <div class="podium-pts">${u.xp} xp</div>
           <div class="podium-bar">${rank}</div>
@@ -3319,8 +3337,8 @@ function renderNotifications(){
       inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> <strong>${esc(n.fromName)}</strong> veut être ton ami !</div>
         <div class="notif-meta">${ts}</div>
         ${!n.read?`<div class="notif-actions">
-          <button class="notif-btn accept" onclick="acceptFriendRequest('${n.id}','${n.fromUid}','${esc(n.fromName)}')">Accepter</button>
-          <button class="notif-btn decline" onclick="declineFriendRequest('${n.id}')">Refuser</button>
+          <button class="notif-btn accept" onclick="acceptFriendRequest(${jsa(n.id)},${jsa(n.fromUid)},${jsa(n.fromName)})">Accepter</button>
+          <button class="notif-btn decline" onclick="declineFriendRequest(${jsa(n.id)})">Refuser</button>
         </div>`:'<div class="notif-done">Traitée</div>'}`;
     }else if(n.type==='friend_accepted'){
       inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> <strong>${esc(n.fromName)}</strong> a accepté ta demande d'ami !</div>
@@ -3724,7 +3742,7 @@ function openBrand(name,back){
   surveys.forEach(s=>{
     const active=s.status==='active';
     const isdone=s.status==='done';
-    sv+=`<div class="bp-survey${active?' active':''}">${active?'':''}<div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:var(--fs-1);font-weight:700;color:var(--jaune-ink);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>${s.n} questions</span><span>⏱️ ~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand('${name.replace(/'/g,"\\'")}')">Répondre au questionnaire</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
+    sv+=`<div class="bp-survey${active?' active':''}">${active?'':''}<div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:var(--fs-1);font-weight:700;color:var(--jaune-ink);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>${s.n} questions</span><span>~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand(${jsa(name)})">Répondre au questionnaire</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
   });
   if(!surveys.length)sv='<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>';
   document.getElementById('bp-wrap').innerHTML=`
@@ -4007,7 +4025,7 @@ async function renderNearbyGrid(){
     }).sort((a,b) => (a._dist??1e12) - (b._dist??1e12));
   }
   el.innerHTML = withDist.slice(0,4).map(c => `
-    <div class="dnb-card" ${c._merchantId?`onclick="openBrandById('${c._merchantId}','${esc(c.name).replace(/'/g,"\\'")}')"`:''}>
+    <div class="dnb-card" ${c._merchantId?`onclick="openBrandById(${jsa(c._merchantId)},${jsa(c.name)})"`:''}>
       <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="Photo de ${esc(c.name)}" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}</div>
       <div class="dnb-scrim"></div>
       <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':(c.request?'À découvrir':'Bientôt')}</div>
@@ -4065,7 +4083,7 @@ function mapRenderList(){
     const d=mapDist(m);
     const tag=m.hasQ?'<span class="mf-tag q">Question active</span>':m.request?'<span class="mf-tag q">À découvrir</span>':m.authorized?'<span class="mf-tag">Autorisé</span>':'<span class="mf-tag">Bientôt</span>';
     const meta=esc(m.sector)+(d!=null?', à '+fmtDist(d):(m.lat==null&&m._geoDone?', adresse introuvable':''));
-    return `<div class="mf-row${_mapSt.sel===m.id?' sel':''}" data-id="${m.id}" onclick="mapSelect('${m.id}',true)">${logoHTML(m.name,46,m.logoUrl)}<div class="mf-bd"><div class="mf-nm">${esc(m.name)}</div><div class="mf-mt">${meta}</div>${tag}</div><div class="mf-act"><button onclick="event.stopPropagation();openBrandById('${m.id}','${esc(m.name).replace(/'/g,"\\'")}')">Voir</button>${m.lat!=null?`<button class="alt" onclick="event.stopPropagation();mapDirections('${m.id}')">Y aller</button>`:''}</div></div>`;
+    return `<div class="mf-row${_mapSt.sel===m.id?' sel':''}" data-id="${m.id}" onclick="mapSelect('${m.id}',true)">${logoHTML(m.name,46,m.logoUrl)}<div class="mf-bd"><div class="mf-nm">${esc(m.name)}</div><div class="mf-mt">${meta}</div>${tag}</div><div class="mf-act"><button onclick="event.stopPropagation();openBrandById(${jsa(m.id)},${jsa(m.name)})">Voir</button>${m.lat!=null?`<button class="alt" onclick="event.stopPropagation();mapDirections('${m.id}')">Y aller</button>`:''}</div></div>`;
   }).join('');
 }
 function mapApplyMarkers(){
@@ -4773,7 +4791,7 @@ function renderFollowPrompt(mid,brand){
   const b=esc(brand||'ce commerce'),id=esc(mid);
   el.innerHTML=`<div class="follow-card" role="group" aria-label="Suivre ${b}"><div class="fc-t">Tu veux suivre ${b} ?</div>
     <div class="fc-d">Tu recevras ses prochaines questions à l'accueil, et il pourra voir ton profil anonyme (ville, tranche d'âge, centres d'intérêt). Tu peux arrêter à tout moment dans Profil.</div>
-    <div class="fc-b"><button class="btn-p" onclick="followFromReward('${id}','${b.replace(/'/g,"\\'")}')">Suivre</button><button class="btn-s" onclick="dismissFollow()">Pas maintenant</button></div>
+    <div class="fc-b"><button class="btn-p" onclick="followFromReward(${jsa(id)},${jsa(b)})">Suivre</button><button class="btn-s" onclick="dismissFollow()">Pas maintenant</button></div>
     <button class="fc-x" onclick="blockFromReward('${id}')">Ne plus voir ce commerce</button></div>`;
 }
 async function followFromReward(mid,brand){
@@ -5136,7 +5154,7 @@ function renderInProgressRewards(){
     .sort((a,b) => (rewardCost(a)-S.pts) - (rewardCost(b)-S.pts)).slice(0,5);
   if(countEl) countEl.textContent = rewards.length ? '('+rewards.length+')' : '';
   renderTierTrack();
-  if(!rewards.length){ el.innerHTML='<div style="text-align:center;padding:16px;color:rgba(18,16,22,.65);font-size:var(--fs-2)">Tout est disponible dès maintenant.</div>'; return; }
+  if(!rewards.length){ el.innerHTML='<div style="text-align:center;padding:16px;color:rgba(28,14,2,.65);font-size:var(--fs-2)">Tout est disponible dès maintenant.</div>'; return; }
   el.innerHTML = rewards.map(r => {
     const pct = Math.max(0, Math.min(100, (S.pts / rewardCost(r)) * 100));
     const circ = 2*Math.PI*20;
@@ -5178,7 +5196,7 @@ function loadActiveRedemptions(){
       <div class="dcode-name">${esc(r.label||'Récompense')}</div>
       <div class="dcode-sub">${esc(r.merchantName||'')}${exp?', expire le '+exp:''}</div>
       <div class="dcode-box"><div class="dcode-lbl">Code à montrer en caisse</div><div class="dcode-val">${esc((r.code||'').split('').join(' '))}</div></div>
-      <button class="dcode-btn" onclick="showVoucherModal({id:'${r.id}',code:'${(r.code||'').replace(/'/g,"\\'")}',label:'${(r.label||'').replace(/'/g,"\\'")}',merchantName:'${(r.merchantName||'').replace(/'/g,"\\'")}',cost:${r.cost||0},tier:${r.tier||0},purchaseCondition:${r.purchaseCondition?`'${r.purchaseCondition.replace(/'/g,"\\'")}'`:'null'},expiresAt:${r._expMs?`new Date(${r._expMs})`:'null'}})">Utiliser maintenant</button>
+      <button class="dcode-btn" onclick="showVoucherModal({id:${jsa(r.id)},code:${jsa(r.code||'')},label:${jsa(r.label||'')},merchantName:${jsa(r.merchantName||'')},cost:${Number(r.cost)||0},tier:${Number(r.tier)||0},purchaseCondition:${r.purchaseCondition?jsa(r.purchaseCondition):'null'},expiresAt:${r._expMs?`new Date(${r._expMs})`:'null'}})">Utiliser maintenant</button>
     </div>
     ${active.length>1?`<div class="dcode-more" onclick="showToast('${active.length-1} autre${active.length>2?'s':''} code${active.length>2?'s':''} disponible${active.length>2?'s':''}','success')">+${active.length-1} autre${active.length>2?'s':''} code${active.length>2?'s':''} actif${active.length>2?'s':''}</div>`:''}`;
   }, e => { console.warn('loadActiveRedemptions:', e); wrap.innerHTML=''; });

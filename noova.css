@@ -1,0 +1,174 @@
+/* NOOVA — composants de la DA NOOVA (chargé après le style de app_DEF.html).
+   Les couleurs vivent dans tokens.css ; ici : marges, cartes, titres, boutons, moments forts en or,
+   logotype, navigation et mouvement, identiques sur tous les écrans. */
+
+/* ─── 1. Fond ───────────────────────────────────────────── */
+html #question.qmode-noova.qfull { background-color: var(--marque-marron) }
+html, html body, html #shell, html #app { background: var(--bg) }
+
+/* ─── 2. Une seule marge d'écran : 16px ───────────────────────────────────────────────── */
+html .sec-lbl,
+html .dsec-row,
+html .dsec-h { padding-left: var(--s4); padding-right: var(--s4) }
+html .dtoday-card,
+html .dpat-card,
+html .dpat-row,
+html .dmap-card,
+html .dprof-stats,
+html .cm-invite,
+html .inv-c { margin-left: var(--s4); margin-right: var(--s4) }
+html .dnearby-grid { padding-left: var(--s4); padding-right: var(--s4); gap: var(--s2) }
+html .q-list { padding-left: var(--s4); gap: var(--s2) }
+html .q-card:only-child { margin-right: var(--s4) }
+html .dh-hdr { padding-left: var(--s4); padding-right: var(--s4) }
+html .wallet-wrap { padding-left: var(--s4); padding-right: var(--s4) }
+html .ob-slide { padding-left: var(--s5); padding-right: var(--s5) }
+html .ob-bottom { padding-left: var(--s4); padding-right: var(--s4) }
+
+/* ─── 3. Titres et étiquettes : une seule forme ───────────────────────────────────────── */
+html .sec-lbl,
+html .dsec-title,
+html .dsec-h { font: 800 var(--fs-5)/1.2 var(--font-titre); letter-spacing: var(--lettrage-titre); color: var(--text) }
+html .sec-lbl { margin-bottom: var(--s3) }
+html .dsec-row { padding-top: var(--s2); padding-bottom: var(--s3) }
+html .dsec-link { color: var(--text); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px }
+html .set-eyebrow,
+html .auth-badge { font: 600 var(--fs-2)/1.3 var(--font); color: var(--text-2) }
+html .auth-badge { background: var(--surface-2); padding: var(--s1) var(--s2); border-radius: var(--r-xs) }
+
+/* ─── 4. Cartes : fond surface, trait 1px, rayon 14 — partout pareil ──────────────────── */
+html .q-card,
+html .gift-c,
+html .dpat-mini,
+html .feed-post,
+html .dprof-stat,
+html .rv,
+html .how-row,
+html .ob-step,
+html .bp-survey { border: 1px solid var(--trait); border-radius: var(--r-md) }
+html .q-card.disc { border: 1.5px dashed var(--text) }
+html .q-card.noova { border-color: transparent }
+html .dmap-card { border: 1px solid var(--trait); border-radius: var(--r-md) }
+html .dmap-label { border: 1px solid var(--trait) }
+
+/* ─── 5. En-tête de l'accueil : bandeau brun NOOVA ────────────────────────────────────── */
+html #home .dh-hdr { background: var(--marque-marron) }
+html #home .dh-hdr .dh-noov,
+html #home .dh-hdr .dh-pts { background: rgba(255,251,215,.1); color: var(--jaune) }
+html #home .dh-hdr .dh-pts-l { color: #D9C9A8 }
+html #home .dh-hdr .dh-streak { color: #FFFBD7 }
+
+/* ─── 6. La question du jour : le moment fort, en dégradé or ──────────────────────────── */
+html .dtoday-card { border-radius: var(--r-lg) }
+html .dtoday-body { background: var(--or) }
+html .dtoday-body .mark { opacity: .22 }
+html .dtoday-q { color: var(--marque-marron); font-size: var(--fs-5); line-height: 1.22 }
+html .dtoday-cta { background: var(--marque-marron); color: var(--jaune); padding: 12px 18px; font-size: var(--fs-3) }
+html .dt-pts { background: var(--marque-marron); color: var(--jaune) }
+html .dtoday-card.disc .dtoday-body { background: var(--marque-marron) }
+html .dtoday-card.disc .dtoday-q { color: #FFFBD7 }
+html .dtoday-card.disc .dtoday-cta { background: var(--jaune); color: var(--marque-marron) }
+/* Progression vers la récompense : même famille visuelle */
+html .dpat-body { background: var(--or) }
+html .dpat-name, html .dpat-txt strong { color: var(--marque-marron) }
+html .dpat-sub, html .dpat-txt { color: rgba(28,14,2,.78) }
+html .dpat-bar { background: rgba(28,14,2,.16) }
+html .dpat-bar-fill { background: var(--marque-marron) }
+
+/* ─── 7. Boutons : jaune plat (action principale), brun (secondaire sur fond clair) ───── */
+html .btn-p,
+html .btn-sub { background: var(--jaune); color: var(--marque-marron); font-weight: 800; min-height: var(--h-bouton); border-radius: var(--r-sm) }
+html .btn-s { background: transparent; border: 1px solid var(--trait); color: var(--text); min-height: var(--h-bouton); border-radius: var(--r-sm) }
+html .btn-p:disabled { opacity: 1; background: var(--surface-2); color: var(--text-3) }
+/* Posé sur un aplat jaune ou or (ticket, sondage actif) : le bouton passe en brun, sinon il disparaît */
+html .reward-featured .btn-p,
+html .bp-survey.active .btn-p,
+html .dtoday-body .btn-p { background: var(--marque-marron); color: var(--jaune) }
+html .back-btn { background: var(--surface); border: 1px solid var(--trait); color: var(--text); width: 44px; height: 44px }
+
+/* ─── 8. Barre de navigation : pilule brune, icône active en pastille jaune ───────────── */
+html .bnav { background: var(--marque-marron); border: 1px solid rgba(255,251,215,.1); left: var(--s4); right: var(--s4) }
+html .nav-ico { color: rgba(255,251,215,.62); width: 44px; height: 44px }
+html .nav-it.on .nav-ico { background: var(--jaune); color: var(--marque-marron) }
+html .nav-badge { border-color: var(--marque-marron) }
+
+/* ─── 9. Bienvenue et connexion : le logotype NOOVA ───────────────────────────────────── */
+html #onboard .ob-topbar {
+  justify-content: flex-end; align-items: center;
+  background: url('texte-noova-jaune.svg') left bottom / auto 26px no-repeat;
+  margin: 0 var(--s4); padding-left: 0; padding-right: 0;
+}
+html .ob-illo { background: var(--or) !important; border-radius: var(--r-lg) }
+html .ob-title em { text-decoration-color: var(--jaune) }
+html .ob-dot { background: var(--surface-2) }
+html .ob-dot.on { background: var(--jaune) }
+html .ob-skip { color: var(--text-2); min-height: var(--tactile-min); padding: 0 var(--s2) }
+html #auth-wall .aw-logo { display: none !important }
+html #auth-wall .aw-wordmark {
+  width: 180px; height: 44px; margin: 0 auto;
+  background: url('texte-noova-jaune.svg') center / contain no-repeat;
+  color: transparent !important; font-size: 0 !important; overflow: hidden;
+}
+
+/* ─── 10. Profil et récompenses : le ticket et le bandeau or ──────────────────────────── */
+html .dprof-hdr { background: var(--or); border-radius: 0 0 var(--r-lg) var(--r-lg) }
+html .dprof-hdr::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .14;
+  background: url('logo-mark-white.svg') right -30px top 30px / 150px auto no-repeat;
+}
+html .dprof-city { color: var(--marque-marron) }
+html .dprof-lvl { background: var(--marque-marron); color: var(--jaune) }
+html .dprof-av { background: var(--marque-marron); border-color: #FFFBD7 }
+html .wallet-card { background: var(--marque-marron) }
+/* Écran Cadeaux : un seul aplat or, le ticket. Le solde passe en brun, les NOOVS en carte claire. */
+html .wpts-card { background: var(--marque-marron); margin-left: var(--s4); margin-right: var(--s4) }
+html .wpts-n { color: var(--jaune) }
+html .wpts-l { color: #FFFBD7 }
+html .wpts-ico { background: rgba(255,251,215,.1) }
+html .reward-featured { margin-left: var(--s4); margin-right: var(--s4) }
+html .reward-featured.on { background: var(--or) }
+html .reward-featured.on .rf-name,
+html .reward-featured.on .rf-sub,
+html .reward-featured.on .rf-amount { color: var(--marque-marron) }
+html .noov-card { background: var(--surface); border: 1px solid var(--trait); margin-left: var(--s4); margin-right: var(--s4) }
+html .noov-tiles,
+html .noov-soon { margin-left: var(--s4); margin-right: var(--s4) }
+
+/* ─── 11. Fluidité : un seul rythme de mouvement, retour tactile discret et identique ─── */
+html .screen { transition: opacity .2s ease, transform .2s cubic-bezier(.2,.8,.2,1), visibility 0s linear .21s; transform: translateX(16px) }
+html .screen.active { transform: none }
+html .screen.exit { transform: translateX(-16px) }
+html .q-card:active,
+html .gift-c:active,
+html .dpat-mini:active,
+html .dtoday-card:active,
+html .dpat-card:active,
+html .feed-post:active,
+html .fi:active,
+html .br-card:active,
+html .btn-p:active,
+html .btn-sub:active,
+html .back-btn:active,
+html .nav-it:active { transform: scale(.98); opacity: .92 }
+html :focus-visible { outline: 2px solid var(--jaune); outline-offset: 2px }
+@media (prefers-reduced-motion: reduce) {
+  html .screen { transform: none !important }
+}
+
+/* ─── 12. Classement : noms toujours lisibles ─────────────────────────────────────────── */
+html .podium { background: var(--surface); border: 1px solid var(--trait) }
+html .podium-name { color: var(--text) }
+html .podium-pts { color: var(--text-2) }
+html .podium-bar { color: var(--marque-encre) }
+html .podium-slot.p1 .podium-bar { background: var(--or) }
+html .podium-slot.p2 .podium-bar { background: #E3D9BF }
+html .podium-slot.p3 .podium-bar { background: #D9A06A }
+html .podium-av { border-color: var(--surface) }
+html .podium-slot.me .podium-av { outline-color: var(--marque-encre) }
+html .drank-me { border: 1.5px solid var(--marque-encre) }
+html .drank-me .drank-num { background: var(--marque-encre); color: var(--jaune) }
+html .drank-name, html .drank-pts { color: var(--text) }
+html .drank-sub { color: var(--text-2) }
+html .drank-row { border: 1px solid var(--trait); border-radius: var(--r-md) }
+html .drank-list-title span { color: #FFFBD7 }
+html .drank-list-title small { color: #D9C9A8 }
