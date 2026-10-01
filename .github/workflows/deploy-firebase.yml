@@ -1,0 +1,52 @@
+name: Déploiement Firebase
+
+# Met en production les règles Firestore/Storage, les index et les Cloud Functions.
+# Vercel ne déploie que le site : sans ce workflow, une modification de functions/ ou des règles
+# ne part en production qu'avec un « firebase deploy » lancé à la main.
+#
+# Se déclenche tout seul quand main change un de ces fichiers, ou à la main (onglet Actions → « Run workflow »).
+# Prérequis (une seule fois) : le secret GitHub FIREBASE_SERVICE_ACCOUNT, qui contient la clé JSON d'un compte
+# de service du projet noova-366d0 (voir la PR qui a ajouté ce fichier pour les rôles nécessaires).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "functions/**"
+      - "firestore.rules"
+      - "firestore.indexes.json"
+      - "storage.rules"
+      - "firebase.json"
+  workflow_dispatch:
+
+concurrency:
+  group: firebase-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Clé de déploiement présente ?
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA" ]; then
+            echo "::error::Secret FIREBASE_SERVICE_ACCOUNT absent : ajoute la clé du compte de service dans Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Dépendances des fonctions
+        run: npm ci
+        working-directory: functions
+      - name: Connexion à Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - name: Déploiement (règles, index, fonctions)
+        # Sans --force : si une fonction devait être supprimée en production, le déploiement s'arrête
+        # au lieu de la supprimer sans prévenir.
+        run: npx --yes firebase-tools@14 deploy --only firestore:rules,firestore:indexes,storage,functions --project noova-366d0 --non-interactive
