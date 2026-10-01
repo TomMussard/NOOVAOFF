@@ -113,7 +113,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 /* Bandeau « en phase de test » : bloc normal (pas superposé), donc tout le reste de l'app (dont le
    shell fixe ci-dessous) est décalé de sa hauteur — jamais recouvert, jamais à retirer écran par écran. */
 .test-banner{position:fixed;top:0;left:0;right:0;z-index:100000;background:var(--erreur-fort);color:var(--blanc);font-family:var(--fb);font-weight:800;font-size:var(--fs-1);letter-spacing:0;text-align:center;line-height:24px;padding-top:env(safe-area-inset-top,0px)}
-#shell{position:fixed;top:env(safe-area-inset-top,0px);right:0;bottom:0;left:0;background:var(--bg);overflow:hidden}
+#shell{position:fixed;top:calc(24px + env(safe-area-inset-top,0px));right:0;bottom:0;left:0;background:var(--bg);overflow:hidden}
 @media(min-width:520px){
   #shell{inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:390px;height:844px;border-radius:var(--r-pill);}
   #shell::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:37px;background:#17141A;border-radius:0 0 var(--r-lg) var(--r-lg);z-index:999}
@@ -1297,7 +1297,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 <link rel="stylesheet" href="/noova.css">
 </head>
 <body>
-<!-- Bandeau « version test » retiré pour le lancement. Pour le remettre : <div class="test-banner" role="note">Version test — NOOVA n'est pas encore lancée officiellement</div> -->
+<div class="test-banner" role="note">Version test — NOOVA n'est pas encore lancée officiellement</div>
 <div id="shell">
 <div id="app">
 
