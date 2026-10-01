@@ -4980,7 +4980,8 @@ function renderDailyTrack(){
   const left=MAX_POINT_ANSWERS-n;
   el.className='dtrack';
   el.innerHTML='<div class="dt-dots">'+[0,1,2].map(i=>'<div class="dt-dot'+(i<n?' on':'')+'"></div>').join('')+'</div>'
-    +'<div class="dt-txt">'+(left<=0?'Tes '+(S._pointsToday||0)+' pts du jour sont validés':'Encore '+left+' réponse'+(left>1?'s':'')+' pour tes points du jour')+'</div>';
+    // Pas de compte à rebours textuel (« Encore N réponses… ») : retiré volontairement (retour mairie). Les pastilles suffisent.
+    +(left<=0?'<div class="dt-txt">Tes '+(S._pointsToday||0)+' pts du jour sont validés</div>':'');
 }
 function renderHomeState(){
   const el=document.getElementById('home-state'),card=document.getElementById('today-card');
