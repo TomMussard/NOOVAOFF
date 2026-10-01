@@ -88,7 +88,9 @@
 
     // ── Badges / paliers / rang ───────────────────────────────────────────
     target: `<svg ${S}><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>`,
-    fire: `<svg ${S}><path d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c1 1 2 2.5 2 4.5A5.5 5.5 0 0 1 6.5 19c0-1 .2-2 1-3-2 .5-3.5 2.3-3.5 4.5A8 8 0 0 0 12 22a8 8 0 0 0 7-11.9c-1 1-2 1.5-3 1.4C17 8 14 6 12 2z"/></svg>`,
+    // La série s'affiche toujours avec la flamme NOOVA (noov-flame.svg), jamais une flamme générique.
+    fire: `<img src="/noov-flame.svg" alt="" style="width:100%;height:100%;object-fit:contain;display:block">`,
+    flame: `<img src="/noov-flame.svg" alt="" style="width:100%;height:100%;object-fit:contain;display:block">`,
     people: `<svg ${S}><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg>`,
     sparkle: `<svg ${S}><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><path d="M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></svg>`,
     seed: `<svg ${S}><path d="M12 21c-4.5 0-7-3-7-7 4.5 0 7 2.5 7 7z"/><path d="M12 21c4.5 0 7-3 7-7-4.5 0-7 2.5-7 7z"/><path d="M12 21V9"/><path d="M12 9c0-3.5 2-6 5-6 0 3.5-2 6-5 6z"/></svg>`,

@@ -6,34 +6,35 @@
   /* --- Couleurs de marque (valeurs brutes, à ne consommer que via les ambiances ci-dessous,
          ou pour les fonds plein écran de marque) --- */
   --marque-creme:  #FFFBD7;  /* fond crème des écrans Accueil, Question, Récompenses, Profil */
-  --marque-encre:  #1C1917;  /* texte sur crème et sur jaune */
+  --marque-encre:  #1C0E02;  /* brun NOOVA : texte sur crème et sur jaune */
   --marque-marron: #1C0E02;  /* fond à carreaux de Communauté */
   --marque-or-1:   #F29715;  /* dégradé or : départ */
   --marque-or-2:   #FFDA09;  /* dégradé or : arrivée */
+  --or:  linear-gradient(100deg, var(--marque-or-1) 0%, var(--marque-or-2) 100%); /* moments forts uniquement */
   --marque-brule:  #A14E08;  /* or brûlé : pastille de points, carte portefeuille, avatars */
 
-  /* --- Fonds (ambiance sombre, par défaut) --- */
-  --bg:         #121016;   /* fond d'écran */
-  --surface:    #1B1721;   /* cartes, barres */
-  --surface-2:  #241F2C;   /* carte sélectionnée ou active */
-  --trait:      #2F2937;   /* bordures et séparateurs, 1px */
+  /* --- Fonds (ambiance brune, par défaut) --- */
+  --bg:         #1C0E02;   /* fond d'écran : le brun NOOVA */
+  --surface:    #2A1A0B;   /* cartes, barres */
+  --surface-2:  #3A2715;   /* carte sélectionnée ou active */
+  --trait:      #4A3420;   /* bordures et séparateurs, 1px */
 
   /* --- Texte --- */
-  --text:       #F7F4F1;
-  --text-2:     #A49CAE;   /* secondaire, libellés */
-  --text-3:     #6F6779;   /* désactivé */
+  --text:       #FFFBD7;   /* crème */
+  --text-2:     #D9C9A8;   /* secondaire, libellés */
+  --text-3:     #A89478;   /* désactivé */
 
   /* --- Accent unique --- */
   --jaune:      #FFC300;   /* valeur exacte du logo (favicon.svg) */
-  --jaune-ink:  #121016;   /* texte posé sur le jaune */
+  --jaune-ink:  #1C0E02;   /* texte posé sur le jaune */
   --blanc:      #FFFFFF;   /* texte sur photo ou sur aplat sombre de marque */
-  --jaune-faible: #3A2F00; /* fond discret d'un état jaune, jamais un bouton */
+  --jaune-faible: #3D2B08; /* fond discret d'un état jaune, jamais un bouton */
   --jaune-pale: #FFF3D1;   /* bandeau clair de marque (illustrations d’accueil), toutes ambiances */
 
   /* --- États --- */
-  --ok:         #3FBF87;
+  --ok:         #5FD39B;
   --ok-ink:     #0C2419;
-  --erreur:     #E5484D;
+  --erreur:     #FF6B5E;
   --erreur-ink: #FFFFFF;
   --erreur-fort: #B42318;  /* aplat rouge sous texte blanc (bandeau « version test ») : AA */
 
@@ -89,26 +90,26 @@
 .amb-creme {
   --bg:        var(--marque-creme);
   --surface:   #FFFFFF;
-  --surface-2: #FFEC96;
-  --trait:     #EDE3B3;
+  --surface-2: #FFF0A8;
+  --trait:     #EADFB8;
   --text:      var(--marque-encre);
-  --text-2:    #5F594E;
-  --text-3:    #8A8274;
+  --text-2:    #6B5A45;
+  --text-3:    #8C7A62;
   --jaune-faible: #FFF3D1;
   --ok:        #17663F;   /* vert assombri : AA sur crème, blanc et jaune pâle */
-  --erreur:    #C62828;
+  --erreur:    #B42318;
 }
 .amb-marron {
   --bg:        var(--marque-marron);
-  --surface:   #FFFFFF;
-  --surface-2: #FFEC96;
-  --trait:     #EDE3B3;
+  --surface:   #FFFBD7;
+  --surface-2: #FFF0A8;
+  --trait:     #EADFB8;
   --text:      var(--marque-encre);
-  --text-2:    #5F594E;
-  --text-3:    #8A8274;
+  --text-2:    #6B5A45;
+  --text-3:    #8C7A62;
   --jaune-faible: #FFF3D1;
-  --ok:        #17663F;
-  --erreur:    #C62828;
+  --ok:        #17663F;   /* vert assombri : AA sur crème, blanc et jaune pâle */
+  --erreur:    #B42318;
 }
 
 /* Le fond couvre tout l'écran, encoches comprises */

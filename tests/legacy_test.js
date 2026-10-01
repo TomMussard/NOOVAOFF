@@ -66,7 +66,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     check('C2 étape 1 -> étape 2 (vous)', true);
     await mp.evaluate(() => awSubmit());
     const errP = await mp.$eval('#aw-err', e => e.style.display === 'block' ? e.textContent : '');
-    check('C2 étape 2 : champs personnels obligatoires', /Remplis tous les champs/.test(errP), errP);
+    check('C2 étape 2 : champs personnels obligatoires', /Remplissez tous les champs/.test(errP), errP);
     await setVal(mp, '#aw-firstname', 'Marie'); await setVal(mp, '#aw-lastname', 'Dupont');
     await setVal(mp, '#aw-phone', '0612345678'); await setVal(mp, '#aw-email', MEMAIL); await setVal(mp, '#aw-pass', 'secret123');
     await mp.evaluate(() => awSubmit());

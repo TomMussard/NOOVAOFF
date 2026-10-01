@@ -242,20 +242,18 @@ cartes. Respecter `prefers-reduced-motion`.
 
 ---
 
-## 13. Proposition « DA NOOVA » (en test)
+## 13. DA NOOVA (en place)
 
-Une version plus affirmée de la marque, activable sans rien casser :
-`/app_DEF.html?propo` l'active (et la garde sur l'appareil), `/app_DEF.html?propo=0` revient à l'app actuelle.
-Elle tient entièrement dans `propo.css` : même code, même Firebase, mêmes données.
+Couleurs dans `tokens.css`, composants dans `noova.css` (chargé après le style de `app_DEF.html`).
 
-- **Plus de gris-violet.** Le sombre devient le brun NOOVA (`#1C0E02`, surfaces `#2A1A0B` / `#3A2715`),
-  texte crème `#FFFBD7`. Le clair reste la crème, avec un texte brun au lieu de noir.
-- **Le dégradé or** (`#F29715 → #FFDA09`) est réservé aux moments forts : la question du jour,
-  le ticket de récompense, le bandeau du profil, l'illustration de bienvenue.
-- **Un seul aplat or par écran.** Sur l'écran Cadeaux, le solde passe en brun et les NOOVS en carte claire.
-- **Le logotype NOOVA** remplace le mot « Noova » en texte sur la bienvenue et la connexion.
-- **Une seule marge d'écran** (16px), une seule forme de carte (trait 1px, rayon 14), de titre, d'étiquette et de bouton.
-- **Fluidité** : un seul rythme de transition (0,2 s), le même retour tactile partout, focus clavier jaune.
-- **Contraste** : audité par `tests/propo_audit.js` (axe, contraste compris).
-
-Si la proposition est validée : on copie ses valeurs dans `tokens.css` et on retire l'interrupteur.
+- **Plus de gris-violet.** Le sombre est le brun NOOVA (`#1C0E02`, surfaces `#2A1A0B` / `#3A2715`),
+  texte crème `#FFFBD7`. Le clair est la crème, avec un texte brun.
+- **Le dégradé or** (`--or` : `#F29715 → #FFDA09`) est réservé aux moments forts : la question du jour,
+  le ticket de récompense, le bandeau du profil, l'illustration de bienvenue, la 1re marche du podium.
+- **Un seul aplat or par écran.**
+- **Questions classiques** : fond crème uni, cartes blanches, texte brun.
+- **La série s'affiche toujours avec la flamme NOOVA** (`noov-flame.svg`, icône `fire` / `flame` d'`icons.js`).
+- **Le logotype NOOVA** sur la bienvenue et la connexion.
+- **Une seule marge d'écran** (16px), une seule forme de carte, de titre, d'étiquette et de bouton.
+- **Dashboard commerçant** : vouvoiement partout, aucun libellé en majuscules, villes affichées par leur nom.
+- **Sécurité** : toute valeur insérée dans un `onclick="…"` passe par `jsa()` (prénoms avec apostrophe, injection).

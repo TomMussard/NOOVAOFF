@@ -12,7 +12,7 @@ firebase.initializeApp({
   appId: "1:710589257687:web:946b5d1efffabff14d9d92"
 });
 
-// Version du script : v3. Activation immédiate pour que les appareils déjà abonnés passent tout de
+// Version du script : v4. Activation immédiate pour que les appareils déjà abonnés passent tout de
 // suite sur le nouveau comportement (une seule notification, regroupée par tag).
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
@@ -44,7 +44,10 @@ self.addEventListener('notificationclick', (event) => {
   try { go = new URL(url, self.location.origin).searchParams.get('go') || 'home'; } catch (e) {}
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-      const c = list.find((x) => 'focus' in x);
+      // Seul un onglet de l'APP habitant sait traiter le clic : un onglet du dashboard ou du site vitrine
+      // (même domaine) serait mis au premier plan sans rien afficher. Sinon, on ouvre l'app.
+      const isApp = (x) => { try { return /^\/(app-v2|app|app_DEF\.html)\/?$/.test(new URL(x.url).pathname); } catch (e) { return false; } };
+      const c = list.find((x) => 'focus' in x && isApp(x));
       if (c) { if (d.nid) c.postMessage({ type: 'notif-open', nid: d.nid, go }); return c.focus(); }
       return clients.openWindow(url);
     })
