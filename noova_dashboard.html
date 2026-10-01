@@ -803,6 +803,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 </style>
 <script src="icons.js"></script>
 <script src="/tiers.js"></script>
+<script src="/interests.js"></script>
 </head>
 <body>
 
@@ -1083,28 +1084,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                   <div class="step-card-title">Ciblez votre audience</div>
                   <div class="step-card-sub" id="aud-subtitle">Chaque filtre affine les profils éligibles. Vos questions sont posées aux habitants de <strong class="wz-city">votre ville</strong> : affinez seulement par tranche d'âge.</div>
                   <div class="field">
-                    <label class="field-lbl" style="display:flex;align-items:center;justify-content:space-between">Thèmes d'intérêt <span style="color:var(--ink3);font-weight:400">(indicatif)</span><button type="button" onclick="toggleAllThemes()" style="background:none;border:none;padding:0;font-size:11px;font-weight:700;color:var(--coral-text);cursor:pointer;text-transform:none;letter-spacing:0">Tout sélectionner</button></label>
-                    <div class="theme-grid" id="theme-grid">
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.3 3.6 5.6 3.6 9s-1.2 6.7-3.6 9c-2.4-2.3-3.6-5.6-3.6-9S9.6 5.3 12 3z"/></svg> Sport</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 20s-7-4.4-7-9.8A4.2 4.2 0 0 1 12 7.5a4.2 4.2 0 0 1 7 2.7C19 15.6 12 20 12 20z"/></svg> Bien-être</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="4" y="5" width="16" height="11" rx="1.4"/><path d="M9 20h6M12 16v4"/><path d="M8 9l2 2-2 2M13 13h3"/></svg> Tech</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M3 13l7-2-3-6 2.5-.7L14 10l6-1.6a1.6 1.6 0 0 1 2 1.5c0 .7-.4 1.3-1 1.5L4.5 17z"/><path d="M9 17.5 7 21M13 17.5l1 3.5"/></svg> Voyage</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> Gaming</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Alimentation</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c5 0 8 3.2 8 8-5 0-8-3.2-8-8z"/><path d="M12 21c0-7 2.5-11 8-13"/><path d="M12 21c0-5-2-8-8-9"/></svg> Éco-responsable</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M9 4h6l1 3-3 2-3-2z"/><path d="M9 4 4 7l2.5 3L8 9v11h8V9l1.5-2L20 7l-5-3"/></svg> Mode & Beauté</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/><path d="M9 17.5V5.5l10-2v10"/></svg> Musique</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/><circle cx="12" cy="15" r="2"/></svg> Maison & Déco</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 16V12l2-5h12l2 5v4"/><path d="M4 16h16M7 16v2.5M17 16v2.5"/><circle cx="8" cy="13.5" r="1.1"/><circle cx="16" cy="13.5" r="1.1"/></svg> Auto & Moto</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 4.5h6v15H4z"/><path d="M14 4.5h6v15h-6z"/><path d="M10 4.5h4v15h-4z"/></svg> Lecture</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 8l8-4.5L20 8l-8 4.5z"/><path d="M6.5 9.5v6L12 18l5.5-2.5v-6"/><path d="M20 8v6.5"/></svg> Cinéma & Séries</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 19V9M10 19V5M16 19v-7M20 19V11"/><path d="M4 19h16"/></svg> Finance & Épargne</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="7" cy="7.5" r="1.8"/><circle cx="12" cy="5.5" r="1.8"/><circle cx="17" cy="7.5" r="1.8"/><path d="M12 12c-3.3 0-6 2-6 4.6 0 1.9 1.6 2.9 3.1 2.1.9-.5 1.9-.7 2.9-.7s2 .2 2.9.7c1.5.8 3.1-.2 3.1-2.1 0-2.6-2.7-4.6-6-4.6z"/></svg> Animaux</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><rect x="3" y="7" width="18" height="13" rx="1.5"/><path d="M8 7l1.6-2.5h4.8L16 7"/><circle cx="12" cy="13.5" r="3.4"/></svg> Photo & Vidéo</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M16 3c-1.4 0-2.5 1.6-2.5 5s1.1 5 2.5 5 2.5-1.6 2.5-5-1.1-5-2.5-5z"/><path d="M16 13v8"/></svg> Gastronomie</div>
-                      <div class="th-chip" onclick="this.classList.toggle('sel');updAud()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5H18.5V10"/><path d="M10 19.5v-6h4v6"/></svg> Immobilier</div>
-                    </div>
-                    <div style="font-size:11.5px;color:var(--ink2);margin-top:8px">Les thèmes sont indicatifs : ils ne restreignent pas encore les habitants à qui la question est posée.</div>
+                    <label class="field-lbl" style="display:flex;align-items:center;justify-content:space-between">Centres d'intérêt <span style="color:var(--ink3);font-weight:400">(laisser vide = tout le monde)</span><button type="button" onclick="toggleAllThemes()" style="background:none;border:none;padding:0;font-size:11px;font-weight:700;color:var(--coral-text);cursor:pointer;text-transform:none;letter-spacing:0">Tout sélectionner</button></label>
+                    <div class="theme-grid" id="theme-grid"></div>
+                    <div style="font-size:11.5px;color:var(--ink2);margin-top:8px">La question est posée aux habitants qui ont choisi au moins un de ces centres d'intérêt, ainsi qu'à ceux qui ont choisi « Tout m'intéresse ». Ce sont les mêmes centres d'intérêt que ceux des habitants dans l'app.</div>
                   </div>
                   <div class="field">
                     <label class="field-lbl">Tranches d'âge <span style="color:var(--ink3);font-weight:400">(laisser vide = toutes)</span></label>
@@ -1724,7 +1706,7 @@ function renderResultsDetail(c){
   const questions = `<div class="rs-sec-h">Résultats par question</div>${qs.map((q, i) => rsQuestionHTML(q, i, r, qs.length)).join('')}`;
   let profile;
   if(r.withAge.length >= RES_MIN){
-    const ageRows = RES_AGES.filter(k => r.ages[k]).map(k => ({ label: k + ' ans', n: r.ages[k] })), intRows = Object.entries(r.ints).sort((x, y) => y[1] - x[1]).slice(0, 6).map(([label, n]) => ({ label, n }));
+    const ageRows = RES_AGES.filter(k => r.ages[k]).map(k => ({ label: k + ' ans', n: r.ages[k] })), intRows = Object.entries(r.ints).sort((x, y) => y[1] - x[1]).slice(0, 6).map(([key, n]) => ({ label: NOOVA_INTERESTS.label(key), n }));
     profile = `<div class="rs-sec-h">Qui a répondu</div><div class="rs-two"><div class="card rs-sec"><div class="rs-sec-t">Âge <span>(${r.withAge.length} abonnés)</span></div>${rsBars(ageRows, { pct: true, total: r.withAge.length })}</div><div class="card rs-sec"><div class="rs-sec-t">Centres d'intérêt</div>${intRows.length ? rsBars(intRows, { color: 'var(--mint-text)' }) : '<div class="rs-masked">Pas de donnée.</div>'}</div></div><div class="rs-note">L'âge et les centres d'intérêt ne sont transmis que pour les habitants qui vous suivent ; les réponses « découverte » n'en portent pas.</div>`;
   } else profile = `<div class="rs-sec-h">Qui a répondu</div><div class="card rs-sec"><div class="rs-masked">Le profil (âge, centres d'intérêt) s'affiche à partir de ${RES_MIN} répondants qui vous suivent. Il ne provient jamais des réponses « découverte ».</div></div>`;
   const compare = r.avgOthers != null ? `<div class="rs-note">Moyenne de vos autres campagnes : ${r.avgOthers} réponses.</div>` : '';
@@ -1989,7 +1971,7 @@ function collectWizFormState() {
   return {
     name: (document.getElementById('camp-name-inp') || {}).value || '',
     questions,
-    themes: [...document.querySelectorAll('.th-chip.sel')].map(e => e.textContent.replace(/[^\w\s\-éèêàùç]/gi, '').trim()),
+    themes: wzThemes(),
     ageRanges: [...document.querySelectorAll('.age-chip.sel')].map(e => e.textContent.trim()),
     days: _wzDays
   };
@@ -2039,7 +2021,7 @@ async function restoreDraftIfAny() {
     setFmtNByName(qn, qs[i].format || 'mcq');
     if(needsOptions(qs[i].format || 'mcq')) fillOptionRows('q' + qn + '-mcq-opts', qs[i].options, 'removeQOpt');
   }
-  (d.targetInterests || []).forEach(t => document.querySelectorAll('.th-chip').forEach(c => { if(c.textContent.replace(/[^\w\s\-éèêàùç]/gi, '').trim() === t) c.classList.add('sel'); }));
+  renderThemeChips(); (d.targetInterests || []).forEach(t => document.querySelectorAll('.th-chip').forEach(c => { if(c.dataset.key === t) c.classList.add('sel'); }));
   (d.ageRanges || []).forEach(a => document.querySelectorAll('.age-chip').forEach(c => { if(c.textContent.trim() === a) c.classList.add('sel'); }));
   _wzDays = (typeof d.draftDays === 'number') ? d.draftDays : null; renderDuration();
   const el = document.getElementById('draft-indicator');
@@ -2151,6 +2133,13 @@ function toggleAllThemes(){
   chips.forEach(c=>c.classList.toggle('sel',!allSel));
   updAud();
 }
+// Centres d'intérêt : la même liste que l'app habitant (interests.js). On enregistre les clés, jamais le libellé.
+function renderThemeChips(){
+  const g=document.getElementById('theme-grid');if(!g||g.children.length)return;
+  g.innerHTML=NOOVA_INTERESTS.INTERESTS.map(i=>`<div class="th-chip" role="button" tabindex="0" data-key="${i.key}" onclick="this.classList.toggle('sel');updAud()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">${esc(i.label)}</div>`).join('');
+}
+function wzThemes(){return [...document.querySelectorAll('#theme-grid .th-chip.sel')].map(e=>e.dataset.key).filter(Boolean);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',renderThemeChips);else renderThemeChips();
 function updAud(){
   // Le nombre de profils éligibles vient des données réelles (habitants inscrits dans la ville, filtrés par tranche d'âge).
   loadEstimate();
@@ -2240,13 +2229,13 @@ function renderReachRecap(){
 }
 // Appel serveur (données agrégées uniquement), avec anti-rebond et sans rappel si rien n'a changé.
 function loadEstimate(){
-  const key = wzAges().join(',') + '|' + (typeof _wzQCount === 'number' ? _wzQCount : 1);
+  const key = wzAges().join(',') + '|' + wzThemes().join(',') + '|' + (typeof _wzQCount === 'number' ? _wzQCount : 1);
   if(_est && key === _estKey){ renderDuration(); return; }
   clearTimeout(_estTimer);
   _estTimer = setTimeout(async () => {
     const asked = key;
     try {
-      const r = (await fx.httpsCallable('estimateCampaign')({ ageRanges: wzAges(), questions: typeof _wzQCount === 'number' ? _wzQCount : 1 })).data;
+      const r = (await fx.httpsCallable('estimateCampaign')({ ageRanges: wzAges(), interests: wzThemes(), questions: typeof _wzQCount === 'number' ? _wzQCount : 1 })).data;
       _est = r; _estKey = asked;
     } catch(e) { console.warn('estimateCampaign:', e); _est = null; const box = document.getElementById('dur-est'); if(box) box.innerHTML = '<div class="dur-est-t">Réponses estimées</div><div class="dur-est-n">Estimation indisponible</div><div class="dur-est-d">Réessayez dans un instant.</div>'; return; }
     renderDuration();
@@ -3299,7 +3288,7 @@ function updateKPIFromCampaigns(camps) {
   const thCard = document.getElementById('dash-themes-card');
   if(thCard) {
     const themeCounts = {};
-    camps.forEach(c => (c.targetInterests||[]).forEach(t => { themeCounts[t] = (themeCounts[t]||0) + 1; }));
+    camps.forEach(c => (c.targetInterests||[]).forEach(t => { const l = NOOVA_INTERESTS.label(t); themeCounts[l] = (themeCounts[l]||0) + 1; }));
     const sorted = Object.entries(themeCounts).sort((a,b) => b[1]-a[1]).slice(0, 5);
     if(!sorted.length) {
       thCard.innerHTML = '<div style="text-align:center;padding:16px;color:var(--ink3);font-size:12px">Lancez une campagne pour voir les thèmes.</div>';
@@ -3332,7 +3321,7 @@ launchCampaign = async function() {
   const options  = needsOptions(curFmt) ? collectOptions('#mcq-options') : [];
   if(needsOptions(curFmt) && options.length < 2) { showToast('Question 1 : ajoutez au moins 2 ' + (curFmt === 'rank' ? 'éléments à classer' : 'options de réponse') + ' différents.', 'warning'); return; }
   const days     = _wzDays;                      // durée facultative : null = sans limite
-  const themes   = Array.from(document.querySelectorAll('.th-chip.sel')).map(el=>el.textContent.replace(/[^\w\s\-éèêàùç]/gi,'').trim());
+  const themes   = wzThemes();
   const city     = normalizeCity(_mData.city || _mData.cityLabel || '');
   const cityLabel = _mData.cityLabel || _mData.city || '';
   const ageRanges = Array.from(document.querySelectorAll('.age-chip.sel')).map(el => el.textContent.trim()).filter(Boolean);
