@@ -386,7 +386,8 @@ async function runTick(now = Date.now()) {
       if (r.status === "sent") out.serie++;
     }
   });
-  for (let i = 0; i < work.length; i += 10) await Promise.all(work.slice(i, i + 10).map((f) => f()));
+  // 40 habitants en parallèle : à 50 000 comptes, l'envoi de 12h30 tient dans le passage (9 min) au lieu d'en déborder.
+  for (let i = 0; i < work.length; i += 40) await Promise.all(work.slice(i, i + 40).map((f) => f()));
 
   if (p.hour === 11) out.code = await notifyExpiringCodes(now);
   if (p.hour === 10) out.ending = await notifyEndingCampaigns(now, caches);
