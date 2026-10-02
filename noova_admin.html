@@ -207,6 +207,49 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 .loading{text-align:center;padding:48px 20px;color:var(--ink3);font-size:13px}
 .loading::after{content:"";display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--coral);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* === STATISTIQUES (graphiques SVG faits main, aucune dépendance) === */
+.st-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.st-upd{font-size:12px;color:var(--ink3)}
+.st-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.st-kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.st-kpi.hero{background:var(--brown);color:var(--cream);border-color:var(--brown)}
+.st-kpi-l{font-size:12px;font-weight:600;color:var(--ink3)}
+.st-kpi.hero .st-kpi-l{color:rgba(255,251,215,.7)}
+.st-kpi-v{font-family:var(--fd);font-weight:800;font-size:30px;letter-spacing:-.02em;line-height:1.1;margin-top:6px;font-variant-numeric:tabular-nums}
+.st-kpi.hero .st-kpi-v{color:var(--amber)}
+.st-kpi-s{font-size:12px;color:var(--ink3);margin-top:4px}
+.st-kpi.hero .st-kpi-s{color:rgba(255,251,215,.7)}
+.st-up{color:var(--mint-text);font-weight:700}
+.st-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.st-grid .card{margin-bottom:0}
+.st-sec{margin-top:20px}
+.st-body{padding:16px 18px}
+.st-chart svg{display:block;width:100%;height:auto}
+.st-chart text{font-family:var(--fb);font-size:11px;fill:var(--ink3)}
+.st-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-bottom:8px}
+.st-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.st-total{font-family:var(--fd);font-weight:800;font-size:22px;margin-bottom:2px}
+.st-hb{display:grid;grid-template-columns:minmax(90px,150px) 1fr auto;align-items:center;gap:10px;margin:9px 0;font-size:13px}
+.st-hb-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+.st-hb-t{height:12px;background:var(--bg2);border-radius:6px;overflow:hidden}
+.st-hb-t>div{height:100%;border-radius:6px;background:var(--coral)}
+.st-hb-v{font-weight:700;font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+.st-hb-v small{font-weight:500;color:var(--ink3);margin-left:4px}
+.st-donut{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.st-donut svg{width:140px;height:140px;flex-shrink:0}
+.st-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.st-tbl th{text-align:left;font-size:11px;color:var(--ink3);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--border)}
+.st-tbl td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.st-tbl td.n{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.st-q{max-width:340px;line-height:1.35}
+.st-q small{display:block;color:var(--ink3);margin-top:2px}
+.st-prog{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:6px;max-width:160px}
+.st-prog>div{height:100%;background:var(--mint)}
+.st-tag{display:inline-block;font-size:10px;font-weight:700;background:var(--bg2);color:var(--ink3);border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+@media(max-width:720px){.st-grid{grid-template-columns:minmax(0,1fr)}.st-kpi-v{font-size:24px}.st-q{max-width:200px}.st-chart text{font-size:20px}}
+/* Téléphone : les raccourcis Site / App / Dashboard du bandeau font déborder la page, on les retire. */
+@media(max-width:480px){.topbar a[target="_blank"]{display:none}.topbar{justify-content:space-between}}
 </style>
 <script src="icons.js"></script>
 <script src="/tiers.js"></script>
@@ -252,6 +295,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
   <!-- TABS -->
   <div class="tabs">
+    <button class="tab-btn-main" onclick="switchTab('stats',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg> Statistiques</button>
     <button class="tab-btn-main active" onclick="switchTab('entreprises',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg> Entreprises<span class="tab-badge" id="tb-ent">—</span></button>
     <button class="tab-btn-main" onclick="switchTab('utilisateurs',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> Utilisateurs<span class="tab-badge" id="tb-usr">—</span></button>
     <button class="tab-btn-main" onclick="switchTab('diffusion',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> Diffusion</button>
@@ -262,6 +306,15 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   </div>
 
   <!-- ══════════════ TAB ENTREPRISES ══════════════ -->
+  <!-- ══════════════ TAB STATISTIQUES ══════════════ -->
+  <div id="tab-stats" style="display:none">
+    <div class="st-head">
+      <div class="sec-hdr" style="margin:0"><h2>Statistiques</h2><p>Toute l'activité NOOVA en un coup d'œil, calculée sur l'ensemble des comptes.</p></div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="st-upd" id="st-upd"></span><button class="btn-approve" id="st-refresh" onclick="loadStats(true)">Actualiser</button></div>
+    </div>
+    <div id="st-root"><div class="loading">Chargement</div></div>
+  </div>
+
   <div id="tab-entreprises">
     <div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2>Entreprises</h2><p>Gestion et validation des commerçants inscrits sur Noova. <span id="ent-updated" style="color:var(--ink3)"></span></p></div><button id="ent-refresh" onclick="refreshMerchants(this)" style="padding:8px 16px;background:var(--grad);color:var(--brown);border:none;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--fb);white-space:nowrap">↻ Actualiser</button></div>
 
@@ -830,9 +883,10 @@ async function loadNotifMetrics() {
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn-main').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  ['entreprises','utilisateurs','diffusion','lancement','moderation','notifications','danger'].forEach(t => {
+  ['stats','entreprises','utilisateurs','diffusion','lancement','moderation','notifications','danger'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
   });
+  if (tab === 'stats') loadStats(false);
   if (tab === 'entreprises') loadMerchants();
   if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
   if (tab === 'diffusion') initDiffusion();
@@ -840,6 +894,132 @@ function switchTab(tab, btn) {
   if (tab === 'moderation') { loadModeration(); loadResponseQuality(); }
   if (tab === 'notifications') loadNotifMetrics();
   if (tab === 'danger') loadDangerZone();
+}
+
+
+// ── Statistiques ─────────────────────────────────────────────────────────
+const ST_C = { or: '#f29715', jaune: '#ffda09', brun: '#1c0e02', brule: '#a14e08', menthe: '#0BAB84', gris: '#c9c3bb' };
+const fmtN = (n) => (n == null ? '—' : Number(n).toLocaleString('fr-FR'));
+const pctS = (a, b) => (b ? Math.round((a * 100) / b) + ' %' : '—');
+const dayLbl = (d) => { const [y, m, j] = d.split('-'); return +j + '/' + +m; };
+function stArea(series, days, h) {
+  h = h || 200; const W = 640, P = { l: 36, r: 12, t: 12, b: 26 }, iw = W - P.l - P.r, ih = h - P.t - P.b, n = days.length;
+  const max = Math.max(1, ...series.flatMap(s => s.values.map(v => v || 0)));
+  const nice = (() => { const e = Math.pow(10, Math.floor(Math.log10(max))); const f = max / e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * e; })();
+  const x = (i) => P.l + (n > 1 ? (i * iw) / (n - 1) : iw / 2), y = (v) => P.t + ih - ((v || 0) / nice) * ih;
+  let g = '';
+  for (let k = 0; k <= 4; k++) { const v = (nice * k) / 4, yy = y(v); g += `<line x1="${P.l}" x2="${W - P.r}" y1="${yy}" y2="${yy}" stroke="rgba(23,20,26,.08)"/><text x="${P.l - 6}" y="${yy + 4}" text-anchor="end">${fmtN(Math.round(v))}</text>`; }
+  days.forEach((d, i) => { if (i % 5 === (n - 1) % 5) g += `<text x="${x(i)}" y="${h - 8}" text-anchor="middle">${dayLbl(d)}</text>`; });
+  const paths = series.map(s => {
+    const pts = s.values.map((v, i) => [x(i), y(v)]);
+    const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
+    const area = line + `L${x(n - 1)} ${P.t + ih}L${x(0)} ${P.t + ih}Z`;
+    const dots = s.values.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="9" fill="transparent"><title>${dayLbl(days[i])} : ${fmtN(v)} ${s.unit || ''}</title></circle>`).join('');
+    const last = pts[n - 1];
+    return `<path d="${area}" fill="${s.color}" opacity=".14"/><path d="${line}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${last[0]}" cy="${last[1]}" r="4" fill="${s.color}"/>${dots}`;
+  }).join('');
+  return `<div class="st-chart"><svg viewBox="0 0 ${W} ${h}" role="img">${g}${paths}</svg></div>`;
+}
+function stBars(values, days, color, h) {
+  h = h || 160; const W = 640, P = { l: 36, r: 12, t: 12, b: 26 }, iw = W - P.l - P.r, ih = h - P.t - P.b, n = days.length;
+  const max = Math.max(1, ...values.map(v => v || 0)), bw = iw / n;
+  let g = `<line x1="${P.l}" x2="${W - P.r}" y1="${P.t + ih}" y2="${P.t + ih}" stroke="rgba(23,20,26,.15)"/><text x="${P.l - 6}" y="${P.t + 8}" text-anchor="end">${fmtN(max)}</text>`;
+  values.forEach((v, i) => { const bh = ((v || 0) / max) * ih; g += `<rect x="${(P.l + i * bw + 1.5).toFixed(1)}" y="${(P.t + ih - bh).toFixed(1)}" width="${Math.max(1, bw - 3).toFixed(1)}" height="${bh.toFixed(1)}" rx="2" fill="${color}"><title>${dayLbl(days[i])} : ${fmtN(v)}</title></rect>`; if (i % 5 === (n - 1) % 5) g += `<text x="${P.l + i * bw + bw / 2}" y="${h - 8}" text-anchor="middle">${dayLbl(days[i])}</text>`; });
+  return `<div class="st-chart"><svg viewBox="0 0 ${W} ${h}" role="img">${g}</svg></div>`;
+}
+function stHBars(items, total, color) {
+  const max = Math.max(1, ...items.map(i => i.value || 0));
+  return items.map(i => `<div class="st-hb"><span class="st-hb-l" title="${esc(i.label)}">${esc(i.label)}</span><div class="st-hb-t"><div style="width:${((i.value || 0) * 100 / max).toFixed(1)}%;background:${i.color || color || ST_C.or}"></div></div><span class="st-hb-v">${fmtN(i.value)}${total ? `<small>${pctS(i.value || 0, total)}</small>` : ''}</span></div>`).join('');
+}
+function stDonut(parts, center, sub) {
+  const tot = parts.reduce((a, p) => a + (p.value || 0), 0) || 1, R = 52, C = 2 * Math.PI * R; let off = 0;
+  const arcs = parts.map(p => { const len = ((p.value || 0) / tot) * C; const a = `<circle cx="70" cy="70" r="${R}" fill="none" stroke="${p.color}" stroke-width="18" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 70 70)"><title>${esc(p.label)} : ${fmtN(p.value)}</title></circle>`; off += len; return a; }).join('');
+  const leg = parts.map(p => `<div style="margin:6px 0;font-size:13px"><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${p.color};margin-right:8px"></i>${esc(p.label)} <strong>${fmtN(p.value)}</strong> <span style="color:var(--ink3)">${pctS(p.value || 0, tot)}</span></div>`).join('');
+  return `<div class="st-donut"><svg viewBox="0 0 140 140" role="img"><circle cx="70" cy="70" r="${R}" fill="none" stroke="var(--bg2)" stroke-width="18"/>${arcs}<text x="70" y="70" text-anchor="middle" style="font-family:var(--fd);font-weight:800;font-size:22px;fill:var(--ink)">${center}</text><text x="70" y="88" text-anchor="middle" style="font-size:10px;fill:var(--ink3)">${sub || ''}</text></svg><div>${leg}</div></div>`;
+}
+const stCard = (title, body, extra) => `<div class="card"><div class="card-title">${title}${extra || ''}</div><div class="st-body">${body}</div></div>`;
+const stKpi = (l, v, sub, hero) => `<div class="st-kpi${hero ? ' hero' : ''}"><div class="st-kpi-l">${l}</div><div class="st-kpi-v">${v}</div>${sub ? `<div class="st-kpi-s">${sub}</div>` : ''}</div>`;
+const sumArr = (a) => (a || []).reduce((x, y) => x + (y || 0), 0);
+
+let _statsTimer = null;
+async function loadStats(force) {
+  const root = document.getElementById('st-root'), btn = document.getElementById('st-refresh');
+  if (!root.dataset.loaded || force) root.innerHTML = '<div class="loading">Calcul des statistiques…</div>';
+  if (btn) btn.disabled = true;
+  try {
+    const s = (await fx.httpsCallable('adminStats')({ force: !!force })).data;
+    root.dataset.loaded = '1';
+    renderStats(s);
+    const upd = () => { const m = Math.round((Date.now() - s.at) / 60000); document.getElementById('st-upd').textContent = m < 1 ? "Mis à jour à l'instant" : `Mis à jour il y a ${m} min`; };
+    upd(); clearInterval(_statsTimer); _statsTimer = setInterval(upd, 30000);
+  } catch (e) {
+    root.innerHTML = `<div class="empty">Statistiques indisponibles : ${esc(e.message)}<br>Si la fonction vient d'être ajoutée, redéploie les fonctions Firebase.</div>`;
+  }
+  if (btn) btn.disabled = false;
+}
+function renderStats(s) {
+  const T = s.totals || {}, A = s.active || {}, S = s.series || { days: [] }, d = S.days || [];
+  const last7 = (a) => sumArr((a || []).slice(-7)), prev7 = (a) => sumArr((a || []).slice(-14, -7));
+  const trend = (a) => { const x = last7(a), y = prev7(a); if (!y) return x ? `<span class="st-up">+${fmtN(x)}</span> sur 7 jours` : 'Rien sur 7 jours'; const p = Math.round(((x - y) * 100) / y); return `${fmtN(x)} sur 7 jours <span class="${p >= 0 ? 'st-up' : ''}" style="${p < 0 ? 'color:var(--red-text);font-weight:700' : ''}">${p >= 0 ? '+' : ''}${p} %</span>`; };
+  const ansToday = (S.answers || [])[d.length - 1] || 0;
+  const kpis = [
+    stKpi('Habitants inscrits', fmtN(T.users), trend(S.signups), true),
+    stKpi('Actifs aujourd\'hui', fmtN(A.today), `${pctS(A.today || 0, T.users)} des inscrits`),
+    stKpi('Actifs sur 7 jours', fmtN(A.week), `${fmtN(A.month)} sur 30 jours`),
+    stKpi('Réponses', fmtN(T.answers), `${fmtN(ansToday)} aujourd'hui, ${trend(S.answers)}`),
+    stKpi('Commerces vérifiés', fmtN(T.merchantsVerified), T.merchantsPending ? `<span style="color:var(--coral-text);font-weight:700">${fmtN(T.merchantsPending)} en attente de validation</span>` : 'Aucun en attente'),
+    stKpi('Questions en cours', fmtN(T.campaignsActive), `${T.answers && T.campaignsActive ? fmtN(Math.round(T.answers / Math.max(1, T.campaignsActive))) + ' réponses par question en moyenne' : ''}`),
+    stKpi('Récompenses échangées', fmtN(T.redemptionsUsed), `${fmtN(T.redemptionsPending)} bon${(T.redemptionsPending||0)>1?'s':''} en attente en caisse`),
+    stKpi('Notifications activées', pctS(T.pushEnabled || 0, T.users), `${fmtN(T.pushEnabled)} habitants`),
+  ].join('');
+
+  const funnel = [
+    { label: 'Inscrits', value: T.users, color: ST_C.brun },
+    { label: 'Actifs 30 jours', value: A.month, color: ST_C.brule },
+    { label: 'Actifs 7 jours', value: A.week, color: ST_C.or },
+    { label: 'Actifs aujourd\'hui', value: A.today, color: ST_C.jaune },
+    { label: 'Série de 3 jours et +', value: T.streak3, color: ST_C.menthe },
+    { label: 'Série de 7 jours et +', value: T.streak7, color: '#087355' },
+  ];
+  const cityItems = (s.cities || []).slice().sort((a, b) => (b.users || 0) - (a.users || 0)).map(c => ({ label: c.label, value: c.users }));
+  const inCities = sumArr(cityItems.map(c => c.value)); if ((T.users || 0) > inCities) cityItems.push({ label: 'Autres ou non renseigné', value: T.users - inCities, color: ST_C.gris });
+  const AGE_L = { '16-17': '16–17 ans', '18-24': '18–24 ans', '25-34': '25–34 ans', '35-49': '35–49 ans', '50-64': '50–64 ans', '65+': '65 ans et +' };
+  const ageItems = (s.ages || []).map(a => ({ label: AGE_L[a.key] || a.key, value: a.users }));
+  const ageKnown = sumArr(ageItems.map(a => a.value));
+  const intItems = (s.interests || []).slice().sort((a, b) => (b.users || 0) - (a.users || 0)).map(i => ({ label: i.label, value: i.users }));
+
+  const camps = (s.topCampaigns || []).map(c => `<tr><td class="st-q">${esc(c.question)}<small>${esc(c.merchant)}${c.city ? ', ' + esc(c.city) : ''}${c.isTest ? '<span class="st-tag">test</span>' : ''}</small>${c.target ? `<div class="st-prog"><div style="width:${Math.min(100, (c.answers * 100) / c.target).toFixed(0)}%"></div></div>` : ''}</td><td class="n">${fmtN(c.answers)}${c.target ? `<div style="font-weight:500;color:var(--ink3);font-size:11px">sur ${fmtN(c.target)}</div>` : ''}</td></tr>`).join('');
+  const merch = (s.topMerchants || []).map((m, i) => `<tr><td style="width:24px;color:var(--ink3);font-weight:700">${i + 1}</td><td>${esc(m.name)}${m.isTest ? '<span class="st-tag">test</span>' : ''}<div style="font-size:11px;color:var(--ink3)">${esc(m.city)}, ${m.questions} question${m.questions > 1 ? 's' : ''}</div></td><td class="n">${fmtN(m.answers)}</td></tr>`).join('');
+  const NL = (typeof NOTIF_LABELS !== 'undefined' ? NOTIF_LABELS : {});
+  const notif = (s.notifications || []).map(n => { const r = n.sent ? (n.opened * 100) / n.sent : 0; return `<tr><td>${esc(NL[n.type] || n.type)}</td><td class="n">${fmtN(n.sent)}</td><td class="n">${fmtN(n.opened)}</td><td style="min-width:120px"><div class="st-hb-t" style="height:8px"><div style="width:${Math.min(100, r * 3).toFixed(0)}%;background:${r < 5 && n.sent >= 200 ? 'var(--red)' : ST_C.menthe}"></div></div></td><td class="n">${r.toFixed(1)} %</td><td class="n" style="color:var(--ink3)">${fmtN(n.disabled)}</td></tr>`; }).join('');
+  const quality = T.answers ? `${pctS(T.answersFlagged || 0, T.answers)} des réponses signalées (trop rapides), ${fmtN(T.answersFlagged)} au total` : '';
+
+  document.getElementById('st-root').innerHTML = `
+    <div class="st-kpis">${kpis}</div>
+    <div class="st-grid">
+      ${stCard('Réponses par jour', `<div class="st-total">${fmtN(sumArr(S.answers))}</div><div class="st-kpi-s" style="margin-bottom:10px">sur les 30 derniers jours</div>${stArea([{ values: S.answers || [], color: ST_C.or, unit: 'réponses' }], d)}`)}
+      ${stCard('Inscriptions par jour', `<div class="st-total">${fmtN(sumArr(S.signups))}</div><div class="st-kpi-s" style="margin-bottom:10px">nouveaux habitants sur 30 jours</div>${stArea([{ values: S.signups || [], color: ST_C.brule, unit: 'inscriptions' }], d)}`)}
+    </div>
+    <div class="st-grid st-sec">
+      ${stCard('Engagement des habitants', stHBars(funnel, T.users))}
+      ${stCard('Notifications', stDonut([{ label: 'Activées', value: T.pushEnabled || 0, color: ST_C.menthe }, { label: 'Non activées', value: Math.max(0, (T.users || 0) - (T.pushEnabled || 0)), color: ST_C.gris }], pctS(T.pushEnabled || 0, T.users), 'activées') + `<div class="st-kpi-s" style="margin-top:12px">Points en circulation chez les habitants : <strong>${fmtN(T.pointsHeld)}</strong></div>`)}
+    </div>
+    <div class="st-grid st-sec">
+      ${stCard('Habitants par ville', stHBars(cityItems, T.users))}
+      ${stCard('Tranches d\'âge', stHBars(ageItems, ageKnown, ST_C.brule) + `<div class="st-kpi-s" style="margin-top:8px">${fmtN(ageKnown)} habitants ont renseigné leur âge (${pctS(ageKnown, T.users)})</div>`)}
+    </div>
+    <div class="st-grid st-sec">
+      ${stCard('Centres d\'intérêt', stHBars(intItems, T.users, ST_C.menthe) + '<div class="st-kpi-s" style="margin-top:8px">Un habitant peut en choisir plusieurs.</div>')}
+      ${stCard('Récompenses échangées par jour', `<div class="st-total">${fmtN(sumArr(S.redemptions))}</div><div class="st-kpi-s" style="margin-bottom:10px">bons créés sur 30 jours, ${fmtN(T.redemptionsUsed)} utilisés au total</div>${stBars(S.redemptions || [], d, ST_C.brun)}`)}
+    </div>
+    <div class="st-grid st-sec">
+      ${stCard('Questions les plus répondues', camps ? `<table class="st-tbl"><thead><tr><th>Question</th><th style="text-align:right">Réponses</th></tr></thead><tbody>${camps}</tbody></table>` : '<div class="empty">Aucune réponse pour l\'instant.</div>')}
+      ${stCard('Commerces les plus actifs', merch ? `<table class="st-tbl"><thead><tr><th></th><th>Commerce</th><th style="text-align:right">Réponses</th></tr></thead><tbody>${merch}</tbody></table>` : '<div class="empty">Aucun commerce actif pour l\'instant.</div>')}
+    </div>
+    <div class="st-sec">
+      ${stCard('Notifications par type', notif ? `<div style="overflow-x:auto"><table class="st-tbl"><thead><tr><th>Type</th><th style="text-align:right">Envois</th><th style="text-align:right">Ouvertures</th><th></th><th style="text-align:right">Taux</th><th style="text-align:right">Coupées</th></tr></thead><tbody>${notif}</tbody></table></div>` : '<div class="empty">Aucune notification envoyée pour l\'instant.</div>')}
+    </div>
+    <div class="st-kpi-s st-sec">${quality}</div>`;
 }
 
 // ── Merchants ──────────────────────────────────────────────────────────────
