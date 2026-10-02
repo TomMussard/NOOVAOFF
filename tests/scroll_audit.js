@@ -98,6 +98,9 @@ function pageAudit(rootSel){
     await setVal(p,'#aw-email','me@t.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());
     await wf(p,()=>document.getElementById('home').classList.contains('active'));await sleep(2500);
     await audit('app accueil','#home');
+    // Chaque écran doit rester à la taille du téléphone (sinon il grandit, est rogné et ne défile plus).
+    const scr=await p.evaluate(()=>{const H=document.getElementById('app').clientHeight;return [...document.querySelectorAll('.screen')].filter(e=>{const cs=getComputedStyle(e);return cs.position!=='absolute'||Math.abs(e.clientHeight-H)>1||(e.id!=='splash'&&!/auto|scroll/.test(cs.overflowY));}).map(e=>e.id+':'+getComputedStyle(e).position+'/'+e.clientHeight+'/'+H);});
+    check(`${sz} tous les écrans de l'app ont la hauteur du téléphone et défilent`,!scr.length,scr);
     await step('app accueil, plus de commerces',()=>p.evaluate(()=>{const b=document.getElementById('dnb-more');if(b)b.click();}),'#home');
     await step('app communauté',()=>p.evaluate(()=>goNav('social')),'#social');
     await step('app classement',()=>p.evaluate(()=>{const b=[...document.querySelectorAll('#social .tab-btn')].find(x=>/Classement/.test(x.textContent));if(b)b.click();}),'#social');
@@ -125,6 +128,14 @@ function pageAudit(rootSel){
     await step('app célébration',()=>p.evaluate(()=>showCelebration({icon:'fire',title:'7 jours d’affilée !',subtitle:'Continue comme ça.'})),'#celebrate-sheet');
     await p.evaluate(()=>{try{closeCelebration()}catch(e){}});
     await step('app récompense gagnée',()=>p.evaluate(()=>openReward({title:'Bien joué !',sub:'Ta réponse aide Le Fournil.'})),'#reward');
+    // « Bien joué » rempli comme en vrai (résultats sous le seuil + suivre le commerce + actions) : plus haut que l'écran.
+    await step('app récompense gagnée, écran long',async()=>{await p.evaluate(()=>{
+      document.getElementById('rw-reveal').innerHTML=revealCardHTML({options:['Fruits et légumes','Produits locaux','Vrac','Plats préparés'].map(text=>({text})),myIdx:1,n:2,min:5,needed:3,belowThreshold:true,friends:[]},false);
+      document.getElementById('rw-follow').innerHTML='<div style="padding:24px;border:1px solid;border-radius:14px;margin-top:16px"><h3>Tu veux suivre Le Cabas Malin ?</h3><p style="height:160px">Tu recevras ses prochaines questions.</p><button>Suivre</button></div>';
+      document.getElementById('rw-actions').innerHTML='<button class="btn-p">Question suivante</button><button>Retour à l\'accueil</button>';});
+      const r=await p.evaluate(()=>{const el=document.getElementById('reward');const txt=el.textContent;return {sh:el.scrollHeight,ch:el.clientHeight,over:el.scrollHeight>el.clientHeight,top:document.querySelector('#reward .dh-hdr').getBoundingClientRect().top,undef:/undefined/.test(txt)};});
+      check(`${sz} écran « Bien joué » long : il défile, le haut reste visible, aucun « undefined »`,r.over&&r.top>=0&&!r.undef,r);
+    },'#reward');
 
     // ═════ Dashboard commerçant ═════
     const d=await ctx.newPage();await d.setViewport({width:w,height:h,isMobile:true,hasTouch:true,deviceScaleFactor:1});d.on('pageerror',e=>errs.push('dash: '+e.message));d.on('dialog',x=>x.dismiss().catch(()=>{}));
