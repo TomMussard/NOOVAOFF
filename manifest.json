@@ -1,7 +1,7 @@
 {
-  "name": "Noova — Là où tes avis ont de la valeur",
-  "short_name": "Noova",
-  "description": "Là où tes avis ont de la valeur",
+  "name": "NOOVA",
+  "short_name": "NOOVA",
+  "description": "Les commerces de ton quartier te posent une question. Tu réponds en 30 secondes.",
   "start_url": "/app-v2",
   "scope": "/",
   "display": "standalone",
