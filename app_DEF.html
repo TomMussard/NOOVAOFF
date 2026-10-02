@@ -192,7 +192,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .feed-post:active,.fi:active,.br-card:active{transform:scale(.97)}
 .today-card:active{transform:scale(.98)}
 /* SPLASH — empty screen covered by #app-loader */
-#splash{position:relative;overflow:hidden;background:var(--bg)}
+#splash{overflow:hidden;background:var(--bg)}
 /* ONBOARDING */
 .how-row{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border-radius:var(--r-md);padding:14px 16px;}
 .how-n{width:30px;height:30px;border-radius:50%;background:var(--surface-2);color:var(--yellow);font-family:var(--fd);font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -651,7 +651,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 #question.qfull .btn-sub:disabled,#question.qfull .btn-sub.locked{opacity:1;background:rgba(28,14,2,.16);color:var(--nv-black)}
 .skip-btn{padding:15px 16px;border-radius:var(--r-btn);background:var(--cream);border:none;color:var(--muted);font-size:var(--fs-3);font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .13s}
 /* REWARD */
-#reward{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;position:relative}
+#reward{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:30px 20px calc(40px + env(safe-area-inset-bottom,0px))}
+/* Écran plus haut que le téléphone : rien ne rétrécit et tout défile (le centrage flex rognait le contenu, plus de défilement sur iPhone).
+   Centré quand il tient, grâce aux marges automatiques. */
+#reward>*{flex-shrink:0}
+#reward>.rw-circle{margin-top:auto}
+#reward>#rw-actions{margin-bottom:auto}
 .conf-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .conf-p{position:absolute;top:-20px;border-radius:var(--r-xs);animation:confFall linear forwards}
 .rw-circle{width:64px;height:64px;border-radius:50%;background:var(--surface-2);color:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:var(--fs-6);margin-bottom:14px;animation:pop .45s cubic-bezier(.34,1.56,.64,1);position:relative;z-index:1}
@@ -4902,9 +4907,13 @@ function revealCardHTML(r,compact){
   const rows=r.options.map((o,i)=>{
     const mine=i===r.myIdx;
     const av=(friendsBy[i]||[]).map(f=>`<div class="rv-av" title="${esc(f.name)}">${avInner(f.photoUrl,f.name)}</div>`).join('');
-    return `<div class="rv-row${mine?' mine':''}"><div class="rv-top"><span class="rv-l">${mine?icon('check',{size:14}):''}${esc(o.text)}</span><span class="rv-p">${o.pct} %</span></div><div class="rv-bar"><div style="width:${o.pct}%"></div></div>${av?`<div class="rv-fr">${av}</div>`:''}</div>`;
+    // Sous le seuil de réponses, le serveur ne donne pas de pourcentage : on liste les choix, sans barre.
+    const hasPct=typeof o.pct==='number'&&isFinite(o.pct);
+    return `<div class="rv-row${mine?' mine':''}"><div class="rv-top"><span class="rv-l">${mine?icon('check',{size:14}):''}${esc(o.text)}</span>${hasPct?`<span class="rv-p">${o.pct} %</span>`:''}</div>${hasPct?`<div class="rv-bar"><div style="width:${o.pct}%"></div></div>`:''}${av?`<div class="rv-fr">${av}</div>`:''}</div>`;
   }).join('');
-  const note=`<div class="rv-foot">${r.n} réponse${r.n>1?'s':''}</div>`;
+  const below=r.belowThreshold||!r.options.some(o=>typeof o.pct==='number');
+  const n=r.n||0,need=r.needed||Math.max(0,(r.min||0)-n);
+  const note=below?`<div class="rv-foot">${n} réponse${n>1?'s':''} pour l'instant. Les résultats s'affichent dès ${n+need} réponses${need?` : encore ${need}`:''}.</div>`:`<div class="rv-foot">${n} réponse${n>1?'s':''}</div>`;
   let info='';
   try{if(!localStorage.getItem('nv_reveal_info')){localStorage.setItem('nv_reveal_info','1');info=`<div class="rv-info"><span style="flex:1">Tes amis voient ce que tu réponds. Tu comptes toujours dans les résultats, même si tu coupes ce partage.</span><button onclick="closeRevealSheet();openPrivacySettings()">Régler</button></div>`;}}catch(e){}
   return `<div class="rv"><div class="rv-h">${compact?'Les autres ont répondu':'Comment les autres ont répondu'}</div>${rows}${note}${info}</div>`;
