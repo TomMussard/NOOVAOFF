@@ -5402,7 +5402,7 @@ function showVoucherModal({ id, code, label, merchantName, cost, purchaseConditi
 function showToast(msg, ico = 'error') {
   const ov = document.createElement('div');
   ov.setAttribute('role', 'status');
-  ov.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);opacity:0;display:flex;align-items:center;gap:9px;background:var(--marque-marron);color:var(--blanc);padding:12px 20px;border-radius:var(--r-sm);font-size:var(--fs-2);font-weight:600;z-index:9999;width:max-content;max-width:calc(100vw - 32px);line-height:1.45;transition:all .3s cubic-bezier(.34,1.56,.64,1)';
+  ov.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);opacity:0;display:flex;align-items:center;gap:9px;background:var(--marque-marron);color:var(--blanc);padding:12px 20px;border-radius:var(--r-sm);font-size:var(--fs-2);font-weight:600;z-index:9999;pointer-events:none;width:max-content;max-width:calc(100vw - 32px);line-height:1.45;transition:all .3s cubic-bezier(.34,1.56,.64,1)';
   ov.innerHTML = icon(ico, { size: 18, class: 'toast-ico' });
   const label = document.createElement('span');
   label.textContent = msg;

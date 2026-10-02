@@ -800,6 +800,10 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .dtour-skip:focus-visible,.dtour-next:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .dtour-next{background:var(--ink);color:#fff;font-family:var(--fd);font-weight:800;font-size:12.5px;padding:9px 16px;border-radius:99px;border:none;cursor:pointer}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* Fenêtres centrées : sur un petit écran, le haut ne doit jamais sortir de l'écran (marges auto plutôt
+   que centrage flex, qui coupe le haut quand le contenu dépasse) et le contenu défile. */
+#auth-wall,#google-merchant-wall,#verified-modal,#edit-field-modal,#resubmit-modal,#cashier-modal{overflow-y:auto}
+#auth-wall>*,#google-merchant-wall>*,#verified-modal>*,#edit-field-modal>*,#resubmit-modal>*,#cashier-modal>*{margin:auto}
 </style>
 <script src="icons.js"></script>
 <script src="/tiers.js"></script>
@@ -2612,7 +2616,7 @@ window.addEventListener('load',()=>{
       </button>
     </div>
 
-    <div style="margin-top:18px;font-size:12px;color:var(--ink2);text-align:center;line-height:1.8">En continuant, vous acceptez les <a href="/cgu.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">CGU</a> et tu reconnais avoir pris connaissance de la <a href="/confidentialite.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">Politique de confidentialité</a>. <a href="/mentions-legales.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">Mentions légales</a> · <a href="/accessibilite.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">Accessibilité</a></div>
+    <div style="margin-top:18px;font-size:12px;color:var(--ink2);text-align:center;line-height:1.8">En continuant, vous acceptez les <a href="/cgu.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">CGU</a> et reconnaissez avoir pris connaissance de la <a href="/confidentialite.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">Politique de confidentialité</a>. <a href="/mentions-legales.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">Mentions légales</a> · <a href="/accessibilite.html" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline">Accessibilité</a></div>
   </div>
 </div>
 

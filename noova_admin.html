@@ -156,6 +156,9 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 /* === RESPONSIVE === */
 @media(max-width:720px){
   .two-col{grid-template-columns:1fr}
+  .two-col>*{min-width:0}
+  .sec-hdr{flex-wrap:wrap;gap:10px}
+  .sec-hdr>div{flex-wrap:wrap}
   .merchant-row,.thead{grid-template-columns:1fr auto}
   .merchant-row > *:nth-child(3){ display:none }
   .thead > *:nth-child(3){ display:none }
