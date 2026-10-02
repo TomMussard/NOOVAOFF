@@ -3,6 +3,7 @@
  * Génère les visuels des commerces fictifs du mois de test : une devanture illustrée (couverture, 1200×600)
  * et un logo rond (256×256) par métier, en trois variantes de couleurs (une ville sur trois a la même).
  * Palette NOOVA uniquement (valeurs de tokens.css). Aucun texte : rien ne dépend d'une police.
+ * Si une vraie photo du métier est fournie (scripts/commerce-photos/<metier>.jpg), elle remplace la devanture dessinée.
  *   node scripts/gen-commerce-visuals.js     → img/commerces/<metier>-<1|2|3>.svg et <metier>-logo-<1|2|3>.svg
  */
 const fs = require("fs"), path = require("path");
@@ -131,9 +132,18 @@ function logo(type, vi) {
 `;
 }
 
+// Vraie photo du métier (scripts/commerce-photos/<metier>.jpg, 960×640) : si elle existe, la devanture est la
+// photo, intégrée dans le SVG pour garder les mêmes adresses (aucune mise à jour de la base nécessaire).
+const PHOTOS = path.join(__dirname, "commerce-photos");
+function photoCover(type) {
+  const f = path.join(PHOTOS, `${type}.jpg`);
+  if (!fs.existsSync(f)) return null;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640" role="img"><image width="960" height="640" preserveAspectRatio="xMidYMid slice" href="data:image/jpeg;base64,${fs.readFileSync(f).toString("base64")}"/></svg>\n`;
+}
+
 fs.mkdirSync(OUT, { recursive: true });
 for (const type of Object.keys(ICON)) for (let vi = 0; vi < 3; vi++) {
-  fs.writeFileSync(path.join(OUT, `${type}-${vi + 1}.svg`), cover(type, vi));
+  fs.writeFileSync(path.join(OUT, `${type}-${vi + 1}.svg`), photoCover(type) || cover(type, vi));
   fs.writeFileSync(path.join(OUT, `${type}-logo-${vi + 1}.svg`), logo(type, vi));
 }
 console.log("Visuels écrits dans " + path.relative(process.cwd(), OUT));
