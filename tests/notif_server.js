@@ -55,6 +55,27 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await tick(addDays(D1, 1), '12:30');
     check('QDJ : renvoyée le lendemain', (await sink('u1')).length === 2);
   });
+  await T('rappel soir', async () => {
+    await wipe();
+    await mkMerchant('m1'); await mkCampaign('c1'); await mkCampaign('c2', { name: 'Horaires' });
+    await mkUser('r1');                                                              // n'a pas répondu
+    await mkUser('r2', { dailyAnswerDate: D1, dailyAnswerCount: 1 });                // a répondu une fois
+    await mkUser('r3', { dailyAnswerDate: D1, dailyAnswerCount: CFG.POINTS.MAX_ANSWERS_PER_DAY }); // quota atteint
+    await mkUser('r4', { answeredCampaigns: ['c1', 'c2'] });                         // plus rien à répondre
+    await mkUser('r5', { notifPrefs: { question: false } });                         // réglage coupé
+    await tick(D1, '12:30');
+    await tick(D1, '18:29');
+    check('Rappel soir : rien avant 18h30', (await sink('r1')).filter(x => x.ntype === 'rappel_soir').length === 0, await sink('r1'));
+    await tick(D1, '18:30'); await tick(D1, '18:45');
+    const s1 = await sink('r1'), s2 = await sink('r2');
+    check('Rappel soir : 2 notifications dans la journée (midi + 18h30)', s1.length === 2, s1.map(x => x.ntype));
+    check('Rappel soir : un seul rappel par jour', s1.filter(x => x.ntype === 'rappel_soir').length === 1);
+    check('Rappel soir : aussi pour qui a déjà répondu une fois', s2.filter(x => x.ntype === 'rappel_soir').length === 1, s2.map(x => x.ntype));
+    check('Rappel soir : texte sans « from », nomme le commerce', s1[1] && !/from/i.test(s1[1].title + s1[1].body) && s1[1].title.length > 0, s1[1]);
+    check('Rappel soir : rien si quota du jour atteint', (await sink('r3')).length === 0);
+    check('Rappel soir : rien si plus de question', (await sink('r4')).length === 0);
+    check('Rappel soir : respecte le réglage', (await sink('r5')).length === 0);
+  });
   await T('qdj habit', async () => {
     await wipe();
     await mkMerchant('m1'); await mkCampaign('c1');

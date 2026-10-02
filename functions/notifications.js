@@ -36,6 +36,9 @@ const IMMINENT_UNIT_PTS = CFG.POINTS.PER_ANSWER;    // points d'une réponse (ba
 // « exceptional » peut utiliser un 3e créneau, jamais plus (voir deliver()).
 const TYPES = {
   question_du_jour:     { group: "question",    nudge: true,  gapDays: 1 },
+  // Rappel de 18h30 : 2e rendez-vous du jour, seulement s'il reste des questions et que l'habitant n'a pas pris
+  // ses 3 réponses à points (voir runTick). Pas « nudge » : il peut partir après une ou deux réponses.
+  rappel_soir:          { group: "question",    nudge: false, gapDays: 1 },
   nouveau_commerce:     { group: "commerces",   nudge: true,  gapDays: 7, deferQuiet: true, ttlH: 24 },
   resultat_dispo:       { group: "resultats",   nudge: false, deferQuiet: true, deferBusy: true, ttlH: 72 },
   recompense_debloquee: { group: "recompenses", nudge: false, exceptional: true, deferQuiet: true, deferBusy: true, ttlH: 48 },
@@ -47,7 +50,7 @@ const TYPES = {
   impact:               { group: "actualites",  nudge: false, deferQuiet: true, ttlH: 48 },
 };
 const GROUPS = {
-  question: ["question_du_jour"],
+  question: ["question_du_jour", "rappel_soir"],
   commerces: ["nouveau_commerce"],
   resultats: ["resultat_dispo"],
   serie: ["serie_en_danger"],
@@ -100,6 +103,9 @@ const copy = {
     ? finish({ title: `${pct} % de tes voisins pensent comme toi`, body: `Découvre le résultat de ${short(merchant, 30)}`, screen: "home" })
     : finish({ title: `Les résultats de ${short(merchant, 30)} sont là`, body: "Découvre ce qu'ont répondu tes voisins", screen: "home" }),
   recompense: ({ reward, merchant, cost }) => finish({ title: `Ton ${short(reward, 26)} chez ${short(merchant, 20)} est à toi`, body: `Échange-le contre tes ${cost} points`, screen: "rewards-tab" }),
+  rappelSoir: ({ merchant, answered }) => answered > 0
+    ? finish({ title: `${short(merchant, 30)} a encore une question pour toi`, body: "30 secondes, +10 points", screen: "home" })
+    : finish({ title: "Ta question du jour t'attend", body: `${short(merchant, 34)} : 30 secondes, +10 points`, screen: "home" }),
   serie: ({ n, merchant }) => finish({ title: `Ta série est à ${n} jours`, body: `${short(merchant, 30)} a une question : réponds à 3 questions aujourd'hui pour la garder`, screen: "home" }),
   code: ({ reward, merchant, when, until }) => finish({ title: `Ton ${short(reward, 26)} expire ${when}`, body: `Chez ${short(merchant, 30)}, à utiliser avant ${until}`, screen: "rewards-tab" }),
   pointsExpirant: ({ points }) => finish({ title: `Tes ${points} pts expirent dans 30 jours`, body: "Réponds à une question pour les garder", screen: "rewards-tab" }),
@@ -359,7 +365,7 @@ function nearestReward(u, list) {
 // ─────────────────────────── Tick planifié ───────────────────────────
 async function runTick(now = Date.now()) {
   const p = parisParts(now);
-  const out = { queue: await drainQueue(now), misses: await processMisses(now), qdj: 0, serie: 0, code: 0, ending: 0 };
+  const out = { queue: await drainQueue(now), misses: await processMisses(now), qdj: 0, soir: 0, serie: 0, code: 0, ending: 0 };
   const caches = await loadCaches(now);
   const users = await db().collection("users").where("pushEnabled", "==", true).get();
 
@@ -379,6 +385,16 @@ async function runTick(now = Date.now()) {
       }
       const r = await deliver(uid, "question_du_jour", content, { key: p.day, now });
       if (r.status === "sent") out.qdj++;
+    }
+    // Rappel du soir (18h30-18h59) : 2e notification du jour, s'il reste des questions et des points à prendre
+    // (moins de 3 réponses aujourd'hui). Jamais pour qui recevra l'alerte « série en danger » à 20h (pas de doublon).
+    const doneToday = u.dailyAnswerDate === p.day ? (u.dailyAnswerCount || 0) : 0;
+    const serieAtRisk = (u.streak || 0) >= 3 && (u.streakDate !== undefined ? u.streakDate : u.lastAnswerDate) === yesterdayDay(now) && !answeredToday(u, p.day);
+    if (p.hour === 18 && p.minute >= 30 && avail.length && doneToday < CFG.POINTS.MAX_ANSWERS_PER_DAY && !serieAtRisk
+        && ((u.notifStats || {}).rappel_soir || {}).lastSentDay !== p.day) {
+      const m = (avail[1] || avail[0]).merchantName;
+      const r = await deliver(uid, "rappel_soir", copy.rappelSoir({ merchant: m, answered: doneToday }), { key: p.day, now });
+      if (r.status === "sent") out.soir++;
     }
     // Série en danger : 20h, série >= 3 jours encore vivante (répondu hier), rien répondu aujourd'hui.
     if (p.hour === 20 && (u.streak || 0) >= 3 && (u.streakDate !== undefined ? u.streakDate : u.lastAnswerDate) === yesterdayDay(now) && avail.length && !answeredToday(u, p.day)) {
