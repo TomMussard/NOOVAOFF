@@ -16,6 +16,7 @@ function buildSite() {
     .forEach((f) => fs.copyFileSync(path.join(ROOT, f), path.join(SITE, f)));
   fs.cpSync(path.join(ROOT, "fonts"), path.join(SITE, "fonts"), { recursive: true });
   fs.cpSync(path.join(ROOT, "vendor"), path.join(SITE, "vendor"), { recursive: true });
+  fs.cpSync(path.join(ROOT, "img"), path.join(SITE, "img"), { recursive: true });
   const emu = "auth.useEmulator('http://127.0.0.1:9099');db.useEmulator('127.0.0.1',8080);fx.useEmulator('127.0.0.1',5001);";
   const emuAdmin = "\nauth.useEmulator('http://127.0.0.1:9099');db.useEmulator('127.0.0.1',8080);";
   [["app_DEF.html", "app.html", "const fx  = firebase.app().functions('europe-west1');", emu],
@@ -60,7 +61,7 @@ function serve(port) {
   });
 }
 
-const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "eng8", "eng9", "eng10", "eng11", "eng12", "eng13", "eng14", "eng15", "eng16", "eng17", "eng18", "eng19", "eng20", "eng21", "eng22", "eng23", "eng24", "eng25", "eng26", "eng27", "eng28", "eng29", "eng30", "zones", "interests", "testmonth", "notif_server", "notif_ui", "mobile_audit", "a11y_audit", "tour_audit", "perf_audit"];
+const SUITES = ["legacy_test", "legacy_test4", "legacy_test5", "eng1", "eng2", "eng3", "eng4", "eng5", "eng6", "eng7", "eng8", "eng9", "eng10", "eng11", "eng12", "eng13", "eng14", "eng15", "eng16", "eng17", "eng18", "eng19", "eng20", "eng21", "eng22", "eng23", "eng24", "eng25", "eng26", "eng27", "eng28", "eng29", "eng30", "zones", "interests", "testmonth", "notif_server", "notif_ui", "mobile_audit", "scroll_audit", "a11y_audit", "tour_audit", "perf_audit"];
 
 function runSuite(name) {
   return new Promise((resolve) => {
