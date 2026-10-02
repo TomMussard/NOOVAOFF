@@ -16,6 +16,7 @@ function buildSite() {
     .forEach((f) => fs.copyFileSync(path.join(ROOT, f), path.join(SITE, f)));
   fs.cpSync(path.join(ROOT, "fonts"), path.join(SITE, "fonts"), { recursive: true });
   fs.cpSync(path.join(ROOT, "vendor"), path.join(SITE, "vendor"), { recursive: true });
+  fs.cpSync(path.join(ROOT, "img"), path.join(SITE, "img"), { recursive: true });
   const emu = "auth.useEmulator('http://127.0.0.1:9099');db.useEmulator('127.0.0.1',8080);fx.useEmulator('127.0.0.1',5001);";
   const emuAdmin = "\nauth.useEmulator('http://127.0.0.1:9099');db.useEmulator('127.0.0.1',8080);";
   [["app_DEF.html", "app.html", "const fx  = firebase.app().functions('europe-west1');", emu],

@@ -179,6 +179,30 @@ async function deleteMerchant(uid) {
   try { await getAuth().deleteUser(uid); } catch (e) { if (e.code !== "auth/user-not-found") logger.warn("deleteMerchant auth", { uid, message: e.message }); }
 }
 
+// Logo et devanture illustrés (img/commerces, générés par scripts/gen-commerce-visuals.js) : trois variantes de
+// couleurs par métier, une ville sur trois partage la même.
+function visualsFor(ci, type) {
+  const v = (ci % 3) + 1;
+  return { logoUrl: `/img/commerces/${type}-logo-${v}.svg`, coverUrl: `/img/commerces/${type}-${v}.svg` };
+}
+
+// Pose (ou remet) le logo et la devanture de chaque commerce fictif, sans rien toucher d'autre.
+async function visualsCore() {
+  let n = 0;
+  for (const [ci, c] of CITIES.entries()) {
+    for (const type of Object.keys(TYPES)) {
+      const ref = db().collection("merchants").doc(merchantId(c.slug, type));
+      const snap = await ref.get();
+      if (!snap.exists) continue;
+      const vis = visualsFor(ci, type), m = snap.data();
+      if (m.logoUrl === vis.logoUrl && m.coverUrl === vis.coverUrl) continue;
+      await ref.update(vis);
+      n++;
+    }
+  }
+  return n;
+}
+
 // Crée ou met à jour les 45 commerces fictifs et leurs vitrines (idempotent : relancer ne duplique rien).
 async function upsertTestMerchants() {
   let n = 0;
@@ -190,7 +214,7 @@ async function upsertTestMerchants() {
         role: "merchant", ownerUid: id, brandName: name, name, sector: t.sector, theme: t.sector,
         city: c.slug, cityLabel: c.label, address: `Centre-ville, ${c.label}`,
         description: t.desc, status: "verified", isTest: true, email: `${id}@test.noova.fr`,
-        verifiedPopupShown: true, seenDashTour: true, updatedAt: FieldValue.serverTimestamp(),
+        verifiedPopupShown: true, seenDashTour: true, ...visualsFor(ci, type), updatedAt: FieldValue.serverTimestamp(),
       }, { merge: true });
       for (const tier of TIERS) {
         await db().collection("rewards").doc(`${id}_p${tier.n}`).set({
@@ -263,12 +287,14 @@ async function stopCore({ hide = false } = {}) {
 async function autopilotCore(now = Date.now()) {
   const cfg = await CONFIG_REF().get();
   if (!cfg.exists || cfg.data().active !== true) return { skipped: true };
-  return { questions: await postNextQuestions(now) };
+  return { visuals: await visualsCore(), questions: await postNextQuestions(now) };
 }
 
 const adminSetupTestMonth = onCall({ region: "europe-west1", timeoutSeconds: 540, memory: "512MiB" }, async (request) => {
   if (!isAdmin(request)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
-  const { deleteReal, confirm } = request.data || {};
+  const { deleteReal, confirm, visualsOnly } = request.data || {};
+  // Mise à jour des seuls visuels (logo, devanture) : ne pose aucune question et ne supprime rien.
+  if (visualsOnly) return { visuals: await visualsCore() };
   if (deleteReal && confirm !== "SUPPRIMER") throw new HttpsError("failed-precondition", "Tape SUPPRIMER pour confirmer la suppression des commerces réels.");
   const r = await setupCore({ deleteReal: !!deleteReal });
   logger.info("adminSetupTestMonth", { by: request.auth.token.email, ...r, deleted: r.deleted.length });
@@ -285,4 +311,4 @@ const testMonthAutopilot = onSchedule({ schedule: "0 9 * * 1,3,5", timeZone: "Eu
   logger.info("testMonthAutopilot", r);
 });
 
-module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { setupCore, stopCore, autopilotCore, postNextQuestions, CITIES, TYPES, BANK, merchantId } };
+module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { setupCore, stopCore, autopilotCore, postNextQuestions, visualsCore, visualsFor, CITIES, TYPES, BANK, merchantId } };

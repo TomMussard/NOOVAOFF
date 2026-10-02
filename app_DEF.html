@@ -955,6 +955,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 /* ===== brand page (Welcome-to-the-Jungle style) ===== */
 .bp-wrap{min-height:100%;padding-bottom:34px}
 .bp-cover{padding:56px 20px 46px;color:var(--blanc);position:relative}
+.bp-cover{background:var(--marque-encre)}
+/* Photo de couverture du commerce : dégradé noir vers transparent pour la lisibilité du nom (NOOVA_DESIGN §3) */
+.bp-cover.has-img{padding-top:180px;background:linear-gradient(to top,rgba(0,0,0,.82) 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,0) 75%),var(--bp-img) center/cover no-repeat,var(--marque-encre)}
 .bp-back{position:absolute;top:18px;left:16px;width:38px;height:38px;border-radius:var(--r-btn);background:rgba(28,14,2,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:var(--fs-4);color:var(--blanc);cursor:pointer;border:none}
 .bp-logo-wrap{display:flex;align-items:center;gap:13px;margin-bottom:14px}
 .bp-name{font-family:var(--fd);font-weight:800;font-size:var(--fs-6);letter-spacing:var(--lettrage-titre);color:var(--blanc);line-height:1.05}
@@ -2415,7 +2418,7 @@ function renderQueue(){
       const verb=friendArr.length>1?'ont répondu':'a répondu';
       badge=`<div class="friend-badge"><div class="fb-av" style="background:${c}22;color:${c}">${(fn||'?')[0]}</div>${esc(fn)}${more>0?` + ${more} ami${more>1?'s':''}`:''} ${verb}</div>`;
     }
-    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${esc(q.brand)}${testTagHTML(q._isTest)}</div><div class="q-prev">${esc(q.q.length>55?q.q.substring(0,55)+'…':q.q)}</div><div class="q-meta">${q._byNoova?'<span class="noova-tag">NOOVA</span>':q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:var(--fs-1);color:var(--ink2);margin-top:5px">Nouveau près de chez toi, tu ne le suis pas encore</div>':''}${badge}</div>`;
+    d.innerHTML=`${logoHTML(q.brand,44,q.logoUrl)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${esc(q.brand)}${testTagHTML(q._isTest)}</div><div class="q-prev">${esc(q.q.length>55?q.q.substring(0,55)+'…':q.q)}</div><div class="q-meta">${q._byNoova?'<span class="noova-tag">NOOVA</span>':q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:var(--fs-1);color:var(--ink2);margin-top:5px">Nouveau près de chez toi, tu ne le suis pas encore</div>':''}${badge}</div>`;
     el.appendChild(d);cnt++;
     if(cnt%3===0){const sc=buildSocialCard();if(sc)el.appendChild(sc);}
   });
@@ -3853,7 +3856,7 @@ async function openBrandById(mid, fallbackName) {
               </div>`;
         }).join('');
     document.getElementById('bp-wrap').innerHTML=`
-      <div class="bp-cover" style="background:#181410">
+      <div class="bp-cover${m.coverUrl?' has-img':''}"${m.coverUrl?` style="--bp-img:url('${String(m.coverUrl).replace(/['"()\\\s<>]/g,'')}')"`:''}>
         <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
         <div class="bp-logo-wrap">${logoHTML(brandName,60,m.logoUrl)}<div><div class="bp-name">${esc(brandName)}${testTagHTML(m.isTest)}</div><div class="bp-tag">${m.sector||'Commerce local'}${m.city?' '+cityPhrase(m.cityLabel||m.city):''}</div></div></div>
         <div class="bp-chips"><span class="bp-chip">${icon('check',{size:11})} Commerce vérifié</span>${m.city?`<span class="bp-chip">${icon('pin',{size:11})} ${m.cityLabel||m.city}</span>`:''}${m.sector?`<span class="bp-chip">${m.sector}</span>`:''}</div>

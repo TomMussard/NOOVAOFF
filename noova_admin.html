@@ -493,6 +493,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
         <div id="tm-confirm-wrap" style="display:none;margin:8px 0">Pour confirmer, tape <b>SUPPRIMER</b> : <input id="tm-confirm" autocomplete="off" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit"></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
           <button class="btn-approve" id="tm-setup-btn" onclick="setupTestMonth(this)">Préparer et lancer le mois de test</button>
+          <button class="btn-approve" onclick="refreshTestVisuals(this)">Mettre à jour logos et devantures</button>
           <button class="btn-reject" onclick="stopTestMonth(false)">Arrêter les questions automatiques</button>
           <button class="btn-reject" onclick="stopTestMonth(true)">Fin du test : masquer les commerces fictifs</button>
         </div>
@@ -687,6 +688,12 @@ async function setupTestMonth(btn) {
     showToast('Mois de test lancé.');
   } catch (e) { out.textContent = 'Erreur : ' + e.message; }
   btn.disabled = false; loadTestMonth();
+}
+async function refreshTestVisuals(btn) {
+  btn.disabled = true; const out = document.getElementById('tm-result'); out.textContent = 'En cours…';
+  try { const r = (await fx.httpsCallable('adminSetupTestMonth')({ visualsOnly: true })).data; out.textContent = `Fait : ${r.visuals} commerces fictifs mis à jour (logo et devanture).`; }
+  catch (e) { out.textContent = 'Erreur : ' + e.message; }
+  btn.disabled = false;
 }
 async function stopTestMonth(hide) {
   if (!confirm(hide ? 'Fin du test : arrêter les questions, clore les questions en cours et masquer les commerces fictifs ?' : 'Arrêter les questions automatiques (les commerces fictifs restent visibles) ?')) return;

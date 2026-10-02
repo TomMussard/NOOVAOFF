@@ -892,6 +892,12 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
       <div class="page active" id="page-dashboard">
         <div id="quota-card" style="display:none"></div>
         <div id="acq-card" style="display:none"></div>
+        <!-- Rappel visuel : sans logo ni couverture, la fiche du commerce paraît vide dans l'app. -->
+        <div id="photo-nudge" style="display:none;align-items:center;gap:14px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px">
+          <div style="flex:1;min-width:200px"><div style="font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ink)" id="photo-nudge-title">Ajoutez votre logo et une photo de devanture</div>
+          <div style="font-size:13px;color:var(--ink2);margin-top:4px;line-height:1.5">Ils s'affichent sur votre fiche et derrière vos questions dans l'app. Les commerces avec photo reçoivent nettement plus de réponses.</div></div>
+          <button class="tb-btn tb-btn-ghost" style="font-size:13px" onclick="navTo('settings',document.querySelector('.sb-item[onclick*=&quot;settings&quot;]'))">Ajouter</button>
+        </div>
         <!-- Clients ramenés par NOOVA (bons validés ce mois-ci). Le panier moyen a été retiré : basé sur une
              saisie manuelle facultative au comptoir, la base était trop faible pour être fiable au lancement. -->
         <div class="kpi-row" id="bring-row" style="grid-template-columns:repeat(2,1fr)">
@@ -3108,6 +3114,12 @@ async function loadMerchantAndStart(uid) {
   document.querySelectorAll('.sb-brand-av').forEach(el => { el.innerHTML = _mData.logoUrl ? `<img src="${_mData.logoUrl}" alt="Logo de votre commerce" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.innerHTML=merchantLogoFallbackHTML()">` : merchantLogoFallbackHTML(); });
   const coverPreview = document.getElementById('set-cover-preview');
   if(coverPreview) coverPreview.innerHTML = _mData.coverUrl ? `<img src="${_mData.coverUrl}" alt="Photo de couverture de votre commerce" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=merchantCoverFallbackHTML()" onload="this.decode?this.decode().catch(()=>this.parentElement.innerHTML=merchantCoverFallbackHTML()):0">` : merchantCoverFallbackHTML();
+  const nudge = document.getElementById('photo-nudge');
+  if(nudge){
+    const missLogo = !_mData.logoUrl, missCover = !_mData.coverUrl;
+    nudge.style.display = (missLogo || missCover) ? 'flex' : 'none';
+    document.getElementById('photo-nudge-title').textContent = missLogo && missCover ? 'Ajoutez votre logo et une photo de devanture' : missLogo ? 'Ajoutez votre logo' : 'Ajoutez une photo de devanture';
+  }
   const setIddoc = document.getElementById('set-iddoc');
   if(setIddoc && _mData.idDocumentPath) setIddoc.textContent = 'Envoyé — en cours de vérification';
   // Update wizard preview brand names
