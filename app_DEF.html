@@ -4991,7 +4991,7 @@ function cityPhrase(label){
 // Récompenses payables en NOOVS : annoncées, pas encore ouvertes.
 function renderNoovRewards(){
   const el=document.getElementById('noov-rewards');if(!el)return;
-  const items=[{ico:'gift-generic',t:'Bons'},{ico:'eye',t:'Sans pub'},{ico:'trophy',t:'Concours'},{ico:'credit-card',t:'Cash'}];
+  const items=[{ico:'gift-generic',t:'Bons'},{ico:'eye',t:'Sans pub'},{ico:'trophy',t:'Concours'}];
   el.className='noov-tiles';
   el.innerHTML=items.map(i=>`<div class="noov-tile"><div class="ns-ico">${icon(i.ico,{size:20})}</div><div class="ns-t">${i.t}</div><div class="ns-tag">Bientôt</div></div>`).join('');
 }
