@@ -140,6 +140,7 @@ const redeemReward = onCall(async (request) => {
       userId: uid, rewardId, merchantId: mid, merchantName: r.merchantName || m.brandName || "", city: r.city || "",
       tier: tier.n, cost, label: r.label || "Récompense", icon: r.icon || null,
       purchaseCondition, minPurchase, code, status: "pending",
+      isTest: r.isTest === true || (m && m.isTest === true),   // mois de test : bon simulé, sans valeur
       createdAt: FieldValue.serverTimestamp(), expiresAt, usedAt: null,
     });
     tx.update(userRef, { points: balance - cost, lastActivityAt: FieldValue.serverTimestamp() });
@@ -150,6 +151,7 @@ const redeemReward = onCall(async (request) => {
     return {
       redemptionId: redemRef.id, code, cost, tier: tier.n, label: r.label || "Récompense", merchantName: r.merchantName || "",
       purchaseCondition, expiresAt: expiresAt.toMillis(), totalPoints: balance - cost,
+      isTest: r.isTest === true || (m && m.isTest === true),
     };
   });
 });

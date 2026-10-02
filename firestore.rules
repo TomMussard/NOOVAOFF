@@ -455,5 +455,7 @@ service cloud.firestore {
     // Réglages d'engagement : lus/écrits uniquement par les fonctions (l'admin passe par getEngagementConfig).
     match /appConfig/{id}      { allow read, write: if false; }
     match /mail/{id}           { allow read, write: if false; }
+    // État du mois de test (commerces fictifs) : écrit par les fonctions, lu par l'admin.
+    match /config/{id}         { allow read: if isAdmin(); allow write: if false; }
   }
 }

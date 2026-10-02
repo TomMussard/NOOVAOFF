@@ -2139,7 +2139,9 @@ async function confirmInterestsEditSheet(){
 // (cityLabel) : « Allonnes » reste écrit « Allonnes » dans son profil, seule la ville de correspondance change.
 const NOOVA_KNOWN_CITIES=[
   {slug:'le-mans',label:'Le Mans',zone:['Aigné','Allonnes','Arnage','Champagné','Changé','Chaufour-Notre-Dame','Coulaines','Fatines','Fay','La Chapelle-Saint-Aubin','Laigné-en-Belin','Mulsanne','Neuville-sur-Sarthe','Pruillé-le-Chétif','Rouillon','Ruaudin','Saint-Georges-du-Bois','Saint-Saturnin','Sargé-lès-Le Mans',"Savigné-l'Évêque",'Trangé',"Yvré-l'Évêque"]},
-  {slug:'angers',label:'Angers',zone:[]}
+  {slug:'angers',label:'Angers',zone:[]},
+  {slug:'paris',label:'Paris',zone:[]},{slug:'nantes',label:'Nantes',zone:[]},{slug:'bordeaux',label:'Bordeaux',zone:[]},
+  {slug:'marseille',label:'Marseille',zone:[]},{slug:'toulouse',label:'Toulouse',zone:[]},{slug:'lille',label:'Lille',zone:[]},{slug:'dijon',label:'Dijon',zone:[]}
 ];
 function normalizeCity(s){
   const base=(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
@@ -2356,7 +2358,7 @@ function renderHeaderStats(){
 function refreshHome(){
   if(!S.user)return;
   renderHeaderStats();   // met aussi à jour #home-pts (S.pts), en plus des NOOVS/série
-  if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('today-card').classList.toggle('disc',!!q._discovery);document.getElementById('tc-brand').textContent=q.brand;document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
+  if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('today-card').classList.toggle('disc',!!q._discovery);document.getElementById('tc-brand').innerHTML=esc(q.brand)+testTagHTML(q._isTest);document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector(':scope > img');
     if(q.photoUrl){
       // Certains fichiers Storage sont corrompus/tronqués : ils chargent (pas d'erreur réseau)
@@ -2413,7 +2415,7 @@ function renderQueue(){
       const verb=friendArr.length>1?'ont répondu':'a répondu';
       badge=`<div class="friend-badge"><div class="fb-av" style="background:${c}22;color:${c}">${(fn||'?')[0]}</div>${esc(fn)}${more>0?` + ${more} ami${more>1?'s':''}`:''} ${verb}</div>`;
     }
-    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${esc(q.brand)}</div><div class="q-prev">${esc(q.q.length>55?q.q.substring(0,55)+'…':q.q)}</div><div class="q-meta">${q._byNoova?'<span class="noova-tag">NOOVA</span>':q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:var(--fs-1);color:var(--ink2);margin-top:5px">Nouveau près de chez toi, tu ne le suis pas encore</div>':''}${badge}</div>`;
+    d.innerHTML=`${logoHTML(q.brand,44)}<div class="q-bdy"><div class="q-br" style="color:var(--ink)">${esc(q.brand)}${testTagHTML(q._isTest)}</div><div class="q-prev">${esc(q.q.length>55?q.q.substring(0,55)+'…':q.q)}</div><div class="q-meta">${q._byNoova?'<span class="noova-tag">NOOVA</span>':q._discovery?'<span class="disc-tag">Découverte</span>':''}<span class="q-pts-t">${ptsTag(q)}</span><span class="q-type-t">${tc}</span></div>${q._discovery?'<div style="font-size:var(--fs-1);color:var(--ink2);margin-top:5px">Nouveau près de chez toi, tu ne le suis pas encore</div>':''}${badge}</div>`;
     el.appendChild(d);cnt++;
     if(cnt%3===0){const sc=buildSocialCard();if(sc)el.appendChild(sc);}
   });
@@ -2430,7 +2432,7 @@ function openQ(idx){
   const pg=document.getElementById('q-prog');pg.innerHTML='';
   S.qs.forEach((_,i)=>{const s=document.createElement('div');s.className='q-seg'+(i<idx?' done':i===idx?' cur':'');pg.appendChild(s)});
   setQPtsTag(q);
-  {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}document.getElementById('bh-name').textContent=q.brand;
+  {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}document.getElementById('bh-name').innerHTML=esc(q.brand)+testTagHTML(q._isTest);
   document.getElementById('bh-usage').textContent=q.usage||'Ta réponse aidera '+q.brand+'.';
   document.getElementById('bh-tag').textContent=q.theme;document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||defaultHint(q.type);
   document.getElementById('sub-btn').disabled=true;buildAns(q);goTo('question');
@@ -2821,6 +2823,8 @@ function esc(s) {
 }
 // Valeur insérée comme argument JS dans un attribut on*="…" : chaîne JSON (guillemets, antislash, apostrophes
 // gérés), puis échappée pour l'attribut. Un prénom comme « N'Diaye » ou « ');alert(1)// » reste une simple chaîne.
+// Mois de test : étiquette discrète sur tout commerce fictif (nom, question, fiche).
+function testTagHTML(on){return on?'<span class="test-tag">Commerce test</span>':'';}
 function jsa(v){return esc(JSON.stringify(v==null?'':String(v)));}
 
 // ─── Micro-interactions : entrée en cascade + compteurs animés ────────────
@@ -3662,7 +3666,7 @@ function fillQuestion(q,opts){
   beginQuestionOnServer(q);
   startAnswerLock();
   {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}
-  document.getElementById('bh-name').textContent=q.brand;
+  document.getElementById('bh-name').innerHTML=esc(q.brand)+testTagHTML(q._isTest);
   document.getElementById('bh-usage').textContent=q.usage||('Ta réponse aide '+q.brand+'.');
   document.getElementById('bh-tag').textContent=q.theme||'';
   document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||defaultHint(q.type);
@@ -3851,7 +3855,7 @@ async function openBrandById(mid, fallbackName) {
     document.getElementById('bp-wrap').innerHTML=`
       <div class="bp-cover" style="background:#181410">
         <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
-        <div class="bp-logo-wrap">${logoHTML(brandName,60,m.logoUrl)}<div><div class="bp-name">${brandName}</div><div class="bp-tag">${m.sector||'Commerce local'}${m.city?' '+cityPhrase(m.cityLabel||m.city):''}</div></div></div>
+        <div class="bp-logo-wrap">${logoHTML(brandName,60,m.logoUrl)}<div><div class="bp-name">${esc(brandName)}${testTagHTML(m.isTest)}</div><div class="bp-tag">${m.sector||'Commerce local'}${m.city?' '+cityPhrase(m.cityLabel||m.city):''}</div></div></div>
         <div class="bp-chips"><span class="bp-chip">${icon('check',{size:11})} Commerce vérifié</span>${m.city?`<span class="bp-chip">${icon('pin',{size:11})} ${m.cityLabel||m.city}</span>`:''}${m.sector?`<span class="bp-chip">${m.sector}</span>`:''}</div>
       </div>
       <div class="bp-stats">
@@ -3940,11 +3944,11 @@ function mapMerchants(){
   return [...map.values()].map(m=>({
     id:m.id,name:m.brandName||m.name||'Commerce',sector:m.sector||'Commerce local',cat:sectorCat(m.sector||m.theme),
     address:m.address||'',city:m.cityLabel||m.city||S._cityLabel||S._city||'',logoUrl:m.logoUrl||null,photoUrl:m.coverUrl||null,
-    authorized:auth_.includes(m.id),request:reqs.includes(m.id),hasQ:(S.qs||[]).some(q=>q._merchantId===m.id)
+    authorized:auth_.includes(m.id),request:reqs.includes(m.id),hasQ:(S.qs||[]).some(q=>q._merchantId===m.id),isTest:m.isTest===true
   }));
 }
 function getNearbyCards(){
-  return mapMerchants().map(m=>({name:m.name,ico:'🏪',sector:m.sector,hasQ:m.hasQ,request:m.request,_merchantId:m.id,logoUrl:m.logoUrl,photoUrl:m.photoUrl,address:m.address,city:m.city}));
+  return mapMerchants().map(m=>({isTest:m.isTest,name:m.name,ico:'🏪',sector:m.sector,hasQ:m.hasQ,request:m.request,_merchantId:m.id,logoUrl:m.logoUrl,photoUrl:m.photoUrl,address:m.address,city:m.city}));
 }
 function renderBrandRail(){
   const el=document.getElementById('br-rail');if(!el)return;el.innerHTML='';
@@ -4097,7 +4101,7 @@ async function renderNearbyGrid(){
       <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="Photo de ${esc(c.name)}" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}</div>
       <div class="dnb-scrim"></div>
       <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':(c.request?'À découvrir':'Bientôt')}</div>
-      <div class="dnb-body"><div class="dnb-name">${esc(c.name)}</div><div class="dnb-meta">${esc(c.sector)}${c._dist!=null?', à '+fmtDist(c._dist):''}</div></div>
+      <div class="dnb-body"><div class="dnb-name">${esc(c.name)}${testTagHTML(c.isTest)}</div><div class="dnb-meta">${esc(c.sector)}${c._dist!=null?', à '+fmtDist(c._dist):''}</div></div>
     </div>`).join('');
 }
 
@@ -5253,7 +5257,7 @@ function loadActiveRedemptions(){
       <div class="dcode-name">${esc(r.label||'Récompense')}</div>
       <div class="dcode-sub">${esc(r.merchantName||'')}${exp?', expire le '+exp:''}</div>
       <div class="dcode-box"><div class="dcode-lbl">Code à montrer en caisse</div><div class="dcode-val">${esc((r.code||'').split('').join(' '))}</div></div>
-      <button class="dcode-btn" onclick="showVoucherModal({id:${jsa(r.id)},code:${jsa(r.code||'')},label:${jsa(r.label||'')},merchantName:${jsa(r.merchantName||'')},cost:${Number(r.cost)||0},tier:${Number(r.tier)||0},purchaseCondition:${r.purchaseCondition?jsa(r.purchaseCondition):'null'},expiresAt:${r._expMs?`new Date(${r._expMs})`:'null'}})">Utiliser maintenant</button>
+      <button class="dcode-btn" onclick="showVoucherModal({isTest:${r.isTest?'true':'false'},id:${jsa(r.id)},code:${jsa(r.code||'')},label:${jsa(r.label||'')},merchantName:${jsa(r.merchantName||'')},cost:${Number(r.cost)||0},tier:${Number(r.tier)||0},purchaseCondition:${r.purchaseCondition?jsa(r.purchaseCondition):'null'},expiresAt:${r._expMs?`new Date(${r._expMs})`:'null'}})">Utiliser maintenant</button>
     </div>
     ${active.length>1?`<div class="dcode-more" onclick="showToast('${active.length-1} autre${active.length>2?'s':''} code${active.length>2?'s':''} disponible${active.length>2?'s':''}','success')">+${active.length-1} autre${active.length>2?'s':''} code${active.length>2?'s':''} actif${active.length>2?'s':''}</div>`:''}`;
   }, e => { console.warn('loadActiveRedemptions:', e); wrap.innerHTML=''; });
@@ -5294,7 +5298,7 @@ async function redeemReward(reward) {
     setTimeout(maybeShowInstallInvite, 2500);
     refreshWallet();
     trackEvent('spend_virtual_currency', { virtual_currency_name: 'points', value: cost, item_name: reward.label||'Récompense' });
-    showVoucherModal({ id: d.redemptionId, code: d.code, label: d.label || reward.label, merchantName: d.merchantName || reward.merchantName, cost, tier: d.tier || reward.tier, purchaseCondition: d.purchaseCondition, expiresAt: new Date(d.expiresAt) });
+    showVoucherModal({ isTest: !!(d.isTest || reward.isTest), id: d.redemptionId, code: d.code, label: d.label || reward.label, merchantName: d.merchantName || reward.merchantName, cost, tier: d.tier || reward.tier, purchaseCondition: d.purchaseCondition, expiresAt: new Date(d.expiresAt) });
   } catch(e) {
     showVoucherError((e && e.message) || ('Erreur : ' + e));
   }
@@ -5345,7 +5349,7 @@ function closeVoucherFull() {
   if(_voucherTimer) { clearInterval(_voucherTimer); _voucherTimer = null; }
   try { if(_voucherLock) { _voucherLock.release(); _voucherLock = null; } } catch(e) {}
 }
-function showVoucherModal({ id, code, label, merchantName, cost, purchaseCondition, expiresAt }) {
+function showVoucherModal({ id, code, label, merchantName, cost, purchaseCondition, expiresAt, isTest }) {
   closeVoucherFull();
   const ov = document.createElement('div');
   ov.id = 'voucher-full';
@@ -5362,6 +5366,7 @@ function showVoucherModal({ id, code, label, merchantName, cost, purchaseConditi
       </div>
       <div id="vf-timer" style="font-size:var(--fs-3);font-weight:700;color:var(--ink);margin-top:20px"></div>
       ${cond}
+      ${isTest?'<div class="vf-test">Bon de test, sans valeur : ce commerce est fictif, le temps du mois de test.</div>':''}
     </div>
     <button id="vf-ok" class="btn-p" style="background:var(--surface-2);color:var(--blanc);">C'est validé</button>
     <div style="font-size:var(--fs-1);color:var(--ink3);text-align:center;margin-top:8px">À presser devant le commerçant, quand tu as reçu ta récompense.</div>`;
@@ -6091,6 +6096,7 @@ function recomputeCampaignFeed(city) {
       }));
       const built = {
         _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: 0, _byNoova: byNoova,
+        _isTest: !!(d.isTest || (merchantData && merchantData.isTest)),
         _surveyCount: allQs.length,
         brand: brandName, ico: d.brandEmoji || (byNoova ? '✨' : '🏪'),
         photoUrl: merchantData ? merchantData.coverUrl || null : null, logoUrl: merchantData ? merchantData.logoUrl || null : null,
