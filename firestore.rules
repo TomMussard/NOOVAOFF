@@ -83,7 +83,7 @@ service cloud.firestore {
       allow update: if isAdmin() || (isOwner(uid) &&
         ownFile(request.resource.data.get('photoUrl', null), 'users', uid) &&
         !request.resource.data.diff(resource.data).affectedKeys().hasAny(
-          ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','welcomeClaimed','streakDate','lastActivityAt','answeredMerchants','discoveryBonusDate','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats']
+          ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','welcomeClaimed','streakDate','lastActivityAt','answeredMerchants','discoveryBonusDate','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats','weeklyNoovs']
         ));
       allow delete: if isOwner(uid) || isAdmin();
 

@@ -24,6 +24,7 @@ const DAY = 86400000;
 const QUIET_FROM = 21 * 60;      // 21h
 const QUIET_TO = 9 * 60;         // 9h
 const DEFAULT_HABIT_MIN = 12 * 60 + 30;
+const DAILY_CAP = 3;             // notifications « normales » par jour (+1 pour un type exceptionnel : série, récompense, code)
 const WEEKLY_AFTER_MISSES = 3;
 const OFF_AFTER_MISSES = 6;
 const MISS_AFTER_MS = 24 * 3600000;
@@ -39,6 +40,9 @@ const TYPES = {
   // Rappel de 18h30 : 2e rendez-vous du jour, seulement s'il reste des questions et que l'habitant n'a pas pris
   // ses 3 réponses à points (voir runTick). Pas « nudge » : il peut partir après une ou deux réponses.
   rappel_soir:          { group: "question",    nudge: false, gapDays: 1 },
+  // Nouvelle question de l'après-midi : un commerce vient de poser une question aujourd'hui (heure propre à chaque
+  // habitant, tirée au hasard entre 14h et 17h30, pour que les envois ne tombent pas tous à la même minute).
+  nouvelle_question:    { group: "question",    nudge: false, gapDays: 1 },
   nouveau_commerce:     { group: "commerces",   nudge: true,  gapDays: 7, deferQuiet: true, ttlH: 24 },
   resultat_dispo:       { group: "resultats",   nudge: false, deferQuiet: true, deferBusy: true, ttlH: 72 },
   recompense_debloquee: { group: "recompenses", nudge: false, exceptional: true, deferQuiet: true, deferBusy: true, ttlH: 48 },
@@ -50,7 +54,7 @@ const TYPES = {
   impact:               { group: "actualites",  nudge: false, deferQuiet: true, ttlH: 48 },
 };
 const GROUPS = {
-  question: ["question_du_jour", "rappel_soir"],
+  question: ["question_du_jour", "nouvelle_question", "rappel_soir"],
   commerces: ["nouveau_commerce"],
   resultats: ["resultat_dispo"],
   serie: ["serie_en_danger"],
@@ -91,6 +95,9 @@ function finish(o) {
   return { title, body, screen: o.screen || "home" };
 }
 const copy = {
+  nouvelleQuestion: ({ merchant, byNoova }) => byNoova
+    ? finish({ title: "NOOVA te pose une question", body: "30 secondes, et des NOOVS à la clé", screen: "home" })
+    : finish({ title: `${short(merchant, 30)} vient de poser une question`, body: "Sois parmi les premiers à répondre", screen: "home" }),
   questionDuJour: ({ merchant }) => finish({ title: `${short(merchant, 30)} veut ton avis`, body: "30 secondes, +10 points", screen: "home" }),
   imminent: ({ left, reward, rewardMerchant }) => finish({
     title: left === 1 ? "Plus qu'une réponse" : `Plus que ${left} réponses`,
@@ -181,7 +188,7 @@ async function deliver(uid, type, content, opts = {}) {
     if (weekly) { if (now - (stat.lastSentAt || 0) < 7 * DAY - 3600000) { out = { status: "skip", reason: "weekly" }; return; } }
     else if (cfg.gapDays === 1 && stat.lastSentDay === p.day) { out = { status: "skip", reason: "once_a_day" }; return; }
     const daily = u.notifDaily && u.notifDaily.date === p.day ? u.notifDaily.count || 0 : 0;
-    if (daily >= (cfg.exceptional ? 3 : 2)) { out = { status: "blocked", reason: "cap" }; return; }   // 2/jour, 3 avec un type exceptionnel
+    if (daily >= (cfg.exceptional ? DAILY_CAP + 1 : DAILY_CAP)) { out = { status: "blocked", reason: "cap" }; return; }   // 3/jour, 4 avec un type exceptionnel
 
     tx.update(userRef, {
       notifDaily: { date: p.day, count: daily + 1 },
@@ -342,16 +349,19 @@ async function loadCaches(now) {
 }
 
 // Questions que l'habitant peut réellement répondre aujourd'hui (mêmes critères que submitAnswer).
+// Questions qu'un habitant peut ouvrir, comme dans l'app : celles des commerces qu'il suit et celles de NOOVA d'abord,
+// puis les « découvertes » (commerces de sa ville qu'il n'a pas encore suivis ni écartés).
 function availableFor(u, list) {
-  const authorized = u.authorizedMerchants || [], answered = u.answeredCampaigns || [];
+  const authorized = u.authorizedMerchants || [], answered = u.answeredCampaigns || [], declined = u.declinedMerchants || [];
   const age = u.ageRange || u.age || "";
+  const followed = (c) => !c.merchantId || authorized.includes(c.merchantId);
   return (list || []).filter((c) => {
-    if (answered.includes(c.id) || !authorized.includes(c.merchantId)) return false;
+    if (answered.includes(c.id) || (c.merchantId && declined.includes(c.merchantId))) return false;
     if ((c.ageRanges || []).length && age && !c.ageRanges.includes(age)) return false;
     if (!INTERESTS.targetsUser(c.targetInterests, u.interests)) return false;
     const target = Number(c.targetVolume ?? c.volumeTarget) || 0;   // objectif facultatif : sans valeur, pas de plafond
     return !(target > 0 && (c.answersCount || 0) >= target);
-  }).sort((a, b) => toMs(b.createdAt) - toMs(a.createdAt));
+  }).sort((a, b) => (followed(b) - followed(a)) || (toMs(b.createdAt) - toMs(a.createdAt)));
 }
 
 // Récompense la plus proche pas encore atteinte, exprimée en nombre de réponses restantes.
@@ -362,10 +372,17 @@ function nearestReward(u, list) {
   return { reward: above, left: Math.ceil((above.cost - pts) / IMMINENT_UNIT_PTS) };
 }
 
+// Minute (depuis minuit) de la notification de l'après-midi : stable pour un habitant et un jour, entre 14h et 17h30.
+function afternoonSlot(uid, day) {
+  let h = 2166136261;
+  for (const ch of `${uid}|${day}`) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return 14 * 60 + ((h >>> 0) % 211);
+}
+
 // ─────────────────────────── Tick planifié ───────────────────────────
 async function runTick(now = Date.now()) {
   const p = parisParts(now);
-  const out = { queue: await drainQueue(now), misses: await processMisses(now), qdj: 0, soir: 0, serie: 0, code: 0, ending: 0 };
+  const out = { queue: await drainQueue(now), misses: await processMisses(now), qdj: 0, nouvelle: 0, soir: 0, serie: 0, code: 0, ending: 0 };
   const caches = await loadCaches(now);
   const users = await db().collection("users").where("pushEnabled", "==", true).get();
 
@@ -385,6 +402,14 @@ async function runTick(now = Date.now()) {
       }
       const r = await deliver(uid, "question_du_jour", content, { key: p.day, now });
       if (r.status === "sent") out.qdj++;
+    }
+    // Nouvelle question de l'après-midi : à l'heure tirée pour cet habitant aujourd'hui (14h-17h30), s'il y a une
+    // question publiée aujourd'hui qu'il n'a pas encore vue.
+    const fresh = avail.find((c) => toMs(c.createdAt) && parisParts(toMs(c.createdAt)).day === p.day);
+    if (fresh && p.min >= afternoonSlot(uid, p.day) && p.min < 18 * 60 + 30
+        && ((u.notifStats || {}).nouvelle_question || {}).lastSentDay !== p.day) {
+      const r = await deliver(uid, "nouvelle_question", copy.nouvelleQuestion({ merchant: fresh.merchantName, byNoova: !fresh.merchantId }), { key: p.day, now });
+      if (r.status === "sent") out.nouvelle++;
     }
     // Rappel du soir (18h30-18h59) : 2e notification du jour, s'il reste des questions et des points à prendre
     // (moins de 3 réponses aujourd'hui). Jamais pour qui recevra l'alerte « série en danger » à 20h (pas de doublon).
@@ -481,6 +506,63 @@ async function notifyEndingCampaigns(now, caches) {
 // ─────────────────────────── Fonctions exportées ───────────────────────────
 // 9 minutes et 1 Go : à 12h30 (heure par défaut des nouveaux comptes), des milliers d'habitants peuvent recevoir leur
 // question du jour dans le même passage ; le délai par défaut (60 s) couperait l'envoi en plein milieu.
+// ─────────────────────────── Diagnostic admin ───────────────────────────
+// Pourquoi tel habitant reçoit (ou pas) des notifications, et envoi d'une notification de test qui ignore toutes les
+// règles (plafond, silence, réglages) pour vérifier l'appareil. reset : remet à zéro le ralentissement automatique.
+async function notifDiagCore({ email, send = false, reset = false }, now = Date.now()) {
+  const q = await db().collection("users").where("email", "==", String(email || "").trim().toLowerCase()).limit(1).get();
+  const snap = q.empty ? await db().collection("users").where("email", "==", String(email || "").trim()).limit(1).get() : q;
+  if (snap.empty) return { found: false };
+  const doc = snap.docs[0], u = doc.data(), uid = doc.id, p = parisParts(now);
+  if (reset) {
+    const upd = {};
+    Object.keys(TYPES).forEach((t) => { upd[`notifStats.${t}.autoOff`] = false; upd[`notifStats.${t}.weekly`] = false; upd[`notifStats.${t}.missStreak`] = 0; });
+    await doc.ref.update(upd);
+    Object.keys(TYPES).forEach((t) => { if (u.notifStats && u.notifStats[t]) Object.assign(u.notifStats[t], { autoOff: false, weekly: false, missStreak: 0 }); });
+  }
+  const city = String(u.city || "").toLowerCase();
+  const cs = await db().collection("campaigns").where("status", "==", "active").get();
+  const list = cs.docs.map((d) => ({ id: d.id, ...d.data() })).filter((c) => String(c.targetCity || c.city || "").toLowerCase() === city && !(c.endsAt && toMs(c.endsAt) < now));
+  const avail = availableFor(u, list);
+  const logs = (await db().collection("notifLog").where("uid", "==", uid).limit(200).get()).docs.map((d) => d.data())
+    .sort((a, b) => toMs(b.sentAt) - toMs(a.sentAt)).slice(0, 12)
+    .map((l) => ({ type: l.type, status: l.status, title: l.title, at: toMs(l.sentAt) }));
+  const stats = u.notifStats || {};
+  const tokens = uniq(u.fcmTokens);
+  const problems = [];
+  if (!tokens.length) problems.push("Aucun appareil enregistré : les notifications n'ont jamais été activées sur ce compte (ou ont été retirées à la déconnexion).");
+  if (u.pushEnabled !== true) problems.push("Notifications désactivées sur le compte (pushEnabled).");
+  if (!u.city) problems.push("Pas de ville : aucune question ne peut lui être proposée.");
+  if (!avail.length) problems.push("Aucune question à lui proposer dans sa ville en ce moment (tout est répondu, ou aucune question active).");
+  const off = Object.keys(GROUPS).filter((g) => (u.notifPrefs || {})[g] === false);
+  if (off.length) problems.push("Réglages coupés par l'habitant : " + off.join(", ") + ".");
+  const auto = Object.keys(stats).filter((t) => stats[t].autoOff);
+  if (auto.length) problems.push("Coupées automatiquement après plusieurs notifications ignorées : " + auto.join(", ") + " (bouton « Réactiver »).");
+  const today = u.notifDaily && u.notifDaily.date === p.day ? u.notifDaily.count || 0 : 0;
+  let test = null;
+  if (send) {
+    if (!tokens.length) test = { ok: false, error: "Aucun appareil enregistré" };
+    else {
+      try {
+        const r = await sendPush(uid, tokens, { title: "Test NOOVA", body: "Si tu vois ce message, les notifications marchent sur ce téléphone.", url: "/app-v2", tag: `test-${now}`, nid: "", ntype: "test" });
+        const errs = (r.responses || []).filter((x) => !x.success).map((x) => (x.error && x.error.code) || "erreur");
+        test = { ok: (r.successCount || 0) > 0, success: r.successCount || 0, failure: r.failureCount || 0, errors: errs };
+      } catch (e) { test = { ok: false, error: e.message }; }
+    }
+  }
+  return {
+    found: true, uid, name: u.name || "", city: u.city || "", pushEnabled: u.pushEnabled === true, devices: tokens.length,
+    available: avail.length, nextQuestion: avail[0] ? avail[0].merchantName || "NOOVA" : null, sentToday: today,
+    habit: `${String(Math.floor(habitMinutes(u) / 60)).padStart(2, "0")}h${String(habitMinutes(u) % 60).padStart(2, "0")}`,
+    answeredToday: answeredToday(u, p.day), problems, logs, test,
+  };
+}
+const adminNotifDiag = onCall({ region: "europe-west1" }, async (request) => {
+  const email = request.auth && request.auth.token && request.auth.token.email;
+  if (!email || !require("./lib").ADMIN_EMAILS.includes(email)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
+  return notifDiagCore(request.data || {});
+});
+
 const notifTick = onSchedule({ schedule: "every 15 minutes", timeZone: "Europe/Paris", retryCount: 0, timeoutSeconds: 540, memory: "1GiB" }, async () => {
   const r = await runTick(Date.now());
   logger.info("notifTick", r);
@@ -635,7 +717,7 @@ const setNotifPref = onCall(async (request) => {
 
 module.exports = {
   notifTick, notifyNewCampaign, onAnswerNotifs, onFriendNotif, onCampaignProgress, onRedemptionUpdated, onMerchantStatus,
-  trackNotifOpen, setNotifPref,
+  trackNotifOpen, setNotifPref, adminNotifDiag,
   // Internes exposés aux tests
-  _t: { deliver, runTick, nowMs, trackOpen, setPref, processMisses, drainQueue, habitMinutes, parisParts, next9h, copy, TYPES, GROUPS, notifyMerchant, notifyExpiringCodes, notifyEndingCampaigns, expireCampaigns, loadCaches, sectorCategory },
+  _t: { deliver, runTick, notifDiagCore, nowMs, trackOpen, setPref, processMisses, drainQueue, habitMinutes, afternoonSlot, availableFor, parisParts, next9h, copy, TYPES, GROUPS, notifyMerchant, notifyExpiringCodes, notifyEndingCampaigns, expireCampaigns, loadCaches, sectorCategory },
 };

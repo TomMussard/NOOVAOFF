@@ -182,6 +182,7 @@ exports.submitAnswer = onCall(async (request) => {
     const pointsEligible = answersToday < MAX_POINT_ANSWERS_PER_DAY;
 
     let earnedPts = 0, discoveryBonus = 0, noovsEarned = 0, noovsWithheld = null;
+    const noovaQ = !camp.merchantId || camp.postedByNoova === true;   // question posée par NOOVA elle-même
     const noovsToday = user.dailyNoovsDate === today ? (user.dailyNoovs || 0) : 0;
     let newStreak = user.streak || 0;
     let newLastAnswerDate = user.lastAnswerDate || null;
@@ -198,6 +199,8 @@ exports.submitAnswer = onCall(async (request) => {
       } else {
         noovsEarned = Math.min(NOOVS_PER_ANSWER, CFG.NOOVS.DAILY_CAP - noovsToday);
       }
+      // Question posée par NOOVA : des NOOVS à chaque fois, en plus des points du jour, hors plafond.
+      if (noovaQ) { noovsEarned = CFG.NOOVS.PER_NOOVA_QUESTION; noovsWithheld = null; }
       // Bonus découverte : 1re réponse à ce commerçant, une fois par jour au maximum (même au-delà des 3 réponses du jour).
       if (camp.merchantId && !(user.answeredMerchants || []).includes(camp.merchantId) && user.discoveryBonusDate !== today) {
         discoveryBonus = CFG.POINTS.DISCOVERY_BONUS;
@@ -296,7 +299,7 @@ exports.submitAnswer = onCall(async (request) => {
     if (!flagged && camp.merchantId) userUpdate.answeredMerchants = FieldValue.arrayUnion(camp.merchantId);
     if (discoveryBonus > 0) userUpdate.discoveryBonusDate = today;
     if (totalEarned > 0) { userUpdate.points = FieldValue.increment(totalEarned); userUpdate.xp = FieldValue.increment(totalEarned); }
-    if (noovsEarned > 0) { userUpdate.noovs = FieldValue.increment(noovsEarned); userUpdate.dailyNoovs = noovsToday + noovsEarned; userUpdate.dailyNoovsDate = today; }
+    if (noovsEarned > 0) { userUpdate.noovs = FieldValue.increment(noovsEarned); if (!noovaQ) { userUpdate.dailyNoovs = noovsToday + noovsEarned; userUpdate.dailyNoovsDate = today; } }
     if (qIdx === 0) userUpdate.answeredCampaigns = FieldValue.arrayUnion(campaignId);
     tx.update(userRef, userUpdate);
 
@@ -361,7 +364,19 @@ exports.onWeeklyVote = onDocumentCreated("weeklyQuestions/{qId}/votes/{uid}", as
     voteCounts: { [String(v.optionIndex)]: FieldValue.increment(1) },
     voteTotal: FieldValue.increment(1),
   }, { merge: true });
+  await awardWeeklyNoovs(event.params.uid, event.params.qId);
 });
+
+// Question de la semaine (posée par NOOVA) : des NOOVS au votant, une seule fois par question, même si le
+// déclencheur est livré deux fois (marqueur sur le compte, vérifié dans une transaction).
+async function awardWeeklyNoovs(uid, qId) {
+  const ref = db.collection("users").doc(uid);
+  await db.runTransaction(async (tx) => {
+    const u = await tx.get(ref);
+    if (!u.exists || (u.data().weeklyNoovs || []).includes(qId)) return;
+    tx.update(ref, { noovs: FieldValue.increment(CFG.NOOVS.PER_NOOVA_QUESTION), weeklyNoovs: FieldValue.arrayUnion(qId) });
+  });
+}
 
 /**
  * countConsent — tient à jour merchants/{id}.consentCount (audience affichée dans le

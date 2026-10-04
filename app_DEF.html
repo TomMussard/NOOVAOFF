@@ -1951,7 +1951,9 @@ function parisToday(ms){return new Date(ms||Date.now()).toLocaleDateString('sv-S
 function getAnswersToday(){return S._answersDate===parisToday()?(S._answersToday||0):0;}
 // Libellé de gain d'une question : points tant que le quota du jour n'est pas atteint, ensuite 1 NOOV.
 function isFreeMode(){return getAnswersToday()>=MAX_POINT_ANSWERS;}
-function ptsTag(q){return isFreeMode()?'+1 NOOV':'+'+q.pts+' pts';}
+// Questions posées par NOOVA : des NOOVS à chaque fois (engagementConfig NOOVS.PER_NOOVA_QUESTION), en plus des points du jour.
+const NOOVA_Q_NOOVS=5;
+function ptsTag(q){if(q&&q._byNoova)return isFreeMode()?'+'+NOOVA_Q_NOOVS+' NOOVS':'+'+q.pts+' pts +'+NOOVA_Q_NOOVS+' NOOVS';return isFreeMode()?'+1 NOOV':'+'+q.pts+' pts';}
 function setQPtsTag(q){const el=document.getElementById('q-pts-tag');if(!el)return;el.textContent=ptsTag(q);}
 const BRANDMETA={};
 function logoFallbackHTML(name,size){
@@ -2551,6 +2553,9 @@ async function voteWeeklyQuestion(qId, optionIndex) {
     const qSnap = await db.collection('weeklyQuestions').doc(qId).get();
     // Les totaux sont tenus par le serveur juste après le vote : on compte le sien tout de suite pour l'affichage.
     renderWeeklyQuestionResults({ id: qId, ...qSnap.data() }, optionIndex, true);
+    // Question de la semaine = question NOOVA : des NOOVS au vote (crédités par le serveur).
+    S.noovs = (S.noovs || 0) + NOOVA_Q_NOOVS; renderHeaderStats();
+    showToast('+' + NOOVA_Q_NOOVS + ' NOOVS pour ton vote', 'success');
   } catch(e) {
     console.warn('voteWeeklyQuestion:', e);
     document.querySelectorAll('.wq-opt-btn').forEach(b=>b.disabled=false);
@@ -4489,7 +4494,7 @@ async function enableNotifications(uid) {
   refreshNotifSettingsUI();
 }
 const NOTIF_GROUPS=[
-  {g:'question',t:'Ma question du jour',d:"À ton heure habituelle, et un rappel à 18h30 s'il te reste des questions"},
+  {g:'question',t:'Mes questions',d:"La question du jour à ton heure habituelle, les nouvelles questions de l'après-midi et un rappel à 18h30"},
   {g:'commerces',t:'Nouveaux commerces',d:'Quand un commerce près de toi veut ton avis'},
   {g:'resultats',t:'Résultats',d:'Quand les résultats de ta réponse sont prêts'},
   {g:'serie',t:'Ma série',d:'Un rappel le soir si ta série est en jeu'},
@@ -6230,7 +6235,7 @@ submitAns = function() {
         if (rwTotalEl) rwTotalEl.textContent = S.noovs + ' NOOVS';
         if (rwCoin) rwCoin.style.display = 'flex';
         if (rwSub) rwSub.textContent = data.noovsWithheld === 'cap' ? 'Merci pour ton avis. Plafond de NOOVS du jour atteint : reviens demain.' : 'Merci pour ton avis. Les réponses lues très vite ne rapportent pas de NOOVS.';
-      } else if (noovsGot > 0) {
+      } else if (noovsGot > 0 && !(totalEarned > 0)) {
         if (rwPtsEl) rwPtsEl.textContent = noovsGot;
         if (rwLbl) rwLbl.textContent = 'NOOVS au total';
         if (rwTotalEl) rwTotalEl.textContent = S.noovs + ' NOOVS';
@@ -6248,6 +6253,8 @@ submitAns = function() {
           if (left > 0) rwSub.textContent = disc ? disc.trim() : 'Ta réponse a été envoyée';
           else rwSub.innerHTML = disc + 'Tes ' + (S._pointsToday || 0) + ' pts du jour sont validés ' + icon('check', { size: 15 });
         }
+        // Question NOOVA : points ET NOOVS.
+        if (rwSub && noovsGot > 0) rwSub.textContent = (rwSub.textContent ? rwSub.textContent.replace(/\s*$/, '') + ' ' : '') + '+' + noovsGot + ' NOOVS en bonus, question NOOVA.';
       }
       renderDailyTrack();
       showReveal(q, qIdx);

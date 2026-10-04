@@ -78,6 +78,8 @@ module.exports = {
     DAILY_CAP: 30,               // NOOVS maximum par jour et par habitant (les réponses restent enregistrées au-delà)
     PENDING_DAYS: 3,             // délai de validation avant qu'un NOOV soit utilisable (enregistré sur la réponse)
     MIN_RESPONSE_MS: 0,          // temps minimum (mesuré serveur) pour gagner des NOOVS ; 0 = désactivé (à monter si des abus apparaissent)
+    PER_NOOVA_QUESTION: 5,       // TOUTE question posée par NOOVA (campagne NOOVA, question de la semaine) rapporte ces NOOVS,
+                                 // en plus des points éventuels, hors plafond du jour (NOOVA décide combien elle en pose)
   },
 
   // ─── Onglet Communauté ───
