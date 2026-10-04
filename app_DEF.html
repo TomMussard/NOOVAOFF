@@ -5080,8 +5080,12 @@ function askNotifFlow(force){
     askPerm({key:'notif_install',force,title:'Reçois tes notifications',text:"Sur iPhone, les notifications fonctionnent une fois NOOVA ajoutée à ton écran d'accueil : appuie sur Partager, puis sur « Sur l'écran d'accueil ».",cta:'Voir comment faire',onAccept:showIOSInstallSheet});
     return;
   }
-  if(typeof Notification==='undefined'||Notification.permission!=='default'||notifSupportReason()!=='ok') return;
-  askPerm({key:'notif',force,title:'Une notification par jour, pas plus',text:"NOOVA te prévient au maximum une fois par jour, quand un commerce a besoin de ton avis, jamais la nuit. Tu choisis lesquelles dans ton profil.",cta:'Activer les notifications',onAccept:()=>enableNotifications(auth.currentUser.uid)});
+  if(typeof Notification==='undefined'||notifSupportReason()!=='ok'){ if(force) showToast("Ton navigateur ne permet pas les notifications. Ouvre NOOVA depuis ton écran d'accueil.",'warning'); return; }
+  // Permission déjà accordée sur ce téléphone (avant une déconnexion, un autre compte, une remise à zéro) mais
+  // appareil pas rattaché à CE compte : pas de nouvelle demande, on enregistre directement le téléphone.
+  if(Notification.permission==='granted'){ if(force) enableNotifications(auth.currentUser.uid); return; }
+  if(Notification.permission==='denied'){ if(force) showToast('Les notifications sont bloquées pour NOOVA : réactive-les dans les réglages de ton téléphone.','warning'); return; }
+  askPerm({key:'notif',force,title:'Ne rate aucune question',text:"NOOVA te prévient quand un commerce a besoin de ton avis : quelques notifications par jour au maximum, jamais la nuit. Tu choisis lesquelles dans ton profil.",cta:'Activer les notifications',onAccept:()=>enableNotifications(auth.currentUser.uid)});
 }
 function maybeAskNotifications(){ askNotifFlow(false); }
 function geoAllowed(){try{return localStorage.getItem('nv_geo_ok')==='1';}catch(e){return false;}}
