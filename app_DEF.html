@@ -868,6 +868,27 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .acc-chev{display:inline-flex;color:var(--ink3);transition:transform .2s;margin-left:6px}
 .sec-card.acc.open .acc-chev{transform:rotate(90deg)}
 .acc-body{display:none;padding:2px 0 8px}
+/* Retours des testeurs (profil) */
+.fb-wrap{padding:6px 16px 14px}
+.fb-l{font-size:var(--fs-2);font-weight:700;color:var(--text);margin:14px 0 8px}
+.fb-rate{display:flex;gap:var(--s2)}
+.fb-rate button{flex:1;min-height:var(--tactile-min);border-radius:var(--r-sm);border:1px solid var(--trait);background:var(--bg);color:var(--text);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-4);cursor:pointer}
+.fb-rate button.on{background:var(--jaune);border-color:var(--jaune);color:var(--jaune-ink)}
+.fb-rate-h{display:flex;justify-content:space-between;font-size:var(--fs-1);color:var(--text-2);margin-top:var(--s1)}
+.fb-feat{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) 0;border-bottom:1px solid var(--trait)}
+.fb-feat:last-child{border-bottom:none}
+.fb-feat-l{flex:1;min-width:0;font-size:var(--fs-2);color:var(--text)}
+.fb-feat button{min-height:36px;padding:0 var(--s3);border-radius:var(--r-sm);border:1px solid var(--trait);background:var(--bg);color:var(--text-2);font-family:var(--font);font-weight:700;font-size:var(--fs-1);cursor:pointer}
+.fb-feat button.on.up{background:var(--ok);border-color:var(--ok);color:var(--blanc)}
+.fb-feat button.on.down{background:var(--text);border-color:var(--text);color:var(--bg)}
+.fb-kinds{display:flex;gap:var(--s2);flex-wrap:wrap}
+.fb-kinds button{min-height:var(--tactile-min);padding:0 var(--s4);border-radius:var(--r-sm);border:1px solid var(--trait);background:var(--bg);color:var(--text);font-family:var(--font);font-weight:600;font-size:var(--fs-2);cursor:pointer}
+.fb-kinds button.on{background:var(--text);border-color:var(--text);color:var(--bg)}
+.fb-txt{width:100%;min-height:110px;padding:var(--s3);border-radius:var(--r-sm);border:1px solid var(--trait);background:var(--bg);color:var(--text);font:var(--t-body);resize:vertical;box-sizing:border-box}
+.fb-count{font-size:var(--fs-1);color:var(--text-3);text-align:right;margin-top:var(--s1)}
+.fb-send{width:100%;margin-top:var(--s3);min-height:var(--h-bouton);border-radius:var(--r-sm);border:none;background:var(--marque-encre);color:var(--jaune);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-4);cursor:pointer}
+.fb-send:disabled{opacity:.45;cursor:default}
+.fb-done{margin-top:var(--s3);padding:var(--s3);border-radius:var(--r-sm);background:var(--jaune-faible);color:var(--text);font-size:var(--fs-2);line-height:1.5}
 .nf-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--bg3)}
 .nf-row .nf-t{font-size:var(--fs-2);font-weight:700;color:var(--ink)}
 .nf-row .nf-d{font-size:var(--fs-1);color:var(--ink2);margin-top:1px;line-height:1.4}
@@ -1735,6 +1756,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
     </div>
     <div style="display:none" id="s-pts">0</div>
     <div class="dimpact" id="dpred" style="display:none"><div class="dimpact-ico" id="dpred-ico"></div><div class="dimpact-txt" id="dpred-txt"></div></div>
+    <div class="set-eyebrow" style="margin-top:4px">Phase de test</div>
+    <div class="sec-card acc" id="feedback-section">
+      <div class="sc-hdr" onclick="toggleAcc(this);renderFeedbackForm()"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12.5h5"/></svg></span><div style="flex:1;min-width:0"><div class="sc-title">Ton avis sur NOOVA</div><div class="dconsent-sub" style="white-space:normal">Note l'app, propose une idée, signale un bug</div></div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="acc-body"><div class="fb-wrap" id="fb-wrap"></div></div>
+    </div>
     <div class="set-eyebrow" style="margin-top:4px">Compte</div>
     <div class="sec-card acc">
       <div class="sc-hdr" onclick="toggleAcc(this)"><span class="sc-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></span><div class="sc-title">Mes informations</div><span class="acc-chev"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 6l6 6-6 6"/></svg></span></div>
@@ -3611,6 +3637,53 @@ function refreshWallet(){
   loadActiveRedemptions();
   const tl=document.getElementById('tiers-list');tl.innerHTML='';
   TIERS.forEach((t)=>{const reached=S.xp>=t.min;const d=document.createElement('div');d.style.cssText=`background:var(--card);border-radius:var(--r-md);padding:12px 13px;margin-bottom:8px;`;d.innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:var(--r-sm);background:${reached?'var(--coral)':'var(--bg2)'};color:${reached?'var(--ink)':'var(--ink3)'};display:flex;align-items:center;justify-content:center">${icon(t.ico,{size:22})}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:var(--fs-3);color:var(--ink)">${t.n}</div><div style="font-size:var(--fs-1);color:var(--ink2);margin-top:1px">${t.min===0?'Dès le départ':t.min+' xp requis'}</div></div><div style="display:flex;align-items:center;gap:4px;font-size:var(--fs-2);font-weight:700;color:${reached?'var(--ink)':'var(--ink3)'}">${reached?icon('success',{size:14})+' Atteint':icon('lock',{size:14})}</div></div>`;tl.appendChild(d)});
+}
+
+// ─── Retours des testeurs (profil → « Ton avis sur NOOVA ») ─────────────────
+const FB_FEATURES=[
+  {k:'questions',t:'Les questions'},{k:'recompenses',t:'Les récompenses'},{k:'notifications',t:'Les notifications'},
+  {k:'communaute',t:'Classement et amis'},{k:'commerces',t:'Les commerces'},{k:'design',t:'Le design'},{k:'rapidite',t:"La rapidité de l'app"}
+];
+const FB_KINDS=[{k:'idee',t:'Une idée',ph:"Qu'est-ce qui rendrait NOOVA plus utile ou plus fun pour toi ?"},{k:'bug',t:'Un bug',ph:"Qu'est-ce qui n'a pas marché ? Sur quel écran, et qu'as-tu fait juste avant ?"},{k:'remarque',t:'Une remarque',ph:'Dis-nous tout, en quelques mots.'}];
+let _fb={rating:0,votes:{},kind:'idee',text:''};
+function renderFeedbackForm(){
+  const w=document.getElementById('fb-wrap');if(!w)return;
+  const kind=FB_KINDS.find(k=>k.k===_fb.kind)||FB_KINDS[0];
+  w.innerHTML=`<div class="fb-l">Ta note globale</div>
+    <div class="fb-rate" role="radiogroup" aria-label="Ta note globale">${[1,2,3,4,5].map(n=>`<button type="button" role="radio" aria-checked="${_fb.rating===n}" class="${_fb.rating===n?'on':''}" onclick="fbSet('rating',${n})">${n}</button>`).join('')}</div>
+    <div class="fb-rate-h"><span>Pas convaincu</span><span>J'adore</span></div>
+    <div class="fb-l">Ce qui marche, ce qui coince</div>
+    ${FB_FEATURES.map(f=>{const v=_fb.votes[f.k];return `<div class="fb-feat"><span class="fb-feat-l">${f.t}</span><button type="button" aria-pressed="${v==='up'}" class="up${v==='up'?' on':''}" onclick="fbVote('${f.k}','up')">J'aime</button><button type="button" aria-pressed="${v==='down'}" class="down${v==='down'?' on':''}" onclick="fbVote('${f.k}','down')">À revoir</button></div>`;}).join('')}
+    <div class="fb-l">Tu veux nous dire</div>
+    <div class="fb-kinds">${FB_KINDS.map(k=>`<button type="button" aria-pressed="${_fb.kind===k.k}" class="${_fb.kind===k.k?'on':''}" onclick="fbSet('kind','${k.k}')">${k.t}</button>`).join('')}</div>
+    <textarea class="fb-txt" id="fb-txt" maxlength="2000" placeholder="${esc(kind.ph)}" aria-label="Ton message" oninput="_fb.text=this.value;document.getElementById('fb-count').textContent=this.value.length+' / 2000';fbSync()" style="margin-top:var(--s3)">${esc(_fb.text)}</textarea>
+    <div class="fb-count" id="fb-count">${_fb.text.length} / 2000</div>
+    <button type="button" class="fb-send" id="fb-send" onclick="sendFeedback()">Envoyer mon avis</button>`;
+  fbSync();
+}
+function fbSync(){const b=document.getElementById('fb-send');if(b)b.disabled=!(_fb.rating||_fb.text.trim()||Object.keys(_fb.votes).length);}
+function fbSet(k,v){_fb[k]=v;renderFeedbackForm();if(k==='kind'){const t=document.getElementById('fb-txt');if(t)t.focus();}}
+function fbVote(f,v){if(_fb.votes[f]===v)delete _fb.votes[f];else _fb.votes[f]=v;renderFeedbackForm();}
+async function sendFeedback(){
+  const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
+  const b=document.getElementById('fb-send');if(b){b.disabled=true;b.textContent='Envoi…';}
+  const ua=navigator.userAgent||'';
+  try{
+    await db.collection('feedback').add({
+      uid,name:(S.user&&S.user.name)||'',email:(auth.currentUser.email||'').slice(0,200),city:S._city||'',
+      rating:_fb.rating||0,likes:Object.keys(_fb.votes).filter(k=>_fb.votes[k]==='up'),dislikes:Object.keys(_fb.votes).filter(k=>_fb.votes[k]==='down'),
+      kind:_fb.kind,text:_fb.text.trim().slice(0,2000),
+      platform:/iPhone|iPad|iPod/.test(ua)?'iphone':/Android/.test(ua)?'android':'ordinateur',standalone:!!nvIsStandalone(),
+      status:'nouveau',createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    trackEvent('feedback_sent',{kind:_fb.kind,rating:_fb.rating||0});
+    _fb={rating:0,votes:{},kind:'idee',text:''};
+    const w=document.getElementById('fb-wrap');
+    if(w)w.innerHTML='<div class="fb-done"><strong>Merci, c\'est envoyé !</strong><br>On lit chaque retour pendant la phase de test. Tu peux en envoyer d\'autres quand tu veux.</div><button type="button" class="fb-send" onclick="renderFeedbackForm()">Donner un autre avis</button>';
+  }catch(e){
+    console.warn('sendFeedback:',e);showToast("Ton avis n'a pas pu être envoyé. Vérifie ta connexion et réessaie.",'error');
+    if(b){b.disabled=false;b.textContent='Envoyer mon avis';}
+  }
 }
 function toggleAcc(hdr){
   const card=hdr.closest('.sec-card');if(!card)return;
