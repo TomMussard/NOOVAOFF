@@ -296,6 +296,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <!-- TABS -->
   <div class="tabs">
     <button class="tab-btn-main" onclick="switchTab('stats',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg> Statistiques</button>
+    <button class="tab-btn-main" onclick="switchTab('retours',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 5h16v11H9l-5 4z"/></svg> Retours<span class="tab-badge" id="tb-fb" style="display:none"></span></button>
     <button class="tab-btn-main active" onclick="switchTab('entreprises',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg> Entreprises<span class="tab-badge" id="tb-ent">—</span></button>
     <button class="tab-btn-main" onclick="switchTab('utilisateurs',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> Utilisateurs<span class="tab-badge" id="tb-usr">—</span></button>
     <button class="tab-btn-main" onclick="switchTab('diffusion',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> Diffusion</button>
@@ -313,6 +314,15 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div style="display:flex;align-items:center;gap:10px"><span class="st-upd" id="st-upd"></span><button class="btn-approve" id="st-refresh" onclick="loadStats(true)">Actualiser</button></div>
     </div>
     <div id="st-root"><div class="loading">Chargement</div></div>
+  </div>
+
+  <!-- ══════════════ TAB RETOURS DES TESTEURS ══════════════ -->
+  <div id="tab-retours" style="display:none">
+    <div class="st-head">
+      <div class="sec-hdr" style="margin:0"><h2>Retours des testeurs</h2><p>Ce que les habitants disent de NOOVA depuis leur profil : note, ce qui marche, ce qui coince, idées et bugs.</p></div>
+      <button class="btn-approve" onclick="loadFeedback()">Actualiser</button>
+    </div>
+    <div id="fb-root"><div class="loading">Chargement</div></div>
   </div>
 
   <div id="tab-entreprises">
@@ -917,10 +927,11 @@ async function notifDiag(opts) {
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn-main').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  ['stats','entreprises','utilisateurs','diffusion','lancement','moderation','notifications','danger'].forEach(t => {
+  ['stats','retours','entreprises','utilisateurs','diffusion','lancement','moderation','notifications','danger'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'stats') loadStats(false);
+  if (tab === 'retours') loadFeedback();
   if (tab === 'entreprises') loadMerchants();
   if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
   if (tab === 'diffusion') initDiffusion();
@@ -1060,6 +1071,68 @@ function renderStats(s) {
       ${stCard('Notifications par type', notif ? `<div style="overflow-x:auto"><table class="st-tbl"><thead><tr><th>Type</th><th style="text-align:right">Envois</th><th style="text-align:right">Ouvertures</th><th></th><th style="text-align:right">Taux</th><th style="text-align:right">Coupées</th></tr></thead><tbody>${notif}</tbody></table></div>` : '<div class="empty">Aucune notification envoyée pour l\'instant.</div>')}
     </div>
     <div class="st-kpi-s st-sec">${quality}</div>`;
+}
+
+
+// ── Retours des testeurs ─────────────────────────────────────────────────
+const FB_FEAT = { questions: 'Les questions', recompenses: 'Les récompenses', notifications: 'Les notifications', communaute: 'Classement et amis', commerces: 'Les commerces', design: 'Le design', rapidite: "La rapidité de l'app" };
+const FB_KIND = { idee: 'Idée', bug: 'Bug', remarque: 'Remarque' };
+let _fbAll = [], _fbFilter = { kind: 'all', status: 'all' };
+async function loadFeedback() {
+  const root = document.getElementById('fb-root');
+  if (!_fbAll.length) root.innerHTML = '<div class="loading">Chargement</div>';
+  try {
+    const snap = await db.collection('feedback').orderBy('createdAt', 'desc').limit(1000).get();
+    _fbAll = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const fresh = _fbAll.filter(f => f.status === 'nouveau').length, b = document.getElementById('tb-fb');
+    if (b) { b.textContent = fresh; b.style.display = fresh ? '' : 'none'; }
+    renderFeedback();
+  } catch (e) { root.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`; }
+}
+function renderFeedback() {
+  const all = _fbAll, root = document.getElementById('fb-root');
+  if (!all.length) { root.innerHTML = '<div class="empty">Aucun retour pour l\'instant. Ils arriveront ici dès qu\'un testeur utilisera « Ton avis sur NOOVA » dans son profil.</div>'; return; }
+  const rated = all.filter(f => f.rating > 0), avg = rated.length ? rated.reduce((a, f) => a + f.rating, 0) / rated.length : 0;
+  const dist = [5, 4, 3, 2, 1].map(n => ({ label: n + ' / 5', value: rated.filter(f => f.rating === n).length, color: n >= 4 ? ST_C.menthe : n === 3 ? ST_C.jaune : ST_C.brule }));
+  const feat = Object.keys(FB_FEAT).map(k => ({ k, up: all.filter(f => (f.likes || []).includes(k)).length, down: all.filter(f => (f.dislikes || []).includes(k)).length }))
+    .sort((a, b) => (b.up + b.down) - (a.up + a.down));
+  const featRows = feat.map(x => { const t = x.up + x.down, pu = t ? (x.up * 100) / t : 0; return `<div class="st-hb" style="grid-template-columns:minmax(110px,170px) 1fr auto"><span class="st-hb-l">${esc(FB_FEAT[x.k])}</span><div class="st-hb-t" style="display:flex">${t ? `<div style="width:${pu.toFixed(0)}%;background:${ST_C.menthe};border-radius:6px 0 0 6px"></div><div style="width:${(100 - pu).toFixed(0)}%;background:${ST_C.brule};border-radius:0 6px 6px 0"></div>` : ''}</div><span class="st-hb-v"><span style="color:var(--mint-text)">${x.up} j'aime</span> <small style="color:var(--red-text)">${x.down} à revoir</small></span></div>`; }).join('');
+  const kinds = Object.keys(FB_KIND).map(k => ({ label: FB_KIND[k], value: all.filter(f => f.kind === k && (f.text || '').trim()).length, color: k === 'bug' ? ST_C.brule : k === 'idee' ? ST_C.or : ST_C.gris }));
+  const fresh = all.filter(f => f.status === 'nouveau').length;
+  const list = all.filter(f => (_fbFilter.kind === 'all' || f.kind === _fbFilter.kind) && (_fbFilter.status === 'all' || f.status === _fbFilter.status));
+  const chip = (grp, val, lbl) => `<button class="tab-btn-main${_fbFilter[grp] === val ? ' active' : ''}" style="padding:6px 12px;font-size:12px" onclick="_fbFilter.${grp}='${val}';renderFeedback()">${lbl}</button>`;
+  const when = (f) => f.createdAt && f.createdAt.toDate ? f.createdAt.toDate().toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+  const items = list.map(f => `<div class="card" style="margin-bottom:12px;${f.status === 'traite' ? 'opacity:.6' : ''}"><div style="padding:14px 18px">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+        <div><strong>${esc(f.name || 'Habitant')}</strong> <span style="color:var(--ink3);font-size:12px">${esc(f.city || '')}${f.city ? ', ' : ''}${esc(f.platform || '')}${f.standalone ? ' (app installée)' : ''}, ${esc(when(f))}</span></div>
+        <div style="display:flex;gap:6px;align-items:center">${f.rating ? `<span class="st-tag" style="background:var(--amber);color:var(--brown);font-size:12px">${f.rating}/5</span>` : ''}<span class="st-tag" style="font-size:12px;${f.kind === 'bug' ? 'background:rgba(239,68,68,.12);color:var(--red-text)' : ''}">${esc(FB_KIND[f.kind] || f.kind)}</span>
+          <button class="${f.status === 'traite' ? 'btn-reject' : 'btn-approve'}" onclick="setFeedbackStatus('${f.id}','${f.status === 'traite' ? 'nouveau' : 'traite'}')">${f.status === 'traite' ? 'Remettre à traiter' : 'Marquer traité'}</button></div>
+      </div>
+      ${(f.text || '').trim() ? `<div style="margin-top:8px;font-size:14px;line-height:1.55;white-space:pre-wrap">${esc(f.text)}</div>` : ''}
+      ${(f.likes || []).length || (f.dislikes || []).length ? `<div style="margin-top:8px;font-size:12px">${(f.likes || []).map(k => `<span class="st-tag" style="background:rgba(11,171,132,.12);color:var(--mint-text)">${esc(FB_FEAT[k] || k)}</span>`).join('')}${(f.dislikes || []).map(k => `<span class="st-tag" style="background:rgba(161,78,8,.12);color:#8a4206">${esc(FB_FEAT[k] || k)} à revoir</span>`).join('')}</div>` : ''}
+      ${f.email ? `<div style="margin-top:6px;font-size:12px;color:var(--ink3)">${esc(f.email)}</div>` : ''}
+    </div></div>`).join('');
+  root.innerHTML = `
+    <div class="st-kpis">
+      ${stKpi('Retours reçus', fmtN(all.length), `${fresh} à traiter`, true)}
+      ${stKpi('Note moyenne', rated.length ? avg.toFixed(1).replace('.', ',') + ' / 5' : '—', `sur ${rated.length} note${rated.length > 1 ? 's' : ''}`)}
+      ${stKpi('Bugs signalés', fmtN(kinds[1].value), 'avec un message')}
+      ${stKpi('Idées', fmtN(kinds[0].value), 'avec un message')}
+    </div>
+    <div class="st-grid">
+      ${stCard('Ce qui marche, ce qui coince', featRows || '<div class="empty">Aucun avis par fonctionnalité.</div>')}
+      ${stCard('Répartition des notes', stHBars(dist, rated.length))}
+    </div>
+    <div class="st-sec" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+      ${chip('kind', 'all', 'Tous')}${chip('kind', 'bug', 'Bugs')}${chip('kind', 'idee', 'Idées')}${chip('kind', 'remarque', 'Remarques')}
+      <span style="width:12px"></span>${chip('status', 'all', 'Tous statuts')}${chip('status', 'nouveau', 'À traiter')}${chip('status', 'traite', 'Traités')}
+    </div>
+    ${items || '<div class="empty">Aucun retour dans ce filtre.</div>'}`;
+}
+async function setFeedbackStatus(id, status) {
+  try { await db.collection('feedback').doc(id).update({ status }); const f = _fbAll.find(x => x.id === id); if (f) f.status = status; renderFeedback();
+    const fresh = _fbAll.filter(f => f.status === 'nouveau').length, b = document.getElementById('tb-fb'); if (b) { b.textContent = fresh; b.style.display = fresh ? '' : 'none'; } }
+  catch (e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 
 // ── Merchants ──────────────────────────────────────────────────────────────

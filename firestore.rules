@@ -359,6 +359,22 @@ service cloud.firestore {
     // ─── WeeklyQuestions ─────────────────────────────────────────────────────
     // Question communautaire hebdomadaire, publiée par l'admin dans le feed d'une ville
     // (ou de toutes). Lecture : tout user de la ville concernée. Écriture : admin seul.
+    // Retours des testeurs (profil → « Ton avis sur NOOVA ») : un habitant crée les siens, seul l'admin les lit et
+    // les traite. Champs et tailles bornés (pas de document géant, pas de champ inattendu).
+    match /feedback/{id} {
+      allow create: if isAuth()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'email', 'city', 'rating', 'likes', 'dislikes', 'kind', 'text', 'platform', 'standalone', 'status', 'createdAt'])
+        && request.resource.data.rating is int && request.resource.data.rating >= 0 && request.resource.data.rating <= 5
+        && request.resource.data.kind in ['idee', 'bug', 'remarque']
+        && request.resource.data.text is string && request.resource.data.text.size() <= 2000
+        && request.resource.data.likes is list && request.resource.data.likes.size() <= 10
+        && request.resource.data.dislikes is list && request.resource.data.dislikes.size() <= 10
+        && request.resource.data.status == 'nouveau'
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if isAdmin();
+    }
+
     match /weeklyQuestions/{qId} {
       allow read: if isAuth() && (resource.data.get('city', null) == 'all' || resource.data.get('city', null) == myCity() || isAdmin());
       allow create, update, delete: if isAdmin();

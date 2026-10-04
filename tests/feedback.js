@@ -1,0 +1,68 @@
+// Retours des testeurs : formulaire « Ton avis sur NOOVA » (profil) → collection feedback → onglet Retours de l'admin.
+process.env.FIRESTORE_EMULATOR_HOST='127.0.0.1:8080';process.env.FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:9099';process.env.FUNCTIONS_EMULATOR='true';
+const puppeteer=require('puppeteer-core');
+const admin=require(__dirname+'/helpers/admin');
+admin.initializeApp({projectId:'noova-366d0'});const db=admin.firestore(),aauth=admin.auth();
+const {Timestamp}=admin.firestore;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let pass=0,fail=0;const check=(n,ok,x)=>{ok?pass++:fail++;console.log((ok?'PASS ':'FAIL ')+n+(!ok&&x!==undefined?'  -> '+JSON.stringify(x):''));};
+const wf=(p,fn,arg,t=30000)=>p.waitForFunction(fn,{timeout:t,polling:200},arg);
+const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));},v);
+const CHROME=(process.env.CHROME_PATH||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome');
+async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/noova-366d0/databases/(default)/documents',{method:'DELETE'});await fetch('http://127.0.0.1:9099/emulator/v1/projects/noova-366d0/accounts',{method:'DELETE'});await sleep(300);}
+(async()=>{
+  await wipe();
+  await db.doc('users/me').set({role:'user',welcomeClaimed:true,name:'Camille',email:'me@t.fr',city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:[],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true});
+  await db.doc('users/other').set({role:'user',name:'Autre',email:'o@t.fr',city:'le-mans',onboardingStep:'done'});
+  await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});await aauth.createUser({uid:'other',email:'o@t.fr',password:'secret123'});
+  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+  const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
+  const p=await browser.newPage();await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+  await p.goto('http://localhost:8950/app.html',{waitUntil:'load'});await wf(p,()=>document.getElementById('onboard').classList.contains('active'));
+  await p.evaluate(()=>showAuthWall('login'));await setVal(p,'#aw-email','me@t.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());
+  await wf(p,()=>document.getElementById('home').classList.contains('active'));await sleep(1500);
+  await p.evaluate(()=>goNav('profile'));await sleep(1000);
+  const sec=await p.evaluate(()=>{const c=document.getElementById('feedback-section');const prev=c.previousElementSibling;return {exists:!!c,eyebrow:prev&&prev.textContent,beforeCompte:[...document.querySelectorAll('#profile .set-eyebrow')].map(e=>e.textContent).indexOf('Phase de test')<[...document.querySelectorAll('#profile .set-eyebrow')].map(e=>e.textContent).indexOf('Compte')};});
+  check('Profil : section « Ton avis sur NOOVA » sous « Phase de test », avant le compte',sec.exists&&sec.eyebrow==='Phase de test'&&sec.beforeCompte,sec);
+  await p.evaluate(()=>{document.querySelector('#feedback-section .sc-hdr').click();document.getElementById('feedback-section').scrollIntoView();});await sleep(500);
+  check('Bouton d\'envoi grisé tant que rien n\'est rempli',await p.evaluate(()=>document.getElementById('fb-send').disabled));
+  await p.evaluate(()=>{document.querySelectorAll('.fb-rate button')[3].click();});
+  await p.evaluate(()=>{const row=[...document.querySelectorAll('.fb-feat')].find(r=>/questions/.test(r.textContent));row.querySelector('.up').click();});
+  await p.evaluate(()=>{const row=[...document.querySelectorAll('.fb-feat')].find(r=>/notifications/.test(r.textContent));row.querySelector('.down').click();});
+  await p.evaluate(()=>{[...document.querySelectorAll('.fb-kinds button')].find(b=>/bug/i.test(b.textContent)).click();});
+  await setVal(p,'#fb-txt','Le bouton « Activer sur cet appareil » ne faisait rien.');
+  await p.setViewport({width:390,height:1400,isMobile:true,hasTouch:true});await sleep(300);
+  await p.evaluate(()=>document.getElementById('feedback-section').scrollIntoView());await sleep(300);
+  await p.screenshot({path:'/tmp/shots/feedback_form.png'});
+  await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
+  check('Formulaire : note, avis par fonctionnalité et type sélectionnés',await p.evaluate(()=>document.querySelector('.fb-rate button.on').textContent==='4'&&document.querySelectorAll('.fb-feat button.on').length===2&&/bug/i.test(document.querySelector('.fb-kinds button.on').textContent)&&!document.getElementById('fb-send').disabled));
+  await p.evaluate(()=>sendFeedback());
+  await wf(p,()=>/Merci, c'est envoyé/.test((document.getElementById('fb-wrap')||{}).textContent||''),null,15000);
+  const docs=(await db.collection('feedback').get()).docs.map(d=>d.data());
+  const f=docs[0]||{};
+  check('Retour enregistré : note, j\'aime, à revoir, type, texte, ville, statut « nouveau »',docs.length===1&&f.uid==='me'&&f.rating===4&&f.likes.join()==='questions'&&f.dislikes.join()==='notifications'&&f.kind==='bug'&&/Activer/.test(f.text)&&f.city==='le-mans'&&f.status==='nouveau',f);
+  // Règles : personne d'autre ne lit, pas de retour au nom d'un autre, pas de champ inattendu
+  const rules=await p.evaluate(async()=>{const t=async fn=>{try{await fn();return 'ok';}catch(e){return e.code;}};
+    const base={uid:auth.currentUser.uid,name:'X',email:'',city:'',rating:3,likes:[],dislikes:[],kind:'idee',text:'t',platform:'iphone',standalone:true,status:'nouveau',createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+    return {read:await t(()=>db.collection('feedback').get()),forge:await t(()=>db.collection('feedback').add({...base,uid:'other'})),extra:await t(()=>db.collection('feedback').add({...base,points:1000})),done:await t(()=>db.collection('feedback').add({...base,status:'traite'})),big:await t(()=>db.collection('feedback').add({...base,text:'x'.repeat(2500)})),ok:await t(()=>db.collection('feedback').add(base))};});
+  check('Règles : un habitant ne lit pas les retours, ne peut ni usurper, ni ajouter de champ, ni se marquer « traité », ni envoyer un pavé',rules.read==='permission-denied'&&rules.forge==='permission-denied'&&rules.extra==='permission-denied'&&rules.done==='permission-denied'&&rules.big==='permission-denied'&&rules.ok==='ok',rules);
+  await db.collection('feedback').add({uid:'other',name:'Autre',city:'angers',rating:2,likes:['design'],dislikes:['questions','rapidite'],kind:'idee',text:'Un mode sombre ?',platform:'android',standalone:false,status:'nouveau',createdAt:Timestamp.now()});
+  // Admin
+  const a=await browser.newPage();await a.setViewport({width:1280,height:900});a.on('pageerror',e=>errs.push('admin: '+e.message));
+  await a.goto('http://localhost:8950/admin.html',{waitUntil:'load'});await sleep(1500);
+  await a.evaluate(async()=>{await auth.signInWithEmailAndPassword('tomussproduction@gmail.com','secret123');});
+  await wf(a,()=>document.getElementById('main').style.display!=='none');
+  await a.evaluate(()=>{[...document.querySelectorAll('.tab-btn-main')].find(x=>/Retours/.test(x.textContent)).click();});
+  await wf(a,()=>document.querySelectorAll('#fb-root .st-kpi').length>=4,null,20000);
+  const r=await a.evaluate(()=>({txt:document.getElementById('fb-root').textContent,badge:document.getElementById('tb-fb').textContent,cards:document.querySelectorAll('#fb-root .btn-approve').length}));
+  check('Admin : synthèse (retours, note moyenne, bugs, idées), ce qui marche / coince, liste avec texte et badge « à traiter »',/Retours reçus/.test(r.txt)&&/3,0 \/ 5/.test(r.txt)&&/Le bouton « Activer/.test(r.txt)&&/Un mode sombre/.test(r.txt)&&r.badge==='3'&&/Les questions/.test(r.txt),{badge:r.badge,cards:r.cards,avg:(r.txt.match(/Note moyenne.{0,20}/)||[])[0]});
+  await a.setViewport({width:1280,height:2000});await sleep(300);await a.screenshot({path:'/tmp/shots/feedback_admin.png'});await a.setViewport({width:1280,height:900});
+  await a.evaluate(()=>{_fbFilter.kind='bug';renderFeedback();});
+  check('Admin : filtre « Bugs »',await a.evaluate(()=>{const t=document.getElementById('fb-root').textContent;return /Activer/.test(t)&&!/mode sombre/.test(t);}));
+  await a.evaluate(()=>{_fbFilter.kind='all';renderFeedback();document.querySelector('#fb-root .card .btn-approve').click();});await sleep(1500);
+  const st=(await db.collection('feedback').get()).docs.map(d=>d.data().status);
+  check('Admin : « Marquer traité » enregistré, badge mis à jour',st.filter(x=>x==='traite').length===1&&await a.evaluate(()=>document.getElementById('tb-fb').textContent==='2'),st);
+  check('Aucune erreur JavaScript',!errs.length,errs);
+  await browser.close();
+  console.log(`\n${pass} ok, ${fail} échec(s)`);process.exit(0);
+})().catch(e=>{console.log('FAIL '+String(e.stack||e).slice(0,400));process.exit(1);});
