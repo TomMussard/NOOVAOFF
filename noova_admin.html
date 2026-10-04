@@ -613,6 +613,21 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <div id="tab-notifications" style="display:none">
     <div class="sec-hdr"><h2>Notifications</h2><p>Envois, ouvertures et désactivations par type. Règle de décision : tout type sous 5 % d'ouverture après 200 envois est supprimé.</p></div>
     <div class="card">
+      <div class="card-title">Alertes e-mail</div>
+      <div style="padding:14px 18px;display:grid;gap:10px">
+        <p style="font-size:12.5px;color:var(--ink3);line-height:1.5">Reçois un e-mail quand un commerce s'inscrit, quand un testeur envoie un retour, et un résumé chaque soir à 20h. L'envoi passe par l'extension Firebase « Trigger Email » (à relier une fois à une boîte d'envoi).</p>
+        <label style="font-size:12px;font-weight:700;color:var(--ink2)">Adresses (séparées par des virgules, 5 au maximum)
+          <input id="al-to" type="text" style="margin-top:4px;width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13px"></label>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px">
+          <label><input type="checkbox" id="al-merchant"> Nouveau commerce inscrit</label>
+          <label><input type="checkbox" id="al-feedback"> Retour d'un testeur</label>
+          <label><input type="checkbox" id="al-digest"> Résumé du soir (20h)</label>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-approve" onclick="saveAlerts()">Enregistrer</button><button class="btn-approve" onclick="testAlertMail()">Envoyer un e-mail test</button></div>
+        <div id="al-out" style="font-size:13px;line-height:1.6"></div>
+      </div>
+    </div>
+    <div class="card">
       <div class="card-title">Diagnostic d'un compte</div>
       <div style="padding:14px 18px">
         <p style="font-size:12.5px;color:var(--ink3);margin-bottom:10px;line-height:1.5">Un habitant ne reçoit rien ? Entre son e-mail : tu vois pourquoi, et tu peux lui envoyer une notification de test (elle ignore le plafond, les heures de silence et les réglages).</p>
@@ -903,6 +918,34 @@ async function loadNotifMetrics() {
   } catch (e) { body.innerHTML = '<tr><td colspan="6" class="loading">Erreur : ' + esc(e.message) + '</td></tr>'; }
 }
 
+async function loadAlerts() {
+  try { const r = (await fx.httpsCallable('adminAlerts')({})).data;
+    document.getElementById('al-to').value = (r.to || []).join(', ');
+    ['merchant', 'feedback', 'digest'].forEach(k => { document.getElementById('al-' + k).checked = r[k] !== false; });
+  } catch (e) { document.getElementById('al-out').textContent = 'Réglages indisponibles : ' + e.message + ' (redéploie les fonctions si elles viennent d\'être ajoutées).'; }
+}
+async function saveAlerts() {
+  const out = document.getElementById('al-out');
+  try { const r = (await fx.httpsCallable('adminAlerts')({ action: 'save', to: document.getElementById('al-to').value.split(',').map(x => x.trim()).filter(Boolean),
+      merchant: document.getElementById('al-merchant').checked, feedback: document.getElementById('al-feedback').checked, digest: document.getElementById('al-digest').checked })).data;
+    out.innerHTML = '<span style="color:var(--mint-text);font-weight:700">Réglages enregistrés.</span> Alertes envoyées à ' + esc(r.to.join(', ')) + '.';
+  } catch (e) { out.innerHTML = '<span style="color:var(--red-text)">' + esc(e.message) + '</span>'; }
+}
+async function testAlertMail() {
+  const out = document.getElementById('al-out');
+  out.textContent = 'Envoi du test…';
+  try {
+    const t = (await fx.httpsCallable('adminAlerts')({ action: 'test' })).data;
+    out.textContent = 'E-mail de test déposé pour ' + t.to.join(', ') + '. Vérification de l\'envoi…';
+    let st = null;
+    for (let i = 0; i < 6; i++) { await new Promise(r => setTimeout(r, 2500)); st = (await fx.httpsCallable('adminAlerts')({ action: 'status', id: t.id })).data; if (st.state === 'SUCCESS' || st.state === 'ERROR') break; }
+    if (st && st.state === 'SUCCESS') out.innerHTML = '<span style="color:var(--mint-text);font-weight:700">E-mail envoyé.</span> Regarde ta boîte de réception (et les spams la première fois).';
+    else if (st && st.state === 'ERROR') out.innerHTML = '<span style="color:var(--red-text);font-weight:700">L\'envoi a échoué :</span> ' + esc(st.error || 'erreur inconnue') + '. Vérifie l\'adresse SMTP de l\'extension Trigger Email.';
+    else if (st && st.state) out.innerHTML = 'E-mail en cours d\'envoi (' + esc(st.state) + '). Regarde ta boîte dans une minute.';
+    else out.innerHTML = '<span style="color:var(--coral-text);font-weight:700">L\'e-mail attend, mais rien ne l\'envoie.</span> L\'extension Firebase « Trigger Email from Firestore » n\'est pas installée, ou ne surveille pas la collection « mail ».';
+  } catch (e) { out.innerHTML = '<span style="color:var(--red-text)">Erreur : ' + esc(e.message) + '</span>'; }
+}
+
 async function notifDiag(opts) {
   const email = (document.getElementById('nd-email').value || '').trim(), out = document.getElementById('nd-out');
   if (!email) { out.textContent = 'Entre un e-mail.'; return; }
@@ -937,7 +980,7 @@ function switchTab(tab, btn) {
   if (tab === 'diffusion') initDiffusion();
   if (tab === 'lancement') { loadReadiness(); loadTestMonth(); }
   if (tab === 'moderation') { loadModeration(); loadResponseQuality(); }
-  if (tab === 'notifications') loadNotifMetrics();
+  if (tab === 'notifications') { loadNotifMetrics(); loadAlerts(); }
   if (tab === 'danger') loadDangerZone();
 }
 

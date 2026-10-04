@@ -32,6 +32,7 @@ Object.assign(exports, require("./seedDemo"));
 // Mois de test : commerces fictifs autonomes (voir testMonth.js).
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./testMonth")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./adminStats")));
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./adminAlerts")));
 
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.
