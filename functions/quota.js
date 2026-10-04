@@ -42,6 +42,7 @@ async function stateOf(mid, now) {
 // Enregistre la consommation d'une nouvelle campagne. Renvoie true si elle est autorisée, false si elle est bloquée.
 async function accountCampaign(campaignId, camp, now) {
   if (!camp || !camp.merchantId) return true;
+  if (camp.isTest) return true;                 // commerces fictifs du mois de test : une question par jour, sans quota
   if (now == null) now = await nowMs();
   await applyOverrides();
   const mid = camp.merchantId, n = questionsOf(camp), month = monthOf(now);

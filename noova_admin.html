@@ -539,7 +539,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div class="card-title">Mois de test : commerces fictifs</div>
       <div style="padding:14px 18px;font-size:13px;color:var(--ink2);line-height:1.6">
         50 commerces fictifs (café, coiffeur, fleuriste, supérette, bar) dans 10 villes : Le Mans, Angers, Paris, Nantes, Bordeaux, Marseille, Toulouse, Lille, Dijon, Rennes.
-        Chacun pose une question le lundi, le mercredi et le vendredi à 9h, toute seule. Les habitants voient l'étiquette « Commerce test » et les bons échangés sont marqués « sans valeur ».
+        Chacun pose une question par jour, week-end compris, à une heure différente chaque jour (entre 8h30 et 19h30), tout seul. Les habitants voient l'étiquette « Commerce test » et les bons échangés sont marqués « sans valeur ».
         <div id="tm-status" style="margin:12px 0;font-weight:700;color:var(--ink)">Chargement…</div>
         <label style="display:flex;gap:8px;align-items:flex-start;margin:10px 0"><input type="checkbox" id="tm-delete" onchange="document.getElementById('tm-confirm-wrap').style.display=this.checked?'block':'none'">
           <span>Supprimer définitivement les commerces réels (<span id="tm-real-n">…</span>) : <span id="tm-real-names" style="color:var(--ink3)"></span></span></label>
@@ -602,6 +602,19 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <!-- ══════════════ TAB NOTIFICATIONS ══════════════ -->
   <div id="tab-notifications" style="display:none">
     <div class="sec-hdr"><h2>Notifications</h2><p>Envois, ouvertures et désactivations par type. Règle de décision : tout type sous 5 % d'ouverture après 200 envois est supprimé.</p></div>
+    <div class="card">
+      <div class="card-title">Diagnostic d'un compte</div>
+      <div style="padding:14px 18px">
+        <p style="font-size:12.5px;color:var(--ink3);margin-bottom:10px;line-height:1.5">Un habitant ne reçoit rien ? Entre son e-mail : tu vois pourquoi, et tu peux lui envoyer une notification de test (elle ignore le plafond, les heures de silence et les réglages).</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="nd-email" type="email" placeholder="email@exemple.fr" style="flex:1;min-width:200px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13px">
+          <button class="btn-approve" onclick="notifDiag({})">Diagnostiquer</button>
+          <button class="btn-approve" onclick="notifDiag({send:true})">Envoyer une notification test</button>
+          <button class="btn-reject" onclick="notifDiag({reset:true})">Réactiver ses notifications</button>
+        </div>
+        <div id="nd-out" style="margin-top:12px;font-size:13px;line-height:1.6"></div>
+      </div>
+    </div>
     <div class="card">
       <div class="card-title">Performance par type <span class="ct-right" id="notif-total"></span></div>
       <table class="age-table" style="width:100%">
@@ -857,7 +870,7 @@ async function loadResponseQuality() {
 
 // ─── Notifications : métriques par type (envois, ouvertures, désactivations) ───
 const NOTIF_LABELS = {
-  question_du_jour: 'Question du jour', nouveau_commerce: 'Nouveau commerce', resultat_dispo: 'Résultat disponible',
+  question_du_jour: 'Question du jour', nouvelle_question: 'Nouvelle question (après-midi)', rappel_soir: 'Rappel du soir (18h30)', points_expirant: 'Points bientôt expirés', nouveau_commerce: 'Nouveau commerce', resultat_dispo: 'Résultat disponible',
   recompense_debloquee: 'Récompense débloquée', serie_en_danger: 'Série en danger', code_expire: 'Code bientôt expiré', ami: 'Ami', impact: 'Ton avis a compté'
 };
 async function loadNotifMetrics() {
@@ -878,6 +891,27 @@ async function loadNotifMetrics() {
     }).join('');
     document.getElementById('notif-total').textContent = tot + ' envois au total';
   } catch (e) { body.innerHTML = '<tr><td colspan="6" class="loading">Erreur : ' + esc(e.message) + '</td></tr>'; }
+}
+
+async function notifDiag(opts) {
+  const email = (document.getElementById('nd-email').value || '').trim(), out = document.getElementById('nd-out');
+  if (!email) { out.textContent = 'Entre un e-mail.'; return; }
+  out.innerHTML = '<span style="color:var(--ink3)">Vérification…</span>';
+  try {
+    const r = (await fx.httpsCallable('adminNotifDiag')({ email, ...opts })).data;
+    if (!r.found) { out.innerHTML = '<strong>Aucun compte avec cet e-mail.</strong>'; return; }
+    const ok = (b) => b ? '<span style="color:var(--mint-text);font-weight:700">oui</span>' : '<span style="color:var(--red-text);font-weight:700">non</span>';
+    const fmtT = (ms) => ms ? new Date(ms).toLocaleString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+    let h = `<div><strong>${esc(r.name || 'Habitant')}</strong>, ${esc(r.city || 'sans ville')}</div>`
+      + `<div>Notifications activées : ${ok(r.pushEnabled)} · Appareils enregistrés : <strong>${r.devices}</strong> · Questions à lui proposer : <strong>${r.available}</strong>${r.nextQuestion ? ' (prochaine : ' + esc(r.nextQuestion) + ')' : ''}</div>`
+      + `<div>Heure de sa question du jour : <strong>${esc(r.habit)}</strong> · Déjà répondu aujourd'hui : ${r.answeredToday ? 'oui' : 'non'} · Notifications reçues aujourd'hui : <strong>${r.sentToday}</strong>/3</div>`;
+    h += r.problems.length ? `<div style="margin-top:8px;padding:10px 12px;background:rgba(239,68,68,.07);border-radius:9px"><strong>À régler :</strong><ul style="margin:4px 0 0 18px">${r.problems.map(p => '<li>' + esc(p) + '</li>').join('')}</ul></div>` : '<div style="margin-top:8px;color:var(--mint-text);font-weight:700">Rien qui bloque : ce compte doit recevoir ses notifications.</div>';
+    if (r.test) h += `<div style="margin-top:8px"><strong>Notification test :</strong> ${r.test.ok ? '<span style="color:var(--mint-text);font-weight:700">envoyée</span> (' + r.test.success + ' appareil' + (r.test.success > 1 ? 's' : '') + '). Si elle n\'apparaît pas sur le téléphone, c\'est un réglage du téléphone (notifications autorisées pour NOOVA, mode concentration).' : '<span style="color:var(--red-text);font-weight:700">échec</span> : ' + esc(r.test.error || (r.test.errors || []).join(', ') || 'inconnu') + (r.test.errors && r.test.errors.some(e => /not-registered|invalid/.test(e)) ? '. L\'appareil n\'est plus valide : l\'habitant doit rouvrir l\'app et réactiver les notifications.' : '')}</div>`;
+    if (opts.reset) h += '<div style="margin-top:8px;color:var(--mint-text);font-weight:700">Ralentissement automatique remis à zéro.</div>';
+    if (r.logs.length) h += `<div style="margin-top:10px"><strong>Dernières notifications</strong><table class="st-tbl" style="margin-top:4px">${r.logs.map(l => `<tr><td>${esc(fmtT(l.at))}</td><td>${esc(NOTIF_LABELS[l.type] || l.type)}</td><td>${esc(l.title || '')}</td><td>${esc({ sent: 'envoyée', opened: 'ouverte', missed: 'ignorée', failed: 'échec', seen: 'vue app ouverte' }[l.status] || l.status)}</td></tr>`).join('')}</table></div>`;
+    else h += '<div style="margin-top:8px;color:var(--ink3)">Aucune notification envoyée à ce compte pour l\'instant.</div>';
+    out.innerHTML = h;
+  } catch (e) { out.innerHTML = '<span style="color:var(--red-text)">Erreur : ' + esc(e.message) + '</span>'; }
 }
 
 function switchTab(tab, btn) {

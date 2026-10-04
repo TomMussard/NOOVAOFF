@@ -1,13 +1,13 @@
 "use strict";
 /**
  * Mois de test — 50 commerces FICTIFS (10 villes × café, coiffeur, fleuriste, supérette, bar) qui posent chacun
- * 3 questions par semaine (lundi, mercredi, vendredi à 9h), en totale autonomie, pour faire vivre l'app pendant la
- * phase de test sans aucune vraie entreprise.
+ * une question par jour, à une heure différente chaque jour (entre 8h30 et 19h30, week-end compris), en totale
+ * autonomie, pour faire vivre l'app pendant la phase de test sans aucune vraie entreprise.
  *
  *  - adminSetupTestMonth : (admin) supprime, si demandé ET confirmé, les commerces réels ; crée ou met à jour les
- *    commerces fictifs et leurs vitrines ; ouvre les 9 villes ; active le pilote ; pose une première question.
+ *    commerces fictifs et leurs vitrines ; ouvre les villes ; active le pilote ; pose une première question.
  *  - adminStopTestMonth : (admin) arrête le pilote ; peut aussi masquer les commerces fictifs et clore leurs questions.
- *  - testMonthAutopilot : chaque lundi, mercredi et vendredi, une nouvelle question par commerce fictif.
+ *  - testMonthAutopilot : toutes les 20 minutes, chaque commerce fictif publie sa question du jour à son heure.
  *
  * Tout le reste est le fonctionnement normal de NOOVA : notifications, question du jour, points, séries, classement,
  * réponses visibles dans le dashboard (via l'admin). Chaque document porte isTest: true (étiquette « Commerce test »
@@ -23,7 +23,7 @@ const TIERS = require("./tiers");
 
 const db = () => getFirestore();
 const DAY = 86400000;
-const QUESTION_DAYS = 7;          // une question reste ouverte une semaine
+const QUESTION_DAYS = 2;          // une question reste ouverte 48 h (une nouvelle arrive chaque jour)
 const CONFIG_REF = () => db().collection("config").doc("testMonth");
 
 const CITIES = [
@@ -68,7 +68,7 @@ const TYPES = {
   },
 };
 
-// Banque de questions par métier (15 chacune : 4 semaines × 3 sans répétition, avec de la marge).
+// Banque de questions par métier (32 chacune : une question par jour pendant un mois, sans répétition).
 const BANK = {
   cafe: [
     ["À quelle heure aimerais-tu qu'on ouvre le matin ?", ["7h", "7h30", "8h", "Peu importe"]],
@@ -86,6 +86,23 @@ const BANK = {
     ["Tu apporterais ta propre tasse contre une petite réduction ?", ["Oui", "Peut-être", "Non"]],
     ["Quelle option sans gluten t'intéresserait ?", ["Cookies", "Cake", "Pain", "Aucune"]],
     ["Tu voudrais pouvoir commander à l'avance depuis ton téléphone ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu préfères ton café…", ["Serré", "Allongé", "Avec du lait", "Je bois du thé"]],
+    ["Tu viendrais pour un goûter le mercredi après-midi ?", ["Oui", "Peut-être", "Non"]],
+    ["Quel gâteau aimerais-tu trouver chaque jour ?", ["Carrot cake", "Cookie", "Banana bread", "Tarte du moment"]],
+    ["Tu travailles parfois depuis un café ?", ["Souvent", "De temps en temps", "Jamais"]],
+    ["Des prises électriques à chaque table, c'est important pour toi ?", ["Très important", "Pratique", "Pas du tout"]],
+    ["Tu goûterais un café d'un torréfacteur local ?", ["Oui, carrément", "Peut-être", "Non"]],
+    ["Une soirée lecture ou jeux au café, ça te tente ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu viens plutôt seul ou accompagné ?", ["Seul", "À deux", "En groupe", "Ça dépend"]],
+    ["Un petit-déjeuner complet le week-end, tu le vois à combien ?", ["Moins de 8 €", "8 à 12 €", "12 à 15 €", "Plus de 15 €"]],
+    ["Quelle boisson fraîche te ferait plaisir en été ?", ["Café glacé", "Limonade maison", "Thé glacé", "Smoothie"]],
+    ["Tu préfères des tables…", ["Hautes", "Basses avec fauteuils", "En terrasse", "Peu importe"]],
+    ["Tu aimerais voir des expositions d'artistes du quartier au café ?", ["Oui", "Peut-être", "Non"]],
+    ["Ton snack salé idéal pour le midi ?", ["Croque-monsieur", "Quiche", "Sandwich", "Soupe"]],
+    ["Tu aimerais des tasses et du café en grains à acheter ?", ["Oui", "Peut-être", "Non"]],
+    ["Une carte de fidélité, tu la préfères…", ["Sur papier", "Sur téléphone", "Pas besoin"]],
+    ["Tu ajoutes plutôt du sucre ou du sirop ?", ["Sucre", "Sirop", "Rien", "Ça dépend"]],
+    ["Tu passerais plus souvent si on ouvrait le dimanche après-midi ?", ["Oui", "Peut-être", "Non"]],
   ],
   coiffeur: [
     ["Tu préfères prendre rendez-vous ou passer sans rendez-vous ?", ["Rendez-vous", "Sans rendez-vous", "Les deux"]],
@@ -103,6 +120,23 @@ const BANK = {
     ["Tu prends des conseils pour entretenir ta coupe chez toi ?", ["Oui, toujours", "Parfois", "Jamais"]],
     ["Une offre étudiante te ferait venir ?", ["Oui", "Peut-être", "Je ne suis pas concerné"]],
     ["Quel jour fermerait le moins bien le salon pour toi ?", ["Lundi", "Mercredi", "Samedi", "Peu importe"]],
+    ["Tu préfères une ambiance de salon…", ["Calme", "Musique", "Discussion", "Peu importe"]],
+    ["Un rappel par SMS avant ton rendez-vous, c'est utile ?", ["Oui", "Parfois", "Non"]],
+    ["Tu prends soin de ta barbe ou de tes sourcils au salon ?", ["Oui", "Parfois", "Jamais"]],
+    ["Quel soin te ferait plaisir ?", ["Massage du cuir chevelu", "Soin hydratant", "Soin anti-frisottis", "Aucun"]],
+    ["Tu choisis ta coupe plutôt…", ["Avec une photo", "Sur conseil du coiffeur", "Toujours la même"]],
+    ["Une boisson offerte pendant la coupe, ça compte pour toi ?", ["Oui", "Un petit plus", "Pas du tout"]],
+    ["Tu emmènerais tes enfants chez le même coiffeur que toi ?", ["Oui", "Peut-être", "Pas concerné"]],
+    ["Une carte de fidélité (10e coupe offerte), ça te motiverait ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu achètes tes produits de soin…", ["Au salon", "En supermarché", "En ligne", "Je n'en achète pas"]],
+    ["Quelle tendance te tente cette saison ?", ["Coupe courte", "Frange", "Dégradé", "Je garde mon style"]],
+    ["Tu viendrais à une soirée « relooking » au salon ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu préfères toujours le même coiffeur ?", ["Oui, toujours", "De préférence", "Peu importe"]],
+    ["Un tarif réduit en semaine le matin, ça t'intéresse ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu lis les avis en ligne avant de choisir un salon ?", ["Toujours", "Parfois", "Jamais"]],
+    ["Un shampoing sans sulfate, tu y fais attention ?", ["Oui", "Un peu", "Pas du tout"]],
+    ["Tu aimerais voir des photos de nos coupes avant de venir ?", ["Oui", "Peut-être", "Non"]],
+    ["Combien de temps à l'avance réserves-tu ?", ["Le jour même", "Quelques jours", "Une semaine ou plus"]],
   ],
   fleuriste: [
     ["Tu achètes des fleurs plutôt pour…", ["Offrir", "Chez moi", "Un événement", "Rarement"]],
@@ -120,6 +154,23 @@ const BANK = {
     ["Un rayon de fleurs séchées, ça te plairait ?", ["Oui", "Peut-être", "Non"]],
     ["Quel horaire t'arrangerait pour passer ?", ["Avant 9h", "Le midi", "Après 19h", "Le dimanche matin"]],
     ["Tu offrirais une plante plutôt qu'un bouquet ?", ["Plutôt une plante", "Plutôt un bouquet", "Ça dépend"]],
+    ["Tu gardes ton bouquet combien de temps en moyenne ?", ["Moins d'une semaine", "Une semaine", "Plus d'une semaine"]],
+    ["Un bouquet « surprise du fleuriste », ça te tente ?", ["Oui", "Peut-être", "Non, je préfère choisir"]],
+    ["Quelle couleur domine chez toi ?", ["Blanc et vert", "Rose et pastel", "Jaune et orange", "Rouge"]],
+    ["Tu aimerais des compositions pour ton bureau ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu offres plutôt des fleurs…", ["Coupées", "En pot", "Séchées", "Je n'en offre pas"]],
+    ["Un petit bouquet à moins de 10 €, ça te ferait passer plus souvent ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu as déjà fait pousser des plantes aromatiques ?", ["Oui", "J'aimerais bien", "Non"]],
+    ["Tu aimerais un atelier « soigner ses plantes d'intérieur » ?", ["Oui", "Peut-être", "Non"]],
+    ["Pour un mariage ou un événement, tu ferais appel à nous ?", ["Oui", "Peut-être", "Non"]],
+    ["Le papier kraft plutôt que le plastique pour emballer, c'est important ?", ["Très important", "Un peu", "Peu importe"]],
+    ["Quelle saison préfères-tu pour les fleurs ?", ["Printemps", "Été", "Automne", "Hiver"]],
+    ["Tu prends des fleurs en passant ou tu viens exprès ?", ["En passant", "Je viens exprès", "Les deux"]],
+    ["Une carte personnalisée avec le bouquet, ça compte ?", ["Oui", "Parfois", "Non"]],
+    ["Tu aimerais un rappel pour les dates importantes (anniversaires…) ?", ["Oui", "Peut-être", "Non"]],
+    ["Quel parfum de fleur préfères-tu ?", ["Rose", "Lys", "Jasmin", "Je préfère sans parfum"]],
+    ["Un coin de plantes à adopter à petit prix, ça te plairait ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu suivrais nos créations sur les réseaux sociaux ?", ["Oui", "Peut-être", "Non"]],
   ],
   superette: [
     ["Jusqu'à quelle heure aimerais-tu qu'on reste ouvert ?", ["20h", "21h", "22h", "Minuit"]],
@@ -137,6 +188,23 @@ const BANK = {
     ["La livraison en vélo dans le quartier, tu l'utiliserais ?", ["Oui", "Peut-être", "Non"]],
     ["Tu aimerais plus de produits bio ?", ["Oui", "Un peu plus", "Non, ça me va"]],
     ["Un coin café en entrée de magasin, ça te tenterait ?", ["Oui", "Peut-être", "Non"]],
+    ["Quel petit-déjeuner achètes-tu le plus souvent ?", ["Céréales", "Pain et confiture", "Yaourts et fruits", "Je saute le petit-déj"]],
+    ["Tu aimerais un rayon de produits du monde ?", ["Oui", "Peut-être", "Non"]],
+    ["Des fruits et légumes de producteurs du coin, tu paierais un peu plus ?", ["Oui", "Un peu plus", "Non"]],
+    ["Tu passes plutôt à quelle heure ?", ["Le matin", "Le midi", "En sortant du travail", "Tard le soir"]],
+    ["Des plats tout prêts pour le midi, tu en prendrais ?", ["Souvent", "Parfois", "Jamais"]],
+    ["Tu utilises un sac réutilisable ?", ["Toujours", "Souvent", "Rarement"]],
+    ["Un rayon « petits prix » toute l'année, ça compte pour toi ?", ["Beaucoup", "Un peu", "Pas vraiment"]],
+    ["Quel produit manque le plus en dépannage ?", ["Lait", "Pain", "Œufs", "Produits d'hygiène"]],
+    ["Tu aimerais trouver des fleurs ou des plantes en magasin ?", ["Oui", "Peut-être", "Non"]],
+    ["Des promotions annoncées sur ton téléphone, ça t'intéresse ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu préfères acheter à l'unité ou en grand format ?", ["À l'unité", "Grand format", "Ça dépend"]],
+    ["Tu fais attention au Nutri-Score ?", ["Toujours", "Parfois", "Jamais"]],
+    ["Un rayon sans gluten ou sans lactose, tu en aurais besoin ?", ["Oui", "Pour un proche", "Non"]],
+    ["Des produits ménagers écologiques, ça te tenterait ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu viendrais à une dégustation de produits locaux en magasin ?", ["Oui", "Peut-être", "Non"]],
+    ["Le dimanche matin, tu aimerais qu'on soit ouvert ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu prends un en-cas en passant ?", ["Souvent", "Parfois", "Jamais"]],
   ],
   bar: [
     ["Quel soir viendrais-tu le plus volontiers ?", ["Jeudi", "Vendredi", "Samedi", "En semaine"]],
@@ -154,6 +222,23 @@ const BANK = {
     ["Quelle boisson sans alcool devrait-on ajouter ?", ["Kombucha", "Limonade maison", "Thé glacé", "Bière sans alcool"]],
     ["Tu préfères commander au comptoir ou être servi à table ?", ["Au comptoir", "À table", "Peu importe"]],
     ["Jusqu'à quelle heure aimerais-tu qu'on reste ouvert le week-end ?", ["Minuit", "1h", "2h", "Peu importe"]],
+    ["Tu viens plutôt…", ["Entre amis", "En couple", "Avec des collègues", "Seul"]],
+    ["Une soirée blind test, ça te ferait venir ?", ["Oui", "Peut-être", "Non"]],
+    ["Quel style de musique pour l'ambiance ?", ["Pop", "Rock", "Électro", "Jazz"]],
+    ["Tu aimerais une petite carte à grignoter le midi ?", ["Oui", "Peut-être", "Non"]],
+    ["Des jeux en libre-service (fléchettes, baby-foot), ça compte ?", ["Oui", "Un petit plus", "Pas du tout"]],
+    ["Tu préfères t'installer…", ["En terrasse", "Au comptoir", "En salle", "Peu importe"]],
+    ["Un afterwork le jeudi avec planches à partager, ça te tente ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu viendrais pour une soirée stand-up ?", ["Oui", "Peut-être", "Non"]],
+    ["Des mocktails de saison faits maison, tu goûterais ?", ["Oui", "Peut-être", "Non"]],
+    ["Tu aimerais privatiser un coin pour un anniversaire ?", ["Oui", "Peut-être", "Non"]],
+    ["Le volume de la musique, tu le préfères…", ["Bas pour discuter", "Moyen", "Fort"]],
+    ["Une soirée à thème par mois, c'est…", ["Trop peu", "Parfait", "Trop"]],
+    ["Tu suivrais notre programme de soirées sur les réseaux ?", ["Oui", "Peut-être", "Non"]],
+    ["Quelle planche végétarienne te ferait envie ?", ["Houmous et légumes", "Fromages", "Tapas", "Aucune"]],
+    ["Tu viens plutôt en début ou en fin de soirée ?", ["En début de soirée", "En fin de soirée", "Les deux"]],
+    ["Des jeux de société à emprunter, ça te ferait rester plus longtemps ?", ["Oui", "Peut-être", "Non"]],
+    ["Un concert le dimanche après-midi, ça te plairait ?", ["Oui", "Peut-être", "Non"]],
   ],
 };
 
@@ -236,13 +321,30 @@ async function upsertTestMerchants({ onlyMissing = false } = {}) {
 }
 
 // Une nouvelle question pour chaque commerce fictif (la suivante de sa banque, sans répétition).
+// Jour (AAAA-MM-JJ) et minute depuis minuit, à Paris.
+function parisNow(ms) {
+  const f = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+  const p = {}; f.formatToParts(new Date(ms)).forEach((x) => { p[x.type] = x.value; });
+  return { day: `${p.year}-${p.month}-${p.day}`, min: +p.hour * 60 + +p.minute };
+}
+// Heure de la question du jour d'un commerce fictif : tirée au hasard, mais stable pour un commerce et un jour,
+// entre 8h30 et 19h30 — les commerces ne publient jamais tous à la même minute, et l'heure change chaque jour.
+function postSlot(id, day) {
+  let h = 2166136261;
+  for (const ch of `${id}|${day}`) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return 8 * 60 + 30 + ((h >>> 0) % 661);
+}
+
 // onlyNew : seulement les commerces qui n'ont encore jamais posé de question (nouvelle ville ajoutée en cours de test).
-async function postNextQuestions(now = Date.now(), { onlyNew = false } = {}) {
+// dueOnly : une question par commerce et par jour, à son heure du jour (pilote automatique).
+async function postNextQuestions(now = Date.now(), { onlyNew = false, dueOnly = false } = {}) {
   const snap = await db().collection("merchants").where("isTest", "==", true).where("status", "==", "verified").get();
+  const p = parisNow(now);
   let created = 0;
   for (const doc of snap.docs) {
     const m = doc.data();
     if (onlyNew && Number(m.testQIdx) > 0) continue;
+    if (dueOnly && (m.testLastDay === p.day || p.min < postSlot(doc.id, p.day))) continue;
     const type = String(doc.id).split("_").pop();
     const t = TYPES[type], bank = BANK[type];
     if (!t || !bank) continue;
@@ -258,7 +360,7 @@ async function postNextQuestions(now = Date.now(), { onlyNew = false } = {}) {
       durationDays: QUESTION_DAYS, endsAt: Timestamp.fromMillis(now + QUESTION_DAYS * DAY),
       createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
     });
-    await doc.ref.update({ testQIdx: idx + 1 });
+    await doc.ref.update({ testQIdx: idx + 1, testLastDay: p.day });
     created++;
   }
   return created;
@@ -305,7 +407,7 @@ async function autopilotCore(now = Date.now()) {
   const cfg = await CONFIG_REF().get();
   if (!cfg.exists || cfg.data().active !== true) return { skipped: true };
   const sync = await syncCore(now);                     // une ville ajoutée apparaît au plus tard au passage suivant
-  return { sync, questions: await postNextQuestions(now) };
+  return { sync, questions: await postNextQuestions(now, { dueOnly: true }) };
 }
 
 const adminSetupTestMonth = onCall({ region: "europe-west1", timeoutSeconds: 540, memory: "512MiB" }, async (request) => {
@@ -325,9 +427,11 @@ const adminStopTestMonth = onCall({ region: "europe-west1", timeoutSeconds: 300 
   return stopCore({ hide: !!(request.data && request.data.hide) });
 });
 
-const testMonthAutopilot = onSchedule({ schedule: "0 9 * * 1,3,5", timeZone: "Europe/Paris", retryCount: 0, timeoutSeconds: 300 }, async () => {
+// Toutes les 20 minutes de 8h à 20h, tous les jours (week-end compris) : chaque commerce publie sa question du jour
+// à l'heure tirée pour lui (voir postSlot).
+const testMonthAutopilot = onSchedule({ schedule: "*/20 8-20 * * *", timeZone: "Europe/Paris", retryCount: 0, timeoutSeconds: 300 }, async () => {
   const r = await autopilotCore(Date.now());
   logger.info("testMonthAutopilot", r);
 });
 
-module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { setupCore, stopCore, autopilotCore, postNextQuestions, visualsCore, syncCore, visualsFor, CITIES, TYPES, BANK, merchantId } };
+module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { setupCore, stopCore, autopilotCore, postNextQuestions, postSlot, parisNow, visualsCore, syncCore, visualsFor, CITIES, TYPES, BANK, merchantId } };

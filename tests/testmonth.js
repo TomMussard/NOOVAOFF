@@ -47,10 +47,22 @@ const TM=require(__dirname+'/../functions/testMonth.js')._t;
   const cs1=(await db.collection('campaigns').get()).docs.map(d=>d.data());
   check('Première vague : une question par commerce (50), liée à son métier',cs1.length===50&&cs1.every(c=>c.isTest&&c.status==='active'&&c.questions[0].options.length>=3),cs1.length);
   check('10 villes ouvertes',(await Promise.all(TM.CITIES.map(c=>db.doc('cities/'+c.slug).get()))).every(d=>d.exists&&d.data().active===true));
-  // Pilote automatique : la question suivante de la banque, jamais la même
-  const a=await TM.autopilotCore(Date.now());
-  const cs2=(await db.collection('campaigns').where('merchantId','==','test_paris_cafe').get()).docs.map(d=>d.data().question);
-  check('Pilote automatique : une nouvelle question par commerce, différente de la précédente',a.questions===50&&cs2.length===2&&cs2[0]!==cs2[1],cs2);
+  // Pilote automatique : une question par commerce et par jour, à une heure tirée pour chaque commerce (8h30-19h30),
+  // week-end compris ; la suivante de la banque, jamais la même.
+  const atParis=(day,hm)=>{for(const off of ['+01:00','+02:00']){const ms=Date.parse(`${day}T${hm}:00${off}`);const q=TM.parisNow(ms);if(q.day===day&&q.min===+hm.slice(0,2)*60+ +hm.slice(3))return ms;}};
+  const today=TM.parisNow(Date.now()).day, tomorrow=TM.parisNow(Date.now()+86400000+3600000).day;
+  check('Pilote automatique : rien de plus le jour de la préparation (déjà une question chacun)',(await TM.autopilotCore(Date.now())).questions===0);
+  check('Pilote automatique : rien avant 8h30',(await TM.autopilotCore(atParis(tomorrow,'08:20'))).questions===0);
+  const slots=Object.keys(TM.TYPES).flatMap(t=>TM.CITIES.map(c=>TM.postSlot(TM.merchantId(c.slug,t),tomorrow)));
+  const mid=await TM.autopilotCore(atParis(tomorrow,'14:00'));
+  check('Pilote automatique : heures différentes selon les commerces, entre 8h30 et 19h30 (à 14h, seuls ceux dont l\'heure est passée ont publié)',mid.questions===slots.filter(m=>m<=840).length&&mid.questions>0&&mid.questions<50&&slots.every(m=>m>=510&&m<=1171),{mid:mid.questions,slots:slots.slice(0,8)});
+  check('Pilote automatique : l\'heure d\'un commerce change d\'un jour à l\'autre',Object.keys(TM.TYPES).some(t=>TM.postSlot(TM.merchantId('paris',t),today)!==TM.postSlot(TM.merchantId('paris',t),tomorrow)));
+  const late=await TM.autopilotCore(atParis(tomorrow,'19:40'));
+  check('Pilote automatique : à 19h40, tous les commerces ont publié leur question du jour',mid.questions+late.questions===50,{mid:mid.questions,late:late.questions});
+  check('Pilote automatique : une seule question par commerce et par jour',(await TM.autopilotCore(atParis(tomorrow,'20:00'))).questions===0);
+  const cs2=(await db.collection('campaigns').where('merchantId','==','test_paris_cafe').get()).docs.map(d=>d.data());
+  check('Pilote automatique : question suivante de la banque, différente de la précédente, ouverte 48 h',cs2.length===2&&cs2[0].question!==cs2[1].question&&cs2.some(c=>Math.abs(c.endsAt.toMillis()-atParis(tomorrow,'00:00')-2*86400000)<2*86400000),cs2.map(c=>c.question));
+  check('Banque : 32 questions par métier, sans doublon (un mois à une par jour)',Object.values(TM.BANK).every(b=>b.length>=30&&new Set(b.map(x=>x[0])).size===b.length));
   // Ville ajoutée en cours de test (ex. Rennes) : la synchro crée ses 5 commerces et leur première question, sans
   // question en plus pour les autres, et sans rouvrir une ville fermée depuis l'admin.
   for(const t of Object.keys(TM.TYPES)){await db.doc('merchants/'+TM.merchantId('rennes',t)).delete();for(let n=1;n<=5;n++)await db.doc(`rewards/${TM.merchantId('rennes',t)}_p${n}`).delete();}

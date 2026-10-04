@@ -76,6 +76,48 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     check('Rappel soir : rien si plus de question', (await sink('r4')).length === 0);
     check('Rappel soir : respecte le réglage', (await sink('r5')).length === 0);
   });
+  await T('nouvelle question', async () => {
+    await wipe();
+    await mkMerchant('m1');
+    await mkCampaign('old', { createdAt: Timestamp.fromMillis(at(addDays(D1, -1), '10:00')) });
+    await mkUser('n1', { dailyAnswerDate: D1, dailyAnswerCount: 1 });            // a déjà répondu : pas de QDJ, mais nouvelle question oui
+    await mkUser('n2', { dailyAnswerDate: D1, dailyAnswerCount: 1 });
+    const slot = N.afternoonSlot('n1', D1), hm = (m) => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+    check('Après-midi : heure propre à chaque habitant, entre 14h et 17h30', slot >= 840 && slot <= 1050 && [...Array(30).keys()].map(i => N.afternoonSlot('u' + i, D1)).some(x => x !== slot), slot);
+    await tick(D1, '17:45');
+    check('Après-midi : rien sans question publiée AUJOURD\'HUI', (await sink('n1')).length === 0);
+    await mkCampaign('fresh', { merchantName: 'Café Plume', createdAt: Timestamp.fromMillis(at(D1, '13:10')) });
+    await tick(D1, hm(Math.max(840, slot - 15)));
+    check('Après-midi : rien avant son heure', slot - 15 < 840 || (await sink('n1')).length === 0);
+    await tick(D1, hm(slot)); await tick(D1, '17:59');
+    const s1 = await sink('n1');
+    check('Après-midi : « Café Plume vient de poser une question », une seule fois, même s\'il a déjà répondu aujourd\'hui', s1.length === 1 && s1[0].ntype === 'nouvelle_question' && s1[0].title === 'Café Plume vient de poser une question', s1.map(x => [x.ntype, x.title]));
+  });
+  await T('questions NOOVA et week-end', async () => {
+    await wipe();
+    const SAT = '2026-01-17';
+    await mkCampaign('nq', { merchantId: null, merchantName: 'NOOVA', postedByNoova: true, createdAt: Timestamp.fromMillis(at(SAT, '08:00')) });
+    await mkUser('w', { authorizedMerchants: [] });
+    await tick(SAT, '12:30');
+    const s = await sink('w');
+    check('Samedi : la question du jour part aussi le week-end', s.length === 1 && s[0].ntype === 'question_du_jour', s.map(x => x.ntype));
+    check('Une question posée par NOOVA déclenche bien les notifications (sans commerce à suivre)', s[0] && /NOOVA/.test(s[0].title), s[0] && s[0].title);
+  });
+  await T('diagnostic', async () => {
+    await wipe();
+    await mkMerchant('m1'); await mkCampaign('c1');
+    await mkUser('dg', { email: 'dg@t.fr', notifPrefs: { amis: false }, notifStats: { question_du_jour: { autoOff: true, weekly: true, missStreak: 6 } } });
+    await mkUser('nt', { email: 'nt@t.fr', fcmTokens: [] });
+    let r = await N.notifDiagCore({ email: 'dg@t.fr', send: true });
+    check('Diagnostic : compte trouvé, appareils, questions disponibles, notification test envoyée', r.found && r.devices === 1 && r.available === 1 && r.test && r.test.ok && (await sink('dg')).some(x => x.ntype === 'test'), r);
+    check('Diagnostic : explique ce qui bloque (coupée automatiquement, réglage coupé)', r.problems.some(p => /automatiquement/.test(p)) && r.problems.some(p => /amis/.test(p)), r.problems);
+    r = await N.notifDiagCore({ email: 'dg@t.fr', reset: true });
+    const st = (await db.doc('users/dg').get()).data().notifStats.question_du_jour;
+    check('Diagnostic : « Réactiver » remet à zéro le ralentissement automatique', st.autoOff === false && st.weekly === false && st.missStreak === 0 && !r.problems.some(p => /automatiquement/.test(p)), st);
+    r = await N.notifDiagCore({ email: 'nt@t.fr', send: true });
+    check('Diagnostic : sans appareil enregistré, le dit clairement', r.devices === 0 && r.problems.some(p => /Aucun appareil/.test(p)) && r.test && !r.test.ok, r);
+    check('Diagnostic : e-mail inconnu', (await N.notifDiagCore({ email: 'x@x.fr' })).found === false);
+  });
   await T('qdj habit', async () => {
     await wipe();
     await mkMerchant('m1'); await mkCampaign('c1');
@@ -97,16 +139,18 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await mkMerchant('m1'); await mkCampaign('c1');
     await mkUser('a', { dailyAnswerDate: D1, dailyAnswerCount: 1 });                   // a déjà répondu
     await mkUser('b', { answeredCampaigns: ['c1'] });                                  // plus de question dispo
-    await mkUser('c', { authorizedMerchants: [] });                                    // commerce non autorisé
+    await mkUser('c', { authorizedMerchants: [] });                                    // commerce pas encore suivi -> question « découverte », reçoit
+    await mkUser('h', { authorizedMerchants: [], declinedMerchants: ['m1'] });         // commerce écarté -> rien
     await mkUser('d', { notifPrefs: { question: false } });                            // réglage coupé
     await mkUser('e', { fcmTokens: [] });                                              // pas de push
     await mkUser('f', { city: 'angers' });                                             // autre ville
     await mkUser('g', { dailyAnswerDate: addDays(D1, -1), dailyAnswerCount: 2 });      // a répondu HIER -> reçoit
     await tick(D1, '13:00');
     const got = {};
-    for (const u of ['a', 'b', 'c', 'd', 'e', 'f', 'g']) got[u] = (await sink(u)).length;
+    for (const u of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) got[u] = (await sink(u)).length;
     check('QDJ : jamais le jour où il a déjà répondu', got.a === 0, got);
-    check('QDJ : jamais sans question à répondre', got.b === 0 && got.c === 0 && got.f === 0, got);
+    check('QDJ : jamais sans question à répondre (tout répondu, autre ville, commerce écarté)', got.b === 0 && got.f === 0 && got.h === 0, got);
+    check('QDJ : aussi pour une question d\'un commerce pas encore suivi (comme dans l\'app)', got.c === 1, got);
     check('QDJ : respecte l\'interrupteur du type', got.d === 0);
     check('QDJ : jamais sans jeton push', got.e === 0);
     check('QDJ : réponse d\'hier n\'empêche pas l\'envoi d\'aujourd\'hui', got.g === 1, got);
@@ -137,16 +181,18 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     check('Plafond : QDJ 12h30 + série en danger 20h = 2 (normale + exceptionnelle)', s.length === 2 && s.map(x => x.ntype).join() === 'question_du_jour,serie_en_danger', s.map(x => x.ntype));
     check('Série en danger : titre et consigne (3 réponses), sans culpabilisation', s[1] && s[1].title === 'Ta série est à 5 jours' && /réponds à 3 questions/.test(s[1].body) && !/manqu|perds|derni/i.test(s[1].title + s[1].body), s[1] && [s[1].title, s[1].body]);
     const now = at(D1, '20:30');
-    const r1 = await N.deliver('u', 'ami', N.copy.amiRequest({ name: 'Zoé' }), { key: 'x1', now });
-    check('Plafond : une 3e notification NORMALE (pas exceptionnelle) est refusée — 2 normales par jour au maximum', r1.status === 'skip' && r1.reason === 'cap', r1);
+    const r0 = await N.deliver('u', 'ami', N.copy.amiRequest({ name: 'Zoé' }), { key: 'x0', now });
+    check('Plafond : une 3e notification normale passe — 3 normales par jour', r0.status === 'sent', r0);
+    const r1 = await N.deliver('u', 'impact', N.copy.impact({ merchant: 'Le Fournil', text: 'Ouvert plus tôt' }), { key: 'x1', now });
+    check('Plafond : une 4e notification NORMALE (pas exceptionnelle) est refusée — 3 normales par jour au maximum', r1.status === 'skip' && r1.reason === 'cap', r1);
     const r2 = await N.deliver('u', 'recompense_debloquee', N.copy.recompense({ reward: 'café', merchant: 'Café', cost: 200 }), { key: 'x2', now });
-    check('Plafond : une notification EXCEPTIONNELLE peut prendre le 3e créneau du jour — jusqu\'à 3 au total', r2.status === 'sent', r2);
-    check('Plafond : 3 envoyées ce jour-là', (await sink('u')).length === 3);
+    check('Plafond : une notification EXCEPTIONNELLE peut prendre le 4e créneau du jour — jusqu\'à 4 au total', r2.status === 'sent', r2);
+    check('Plafond : 4 envoyées ce jour-là', (await sink('u')).length === 4);
     const r3 = await N.deliver('u', 'recompense_debloquee', N.copy.recompense({ reward: 'thé', merchant: 'Café', cost: 300 }), { key: 'x3', now: at(D1, '20:31') });
-    check('Plafond : une 4e, même exceptionnelle, est refusée — jamais plus de 3 par jour, reportée au lendemain', r3.status === 'queued', r3);
+    check('Plafond : une 5e, même exceptionnelle, est refusée — jamais plus de 4 par jour, reportée au lendemain', r3.status === 'queued', r3);
     await N.drainQueue(at(addDays(D1, 1), '09:00'));
     const s2 = await sink('u');
-    check('Reportée : envoyée le lendemain à 9h (4e au total)', s2.length === 4 && s2[3].ntype === 'recompense_debloquee', s2.map(x => x.ntype));
+    check('Reportée : envoyée le lendemain à 9h (5e au total)', s2.length === 5 && s2[4].ntype === 'recompense_debloquee', s2.map(x => x.ntype));
   });
   await T('quiet', async () => {
     await wipe();
