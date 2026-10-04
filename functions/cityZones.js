@@ -21,6 +21,7 @@ const HUB_CITIES = [
   { slug: "le-mans", label: "Le Mans" }, { slug: "angers", label: "Angers" }, { slug: "paris", label: "Paris" },
   { slug: "nantes", label: "Nantes" }, { slug: "bordeaux", label: "Bordeaux" }, { slug: "marseille", label: "Marseille" },
   { slug: "toulouse", label: "Toulouse" }, { slug: "lille", label: "Lille" }, { slug: "dijon", label: "Dijon" },
+  { slug: "rennes", label: "Rennes" },
 ];
 
 // Émulateur uniquement : si un document _testGeocode/{nom en minuscules} existe, on l'utilise au lieu d'appeler la
