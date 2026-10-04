@@ -23,7 +23,9 @@ async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/no
   for(let i=0;i<15;i++)await db.doc('answers/a'+i).set({userId:'u'+i,campaignId:'c1',flagged:i===0,createdAt:Timestamp.fromMillis(now-(i%3)*DAY)});
   await db.doc('redemptions/r1').set({status:'used',createdAt:Timestamp.fromMillis(now)});await db.doc('redemptions/r2').set({status:'pending',createdAt:Timestamp.fromMillis(now-DAY)});
   await db.doc('notifMetrics/question_du_jour').set({sent:300,opened:30,deactivated:2});
+  await db.doc('cities/le-mans').set({label:'Le Mans',active:true,count:20});await db.doc('cities/ailleurs').set({label:'Ailleurs',active:true,count:57});
   const s=await S.computeStats(now);
+  check('Compteur d\'habitants des villes remis à la valeur réelle (il ne redescendait pas après une remise à zéro)',(await db.doc('cities/le-mans').get()).data().count===8&&(await db.doc('cities/ailleurs').get()).data().count===4&&s.cities.find(c=>c.slug==='ailleurs').users===4&&s.cities.find(c=>c.slug==='rennes').hub===true,{lm:(await db.doc('cities/le-mans').get()).data().count});
   check('Totaux : habitants, commerces, questions, réponses, bons',s.totals.users===20&&s.totals.merchantsVerified===1&&s.totals.merchantsPending===1&&s.totals.campaignsActive===2&&s.totals.answers===15&&s.totals.answersFlagged===1&&s.totals.redemptionsUsed===1&&s.totals.redemptionsPending===1,s.totals);
   check('Notifications activées, séries, points en circulation',s.totals.pushEnabled===12&&s.totals.streak3===11&&s.totals.streak7===2&&s.totals.pointsHeld===1900,s.totals);
   check('Actifs : aujourd\'hui, 7 jours, 30 jours',s.active.today===5&&s.active.week===9&&s.active.month===9,s.active);

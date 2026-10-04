@@ -37,15 +37,15 @@ async function computeStats(now = Date.now()) {
 
   const [totals, active, series, cities, ages, interests, topSnap, notifSnap] = await Promise.all([
     (async () => {
-      const [users_, verified, pending, campActive, answers_, flagged, redPending, redUsed, push, streak3, streak7, points] = await Promise.all([
+      const [users_, verified, pending, campActive, answers_, flagged, redPending, redUsed, push, streak3, streak7, points, redAll] = await Promise.all([
         count(users), count(merchants.where("status", "==", "verified")), count(merchants.where("status", "==", "pending")),
         count(campaigns.where("status", "==", "active")), count(answers), count(answers.where("flagged", "==", true)),
         count(redemptions.where("status", "==", "pending")), count(redemptions.where("status", "==", "used")),
         count(users.where("pushEnabled", "==", true)), count(users.where("streak", ">=", 3)), count(users.where("streak", ">=", 7)),
-        sum(users, "points"),
+        sum(users, "points"), count(redemptions),
       ]);
       return { users: users_, merchantsVerified: verified, merchantsPending: pending, campaignsActive: campActive, answers: answers_,
-        answersFlagged: flagged, redemptionsPending: redPending, redemptionsUsed: redUsed, pushEnabled: push, streak3, streak7, pointsHeld: points };
+        answersFlagged: flagged, redemptionsPending: redPending, redemptionsUsed: redUsed, redemptions: redAll, pushEnabled: push, streak3, streak7, pointsHeld: points };
     })(),
     (async () => {
       const [d1, d7, d30] = await Promise.all([
@@ -60,7 +60,18 @@ async function computeStats(now = Date.now()) {
       const [signups, answersPerDay, redPerDay] = await Promise.all([per("users"), per("answers"), per("redemptions")]);
       return { days, signups, answers: answersPerDay, redemptions: redPerDay };
     })(),
-    Promise.all(HUB_CITIES.map(async (c) => ({ slug: c.slug, label: c.label, users: await count(users.where("city", "==", c.slug)) }))),
+    // Toutes les villes (villes NOOVA + villes créées à l'inscription), comptées pour de vrai. Le compteur « count »
+    // stocké sur chaque ville est remis à la valeur réelle : il ne redescendait pas quand des comptes étaient supprimés.
+    (async () => {
+      const snap = await db().collection("cities").get().catch(() => ({ docs: [] }));
+      const docs = Object.fromEntries(snap.docs.map((d) => [d.id, d.data()]));
+      const list = HUB_CITIES.map((c) => ({ slug: c.slug, label: c.label, hub: true }))
+        .concat(Object.keys(docs).filter((id) => !HUB_CITIES.some((h) => h.slug === id)).map((id) => ({ slug: id, label: docs[id].label || id, hub: false })));
+      const out = await Promise.all(list.map(async (c) => ({ ...c, users: await count(users.where("city", "==", c.slug)), active: docs[c.slug] ? docs[c.slug].active !== false : true })));
+      await Promise.all(out.filter((c) => docs[c.slug] && c.users != null && docs[c.slug].count !== c.users)
+        .map((c) => db().collection("cities").doc(c.slug).update({ count: c.users }).catch(() => {})));
+      return out;
+    })(),
     Promise.all(AGES.map(async (a) => ({ key: a, users: await count(users.where("ageRange", "==", a)) }))),
     Promise.all(INTERESTS.INTERESTS.map(async (i) => ({ key: i.key, label: i.label, users: await count(users.where("interests", "array-contains", i.key)) }))),
     campaigns.orderBy("answersCount", "desc").limit(200).get().catch(() => ({ docs: [] })),

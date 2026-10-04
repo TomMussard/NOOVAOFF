@@ -23,7 +23,7 @@ const byName=(r,u)=>r.friends.find(f=>f.uid===u);
 const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(e);}};
 
 
-// ─── Mois de test : 45 commerces fictifs autonomes (préparation, pilote automatique, app, échange simulé, arrêt) ───
+// ─── Mois de test : 50 commerces fictifs autonomes (préparation, pilote automatique, app, échange simulé, arrêt) ───
 const TM=require(__dirname+'/../functions/testMonth.js')._t;
 (async()=>{
   await wipe();
@@ -34,23 +34,34 @@ const TM=require(__dirname+'/../functions/testMonth.js')._t;
   const r=await TM.setupCore({deleteReal:true});
   check('Commerce réel supprimé avec sa campagne et sa récompense',r.deleted.includes('Vraie Boulangerie')&&!(await db.doc('merchants/real1').get()).exists&&!(await db.doc('campaigns/realc').get()).exists&&!(await db.doc('rewards/real1_p1').get()).exists,r.deleted);
   const ms=(await db.collection('merchants').get()).docs.map(d=>d.data());
-  check('45 commerces fictifs (9 villes × 5), tous vérifiés et marqués isTest',ms.length===45&&ms.every(m=>m.isTest===true&&m.status==='verified'),ms.length);
+  check('50 commerces fictifs (10 villes × 5, Rennes comprise), tous vérifiés et marqués isTest',ms.length===50&&ms.some(m=>m.city==='rennes')&&ms.every(m=>m.isTest===true&&m.status==='verified'),ms.length);
   check('Chaque ville a son café, coiffeur, fleuriste, supérette et bar',TM.CITIES.every(c=>['Café','Coiffeur','Fleuriste','Supérette','Bar'].every(s=>ms.some(m=>m.city===c.slug&&m.sector===s))));
   const fs=require('fs');
   check('Chaque commerce fictif a un logo et une devanture, et les fichiers existent',ms.every(m=>/^\/img\/commerces\/[a-z]+-logo-[123]\.svg$/.test(m.logoUrl||'')&&/^\/img\/commerces\/[a-z]+-[123]\.svg$/.test(m.coverUrl||'')&&fs.existsSync(__dirname+'/..'+m.logoUrl)&&fs.existsSync(__dirname+'/..'+m.coverUrl)),ms.filter(m=>!m.coverUrl).length);
   await db.doc('merchants/'+TM.merchantId('angers','cafe')).update({logoUrl:admin.firestore.FieldValue.delete(),coverUrl:admin.firestore.FieldValue.delete()});
   const nv=await TM.visualsCore();const back=(await db.doc('merchants/'+TM.merchantId('angers','cafe')).get()).data();
   check('Mise à jour des visuels : ne touche que les commerces sans visuel, et les remet',nv===1&&back.coverUrl==='/img/commerces/cafe-2.svg'&&back.logoUrl==='/img/commerces/cafe-logo-2.svg',{nv,back:[back.logoUrl,back.coverUrl]});
-  const names=ms.map(m=>m.brandName);check('Aucun nom en double',new Set(names).size===45,names.length);
+  const names=ms.map(m=>m.brandName);check('Aucun nom en double',new Set(names).size===50,names.length);
   const rw=(await db.collection('rewards').get()).docs.map(d=>d.data());
-  check('Vitrine de 5 paliers par commerce (225 récompenses validées, sans alcool mis en avant)',rw.length===225&&rw.every(x=>x.isTest&&x.approved&&x.active)&&!rw.some(x=>/bière|vin|alcool(?! )/i.test(x.label.replace(/sans alcool/gi,''))),rw.length);
+  check('Vitrine de 5 paliers par commerce (250 récompenses validées, sans alcool mis en avant)',rw.length===250&&rw.every(x=>x.isTest&&x.approved&&x.active)&&!rw.some(x=>/bière|vin|alcool(?! )/i.test(x.label.replace(/sans alcool/gi,''))),rw.length);
   const cs1=(await db.collection('campaigns').get()).docs.map(d=>d.data());
-  check('Première vague : une question par commerce (45), liée à son métier',cs1.length===45&&cs1.every(c=>c.isTest&&c.status==='active'&&c.questions[0].options.length>=3),cs1.length);
-  check('9 villes ouvertes',(await Promise.all(TM.CITIES.map(c=>db.doc('cities/'+c.slug).get()))).every(d=>d.exists&&d.data().active===true));
+  check('Première vague : une question par commerce (50), liée à son métier',cs1.length===50&&cs1.every(c=>c.isTest&&c.status==='active'&&c.questions[0].options.length>=3),cs1.length);
+  check('10 villes ouvertes',(await Promise.all(TM.CITIES.map(c=>db.doc('cities/'+c.slug).get()))).every(d=>d.exists&&d.data().active===true));
   // Pilote automatique : la question suivante de la banque, jamais la même
   const a=await TM.autopilotCore(Date.now());
   const cs2=(await db.collection('campaigns').where('merchantId','==','test_paris_cafe').get()).docs.map(d=>d.data().question);
-  check('Pilote automatique : une nouvelle question par commerce, différente de la précédente',a.questions===45&&cs2.length===2&&cs2[0]!==cs2[1],cs2);
+  check('Pilote automatique : une nouvelle question par commerce, différente de la précédente',a.questions===50&&cs2.length===2&&cs2[0]!==cs2[1],cs2);
+  // Ville ajoutée en cours de test (ex. Rennes) : la synchro crée ses 5 commerces et leur première question, sans
+  // question en plus pour les autres, et sans rouvrir une ville fermée depuis l'admin.
+  for(const t of Object.keys(TM.TYPES)){await db.doc('merchants/'+TM.merchantId('rennes',t)).delete();for(let n=1;n<=5;n++)await db.doc(`rewards/${TM.merchantId('rennes',t)}_p${n}`).delete();}
+  await db.doc('cities/angers').update({active:false});
+  const before=(await db.collection('campaigns').get()).size;
+  const sy=await TM.syncCore();
+  const after=(await db.collection('campaigns').get()).docs.map(d=>d.data());
+  const ren=after.filter(c=>String(c.merchantId).startsWith('test_rennes_'));
+  check('Synchro : les 5 commerces de Rennes sont recréés avec récompenses et une première question, rien de plus ailleurs',sy.merchants===5&&sy.firstQuestions===5&&after.length===before+5&&ren.length>=5&&(await db.doc('rewards/'+TM.merchantId('rennes','bar')+'_p1').get()).exists,{sy,before,after:after.length,ren:ren.length});
+  check('Synchro : une ville fermée depuis l\'admin reste fermée',(await db.doc('cities/angers').get()).data().active===false);
+  await db.doc('cities/angers').update({active:true});
   check('Banque : 15 questions par métier, sans doublon',Object.values(TM.BANK).every(b=>b.length>=12&&new Set(b.map(x=>x[0])).size===b.length));
   // App : un habitant de Paris voit les questions des commerces fictifs de Paris, étiquetées « Commerce test »
   await mkUser('uPA',{email:'uPA@t.fr',city:'paris',cityLabel:'Paris',authorizedMerchants:TM.CITIES.length?['test_paris_cafe','test_paris_bar','test_paris_coiffeur','test_paris_fleuriste','test_paris_superette']:[],points:400,interests:[]});
@@ -74,6 +85,6 @@ const TM=require(__dirname+'/../functions/testMonth.js')._t;
   await TM.stopCore({hide:false});
   check('Arrêt : le pilote ne pose plus de question',(await TM.autopilotCore(Date.now())).skipped===true);
   const st=await TM.stopCore({hide:true});
-  check('Fin du test : 45 commerces masqués, questions closes',st.hidden===45&&(await db.collection('campaigns').where('status','==','active').get()).size===0,st);
+  check('Fin du test : 50 commerces masqués, questions closes',st.hidden===50&&(await db.collection('campaigns').where('status','==','active').get()).size===0,st);
   console.log(`\n${pass} ok, ${fail} échec(s)`);process.exit(fail?1:0);
 })().catch(e=>{console.log('FAIL '+String(e.stack||e).slice(0,500));process.exit(1);});

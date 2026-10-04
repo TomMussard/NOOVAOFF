@@ -2276,7 +2276,7 @@ const NOOVA_KNOWN_CITIES=[
   {slug:'le-mans',label:'Le Mans',zone:['Aigné','Allonnes','Arnage','Champagné','Changé','Chaufour-Notre-Dame','Coulaines','Fatines','Fay','La Chapelle-Saint-Aubin','Laigné-en-Belin','Mulsanne','Neuville-sur-Sarthe','Pruillé-le-Chétif','Rouillon','Ruaudin','Saint-Georges-du-Bois','Saint-Saturnin','Sargé-lès-Le Mans',"Savigné-l'Évêque",'Trangé',"Yvré-l'Évêque"]},
   {slug:'angers',label:'Angers',zone:[]},
   {slug:'paris',label:'Paris',zone:[]},{slug:'nantes',label:'Nantes',zone:[]},{slug:'bordeaux',label:'Bordeaux',zone:[]},
-  {slug:'marseille',label:'Marseille',zone:[]},{slug:'toulouse',label:'Toulouse',zone:[]},{slug:'lille',label:'Lille',zone:[]},{slug:'dijon',label:'Dijon',zone:[]}
+  {slug:'marseille',label:'Marseille',zone:[]},{slug:'toulouse',label:'Toulouse',zone:[]},{slug:'lille',label:'Lille',zone:[]},{slug:'dijon',label:'Dijon',zone:[]},{slug:'rennes',label:'Rennes',zone:[]}
 ];
 // Nom affichable d'une ville à partir de son slug (« le-mans » → « Le Mans ») : jamais de slug à l'écran.
 function cityName(slug){if(!slug)return '';const k=NOOVA_KNOWN_CITIES.find(c=>c.slug===slug);if(k)return k.label;return String(slug).split('-').map((w,n)=>n&&/^(de|du|des|la|le|les|sur|en|et|sous|aux?)$/.test(w)?w:w.charAt(0).toUpperCase()+w.slice(1)).join(' ');}

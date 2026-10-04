@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Mois de test — 45 commerces FICTIFS (9 villes × café, coiffeur, fleuriste, supérette, bar) qui posent chacun
+ * Mois de test — 50 commerces FICTIFS (10 villes × café, coiffeur, fleuriste, supérette, bar) qui posent chacun
  * 3 questions par semaine (lundi, mercredi, vendredi à 9h), en totale autonomie, pour faire vivre l'app pendant la
  * phase de test sans aucune vraie entreprise.
  *
@@ -30,37 +30,38 @@ const CITIES = [
   { slug: "le-mans", label: "Le Mans" }, { slug: "angers", label: "Angers" }, { slug: "paris", label: "Paris" },
   { slug: "nantes", label: "Nantes" }, { slug: "bordeaux", label: "Bordeaux" }, { slug: "marseille", label: "Marseille" },
   { slug: "toulouse", label: "Toulouse" }, { slug: "lille", label: "Lille" }, { slug: "dijon", label: "Dijon" },
+  { slug: "rennes", label: "Rennes" },
 ];
 
 // Noms inventés (un par ville, même ordre que CITIES). L'étiquette « Commerce test » lève toute ambiguïté.
 const TYPES = {
   cafe: {
     sector: "Café", emoji: "☕", interest: "restauration",
-    names: ["Café Tilleul & Cie", "La Tasse Vagabonde", "Café Hirondelle", "Le Moulin à Café Bleu", "Café Boussole", "La Théière Rousse", "Café Nuage d'Ambre", "Le Comptoir Filament", "Café Pistache Lunaire"],
+    names: ["Café Tilleul & Cie", "La Tasse Vagabonde", "Café Hirondelle", "Le Moulin à Café Bleu", "Café Boussole", "La Théière Rousse", "Café Nuage d'Ambre", "Le Comptoir Filament", "Café Pistache Lunaire", "Café Bigoudi Breizh"],
     desc: "Café de quartier : torréfaction maison, pâtisseries du matin et brunch le week-end.",
     rewards: ["Café offert", "Viennoiserie et café", "Petit-déjeuner complet", "Brunch pour une personne", "Brunch pour deux"],
   },
   coiffeur: {
     sector: "Coiffeur", emoji: "✂️", interest: "beaute",
-    names: ["Ciseaux d'Argile", "Peigne & Plume", "Studio Boucle Douce", "La Frange Céleste", "Mèche & Miel", "Salon Brin de Soie", "Les Ciseaux Voyageurs", "Coiff' Comète", "L'Atelier Mèche Folle"],
+    names: ["Ciseaux d'Argile", "Peigne & Plume", "Studio Boucle Douce", "La Frange Céleste", "Mèche & Miel", "Salon Brin de Soie", "Les Ciseaux Voyageurs", "Coiff' Comète", "L'Atelier Mèche Folle", "Salon Hermine & Ciseaux"],
     desc: "Salon de coiffure mixte : coupes, couleurs et soins, avec ou sans rendez-vous.",
     rewards: ["Shampoing soin offert", "Brushing offert", "Coupe offerte", "Coupe et soin", "Coloration offerte"],
   },
   fleuriste: {
     sector: "Fleuriste", emoji: "💐", interest: "commerce",
-    names: ["Pétale Funambule", "Fleur de Brume", "L'Herbier Joyeux", "Bouquet Boréal", "La Tige Rêveuse", "Corolle & Compagnie", "Les Pivoines Pressées", "Graine d'Étoile", "Les Jardins de Mirabelle"],
+    names: ["Pétale Funambule", "Fleur de Brume", "L'Herbier Joyeux", "Bouquet Boréal", "La Tige Rêveuse", "Corolle & Compagnie", "Les Pivoines Pressées", "Graine d'Étoile", "Les Jardins de Mirabelle", "Fleurs d'Ajonc Doré"],
     desc: "Fleuriste : bouquets de saison, plantes et compositions pour toutes les occasions.",
     rewards: ["Une fleur offerte", "Petit bouquet", "Plante verte", "Bouquet de saison", "Grande composition"],
   },
   superette: {
     sector: "Supérette", emoji: "🛒", interest: "commerce",
-    names: ["Le Cabas Malin", "Supérette Bon Voisin", "Le Petit Panier Rond", "Marché Express Noisette", "L'Épicerie des Lilas Bleus", "Proxi Tournesol", "Le Panier du Quartier Nova", "Supérette Le Comptoir Vert", "Épicerie Petit Marché Lune"],
+    names: ["Le Cabas Malin", "Supérette Bon Voisin", "Le Petit Panier Rond", "Marché Express Noisette", "L'Épicerie des Lilas Bleus", "Proxi Tournesol", "Le Panier du Quartier Nova", "Supérette Le Comptoir Vert", "Épicerie Petit Marché Lune", "Supérette La Cale Joyeuse"],
     desc: "Supérette de proximité : produits du quotidien, fruits et légumes, ouverte tard.",
     rewards: ["Boisson fraîche offerte", "Panier goûter", "Sac de courses du quotidien", "Panier de produits locaux", "Grand panier gourmand"],
   },
   bar: {
     sector: "Bar", emoji: "🍹", interest: "restauration",
-    names: ["Le Zinc Rêveur", "Le Comptoir des Lucioles", "Le Héron Bleu", "Le Quai des Hiboux", "Le Petit Phare", "Le Tonneau Céleste", "Le Bar à Coulisses", "La Lanterne Douce", "Le Mélusine Bar"],
+    names: ["Le Zinc Rêveur", "Le Comptoir des Lucioles", "Le Héron Bleu", "Le Quai des Hiboux", "Le Petit Phare", "Le Tonneau Céleste", "Le Bar à Coulisses", "La Lanterne Douce", "Le Mélusine Bar", "Le Korrigan Funambule"],
     desc: "Bar de quartier : planches à partager, soirées à thème et cocktails sans alcool.",
     // Loi Évin : aucune récompense ne met l'alcool en avant.
     rewards: ["Cocktail sans alcool offert", "Planche apéro", "Deux boissons sans alcool", "Planche et deux boissons sans alcool", "Planche géante pour quatre"],
@@ -203,13 +204,17 @@ async function visualsCore() {
   return n;
 }
 
-// Crée ou met à jour les 45 commerces fictifs et leurs vitrines (idempotent : relancer ne duplique rien).
-async function upsertTestMerchants() {
+// Crée ou met à jour les commerces fictifs et leurs vitrines (idempotent : relancer ne duplique rien).
+// onlyMissing : ne crée que ce qui manque (ville ajoutée en cours de test) et ne touche à rien d'existant — une ville
+// fermée ou un commerce suspendu depuis l'admin le restent.
+async function upsertTestMerchants({ onlyMissing = false } = {}) {
   let n = 0;
   for (const [ci, c] of CITIES.entries()) {
-    await db().collection("cities").doc(c.slug).set({ label: c.label, active: true }, { merge: true });
+    const cityRef = db().collection("cities").doc(c.slug);
+    if (!onlyMissing || !(await cityRef.get()).exists) await cityRef.set({ label: c.label, active: true }, { merge: true });
     for (const [type, t] of Object.entries(TYPES)) {
       const id = merchantId(c.slug, type), name = t.names[ci];
+      if (onlyMissing && (await db().collection("merchants").doc(id).get()).exists) continue;
       await db().collection("merchants").doc(id).set({
         role: "merchant", ownerUid: id, brandName: name, name, sector: t.sector, theme: t.sector,
         city: c.slug, cityLabel: c.label, address: `Centre-ville, ${c.label}`,
@@ -231,11 +236,13 @@ async function upsertTestMerchants() {
 }
 
 // Une nouvelle question pour chaque commerce fictif (la suivante de sa banque, sans répétition).
-async function postNextQuestions(now = Date.now()) {
+// onlyNew : seulement les commerces qui n'ont encore jamais posé de question (nouvelle ville ajoutée en cours de test).
+async function postNextQuestions(now = Date.now(), { onlyNew = false } = {}) {
   const snap = await db().collection("merchants").where("isTest", "==", true).where("status", "==", "verified").get();
   let created = 0;
   for (const doc of snap.docs) {
     const m = doc.data();
+    if (onlyNew && Number(m.testQIdx) > 0) continue;
     const type = String(doc.id).split("_").pop();
     const t = TYPES[type], bank = BANK[type];
     if (!t || !bank) continue;
@@ -284,17 +291,29 @@ async function stopCore({ hide = false } = {}) {
   return { hidden, closed };
 }
 
+// Remet les commerces fictifs à jour sans rien supprimer : crée ceux d'une ville ajoutée (ex. Rennes) avec leurs
+// récompenses, pose leur première question, remet logos et devantures. Les autres commerces ne reçoivent AUCUNE
+// question en plus.
+async function syncCore(now = Date.now()) {
+  const merchants = await upsertTestMerchants({ onlyMissing: true });
+  const firstQuestions = await postNextQuestions(now, { onlyNew: true });
+  const visuals = await visualsCore();
+  return { merchants, firstQuestions, visuals, cities: CITIES.length };
+}
+
 async function autopilotCore(now = Date.now()) {
   const cfg = await CONFIG_REF().get();
   if (!cfg.exists || cfg.data().active !== true) return { skipped: true };
-  return { visuals: await visualsCore(), questions: await postNextQuestions(now) };
+  const sync = await syncCore(now);                     // une ville ajoutée apparaît au plus tard au passage suivant
+  return { sync, questions: await postNextQuestions(now) };
 }
 
 const adminSetupTestMonth = onCall({ region: "europe-west1", timeoutSeconds: 540, memory: "512MiB" }, async (request) => {
   if (!isAdmin(request)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   const { deleteReal, confirm, visualsOnly } = request.data || {};
-  // Mise à jour des seuls visuels (logo, devanture) : ne pose aucune question et ne supprime rien.
-  if (visualsOnly) return { visuals: await visualsCore() };
+  // Mise à jour des commerces fictifs (nouvelle ville, logos, devantures) : ne supprime rien et ne pose une question
+  // qu'aux commerces qui n'en ont encore jamais posé.
+  if (visualsOnly || (request.data && request.data.sync)) return await syncCore();
   if (deleteReal && confirm !== "SUPPRIMER") throw new HttpsError("failed-precondition", "Tape SUPPRIMER pour confirmer la suppression des commerces réels.");
   const r = await setupCore({ deleteReal: !!deleteReal });
   logger.info("adminSetupTestMonth", { by: request.auth.token.email, ...r, deleted: r.deleted.length });
@@ -311,4 +330,4 @@ const testMonthAutopilot = onSchedule({ schedule: "0 9 * * 1,3,5", timeZone: "Eu
   logger.info("testMonthAutopilot", r);
 });
 
-module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { setupCore, stopCore, autopilotCore, postNextQuestions, visualsCore, visualsFor, CITIES, TYPES, BANK, merchantId } };
+module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { setupCore, stopCore, autopilotCore, postNextQuestions, visualsCore, syncCore, visualsFor, CITIES, TYPES, BANK, merchantId } };

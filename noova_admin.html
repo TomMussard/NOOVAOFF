@@ -538,7 +538,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <div class="card" id="test-month-card" style="margin-bottom:20px">
       <div class="card-title">Mois de test : commerces fictifs</div>
       <div style="padding:14px 18px;font-size:13px;color:var(--ink2);line-height:1.6">
-        45 commerces fictifs (café, coiffeur, fleuriste, supérette, bar) dans 9 villes : Le Mans, Angers, Paris, Nantes, Bordeaux, Marseille, Toulouse, Lille, Dijon.
+        50 commerces fictifs (café, coiffeur, fleuriste, supérette, bar) dans 10 villes : Le Mans, Angers, Paris, Nantes, Bordeaux, Marseille, Toulouse, Lille, Dijon, Rennes.
         Chacun pose une question le lundi, le mercredi et le vendredi à 9h, toute seule. Les habitants voient l'étiquette « Commerce test » et les bons échangés sont marqués « sans valeur ».
         <div id="tm-status" style="margin:12px 0;font-weight:700;color:var(--ink)">Chargement…</div>
         <label style="display:flex;gap:8px;align-items:flex-start;margin:10px 0"><input type="checkbox" id="tm-delete" onchange="document.getElementById('tm-confirm-wrap').style.display=this.checked?'block':'none'">
@@ -546,7 +546,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
         <div id="tm-confirm-wrap" style="display:none;margin:8px 0">Pour confirmer, tape <b>SUPPRIMER</b> : <input id="tm-confirm" autocomplete="off" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit"></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
           <button class="btn-approve" id="tm-setup-btn" onclick="setupTestMonth(this)">Préparer et lancer le mois de test</button>
-          <button class="btn-approve" onclick="refreshTestVisuals(this)">Mettre à jour logos et devantures</button>
+          <button class="btn-approve" onclick="refreshTestVisuals(this)">Mettre à jour les commerces test (nouvelles villes, logos, devantures)</button>
           <button class="btn-reject" onclick="stopTestMonth(false)">Arrêter les questions automatiques</button>
           <button class="btn-reject" onclick="stopTestMonth(true)">Fin du test : masquer les commerces fictifs</button>
         </div>
@@ -744,7 +744,7 @@ async function setupTestMonth(btn) {
 }
 async function refreshTestVisuals(btn) {
   btn.disabled = true; const out = document.getElementById('tm-result'); out.textContent = 'En cours…';
-  try { const r = (await fx.httpsCallable('adminSetupTestMonth')({ visualsOnly: true })).data; out.textContent = `Fait : ${r.visuals} commerces fictifs mis à jour (logo et devanture).`; }
+  try { const r = (await fx.httpsCallable('adminSetupTestMonth')({ sync: true })).data; out.textContent = `Fait : ${r.merchants} commerce${r.merchants > 1 ? 's' : ''} créé${r.merchants > 1 ? 's' : ''}, ${r.firstQuestions} première${r.firstQuestions > 1 ? 's' : ''} question${r.firstQuestions > 1 ? 's' : ''} posée${r.firstQuestions > 1 ? 's' : ''}, ${r.visuals} visuel${r.visuals > 1 ? 's' : ''} mis à jour. ${r.cities} villes au total.`; loadTestMonth(); }
   catch (e) { out.textContent = 'Erreur : ' + e.message; }
   btn.disabled = false;
 }
@@ -941,13 +941,19 @@ const stCard = (title, body, extra) => `<div class="card"><div class="card-title
 const stKpi = (l, v, sub, hero) => `<div class="st-kpi${hero ? ' hero' : ''}"><div class="st-kpi-l">${l}</div><div class="st-kpi-v">${v}</div>${sub ? `<div class="st-kpi-s">${sub}</div>` : ''}</div>`;
 const sumArr = (a) => (a || []).reduce((x, y) => x + (y || 0), 0);
 
+// Chiffres en direct (fonction adminStats, agrégations sur tous les comptes), partagés par les onglets de la page.
+let _statsP = null, _statsAt = 0;
+function getAdminStats(force) {
+  if (force || !_statsP || Date.now() - _statsAt > 60000) { _statsAt = Date.now(); _statsP = fx.httpsCallable('adminStats')({ force: !!force }).then(r => r.data).catch(e => { _statsP = null; throw e; }); }
+  return _statsP;
+}
 let _statsTimer = null;
 async function loadStats(force) {
   const root = document.getElementById('st-root'), btn = document.getElementById('st-refresh');
   if (!root.dataset.loaded || force) root.innerHTML = '<div class="loading">Calcul des statistiques…</div>';
   if (btn) btn.disabled = true;
   try {
-    const s = (await fx.httpsCallable('adminStats')({ force: !!force })).data;
+    const s = await getAdminStats(force);
     root.dataset.loaded = '1';
     renderStats(s);
     const upd = () => { const m = Math.round((Date.now() - s.at) / 60000); document.getElementById('st-upd').textContent = m < 1 ? "Mis à jour à l'instant" : `Mis à jour il y a ${m} min`; };
@@ -981,7 +987,7 @@ function renderStats(s) {
     { label: 'Série de 3 jours et +', value: T.streak3, color: ST_C.menthe },
     { label: 'Série de 7 jours et +', value: T.streak7, color: '#087355' },
   ];
-  const cityItems = (s.cities || []).slice().sort((a, b) => (b.users || 0) - (a.users || 0)).map(c => ({ label: c.label, value: c.users }));
+  const cityItems = (s.cities || []).filter(c => c.hub || c.users > 0).slice().sort((a, b) => (b.users || 0) - (a.users || 0)).map(c => ({ label: c.label, value: c.users }));
   const inCities = sumArr(cityItems.map(c => c.value)); if ((T.users || 0) > inCities) cityItems.push({ label: 'Autres ou non renseigné', value: T.users - inCities, color: ST_C.gris });
   const AGE_L = { '16-17': '16–17 ans', '18-24': '18–24 ans', '25-34': '25–34 ans', '35-49': '35–49 ans', '50-64': '50–64 ans', '65+': '65 ans et +' };
   const ageItems = (s.ages || []).map(a => ({ label: AGE_L[a.key] || a.key, value: a.users }));
@@ -1055,6 +1061,8 @@ async function loadCityControls() {
   try {
     const snap = await db.collection('cities').get();
     const cities = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (a.label||a.id).localeCompare(b.label||b.id));
+    // Nombre d'habitants réel (et non le compteur stocké, qui ne redescendait pas après une remise à zéro).
+    try { const st = await getAdminStats(true); const live = Object.fromEntries((st.cities || []).map(c => [c.slug, c.users])); cities.forEach(c => { if (live[c.id] != null) c.count = live[c.id]; }); } catch (e) {}
     if (!cities.length) {
       el.innerHTML = '<div class="empty">Aucune ville enregistrée pour l\'instant — une entrée est créée automatiquement à la première inscription dans cette ville.</div>';
       return;
@@ -1084,6 +1092,13 @@ async function toggleCityActive(cityId, newActive) {
 // moins une récompense active. C'est ce qui fait qu'un nouvel utilisateur voit
 // vraiment quelque chose en arrivant sur l'app, pas un écran vide.
 async function loadGlobalStats() {
+  // Chiffres en direct via adminStats (le SDK de la page ne sait pas compter côté serveur).
+  try {
+    const t = (await getAdminStats()).totals || {};
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v == null ? '—' : Number(v).toLocaleString('fr-FR'); };
+    set('g-camps-active', t.campaignsActive); set('g-answers', t.answers); set('g-redemptions', t.redemptions != null ? t.redemptions : (t.redemptionsPending || 0) + (t.redemptionsUsed || 0)); set('g-flagged', t.answersFlagged);
+    return;
+  } catch (e) {}
   try {
     const [campActiveCount, answersCount, redemptionsCount, flaggedCount] = await Promise.all([
       db.collection('campaigns').where('status', '==', 'active').count().get(),
