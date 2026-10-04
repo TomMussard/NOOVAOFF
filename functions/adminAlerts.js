@@ -5,9 +5,8 @@
  *  - un testeur envoie un retour (« Ton avis sur NOOVA ») ;
  *  - un résumé chaque soir à 20h (inscriptions, actifs, réponses, commerces, bons, retours).
  *
- * Les e-mails passent par la collection « mail », au format de l'extension Firebase « Trigger Email from Firestore »
- * (la même que les e-mails aux commerçants). Sans l'extension installée et reliée à une boîte d'envoi (SMTP), rien
- * n'est envoyé : l'admin affiche alors « en attente » sur l'e-mail de test.
+ * Les e-mails passent par la collection « mail » et sont envoyés par functions/mailer.js (SMTP, secret SMTP_PASSWORD),
+ * comme les e-mails aux commerçants. Le résultat de l'envoi est écrit sur le document (delivery.state).
  * Réglages (adresses, types d'alertes) dans config/adminAlerts, modifiables depuis l'admin.
  */
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
@@ -32,7 +31,7 @@ async function settings() {
   return { to, merchant: d.merchant !== false, feedback: d.feedback !== false, digest: d.digest !== false };
 }
 
-// Un e-mail dans la file de l'extension. id déterministe : un déclencheur livré deux fois n'envoie qu'un e-mail.
+// Un e-mail dans la file d'envoi (functions/mailer.js). id déterministe : un déclencheur livré deux fois n'envoie qu'un e-mail.
 async function queueMail(id, to, subject, lines, cta) {
   const html = `<div style="font-family:Helvetica,Arial,sans-serif;color:#1C0E02;max-width:560px">`
     + `<div style="font-weight:800;font-size:18px;margin-bottom:12px">NOOVA</div>`
@@ -40,7 +39,9 @@ async function queueMail(id, to, subject, lines, cta) {
     + (cta ? `<p style="margin:16px 0"><a href="${cta.url}" style="background:#FFC300;color:#1C0E02;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:700">${escH(cta.label)}</a></p>` : "")
     + `<p style="color:#8C7A62;font-size:12px;margin-top:20px">Alerte automatique NOOVA. Réglages : admin, onglet Notifications.</p></div>`;
   const text = lines.map((l) => l.replace(/<[^>]+>/g, "")).join("\n") + (cta ? `\n\n${cta.label} : ${cta.url}` : "");
-  await db().collection("mail").doc(id.slice(0, 400)).set({ to, message: { subject, text, html }, type: "admin_alert", createdAt: FieldValue.serverTimestamp() });
+  // create (et non set) : un e-mail déjà en file n'est jamais réécrit, donc jamais renvoyé ni privé de son résultat.
+  try { await db().collection("mail").doc(id.slice(0, 400)).create({ to, message: { subject, text, html }, type: "admin_alert", createdAt: FieldValue.serverTimestamp() }); }
+  catch (e) { if (e.code !== 6 && !/already exists/i.test(String(e.message))) throw e; }
 }
 
 // ── Nouveau commerce inscrit (hors commerces fictifs du mois de test)
@@ -124,8 +125,8 @@ const adminAlerts = onCall({ region: "europe-west1" }, async (request) => {
     return { id, to: s.to };
   }
   if (d.action === "status") {
-    // L'extension écrit delivery.state (PENDING, PROCESSING, SUCCESS, ERROR) sur le document : sans ce champ, elle
-    // n'est pas installée ou ne surveille pas la collection « mail ».
+    // mailer.js écrit delivery.state (PROCESSING, SUCCESS, ERROR) sur le document : sans ce champ, la fonction
+    // d'envoi n'est pas déployée.
     const m = await db().collection("mail").doc(String(d.id || "x")).get();
     const del = m.exists ? m.data().delivery : null;
     return { exists: m.exists, state: del ? del.state : null, error: del && del.error ? String(del.error).slice(0, 300) : null };

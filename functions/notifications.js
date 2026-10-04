@@ -462,8 +462,7 @@ async function notifyMerchant(mid, key, { title, message, type }) {
   const m = await db().collection("merchants").doc(mid).get();
   const to = m.exists && m.data().email;
   if (to) {
-    // Format de l'extension Firebase « Trigger Email from Firestore » : l'envoi réel demande de la
-    // configurer avec un SMTP (Firebase Console > Extensions). Sans elle, seul l'in-app est actif.
+    // Envoyé par functions/mailer.js (SMTP). Sans mot de passe SMTP configuré, seul l'in-app est actif.
     await db().collection("mail").doc(`${mid}_${key}`).set({
       to, type, message: {
         subject: title,
