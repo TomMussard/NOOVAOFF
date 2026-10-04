@@ -8,3 +8,5 @@ firestore-debug.log
 ui-debug.log
 firebase-debug.log
 tests/.site/
+functions/.env.local
+functions/.secret.local

@@ -47,9 +47,15 @@ const until=async(fn,t=15000)=>{const s=Date.now();while(Date.now()-s<t){if(awai
   const t=await call('adminAlerts',{action:'test'},tok);
   const tm=(await db.doc('mail/'+t.id).get()).data();
   check('E-mail test : déposé pour les nouvelles adresses',tm&&tm.to.join()==='tom@noova.fr,autre@noova.fr'&&/Test des alertes/.test(tm.message.subject),t);
-  const st=await call('adminAlerts',{action:'status',id:t.id},tok);
-  check('Statut : sans extension, l\'e-mail existe mais n\'a pas d\'état de livraison',st.exists===true&&st.state===null,st);
-  await db.doc('mail/'+t.id).update({delivery:{state:'SUCCESS'}});
-  check('Statut : lit l\'état écrit par l\'extension',(await call('adminAlerts',{action:'status',id:t.id},tok)).state==='SUCCESS');
+  let st=null;await until(async()=>{st=await call('adminAlerts',{action:'status',id:t.id},tok);return st.state==='SUCCESS';});
+  check('Envoi : la fonction d\'envoi traite l\'e-mail et l\'admin lit « SUCCESS »',st.exists===true&&st.state==='SUCCESS',st);
+  // Toutes les alertes de ce test ont été envoyées par la fonction d'envoi (aucune extension)
+  const all=await mails();
+  check('Envoi : chaque e-mail de la file reçoit un résultat (SUCCESS en test, sans envoi réel)',all.length>=4&&all.every(m=>m.delivery&&m.delivery.state==='SUCCESS'),all.map(m=>[m.id,m.delivery&&m.delivery.state]));
+  await db.collection('mail').doc('bad1').set({message:{subject:'Sans destinataire'}});
+  await until(async()=>{const d=(await db.doc('mail/bad1').get()).data();return d.delivery&&d.delivery.state==='ERROR';});
+  check('Envoi : un e-mail incomplet est marqué en erreur avec une explication',/incomplet/.test(((await db.doc('mail/bad1').get()).data().delivery||{}).error||''));
+  const MX=require(__dirname+'/../functions/mailer.js')._t;
+  check('Erreurs SMTP traduites (mot de passe d\'application Gmail, identifiants, serveur injoignable)',/mot de passe d'application/.test(MX.explain(new Error('534-5.7.9 Application-specific password required')))&&/refusé/.test(MX.explain(new Error('535 Invalid login')))&&/injoignable/.test(MX.explain(new Error('connect ECONNREFUSED 127.0.0.1:465'))));
   console.log(`\n${pass} ok, ${fail} échec(s)`);process.exit(0);
 })().catch(e=>{console.log('FAIL '+String(e.stack||e).slice(0,400));process.exit(1);});
