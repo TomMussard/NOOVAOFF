@@ -98,7 +98,7 @@ async function login(browser,email,{ua,perm='default',standalone=false}={}){
     await pa.evaluate(()=>submitAns());
     await wf(pa,()=>document.getElementById('perm-sheet').style.display==='flex',null,15000);
     const txt=await pa.evaluate(()=>({t:document.getElementById('perm-title').textContent,d:document.getElementById('perm-text').textContent,c:document.getElementById('perm-cta').textContent,req:window.__reqCount}));
-    check('Première réponse validée : écran d\'explication maison AVANT la pop-up système',/Une notification par jour/.test(txt.t)&&/au maximum une fois par jour/.test(txt.d)&&txt.req===0,txt);
+    check('Première réponse validée : écran d\'explication maison AVANT la pop-up système',/Ne rate aucune question/.test(txt.t)&&/jamais la nuit/.test(txt.d)&&txt.req===0,txt);
     await pa.screenshot({path:'/tmp/shots/notif_ask.png'});
     await pa.evaluate(()=>permLater());
     check('« Pas maintenant » : la pop-up système n\'est jamais déclenchée',await pa.evaluate(()=>window.__reqCount===0));
@@ -109,6 +109,14 @@ async function login(browser,email,{ua,perm='default',standalone=false}={}){
     const after=await pa.evaluate(()=>({req:window.__reqCount,cool:+localStorage.getItem('nv_perm_notif')||0}));
     check('Accepter l\'explication déclenche la pop-up système (une seule)',after.req===1,after);
     check('Refus système : plus de demande avant 7 jours',after.cool>Date.now()-60000&&await pa.evaluate(()=>{askNotifFlow(false);return document.getElementById('perm-sheet').style.display!=='flex';}));
+    // Permission déjà accordée sur ce téléphone, mais téléphone pas rattaché à ce compte (remise à zéro, autre compte) :
+    // « Activer sur cet appareil » doit enregistrer le téléphone tout de suite (avant : le bouton ne faisait rien).
+    const g=await pa.evaluate(async()=>{window.__perm='granted';localStorage.removeItem('nv_fcm_token_'+auth.currentUser.uid);window.__en=0;window.enableNotifications=async()=>{window.__en++;};
+      const r0=window.__reqCount;refreshNotifSettingsUI();const b=[...document.querySelectorAll('#notif-device button')].find(x=>/Activer sur cet appareil/.test(x.textContent));if(b)b.click();await new Promise(r=>setTimeout(r,300));
+      return {btn:!!b,en:window.__en,req:window.__reqCount-r0,sheet:document.getElementById('perm-sheet').style.display==='flex'};});
+    check('Permission déjà accordée : « Activer sur cet appareil » enregistre le téléphone, sans redemander',g.btn&&g.en===1&&g.req===0&&!g.sheet,g);
+    const d=await pa.evaluate(async()=>{window.__perm='denied';refreshNotifSettingsUI();askNotifFlow(true);await new Promise(r=>setTimeout(r,300));return {txt:document.getElementById('notif-device').textContent,toast:document.body.textContent.includes('bloquées pour NOOVA')};});
+    check('Notifications bloquées dans le téléphone : explication claire au lieu d\'un bouton sans effet',/bloquées/.test(d.txt)&&d.toast,d);
   });
   await pa.close();
 
