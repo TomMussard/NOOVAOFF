@@ -6108,10 +6108,22 @@ let _verifiedMerchantsUnsub = null;
 let _campaignsUnsub = null;
 let _verifiedMerchantsCache = {};
 let _campaignsCache = [];
+// Compte NOOVA (diffusion dans toutes les villes) : sa fiche (logo, photo de devanture) est lue à part, en direct, pour
+// que ses questions s'affichent avec ses visuels à jour dans toutes les villes.
+let _noovaMerchantsUnsub = null;
+let _noovaMerchantsCache = {};
 async function loadCampaignsFromFirestore(userData) {
   const city = normalizeCity((userData && userData.city) || S._city || '');
   if (_verifiedMerchantsUnsub) _verifiedMerchantsUnsub();
   if (_campaignsUnsub) _campaignsUnsub();
+  if (_noovaMerchantsUnsub) _noovaMerchantsUnsub();
+  _noovaMerchantsUnsub = db.collection('merchants').where('broadcast', '==', true).where('status', '==', 'verified')
+    .onSnapshot(snap => {
+      const map = {};
+      snap.forEach(doc => { map[doc.id] = doc.data(); });
+      _noovaMerchantsCache = map;
+      if (window._campaignFeedRenderedOnce) recomputeCampaignFeed(city);   // sinon le premier rendu des questions s'en charge
+    }, e => console.warn('noova merchants listener:', e));
   return new Promise(resolve => {
     let merchantsReady = false, campaignsReady = false;
     const maybeResolve = () => { if (merchantsReady && campaignsReady) resolve(); };
@@ -6160,7 +6172,9 @@ function recomputeCampaignFeed(city) {
       const broadcast = !byNoova && d.broadcast === true && d.targetCity === 'toutes';
       const noovaLike = byNoova || broadcast;
       const campaignCity = getCampaignCity(d);
-      const merchantData = byNoova ? null : (_verifiedMerchantsCache[d.merchantId] || (broadcast ? { logoUrl: d.merchantLogoUrl || null } : null));
+      const merchantData = byNoova ? null : broadcast
+        ? (_noovaMerchantsCache[d.merchantId] || { logoUrl: d.merchantLogoUrl || null })
+        : (_verifiedMerchantsCache[d.merchantId] || null);
       const merchantCity = normalizeCity((merchantData && merchantData.city) || d.city || '');
       if (!broadcast && city && campaignCity && campaignCity !== city) return;
       if (!noovaLike) {
