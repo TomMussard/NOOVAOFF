@@ -459,18 +459,8 @@ async function notifyMerchant(mid, key, { title, message, type }) {
   const ref = db().collection("merchants").doc(mid).collection("notifications").doc(key);
   try { await ref.create({ title, message, type, read: false, createdAt: FieldValue.serverTimestamp() }); }
   catch (e) { return false; } // déjà créée : jamais deux fois la même
-  const m = await db().collection("merchants").doc(mid).get();
-  const to = m.exists && m.data().email;
-  if (to) {
-    // Envoyé par functions/mailer.js (SMTP). Sans mot de passe SMTP configuré, seul l'in-app est actif.
-    await db().collection("mail").doc(`${mid}_${key}`).set({
-      to, type, message: {
-        subject: title,
-        text: `${message}\n\nVoir mon dashboard : https://noovaoff.fr/dashboard\n\nL'équipe NOOVA`,
-        html: `<p>${message}</p><p><a href="https://noovaoff.fr/dashboard">Voir mon dashboard</a></p><p>L'équipe NOOVA</p>`,
-      }, createdAt: FieldValue.serverTimestamp(),
-    }).catch(() => {});
-  }
+  // Pas d'e-mail aux commerçants (décision du 5 oct.) : le message reste dans leur dashboard (cloche). Les e-mails
+  // NOOVA servent uniquement aux alertes de l'équipe (functions/adminAlerts.js).
   return true;
 }
 

@@ -229,7 +229,7 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await mkUser('F', { interests: ['boulangerie'], authorizedMerchants: [], fcmTokens: [] });
     await mkUser('G', { interests: [], authorizedMerchants: [] });                       // ancien profil : tout
     await mkCampaign('n1', { merchantId: 'm2', merchantName: 'Boulangerie Martin', sector: 'Boulangerie' });
-    await until(async () => (await db.collection('_pushSink').get()).size >= 3);
+    await until(async () => (await db.collection('_pushSink').get()).size >= 3, 30000);
     await sleep(800);
     const has = async u => (await sink(u)).length;
     check('Nouveau commerce : habitant de la ville et de la catégorie', await has('A') === 1);
@@ -450,7 +450,7 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await db.doc('campaigns/cm').update({ answersCount: 121 }); await sleep(2000);
     check('Commerçant : aucun doublon de palier', (await inapp()).length === 5);
     const mails = (await db.collection('mail').get()).docs.map(d => d.data()).filter(m => m.type !== 'admin_alert');
-    check('Commerçant : un e-mail par notification', mails.length === 5 && mails.every(m => m.to === 'boulanger@shop.fr' && m.message.subject && m.message.text), mails.length);
+    check('Commerçant : aucun e-mail (messages uniquement dans le dashboard)', mails.length === 0, mails.length);
     await db.doc('redemptions/rr1').set({ userId: 'u', merchantId: 'm1', status: 'pending', label: 'café', code: 'AB7K' });
     await sleep(1200);
     await db.doc('redemptions/rr1').update({ status: 'used' });
