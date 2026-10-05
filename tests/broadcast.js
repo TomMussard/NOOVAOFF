@@ -60,7 +60,7 @@ const mkUser=async(uid,city,o={})=>{await db.doc('users/'+uid).set({role:'user',
   check('Règles : un habitant de Paris voit la question (requête de l\'app : sa ville + « toutes »)',qr.status===200&&qr.ids.includes('bc1'),qr);
   await call('beginQuestion',{campaignId:'bc1',questionIdx:0},ptok);await sleep(2700);
   const res=await call('submitAnswer',{campaignId:'bc1',questionIdx:0,answerValue:'Oui'},ptok);
-  check('Un habitant de Paris peut répondre, avec points et NOOVS (question NOOVA)',res.pointsAwarded>0&&res.noovsAwarded===CFG.NOOVS.PER_NOOVA_QUESTION,res);
+  check('Un habitant de Paris peut répondre : uniquement des NOOVS, sans points, hors des 3 réponses du jour',res.pointsAwarded===0&&res.noovsAwarded===CFG.NOOVS.PER_NOOVA_QUESTION&&res.answersToday===0,res);
   const a=(await db.doc('answers/pa_bc1_q0').get()).data()||{};
   check('La réponse arrive dans le compte (merchantId) : réponses et résultats visibles dans son dashboard',a.merchantId==='nv'&&(await db.doc('campaigns/bc1').get()).data().answersCount===1,a);
   // Fausse diffusion (écrite hors règles) : refusée par le serveur, aucune notification

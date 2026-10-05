@@ -1977,9 +1977,10 @@ function parisToday(ms){return new Date(ms||Date.now()).toLocaleDateString('sv-S
 function getAnswersToday(){return S._answersDate===parisToday()?(S._answersToday||0):0;}
 // Libellé de gain d'une question : points tant que le quota du jour n'est pas atteint, ensuite 1 NOOV.
 function isFreeMode(){return getAnswersToday()>=MAX_POINT_ANSWERS;}
-// Questions posées par NOOVA : des NOOVS à chaque fois (engagementConfig NOOVS.PER_NOOVA_QUESTION), en plus des points du jour.
+// Questions posées par NOOVA : uniquement des NOOVS (engagementConfig NOOVS.PER_NOOVA_QUESTION), jamais de points, et
+// elles ne comptent pas dans les 3 réponses à points du jour.
 const NOOVA_Q_NOOVS=5;
-function ptsTag(q){if(q&&q._byNoova)return isFreeMode()?'+'+NOOVA_Q_NOOVS+' NOOVS':'+'+q.pts+' pts +'+NOOVA_Q_NOOVS+' NOOVS';return isFreeMode()?'+1 NOOV':'+'+q.pts+' pts';}
+function ptsTag(q){if(q&&q._byNoova)return '+'+NOOVA_Q_NOOVS+' NOOVS';return isFreeMode()?'+1 NOOV':'+'+q.pts+' pts';}
 function setQPtsTag(q){const el=document.getElementById('q-pts-tag');if(!el)return;el.textContent=ptsTag(q);}
 const BRANDMETA={};
 function logoFallbackHTML(name,size){
@@ -6188,7 +6189,7 @@ function recomputeCampaignFeed(city) {
       const surveyList = allQs.slice(1).map((sq, idx) => ({
         _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: idx + 1, _byNoova: noovaLike,
         brand: brandName, ico: d.brandEmoji || (byNoova ? '✨' : '🏪'),
-        theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: ENGAGEMENT.PTS_PER_ANSWER,
+        theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: noovaLike ? 0 : ENGAGEMENT.PTS_PER_ANSWER,
         type: sq.format || 'text', q: sq.q, hint: '',
         opts: sq.options || [], items: sq.options || [],
         usage: usageTxt
@@ -6201,7 +6202,7 @@ function recomputeCampaignFeed(city) {
         photoUrl: merchantData ? merchantData.coverUrl || null : null, logoUrl: merchantData ? merchantData.logoUrl || null : null,
         _discovery: !followed, _reason: discoveryReason || (isFallbackOnly ? 'fallback' : ''), _strict: (merchantData && interestMatch(merchantData)) ? 1 : 0, _followed: followed ? 1 : 0,
         _createdMs: (d.createdAt && d.createdAt.toMillis ? d.createdAt.toMillis() : 0),
-        theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: 10,
+        theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: noovaLike ? 0 : 10,
         type: allQs[0].format || d.format || 'text',
         q: allQs[0].q || d.question, hint: '',
         opts: allQs[0].options || d.options || [], items: allQs[0].options || d.options || [],
@@ -6335,7 +6336,7 @@ submitAns = function() {
           if (left > 0) rwSub.textContent = disc ? disc.trim() : 'Ta réponse a été envoyée';
           else rwSub.innerHTML = disc + 'Tes ' + (S._pointsToday || 0) + ' pts du jour sont validés ' + icon('check', { size: 15 });
         }
-        // Question NOOVA : points ET NOOVS.
+        // (filet : une réponse qui rapporte des points ET des NOOVS)
         if (rwSub && noovsGot > 0) rwSub.textContent = (rwSub.textContent ? rwSub.textContent.replace(/\s*$/, '') + ' ' : '') + '+' + noovsGot + ' NOOVS en bonus, question NOOVA.';
       }
       renderDailyTrack();

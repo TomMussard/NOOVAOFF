@@ -1,4 +1,4 @@
-// Toute question posée par NOOVA rapporte des NOOVS (en plus des points du jour, hors plafond) ; la question de la
+// Toute question posée par NOOVA rapporte uniquement des NOOVS (hors plafond, sans points, hors des 3 réponses du jour) ; la question de la
 // semaine aussi, une seule fois par question.
 process.env.FIRESTORE_EMULATOR_HOST='127.0.0.1:8080';process.env.FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:9099';process.env.FUNCTIONS_EMULATOR='true';
 const admin=require(__dirname+'/helpers/admin');
@@ -23,15 +23,17 @@ const camp=(id,o)=>db.doc('campaigns/'+id).set({status:'active',targetCity:'le-m
   const tok=await idTokenOf('u@t.fr');
   const answer=async(id)=>{await call('beginQuestion',{campaignId:id,questionIdx:0},tok);await sleep(2700);return call('submitAnswer',{campaignId:id,questionIdx:0,answerValue:'Oui'},tok);};
   const r1=await answer('n0');
-  check('Question NOOVA (1re du jour) : les points du jour ET des NOOVS',r1.pointsAwarded>0&&r1.noovsAwarded===N,{p:r1.pointsAwarded,n:r1.noovsAwarded});
-  await answer('m0');await answer('m1');
-  const r4=await answer('m2');
+  check('Question NOOVA : uniquement des NOOVS, aucun point',r1.pointsAwarded===0&&r1.noovsAwarded===N,{p:r1.pointsAwarded,n:r1.noovsAwarded});
+  check('Question NOOVA : ne compte ni dans les 3 réponses à points du jour ni dans la série',r1.answersToday===0&&r1.pointAnswersLeft===CFG.POINTS.MAX_ANSWERS_PER_DAY&&r1.streakToday===false,r1);
+  const pts=[];for(const id of ['m0','m1','m2'])pts.push((await answer(id)).pointsAwarded);
+  check('Après une question NOOVA, les 3 réponses à points du jour restent entières',pts.every(x=>x>0),pts);
+  const r4=await answer('m3');
   check('Question d\'un commerce au-delà des 3 du jour : 1 NOOV (règle normale inchangée)',r4.pointsAwarded===0&&r4.noovsAwarded===CFG.POINTS.NOOVS_PER_ANSWER,{p:r4.pointsAwarded,n:r4.noovsAwarded});
   await db.doc('users/u').update({dailyNoovs:CFG.NOOVS.DAILY_CAP,dailyNoovsDate:(await db.doc('users/u').get()).data().dailyNoovsDate});
-  const r5=await answer('m3');
+  const r5=await answer('m4');
   check('Commerce, plafond de NOOVS du jour atteint : rien (règle normale inchangée)',r5.noovsAwarded===0&&r5.noovsWithheld==='cap',r5.noovsWithheld);
   const r6=await answer('n1');
-  check('Question NOOVA : des NOOVS quand même, hors plafond du jour',r6.noovsAwarded===N&&!r6.noovsWithheld,{n:r6.noovsAwarded,w:r6.noovsWithheld});
+  check('Question NOOVA : des NOOVS quand même, hors plafond du jour',r6.noovsAwarded===N&&!r6.noovsWithheld&&r6.pointsAwarded===0,{n:r6.noovsAwarded,w:r6.noovsWithheld});
   const before=(await db.doc('users/u').get()).data().noovs;
   // Question de la semaine (NOOVA) : NOOVS au vote, une seule fois
   await db.doc('weeklyQuestions/w1').set({active:true,city:'le-mans',text:'Pizza ananas ?',options:['Oui','Non'],createdAt:Timestamp.now()});
