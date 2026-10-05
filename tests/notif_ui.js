@@ -192,7 +192,7 @@ async function login(browser,email,{ua,perm='default',standalone=false}={}){
     await p.evaluate(()=>{document.getElementById('tab-notifications').style.display='block';return loadNotifMetrics();});await sleep(1500);
     const rows=await p.evaluate(()=>[...document.querySelectorAll('#notif-rows tr')].map(r=>[...r.children].map(c=>c.textContent.trim())));
     const q=rows.find(r=>/Question du jour/.test(r[0]));const n=rows.find(r=>/Nouveau commerce/.test(r[0]));const a=rows.find(r=>/^Ami/.test(r[0]));
-    check('Back-office : les 11 types listés avec envois, ouvertures, taux, désactivations',rows.length===11&&q[1]==='250'&&q[2]==='5'&&q[3]==='2.0 %'&&/^15/.test(q[4]),rows);
+    check('Back-office : les 13 types listés avec envois, ouvertures, taux, désactivations',rows.length===13&&q[1]==='250'&&q[2]==='5'&&q[3]==='2.0 %'&&/^15/.test(q[4]),rows);
     check('Back-office : sous 5 % sur 200 envois = « À supprimer »',/À supprimer/.test(q[5]),q);
     check('Back-office : au-dessus de 5 % = « À garder »',/À garder/.test(n[5]),n);
     check('Back-office : moins de 200 envois = en observation',/En observation \(40\/200\)/.test(a[5]),a);
