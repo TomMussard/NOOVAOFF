@@ -414,6 +414,10 @@ async function runTick(now = Date.now()) {
     const city = String(u.city).toLowerCase();
     const avail = availableFor(u, caches.campaignsFor(city));
     const stats = u.notifStats || {};
+    // Questions à points (commerces) : celles de NOOVA ne rapportent que des NOOVS et ne comptent ni dans les 3 réponses
+    // du jour ni dans la série, donc les rappels « points » et « série » ne s'appuient que sur les commerces.
+    const noovaLike = (c) => !c.merchantId || isBroadcast(c);
+    const ptsQs = avail.filter((c) => !noovaLike(c));
     // Une question d'un commerce suivi a déjà été envoyée aujourd'hui : les rendez-vous à heure fixe (question du jour,
     // nouvelle question de l'après-midi) ne servent plus, ils restent pour qui ne suit encore aucun commerce.
     const suiviToday = (stats.question_suivi || {}).lastSentDay === p.day;
@@ -421,9 +425,9 @@ async function runTick(now = Date.now()) {
     // Question du jour : à l'heure habituelle de réponse, jamais si déjà répondu, jamais sans question à répondre.
     if (!suiviToday && p.min >= habitMinutes(u) && p.min < QUIET_FROM && avail.length && !answeredToday(u, p.day)
         && (stats.question_du_jour || {}).lastSentDay !== p.day) {
-      let content = copy.questionDuJour({ merchant: avail[0].merchantName });
+      let content = ptsQs.length ? copy.questionDuJour({ merchant: ptsQs[0].merchantName }) : copy.nouvelleQuestion({ byNoova: true });
       // « Récompense imminente » : jamais envoyée seule, fusionnée avec la question du jour.
-      if (((u.notifPrefs || {}).recompenses) !== false) {
+      if (ptsQs.length && ((u.notifPrefs || {}).recompenses) !== false) {
         const near = nearestReward(u, caches.rewards.get(city));
         if (near && (near.left === 1 || near.left === 2)) content = copy.imminent({ left: near.left, reward: near.reward.label, rewardMerchant: near.reward.merchantName });
       }
@@ -435,7 +439,7 @@ async function runTick(now = Date.now()) {
     const fresh = avail.find((c) => toMs(c.createdAt) && parisParts(toMs(c.createdAt)).day === p.day);
     if (fresh && !suiviToday && p.min >= afternoonSlot(uid, p.day) && p.min < 18 * 60 + 30
         && (stats.nouvelle_question || {}).lastSentDay !== p.day) {
-      const r = await deliver(uid, "nouvelle_question", copy.nouvelleQuestion({ merchant: fresh.merchantName, byNoova: !fresh.merchantId }), { key: p.day, now });
+      const r = await deliver(uid, "nouvelle_question", copy.nouvelleQuestion({ merchant: fresh.merchantName, byNoova: noovaLike(fresh) }), { key: p.day, now });
       if (r.status === "sent") { out.nouvelle++; sentNow = true; }
     }
     // Relance : une question d'un commerce suivi (ou de NOOVA), publiée aujourd'hui il y a 3 h ou plus, toujours sans
@@ -446,7 +450,7 @@ async function runTick(now = Date.now()) {
     let relanceToday = (stats.relance_question || {}).lastSentDay === p.day;
     const lastQ = Math.max(0, ...["question_du_jour", "nouvelle_question", "question_suivi"].map((t) => (stats[t] || {}).lastSentAt || 0));
     if (pending && !relanceToday && !sentNow && now - lastQ >= 2 * 3600000 && p.min >= QUIET_TO && p.min < RELANCE_UNTIL) {
-      const r = await deliver(uid, "relance_question", copy.relance({ merchant: pending.merchantName, byNoova: !pending.merchantId }), { key: p.day, now });
+      const r = await deliver(uid, "relance_question", copy.relance({ merchant: pending.merchantName, byNoova: noovaLike(pending) }), { key: p.day, now });
       if (r.status === "sent") { out.relance++; relanceToday = true; }
     }
     // Rappel du soir (18h30-18h59) : 2e notification du jour, s'il reste des questions et des points à prendre
@@ -454,15 +458,15 @@ async function runTick(now = Date.now()) {
     const doneToday = u.dailyAnswerDate === p.day ? (u.dailyAnswerCount || 0) : 0;
     const serieAtRisk = (u.streak || 0) >= 3 && (u.streakDate !== undefined ? u.streakDate : u.lastAnswerDate) === yesterdayDay(now) && !answeredToday(u, p.day);
     // Pas de rappel du soir le jour d'une relance (elle a déjà fait ce travail).
-    if (p.hour === 18 && p.minute >= 30 && avail.length && doneToday < CFG.POINTS.MAX_ANSWERS_PER_DAY && !serieAtRisk
+    if (p.hour === 18 && p.minute >= 30 && ptsQs.length && doneToday < CFG.POINTS.MAX_ANSWERS_PER_DAY && !serieAtRisk
         && !relanceToday && (stats.rappel_soir || {}).lastSentDay !== p.day) {
-      const m = (avail[1] || avail[0]).merchantName;
+      const m = (ptsQs[1] || ptsQs[0]).merchantName;
       const r = await deliver(uid, "rappel_soir", copy.rappelSoir({ merchant: m, answered: doneToday }), { key: p.day, now });
       if (r.status === "sent") out.soir++;
     }
     // Série en danger : 20h, série >= 3 jours encore vivante (répondu hier), rien répondu aujourd'hui.
-    if (p.hour === 20 && (u.streak || 0) >= 3 && (u.streakDate !== undefined ? u.streakDate : u.lastAnswerDate) === yesterdayDay(now) && avail.length && !answeredToday(u, p.day)) {
-      const r = await deliver(uid, "serie_en_danger", copy.serie({ n: u.streak, merchant: avail[0].merchantName }), { key: p.day, now });
+    if (p.hour === 20 && (u.streak || 0) >= 3 && (u.streakDate !== undefined ? u.streakDate : u.lastAnswerDate) === yesterdayDay(now) && ptsQs.length && !answeredToday(u, p.day)) {
+      const r = await deliver(uid, "serie_en_danger", copy.serie({ n: u.streak, merchant: ptsQs[0].merchantName }), { key: p.day, now });
       if (r.status === "sent") out.serie++;
     }
   });
@@ -629,7 +633,7 @@ const notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (eve
     if (byNoova || everywhere || (u.authorizedMerchants || []).includes(camp.merchantId)) return true;   // suivi : toujours prévenu
     return !(u.declinedMerchants || []).includes(camp.merchantId) && matchesCategory(u, sector);
   }).map((d) => () => (byNoova || everywhere || (d.data().authorizedMerchants || []).includes(camp.merchantId)
-    ? deliver(d.id, "question_suivi", copy.questionSuivi({ merchant: camp.merchantName, byNoova }), { key: id })
+    ? deliver(d.id, "question_suivi", copy.questionSuivi({ merchant: camp.merchantName, byNoova: byNoova || everywhere }), { key: id })
     : deliver(d.id, "nouveau_commerce", copy.nouveauCommerce({ merchant: camp.merchantName, known: false }), { key: id })));
   for (let i = 0; i < work.length; i += 20) await Promise.all(work.slice(i, i + 20).map((f) => f()));
 });

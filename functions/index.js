@@ -184,10 +184,12 @@ exports.submitAnswer = onCall(async (request) => {
     // ── Barème : 3 réponses/jour en points, ensuite des NOOVS ──
     const today = todayStr();
     const answersToday = user.dailyAnswerDate === today ? (user.dailyAnswerCount || 0) : 0;
-    const pointsEligible = answersToday < MAX_POINT_ANSWERS_PER_DAY;
+    // Question posée par NOOVA (compte de diffusion) : uniquement des NOOVS, jamais de points, et elle ne compte ni
+    // dans les 3 réponses à points du jour ni dans la série.
+    const noovaQ = !camp.merchantId || broadcastQ;
+    const pointsEligible = !noovaQ && answersToday < MAX_POINT_ANSWERS_PER_DAY;
 
     let earnedPts = 0, discoveryBonus = 0, noovsEarned = 0, noovsWithheld = null;
-    const noovaQ = !camp.merchantId || broadcastQ;   // question posée par NOOVA elle-même (compte de diffusion)
     const noovsToday = user.dailyNoovsDate === today ? (user.dailyNoovs || 0) : 0;
     let newStreak = user.streak || 0;
     let newLastAnswerDate = user.lastAnswerDate || null;
@@ -204,34 +206,36 @@ exports.submitAnswer = onCall(async (request) => {
       } else {
         noovsEarned = Math.min(NOOVS_PER_ANSWER, CFG.NOOVS.DAILY_CAP - noovsToday);
       }
-      // Question posée par NOOVA : des NOOVS à chaque fois, en plus des points du jour, hors plafond.
+      // Question posée par NOOVA : des NOOVS à chaque fois (et rien d'autre), hors plafond du jour.
       if (noovaQ) { noovsEarned = CFG.NOOVS.PER_NOOVA_QUESTION; noovsWithheld = null; }
       // Bonus découverte : 1re réponse à ce commerçant, une fois par jour au maximum (même au-delà des 3 réponses du jour).
-      if (camp.merchantId && !(user.answeredMerchants || []).includes(camp.merchantId) && user.discoveryBonusDate !== today) {
+      if (!noovaQ && camp.merchantId && !(user.answeredMerchants || []).includes(camp.merchantId) && user.discoveryBonusDate !== today) {
         discoveryBonus = CFG.POINTS.DISCOVERY_BONUS;
       }
     }
     const totalEarned = earnedPts + discoveryBonus;
     // Une réponse trop rapide (non lue) ne consomme pas le quota du jour.
-    const newAnswersToday = answersToday + (flagged ? 0 : 1);
+    const newAnswersToday = answersToday + (flagged || noovaQ ? 0 : 1);
     // Série : un jour compte à partir de 3 réponses — ou plus tôt si l'habitant a répondu à TOUTES les campagnes
     // actuellement actives de sa ville (une ville qui démarre n'offre pas toujours 3 questions par jour). Cette
     // deuxième vérification ne coûte qu'une requête, et seulement tant que nécessaire (jamais une fois le seuil
     // atteint, ni si la journée est déjà validée) : au plus une fois par jour et par habitant.
     let streakValidatedNow = false;
-    if (!flagged && newStreakDate !== today) {
+    if (!flagged && !noovaQ && newStreakDate !== today) {
       if (newAnswersToday >= CFG.STREAK.MIN_ANSWERS_PER_DAY) {
         streakValidatedNow = true;
       } else {
         const answeredSet = new Set(user.answeredCampaigns || []);
         if (qIdx === 0) answeredSet.add(campaignId);
+        // (questions de commerces de sa ville seulement : celles de NOOVA ne comptent pas dans la série)
         const cityCampaigns = await db.collection("campaigns")
-          .where("status", "==", "active").where("targetCity", "in", [userCity, "toutes"])
-          .select("ageRanges", "endsAt").limit(200).get();
+          .where("status", "==", "active").where("targetCity", "==", userCity)
+          .select("ageRanges", "endsAt", "merchantId").limit(200).get();
         const nowMs = Date.now();
         const stillAvailable = cityCampaigns.docs.some((d) => {
           if (d.id === campaignId || answeredSet.has(d.id)) return false;
           const dd = d.data();
+          if (!dd.merchantId) return false;
           if (dd.endsAt && dd.endsAt.toMillis && dd.endsAt.toMillis() < nowMs) return false;
           const ar = dd.ageRanges || [];
           return !(ar.length && userAge && !ar.includes(userAge));

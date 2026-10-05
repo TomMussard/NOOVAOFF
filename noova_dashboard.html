@@ -1855,6 +1855,7 @@ function closeMobMenu() {
 async function checkRewardsReadyForCampaign(){
   const u = auth.currentUser;
   if(!u) return true;
+  if(_mData && _mData.broadcast === true) return true;   // compte NOOVA : ses questions rapportent des NOOVS, pas de vitrine récompenses
   try{
     const snap = await db.collection('rewards').where('merchantId','==',u.uid).get();
     const filled = new Set();
@@ -3070,6 +3071,10 @@ async function loadMerchantAndStart(uid) {
     }
   }
 
+  // Compte NOOVA (« Diffuser dans toutes les villes », activé dans l'admin) : ses questions rapportent uniquement des
+  // NOOVS aux habitants, donc ni vitrine récompenses ni bons à valider.
+  ['nav-rewards', 'nav-validate'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = _mData.broadcast === true ? 'none' : ''; });
+
   // Dashboard accessible dès l'inscription, même non vérifié : seul le lancement de
   // campagne reste bloqué (bandeau permanent + bouton désactivé).
   renderVerifBanner();
@@ -3435,7 +3440,7 @@ const DASH_TOUR_STEPS=[
 ];
 let _dTourIdx=0, _dashTourStarted=false;
 function maybeShowDashTour(uid){
-  if(!uid || !_mData || _mData.seenDashTour || _dashTourStarted) return;
+  if(!uid || !_mData || _mData.seenDashTour || _mData.broadcast === true || _dashTourStarted) return;
   const vm=document.getElementById('verified-modal');
   const pend=document.getElementById('pending-screen');
   if((vm && vm.style.display==='flex') || (pend && pend.style.display==='flex')){
