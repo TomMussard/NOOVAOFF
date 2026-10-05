@@ -615,11 +615,12 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <div class="card">
       <div class="card-title">Alertes e-mail</div>
       <div style="padding:14px 18px;display:grid;gap:10px">
-        <p style="font-size:12.5px;color:var(--ink3);line-height:1.5">Reçois un e-mail quand un commerce s'inscrit, quand un testeur envoie un retour, et un résumé chaque soir à 20h. L'envoi part de la boîte noovaoffr@gmail.com (mot de passe d'application à enregistrer une fois au déploiement).</p>
+        <p style="font-size:12.5px;color:var(--ink3);line-height:1.5">Reçois un e-mail quand un habitant ou un commerce s'inscrit, quand un testeur envoie un retour, et un résumé chaque soir à 20h. L'envoi part de la boîte noovaoffr@gmail.com (mot de passe d'application à enregistrer une fois au déploiement).</p>
         <label style="font-size:12px;font-weight:700;color:var(--ink2)">Adresses (séparées par des virgules, 5 au maximum)
           <input id="al-to" type="text" style="margin-top:4px;width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13px"></label>
         <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px">
-          <label><input type="checkbox" id="al-merchant"> Nouveau commerce inscrit</label>
+          <label><input type="checkbox" id="al-user"> Nouvel habitant inscrit</label>
+          <label><input type="checkbox" id="al-merchant"> Nouveau commerce inscrit (à valider)</label>
           <label><input type="checkbox" id="al-feedback"> Retour d'un testeur</label>
           <label><input type="checkbox" id="al-digest"> Résumé du soir (20h)</label>
         </div>
@@ -921,13 +922,13 @@ async function loadNotifMetrics() {
 async function loadAlerts() {
   try { const r = (await fx.httpsCallable('adminAlerts')({})).data;
     document.getElementById('al-to').value = (r.to || []).join(', ');
-    ['merchant', 'feedback', 'digest'].forEach(k => { document.getElementById('al-' + k).checked = r[k] !== false; });
+    ['user', 'merchant', 'feedback', 'digest'].forEach(k => { document.getElementById('al-' + k).checked = r[k] !== false; });
   } catch (e) { document.getElementById('al-out').textContent = 'Réglages indisponibles : ' + e.message + ' (redéploie les fonctions si elles viennent d\'être ajoutées).'; }
 }
 async function saveAlerts() {
   const out = document.getElementById('al-out');
   try { const r = (await fx.httpsCallable('adminAlerts')({ action: 'save', to: document.getElementById('al-to').value.split(',').map(x => x.trim()).filter(Boolean),
-      merchant: document.getElementById('al-merchant').checked, feedback: document.getElementById('al-feedback').checked, digest: document.getElementById('al-digest').checked })).data;
+      user: document.getElementById('al-user').checked, merchant: document.getElementById('al-merchant').checked, feedback: document.getElementById('al-feedback').checked, digest: document.getElementById('al-digest').checked })).data;
     out.innerHTML = '<span style="color:var(--mint-text);font-weight:700">Réglages enregistrés.</span> Alertes envoyées à ' + esc(r.to.join(', ')) + '.';
   } catch (e) { out.innerHTML = '<span style="color:var(--red-text)">' + esc(e.message) + '</span>'; }
 }

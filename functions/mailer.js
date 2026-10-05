@@ -54,7 +54,13 @@ function explain(e) {
 
 async function sendCore(ref, data) {
   if (!data || (data.delivery && data.delivery.state)) return { skipped: true };     // déjà traité
-  const to = (Array.isArray(data.to) ? data.to : [data.to]).filter(Boolean);
+  // Seules les alertes de l'équipe partent ; jamais vers une adresse de commerce fictif (test.noova.fr).
+  const all = (Array.isArray(data.to) ? data.to : [data.to]).filter(Boolean);
+  const to = all.filter((a) => !/@test\.noova\.fr$/i.test(String(a).trim()));
+  if (data.type !== "admin_alert" || (all.length && !to.length)) {
+    await ref.update({ delivery: { state: "SKIPPED", error: "Non envoyé : seuls les e-mails d'alerte de l'équipe NOOVA partent.", endTime: FieldValue.serverTimestamp() } });
+    return { skipped: true };
+  }
   const m = data.message || {};
   if (!to.length || !m.subject) {
     await ref.update({ delivery: { state: "ERROR", error: "E-mail incomplet (destinataire ou objet manquant).", endTime: FieldValue.serverTimestamp() } });

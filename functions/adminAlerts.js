@@ -18,7 +18,7 @@ const { ADMIN_EMAILS, parisDay } = require("./lib");
 
 const db = () => getFirestore();
 const CFG_REF = () => db().collection("config").doc("adminAlerts");
-const DEFAULTS = { to: ADMIN_EMAILS, merchant: true, feedback: true, digest: true };
+const DEFAULTS = { to: ADMIN_EMAILS, user: true, merchant: true, feedback: true, digest: true };
 const ADMIN_URL = "https://noovaoff.fr/noova_admin.html";
 const isAdmin = (request) => { const e = request.auth && request.auth.token && request.auth.token.email; return !!e && ADMIN_EMAILS.includes(e); };
 const escH = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -28,7 +28,7 @@ async function settings() {
   const s = await CFG_REF().get();
   const d = s.exists ? s.data() : {};
   const to = Array.isArray(d.to) && d.to.filter(validEmail).length ? d.to.filter(validEmail) : DEFAULTS.to;
-  return { to, merchant: d.merchant !== false, feedback: d.feedback !== false, digest: d.digest !== false };
+  return { to, user: d.user !== false, merchant: d.merchant !== false, feedback: d.feedback !== false, digest: d.digest !== false };
 }
 
 // Un e-mail dans la file d'envoi (functions/mailer.js). id déterministe : un déclencheur livré deux fois n'envoie qu'un e-mail.
@@ -61,6 +61,23 @@ async function onMerchantCore(mid, m) {
 }
 const alertNewMerchant = onDocumentCreated({ document: "merchants/{mid}", region: "europe-west1" }, async (event) => {
   await onMerchantCore(event.params.mid, event.data && event.data.data());
+});
+
+// ── Nouvel habitant inscrit
+async function onUserCore(uid, u) {
+  if (!u || (u.role && u.role !== "user")) return false;
+  const s = await settings();
+  if (!s.user) return false;
+  const name = u.name || "Un habitant";
+  await queueMail(`alert_user_${uid}`, s.to, `Nouvel inscrit : ${name}${u.cityLabel || u.city ? " (" + (u.cityLabel || u.city) + ")" : ""}`, [
+    `<b>${escH(name)}</b> vient de créer son compte NOOVA.`,
+    `Ville : ${escH(u.cityLabel || u.city || "pas encore renseignée")}.`,
+    u.email ? `E-mail : ${escH(u.email)}.` : "",
+  ].filter(Boolean), { label: "Voir les statistiques", url: ADMIN_URL });
+  return true;
+}
+const alertNewUser = onDocumentCreated({ document: "users/{uid}", region: "europe-west1" }, async (event) => {
+  await onUserCore(event.params.uid, event.data && event.data.data());
 });
 
 // ── Retour d'un testeur
@@ -115,7 +132,7 @@ const adminAlerts = onCall({ region: "europe-west1" }, async (request) => {
   if (d.action === "save") {
     const to = (Array.isArray(d.to) ? d.to : []).map((e) => String(e).trim()).filter(validEmail).slice(0, 5);
     if (!to.length) throw new HttpsError("invalid-argument", "Indique au moins une adresse e-mail valide.");
-    await CFG_REF().set({ to, merchant: d.merchant !== false, feedback: d.feedback !== false, digest: d.digest !== false, updatedAt: FieldValue.serverTimestamp() });
+    await CFG_REF().set({ to, user: d.user !== false, merchant: d.merchant !== false, feedback: d.feedback !== false, digest: d.digest !== false, updatedAt: FieldValue.serverTimestamp() });
     return settings();
   }
   if (d.action === "test") {
@@ -134,4 +151,4 @@ const adminAlerts = onCall({ region: "europe-west1" }, async (request) => {
   return settings();
 });
 
-module.exports = { alertNewMerchant, alertNewFeedback, adminDailyDigest, adminAlerts, _t: { onMerchantCore, onFeedbackCore, digestCore, settings } };
+module.exports = { alertNewUser, alertNewMerchant, alertNewFeedback, adminDailyDigest, adminAlerts, _t: { onUserCore, onMerchantCore, onFeedbackCore, digestCore, settings } };

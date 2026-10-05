@@ -26,11 +26,25 @@ const until=async(fn,t=15000)=>{const s=Date.now();while(Date.now()-s<t){if(awai
   const okF=await until(async()=>(await mails()).some(x=>x.id==='alert_feedback_f1'));
   const f=(await mails()).find(x=>x.id==='alert_feedback_f1')||{message:{}};
   check('Retour testeur : « Bug signalé », note, texte (échappé), appareil',okF&&/Bug signalé : Camille \(2\/5\)/.test(f.message.subject)&&/&lt;b&gt;ne marche pas/.test(f.message.html)&&/iphone/.test(f.message.text),f.message.subject);
+  // Nouvel habitant inscrit
+  await db.doc('users/new1').set({role:'user',name:'Inès',city:'le-mans',cityLabel:'Le Mans',email:'ines@t.fr',createdAt:Timestamp.now()});
+  await db.doc('users/merch1').set({role:'merchant',name:'Compte commerçant'});
+  const okU=await until(async()=>(await mails()).some(x=>x.id==='alert_user_new1'));
+  const um=(await mails()).find(x=>x.id==='alert_user_new1')||{message:{}};
+  check('Nouvel habitant : e-mail « Nouvel inscrit : Inès (Le Mans) »',okU&&/Nouvel inscrit : Inès \(Le Mans\)/.test(um.message.subject),um.message.subject);
+  await sleep(1500);
+  check('Compte commerçant dans users : pas d\'alerte « habitant »',!(await mails()).some(x=>x.id==='alert_user_merch1'));
+  // Les e-mails aux commerçants ne partent jamais, ni vers une adresse fictive
+  await db.collection('mail').doc('merchantmail').set({to:'boulanger@shop.fr',type:'resultat',message:{subject:'Vos premières réponses',text:'x'}});
+  await db.collection('mail').doc('fakeaddr').set({to:'test_angers_superette@test.noova.fr',type:'admin_alert',message:{subject:'x',text:'x'}});
+  await until(async()=>{const a=(await db.doc('mail/merchantmail').get()).data(),b=(await db.doc('mail/fakeaddr').get()).data();return a.delivery&&b.delivery;});
+  check('Envoi : un e-mail qui n\'est pas une alerte de l\'équipe n\'est jamais envoyé',((await db.doc('mail/merchantmail').get()).data().delivery||{}).state==='SKIPPED');
+  check('Envoi : jamais vers une adresse de commerce fictif (test.noova.fr)',((await db.doc('mail/fakeaddr').get()).data().delivery||{}).state==='SKIPPED');
   // Résumé du soir
   for(let i=0;i<3;i++)await db.doc('users/u'+i).set({role:'user',city:'le-mans',createdAt:Timestamp.now(),dailyAnswerDate:require(__dirname+'/../functions/lib.js').parisDay(Date.now()),lastAnswerDate:require(__dirname+'/../functions/lib.js').parisDay(Date.now())});
   const d=await A.digestCore(Date.now());
   const dg=(await mails()).find(x=>x.id.startsWith('alert_digest_'))||{message:{}};
-  check('Résumé du soir : inscriptions, actifs, réponses, commerces en attente, retours à traiter',d.sent&&/3 inscriptions/.test(dg.message.subject)&&/1 en attente de validation/.test(dg.message.text)&&/Retours à traiter : 1/.test(dg.message.text),dg.message.subject);
+  check('Résumé du soir : inscriptions, actifs, réponses, commerces en attente, retours à traiter',d.sent&&/4 inscriptions/.test(dg.message.subject)&&/1 en attente de validation/.test(dg.message.text)&&/Retours à traiter : 1/.test(dg.message.text),dg.message.subject);
   await A.digestCore(Date.now());
   check('Résumé : un seul par jour (id déterministe)',(await mails()).filter(x=>x.id.startsWith('alert_digest_')).length===1);
   // Réglages (callable admin)
@@ -51,8 +65,8 @@ const until=async(fn,t=15000)=>{const s=Date.now();while(Date.now()-s<t){if(awai
   check('Envoi : la fonction d\'envoi traite l\'e-mail et l\'admin lit « SUCCESS »',st.exists===true&&st.state==='SUCCESS',st);
   // Toutes les alertes de ce test ont été envoyées par la fonction d'envoi (aucune extension)
   const all=await mails();
-  check('Envoi : chaque e-mail de la file reçoit un résultat (SUCCESS en test, sans envoi réel)',all.length>=4&&all.every(m=>m.delivery&&m.delivery.state==='SUCCESS'),all.map(m=>[m.id,m.delivery&&m.delivery.state]));
-  await db.collection('mail').doc('bad1').set({message:{subject:'Sans destinataire'}});
+  check('Envoi : chaque alerte de la file est envoyée (SUCCESS en test, sans envoi réel)',all.filter(m=>m.type==='admin_alert'&&!/test\.noova/.test(m.to)).length>=4&&all.filter(m=>m.type==='admin_alert'&&!/test\.noova/.test(String(m.to))).every(m=>m.delivery&&m.delivery.state==='SUCCESS'),all.map(m=>[m.id,m.delivery&&m.delivery.state]));
+  await db.collection('mail').doc('bad1').set({type:'admin_alert',message:{subject:'Sans destinataire'}});
   await until(async()=>{const d=(await db.doc('mail/bad1').get()).data();return d.delivery&&d.delivery.state==='ERROR';});
   check('Envoi : un e-mail incomplet est marqué en erreur avec une explication',/incomplet/.test(((await db.doc('mail/bad1').get()).data().delivery||{}).error||''));
   const MX=require(__dirname+'/../functions/mailer.js')._t;
