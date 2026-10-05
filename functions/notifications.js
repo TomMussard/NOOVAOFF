@@ -25,6 +25,11 @@ const QUIET_FROM = 21 * 60;      // 21h
 const QUIET_TO = 9 * 60;         // 9h
 const DEFAULT_HABIT_MIN = 12 * 60 + 30;
 const DAILY_CAP = 3;             // notifications « normales » par jour (+1 pour un type exceptionnel : série, récompense, code)
+// Questions des commerces suivis : compteur à part (l'habitant a choisi de suivre ces commerces), 6 par jour au plus,
+// relance comprise. Elles ne prennent pas les créneaux des autres notifications.
+const SUIVI_CAP = 6;
+const RELANCE_AFTER_MS = 3 * 3600000;   // relance 3 h après la question si l'habitant n'a toujours pas répondu
+const RELANCE_UNTIL = 20 * 60 + 30;     // pas de relance après 20h30 (le silence commence à 21h)
 const WEEKLY_AFTER_MISSES = 3;
 const OFF_AFTER_MISSES = 6;
 const MISS_AFTER_MS = 24 * 3600000;
@@ -43,6 +48,12 @@ const TYPES = {
   // Nouvelle question de l'après-midi : un commerce vient de poser une question aujourd'hui (heure propre à chaque
   // habitant, tirée au hasard entre 14h et 17h30, pour que les envois ne tombent pas tous à la même minute).
   nouvelle_question:    { group: "question",    nudge: false, gapDays: 1 },
+  // Un commerce que l'habitant suit (ou NOOVA) vient de poser une question : envoyée tout de suite, une par question.
+  // Pas de ralentissement automatique : l'habitant a choisi de suivre ce commerce (il peut le retirer ou couper
+  // « Mes questions »). Une question posée pendant le silence part à 9h si elle est encore récente.
+  question_suivi:       { group: "question",    nudge: false, ownCap: SUIVI_CAP, noDecay: true, deferQuiet: true, ttlH: 14 },
+  // Relance unique de la journée : 3 h après une question suivie restée sans réponse.
+  relance_question:     { group: "question",    nudge: false, gapDays: 1, ownCap: SUIVI_CAP },
   nouveau_commerce:     { group: "commerces",   nudge: true,  gapDays: 7, deferQuiet: true, ttlH: 24 },
   resultat_dispo:       { group: "resultats",   nudge: false, deferQuiet: true, deferBusy: true, ttlH: 72 },
   recompense_debloquee: { group: "recompenses", nudge: false, exceptional: true, deferQuiet: true, deferBusy: true, ttlH: 48 },
@@ -54,7 +65,7 @@ const TYPES = {
   impact:               { group: "actualites",  nudge: false, deferQuiet: true, ttlH: 48 },
 };
 const GROUPS = {
-  question: ["question_du_jour", "nouvelle_question", "rappel_soir"],
+  question: ["question_du_jour", "nouvelle_question", "question_suivi", "relance_question", "rappel_soir"],
   commerces: ["nouveau_commerce"],
   resultats: ["resultat_dispo"],
   serie: ["serie_en_danger"],
@@ -95,6 +106,10 @@ function finish(o) {
   return { title, body, screen: o.screen || "home" };
 }
 const copy = {
+  questionSuivi: ({ merchant, byNoova }) => byNoova
+    ? finish({ title: "NOOVA vient de poser une question", body: "30 secondes, et des NOOVS à la clé", screen: "home" })
+    : finish({ title: `${short(merchant, 30)} vient de poser une question`, body: "Réponds en 30 secondes, +10 points", screen: "home" }),
+  relance: ({ merchant, byNoova }) => finish({ title: byNoova ? "La question de NOOVA t'attend" : `La question de ${short(merchant, 30)} t'attend`, body: byNoova ? "30 secondes, et des NOOVS à la clé" : "30 secondes, +10 points", screen: "home" }),
   nouvelleQuestion: ({ merchant, byNoova }) => byNoova
     ? finish({ title: "NOOVA te pose une question", body: "30 secondes, et des NOOVS à la clé", screen: "home" })
     : finish({ title: `${short(merchant, 30)} vient de poser une question`, body: "Sois parmi les premiers à répondre", screen: "home" }),
@@ -181,17 +196,18 @@ async function deliver(uid, type, content, opts = {}) {
     if (!tokens.length) { out = { status: "skip", reason: "no_push" }; return; }
     if ((u.notifPrefs || {})[cfg.group] === false) { out = { status: "skip", reason: "pref_off" }; return; }
     const stat = (u.notifStats || {})[type] || {};
-    if (stat.autoOff) { out = { status: "skip", reason: "auto_off" }; return; }
+    if (stat.autoOff && !cfg.noDecay) { out = { status: "skip", reason: "auto_off" }; return; }
     if (isQuiet(p)) { out = { status: "blocked", reason: "quiet" }; return; }
     if (cfg.nudge && answeredToday(u, p.day)) { out = { status: "skip", reason: "answered_today" }; return; }
-    const weekly = !!stat.weekly || cfg.gapDays >= 7;
+    const weekly = (!!stat.weekly && !cfg.noDecay) || cfg.gapDays >= 7;
     if (weekly) { if (now - (stat.lastSentAt || 0) < 7 * DAY - 3600000) { out = { status: "skip", reason: "weekly" }; return; } }
     else if (cfg.gapDays === 1 && stat.lastSentDay === p.day) { out = { status: "skip", reason: "once_a_day" }; return; }
-    const daily = u.notifDaily && u.notifDaily.date === p.day ? u.notifDaily.count || 0 : 0;
-    if (daily >= (cfg.exceptional ? DAILY_CAP + 1 : DAILY_CAP)) { out = { status: "blocked", reason: "cap" }; return; }   // 3/jour, 4 avec un type exceptionnel
+    const nd = u.notifDaily && u.notifDaily.date === p.day ? u.notifDaily : {};
+    const daily = nd.count || 0, suivi = nd.suivi || 0;
+    if (cfg.ownCap ? suivi >= cfg.ownCap : daily >= (cfg.exceptional ? DAILY_CAP + 1 : DAILY_CAP)) { out = { status: "blocked", reason: "cap" }; return; }   // 3/jour, 4 avec un type exceptionnel ; questions suivies à part
 
     tx.update(userRef, {
-      notifDaily: { date: p.day, count: daily + 1 },
+      notifDaily: cfg.ownCap ? { date: p.day, count: daily, suivi: suivi + 1 } : { date: p.day, count: daily + 1, suivi },
       [`notifStats.${type}.sent`]: FieldValue.increment(1),
       [`notifStats.${type}.lastSentAt`]: now,
       [`notifStats.${type}.lastSentDay`]: p.day,
@@ -208,7 +224,7 @@ async function deliver(uid, type, content, opts = {}) {
     };
     let res = null;
     try { res = await sendPush(uid, out.tokens, payload); } catch (e) { logger.error("sendPush", { message: e.message, type }); }
-    if (!res || res.successCount === 0) await revertSend(uid, type, logId, p.day).catch(() => {});
+    if (!res || res.successCount === 0) await revertSend(uid, type, logId, p.day, !!cfg.ownCap).catch(() => {});
     return { status: "sent", nid: logId };
   }
   if (out.status === "blocked") {
@@ -228,10 +244,10 @@ async function deliver(uid, type, content, opts = {}) {
 
 // Envoi FCM totalement échoué : on annule la comptabilité (sinon l'habitant serait pénalisé par la
 // décroissance pour une notification qu'il n'a jamais pu recevoir).
-async function revertSend(uid, type, logId, day) {
+async function revertSend(uid, type, logId, day, own = false) {
   const batch = db().batch();
   batch.update(db().collection("notifLog").doc(logId), { status: "failed" });
-  batch.update(db().collection("users").doc(uid), { [`notifStats.${type}.sent`]: FieldValue.increment(-1), [`notifStats.${type}.lastSentDay`]: "", "notifDaily.count": FieldValue.increment(-1) });
+  batch.update(db().collection("users").doc(uid), { [`notifStats.${type}.sent`]: FieldValue.increment(-1), [`notifStats.${type}.lastSentDay`]: "", [own ? "notifDaily.suivi" : "notifDaily.count"]: FieldValue.increment(-1) });
   batch.set(db().collection("notifMetrics").doc(type), { sent: FieldValue.increment(-1) }, { merge: true });
   await batch.commit();
 }
@@ -283,8 +299,9 @@ async function processMisses(now) {
       const st = ((u.data().notifStats || {})[type]) || {};
       const ms = (st.missStreak || 0) + 1;
       const upd = { [`notifStats.${type}.missStreak`]: ms };
-      if (ms >= WEEKLY_AFTER_MISSES) upd[`notifStats.${type}.weekly`] = true;
-      if (ms >= OFF_AFTER_MISSES && !st.autoOff) {
+      const decay = !(TYPES[type] && TYPES[type].noDecay);
+      if (decay && ms >= WEEKLY_AFTER_MISSES) upd[`notifStats.${type}.weekly`] = true;
+      if (decay && ms >= OFF_AFTER_MISSES && !st.autoOff) {
         upd[`notifStats.${type}.autoOff`] = true;
         tx.set(db().collection("notifMetrics").doc(type), { autoDisabled: FieldValue.increment(1) }, { merge: true });
       }
@@ -382,7 +399,7 @@ function afternoonSlot(uid, day) {
 // ─────────────────────────── Tick planifié ───────────────────────────
 async function runTick(now = Date.now()) {
   const p = parisParts(now);
-  const out = { queue: await drainQueue(now), misses: await processMisses(now), qdj: 0, nouvelle: 0, soir: 0, serie: 0, code: 0, ending: 0 };
+  const out = { queue: await drainQueue(now), misses: await processMisses(now), qdj: 0, nouvelle: 0, relance: 0, soir: 0, serie: 0, code: 0, ending: 0 };
   const caches = await loadCaches(now);
   const users = await db().collection("users").where("pushEnabled", "==", true).get();
 
@@ -391,9 +408,14 @@ async function runTick(now = Date.now()) {
     if (!u.city || !uniq(u.fcmTokens).length) return;
     const city = String(u.city).toLowerCase();
     const avail = availableFor(u, caches.campaigns.get(city));
+    const stats = u.notifStats || {};
+    // Une question d'un commerce suivi a déjà été envoyée aujourd'hui : les rendez-vous à heure fixe (question du jour,
+    // nouvelle question de l'après-midi) ne servent plus, ils restent pour qui ne suit encore aucun commerce.
+    const suiviToday = (stats.question_suivi || {}).lastSentDay === p.day;
+    let sentNow = false;   // une notification « question » vient de partir dans ce passage
     // Question du jour : à l'heure habituelle de réponse, jamais si déjà répondu, jamais sans question à répondre.
-    if (p.min >= habitMinutes(u) && p.min < QUIET_FROM && avail.length && !answeredToday(u, p.day)
-        && ((u.notifStats || {}).question_du_jour || {}).lastSentDay !== p.day) {
+    if (!suiviToday && p.min >= habitMinutes(u) && p.min < QUIET_FROM && avail.length && !answeredToday(u, p.day)
+        && (stats.question_du_jour || {}).lastSentDay !== p.day) {
       let content = copy.questionDuJour({ merchant: avail[0].merchantName });
       // « Récompense imminente » : jamais envoyée seule, fusionnée avec la question du jour.
       if (((u.notifPrefs || {}).recompenses) !== false) {
@@ -401,22 +423,34 @@ async function runTick(now = Date.now()) {
         if (near && (near.left === 1 || near.left === 2)) content = copy.imminent({ left: near.left, reward: near.reward.label, rewardMerchant: near.reward.merchantName });
       }
       const r = await deliver(uid, "question_du_jour", content, { key: p.day, now });
-      if (r.status === "sent") out.qdj++;
+      if (r.status === "sent") { out.qdj++; sentNow = true; }
     }
     // Nouvelle question de l'après-midi : à l'heure tirée pour cet habitant aujourd'hui (14h-17h30), s'il y a une
     // question publiée aujourd'hui qu'il n'a pas encore vue.
     const fresh = avail.find((c) => toMs(c.createdAt) && parisParts(toMs(c.createdAt)).day === p.day);
-    if (fresh && p.min >= afternoonSlot(uid, p.day) && p.min < 18 * 60 + 30
-        && ((u.notifStats || {}).nouvelle_question || {}).lastSentDay !== p.day) {
+    if (fresh && !suiviToday && p.min >= afternoonSlot(uid, p.day) && p.min < 18 * 60 + 30
+        && (stats.nouvelle_question || {}).lastSentDay !== p.day) {
       const r = await deliver(uid, "nouvelle_question", copy.nouvelleQuestion({ merchant: fresh.merchantName, byNoova: !fresh.merchantId }), { key: p.day, now });
-      if (r.status === "sent") out.nouvelle++;
+      if (r.status === "sent") { out.nouvelle++; sentNow = true; }
+    }
+    // Relance : une question d'un commerce suivi (ou de NOOVA), publiée aujourd'hui il y a 3 h ou plus, toujours sans
+    // réponse. Une seule par jour, jamais après 20h30, et jamais moins de 2 h après une autre notification « question »
+    // (elle attend le passage suivant : deux notifications coup sur coup feraient doublon).
+    const follows = (c) => !c.merchantId || (u.authorizedMerchants || []).includes(c.merchantId);
+    const pending = avail.find((c) => follows(c) && toMs(c.createdAt) && parisParts(toMs(c.createdAt)).day === p.day && now - toMs(c.createdAt) >= RELANCE_AFTER_MS);
+    let relanceToday = (stats.relance_question || {}).lastSentDay === p.day;
+    const lastQ = Math.max(0, ...["question_du_jour", "nouvelle_question", "question_suivi"].map((t) => (stats[t] || {}).lastSentAt || 0));
+    if (pending && !relanceToday && !sentNow && now - lastQ >= 2 * 3600000 && p.min >= QUIET_TO && p.min < RELANCE_UNTIL) {
+      const r = await deliver(uid, "relance_question", copy.relance({ merchant: pending.merchantName, byNoova: !pending.merchantId }), { key: p.day, now });
+      if (r.status === "sent") { out.relance++; relanceToday = true; }
     }
     // Rappel du soir (18h30-18h59) : 2e notification du jour, s'il reste des questions et des points à prendre
     // (moins de 3 réponses aujourd'hui). Jamais pour qui recevra l'alerte « série en danger » à 20h (pas de doublon).
     const doneToday = u.dailyAnswerDate === p.day ? (u.dailyAnswerCount || 0) : 0;
     const serieAtRisk = (u.streak || 0) >= 3 && (u.streakDate !== undefined ? u.streakDate : u.lastAnswerDate) === yesterdayDay(now) && !answeredToday(u, p.day);
+    // Pas de rappel du soir le jour d'une relance (elle a déjà fait ce travail).
     if (p.hour === 18 && p.minute >= 30 && avail.length && doneToday < CFG.POINTS.MAX_ANSWERS_PER_DAY && !serieAtRisk
-        && ((u.notifStats || {}).rappel_soir || {}).lastSentDay !== p.day) {
+        && !relanceToday && (stats.rappel_soir || {}).lastSentDay !== p.day) {
       const m = (avail[1] || avail[0]).merchantName;
       const r = await deliver(uid, "rappel_soir", copy.rappelSoir({ merchant: m, answered: doneToday }), { key: p.day, now });
       if (r.status === "sent") out.soir++;
@@ -557,20 +591,23 @@ const notifTick = onSchedule({ schedule: "every 15 minutes", timeZone: "Europe/P
   logger.info("notifTick", r);
 });
 
-// Un commerce lance une campagne → « nouveau commerce » pour les habitants de sa ville et de ses catégories.
+// Une question est publiée → tout de suite, « X vient de poser une question » pour les habitants qui suivent ce
+// commerce (et pour tous, si c'est NOOVA qui la pose) ; « nouveau commerce » (une fois par semaine au plus) pour les
+// autres habitants de sa ville et de ses catégories.
 const notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (event) => {
   const camp = event.data && event.data.data();
   if (!camp) return;
   // Quota mensuel de questions : comptabilisé pour toute nouvelle campagne ; au-delà, elle est bloquée et jamais notifiée.
   if (!(await require("./quota")._t.accountCampaign(event.params.campaignId, camp))) return;
   if (camp.status !== "active") return;
-  // Question posée par NOOVA elle-même (pas un commerce) : pas de fiche commerce à notifier
-  // comme « nouveau commerce » — ce type de notification ne s'applique qu'aux campagnes de commerçants.
-  if (!camp.merchantId) return;
+  // Relue au moment d'envoyer : une question supprimée ou arrêtée entre-temps ne déclenche rien.
+  const cur = await event.data.ref.get();
+  if (!cur.exists || cur.data().status !== "active") return;
   const city = String(camp.targetCity || camp.city || "").toLowerCase();
   if (!city) return;
-  const m = await db().collection("merchants").doc(camp.merchantId).get();
-  const sector = m.exists ? m.data().sector : camp.sector;
+  const m = camp.merchantId ? await db().collection("merchants").doc(camp.merchantId).get() : null;
+  const sector = m && m.exists ? m.data().sector : camp.sector;
+  const id = event.params.campaignId, byNoova = !camp.merchantId;
   const snap = await db().collection("users").where("city", "==", city).where("pushEnabled", "==", true).get();
   const work = snap.docs.filter((d) => {
     const u = d.data();
@@ -578,10 +615,12 @@ const notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (eve
     const age = u.ageRange || u.age || "";
     if ((camp.ageRanges || []).length && age && !camp.ageRanges.includes(age)) return false;
     if (!INTERESTS.targetsUser(camp.targetInterests, u.interests)) return false;
-    return !(u.declinedMerchants || []).includes(camp.merchantId) && !(u.answeredCampaigns || []).includes(event.params.campaignId) && matchesCategory(u, sector);
-  }).map((d) => () => deliver(d.id, "nouveau_commerce",
-    copy.nouveauCommerce({ merchant: camp.merchantName, known: (d.data().authorizedMerchants || []).includes(camp.merchantId) }),
-    { key: event.params.campaignId }));
+    if ((u.answeredCampaigns || []).includes(id)) return false;
+    if (byNoova || (u.authorizedMerchants || []).includes(camp.merchantId)) return true;            // suivi : toujours prévenu
+    return !(u.declinedMerchants || []).includes(camp.merchantId) && matchesCategory(u, sector);
+  }).map((d) => () => (byNoova || (d.data().authorizedMerchants || []).includes(camp.merchantId)
+    ? deliver(d.id, "question_suivi", copy.questionSuivi({ merchant: camp.merchantName, byNoova }), { key: id })
+    : deliver(d.id, "nouveau_commerce", copy.nouveauCommerce({ merchant: camp.merchantName, known: false }), { key: id })));
   for (let i = 0; i < work.length; i += 20) await Promise.all(work.slice(i, i + 20).map((f) => f()));
 });
 

@@ -90,7 +90,7 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await tick(D1, hm(Math.max(840, slot - 15)));
     check('Après-midi : rien avant son heure', slot - 15 < 840 || (await sink('n1')).length === 0);
     await tick(D1, hm(slot)); await tick(D1, '17:59');
-    const s1 = await sink('n1');
+    const s1 = (await sink('n1')).filter(x => x.ntype !== 'relance_question');
     check('Après-midi : « Café Plume vient de poser une question », une seule fois, même s\'il a déjà répondu aujourd\'hui', s1.length === 1 && s1[0].ntype === 'nouvelle_question' && s1[0].title === 'Café Plume vient de poser une question', s1.map(x => [x.ntype, x.title]));
   });
   await T('questions NOOVA et week-end', async () => {
@@ -99,7 +99,7 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await mkCampaign('nq', { merchantId: null, merchantName: 'NOOVA', postedByNoova: true, createdAt: Timestamp.fromMillis(at(SAT, '08:00')) });
     await mkUser('w', { authorizedMerchants: [] });
     await tick(SAT, '12:30');
-    const s = await sink('w');
+    const s = (await sink('w')).filter(x => x.ntype !== 'relance_question');
     check('Samedi : la question du jour part aussi le week-end', s.length === 1 && s[0].ntype === 'question_du_jour', s.map(x => x.ntype));
     check('Une question posée par NOOVA déclenche bien les notifications (sans commerce à suivre)', s[0] && /NOOVA/.test(s[0].title), s[0] && s[0].title);
   });
@@ -236,7 +236,7 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     const sa = await sink('A');
     check('Nouveau commerce (pas encore autorisé) : titre, corps, sans spoil', sa[0] && sa[0].title === 'Boulangerie Martin veut te poser une question' && !sa[0].body.includes('boisson'), sa[0] && [sa[0].title, sa[0].body]);
     const sd = await sink('D');
-    check('Nouveau commerce (déjà autorisé) : « veut ton avis » + gain', sd[0] && sd[0].title === 'Boulangerie Martin veut ton avis' && sd[0].body === '30 secondes, +10 points', sd[0] && [sd[0].title, sd[0].body]);
+    check('Commerce suivi : « vient de poser une question » tout de suite, avec le gain', sd[0] && sd[0].ntype === 'question_suivi' && sd[0].title === 'Boulangerie Martin vient de poser une question' && sd[0].body === 'Réponds en 30 secondes, +10 points', sd[0] && [sd[0].ntype, sd[0].title, sd[0].body]);
     check('Nouveau commerce : pas hors catégorie / autre ville / refus / sans push', await has('B') === 0 && await has('C') === 0 && await has('E') === 0 && await has('F') === 0);
     check('Nouveau commerce : profil ancien sans catégorie = tout', await has('G') === 1);
     await mkMerchant('m3', { brandName: 'Salon Belle', sector: 'Beauté' });
@@ -255,6 +255,66 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     check('Nouveau commerce lancé la nuit : mis en file jusqu\'à 9h (ou refusé par la limite hebdo)', q.size >= 0 && (await sink('G')).length === 2);
   });
 
+  // ═════════ QUESTIONS DES COMMERCES SUIVIS : TOUT DE SUITE + RELANCE ═════════
+  await T('question suivie', async () => {
+    await wipe();
+    await setClock(at(D1, '10:05'));
+    for (const [id, name, sector] of [['s1', 'Café Plume', 'Café'], ['s2', 'Salon Belle', 'Coiffeur'], ['s3', 'Fleurs du Mans', 'Fleuriste'], ['s4', 'Le Zinc', 'Bar']]) await mkMerchant(id, { brandName: name, sector });
+    await mkUser('F1', { interests: ['sport'], authorizedMerchants: ['s1', 's2', 's3', 's4'] });   // suit tout, autres centres d'intérêt
+    await mkUser('F2', { authorizedMerchants: [] });                                                // ne suit personne
+    await mkCampaign('q1', { merchantId: 's1', merchantName: 'Café Plume', sector: 'Café', createdAt: Timestamp.fromMillis(at(D1, '10:05')) });
+    await until(async () => (await sink('F1')).length === 1, 30000);
+    let s = await sink('F1');
+    check('Suivi : notification immédiate dès que le commerce pose sa question (même hors de ses centres d\'intérêt)', s.length === 1 && s[0].ntype === 'question_suivi' && s[0].title === 'Café Plume vient de poser une question', s.map(x => [x.ntype, x.title]));
+    check('Suivi : la question n\'est pas révélée', s[0] && !(s[0].title + s[0].body).includes('boisson'));
+    for (const [i, id, name] of [[2, 's2', 'Salon Belle'], [3, 's3', 'Fleurs du Mans'], [4, 's4', 'Le Zinc']]) {
+      await setClock(at(D1, `1${i}:00`));
+      await mkCampaign('q' + i, { merchantId: id, merchantName: name, createdAt: Timestamp.fromMillis(at(D1, `1${i}:00`)) });
+    }
+    await until(async () => (await sink('F1')).length === 4, 30000);
+    s = await sink('F1');
+    check('Suivi : une notification par question, sans être bloquée par le plafond des 3 notifications normales', s.length === 4 && s.every(x => x.ntype === 'question_suivi'), s.map(x => x.ntype));
+    const u = (await db.doc('users/F1').get()).data();
+    check('Suivi : compteur à part, les 3 créneaux normaux restent libres', u.notifDaily.suivi === 4 && (u.notifDaily.count || 0) === 0, u.notifDaily);
+    await tick(D1, '12:30');
+    check('Suivi : pas de « question du jour » à heure fixe le jour où ses commerces l\'ont déjà prévenu', (await sink('F1')).filter(x => x.ntype === 'question_du_jour').length === 0);
+    check('Ne suit personne : la question du jour à 12h30 reste son rendez-vous', (await sink('F2')).filter(x => x.ntype === 'question_du_jour').length === 1, (await sink('F2')).map(x => x.ntype));
+    await tick(D1, '13:00');
+    check('Relance : rien avant 3 h', (await sink('F1')).filter(x => x.ntype === 'relance_question').length === 0);
+    await tick(D1, '13:15');
+    check('Relance : jamais moins de 2 h après une autre notification de question (doublon)', (await sink('F1')).filter(x => x.ntype === 'relance_question').length === 0);
+    await tick(D1, '16:15'); await tick(D1, '17:00');
+    s = (await sink('F1')).filter(x => x.ntype === 'relance_question');
+    check('Relance : 3 h après la question restée sans réponse, une seule par jour', s.length === 1 && /t'attend/.test(s[0].title), s.map(x => x.title));
+    await tick(D1, '18:30');
+    check('Relance : pas de rappel du soir en plus le même jour', (await sink('F1')).filter(x => x.ntype === 'rappel_soir').length === 0);
+    // Répondu : pas de relance le lendemain pour cette question
+    await db.doc('users/F1').update({ answeredCampaigns: ['q1', 'q2', 'q3', 'q4'] });
+    await setClock(at(addDays(D1, 1), '09:30'));
+    await mkCampaign('q5', { merchantId: 's1', merchantName: 'Café Plume', createdAt: Timestamp.fromMillis(at(addDays(D1, 1), '09:30')) });
+    await until(async () => (await sink('F1')).filter(x => x.ntype === 'question_suivi').length === 5, 30000);
+    await db.doc('users/F1').update({ answeredCampaigns: ['q1', 'q2', 'q3', 'q4', 'q5'] });
+    await tick(addDays(D1, 1), '13:00');
+    check('Relance : jamais pour une question déjà répondue', (await sink('F1')).filter(x => x.ntype === 'relance_question').length === 1);
+    // Question publiée la nuit : part à 9h
+    await setClock(at(addDays(D1, 1), '22:10'));
+    await mkCampaign('q6', { merchantId: 's2', merchantName: 'Salon Belle', createdAt: Timestamp.fromMillis(at(addDays(D1, 1), '22:10')) });
+    await until(async () => (await db.collection('notifQueue').get()).size >= 1, 15000);
+    check('Suivi : question publiée pendant le silence, rien la nuit', (await sink('F1')).filter(x => x.ntype === 'question_suivi').length === 5);
+    await N.drainQueue(at(addDays(D1, 2), '09:00'));
+    check('Suivi : envoyée à 9h le lendemain', (await sink('F1')).filter(x => x.ntype === 'question_suivi').length === 6);
+    // Question de NOOVA : tout le monde est prévenu
+    await setClock(at(addDays(D1, 2), '11:00'));
+    await mkCampaign('qn', { merchantId: null, merchantName: 'NOOVA', postedByNoova: true, createdAt: Timestamp.fromMillis(at(addDays(D1, 2), '11:00')) });
+    await until(async () => (await sink('F2')).some(x => x.ntype === 'question_suivi'), 30000);
+    const n2 = (await sink('F2')).filter(x => x.ntype === 'question_suivi');
+    check('Question de NOOVA : notification immédiate pour tous les habitants de la ville', n2.length === 1 && n2[0].title === 'NOOVA vient de poser une question', n2.map(x => x.title));
+    // Pas de ralentissement automatique pour les commerces suivis
+    await db.doc('users/F1').update({ 'notifStats.question_suivi.missStreak': 9, 'notifStats.question_suivi.weekly': true, 'notifStats.question_suivi.autoOff': true });
+    const r = await N.deliver('F1', 'question_suivi', N.copy.questionSuivi({ merchant: 'Le Zinc' }), { key: 'zz', now: at(addDays(D1, 2), '12:00') });
+    check('Suivi : jamais coupée automatiquement (l\'habitant a choisi de suivre ce commerce)', r.status === 'sent', r);
+  });
+
   // ═════════ RÉSULTAT DISPONIBLE, RÉCOMPENSE, AMIS, CODE ═════════
   await T('results', async () => {
     await wipe();
@@ -269,19 +329,20 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await batch.commit();
     await sleep(2500);
     await db.doc('campaigns/c50').update({ answersCount: 50 });
-    await until(async () => (await db.collection('_pushSink').get()).size >= 50, 20000);
-    const a = await sink('r0'), b = await sink('r40');
-    check('Résultat dispo : envoyé aux 50 répondants au 50e', (await db.collection('_pushSink').get()).size === 50);
+    await until(async () => (await db.collection('_pushSink').where('ntype', '==', 'resultat_dispo').get()).size >= 50, 20000);
+    const rs = async (u) => (await sink(u)).filter(x => x.ntype === 'resultat_dispo');
+    const a = await rs('r0'), b = await rs('r40');
+    check('Résultat dispo : envoyé aux 50 répondants au 50e', (await db.collection('_pushSink').where('ntype', '==', 'resultat_dispo').get()).size === 50);
     check('Résultat dispo : « 62 % de tes voisins pensent comme toi »', a[0] && a[0].title === '62 % de tes voisins pensent comme toi' && a[0].body === 'Découvre le résultat de Le Fournil', a[0] && [a[0].title, a[0].body]);
     check('Résultat dispo : pourcentage propre à chaque réponse (38 %)', b[0] && b[0].title === '38 % de tes voisins pensent comme toi', b[0] && b[0].title);
     await db.doc('campaigns/c50').update({ answersCount: 51 }); await sleep(2500);
-    check('Résultat dispo : une seule fois', (await db.collection('_pushSink').get()).size === 50);
+    check('Résultat dispo : une seule fois', (await db.collection('_pushSink').where('ntype', '==', 'resultat_dispo').get()).size === 50);
     await mkCampaign('ctext', { answersCount: 49, questions: [{ q: QUESTION, format: 'text' }], format: 'text' });
     for (let i = 0; i < 3; i++) await db.doc(`answers/r${i}_ctext_q0`).set({ userId: 'r' + i, campaignId: 'ctext', merchantId: 'm1', questionIdx: 0, answer: 'libre ' + i, pointsAwarded: 0, flagged: false, brand: 'Le Fournil' });
     await setClock(at(addDays(D1, 1), '14:00'));
     await db.doc('campaigns/ctext').update({ answersCount: 50 });
-    await until(async () => (await sink('r0')).length === 2);
-    const t = (await sink('r0'))[1];
+    await until(async () => (await rs('r0')).length === 2);
+    const t = (await rs('r0'))[1];
     check('Résultat dispo (réponse libre) : formulation sans pourcentage', t && t.title === 'Les résultats de Le Fournil sont là', t && t.title);
   });
   await T('reward unlocked', async () => {
