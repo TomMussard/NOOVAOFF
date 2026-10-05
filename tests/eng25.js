@@ -78,7 +78,7 @@ const login=async(p,email)=>{await p.goto(APP,{waitUntil:'load'});await wf(p,()=
       return {pts:top('.wpts-card'),cur:top('#dprog-count'),feat:top('#reward-featured-wrap'),noov:top('.noov-card'),xp:top('#tier-track-wrap'),len:document.getElementById('rewards-tab').innerText.length,txt:document.getElementById('rewards-tab').innerText.replace(/\s+/g,' '),ptsN:document.getElementById('wc-pts-num-hdr').textContent,tiles:document.querySelectorAll('#noov-rewards .noov-tile').length,longp:[...document.querySelectorAll('#rewards-tab p, #rewards-tab .noov-d, #rewards-tab .ns-d')].length};});
     check('Ordre : 1) points, 2) récompenses en cours, 3) NOOVS, 4) XP',w.pts>=0&&w.pts<w.cur&&w.cur<w.noov&&w.noov<w.xp,w);
     check('Le solde de points est en grand (120), les NOOVS (12) ont leur pièce',w.ptsN==='120'&&/12 NOOVS/.test(w.txt),w.ptsN);
-    check('Beaucoup moins de texte : plus de paragraphe explicatif, 4 pastilles « Bientôt » d\'un mot, moins de 450 caractères en tout',w.longp===0&&w.tiles===4&&w.len<450,{len:w.len,txt:w.txt});
+    check('Beaucoup moins de texte : plus de paragraphe explicatif, 3 pastilles « Bientôt » d\'un mot (plus d\'échange contre de l\'argent), moins de 450 caractères en tout',w.longp===0&&w.tiles===3&&w.len<450,{len:w.len,txt:w.txt});
     await p.evaluate(()=>{NV_ASSETS.points='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="red"/></svg>';refreshWallet();});
     check('Icône des points personnalisable (NV_ASSETS.points → image)',await p.evaluate(()=>!!document.querySelector('#wpts-ico img')));
     await p.evaluate(()=>{NV_ASSETS.points='';refreshWallet();});await sleep(300);

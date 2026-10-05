@@ -30,7 +30,17 @@ async function mkUser(uid, o = {}) {
 async function mkMerchant(id, o = {}) {
   await db.doc('merchants/' + id).set({ brandName: 'Le Fournil', name: 'Le Fournil', sector: 'Boulangerie', city: 'le-mans', cityLabel: 'Le Mans', status: 'verified', email: id + '@shop.fr', ...o });
 }
+// Une nouvelle question déclenche « question suivie » (notifyNewCampaign). On attend que ce déclencheur ait fini avant
+// de créer les habitants, sinon, quand l'émulateur est chargé, il les trouve et fausse les tests des envois planifiés.
+async function settle(id, mid) {
+  if (mid) await until(async () => (await db.doc(`merchants/${mid}/quotaLedger/${id}`).get()).exists, 15000);
+  await sleep(mid ? 700 : 2500);
+}
 async function mkCampaign(id, o = {}) {
+  await mkCampaignRaw(id, o);
+  await settle(id, o.merchantId === undefined ? 'm1' : o.merchantId);
+}
+async function mkCampaignRaw(id, o = {}) {
   await db.doc('campaigns/' + id).set({ merchantId: 'm1', merchantName: 'Le Fournil', status: 'active', targetCity: 'le-mans', city: 'le-mans', question: QUESTION, questions: [{ q: QUESTION, format: 'mcq', options: ['Café', 'Thé'] }], targetVolume: 500, answersCount: 0, name: 'Boissons', createdAt: Timestamp.now(), ...o });
 }
 async function mkReward(id, o = {}) {
@@ -88,9 +98,10 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     check('Après-midi : rien sans question publiée AUJOURD\'HUI', (await sink('n1')).length === 0);
     await mkCampaign('fresh', { merchantName: 'Café Plume', createdAt: Timestamp.fromMillis(at(D1, '13:10')) });
     await tick(D1, hm(Math.max(840, slot - 15)));
-    check('Après-midi : rien avant son heure', slot - 15 < 840 || (await sink('n1')).length === 0);
+    // (la notification immédiate « question suivie » de cette question n'est pas l'objet de ce test : on regarde l'après-midi)
+    check('Après-midi : rien avant son heure', slot - 15 < 840 || (await sink('n1')).filter(x => x.ntype === 'nouvelle_question').length === 0);
     await tick(D1, hm(slot)); await tick(D1, '17:59');
-    const s1 = (await sink('n1')).filter(x => x.ntype !== 'relance_question');
+    const s1 = (await sink('n1')).filter(x => !['relance_question', 'question_suivi'].includes(x.ntype));
     check('Après-midi : « Café Plume vient de poser une question », une seule fois, même s\'il a déjà répondu aujourd\'hui', s1.length === 1 && s1[0].ntype === 'nouvelle_question' && s1[0].title === 'Café Plume vient de poser une question', s1.map(x => [x.ntype, x.title]));
   });
   await T('questions NOOVA et week-end', async () => {

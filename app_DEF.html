@@ -6121,7 +6121,8 @@ async function loadCampaignsFromFirestore(userData) {
         recomputeCampaignFeed(city);
         maybeResolve();
       }, e => { console.warn('merchants listener:', e); merchantsReady = true; maybeResolve(); });
-    _campaignsUnsub = db.collection('campaigns').where('status', '==', 'active').where('targetCity', '==', city).limit(200)
+    // Questions de sa ville + celles du compte de diffusion NOOVA, envoyées à toutes les villes (targetCity « toutes »).
+    _campaignsUnsub = db.collection('campaigns').where('status', '==', 'active').where('targetCity', 'in', [city, 'toutes']).limit(200)
       .onSnapshot(snap => {
         _campaignsCache = snap.docs.map(doc => ({ id: doc.id, data: doc.data() }));
         campaignsReady = true;
@@ -6151,11 +6152,15 @@ function recomputeCampaignFeed(city) {
       // Question posée par NOOVA elle-même (pas un commerce) : pas de merchantId, donc pas de fiche
       // commerce à vérifier — toujours « déjà suivie », visible de tous dans la ville ciblée.
       const byNoova = !d.merchantId;
+      // Compte de diffusion NOOVA : questions pour toutes les villes, toujours « suivies » (les règles Firestore
+      // réservent targetCity « toutes » à ce compte), avec des NOOVS comme toute question de NOOVA.
+      const broadcast = !byNoova && d.broadcast === true && d.targetCity === 'toutes';
+      const noovaLike = byNoova || broadcast;
       const campaignCity = getCampaignCity(d);
-      const merchantData = byNoova ? null : (_verifiedMerchantsCache[d.merchantId] || null);
+      const merchantData = byNoova ? null : (_verifiedMerchantsCache[d.merchantId] || (broadcast ? { logoUrl: d.merchantLogoUrl || null } : null));
       const merchantCity = normalizeCity((merchantData && merchantData.city) || d.city || '');
-      if (city && campaignCity && campaignCity !== city) return;
-      if (!byNoova) {
+      if (!broadcast && city && campaignCity && campaignCity !== city) return;
+      if (!noovaLike) {
         if (city && merchantCity && merchantCity !== city) return;
         if (!merchantData) return;
       }
@@ -6166,7 +6171,7 @@ function recomputeCampaignFeed(city) {
       // Centres d'intérêt ciblés par le commerçant (même règle que le serveur, interests.js).
       if (!NOOVA_INTERESTS.targetsUser(d.targetInterests, S._interests)) return;
       // Commerce pas encore suivi : question « découverte », proposée selon les centres d'intérêt, ou à une petite part au hasard.
-      const followed = byNoova || authorized.includes(d.merchantId);
+      const followed = noovaLike || authorized.includes(d.merchantId);
       let discoveryReason = '';
       let isFallbackOnly = false;
       if (!followed) {
@@ -6178,10 +6183,10 @@ function recomputeCampaignFeed(city) {
       }
 
       const brandName = byNoova ? 'NOOVA' : (d.merchantName || 'Commerce');
-      const usageTxt = byNoova ? (d.usage || 'Ta réponse aide NOOVA à améliorer l’app pour tout le monde.') : ('Ta réponse aide ' + (d.merchantName || 'ce commerce'));
+      const usageTxt = noovaLike ? (d.usage || 'Ta réponse aide NOOVA à améliorer l’app pour tout le monde.') : ('Ta réponse aide ' + (d.merchantName || 'ce commerce'));
       const allQs = getCampaignQuestions(d);
       const surveyList = allQs.slice(1).map((sq, idx) => ({
-        _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: idx + 1, _byNoova: byNoova,
+        _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: idx + 1, _byNoova: noovaLike,
         brand: brandName, ico: d.brandEmoji || (byNoova ? '✨' : '🏪'),
         theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: ENGAGEMENT.PTS_PER_ANSWER,
         type: sq.format || 'text', q: sq.q, hint: '',
@@ -6189,7 +6194,7 @@ function recomputeCampaignFeed(city) {
         usage: usageTxt
       }));
       const built = {
-        _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: 0, _byNoova: byNoova,
+        _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: 0, _byNoova: noovaLike,
         _isTest: !!(d.isTest || (merchantData && merchantData.isTest)),
         _surveyCount: allQs.length,
         brand: brandName, ico: d.brandEmoji || (byNoova ? '✨' : '🏪'),
