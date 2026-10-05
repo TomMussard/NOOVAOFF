@@ -571,6 +571,19 @@ async function notifDiagCore({ email, send = false, reset = false }, now = Date.
   const auto = Object.keys(stats).filter((t) => stats[t].autoOff);
   if (auto.length) problems.push("Coupées automatiquement après plusieurs notifications ignorées : " + auto.join(", ") + " (bouton « Réactiver »).");
   const today = u.notifDaily && u.notifDaily.date === p.day ? u.notifDaily.count || 0 : 0;
+  // Compte NOOVA (diffusion dans toutes les villes) : activé ? questions en ligne ? lancées avant l'activation ?
+  const bms = (await db().collection("merchants").where("broadcast", "==", true).get()).docs;
+  const noova = { accounts: bms.map((d) => d.data().brandName || d.data().name || d.id), active: cs.docs.filter((d) => isBroadcast(d.data())).length };
+  if (!bms.length) problems.push("Aucun compte NOOVA en diffusion : dans l'onglet Commerçants, coche « Diffuser dans toutes les villes » sur la fiche du compte NOOVA.");
+  for (const d of cs.docs) {
+    const c = d.data();
+    if (bms.some((m) => m.id === c.merchantId) && !isBroadcast(c)) {
+      problems.push(`La question NOOVA « ${short(c.name || c.question || "", 50)} » a été lancée avant d'activer la diffusion : elle ne vise que ${c.cityLabel || c.targetCity || "sa ville"}. Supprime-la dans le dashboard NOOVA et relance-la.`);
+    }
+  }
+  // Notifications mises de côté (heures de silence, plafond) : partiront à 9h.
+  const queued = (await db().collection("notifQueue").where("uid", "==", uid).get()).docs.map((d) => d.data())
+    .map((q) => ({ type: q.type, title: (q.content || {}).title || "", at: q.notBefore || 0 }));
   let test = null;
   if (send) {
     if (!tokens.length) test = { ok: false, error: "Aucun appareil enregistré" };
@@ -586,7 +599,8 @@ async function notifDiagCore({ email, send = false, reset = false }, now = Date.
     found: true, uid, name: u.name || "", city: u.city || "", pushEnabled: u.pushEnabled === true, devices: tokens.length,
     available: avail.length, nextQuestion: avail[0] ? avail[0].merchantName || "NOOVA" : null, sentToday: today,
     habit: `${String(Math.floor(habitMinutes(u) / 60)).padStart(2, "0")}h${String(habitMinutes(u) % 60).padStart(2, "0")}`,
-    answeredToday: answeredToday(u, p.day), problems, logs, test,
+    answeredToday: answeredToday(u, p.day), problems, logs, test, noova, queued,
+    suiviToday: (u.notifDaily && u.notifDaily.date === p.day ? u.notifDaily.suivi || 0 : 0),
   };
 }
 const adminNotifDiag = onCall({ region: "europe-west1" }, async (request) => {

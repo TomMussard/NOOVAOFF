@@ -69,6 +69,11 @@ const mkUser=async(uid,city,o={})=>{await db.doc('users/'+uid).set({role:'user',
   check('Question « toutes les villes » d\'un commerce sans diffusion : aucune notification',!(await sink('pa')).some(x=>/Salon/.test(x.title)));
   let refused=false;try{await call('beginQuestion',{campaignId:'fake',questionIdx:0},ptok);await sleep(2700);await call('submitAnswer',{campaignId:'fake',questionIdx:0,answerValue:'Oui'},ptok);}catch(e){refused=/ville/.test(e.message);}
   check('… et réponse refusée par le serveur',refused);
+  // Diagnostic admin : question lancée avant d'activer la diffusion (elle ne vise que la ville du compte)
+  await db.doc('campaigns/pre').set({...Q,merchantId:'nv',merchantName:'NOOVA',name:'Avant activation',targetCity:'le-mans',city:'le-mans',cityLabel:'Le Mans',createdAt:Timestamp.now()});
+  const N=require(__dirname+'/../functions/notifications.js')._t;
+  const dg=await N.notifDiagCore({email:'pa@t.fr'});
+  check('Diagnostic : compte NOOVA en diffusion et question lancée avant l\'activation signalée',dg.noova.accounts.join()==='NOOVA'&&dg.problems.some(p=>/avant d'activer la diffusion/.test(p)&&/Le Mans/.test(p)),{noova:dg.noova,problems:dg.problems});
   check('Le compte de diffusion peut supprimer sa question',(await fetch(`${FS}/campaigns/bc1`,{method:'DELETE',headers:{Authorization:'Bearer '+ntok}})).status===200);
   console.log(`\n${pass} ok, ${fail} échec(s)`);process.exit(0);
 })().catch(e=>{console.log('FAIL '+String(e.stack||e).slice(0,400));process.exit(1);});
