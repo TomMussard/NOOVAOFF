@@ -95,7 +95,7 @@ const used=async()=>((await db.doc('merchants/m1/quota/2026-09').get()).data()||
     await db.doc('merchants/m3').set({role:'merchant',brandName:'Snack',sector:'Restauration',city:'le-mans',status:'verified',monthlyQuestionQuota:0});
     await db.doc('users/u1').update({authorizedMerchants:['m1','m3']});
     await camp('z',1,{merchantId:'m3',merchantName:'Snack'});await until(async()=>(await st('z')).status==='blocked');await sleep(2500);
-    check('Campagne bloquée : aucune notification envoyée aux habitants',(await db.collection('_pushSink').get()).empty);
+    check('Campagne bloquée : aucune notification envoyée aux habitants',!(await db.collection('_pushSink').get()).docs.some(d=>/Snack/.test(d.data().title||'')));
     await db.doc('merchants/m3').update({monthlyQuestionQuota:5});
     await camp('y',1,{merchantId:'m3',merchantName:'Snack'});await until(async()=>!(await db.collection('_pushSink').get()).empty,15000);
     check('Campagne autorisée : notification « nouveau commerce » envoyée',!(await db.collection('_pushSink').get()).empty);

@@ -164,7 +164,8 @@ service cloud.firestore {
     // Écriture : uniquement le commerçant propriétaire, vérifié, avec validation des champs
     match /campaigns/{campaignId} {
       allow read: if isAuth() && (
-        (resource.data.status == 'active' && resource.data.get('targetCity', null) in [myCity(), 'toutes']) ||
+        (resource.data.status == 'active' && resource.data.get('targetCity', null) == 'toutes') ||
+        (resource.data.status == 'active' && resource.data.get('targetCity', null) == myCity()) ||
         resource.data.merchantId == request.auth.uid ||
         isAdmin()
       );
