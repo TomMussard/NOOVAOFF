@@ -107,11 +107,11 @@ function finish(o) {
 }
 const copy = {
   questionSuivi: ({ merchant, byNoova }) => byNoova
-    ? finish({ title: "NOOVA vient de poser une question", body: "30 secondes, et des NOOVS à la clé", screen: "home" })
+    ? finish({ title: "NOOVA vient de poser une question", body: "30 secondes, et un NOOV à la clé", screen: "home" })
     : finish({ title: `${short(merchant, 30)} vient de poser une question`, body: "Réponds en 30 secondes, +10 points", screen: "home" }),
-  relance: ({ merchant, byNoova }) => finish({ title: byNoova ? "La question de NOOVA t'attend" : `La question de ${short(merchant, 30)} t'attend`, body: byNoova ? "30 secondes, et des NOOVS à la clé" : "30 secondes, +10 points", screen: "home" }),
+  relance: ({ merchant, byNoova }) => finish({ title: byNoova ? "La question de NOOVA t'attend" : `La question de ${short(merchant, 30)} t'attend`, body: byNoova ? "30 secondes, et un NOOV à la clé" : "30 secondes, +10 points", screen: "home" }),
   nouvelleQuestion: ({ merchant, byNoova }) => byNoova
-    ? finish({ title: "NOOVA te pose une question", body: "30 secondes, et des NOOVS à la clé", screen: "home" })
+    ? finish({ title: "NOOVA te pose une question", body: "30 secondes, et un NOOV à la clé", screen: "home" })
     : finish({ title: `${short(merchant, 30)} vient de poser une question`, body: "Sois parmi les premiers à répondre", screen: "home" }),
   questionDuJour: ({ merchant }) => finish({ title: `${short(merchant, 30)} veut ton avis`, body: "30 secondes, +10 points", screen: "home" }),
   imminent: ({ left, reward, rewardMerchant }) => finish({
@@ -378,7 +378,7 @@ function availableFor(u, list) {
   const age = u.ageRange || u.age || "";
   const followed = (c) => !c.merchantId || isBroadcast(c) || authorized.includes(c.merchantId);
   return (list || []).filter((c) => {
-    if (answered.includes(c.id) || (c.merchantId && declined.includes(c.merchantId))) return false;
+    if (answered.includes(c.id) || (c.merchantId && !isBroadcast(c) && declined.includes(c.merchantId))) return false;   // NOOVA : suivi d'office
     if ((c.ageRanges || []).length && age && !c.ageRanges.includes(age)) return false;
     if (!INTERESTS.targetsUser(c.targetInterests, u.interests)) return false;
     const target = Number(c.targetVolume ?? c.volumeTarget) || 0;   // objectif facultatif : sans valeur, pas de plafond
