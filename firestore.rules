@@ -117,6 +117,8 @@ service cloud.firestore {
     match /merchants/{merchantId} {
       allow read: if isAuth() && (
         (resource.data.status == 'verified' && resource.data.get('city', null) == myCity()) ||
+        // Compte NOOVA (diffusion dans toutes les villes) : sa fiche (nom, logo, photo) est visible de tous les habitants.
+        (resource.data.status == 'verified' && resource.data.get('broadcast', false) == true) ||
         resource.data.ownerUid == request.auth.uid ||
         merchantId == request.auth.uid ||
         isAdmin()
