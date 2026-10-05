@@ -333,6 +333,8 @@ function matchesCategory(u, sector) {
   if (!ints.length || ints.length === CAT_KEYS.length) return true;
   return ints.includes(sectorCategory(sector));
 }
+const ALL_CITIES = "toutes";
+const isBroadcast = (c) => !!c.merchantId && c.broadcast === true && String(c.targetCity || "").toLowerCase() === ALL_CITIES;
 const toMs = (t) => (t && t.toMillis ? t.toMillis() : typeof t === "number" ? t : 0);
 
 function habitMinutes(u) {
@@ -362,7 +364,10 @@ async function loadCaches(now) {
     if (!rewards.has(city)) rewards.set(city, []);
     rewards.get(city).push(r);
   });
-  return { campaigns, rewards };
+  // Questions du compte de diffusion NOOVA (targetCity « toutes ») : ajoutées à chaque ville.
+  const all = campaigns.get(ALL_CITIES) || [];
+  const campaignsFor = (city) => (city === ALL_CITIES ? [] : (campaigns.get(city) || []).concat(all));
+  return { campaigns, rewards, campaignsFor };
 }
 
 // Questions que l'habitant peut réellement répondre aujourd'hui (mêmes critères que submitAnswer).
@@ -371,7 +376,7 @@ async function loadCaches(now) {
 function availableFor(u, list) {
   const authorized = u.authorizedMerchants || [], answered = u.answeredCampaigns || [], declined = u.declinedMerchants || [];
   const age = u.ageRange || u.age || "";
-  const followed = (c) => !c.merchantId || authorized.includes(c.merchantId);
+  const followed = (c) => !c.merchantId || isBroadcast(c) || authorized.includes(c.merchantId);
   return (list || []).filter((c) => {
     if (answered.includes(c.id) || (c.merchantId && declined.includes(c.merchantId))) return false;
     if ((c.ageRanges || []).length && age && !c.ageRanges.includes(age)) return false;
@@ -407,7 +412,7 @@ async function runTick(now = Date.now()) {
     const u = doc.data(), uid = doc.id;
     if (!u.city || !uniq(u.fcmTokens).length) return;
     const city = String(u.city).toLowerCase();
-    const avail = availableFor(u, caches.campaigns.get(city));
+    const avail = availableFor(u, caches.campaignsFor(city));
     const stats = u.notifStats || {};
     // Une question d'un commerce suivi a déjà été envoyée aujourd'hui : les rendez-vous à heure fixe (question du jour,
     // nouvelle question de l'après-midi) ne servent plus, ils restent pour qui ne suit encore aucun commerce.
@@ -436,7 +441,7 @@ async function runTick(now = Date.now()) {
     // Relance : une question d'un commerce suivi (ou de NOOVA), publiée aujourd'hui il y a 3 h ou plus, toujours sans
     // réponse. Une seule par jour, jamais après 20h30, et jamais moins de 2 h après une autre notification « question »
     // (elle attend le passage suivant : deux notifications coup sur coup feraient doublon).
-    const follows = (c) => !c.merchantId || (u.authorizedMerchants || []).includes(c.merchantId);
+    const follows = (c) => !c.merchantId || isBroadcast(c) || (u.authorizedMerchants || []).includes(c.merchantId);
     const pending = avail.find((c) => follows(c) && toMs(c.createdAt) && parisParts(toMs(c.createdAt)).day === p.day && now - toMs(c.createdAt) >= RELANCE_AFTER_MS);
     let relanceToday = (stats.relance_question || {}).lastSentDay === p.day;
     const lastQ = Math.max(0, ...["question_du_jour", "nouvelle_question", "question_suivi"].map((t) => (stats[t] || {}).lastSentAt || 0));
@@ -545,7 +550,7 @@ async function notifDiagCore({ email, send = false, reset = false }, now = Date.
   }
   const city = String(u.city || "").toLowerCase();
   const cs = await db().collection("campaigns").where("status", "==", "active").get();
-  const list = cs.docs.map((d) => ({ id: d.id, ...d.data() })).filter((c) => String(c.targetCity || c.city || "").toLowerCase() === city && !(c.endsAt && toMs(c.endsAt) < now));
+  const list = cs.docs.map((d) => ({ id: d.id, ...d.data() })).filter((c) => [city, ALL_CITIES].includes(String(c.targetCity || c.city || "").toLowerCase()) && !(c.endsAt && toMs(c.endsAt) < now));
   const avail = availableFor(u, list);
   const logs = (await db().collection("notifLog").where("uid", "==", uid).limit(200).get()).docs.map((d) => d.data())
     .sort((a, b) => toMs(b.sentAt) - toMs(a.sentAt)).slice(0, 12)
@@ -608,7 +613,11 @@ const notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (eve
   const m = camp.merchantId ? await db().collection("merchants").doc(camp.merchantId).get() : null;
   const sector = m && m.exists ? m.data().sector : camp.sector;
   const id = event.params.campaignId, byNoova = !camp.merchantId;
-  const snap = await db().collection("users").where("city", "==", city).where("pushEnabled", "==", true).get();
+  // Compte de diffusion NOOVA : la question part à tous les habitants, toutes villes confondues, comme une question suivie.
+  const everywhere = city === ALL_CITIES;
+  if (everywhere && !(isBroadcast(camp) && m && m.exists && m.data().broadcast === true)) return;
+  const users = db().collection("users").where("pushEnabled", "==", true);
+  const snap = await (everywhere ? users : users.where("city", "==", city)).get();
   const work = snap.docs.filter((d) => {
     const u = d.data();
     // Seuls les habitants que la campagne cible vraiment (tranche d'âge, centres d'intérêt) sont prévenus.
@@ -616,9 +625,10 @@ const notifyNewCampaign = onDocumentCreated("campaigns/{campaignId}", async (eve
     if ((camp.ageRanges || []).length && age && !camp.ageRanges.includes(age)) return false;
     if (!INTERESTS.targetsUser(camp.targetInterests, u.interests)) return false;
     if ((u.answeredCampaigns || []).includes(id)) return false;
-    if (byNoova || (u.authorizedMerchants || []).includes(camp.merchantId)) return true;            // suivi : toujours prévenu
+    if (everywhere && !u.city) return false;
+    if (byNoova || everywhere || (u.authorizedMerchants || []).includes(camp.merchantId)) return true;   // suivi : toujours prévenu
     return !(u.declinedMerchants || []).includes(camp.merchantId) && matchesCategory(u, sector);
-  }).map((d) => () => (byNoova || (d.data().authorizedMerchants || []).includes(camp.merchantId)
+  }).map((d) => () => (byNoova || everywhere || (d.data().authorizedMerchants || []).includes(camp.merchantId)
     ? deliver(d.id, "question_suivi", copy.questionSuivi({ merchant: camp.merchantName, byNoova }), { key: id })
     : deliver(d.id, "nouveau_commerce", copy.nouveauCommerce({ merchant: camp.merchantName, known: false }), { key: id })));
   for (let i = 0; i < work.length; i += 20) await Promise.all(work.slice(i, i + 20).map((f) => f()));

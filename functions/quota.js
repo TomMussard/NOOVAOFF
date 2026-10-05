@@ -43,6 +43,10 @@ async function stateOf(mid, now) {
 async function accountCampaign(campaignId, camp, now) {
   if (!camp || !camp.merchantId) return true;
   if (camp.isTest) return true;                 // commerces fictifs du mois de test : une question par jour, sans quota
+  if (camp.broadcast === true) {                 // compte de diffusion NOOVA (activé par l'admin) : sans quota
+    const m = await db().collection("merchants").doc(camp.merchantId).get();
+    if (m.exists && m.data().broadcast === true) return true;
+  }
   if (now == null) now = await nowMs();
   await applyOverrides();
   const mid = camp.merchantId, n = questionsOf(camp), month = monthOf(now);

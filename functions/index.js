@@ -122,7 +122,10 @@ exports.submitAnswer = onCall(async (request) => {
     }
     const userCity = (user.city || "").toLowerCase();
     const campCity = (camp.targetCity || camp.city || "").toLowerCase();
-    if (!userCity || userCity !== campCity) {
+    // Compte de diffusion NOOVA (activé par l'admin sur la fiche du commerçant) : sa question vaut pour toutes les villes.
+    const mm0 = merchantSnap && merchantSnap.exists ? merchantSnap.data() : null;
+    const broadcastQ = !!camp.merchantId && campCity === "toutes" && camp.broadcast === true && !!mm0 && mm0.broadcast === true && mm0.status === "verified";
+    if (!userCity || (userCity !== campCity && !broadcastQ)) {
       throw new HttpsError("permission-denied", "Cette campagne n'est pas disponible dans ta ville.");
     }
     // Commerce suivi (autorisé) : réponse complète. Commerce PAS ENCORE suivi : question « découverte » — l'habitant choisit
@@ -130,7 +133,7 @@ exports.submitAnswer = onCall(async (request) => {
     // décidera ensuite de le suivre ou non. Un commerce que l'habitant a écarté, non vérifié ou d'une autre ville : refusé.
     const authorized = user.authorizedMerchants || [];
     let discovery = false;
-    if (camp.merchantId && !authorized.includes(camp.merchantId)) {
+    if (camp.merchantId && !broadcastQ && !authorized.includes(camp.merchantId)) {
       if ((user.declinedMerchants || []).includes(camp.merchantId)) {
         throw new HttpsError("permission-denied", "Tu as choisi de ne plus voir ce commerce.");
       }
@@ -184,7 +187,7 @@ exports.submitAnswer = onCall(async (request) => {
     const pointsEligible = answersToday < MAX_POINT_ANSWERS_PER_DAY;
 
     let earnedPts = 0, discoveryBonus = 0, noovsEarned = 0, noovsWithheld = null;
-    const noovaQ = !camp.merchantId || camp.postedByNoova === true;   // question posée par NOOVA elle-même
+    const noovaQ = !camp.merchantId || broadcastQ;   // question posée par NOOVA elle-même (compte de diffusion)
     const noovsToday = user.dailyNoovsDate === today ? (user.dailyNoovs || 0) : 0;
     let newStreak = user.streak || 0;
     let newLastAnswerDate = user.lastAnswerDate || null;
@@ -223,7 +226,7 @@ exports.submitAnswer = onCall(async (request) => {
         const answeredSet = new Set(user.answeredCampaigns || []);
         if (qIdx === 0) answeredSet.add(campaignId);
         const cityCampaigns = await db.collection("campaigns")
-          .where("status", "==", "active").where("targetCity", "==", campCity)
+          .where("status", "==", "active").where("targetCity", "in", [userCity, "toutes"])
           .select("ageRanges", "endsAt").limit(200).get();
         const nowMs = Date.now();
         const stillAvailable = cityCampaigns.docs.some((d) => {
@@ -513,63 +516,29 @@ exports.adminResetAllData = onCall({ timeoutSeconds: 300 }, async (request) => {
 });
 
 /**
- * adminCreateNoovaCampaign — crée une campagne « posée par NOOVA » : pas de commerce
- * (merchantId: null), visible comme suivie par défaut chez tous les habitants de la ou
- * des villes ciblées (voir recomputeCampaignFeed côté client, qui traite l'absence de
- * merchantId comme "déjà suivi"). Les règles Firestore n'autorisent la création de
- * campagne qu'avec merchantId == uid du commerçant qui la crée, donc ce cas — sans aucun
- * commerçant — passe forcément par le SDK Admin, jamais par une écriture cliente directe.
+ * adminNoovaQuestions — les anciennes « questions NOOVA » (posées depuis l'admin, sans commerce : on n'en voyait ni les
+ * réponses ni les résultats, et on ne pouvait pas les supprimer). count : combien il en reste ; purge : les supprime
+ * toutes, avec leurs réponses. Les points et NOOVS déjà gagnés par les habitants restent acquis.
  */
-exports.adminCreateNoovaCampaign = onCall(async (request) => {
+exports.adminNoovaQuestions = onCall({ timeoutSeconds: 300 }, async (request) => {
   const email = request.auth && request.auth.token && request.auth.token.email;
   if (!email || !ADMIN_EMAILS.includes(email)) {
     throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   }
-  const { question, format, options, items, cities: cityIds, durationDays } = request.data || {};
-  if (!question || String(question).trim().length < 5) {
-    throw new HttpsError("invalid-argument", "Question manquante ou trop courte.");
+  const camps = await db.collection("campaigns").where("merchantId", "==", null).get();
+  if (!(request.data && request.data.purge)) return { campaigns: camps.size };
+  let answers = 0;
+  for (const c of camps.docs) {
+    const a = await db.collection("answers").where("campaignId", "==", c.id).get();
+    for (let i = 0; i < a.docs.length; i += 400) {
+      const batch = db.batch();
+      a.docs.slice(i, i + 400).forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    }
+    answers += a.size;
+    await db.recursiveDelete(c.ref);
   }
-  const fmt = ["mcq", "text", "scale", "rank"].includes(format) ? format : "text";
-  const opts = fmt === "mcq" ? (options || []).filter(Boolean)
-    : fmt === "rank" ? (items || []).filter(Boolean) : [];
-  if (fmt === "mcq" && opts.length < 2) throw new HttpsError("invalid-argument", "Au moins 2 options pour un choix multiple.");
-  if (fmt === "rank" && opts.length < 2) throw new HttpsError("invalid-argument", "Au moins 2 éléments à classer.");
-  if (!Array.isArray(cityIds) || !cityIds.length) throw new HttpsError("invalid-argument", "Choisissez au moins une ville.");
-
-  const citiesSnap = await db.collection("cities").get();
-  const cityMap = {};
-  citiesSnap.forEach((d) => { cityMap[d.id] = d.data(); });
-
-  const created = [];
-  for (const cityId of cityIds) {
-    const cityLabel = (cityMap[cityId] && cityMap[cityId].label) || cityId;
-    const ref = await db.collection("campaigns").add({
-      merchantId: null,
-      merchantName: "NOOVA",
-      merchantTheme: "NOOVA",
-      brandEmoji: "✨",
-      postedByNoova: true,
-      name: String(question).slice(0, 60),
-      sector: "NOOVA",
-      question,
-      questions: [{ q: question, format: fmt, options: opts }],
-      questionsSchema: 2,
-      format: fmt,
-      options: opts,
-      city: cityId,
-      cityLabel,
-      targetCity: cityId,
-      pointsPerAnswer: 20,
-      answersCount: 0,
-      responsesCount: 0,
-      status: "active",
-      ...(durationDays ? { durationDays, endsAt: Timestamp.fromMillis(Date.now() + durationDays * 86400000) } : {}),
-      createdAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
-    });
-    created.push({ id: ref.id, city: cityId });
-  }
-  return { created };
+  return { campaigns: camps.size, answers };
 });
 
 /**

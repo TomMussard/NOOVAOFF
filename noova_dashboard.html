@@ -3325,7 +3325,9 @@ launchCampaign = async function() {
   const u = auth.currentUser;
   if(!u || !_mData) { showToast('Connectez-vous pour lancer','warning'); return; }
   if(_mData.status !== 'verified') { showToast('Le lancement sera débloqué après la vérification de votre établissement.','clock'); return; }
-  try {
+  // Compte de diffusion NOOVA (activé dans l'admin) : questions envoyées à toutes les villes, sans vitrine récompenses ni quota.
+  const broadcast = _mData.broadcast === true;
+  if(!broadcast) try {
     const approvedSnap = await db.collection('rewards').where('merchantId','==',u.uid).where('status','==','approved').limit(1).get();
     if(approvedSnap.empty) {
       showToast('Faites valider au moins une récompense de votre vitrine avant de lancer une campagne','gift-generic');
@@ -3333,7 +3335,7 @@ launchCampaign = async function() {
       return;
     }
   } catch(e) { showToast('Erreur : ' + e.message, 'error'); return; }
-  if(!_mData.cashierAck) { openCashierModal(); return; }
+  if(!broadcast && !_mData.cashierAck) { openCashierModal(); return; }
   const q1 = document.getElementById('q-text-inp')?.value?.trim();
   if(!q1) { showToast('Saisissez une question d\'abord','warning'); return; }
   const options  = needsOptions(curFmt) ? collectOptions('#mcq-options') : [];
@@ -3359,7 +3361,7 @@ launchCampaign = async function() {
     }
   }
 
-  if(!(await ensureQuotaFor(questions.length))) return;
+  if(!broadcast && !(await ensureQuotaFor(questions.length))) return;
   try {
     await db.collection('campaigns').add({
       merchantId:      u.uid,
@@ -3373,9 +3375,10 @@ launchCampaign = async function() {
       questionsSchema: 2,                 // options propres à chaque question (voir la correction du 2026-09-20)
       format:          curFmt,
       options,
-      city:            city,
-      cityLabel,
-      targetCity:      city,
+      city:            broadcast ? 'toutes' : city,
+      cityLabel:       broadcast ? 'Toutes les villes' : cityLabel,
+      targetCity:      broadcast ? 'toutes' : city,
+      ...(broadcast ? { broadcast: true, merchantLogoUrl: _mData.logoUrl || null } : {}),
       ageRanges,
       targetInterests: themes,
       pointsPerAnswer: 20,
