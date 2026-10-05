@@ -415,11 +415,12 @@ exports.estimateReach = onCall(async (request) => {
   const m = mSnap.data();
   const city = String(m.city || "").toLowerCase();
   const category = sectorCategory(m.sector);
-  const base = db.collection("users").where("city", "==", city);
+  // Compte NOOVA (diffusion) : tous les habitants, toutes villes confondues.
+  const base = m.broadcast === true ? db.collection("users").where("role", "==", "user") : db.collection("users").where("city", "==", city);
   const total = (await base.count().get()).data().count;
   let matching = null;
   try { matching = (await base.where("interests", "array-contains", category).count().get()).data().count; } catch (e) { logger.warn("estimateReach: matching", { message: e.message }); }
-  return { city: m.cityLabel || m.city || "", total, matching, category };
+  return { city: m.broadcast === true ? "Toutes les villes" : (m.cityLabel || m.city || ""), total, matching, category };
 });
 
 
@@ -442,16 +443,18 @@ exports.estimateCampaign = onCall(async (request) => {
   const ageRanges = (Array.isArray(d.ageRanges) ? d.ageRanges : []).filter((a) => AGE_BUCKETS.includes(a));
   const interests = INTERESTS.valid(d.interests);
   const questions = Math.max(1, Math.min(3, parseInt(d.questions, 10) || 1));
-  if (!city) return { city: "", cityLabel: "", totalUsers: 0, pool: 0, questions, enoughData: false, perDay: 0, cityAnswersPerDay: 0, activeCampaigns: 0 };
+  const all = m.broadcast === true;   // compte NOOVA : estimation sur tous les habitants, toutes villes confondues
+  if (!city && !all) return { city: "", cityLabel: "", totalUsers: 0, pool: 0, questions, enoughData: false, perDay: 0, cityAnswersPerDay: 0, activeCampaigns: 0 };
 
   const SAMPLE = 3000, WINDOW_DAYS = 14;
-  const usersRef = db.collection("users").where("city", "==", city);
+  const usersRef = all ? db.collection("users").where("role", "==", "user") : db.collection("users").where("city", "==", city);
+  const answersRef = all ? db.collection("answers") : db.collection("answers").where("respondentCity", "==", city);
   const [totalUsers, sample, answers14, activeCampaigns] = await Promise.all([
     usersRef.count().get().then((r) => r.data().count),
     usersRef.select("ageRange", "age", "interests").limit(SAMPLE).get(),
-    db.collection("answers").where("respondentCity", "==", city).where("flagged", "==", false)
+    answersRef.where("flagged", "==", false)
       .where("createdAt", ">=", Timestamp.fromMillis(Date.now() - WINDOW_DAYS * 86400000)).count().get().then((r) => r.data().count).catch((e) => { logger.warn("estimateCampaign: answers", { message: e.message }); return null; }),
-    db.collection("campaigns").where("targetCity", "==", city).where("status", "==", "active").count().get().then((r) => r.data().count).catch(() => 0),
+    db.collection("campaigns").where("targetCity", "==", all ? "toutes" : city).where("status", "==", "active").count().get().then((r) => r.data().count).catch(() => 0),
   ]);
   // Même règle que submitAnswer : un habitant sans tranche d'âge renseignée n'est jamais exclu.
   let matching = 0;
@@ -465,7 +468,7 @@ exports.estimateCampaign = onCall(async (request) => {
   const enoughData = answers14 != null && answers14 >= 10 && totalUsers >= 5;
   // Répartition par âge des habitants de la ville (part de l'échantillon, 0 à 1) : affichée telle quelle dans l'assistant.
   const ageShare = {}; Object.keys(ages).forEach((k) => { ageShare[k] = sample.size ? ages[k] / sample.size : 0; });
-  return { city, cityLabel: m.cityLabel || m.city || "", totalUsers, pool, share, questions, answers14, cityAnswersPerDay, activeCampaigns, perDay, enoughData, ageShare };
+  return { city: all ? "toutes" : city, cityLabel: all ? "Toutes les villes" : (m.cityLabel || m.city || ""), totalUsers, pool, share, questions, answers14, cityAnswersPerDay, activeCampaigns, perDay, enoughData, ageShare };
 });
 
 /**

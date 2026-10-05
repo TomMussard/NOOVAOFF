@@ -1902,7 +1902,7 @@ function wzGo(n){
     document.getElementById('recap-name').textContent=document.getElementById('camp-name-inp').value;
     const ages=[...document.querySelectorAll('.age-chip.sel')].map(e=>e.textContent.trim()).filter(Boolean);
     const audEl=document.getElementById('recap-aud');
-    if(audEl) audEl.textContent=((_mData&&(_mData.cityLabel||_mData.city))||'Ma ville')+' · '+(ages.length?ages.join(', '):'Tous les âges');
+    if(audEl) audEl.textContent=(_mData&&_mData.broadcast===true?'Toutes les villes':((_mData&&(_mData.cityLabel||_mData.city))||'Ma ville'))+' · '+(ages.length?ages.join(', '):'Tous les âges');
     renderReachRecap();
   }
 }
@@ -2158,7 +2158,8 @@ function updAud(){
 
 // ═══ LOCALISATION : toujours la ville du commerce ═══════════════
 // Un commerce du Mans questionne les Manceaux : plus de choix de ville ni de région dans l'assistant.
-function wzCityLabel(){ return (_mData && (_mData.cityLabel || _mData.city)) || 'votre ville'; }
+function wzCityIn(){ return _mData && _mData.broadcast === true ? 'dans toutes les villes' : 'à ' + wzCityLabel(); }
+function wzCityLabel(){ if(_mData && _mData.broadcast === true) return 'toutes les villes'; return (_mData && (_mData.cityLabel || _mData.city)) || 'votre ville'; }
 function wzCityLabels(){ document.querySelectorAll('.wz-city').forEach(e => { e.textContent = wzCityLabel(); }); }
 
 // ═══ DURÉE (facultative) + ESTIMATION ═══════════════════════════
@@ -2217,7 +2218,7 @@ function renderDuration(){
   renderReachRecap();
   const cnt = document.getElementById('aud-count'); if(cnt) cnt.textContent = _est ? _est.pool : '—';
   renderAgeDist();
-  const foot = document.getElementById('aud-footer'); if(foot) foot.textContent = _est ? _est.totalUsers + ' habitant' + (_est.totalUsers > 1 ? 's' : '') + ' inscrit' + (_est.totalUsers > 1 ? 's' : '') + ' à ' + wzCityLabel() : 'Habitants inscrits dans votre ville';
+  const foot = document.getElementById('aud-footer'); if(foot) foot.textContent = _est ? _est.totalUsers + ' habitant' + (_est.totalUsers > 1 ? 's' : '') + ' inscrit' + (_est.totalUsers > 1 ? 's' : '') + ' ' + wzCityIn() : 'Habitants inscrits dans votre ville';
 }
 // Répartition réelle des habitants de la ville par tranche d'âge ; les tranches choisies sont en couleur.
 function renderAgeDist(){
@@ -2235,7 +2236,7 @@ function renderReachRecap(){
   if(!_est){ el.textContent = 'Calcul en cours…'; return; }
   const r = _est.enoughData ? estimateFor(_wzDays || 30) : null;
   el.textContent = _est.totalUsers === 0
-    ? `Aucun habitant inscrit à ${wzCityLabel()} pour l'instant : votre affiche en vitrine fera venir les premiers.`
+    ? (_mData && _mData.broadcast === true ? 'Aucun habitant inscrit pour l\'instant.' : `Aucun habitant inscrit à ${wzCityLabel()} pour l'instant : votre affiche en vitrine fera venir les premiers.`)
     : (r ? (r.hi < 5 ? 'moins de 5' : (r.lo === r.hi ? r.hi : r.lo + ' à ' + r.hi)) + ' réponses ' + (_wzDays ? 'sur ' + _wzDays + ' jours' : 'par période de 30 jours') + ' · ' : '') + `${_est.pool} habitant${_est.pool > 1 ? 's' : ''} éligible${_est.pool > 1 ? 's' : ''} à ${wzCityLabel()}` + (r ? ' (estimation indicative)' : ' (activité encore trop faible pour estimer les réponses)') + '.';
 }
 // Appel serveur (données agrégées uniquement), avec anti-rebond et sans rappel si rien n'a changé.
@@ -3073,7 +3074,10 @@ async function loadMerchantAndStart(uid) {
 
   // Compte NOOVA (« Diffuser dans toutes les villes », activé dans l'admin) : ses questions rapportent uniquement des
   // NOOVS aux habitants, donc ni vitrine récompenses ni bons à valider.
+  // Ses questions vont à toutes les villes : aucune localisation à afficher (adresse, ville). Les autres commerçants
+  // gardent leur dashboard tel quel.
   ['nav-rewards', 'nav-validate'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = _mData.broadcast === true ? 'none' : ''; });
+  ['set-address', 'set-city'].forEach(id => { const el = document.getElementById(id); const row = el && el.closest('.setting-row'); if(row) row.style.display = _mData.broadcast === true ? 'none' : ''; });
 
   // Dashboard accessible dès l'inscription, même non vérifié : seul le lancement de
   // campagne reste bloqué (bandeau permanent + bouton désactivé).
@@ -3096,7 +3100,7 @@ async function loadMerchantAndStart(uid) {
   const sun = document.querySelector('.sb-user-name');
   const sur = document.querySelector('.sb-user-role');
   if(sbn) sbn.textContent = _mData.brandName || '';
-  if(sbp) sbp.textContent = _mData.cityLabel || _mData.city || '';
+  if(sbp) sbp.textContent = _mData.broadcast === true ? 'Toutes les villes' : (_mData.cityLabel || _mData.city || '');
   if(sun) sun.textContent = _mData.brandName || '';
   if(sur) sur.textContent = _mData.sector || 'Commerçant';
   document.getElementById('topbar-sub').textContent = 'Bienvenue — ' + (_mData.brandName||'');

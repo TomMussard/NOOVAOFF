@@ -1979,8 +1979,8 @@ function getAnswersToday(){return S._answersDate===parisToday()?(S._answersToday
 function isFreeMode(){return getAnswersToday()>=MAX_POINT_ANSWERS;}
 // Questions posées par NOOVA : uniquement des NOOVS (engagementConfig NOOVS.PER_NOOVA_QUESTION), jamais de points, et
 // elles ne comptent pas dans les 3 réponses à points du jour.
-const NOOVA_Q_NOOVS=5;
-function ptsTag(q){if(q&&q._byNoova)return '+'+NOOVA_Q_NOOVS+' NOOVS';return isFreeMode()?'+1 NOOV':'+'+q.pts+' pts';}
+const NOOVA_Q_NOOVS=1;
+function ptsTag(q){if(q&&q._byNoova)return '+'+NOOVA_Q_NOOVS+(NOOVA_Q_NOOVS>1?' NOOVS':' NOOV');return isFreeMode()?'+1 NOOV':'+'+q.pts+' pts';}
 function setQPtsTag(q){const el=document.getElementById('q-pts-tag');if(!el)return;el.textContent=ptsTag(q);}
 const BRANDMETA={};
 function logoFallbackHTML(name,size){
@@ -2582,7 +2582,7 @@ async function voteWeeklyQuestion(qId, optionIndex) {
     renderWeeklyQuestionResults({ id: qId, ...qSnap.data() }, optionIndex, true);
     // Question de la semaine = question NOOVA : des NOOVS au vote (crédités par le serveur).
     S.noovs = (S.noovs || 0) + NOOVA_Q_NOOVS; renderHeaderStats();
-    showToast('+' + NOOVA_Q_NOOVS + ' NOOVS pour ton vote', 'success');
+    showToast('+' + NOOVA_Q_NOOVS + (NOOVA_Q_NOOVS > 1 ? ' NOOVS' : ' NOOV') + ' pour ton vote', 'success');
   } catch(e) {
     console.warn('voteWeeklyQuestion:', e);
     document.querySelectorAll('.wq-opt-btn').forEach(b=>b.disabled=false);
@@ -4008,7 +4008,7 @@ async function loadNearbyMerchants(merchantIds) {
     // Zone : un commerce autorisé mais d'une autre ville (habitant qui a déménagé, compte ancien) n'apparaît jamais.
     const myCity = normalizeCity(S._city||'');
     S._nearbyMerchants = snaps.filter(s => s.exists).map(s => ({ id: s.id, ...s.data() }))
-      .filter(m => myCity && normalizeCity(m.city||'') === myCity);
+      .filter(m => myCity && normalizeCity(m.city||'') === myCity && m.broadcast !== true);
     renderBrandRail();
     renderNearbyMap();
     // Recharger les récompenses avec les nouveaux marchands
@@ -5988,6 +5988,7 @@ async function openManageMerchants() {
     const all = [];
     snap.forEach(doc => {
       const d = doc.data();
+      if(d.broadcast === true) return;   // compte NOOVA : suivi d'office par tout le monde, ni à suivre ni à retirer
       if(!city || normalizeCity(d.city||'') === city) all.push({ id: doc.id, ...d });
     });
     // commerces déjà autorisés absents du résultat (cache local)
@@ -6061,6 +6062,7 @@ async function loadMerchantsForOnboarding(userData) {
     S._merchantsForOnboarding = [];
     snap.forEach(doc => {
       const d = doc.data();
+      if(d.broadcast === true) return;   // compte NOOVA : suivi d'office, jamais proposé à cocher
       // Filtre côté client pour éviter les problèmes de casse/accents entre dashboard et app
       if(!userCity || normalizeCity(d.city||'') === userCity) {
         S._merchantsForOnboarding.push({ id: doc.id, ...d });
@@ -6116,7 +6118,7 @@ async function loadCampaignsFromFirestore(userData) {
     _verifiedMerchantsUnsub = db.collection('merchants').where('status', '==', 'verified').where('city', '==', city)
       .onSnapshot(snap => {
         const map = {};
-        snap.forEach(doc => { const d = doc.data(); if (d && doc.id) map[doc.id] = d; });
+        snap.forEach(doc => { const d = doc.data(); if (d && doc.id && d.broadcast !== true) map[doc.id] = d; });   // compte NOOVA : à part
         _verifiedMerchantsCache = map;
         merchantsReady = true;
         recomputeCampaignFeed(city);

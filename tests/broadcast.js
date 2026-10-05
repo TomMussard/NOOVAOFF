@@ -69,6 +69,11 @@ const mkUser=async(uid,city,o={})=>{await db.doc('users/'+uid).set({role:'user',
   check('Question « toutes les villes » d\'un commerce sans diffusion : aucune notification',!(await sink('pa')).some(x=>/Salon/.test(x.title)));
   let refused=false;try{await call('beginQuestion',{campaignId:'fake',questionIdx:0},ptok);await sleep(2700);await call('submitAnswer',{campaignId:'fake',questionIdx:0,answerValue:'Oui'},ptok);}catch(e){refused=/ville/.test(e.message);}
   check('… et réponse refusée par le serveur',refused);
+  const est=await call('estimateCampaign',{questions:1},ntok);
+  check('Dashboard NOOVA : estimation sur tous les habitants, sans ville',est.cityLabel==='Toutes les villes'&&est.totalUsers===3,est);
+  const NT=require(__dirname+'/../functions/notifications.js')._t;
+  const bcCamp={id:'bcx',merchantId:'nv',broadcast:true,targetCity:'toutes',createdAt:Timestamp.now()};
+  check('Compte NOOVA suivi d\'office : même « écarté » par un habitant, sa question lui reste proposée',NT.availableFor({declinedMerchants:['nv'],authorizedMerchants:[]},[bcCamp]).length===1);
   // Diagnostic admin : question lancée avant d'activer la diffusion (elle ne vise que la ville du compte)
   await db.doc('campaigns/pre').set({...Q,merchantId:'nv',merchantName:'NOOVA',name:'Avant activation',targetCity:'le-mans',city:'le-mans',cityLabel:'Le Mans',createdAt:Timestamp.now()});
   const N=require(__dirname+'/../functions/notifications.js')._t;
