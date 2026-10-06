@@ -1412,9 +1412,25 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 <!-- U5 : catégories qui intéressent l'habitant -->
 <div id="cat-wall" style="position:fixed;inset:0;z-index:10001;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;overflow-y:auto">
   <div style="width:100%;max-width:340px">
+    <div id="cat-age-wrap">
+      <div style="font-family:var(--fd);font-weight:800;font-size:var(--fs-6);color:var(--ink);letter-spacing:var(--lettrage-titre);margin-bottom:8px">Ton âge</div>
+      <div style="font-size:var(--fs-3);color:var(--ink2);margin-bottom:14px;line-height:1.7">Les commerces voient seulement ta tranche d'âge, jamais ton identité.</div>
+      <div id="cat-age-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:8px">
+        <button type="button" class="age-opt" data-age="16-17" onclick="selCatAge(this)">16–17 ans</button>
+        <button type="button" class="age-opt" data-age="18-24" onclick="selCatAge(this)">18–24 ans</button>
+        <button type="button" class="age-opt" data-age="25-34" onclick="selCatAge(this)">25–34 ans</button>
+        <button type="button" class="age-opt" data-age="35-49" onclick="selCatAge(this)">35–49 ans</button>
+        <button type="button" class="age-opt" data-age="50-64" onclick="selCatAge(this)">50–64 ans</button>
+        <button type="button" class="age-opt" data-age="65+" onclick="selCatAge(this)">65+ ans</button>
+      </div>
+      <div id="cat-age-err" style="color:var(--erreur);font-size:var(--fs-2);display:none;margin-bottom:10px">Choisis ta tranche d'âge.</div>
+      <div style="height:18px"></div>
+    </div>
+    <div id="cat-int-wrap">
     <div style="font-family:var(--fd);font-weight:800;font-size:var(--fs-6);color:var(--ink);letter-spacing:var(--lettrage-titre);margin-bottom:8px">Ce qui t'intéresse</div>
     <div style="font-size:var(--fs-3);color:var(--ink2);margin-bottom:22px;line-height:1.7">On te proposera en priorité les questions de ces commerces.</div>
     <div id="cat-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
+    </div>
     <div id="cat-err" style="color:var(--erreur);font-size:var(--fs-2);display:none;margin-bottom:10px">Choisis au moins une catégorie.</div>
     <button id="cat-submit" onclick="saveCategories()" style="width:100%;padding:16px;border-radius:var(--r-md);background:var(--coral);border:none;color:var(--jaune-ink);font-size:var(--fs-4);font-weight:800;font-family:var(--fd);cursor:pointer">Continuer</button>
   </div>
@@ -1544,6 +1560,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
     </div>
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
     <div id="home-requests"></div>
+    <div id="age-nudge" style="display:none;margin:0 22px 14px"></div>
     <div id="daily-track"></div>
     <div class="sec-lbl" id="queue-sec">À répondre</div>
     <div class="q-list" id="queue-list" tabindex="0" role="group" aria-label="Autres questions à répondre"></div>
@@ -2394,6 +2411,7 @@ function renderHeaderStats(){
 function refreshHome(){
   if(!S.user)return;
   renderHeaderStats();   // met aussi à jour #home-pts (S.pts), en plus des NOOVS/série
+  renderAgeNudge();
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('today-card').classList.toggle('disc',!!q._discovery);document.getElementById('tc-brand').innerHTML=esc(q.brand)+testTagHTML(q._isTest);document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector(':scope > img');
     if(q.photoUrl){
@@ -4865,13 +4883,32 @@ async function afterAccountCreated(uid){
 }
 
 // ─── U5 : catégories ─────────────────────────────────────────
-function showCategoryWall(uid){
-  const w=document.getElementById('cat-wall');w._uid=uid;
+// Inscription (toutes méthodes : e-mail, Google, Apple) : tranche d'âge puis centres d'intérêt, sur le même écran.
+// ageOnly : compte existant sans tranche d'âge, on ne demande que l'âge.
+function showCategoryWall(uid,opts){
+  const ageOnly=!!(opts&&opts.ageOnly);
+  const w=document.getElementById('cat-wall');w._uid=uid;w._ageOnly=ageOnly;
   document.getElementById('cat-grid').innerHTML=interestChipsHTML('toggleCat(this)',true);
   const have=S._interests||[];
   w.querySelectorAll('.int-chip').forEach(c=>c.classList.toggle('sel',have.includes(c.dataset.cat)));
+  w._age=S._age||'';
+  w.querySelectorAll('#cat-age-grid .age-opt').forEach(b=>b.classList.toggle('sel',b.dataset.age===w._age));
+  document.getElementById('cat-int-wrap').style.display=ageOnly?'none':'';
   document.getElementById('cat-err').style.display='none';
+  document.getElementById('cat-age-err').style.display='none';
   w.style.display='flex';
+}
+// Compte inscrit avant que la tranche d'âge soit demandée : petite carte sur l'accueil (jamais bloquante).
+function renderAgeNudge(){
+  const el=document.getElementById('age-nudge');if(!el)return;
+  if(S._age||!auth.currentUser){el.style.display='none';el.innerHTML='';return;}
+  el.innerHTML='<div class="follow-card" role="group" aria-label="Tranche d\'âge"><div class="fc-t">Indique ta tranche d\'âge</div><div class="fc-d">Les commerces la voient de façon anonyme, pour mieux comprendre les réponses.</div><div class="fc-b"><button class="btn-p" onclick="showCategoryWall(auth.currentUser.uid,{ageOnly:true})">Choisir</button></div></div>';
+  el.style.display='block';
+}
+function selCatAge(el){
+  const w=document.getElementById('cat-wall');w._age=el.dataset.age;
+  w.querySelectorAll('#cat-age-grid .age-opt').forEach(b=>b.classList.toggle('sel',b===el));
+  document.getElementById('cat-age-err').style.display='none';
 }
 function toggleCat(el){
   const grid=document.getElementById('cat-grid');
@@ -4882,12 +4919,19 @@ function toggleCat(el){
 async function saveCategories(){
   const w=document.getElementById('cat-wall');const uid=w._uid||(auth.currentUser&&auth.currentUser.uid);
   const cats=[...w.querySelectorAll('.int-chip.sel')].map(c=>c.dataset.cat).filter(c=>c!=='all');
-  if(!cats.length){document.getElementById('cat-err').style.display='block';return;}
+  const age=w._age||'';
+  if(!age){document.getElementById('cat-age-err').style.display='block';return;}
+  if(!w._ageOnly&&!cats.length){document.getElementById('cat-err').style.display='block';return;}
   if(!uid)return;
   const btn=document.getElementById('cat-submit');btn.disabled=true;btn.textContent='…';
   try{
-    await db.collection('users').doc(uid).update({interests:cats,onboardingStep:'done',updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
-    S._interests=cats;w.style.display='none';
+    const upd={ageRange:age,age:age,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+    if(!w._ageOnly){upd.interests=cats;upd.onboardingStep='done';}
+    await db.collection('users').doc(uid).update(upd);
+    S._age=age;
+    if(!w._ageOnly)S._interests=cats;
+    w.style.display='none';
+    if(w._ageOnly){btn.disabled=false;btn.textContent='Continuer';renderAgeNudge();showToast('Merci !','success');return;}
     loadUserAndStart(uid);
   }catch(e){console.warn('saveCategories:',e);document.getElementById('cat-err').textContent='Erreur, réessaie.';document.getElementById('cat-err').style.display='block';}
   btn.disabled=false;btn.textContent='Continuer';

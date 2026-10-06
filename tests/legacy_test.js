@@ -168,9 +168,12 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     uuid = await up.evaluate(() => auth.currentUser.uid);
     const u = (await adb.doc('users/' + uuid).get()).data();
     check('U4 +50 points de bienvenue crédités par le serveur (claimWelcomeBonus), une seule fois', u.points === 50 && u.welcomeClaimed === true && !!u.lastActivityAt, 'points=' + u.points);
-    await up.evaluate(() => { document.querySelector('#cat-grid [data-cat=restauration]').click(); saveCategories(); });
+    // Tranche d'âge demandée à l'inscription : sans elle, on ne peut pas continuer
+    const ageMsg = await up.evaluate(() => { document.querySelector('#cat-grid [data-cat=restauration]').click(); saveCategories(); return getComputedStyle(document.getElementById('cat-age-err')).display; });
+    check('Inscription : la tranche d\'âge est obligatoire (message si elle manque)', ageMsg === 'block', ageMsg);
+    await up.evaluate(() => { document.querySelector('#cat-age-grid [data-age="18-24"]').click(); saveCategories(); });
     await waitFn(up, () => document.getElementById('home').classList.contains('active') && S.user, null, 25000);
-    check('U5 catégories enregistrées puis accueil', (await adb.doc('users/' + uuid).get()).data().interests.includes('restauration'));
+    check('U5 tranche d\'âge et catégories enregistrées puis accueil', (await adb.doc('users/' + uuid).get()).data().interests.includes('restauration') && (await adb.doc('users/' + uuid).get()).data().ageRange === '18-24');
   });
   await step('user discovery -> answer -> follow', async () => {
     await waitFn(up, () => S.qs.length === 1 && S.qs[0]._discovery === true, null, 20000);

@@ -577,5 +577,7 @@ service cloud.firestore {
     match /mail/{id}           { allow read, write: if false; }
     // État du mois de test (commerces fictifs) : écrit par les fonctions, lu par l'admin.
     match /config/{id}         { allow read: if isAdmin(); allow write: if false; }
+    // Zones ouvertes automatiquement (functions/autoZones.js) : écrites par le serveur, lues par l'admin.
+    match /zones/{id}          { allow read: if isAdmin(); allow write: if false; }
   }
 }
