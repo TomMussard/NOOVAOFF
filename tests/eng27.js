@@ -48,7 +48,7 @@ const mkCamp=(id,o={})=>db.doc('campaigns/'+id).set({merchantId:'m1',merchantNam
     const uid=await p.evaluate(()=>auth.currentUser.uid);
     const u=(await db.doc('users/'+uid).get()).data();
     check('Compte créé : city = « le-mans » (zone), cityLabel = « Allonnes » (ce qu\'elle a tapé)',u.city==='le-mans'&&u.cityLabel==='Allonnes',u);
-    await p.evaluate(()=>{document.querySelector('#cat-grid [data-cat=all]').click();saveCategories();});   // « Tout m'intéresse » : la campagne (secteur Boulangerie) apparaît sans dépendre du tirage aléatoire de découverte
+    await p.evaluate(()=>{document.querySelector('#cat-grid [data-cat=all]').click();document.querySelector('#cat-age-grid [data-age="25-34"]').click();saveCategories();});   // « Tout m'intéresse » : la campagne (secteur Boulangerie) apparaît sans dépendre du tirage aléatoire de découverte
     await wf(p,()=>document.getElementById('home').classList.contains('active')&&Array.isArray(S.qs),null,25000);
     check('Elle voit bien la campagne du Fournil (ville « Le Mans ») bien qu\'elle habite Allonnes',await p.evaluate(()=>S.qs.some(q=>q._firestoreId==='c1')));
     await p.evaluate(()=>{goNav('profile');refreshProfile();});await sleep(300);

@@ -319,6 +319,39 @@ async function upsertTestMerchants({ onlyMissing = false } = {}) {
   return n;
 }
 
+// Nouvelle zone créée automatiquement (functions/autoZones.js) : 5 commerces fictifs (café, coiffeur, fleuriste,
+// supérette, bar), leurs vitrines et leurs récompenses, puis leur première question. Noms et visuels choisis d'après
+// le nom de la ville (stables : relancer ne change rien). Idempotent.
+async function createTestZone(slug, label, now = Date.now()) {
+  let h = 2166136261;
+  for (const ch of String(slug)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  const ci = (h >>> 0) % 10;
+  await db().collection("cities").doc(slug).set({ label, active: true, autoZone: true }, { merge: true });
+  let n = 0;
+  for (const [type, t] of Object.entries(TYPES)) {
+    const id = merchantId(slug, type), name = t.names[ci];
+    if ((await db().collection("merchants").doc(id).get()).exists) continue;
+    await db().collection("merchants").doc(id).set({
+      role: "merchant", ownerUid: id, brandName: name, name, sector: t.sector, theme: t.sector,
+      city: slug, cityLabel: label, address: `Centre-ville, ${label}`,
+      description: t.desc, status: "verified", isTest: true, email: `${id}@test.noova.fr`,
+      verifiedPopupShown: true, seenDashTour: true, ...visualsFor(ci, type),
+      createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
+    });
+    for (const tier of TIERS) {
+      await db().collection("rewards").doc(`${id}_p${tier.n}`).set({
+        merchantId: id, merchantName: name, city: slug, label: t.rewards[tier.n - 1], tier: tier.n, slot: tier.n,
+        cost: tier.pts, priceConfirmed: true, monthlyQuota: 1000, timeSlots: [], withPurchase: false, minPurchase: null,
+        status: "approved", active: true, approved: true, isTest: true, icon: "",
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    }
+    n++;
+  }
+  const questions = n ? await postNextQuestions(now, { onlyNew: true }) : 0;
+  return { merchants: n, questions };
+}
+
 // Une nouvelle question pour chaque commerce fictif (la suivante de sa banque, sans répétition).
 // Jour (AAAA-MM-JJ) et minute depuis minuit, à Paris.
 function parisNow(ms) {
@@ -433,4 +466,4 @@ const testMonthAutopilot = onSchedule({ schedule: "*/20 8-20 * * *", timeZone: "
   logger.info("testMonthAutopilot", r);
 });
 
-module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { setupCore, stopCore, autopilotCore, postNextQuestions, postSlot, parisNow, visualsCore, syncCore, visualsFor, CITIES, TYPES, BANK, merchantId } };
+module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { createTestZone, setupCore, stopCore, autopilotCore, postNextQuestions, postSlot, parisNow, visualsCore, syncCore, visualsFor, CITIES, TYPES, BANK, merchantId } };

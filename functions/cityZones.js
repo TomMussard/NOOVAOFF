@@ -64,14 +64,27 @@ async function coordsOf(slug, label) {
   return { lat: geo.lat, lng: geo.lng };
 }
 
-// Résout un slug quelconque vers la ville NOOVA la plus proche à moins de MAX_KM, s'il y en a une.
+// Zones NOOVA : les 10 villes de départ + les zones créées automatiquement à l'inscription d'un habitant dans une
+// ville encore sans zone (collection zones, voir functions/autoZones.js). Lecture mise en cache 5 minutes.
+let _zonesCache = { at: 0, list: [] };
+async function allZones() {
+  if (Date.now() - _zonesCache.at > 5 * 60 * 1000) {
+    const snap = await db().collection("zones").get().catch(() => ({ docs: [] }));
+    _zonesCache = { at: Date.now(), list: snap.docs.map((d) => ({ slug: d.id, label: d.data().label || d.id })) };
+  }
+  return HUB_CITIES.concat(_zonesCache.list.filter((z) => !HUB_CITIES.some((h) => h.slug === z.slug)));
+}
+const resetZonesCache = () => { _zonesCache = { at: 0, list: [] }; };
+
+// Résout un slug quelconque vers la zone NOOVA la plus proche à moins de MAX_KM, s'il y en a une.
 async function resolveZoneCore(rawSlug, rawLabel) {
-  const hub = HUB_CITIES.find((h) => h.slug === rawSlug);
-  if (hub) return { slug: rawSlug, matched: false };            // déjà une ville NOOVA elle-même : rien à faire
+  const hubs = await allZones();
+  const hub = hubs.find((h) => h.slug === rawSlug);
+  if (hub) return { slug: rawSlug, matched: false, isZone: true };   // déjà une zone NOOVA elle-même : rien à faire
   const here = await coordsOf(rawSlug, rawLabel);
-  if (!here) return { slug: rawSlug, matched: false };          // commune introuvable : on ne force rien (fail closed)
+  if (!here) return { slug: rawSlug, matched: false, unknown: true }; // commune introuvable : on ne force rien (fail closed)
   let best = null;
-  for (const h of HUB_CITIES) {
+  for (const h of hubs) {
     const there = await coordsOf(h.slug, h.label);
     if (!there) continue;
     const km = haversineKm(here, there);
@@ -94,4 +107,4 @@ const resolveCityZone = onCall(async (request) => {
   }
 });
 
-module.exports = { resolveCityZone, _t: { resolveZoneCore, haversineKm, coordsOf, setGeocodeFn, MAX_KM, HUB_CITIES } };
+module.exports = { resolveCityZone, _t: { resolveZoneCore, allZones, resetZonesCache, haversineKm, coordsOf, setGeocodeFn, MAX_KM, HUB_CITIES } };
