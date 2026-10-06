@@ -119,10 +119,10 @@ const mkUser=async(uid,o={})=>{await db.doc('users/'+uid).set({role:'user',name:
   });
 
   await T('compteur de consentements',async()=>{
-    for(let i=0;i<5;i++)await createTs(A,'consentEvents','ce'+i,{userId:'alice',merchantId:'m1',action:'granted',segment:{}});
-    await sleep(4000);
+    const st=[];for(let i=0;i<5;i++)st.push(await createTs(A,'consentEvents','ce'+i,{userId:'alice',merchantId:'m1',action:'granted',segment:{}}));
+    await until(async()=>(await db.doc('merchants/m1').get()).data().consentCount>=1,15000);await sleep(2000);
     const c=(await db.doc('merchants/m1').get()).data().consentCount;
-    check('5 « consentements » envoyés par le même habitant : comptés une seule fois',c===1,c);
+    check('5 « consentements » envoyés par le même habitant : comptés une seule fois',st.every(x=>x===200)&&c===1,{st,c:c===undefined?'absent':c});
   });
 
   console.log(`\n${pass} ok, ${fail} échec(s)`);process.exit(0);

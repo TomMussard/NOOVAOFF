@@ -131,7 +131,7 @@ const settle=async()=>{await sleep(4500);for(const c of ['_pushSink','notifLog',
     const ops=async(p,email)=>p.evaluate(async(email)=>{
       await auth.signInWithEmailAndPassword(email,'secret123');const uid=auth.currentUser.uid;
       const t=async fn=>{try{await fn();return 'allowed';}catch(e){return e.code;}};
-      const base={merchantId:uid,merchantName:'X',text:'Suite à vos avis, nous ouvrons plus tôt.',campaignIds:[],status:'pending',city:'le-mans',createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+      const base={merchantId:uid,merchantName:'Le Fournil',text:'Suite à vos avis, nous ouvrons plus tôt.',campaignIds:[],status:'pending',city:'le-mans',createdAt:firebase.firestore.FieldValue.serverTimestamp()};
       const col=db.collection('merchantPosts');const r={};
       r.create=await t(()=>col.doc('t_'+uid).set(base));
       r.createPublished=await t(()=>col.doc('tp_'+uid).set({...base,status:'published'}));
@@ -229,7 +229,7 @@ const settle=async()=>{await sleep(4500);for(const c of ['_pushSink','notifLog',
     const pid2=(await db.collection('merchantPosts').get()).docs.find(d=>d.id!==pid).id;
     await sleep(800);
     await ap.evaluate(()=>{loadPostModeration();});await wf(ap,()=>document.querySelector('#post-mod-list .post-ko'),null,15000);
-    await ap.evaluate(async()=>{const pr=rejectPost(document.querySelector('#post-mod-list .post-ko').getAttribute('onclick').match(/'([^']+)'/)[1],null);await new Promise(r=>setTimeout(r,200));closeTextPromptModal('Trop promotionnel');await pr;});
+    await ap.evaluate(async()=>{const pr=rejectPost(document.querySelector('#post-mod-list .post-ko').getAttribute('onclick').match(/["']([^"']+)["']/)[1],null);await new Promise(r=>setTimeout(r,200));closeTextPromptModal('Trop promotionnel');await pr;});
     await until(async()=>(await db.doc('merchantPosts/'+pid2).get()).data().status==='rejected');
     await sleep(1200);
     const rj=await mp.$eval('#news-list',e=>e.textContent);

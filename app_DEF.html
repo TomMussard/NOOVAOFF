@@ -5893,6 +5893,12 @@ async function loadFriendsFromFirestore(uids) {
     // accepté n'est pas lisible, donc n'apparaît pas.
     const results = await Promise.allSettled(capped.map(uid => db.collection('publicProfiles').doc(uid).get()));
     const allSnaps = results.filter(r => r.status === 'fulfilled').map(r => r.value);
+    // Ami qui n'a pas (encore) accepté : son profil d'ami est illisible. On l'affiche « en attente » avec la seule
+    // copie du classement de la ville (prénom, photo, XP), s'il est de la même ville.
+    const okIds = new Set(allSnaps.filter(s => s.exists).map(s => s.id));
+    const pendingIds = capped.filter(u => !okIds.has(u));
+    const pendingSnaps = (await Promise.allSettled(pendingIds.map(uid => db.collection('cityBoard').doc(uid).get())))
+      .map((r, i) => ({ uid: pendingIds[i], d: r.status === 'fulfilled' && r.value.exists ? r.value.data() : null }));
     const seenUids = new Set();
     S.friends = allSnaps.filter(s => s.exists && !seenUids.has(s.id) && seenUids.add(s.id)).map(s => {
       const d = s.data();
@@ -5901,11 +5907,22 @@ async function loadFriendsFromFirestore(uids) {
       // une récompense semble "redescendre", ce qui n'est pas cohérent pour un classement.
       return { n: d.name || 'Ami', xp: d.xp || 0, str: d.streak || 0, uid: s.id, photoUrl: d.photoUrl || null, share: d.shareAnswers !== false, mutual: true };
     });
+    pendingSnaps.forEach(({ uid, d }) => S.friends.push({ n: (d && d.name) || 'Demande envoyée', xp: (d && d.xp) || 0, str: (d && d.streak) || 0, uid, photoUrl: (d && d.photoUrl) || null, share: false, mutual: false }));
+    // Une amitié tout juste acceptée peut ne pas être encore enregistrée côté serveur au moment de cette lecture :
+    // on relit une fois, quelques secondes plus tard, pour qu'elle apparaisse sans recharger l'app.
+    const retryKey = pendingIds.slice().sort().join(',');
+    if (window._friendRetryKey !== retryKey) { window._friendRetryKey = retryKey; window._friendRetryN = 0; }
+    if (pendingIds.length && window._friendRetryN < 3) {
+      const wait = 3000 * Math.pow(2, window._friendRetryN++);   // 3 s, 6 s, 12 s
+      setTimeout(() => { if ((S._friendUids || []).some(u => pendingIds.includes(u))) loadFriendsFromFirestore(S._friendUids); }, wait);
+    }
     renderFriends();
     if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }
     // Recharge le feed avec la nouvelle liste d'amis
+    // Le fil n'est relancé que si la liste des amis CONFIRMÉS change (sinon une relecture refermerait les commentaires ouverts).
     const feedEl = document.getElementById('feed-content');
-    if (feedEl) loadCommunityFeed();
+    const mutualKey = S.friends.filter(f => f.mutual).map(f => f.uid).sort().join(',');
+    if (feedEl && window._feedFriendsKey !== mutualKey) { window._feedFriendsKey = mutualKey; loadCommunityFeed(); }
     loadFriendAnswers().then(() => { renderQueue(); }).catch(() => {});
   } catch (e) { console.warn('loadFriends:', e); }
 }
