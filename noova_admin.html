@@ -791,8 +791,11 @@ let modalMerchant = null;
 
 // ── Utils ──────────────────────────────────────────────────────────────────
 function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
+// Valeur insérée dans un attribut onclick="…" : chaîne JavaScript sûre (JSON), puis échappée pour l'attribut HTML.
+// Jamais '${esc(x)}' : l'attribut est décodé avant l'exécution, une apostrophe y refermerait la chaîne (injection de code).
+function jsa(v){return esc(JSON.stringify(v==null?'':String(v)));}
 function showToast(msg, ico = 'success') {
   const t = document.getElementById('toast');
   t.innerHTML = icon(ico, { size: 16 }) + `<span>${esc(msg)}</span>`;
@@ -821,7 +824,7 @@ function fmtDate(ts) {
 // ── Auth ───────────────────────────────────────────────────────────────────
 auth.onAuthStateChanged(async user => {
   if (!user) { showGoogleLogin(); return; }
-  if (!ADMIN_EMAILS.includes(user.email)) {
+  if (!ADMIN_EMAILS.includes(String(user.email || "").toLowerCase()) || !user.emailVerified) {   // e-mail admin ET vérifié (mêmes conditions que les règles)
     document.getElementById('auth-wall').innerHTML = `<div class="aw-deco"><svg viewBox="0 0 800 600" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><ellipse cx="650" cy="80" rx="300" ry="220" fill="rgba(255,255,255,.12)"/></svg></div><div class="aw-card" style="text-align:center"><div style="margin-bottom:12px;color:#EF4444;display:flex;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:40px;height:40px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg></div><div style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--ink);margin-bottom:8px;letter-spacing:-.5px">Accès refusé</div><p style="font-size:13px;color:var(--ink3);margin-bottom:20px">Ce compte n'est pas autorisé.</p><button onclick="auth.signOut()" style="padding:10px 20px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;cursor:pointer;font-weight:800;font-family:var(--fb);font-size:14px">Changer de compte</button></div>`;
     return;
   }
@@ -829,6 +832,8 @@ auth.onAuthStateChanged(async user => {
   document.getElementById('topbar').style.display = 'flex';
   document.getElementById('main').style.display = 'block';
   loadMerchants();
+  // Copies publiques réduites (classement, profils d'amis, vitrines) : remplies une fois pour les comptes existants.
+  fx.httpsCallable('adminSyncPublic')({ ifNeeded: true }).catch(e => console.warn('adminSyncPublic:', e));
 });
 
 function showGoogleLogin() {
@@ -1120,13 +1125,13 @@ function renderFeedback() {
   const kinds = Object.keys(FB_KIND).map(k => ({ label: FB_KIND[k], value: all.filter(f => f.kind === k && (f.text || '').trim()).length, color: k === 'bug' ? ST_C.brule : k === 'idee' ? ST_C.or : ST_C.gris }));
   const fresh = all.filter(f => f.status === 'nouveau').length;
   const list = all.filter(f => (_fbFilter.kind === 'all' || f.kind === _fbFilter.kind) && (_fbFilter.status === 'all' || f.status === _fbFilter.status));
-  const chip = (grp, val, lbl) => `<button class="tab-btn-main${_fbFilter[grp] === val ? ' active' : ''}" style="padding:6px 12px;font-size:12px" onclick="_fbFilter.${grp}='${val}';renderFeedback()">${lbl}</button>`;
+  const chip = (grp, val, lbl) => `<button class="tab-btn-main${_fbFilter[grp] === val ? ' active' : ''}" style="padding:6px 12px;font-size:12px" onclick="_fbFilter.${grp}=${jsa(val)};renderFeedback()">${lbl}</button>`;
   const when = (f) => f.createdAt && f.createdAt.toDate ? f.createdAt.toDate().toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
   const items = list.map(f => `<div class="card" style="margin-bottom:12px;${f.status === 'traite' ? 'opacity:.6' : ''}"><div style="padding:14px 18px">
       <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
         <div><strong>${esc(f.name || 'Habitant')}</strong> <span style="color:var(--ink3);font-size:12px">${esc(f.city || '')}${f.city ? ', ' : ''}${esc(f.platform || '')}${f.standalone ? ' (app installée)' : ''}, ${esc(when(f))}</span></div>
         <div style="display:flex;gap:6px;align-items:center">${f.rating ? `<span class="st-tag" style="background:var(--amber);color:var(--brown);font-size:12px">${f.rating}/5</span>` : ''}<span class="st-tag" style="font-size:12px;${f.kind === 'bug' ? 'background:rgba(239,68,68,.12);color:var(--red-text)' : ''}">${esc(FB_KIND[f.kind] || f.kind)}</span>
-          <button class="${f.status === 'traite' ? 'btn-reject' : 'btn-approve'}" onclick="setFeedbackStatus('${f.id}','${f.status === 'traite' ? 'nouveau' : 'traite'}')">${f.status === 'traite' ? 'Remettre à traiter' : 'Marquer traité'}</button></div>
+          <button class="${f.status === 'traite' ? 'btn-reject' : 'btn-approve'}" onclick="setFeedbackStatus(${jsa(f.id)},'${f.status === 'traite' ? 'nouveau' : 'traite'}')">${f.status === 'traite' ? 'Remettre à traiter' : 'Marquer traité'}</button></div>
       </div>
       ${(f.text || '').trim() ? `<div style="margin-top:8px;font-size:14px;line-height:1.55;white-space:pre-wrap">${esc(f.text)}</div>` : ''}
       ${(f.likes || []).length || (f.dislikes || []).length ? `<div style="margin-top:8px;font-size:12px">${(f.likes || []).map(k => `<span class="st-tag" style="background:rgba(11,171,132,.12);color:var(--mint-text)">${esc(FB_FEAT[k] || k)}</span>`).join('')}${(f.dislikes || []).map(k => `<span class="st-tag" style="background:rgba(161,78,8,.12);color:#8a4206">${esc(FB_FEAT[k] || k)} à revoir</span>`).join('')}</div>` : ''}
@@ -1198,7 +1203,7 @@ async function loadCityControls() {
       const active = c.active !== false; // par défaut active tant que non désactivée explicitement
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border)">
         <div><div style="font-weight:700;font-size:13.5px;color:var(--ink)">${esc(c.label||c.id)}</div><div style="font-size:11px;color:var(--ink3)">${c.count||0} habitant${(c.count||0)>1?'s':''} inscrit${(c.count||0)>1?'s':''}</div></div>
-        <button onclick="toggleCityActive('${c.id}',${!active})" style="padding:6px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid ${active?'rgba(11,171,132,.35)':'var(--border)'};background:${active?'rgba(11,171,132,.1)':'var(--bg)'};color:${active?'#0BAB84':'var(--ink3)'};cursor:pointer">${active?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg>'+' Ouverte aux habitants':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><rect x="7" y="5.5" width="4" height="13" rx="1"/><rect x="13" y="5.5" width="4" height="13" rx="1"/></svg>'+' Fermée'}</button>
+        <button onclick="toggleCityActive(${jsa(c.id)},${!active})" style="padding:6px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid ${active?'rgba(11,171,132,.35)':'var(--border)'};background:${active?'rgba(11,171,132,.1)':'var(--bg)'};color:${active?'#0BAB84':'var(--ink3)'};cursor:pointer">${active?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg>'+' Ouverte aux habitants':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><rect x="7" y="5.5" width="4" height="13" rx="1"/><rect x="13" y="5.5" width="4" height="13" rx="1"/></svg>'+' Fermée'}</button>
       </div>`;
     }).join('');
   } catch(e) {
@@ -1324,8 +1329,8 @@ function loadRewardModeration() {
           <div style="font-weight:700;font-size:13.5px;color:var(--ink)">${esc(r.label||'Récompense')}</div>
           <div style="font-size:11.5px;color:var(--ink3);margin-top:2px">${esc(r.merchantName||'')} · ${esc(r.city||'')} · palier ${r.tier||'?'} · ${r.cost||0} pts · prix carte confirmé entre ${((window.NOOVA_TIERS||[]).find(t=>t.n===r.tier)||{}).min||'?'} et ${((window.NOOVA_TIERS||[]).find(t=>t.n===r.tier)||{}).max||'?'} € · quota ${r.monthlyQuota||'?'}/mois${r.withPurchase?' · avec achat (min. '+r.minPurchase+' €)':''}${r.purchaseCondition?' · '+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg>'+' '+esc(r.purchaseCondition):''}</div>
         </div>
-        <button onclick="approveReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>
-        <button onclick="rejectReward('${r.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Refuser</button>
+        <button onclick="approveReward(${jsa(r.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>
+        <button onclick="rejectReward(${jsa(r.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Refuser</button>
       </div>`).join('');
   }, e => {
     el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
@@ -1365,10 +1370,10 @@ async function renderMerchantQuota(m) {
   el.textContent = 'Chargement…';
   const own = Number.isInteger(m.monthlyQuestionQuota) ? m.monthlyQuestionQuota : '';
   el.innerHTML = `<input id="md-quota-inp" type="number" min="0" max="1000" value="${own}" placeholder="défaut" style="width:90px;padding:7px 9px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink)">
-    <button onclick="saveMerchantQuota('${esc(m.id)}')" style="padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;border:none;background:var(--coral);color:var(--ink);cursor:pointer">Enregistrer</button>
+    <button onclick="saveMerchantQuota(${jsa(m.id)})" style="padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;border:none;background:var(--coral);color:var(--ink);cursor:pointer">Enregistrer</button>
     <span style="font-size:11px;color:var(--ink3)">Vide = quota par défaut de la plateforme</span>
     <label style="display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:13px;color:var(--ink);cursor:pointer;flex-basis:100%">
-      <input type="checkbox" id="md-broadcast" ${m.broadcast === true ? 'checked' : ''} onchange="saveMerchantBroadcast('${esc(m.id)}', this)">
+      <input type="checkbox" id="md-broadcast" ${m.broadcast === true ? 'checked' : ''} onchange="saveMerchantBroadcast(${jsa(m.id)}, this)">
       <span><b>Diffuser dans toutes les villes</b> (compte NOOVA)<br><span style="font-size:11px;color:var(--ink3)">Ses questions partent à tous les habitants, toutes villes confondues, avec une notification. Sans quota ni vitrine récompenses.</span></span>
     </label>`;
 }
@@ -1431,8 +1436,8 @@ function loadPostModeration() {
           <div style="font-weight:700;font-size:13.5px;color:var(--ink)">${esc(p.merchantName || 'Commerce')}<span style="font-weight:500;color:var(--ink3);font-size:11.5px"> · ${esc(({news:'Actualité',new:'Nouveauté',top:'À la une',impact:'Suite à vos avis'})[p.kind||'impact'])} · ${esc(p.city || '')}${(p.campaignIds || []).length ? ' · liée à ' + p.campaignIds.length + ' question' + (p.campaignIds.length > 1 ? 's' : '') : ''}</span></div>
           <div class="post-text" style="font-size:13px;color:var(--ink2);margin-top:5px;line-height:1.5;white-space:pre-wrap">${esc(p.text || '')}</div>
         </div>
-        <button class="post-ok" onclick="approvePost('${p.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0">Publier</button>
-        <button class="post-ko" onclick="rejectPost('${p.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Refuser</button>
+        <button class="post-ok" onclick="approvePost(${jsa(p.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0">Publier</button>
+        <button class="post-ko" onclick="rejectPost(${jsa(p.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Refuser</button>
       </div>`).join('');
   }, e => { el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`; });
 }
@@ -1477,7 +1482,7 @@ function loadModeration() {
           <div style="font-size:12px;color:var(--ink2);margin-bottom:3px">${esc(a.question||'')}</div>
           <div style="font-size:13px;color:var(--ink);font-weight:600">"${esc(String(a.answer ?? '—'))}"</div>
         </div>
-        <button onclick="unflagAnswer('${a.id}',this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Lever le signalement</button>
+        <button onclick="unflagAnswer(${jsa(a.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Lever le signalement</button>
       </div>`;
     }).join('');
   }, e => {
@@ -1514,13 +1519,13 @@ async function loadDangerZone() {
     mEl.innerHTML = merchants.length ? merchants.map(m => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border)">
         <div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--ink)">${esc(m.brandName||m.name||'—')}</div><div style="font-size:11px;color:var(--ink3)">${esc(m.email||'')} · ${esc(m.city||'')} · ${esc(m.status||'')}</div></div>
-        <button onclick="dangerDeleteMerchant('${m.id}',this)" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:rgba(239,68,68,.1);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Supprimer</button>
+        <button onclick="dangerDeleteMerchant(${jsa(m.id)},this)" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:rgba(239,68,68,.1);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Supprimer</button>
       </div>`).join('') : '<div class="empty">Aucun commerçant.</div>';
 
     uEl.innerHTML = users.length ? users.map(u => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border)">
         <div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--ink)">${esc(u.name||'—')}</div><div style="font-size:11px;color:var(--ink3)">${esc(u.email||'')} · ${esc(u.city||'')}</div></div>
-        <button onclick="dangerDeleteUser('${u.id}',this)" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:rgba(239,68,68,.1);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Supprimer</button>
+        <button onclick="dangerDeleteUser(${jsa(u.id)},this)" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:rgba(239,68,68,.1);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Supprimer</button>
       </div>`).join('') : '<div class="empty">Aucun utilisateur.</div>';
   } catch (e) {
     mEl.innerHTML = uEl.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
@@ -1612,9 +1617,9 @@ function renderMerchants() {
         <div class="m-cell">${esc(m.sector||'—')}</div>
         <div class="m-cell">${esc(m.city||'—')}</div>
         <div class="row-actions">
-          <button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>
-          <button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Rejeter</button>
-          <button class="btn-detail" onclick="openModal('${m.id}')">Détails ▸</button>
+          <button class="btn-approve" onclick="approveMerchant(${jsa(m.id)},${jsa(m.brandName||'')})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>
+          <button class="btn-reject" onclick="rejectMerchant(${jsa(m.id)},${jsa(m.brandName||'')})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Rejeter</button>
+          <button class="btn-detail" onclick="openModal(${jsa(m.id)})">Détails ▸</button>
         </div>
       </div>`).join('');
   }
@@ -1648,7 +1653,7 @@ function renderAllMerchants() {
       <div class="m-cell">${esc(m.city||'—')}</div>
       <div class="row-actions">
         <span class="badge ${m.status==='verified'?'badge-verified':'badge-rejected'}">${m.status==='verified'?'Vérifié':'Rejeté'}</span>
-        <button class="btn-detail" onclick="openModal('${m.id}')">Détails ▸</button>
+        <button class="btn-detail" onclick="openModal(${jsa(m.id)})">Détails ▸</button>
       </div>
     </div>`).join('');
 }
@@ -1710,11 +1715,11 @@ function openModal(id) {
   renderMerchantQuota(m);
   const foot = document.getElementById('modal-foot');
   if (m.status === 'pending') {
-    foot.innerHTML = `<button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Rejeter</button><button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>`;
+    foot.innerHTML = `<button class="btn-reject" onclick="rejectMerchant(${jsa(m.id)},${jsa(m.brandName||'')})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Rejeter</button><button class="btn-approve" onclick="approveMerchant(${jsa(m.id)},${jsa(m.brandName||'')})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>`;
   } else if (m.status === 'verified') {
-    foot.innerHTML = `<button class="btn-reject" onclick="rejectMerchant('${m.id}','${esc(m.brandName||'')}')">Révoquer l'accès</button>`;
+    foot.innerHTML = `<button class="btn-reject" onclick="rejectMerchant(${jsa(m.id)},${jsa(m.brandName||'')})">Révoquer l'accès</button>`;
   } else {
-    foot.innerHTML = `<button class="btn-approve" onclick="approveMerchant('${m.id}','${esc(m.brandName||'')}')">Ré-approuver</button>`;
+    foot.innerHTML = `<button class="btn-approve" onclick="approveMerchant(${jsa(m.id)},${jsa(m.brandName||'')})">Ré-approuver</button>`;
   }
   document.getElementById('modal-ov').classList.add('open');
 }
@@ -2004,7 +2009,7 @@ async function renderActiveWeeklyQuestion() {
         <div style="font-size:11px;font-weight:700;color:var(--coral-text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${esc(cityLbl)}</div>
         <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px">${esc(q.text||'')}</div>
         <div style="font-size:12px;color:var(--ink3);margin-bottom:10px">${(q.options||[]).map(o=>esc(o)).join(' · ')}</div>
-        <button onclick="stopWeeklyQuestion('${d.id}')" style="padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer">Arrêter</button>
+        <button onclick="stopWeeklyQuestion(${jsa(d.id)})" style="padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer">Arrêter</button>
       </div>`;
     }).join('');
   } catch(e) { el.innerHTML = '<div class="empty">Erreur de chargement.</div>'; }

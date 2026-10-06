@@ -20,8 +20,7 @@ const pick = (arr, n) => { const c = [...arr]; const out = []; while (out.length
 const rint = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 
 exports.adminSeedDemoUsers = onCall({ region: "europe-west1", timeoutSeconds: 120 }, async (request) => {
-  const email = request.auth && request.auth.token && request.auth.token.email;
-  if (!email || !ADMIN_EMAILS.includes(email)) {
+  if (!require("./lib").isAdminRequest(request)) {
     throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   }
   const merchSnap = await db.collection("merchants").where("status", "==", "verified").where("city", "==", "le-mans").get();

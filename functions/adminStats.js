@@ -95,8 +95,7 @@ async function computeStats(now = Date.now()) {
 }
 
 const adminStats = onCall({ region: "europe-west1", timeoutSeconds: 120, memory: "512MiB" }, async (request) => {
-  const email = request.auth && request.auth.token && request.auth.token.email;
-  if (!email || !ADMIN_EMAILS.includes(email)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
+  if (!require("./lib").isAdminRequest(request)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   const ref = db().collection("config").doc("adminStats");
   if (!(request.data && request.data.force)) {
     const c = await ref.get();

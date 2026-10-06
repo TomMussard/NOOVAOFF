@@ -2,7 +2,9 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     function isOwner(uid) { return request.auth != null && request.auth.uid == uid; }
-    function isAdmin() { return request.auth != null && request.auth.token.email in ['noovaoffr@gmail.com', 'tomussproduction@gmail.com']; }
+    // Images « sûres » seulement : PNG, JPEG, WebP, GIF, HEIC. Jamais de SVG (peut contenir du script) ni de HTML.
+    function safeImage() { return request.resource.contentType.matches('image/(png|jpe?g|webp|gif|heic|heif)'); }
+    function isAdmin() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email in ['noovaoffr@gmail.com', 'tomussproduction@gmail.com']; }
 
     // Logo/photo (public, affiché dans l'app) et document d'identité/Kbis (privé,
     // commerçant + admin uniquement) du commerçant, dans un seul et même match car
@@ -14,13 +16,15 @@ service firebase.storage {
       allow write: if isOwner(merchantId) && (
         (fileName.matches('logo\\..*')
           && request.resource.size < 5 * 1024 * 1024
-          && request.resource.contentType.matches('image/.*'))
+          && safeImage())
         ||
         (fileName.matches('cover\\..*')
           && request.resource.size < 8 * 1024 * 1024
-          && request.resource.contentType.matches('image/.*'))
+          && safeImage())
         ||
-        (fileName.matches('id-document\\..*') && request.resource.size < 10 * 1024 * 1024)
+        // Pièce d'identité / Kbis : image ou PDF uniquement.
+        (fileName.matches('id-document\\..*') && request.resource.size < 10 * 1024 * 1024
+          && (safeImage() || request.resource.contentType == 'application/pdf'))
       );
     }
 
@@ -30,7 +34,7 @@ service firebase.storage {
       allow read: if fileName.matches('avatar\\..*');
       allow write: if isOwner(uid) && fileName.matches('avatar\\..*')
         && request.resource.size < 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+        && safeImage();
     }
 
     // Tout le reste : fermé par défaut.

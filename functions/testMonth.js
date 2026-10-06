@@ -245,8 +245,7 @@ const BANK = {
 const merchantId = (city, type) => `test_${city}_${type}`;
 
 function isAdmin(request) {
-  const email = request.auth && request.auth.token && request.auth.token.email;
-  return !!email && ADMIN_EMAILS.includes(email);
+  return require("./lib").isAdminRequest(request);
 }
 
 // Supprime un commerce et tout ce qui lui est rattaché (même périmètre que adminDeleteAccount).

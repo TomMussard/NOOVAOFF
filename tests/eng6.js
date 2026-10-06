@@ -38,7 +38,7 @@ const callFn=async(name,data,token)=>{const r=await fetch('http://127.0.0.1:5001
     for(const u of ['me','a','b','x'])await mkUser(u,{email:u+'@t.fr'});
     await ans('me','c1','Café');await ans('a','c1','Café');await ans('b','c1','Thé');                  // 3 réponses
     await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});
-    await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+    await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
     const tokUser=await idTokenOf('me@t.fr'),tokAdmin=await idTokenOf('tomussproduction@gmail.com');
     check('Réglages : refusés à un simple utilisateur (lecture et écriture)',(await callFn('getEngagementConfig',{},tokUser)).error==='PERMISSION_DENIED'&&(await callFn('setEngagementConfig',{values:{'REVEAL.MIN_ANSWERS':2}},tokUser)).error==='PERMISSION_DENIED');
     check('Réglages : refusés sans connexion',(await callFn('getEngagementConfig',{},null)).error==='PERMISSION_DENIED'||(await callFn('getEngagementConfig',{},null)).error==='UNAUTHENTICATED');

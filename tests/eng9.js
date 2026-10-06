@@ -47,7 +47,7 @@ const path=require('path');
     await db.doc('merchants/m1').set({brandName:'Le Fournil',sector:'Boulangerie',city:'le-mans',status:'verified',monthlyQuestionQuota:50});
     for(let i=0;i<9;i++)await mkCampaign('c'+i,{targetVolume:1000,question:'Question '+i+' ?',questions:[{q:'Question '+i+' ?',format:'mcq',options:['Oui','Non']}]});
     await mkUser('me',{email:'me@t.fr',birthYear:1990,age:30});
-    await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+    await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
     const tok=await idTokenOf('me@t.fr'),tadm=await idTokenOf('tomussproduction@gmail.com');
     await sleep(3000);                                                        // laisse passer les déclencheurs de création
     let n=0;

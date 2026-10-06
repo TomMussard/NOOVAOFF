@@ -15,7 +15,7 @@ async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/no
   await db.doc('users/me').set({role:'user',welcomeClaimed:true,name:'Camille',email:'me@t.fr',city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:[],friendUids:[],answeredCampaigns:[],points:0,xp:0,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true});
   await db.doc('users/other').set({role:'user',name:'Autre',email:'o@t.fr',city:'le-mans',onboardingStep:'done'});
   await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});await aauth.createUser({uid:'other',email:'o@t.fr',password:'secret123'});
-  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
   const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
   const p=await browser.newPage();await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});const errs=[];p.on('pageerror',e=>errs.push(e.message));
   await p.goto('http://localhost:8950/app.html',{waitUntil:'load'});await wf(p,()=>document.getElementById('onboard').classList.contains('active'));

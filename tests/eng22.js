@@ -39,7 +39,7 @@ const reward=(mid,tier,o={})=>({merchantId:mid,merchantName:'Commerce '+mid,city
   });
 
   await wipe();
-  const mkAuth=async(uid,email)=>aauth.createUser({uid,email,password:'secret123'});
+  const mkAuth=async(uid,email)=>aauth.createUser({uid,email,password:'secret123',emailVerified:/@gmail\.com$/.test(email)});
   await db.doc('merchants/m1').set({role:'merchant',ownerUid:'m1',brandName:'Le Fournil',city:'le-mans',status:'verified',email:'m1@s.fr'});
   await db.doc('merchants/m2').set({role:'merchant',ownerUid:'m2',brandName:'Studio Fit',city:'le-mans',status:'verified',email:'m2@s.fr'});
   await db.doc('users/u1').set({role:'user',name:'Alex',city:'le-mans',points:500,xp:500,welcomeClaimed:true,friendUids:[]});

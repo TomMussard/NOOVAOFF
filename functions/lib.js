@@ -14,8 +14,15 @@ function sectorCategory(sec) {
 function parisDay(ms) {
   return new Date(ms).toLocaleDateString("sv-SE", { timeZone: "Europe/Paris" });
 }
-// Comptes autorisés dans le back-office (doit rester aligné sur isAdmin() de firestore.rules).
+// Comptes autorisés dans le back-office (doit rester aligné sur isAdmin() de firestore.rules et storage.rules).
 const ADMIN_EMAILS = ["noovaoffr@gmail.com", "tomussproduction@gmail.com"];
+// Un appel est « admin » seulement si l'e-mail du compte est l'un des e-mails admin ET qu'il est VÉRIFIÉ (connexion Google,
+// ou lien de vérification reçu dans cette boîte). Sans cette vérification, n'importe qui pouvait créer un compte
+// e-mail + mot de passe au nom d'une adresse admin encore libre et obtenir tous les droits.
+function isAdminToken(token) {
+  return !!token && token.email_verified === true && typeof token.email === "string" && ADMIN_EMAILS.includes(token.email.toLowerCase());
+}
+const isAdminRequest = (request) => !!(request && request.auth && isAdminToken(request.auth.token));
 // Questions d'une campagne. Les campagnes créées avant la correction du 2026-09-20 (sans questionsSchema: 2) avaient les
 // champs d'options des questions 2 et 3 (placés AVANT ceux de la question 1 dans la page) ajoutés au DÉBUT de la liste
 // de la question 1 : [options Q2, options Q3, options Q1]. On retire ce début. Les index des options de Q1 sont alors
@@ -36,4 +43,4 @@ function campaignQuestions(camp) {
   first.options = o;
   return qs;
 }
-module.exports = { sectorCategory, parisDay, ADMIN_EMAILS, campaignQuestions };
+module.exports = { sectorCategory, parisDay, ADMIN_EMAILS, isAdminToken, isAdminRequest, campaignQuestions };

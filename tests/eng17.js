@@ -26,7 +26,7 @@ const lastRows=(p,id)=>p.evaluate(id=>[...document.querySelectorAll('#'+id+' .me
   await wipe();
   const mk=(id,name,status,o={})=>db.doc('merchants/'+id).set({role:'merchant',ownerUid:id,brandName:name,name,sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',email:id+'@shop.fr',status,createdAt:Timestamp.now(),...o});
   await mk('p1','Boulangerie Pending 1','pending');await mk('p2','Café Pending 2','pending');await mk('v1','Studio Vérifié','verified');await mk('v2','Fleuriste Vérifié','verified');
-  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
   const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
   const p=await browser.newPage();PG=p;await p.setViewport({width:1200,height:1000});const errs=[];p.on('pageerror',e=>errs.push(e.message));
   p.on('dialog',async d=>{if(d.type()==='prompt')await d.accept('SIRET introuvable');else await d.accept();});

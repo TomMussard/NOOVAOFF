@@ -42,7 +42,12 @@ async function stateOf(mid, now) {
 // Enregistre la consommation d'une nouvelle campagne. Renvoie true si elle est autorisée, false si elle est bloquée.
 async function accountCampaign(campaignId, camp, now) {
   if (!camp || !camp.merchantId) return true;
-  if (camp.isTest) return true;                 // commerces fictifs du mois de test : une question par jour, sans quota
+  if (camp.isTest) {                            // commerces fictifs du mois de test : une question par jour, sans quota
+    // (vérifié sur la fiche du commerçant, que seul le serveur peut marquer « test » : un vrai commerçant qui écrirait
+    // isTest sur sa campagne ne contourne pas son quota)
+    const m = await db().collection("merchants").doc(camp.merchantId).get();
+    if (m.exists && m.data().isTest === true) return true;
+  }
   if (camp.broadcast === true) {                 // compte de diffusion NOOVA (activé par l'admin) : sans quota
     const m = await db().collection("merchants").doc(camp.merchantId).get();
     if (m.exists && m.data().broadcast === true) return true;
@@ -77,8 +82,7 @@ const getMyQuota = onCall(async (request) => {
 });
 
 const setMerchantQuota = onCall(async (request) => {
-  const email = request.auth && request.auth.token && request.auth.token.email;
-  if (!email || !ADMIN_EMAILS.includes(email)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
+  if (!require("./lib").isAdminRequest(request)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   const { merchantId, quota } = request.data || {};
   if (!merchantId || typeof merchantId !== "string") throw new HttpsError("invalid-argument", "Commerçant invalide.");
   const ref = db().collection("merchants").doc(merchantId);

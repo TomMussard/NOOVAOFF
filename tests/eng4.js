@@ -123,7 +123,7 @@ const settle=async()=>{await sleep(4500);for(const c of ['_pushSink','notifLog',
     await mkM('m1');await mkM('m2',{brandName:'Le Bar',email:'m2@shop.fr'});await mkM('m3',{brandName:'Nouveau',status:'pending',email:'m3@shop.fr'});
     await mkCampaign('c1');await mkU('u1',{email:'u1@t.fr'});
     for(const [u,e] of [['m1','m1@shop.fr'],['m2','m2@shop.fr'],['m3','m3@shop.fr'],['u1','u1@t.fr']])await aauth.createUser({uid:u,email:e,password:'secret123'});
-    await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+    await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
     await post('pPub',{status:'published'});await post('pPend');await post('pM2',{merchantId:'m2',merchantName:'Le Bar'});
     const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
     const ctx=await browser.createBrowserContext();
@@ -178,7 +178,7 @@ const settle=async()=>{await sleep(4500);for(const c of ['_pushSink','notifLog',
     await mkM('m1');await mkCampaign('c1',{name:'Boisson préférée'});await mkCampaign('c2',{question:'Quel pain préférez-vous ?',questions:[{q:'Quel pain préférez-vous ?',format:'mcq',options:['a','b']}]});
     await mkU('u1',{email:'u1@t.fr'});await ansM('u1','c1');
     await setClock(T0);await settle();
-    await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});await aauth.createUser({uid:'u1',email:'u1@t.fr',password:'secret123'});await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+    await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});await aauth.createUser({uid:'u1',email:'u1@t.fr',password:'secret123'});await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
     const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
     const errs=[];
     // Commerçant

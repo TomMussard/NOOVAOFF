@@ -45,7 +45,7 @@ const used=async()=>((await db.doc('merchants/m1/quota/2026-09').get()).data()||
     await db.doc('merchants/m2').set({role:'merchant',ownerUid:'m2',brandName:'Le Bar',sector:'Restauration',city:'le-mans',status:'verified',email:'m2@shop.fr'});
     await mkUser('u1',{email:'u1@t.fr'});await db.doc('users/u1').update({pushEnabled:true,fcmTokens:['tok1']});
     await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});await aauth.createUser({uid:'m2',email:'m2@shop.fr',password:'secret123'});
-    await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+    await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
     const tm1=await idTokenOf('m1@shop.fr'),tm2=await idTokenOf('m2@shop.fr'),tadm=await idTokenOf('tomussproduction@gmail.com');
     await setClock(T0);
     let g=await callFn('getMyQuota',{},tm1);

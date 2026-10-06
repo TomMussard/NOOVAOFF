@@ -1741,7 +1741,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
           <span id="prof-av-letter">A</span>
           <div class="dprof-av-edit"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><circle cx="12" cy="13.5" r="3.2"/></svg></div>
         </div>
-        <input type="file" id="avatar-file-inp" accept="image/*" style="display:none" onchange="changeMyAvatar(this.files[0])">
+        <input type="file" id="avatar-file-inp" accept="image/png,image/jpeg,image/webp,image/gif,image/heic" style="display:none" onchange="changeMyAvatar(this.files[0])">
         <div class="dprof-city" id="prof-email">alex@noova.app</div>
         <div class="dprof-lvl" id="pl-name">Curieux, niveau 1</div>
       </div>
@@ -1994,10 +1994,9 @@ function logoFallbackHTML(name,size){
 function logoHTML(name,size,logoUrl){
   const s=size||44;const r=Math.round(s*0.27);
   if(logoUrl){
-    // Échappement à deux niveaux : \' pour rester une chaîne JS valide dans l'attribut
-    // onerror, &quot; pour ne pas casser l'attribut HTML lui-même (double-quoté).
-    const safeName=esc(name).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-    return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;flex-shrink:0;overflow:hidden;background:var(--marque-encre)"><img src="${logoUrl}" style="width:100%;height:100%;object-fit:cover;display:block" alt="Logo de ${esc(name)}" onerror="this.closest('div').outerHTML=logoFallbackHTML('${safeName}',${s})"></div>`;
+    // Nom passé à logoFallbackHTML dans l'attribut onerror : chaîne JSON échappée pour l'attribut (jsa), jamais esc() seul
+    // (l'attribut est décodé avant exécution : une apostrophe refermerait la chaîne).
+    return `<div style="width:${s}px;height:${s}px;border-radius:${r}px;flex-shrink:0;overflow:hidden;background:var(--marque-encre)"><img src="${esc(logoUrl)}" style="width:100%;height:100%;object-fit:cover;display:block" alt="Logo de ${esc(name)}" onerror="this.closest('div').outerHTML=logoFallbackHTML(${jsa(name)},${s})"></div>`;
   }
   return logoFallbackHTML(name,size);
 }
@@ -2826,8 +2825,8 @@ async function loadComments(postId) {
     const snap = await db.collection('communityEvents').doc(postId).collection('comments').orderBy('createdAt', 'asc').limit(30).get();
     items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch(e) { console.warn('comments:', e); box.innerHTML = '<div class="fpc-empty">Impossible de charger les commentaires.</div>'; return; }
-  const list = items.length ? items.map(c => `<div class="fpc-row"><div class="fpc-av">${esc((c.name || '?')[0].toUpperCase())}</div><div class="fpc-bd"><div class="fpc-nm">${esc(c.name || 'Quelqu\'un')}${c.userId === myUid ? `<button class="fpc-del" onclick="deleteComment('${postId}','${c.id}')" aria-label="Supprimer">Supprimer</button>` : ''}</div><div class="fpc-tx">${esc(c.text || '')}</div></div></div>`).join('') : '<div class="fpc-empty">Aucun commentaire. Lance la conversation.</div>';
-  box.innerHTML = `${list}<div class="fpc-form"><input class="fpc-inp" id="cmi-${postId}" maxlength="200" placeholder="Ajoute un commentaire" onkeydown="if(event.key==='Enter')sendComment('${postId}')"><button class="fpc-send" onclick="sendComment('${postId}')">Envoyer</button></div>`;
+  const list = items.length ? items.map(c => `<div class="fpc-row"><div class="fpc-av">${esc((c.name || '?')[0].toUpperCase())}</div><div class="fpc-bd"><div class="fpc-nm">${esc(c.name || 'Quelqu\'un')}${c.userId === myUid ? `<button class="fpc-del" onclick="deleteComment(${jsa(postId)},${jsa(c.id)})" aria-label="Supprimer">Supprimer</button>` : ''}</div><div class="fpc-tx">${esc(c.text || '')}</div></div></div>`).join('') : '<div class="fpc-empty">Aucun commentaire. Lance la conversation.</div>';
+  box.innerHTML = `${list}<div class="fpc-form"><input class="fpc-inp" id="cmi-${postId}" maxlength="200" placeholder="Ajoute un commentaire" onkeydown="if(event.key==='Enter')sendComment(${jsa(postId)})"><button class="fpc-send" onclick="sendComment(${jsa(postId)})">Envoyer</button></div>`;
   const cnt = document.querySelector(`[data-post-id="${postId}"] .fp-com-count`);
   if(cnt) cnt.textContent = items.length > 0 ? items.length : '';
 }
@@ -2859,7 +2858,7 @@ function timeAgo(date) {
 }
 
 function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
 // Valeur insérée comme argument JS dans un attribut on*="…" : chaîne JSON (guillemets, antislash, apostrophes
 // gérés), puis échappée pour l'attribut. Un prénom comme « N'Diaye » ou « ');alert(1)// » reste une simple chaîne.
@@ -2943,7 +2942,7 @@ function buildSocialCard() {
   window._scPool[key] = { campId, friendName, friendAnswer: shortAns, qIdx: S.qs.indexOf(q) };
   const d = document.createElement('div');
   d.className = 'social-card';
-  d.innerHTML = `<div class="sc-label" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> Même avis ?</div><div class="sc-friend"><div class="sc-fav" style="background:${c}20;color:${c}">${(friendName||'?')[0].toUpperCase()}</div><div><div class="sc-fname">${esc(friendName)}</div><div class="sc-brand">a répondu à ${esc(q.brand)}</div></div></div><div class="sc-q">${esc((q.q||'').substring(0,60))}…</div><div class="sc-answer">${shortAns ? '&ldquo;' + esc(shortAns) + '&rdquo;' : '…'}</div><div class="sc-actions"><button class="sc-btn p" onclick="openCompare('${key}')">Comparer</button><button class="sc-btn g" onclick="this.closest('.social-card').remove()">Passer</button></div>`;
+  d.innerHTML = `<div class="sc-label" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> Même avis ?</div><div class="sc-friend"><div class="sc-fav" style="background:${c}20;color:${c}">${(friendName||'?')[0].toUpperCase()}</div><div><div class="sc-fname">${esc(friendName)}</div><div class="sc-brand">a répondu à ${esc(q.brand)}</div></div></div><div class="sc-q">${esc((q.q||'').substring(0,60))}…</div><div class="sc-answer">${shortAns ? '&ldquo;' + esc(shortAns) + '&rdquo;' : '…'}</div><div class="sc-actions"><button class="sc-btn p" onclick="openCompare(${jsa(key)})">Comparer</button><button class="sc-btn g" onclick="this.closest('.social-card').remove()">Passer</button></div>`;
   return d;
 }
 
@@ -2987,7 +2986,7 @@ function initFriendsPanel(){
       <div style="font-size:var(--fs-1);font-weight:700;letter-spacing:0;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg> Demandes reçues (${pending.length})</div>
       <div id="pending-requests-list">${pending.map(n=>`
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
-          <div style="width:36px;height:36px;border-radius:var(--r-sm);background:var(--surface-2);color:var(--coral);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:var(--fs-3);flex-shrink:0">${(n.fromName||'?')[0].toUpperCase()}</div>
+          <div style="width:36px;height:36px;border-radius:var(--r-sm);background:var(--surface-2);color:var(--coral);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:var(--fs-3);flex-shrink:0">${esc((n.fromName||"?")[0].toUpperCase())}</div>
           <div style="flex:1;min-width:0"><div style="font-size:var(--fs-2);font-weight:700;color:var(--ink)">${esc(n.fromName||'Utilisateur')}</div><div style="font-size:var(--fs-1);color:var(--ink3)">veut être ton ami</div></div>
           <button onclick="acceptFriendRequest(${jsa(n.id)},${jsa(n.fromUid)},${jsa(n.fromName||'')});this.closest('div[style]').remove()" style="padding:7px 13px;background:var(--coral);color:var(--jaune-ink);border:none;border-radius:var(--r-btn);font-size:var(--fs-2);font-weight:800;cursor:pointer;font-family:var(--fd)">Accepter</button>
           <button onclick="declineFriendRequest(${jsa(n.id)});this.closest('div[style]').remove()" style="padding:7px 11px;background:var(--bg2);color:var(--ink2);border:none;border-radius:var(--r-btn);font-size:var(--fs-2);font-weight:700;cursor:pointer">✕</button>
@@ -3122,13 +3121,13 @@ async function openFriendProfile(f){
   const body=document.getElementById('fp-body');
   body.innerHTML=`<div class="fpr-head"><div class="fi-av fpr-av" style="background:${col}18;color:${col}">${avInner(f.photoUrl,f.n)}</div><div class="fpr-name">${esc(f.n)}</div><div class="fpr-meta"><span>${f.xp||0} xp</span><span style="display:inline-flex;align-items:center;gap:3px">${flameHTML(13)} ${f.str||0} j</span></div></div>
     <div class="fpr-card" id="fp-compat"><div class="rv-skel"><div class="rv-bar" style="height:44px"></div></div></div>
-    <button class="fpr-btn" onclick="openChatFor(S.friends.find(x=>x.uid==='${esc(f.uid)}'))">Envoyer un message</button>`;
+    <button class="fpr-btn" onclick="openChatFor(S.friends.find(x=>x.uid===${jsa(f.uid)}))">Envoyer un message</button>`;
   goTo('fprofile');
   const card=()=>document.getElementById('fp-compat');
   try{
     const data=await fetchCompat();
     if(!card())return;
-    if(data.sharing===false){card().innerHTML=`<div class="cp-off" style="padding:0;background:none"><span>Pour comparer vos réponses, active « Montrer mes réponses à mes amis ».</span><button onclick="enableCompatSharing().then(()=>openFriendProfile(S.friends.find(x=>x.uid==='${esc(f.uid)}')))">Activer</button></div>`;return;}
+    if(data.sharing===false){card().innerHTML=`<div class="cp-off" style="padding:0;background:none"><span>Pour comparer vos réponses, active « Montrer mes réponses à mes amis ».</span><button onclick="enableCompatSharing().then(()=>openFriendProfile(S.friends.find(x=>x.uid===${jsa(f.uid)})))">Activer</button></div>`;return;}
     const c=(data.friends||[]).find(x=>x.uid===f.uid);
     if(!c){card().style.display='none';return;}
     if(c.state!=='ok'){card().innerHTML=`<div class="fpr-lbl" style="margin-top:0">${esc(compatSubText(c))}.</div>`;return;}
@@ -3222,7 +3221,7 @@ function renderGroups(){
   GROUPS.forEach(g=>{
     const joined=(S._groups||[]).includes(g.id);
     const d=document.createElement('div');d.className='group-c';
-    d.innerHTML=`<div class="gc-ico" style="background:${g.color}18;color:${g.color}">${icon(g.ico,{size:22})}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:var(--fs-2);color:var(--ink)">${g.n}</div><div style="font-size:var(--fs-1);color:var(--ink2);margin-top:2px">${g.meta}</div></div><button class="group-tag" style="background:${joined?'var(--bg3)':'var(--coral)'};color:${joined?'var(--ink2)':'var(--ink)'}" onclick="event.stopPropagation();toggleGroup('${g.id}')">${joined?icon('check',{size:13})+' Rejoint':'Rejoindre'}</button>`;
+    d.innerHTML=`<div class="gc-ico" style="background:${g.color}18;color:${g.color}">${icon(g.ico,{size:22})}</div><div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:var(--fs-2);color:var(--ink)">${g.n}</div><div style="font-size:var(--fs-1);color:var(--ink2);margin-top:2px">${g.meta}</div></div><button class="group-tag" style="background:${joined?'var(--bg3)':'var(--coral)'};color:${joined?'var(--ink2)':'var(--ink)'}" onclick="event.stopPropagation();toggleGroup(${jsa(g.id)})">${joined?icon('check',{size:13})+' Rejoint':'Rejoindre'}</button>`;
     if(joined) d.addEventListener('click',e=>{ if(e.target.tagName!=='BUTTON') openGroupView(g); });
     el.appendChild(d);
   });
@@ -3253,7 +3252,8 @@ async function loadGroupMembers(g){
   const city=normalizeCity(S._city||'');
   if(!city){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--ink3);font-size:var(--fs-2)">Renseigne ta ville pour voir les membres.</div>';return;}
   try{
-    const snap=await db.collection('users').where('city','==',city).orderBy('xp','desc').limit(50).get();
+    // Classement : copie réduite tenue par le serveur (nom, photo, XP, série, groupes), jamais la fiche complète d'un habitant.
+    const snap=await db.collection('cityBoard').where('city','==',city).orderBy('xp','desc').limit(50).get();
     const myUid=auth.currentUser&&auth.currentUser.uid;
     const all=[];
     snap.forEach(doc=>{const u={uid:doc.id,...doc.data()};if(u.groups&&u.groups.includes(g.id))all.push(u);});
@@ -3654,9 +3654,9 @@ function renderFeedbackForm(){
     <div class="fb-rate" role="radiogroup" aria-label="Ta note globale">${[1,2,3,4,5].map(n=>`<button type="button" role="radio" aria-checked="${_fb.rating===n}" class="${_fb.rating===n?'on':''}" onclick="fbSet('rating',${n})">${n}</button>`).join('')}</div>
     <div class="fb-rate-h"><span>Pas convaincu</span><span>J'adore</span></div>
     <div class="fb-l">Ce qui marche, ce qui coince</div>
-    ${FB_FEATURES.map(f=>{const v=_fb.votes[f.k];return `<div class="fb-feat"><span class="fb-feat-l">${f.t}</span><button type="button" aria-pressed="${v==='up'}" class="up${v==='up'?' on':''}" onclick="fbVote('${f.k}','up')">J'aime</button><button type="button" aria-pressed="${v==='down'}" class="down${v==='down'?' on':''}" onclick="fbVote('${f.k}','down')">À revoir</button></div>`;}).join('')}
+    ${FB_FEATURES.map(f=>{const v=_fb.votes[f.k];return `<div class="fb-feat"><span class="fb-feat-l">${f.t}</span><button type="button" aria-pressed="${v==='up'}" class="up${v==='up'?' on':''}" onclick="fbVote(${jsa(f.k)},'up')">J'aime</button><button type="button" aria-pressed="${v==='down'}" class="down${v==='down'?' on':''}" onclick="fbVote(${jsa(f.k)},'down')">À revoir</button></div>`;}).join('')}
     <div class="fb-l">Tu veux nous dire</div>
-    <div class="fb-kinds">${FB_KINDS.map(k=>`<button type="button" aria-pressed="${_fb.kind===k.k}" class="${_fb.kind===k.k?'on':''}" onclick="fbSet('kind','${k.k}')">${k.t}</button>`).join('')}</div>
+    <div class="fb-kinds">${FB_KINDS.map(k=>`<button type="button" aria-pressed="${_fb.kind===k.k}" class="${_fb.kind===k.k?'on':''}" onclick="fbSet('kind',${jsa(k.k)})">${k.t}</button>`).join('')}</div>
     <textarea class="fb-txt" id="fb-txt" maxlength="2000" placeholder="${esc(kind.ph)}" aria-label="Ton message" oninput="_fb.text=this.value;document.getElementById('fb-count').textContent=this.value.length+' / 2000';fbSync()" style="margin-top:var(--s3)">${esc(_fb.text)}</textarea>
     <div class="fb-count" id="fb-count">${_fb.text.length} / 2000</div>
     <button type="button" class="fb-send" id="fb-send" onclick="sendFeedback()">Envoyer mon avis</button>`;
@@ -3706,7 +3706,7 @@ function refreshProfile(){if(!_redemptionsUnsub)loadActiveRedemptions();
   const cm=document.getElementById('consent-mgmt');cm.innerHTML='';
   const _cm=S._nearbyMerchants||[];
   if(!_cm.length){cm.innerHTML='<div style="font-size:var(--fs-2);color:var(--ink2);text-align:center;padding:8px 0">Tu ne suis aucun commerce pour l\'instant. Réponds à une question « découverte » sur ton accueil, puis suis le commerce si ça te plaît.</div>';}
-  else{_cm.slice(0,6).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='dconsent-row';d.innerHTML=`${logoHTML(label,40,m.logoUrl)}<div style="flex:1;min-width:0"><div class="dconsent-name">${esc(label)}</div><div class="dconsent-sub">${esc(m.sector||m.address||'')}, ${questionsAsked(label)} question${questionsAsked(label)>1?'s':''} posée${questionsAsked(label)>1?'s':''}</div></div><label class="tgl"><input type="checkbox" checked aria-label="Autoriser ${esc(label)}" onchange="toggleMerchantConsentQuick('${m.id}',this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label>`;cm.appendChild(d)});if(_cm.length>6){const more=document.createElement('div');more.style.cssText='font-size:var(--fs-1);color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`Gérer les ${_cm.length-6} autres`;more.onclick=openManageMerchants;more.style.cursor='pointer';cm.appendChild(more);}}
+  else{_cm.slice(0,6).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='dconsent-row';d.innerHTML=`${logoHTML(label,40,m.logoUrl)}<div style="flex:1;min-width:0"><div class="dconsent-name">${esc(label)}</div><div class="dconsent-sub">${esc(m.sector||m.address||'')}, ${questionsAsked(label)} question${questionsAsked(label)>1?'s':''} posée${questionsAsked(label)>1?'s':''}</div></div><label class="tgl"><input type="checkbox" checked aria-label="Autoriser ${esc(label)}" onchange="toggleMerchantConsentQuick(${jsa(m.id)},this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label>`;cm.appendChild(d)});if(_cm.length>6){const more=document.createElement('div');more.style.cssText='font-size:var(--fs-1);color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`Gérer les ${_cm.length-6} autres`;more.onclick=openManageMerchants;more.style.cursor='pointer';cm.appendChild(more);}}
   const bl=document.getElementById('badges-list');bl.innerHTML='';
   checkTierAndBadgeCelebrations();
   const earned=S._lastEarnedBadges||[];
@@ -3714,14 +3714,14 @@ function refreshProfile(){if(!_redemptionsUnsub)loadActiveRedemptions();
   BDGS.forEach(b=>{const e=earned.includes(b.id);const d=document.createElement('div');d.className='bp '+(e?'earned':'locked');d.innerHTML=`<div class="bp-ico">${icon(e?b.e:'lock',{size:18})}</div><div class="bp-lbl">${esc(b.n)}</div>`;bl.appendChild(d)});
   const hl=document.getElementById('hist-list');hl.innerHTML='';
   if(!S.hist||!S.hist.length){hl.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:var(--fs-2)">Aucune réponse pour l\'instant.</div>';return}
-  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?h.ico:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:var(--fs-2);font-weight:600;color:var(--ink)">${h.brand}</div><div style="font-size:var(--fs-1);color:var(--ink2);margin-top:1px">${h.q}…</div></div><div style="font-size:var(--fs-2);font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">${h.noovs?'+'+h.noovs+' NOOV'+(h.noovs>1?'S':''):'+'+h.pts+' pts'}</div>`;hl.appendChild(d)});
+  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?esc(h.ico):'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:var(--fs-2);font-weight:600;color:var(--ink)">${esc(h.brand)}</div><div style="font-size:var(--fs-1);color:var(--ink2);margin-top:1px">${esc(h.q)}…</div></div><div style="font-size:var(--fs-2);font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">${h.noovs?'+'+h.noovs+' NOOV'+(h.noovs>1?'S':''):'+'+h.pts+' pts'}</div>`;hl.appendChild(d)});
 }
 function boTab(tab,btn){document.querySelectorAll('.bo-tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');['dashboard','create','results'].forEach(t=>document.getElementById('bo-'+t).style.display=t===tab?'block':'none');if(tab==='create')wzStep(0)}
 function renderCampaigns(){
   const el=document.getElementById('bo-campaigns');el.innerHTML='';
   [{ico:'🌯',t:'Horaires du week-end',st:'live',r:62,tg:80,p:78,c:'#0BAB84'},{ico:'🥤',t:'Quel accompagnement manque le plus',st:'done',r:91,tg:80,p:100,c:'#A14E08'},{ico:'📛',t:'Nom du nouveau menu étudiant',st:'draft',r:0,tg:60,p:0,c:'#F5A623'}].forEach(c=>{
     const d=document.createElement('div');d.className='camp-c';d.onclick=()=>{boTab('results',document.querySelectorAll('.bo-tab')[2])};
-    d.innerHTML=`<div class="cc-top"><div class="cc-ico">${c.ico}</div><div class="cc-t">${c.t}</div><div class="cc-st ${c.st}">${c.st==='live'?'En cours':c.st==='done'?'Terminée':'Brouillon'}</div></div><div style="display:flex;gap:14px;margin-top:7px"><div><div style="font-family:var(--fd);font-weight:700;font-size:var(--fs-3);color:var(--blanc)">${c.r}</div><div style="font-size:var(--fs-1);color:rgba(255,255,255,.36);margin-top:1px">Réponses</div></div><div><div style="font-family:var(--fd);font-weight:700;font-size:var(--fs-3);color:var(--blanc)">${c.tg}</div><div style="font-size:var(--fs-1);color:rgba(255,255,255,.36);margin-top:1px">Objectif</div></div><div><div style="font-family:var(--fd);font-weight:700;font-size:var(--fs-3);color:var(--blanc)">${c.p}%</div><div style="font-size:var(--fs-1);color:rgba(255,255,255,.36);margin-top:1px">Complété</div></div></div><div class="cc-prog"><div class="cc-pf" style="width:${c.p}%;background:${c.c}"></div></div>`;
+    d.innerHTML=`<div class="cc-top"><div class="cc-ico">${esc(c.ico)}</div><div class="cc-t">${esc(c.t)}</div><div class="cc-st ${c.st}">${c.st==='live'?'En cours':c.st==='done'?'Terminée':'Brouillon'}</div></div><div style="display:flex;gap:14px;margin-top:7px"><div><div style="font-family:var(--fd);font-weight:700;font-size:var(--fs-3);color:var(--blanc)">${c.r}</div><div style="font-size:var(--fs-1);color:rgba(255,255,255,.36);margin-top:1px">Réponses</div></div><div><div style="font-family:var(--fd);font-weight:700;font-size:var(--fs-3);color:var(--blanc)">${c.tg}</div><div style="font-size:var(--fs-1);color:rgba(255,255,255,.36);margin-top:1px">Objectif</div></div><div><div style="font-family:var(--fd);font-weight:700;font-size:var(--fs-3);color:var(--blanc)">${c.p}%</div><div style="font-size:var(--fs-1);color:rgba(255,255,255,.36);margin-top:1px">Complété</div></div></div><div class="cc-prog"><div class="cc-pf" style="width:${c.p}%;background:${c.c}"></div></div>`;
     el.appendChild(d);
   });
 }
@@ -3850,7 +3850,7 @@ function openReward(o){
   {const l=document.querySelector('#reward .pe-lbl');if(l)l.textContent='Total cumulé';}
   document.getElementById('rw-total').textContent=(Number(o.total??S.pts)||0)+' pts';
   // Le texte d'usage des questions commence déjà par « Ta réponse aide … » : on ne le répète pas.
-  document.getElementById('rw-usage').innerHTML=/^Ta réponse aide /.test(o.usage||'')?esc(o.usage).replace(esc(o.brand),'<strong>'+esc(o.brand)+'</strong>'):'Ta réponse aide <strong>'+esc(o.brand)+'</strong>, '+(o.usage||'à mieux servir le quartier.');
+  document.getElementById('rw-usage').innerHTML=/^Ta réponse aide /.test(o.usage||'')?esc(o.usage).replace(esc(o.brand),'<strong>'+esc(o.brand)+'</strong>'):'Ta réponse aide <strong>'+esc(o.brand)+'</strong>, '+esc(o.usage||'à mieux servir le quartier.');
   const act=document.getElementById('rw-actions');act.innerHTML='';
   const mk=(cls,txt,fn)=>{const b=document.createElement('button');b.className=cls;b.textContent=txt;b.onclick=fn;act.appendChild(b);};
   if(S.qs&&S.qs.length>0)mk('btn-p','Question suivante',nextQ);
@@ -3887,14 +3887,14 @@ function openBrand(name,back){
   surveys.forEach(s=>{
     const active=s.status==='active';
     const isdone=s.status==='done';
-    sv+=`<div class="bp-survey${active?' active':''}">${active?'':''}<div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:var(--fs-1);font-weight:700;color:var(--jaune-ink);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${s.q}</div>${active?`<div class="bp-sv-meta"><span>${s.n} questions</span><span>~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand(${jsa(name)})">Répondre au questionnaire</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
+    sv+=`<div class="bp-survey${active?' active':''}">${active?'':''}<div class="bp-sv-top">${statusBadge(s.status)}${active?`<span style="font-size:var(--fs-1);font-weight:700;color:var(--jaune-ink);font-family:var(--fd)">jusqu'à +${s.tot} pts</span>`:''}</div><div class="bp-sv-q">${esc(s.q)}</div>${active?`<div class="bp-sv-meta"><span>${s.n} questions</span><span>~${s.n*15}s</span></div><button class="btn-p" onclick="answerBrand(${jsa(name)})">Répondre au questionnaire</button>`:isdone?`<div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div>`:'<div class="bp-sv-meta" style="margin-bottom:0">Pas encore ouvert</div>'}</div>`;
   });
   if(!surveys.length)sv='<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>';
   document.getElementById('bp-wrap').innerHTML=`
     <div class="bp-cover" style="background:${cover}">
       <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
-      <div class="bp-logo-wrap">${logoHTML(name,60)}<div><div class="bp-name">${name}</div><div class="bp-tag">${p.tagline||''}</div></div></div>
-      <div class="bp-chips"><span class="bp-chip">${icon('check',{size:11})} Commerce du quartier</span><span class="bp-chip">${icon('pin',{size:11})} ${(p.loc||'').split(',').pop().trim()}</span><span class="bp-chip">${p.sector||''}</span></div>
+      <div class="bp-logo-wrap">${logoHTML(name,60)}<div><div class="bp-name">${esc(name)}</div><div class="bp-tag">${esc(p.tagline||'')}</div></div></div>
+      <div class="bp-chips"><span class="bp-chip">${icon('check',{size:11})} Commerce du quartier</span><span class="bp-chip">${icon('pin',{size:11})} ${esc((p.loc||'').split(',').pop().trim())}</span><span class="bp-chip">${esc(p.sector||'')}</span></div>
     </div>
     <div class="bp-stats">${stats.map(s=>`<div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center;gap:4px">${s[0]} ${s[1]}</div><div class="bp-stat-l">${s[2]}</div></div>`).join('')}</div>
     <div class="bp-body">
@@ -3912,7 +3912,7 @@ async function openBrandById(mid, fallbackName) {
   try {
     // Promise.allSettled : un des deux appels refusé par les règles ne doit pas vider toute la page
     const [merchantRes,campsRes,newsRes]=await Promise.allSettled([
-      db.collection('merchants').doc(mid).get(),
+      db.collection('merchantsPublic').doc(mid).get(),
       db.collection('campaigns').where('merchantId','==',mid).where('status','==','active').where('targetCity','==',normalizeCity(S._city||'')).get(),
       db.collection('merchantPosts').where('merchantId','==',mid).where('status','==','published').limit(10).get()
     ]);
@@ -3930,19 +3930,19 @@ async function openBrandById(mid, fallbackName) {
       :camps.map(c=>{
           const done=answered.includes(c.id);
           return done
-            ?`<div class="bp-survey"><div class="bp-sv-q">${c.question}</div><div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div></div>`
+            ?`<div class="bp-survey"><div class="bp-sv-q">${esc(c.question)}</div><div class="bp-sv-meta" style="margin-bottom:0;color:var(--green-ink);font-weight:600;display:flex;align-items:center;gap:4px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Tu as déjà répondu — merci !</div></div>`
             :`<div class="bp-survey active">
                 
                 <div class="bp-sv-top"><span class="bp-sv-badge" style="background:var(--surface-2);color:var(--yellow)">● Actif</span><span style="font-size:var(--fs-1);font-weight:700;color:var(--jaune-ink);font-family:var(--fd)">jusqu'à +${(c.questions&&c.questions.length||1)*(c.pointsPerAnswer||10)} pts</span></div>
-                <div class="bp-sv-q">${c.question}</div>
+                <div class="bp-sv-q">${esc(c.question)}</div>
                 <div class="bp-sv-meta"><span style="display:inline-flex;align-items:center;gap:3px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg> ${c.questions&&c.questions.length||1} question(s)</span><span>⏱️ ~${(c.questions&&c.questions.length||1)*15}s</span></div>
-                <button class="btn-p" onclick="startCampaignById('${c.id}')">Répondre au questionnaire</button>
+                <button class="btn-p" onclick="startCampaignById(${jsa(c.id)})">Répondre au questionnaire</button>
               </div>`;
         }).join('');
     document.getElementById('bp-wrap').innerHTML=`
       <div class="bp-cover${m.coverUrl?' has-img':''}"${m.coverUrl?` style="--bp-img:url('${String(m.coverUrl).replace(/['"()\\\s<>]/g,'')}')"`:''}>
         <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
-        <div class="bp-logo-wrap">${logoHTML(brandName,60,m.logoUrl)}<div><div class="bp-name">${esc(brandName)}${testTagHTML(m.isTest)}</div><div class="bp-tag">${m.sector||'Commerce local'}${m.city?' '+cityPhrase(m.cityLabel||m.city):''}</div></div></div>
+        <div class="bp-logo-wrap">${logoHTML(brandName,60,m.logoUrl)}<div><div class="bp-name">${esc(brandName)}${testTagHTML(m.isTest)}</div><div class="bp-tag">${esc(m.sector||'Commerce local')}${m.city?' '+esc(cityPhrase(m.cityLabel||m.city)):''}</div></div></div>
         <div class="bp-chips"><span class="bp-chip">${icon('check',{size:11})} Commerce vérifié</span>${m.city?`<span class="bp-chip">${icon('pin',{size:11})} ${m.cityLabel||m.city}</span>`:''}${m.sector?`<span class="bp-chip">${m.sector}</span>`:''}</div>
       </div>
       <div class="bp-stats">
@@ -3952,7 +3952,7 @@ async function openBrandById(mid, fallbackName) {
         <div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center">${icon('lock',{size:16})}</div><div class="bp-stat-l">Données protégées</div></div>
       </div>
       <div class="bp-body">
-        <div class="bp-block"><div class="bp-sec">À propos</div><div class="bp-text">${m.description||m.about||'Commerce local vérifié sur Noova. Réponds à leurs questions pour gagner des points !'}</div></div>
+        <div class="bp-block"><div class="bp-sec">À propos</div><div class="bp-text">${esc(m.description||m.about||'Commerce local vérifié sur Noova. Réponds à leurs questions pour gagner des points !')}</div></div>
         ${newsHTML}
         <div class="bp-block"><div class="bp-sec">Leurs sondages</div>${sv}</div>
         <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di" style="display:inline-flex"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="bp-text" style="font-size:var(--fs-2)">Tes réponses sont agrégées et anonymes. Ce commerçant ne voit jamais ton identité.</div></div></div>
@@ -4003,7 +4003,7 @@ async function loadNearbyMerchants(merchantIds) {
   if(!merchantIds || !merchantIds.length) { S._nearbyMerchants = []; renderBrandRail(); renderNearbyMap(); return; }
   try {
     // Promise.allSettled : un commerce inaccessible (règle refusée, ex. pas encore vérifié) ne doit pas vider tout le rail
-    const results = await Promise.allSettled(merchantIds.slice(0,20).map(id => db.collection('merchants').doc(id).get()));
+    const results = await Promise.allSettled(merchantIds.slice(0,20).map(id => db.collection('merchantsPublic').doc(id).get()));
     const snaps = results.filter(r => r.status === 'fulfilled').map(r => r.value);
     // Zone : un commerce autorisé mais d'une autre ville (habitant qui a déménagé, compte ancien) n'apparaît jamais.
     const myCity = normalizeCity(S._city||'');
@@ -4226,7 +4226,7 @@ function mapRenderFilters(){
   const keys=Object.keys(cats);
   const el=document.getElementById('mf-filters');
   el.style.display=keys.length>1?'flex':'none';
-  el.innerHTML=`<button class="mf-chip${_mapSt.filter==='all'?' on':''}" onclick="mapSetFilter('all')">Tous (${_mapSt.list.length})</button>`+keys.map(k=>`<button class="mf-chip${_mapSt.filter===k?' on':''}" onclick="mapSetFilter('${k}')">${esc(CAT_LABELS[k]||k)} (${cats[k]})</button>`).join('');
+  el.innerHTML=`<button class="mf-chip${_mapSt.filter==='all'?' on':''}" onclick="mapSetFilter('all')">Tous (${_mapSt.list.length})</button>`+keys.map(k=>`<button class="mf-chip${_mapSt.filter===k?' on':''}" onclick="mapSetFilter(${jsa(k)})">${esc(CAT_LABELS[k]||k)} (${cats[k]})</button>`).join('');
 }
 function mapRenderList(){
   const el=document.getElementById('mf-list'),title=document.getElementById('mf-sheet-title');
@@ -4242,7 +4242,7 @@ function mapRenderList(){
     const d=mapDist(m);
     const tag=m.hasQ?'<span class="mf-tag q">Question active</span>':m.request?'<span class="mf-tag q">À découvrir</span>':m.authorized?'<span class="mf-tag">Autorisé</span>':'<span class="mf-tag">Bientôt</span>';
     const meta=esc(m.sector)+(d!=null?', à '+fmtDist(d):(m.lat==null&&m._geoDone?', adresse introuvable':''));
-    return `<div class="mf-row${_mapSt.sel===m.id?' sel':''}" data-id="${m.id}" onclick="mapSelect('${m.id}',true)">${logoHTML(m.name,46,m.logoUrl)}<div class="mf-bd"><div class="mf-nm">${esc(m.name)}</div><div class="mf-mt">${meta}</div>${tag}</div><div class="mf-act"><button onclick="event.stopPropagation();openBrandById(${jsa(m.id)},${jsa(m.name)})">Voir</button>${m.lat!=null?`<button class="alt" onclick="event.stopPropagation();mapDirections('${m.id}')">Y aller</button>`:''}</div></div>`;
+    return `<div class="mf-row${_mapSt.sel===m.id?' sel':''}" data-id="${m.id}" onclick="mapSelect(${jsa(m.id)},true)">${logoHTML(m.name,46,m.logoUrl)}<div class="mf-bd"><div class="mf-nm">${esc(m.name)}</div><div class="mf-mt">${meta}</div>${tag}</div><div class="mf-act"><button onclick="event.stopPropagation();openBrandById(${jsa(m.id)},${jsa(m.name)})">Voir</button>${m.lat!=null?`<button class="alt" onclick="event.stopPropagation();mapDirections(${jsa(m.id)})">Y aller</button>`:''}</div></div>`;
   }).join('');
 }
 function mapApplyMarkers(){
@@ -4581,7 +4581,7 @@ function refreshNotifSettingsUI() {
   const sw=document.getElementById('notif-switches'), dev=document.getElementById('notif-device');
   if(!sw||!dev) return;
   // Un interrupteur par type (jamais un interrupteur global) : l'état de l'appareil est seulement un statut.
-  sw.innerHTML=NOTIF_GROUPS.map(x=>`<div class="nf-row"><div style="flex:1;min-width:0"><div class="nf-t">${x.t}</div><div class="nf-d">${x.d}</div></div><label class="tgl"><input type="checkbox" data-g="${x.g}" aria-label="${esc(x.t)}" ${notifPrefOn(x.g)?'checked':''} onchange="setNotifPref('${x.g}',this.checked,this)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>`).join('');
+  sw.innerHTML=NOTIF_GROUPS.map(x=>`<div class="nf-row"><div style="flex:1;min-width:0"><div class="nf-t">${x.t}</div><div class="nf-d">${x.d}</div></div><label class="tgl"><input type="checkbox" data-g="${x.g}" aria-label="${esc(x.t)}" ${notifPrefOn(x.g)?'checked':''} onchange="setNotifPref(${jsa(x.g)},this.checked,this)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>`).join('');
   const reason=notifSupportReason();
   const _u=auth.currentUser&&auth.currentUser.uid;
   const perm=typeof Notification!=='undefined'?Notification.permission:'unsupported';
@@ -4938,7 +4938,7 @@ function renderFollowPrompt(mid,brand){
   el.innerHTML=`<div class="follow-card" role="group" aria-label="Suivre ${b}"><div class="fc-t">Tu veux suivre ${b} ?</div>
     <div class="fc-d">Tu recevras ses prochaines questions à l'accueil, et il pourra voir ton profil anonyme (ville, tranche d'âge, centres d'intérêt). Tu peux arrêter à tout moment dans Profil.</div>
     <div class="fc-b"><button class="btn-p" onclick="followFromReward(${jsa(id)},${jsa(b)})">Suivre</button><button class="btn-s" onclick="dismissFollow()">Pas maintenant</button></div>
-    <button class="fc-x" onclick="blockFromReward('${id}')">Ne plus voir ce commerce</button></div>`;
+    <button class="fc-x" onclick="blockFromReward(${jsa(id)})">Ne plus voir ce commerce</button></div>`;
 }
 async function followFromReward(mid,brand){
   await authorizeMerchant(mid);
@@ -5889,7 +5889,9 @@ async function loadFriendsFromFirestore(uids) {
     // Promise.allSettled : un ami inaccessible (règle refusée) ne doit pas faire échouer tous les autres
     const myUid = auth.currentUser && auth.currentUser.uid;
     const capped = [...new Set(uids)].filter(u => u && u !== myUid).slice(0, 30);
-    const results = await Promise.allSettled(capped.map(uid => db.collection('users').doc(uid).get()));
+    // Profil d'ami : copie réduite (publicProfiles), lisible seulement entre amis RÉCIPROQUES — un ami qui n'a pas (ou plus)
+    // accepté n'est pas lisible, donc n'apparaît pas.
+    const results = await Promise.allSettled(capped.map(uid => db.collection('publicProfiles').doc(uid).get()));
     const allSnaps = results.filter(r => r.status === 'fulfilled').map(r => r.value);
     const seenUids = new Set();
     S.friends = allSnaps.filter(s => s.exists && !seenUids.has(s.id) && seenUids.add(s.id)).map(s => {
@@ -5897,7 +5899,7 @@ async function loadFriendsFromFirestore(uids) {
       // Classement/liste d'amis basés sur l'XP (à vie, ne descend jamais) et non le solde
       // de points (dépensable, baisse à chaque échange) — sinon un ami qui vient d'échanger
       // une récompense semble "redescendre", ce qui n'est pas cohérent pour un classement.
-      return { n: d.name || 'Ami', xp: d.xp || d.points || 0, str: d.streak || 0, uid: s.id, photoUrl: d.photoUrl || null, share: d.shareAnswers !== false, mutual: (d.friendUids || []).includes(myUid) };
+      return { n: d.name || 'Ami', xp: d.xp || 0, str: d.streak || 0, uid: s.id, photoUrl: d.photoUrl || null, share: d.shareAnswers !== false, mutual: true };
     });
     renderFriends();
     if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }
@@ -5984,7 +5986,7 @@ async function openManageMerchants() {
   mmUpdateBar();
   try {
     const city = normalizeCity(S._city || '');
-    const snap = await db.collection('merchants').where('status','==','verified').where('city','==',city).get();
+    const snap = await db.collection('merchantsPublic').where('status','==','verified').where('city','==',city).get();
     const all = [];
     snap.forEach(doc => {
       const d = doc.data();
@@ -6058,7 +6060,7 @@ async function loadMerchantsForOnboarding(userData) {
   document.getElementById('bnav').classList.remove('show');
   try {
     const userCity = normalizeCity(userData.city || S._city || '');
-    const snap = await db.collection('merchants').where('status','==','verified').where('city','==',userCity).get();
+    const snap = await db.collection('merchantsPublic').where('status','==','verified').where('city','==',userCity).get();
     S._merchantsForOnboarding = [];
     snap.forEach(doc => {
       const d = doc.data();
@@ -6098,7 +6100,7 @@ function renderBrandsFromFirestore(merchants) {
       const sub   = m.address ? (m.address + (m.city ? ', ' + m.city : '')) : (m.city || '');
       const d = document.createElement('div');
       d.className = 'brand-item' + (checked ? ' on' : '');
-      d.innerHTML = `${logoHTML(label,44,m.logoUrl)}<div style="flex:1;min-width:0"><div class="bi-name">${label}</div><div class="bi-use">${sub}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} onchange="S.brands['${m.id}']=this.checked;this.closest('.brand-item').classList[this.checked?'add':'remove']('on')"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
+      d.innerHTML = `${logoHTML(label,44,m.logoUrl)}<div style="flex:1;min-width:0"><div class="bi-name">${esc(label)}</div><div class="bi-use">${esc(sub)}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} onchange="S.brands[${jsa(m.id)}]=this.checked;this.closest('.brand-item').classList[this.checked?'add':'remove']('on')"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
       el.appendChild(d);
     });
   });
@@ -6117,7 +6119,7 @@ async function loadCampaignsFromFirestore(userData) {
   if (_verifiedMerchantsUnsub) _verifiedMerchantsUnsub();
   if (_campaignsUnsub) _campaignsUnsub();
   if (_noovaMerchantsUnsub) _noovaMerchantsUnsub();
-  _noovaMerchantsUnsub = db.collection('merchants').where('broadcast', '==', true).where('status', '==', 'verified')
+  _noovaMerchantsUnsub = db.collection('merchantsPublic').where('broadcast', '==', true).where('status', '==', 'verified')
     .onSnapshot(snap => {
       const map = {};
       snap.forEach(doc => { map[doc.id] = doc.data(); });
@@ -6127,7 +6129,7 @@ async function loadCampaignsFromFirestore(userData) {
   return new Promise(resolve => {
     let merchantsReady = false, campaignsReady = false;
     const maybeResolve = () => { if (merchantsReady && campaignsReady) resolve(); };
-    _verifiedMerchantsUnsub = db.collection('merchants').where('status', '==', 'verified').where('city', '==', city)
+    _verifiedMerchantsUnsub = db.collection('merchantsPublic').where('status', '==', 'verified').where('city', '==', city)
       .onSnapshot(snap => {
         const map = {};
         snap.forEach(doc => { const d = doc.data(); if (d && doc.id && d.broadcast !== true) map[doc.id] = d; });   // compte NOOVA : à part

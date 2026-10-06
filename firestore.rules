@@ -32,8 +32,11 @@ service cloud.firestore {
       return url == null ||
         (url is string && url.matches('https://firebasestorage\\.googleapis\\.com/[A-Za-z0-9%._~:/?&=+-]*/o/' + folder + '%2F' + id + '%2F[A-Za-z0-9%._~:/?&=+-]*'));
     }
+    // Admin = l'un des e-mails NOOVA ET vérifié (connexion Google ou lien de vérification). Sans « email_verified »,
+    // n'importe qui pouvait créer un compte e-mail + mot de passe avec une adresse admin encore libre et tout lire.
     function isAdmin() {
-      return isAuth() && request.auth.token.email in ['noovaoffr@gmail.com', 'tomussproduction@gmail.com'];
+      return isAuth() && request.auth.token.get('email_verified', false) == true &&
+        request.auth.token.get('email', '') in ['noovaoffr@gmail.com', 'tomussproduction@gmail.com'];
     }
     // Compte de diffusion NOOVA (champ « broadcast » du commerçant, posé uniquement par l'admin) : ses questions
     // ciblent toutes les villes (targetCity « toutes »). Aucun autre commerçant ne peut viser toutes les villes.
@@ -42,6 +45,31 @@ service cloud.firestore {
     }
     function campBroadcastOk(d) {
       return (d.get('targetCity', null) != 'toutes' && d.get('broadcast', false) != true) || isBroadcaster(request.auth.uid);
+    }
+    // Identifiant de document créé par un client : lettres, chiffres, _ et - seulement (jamais de guillemet ni de
+    // chevron, qui pourraient être réinjectés dans une page).
+    function safeId(id) { return id.matches('[A-Za-z0-9_-]{1,128}'); }
+    function myName() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('name', '');
+    }
+    function brandOf(uid) {
+      return getMerchant(uid).get('brandName', '');
+    }
+    // Texte borné (nom, ville…) : chaîne courte, ou champ absent.
+    function shortStr(d, k, n) {
+      return !(k in d) || d[k] == null || (d[k] is string && d[k].size() <= n);
+    }
+    // Champs d'un habitant tenus par le serveur (solde, réponses, série, notifications…) : jamais écrits par le client.
+    function userServerFields() {
+      return ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','welcomeClaimed','streakDate','lastActivityAt','answeredMerchants','discoveryBonusDate','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats','weeklyNoovs','role','createdAt'];
+    }
+    function userTextOk(d) {
+      return shortStr(d, 'name', 60) && shortStr(d, 'city', 80) && shortStr(d, 'cityLabel', 80) &&
+        (!('email' in d) || d.email == '' || d.email == request.auth.token.get('email', ''));
+    }
+    // Champs d'un commerçant réservés à l'admin ou au serveur.
+    function merchantAdminFields() {
+      return ['status', 'verifiedAt', 'submittedAt', 'ownerUid', 'role', 'monthlyQuestionQuota', 'pointsGenerated', 'pointsSpent', 'broadcast', 'isTest', 'testQIdx', 'testLastDay', 'consentCount', 'verifiedPopupShown'];
     }
     function myCity() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('city', null);
@@ -71,28 +99,31 @@ service cloud.firestore {
     }
 
     // ─── Users ────────────────────────────────────────────────────────────────
-    // Lecture : soi-même, ses amis, les autres users de sa propre ville (classement/groupes), ou l'admin
+    // Lecture : soi-même ou l'admin, JAMAIS un autre habitant (e-mail, âge, centres d'intérêt, appareils…). Les autres
+    // ne voient que les copies réduites tenues par le serveur : cityBoard (classement) et publicProfiles (amis).
     // Écriture : propriétaire uniquement
     match /users/{uid} {
-      allow read: if isOwner(uid) ||
-        isFriendOf(uid) ||
-        isAdmin() ||
-        (isAuth() && myCity() != null && resource.data.get('city', null) == myCity());
+      allow read: if isOwner(uid) || isAdmin();
       // À la création, un compte démarre TOUJOURS à zéro : impossible de s'inscrire avec un solde.
       allow create: if isOwner(uid) && ownFile(request.resource.data.get('photoUrl', null), 'users', uid) &&
+        userTextOk(request.resource.data) &&
+        request.resource.data.get('role', 'user') == 'user' &&
         request.resource.data.get('points', 0) == 0 && request.resource.data.get('xp', 0) == 0 &&
-        request.resource.data.get('noovs', 0) == 0 && request.resource.data.get('demoClaimed', false) == false &&
-        request.resource.data.get('welcomeClaimed', false) == false && !('lastActivityAt' in request.resource.data) &&
-        !('answeredMerchants' in request.resource.data) && !('discoveryBonusDate' in request.resource.data);
+        request.resource.data.get('noovs', 0) == 0 && request.resource.data.get('streak', 0) == 0 &&
+        request.resource.data.get('dailyEarned', 0) == 0 &&
+        request.resource.data.get('lastAnswerDate', null) == null && request.resource.data.get('lastDailyDate', null) == null &&
+        request.resource.data.get('answeredCampaigns', []).size() == 0 &&
+        request.resource.data.get('demoClaimed', false) == false && request.resource.data.get('welcomeClaimed', false) == false &&
+        (!('createdAt' in request.resource.data) || request.resource.data.createdAt == request.time) &&
+        !request.resource.data.keys().hasAny(['ans','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','lastActivityAt','answeredMerchants','discoveryBonusDate','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats','weeklyNoovs','streakDate','friendUids']);
       // Le solde de points (points/xp/noovs…) et tout ce qui sert à le calculer passent UNIQUEMENT par les Cloud Functions
       // (SDK Admin, hors règles) : submitAnswer (réponses, bonus découverte), claimWelcomeBonus (+50), redeemReward (échange),
       // expirePoints. Le client ne peut jamais écrire ces champs, pas même pour débiter : le solde ne peut donc pas devenir
       // négatif et les limites d'échange (quota, une récompense par semaine) ne peuvent pas être contournées.
       allow update: if isAdmin() || (isOwner(uid) &&
         ownFile(request.resource.data.get('photoUrl', null), 'users', uid) &&
-        !request.resource.data.diff(resource.data).affectedKeys().hasAny(
-          ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','welcomeClaimed','streakDate','lastActivityAt','answeredMerchants','discoveryBonusDate','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats','weeklyNoovs']
-        ));
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['name', 'city', 'cityLabel', 'email']) || userTextOk(request.resource.data)) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(userServerFields()));
       allow delete: if isOwner(uid) || isAdmin();
 
       // Notifications subcollection
@@ -105,20 +136,39 @@ service cloud.firestore {
         allow create: if isAdmin() || (isAuth() &&
           request.resource.data.fromUid == request.auth.uid &&
           request.auth.uid != uid &&
+          // Le nom affiché est le sien : impossible d'envoyer une demande au nom de quelqu'un d'autre (ou de « NOOVA »).
+          request.resource.data.get('fromName', '') in [myName(), 'Un utilisateur', 'Quelqu\'un'] &&
           ((request.resource.data.type == 'friend_request' && notifId == 'friendreq_' + request.auth.uid) ||
            (request.resource.data.type == 'friend_accepted' && notifId == 'friendacc_' + request.auth.uid)));
         allow delete: if isOwner(uid) || isAdmin();
       }
     }
 
+    // ─── Copies publiques (écrites UNIQUEMENT par le serveur, functions/publicProfiles.js) ───
+    // Classement / groupes : habitants de MA ville (nom, photo, XP, série, groupes).
+    match /cityBoard/{uid} {
+      allow read: if isAuth() && (isAdmin() || (myCity() != null && resource.data.city == myCity()));
+      allow write: if false;
+    }
+    // Profil vu par un ami : uniquement entre amis RÉCIPROQUES.
+    match /publicProfiles/{uid} {
+      allow read: if isOwner(uid) || isFriendOf(uid) || isAdmin();
+      allow write: if false;
+    }
+    // Vitrine d'un commerce vérifié : habitants de sa ville (le compte NOOVA, diffusé partout : tous les habitants).
+    match /merchantsPublic/{merchantId} {
+      allow read: if isAuth() && (
+        isAdmin() || merchantId == request.auth.uid ||
+        (resource.data.status == 'verified' && (resource.data.get('broadcast', false) == true || resource.data.get('city', null) == myCity())));
+      allow write: if false;
+    }
+
     // ─── Merchants ────────────────────────────────────────────────────────────
-    // Lecture : commerçant vérifié de MA ville (onboarding/découverte) OU propriétaire OU admin
+    // Lecture : le commerçant lui-même ou l'admin (e-mail, téléphone, gérant, SIRET, pièce d'identité). Les habitants
+    // lisent merchantsPublic.
     // Écriture : uniquement le propriétaire (ownerUid) OU admin
     match /merchants/{merchantId} {
       allow read: if isAuth() && (
-        (resource.data.status == 'verified' && resource.data.get('city', null) == myCity()) ||
-        // Compte NOOVA (diffusion dans toutes les villes) : sa fiche (nom, logo, photo) est visible de tous les habitants.
-        (resource.data.status == 'verified' && resource.data.get('broadcast', false) == true) ||
         resource.data.ownerUid == request.auth.uid ||
         merchantId == request.auth.uid ||
         isAdmin()
@@ -128,7 +178,11 @@ service cloud.firestore {
         request.resource.data.ownerUid == request.auth.uid ||
         request.auth.uid == merchantId
       ) && request.resource.data.get('status', null) == 'pending' &&
-        request.resource.data.get('broadcast', false) == false &&
+        request.resource.data.get('role', 'merchant') == 'merchant' &&
+        // Aucun privilège à la création : ni quota, ni compte de test, ni diffusion, ni compteurs.
+        !request.resource.data.keys().hasAny(['verifiedAt', 'monthlyQuestionQuota', 'pointsGenerated', 'pointsSpent', 'broadcast', 'isTest', 'testQIdx', 'testLastDay', 'consentCount', 'verifiedPopupShown']) &&
+        shortStr(request.resource.data, 'brandName', 80) && shortStr(request.resource.data, 'name', 80) &&
+        (!('email' in request.resource.data) || request.resource.data.email == request.auth.token.get('email', '')) &&
         ownFile(request.resource.data.get('logoUrl', null), 'merchants', merchantId) &&
         ownFile(request.resource.data.get('coverUrl', null), 'merchants', merchantId);
       // Le commerçant peut modifier son profil (nom, secteur, ville, description...)
@@ -140,13 +194,20 @@ service cloud.firestore {
           (resource.data.ownerUid == request.auth.uid || merchantId == request.auth.uid) &&
           ownFile(request.resource.data.get('logoUrl', null), 'merchants', merchantId) &&
           ownFile(request.resource.data.get('coverUrl', null), 'merchants', merchantId) &&
+          shortStr(request.resource.data, 'brandName', 80) && shortStr(request.resource.data, 'name', 80) &&
+          // Un commerce VÉRIFIÉ ne change ni de nom, ni de SIRET, ni de ville sans repasser par NOOVA (usurpation).
+          (resource.data.get('status', null) != 'verified' ||
+           !request.resource.data.diff(resource.data).affectedKeys().hasAny(['brandName', 'name', 'siret', 'city'])) &&
           (
-            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'verifiedAt', 'submittedAt', 'ownerUid', 'role', 'monthlyQuestionQuota', 'pointsGenerated', 'pointsSpent', 'broadcast'])
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(merchantAdminFields())
             ||
             // « Corriger et renvoyer » : un dossier refusé (à corriger) repasse en attente,
             // sans jamais pouvoir se déclarer vérifié soi-même.
             (resource.data.status == 'rejected' && request.resource.data.status == 'pending' &&
-             !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verifiedAt', 'ownerUid', 'role', 'monthlyQuestionQuota', 'pointsGenerated', 'pointsSpent', 'broadcast']))
+             !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verifiedAt', 'ownerUid', 'role', 'monthlyQuestionQuota', 'pointsGenerated', 'pointsSpent', 'broadcast', 'isTest', 'testQIdx', 'testLastDay', 'consentCount', 'verifiedPopupShown']))
+            ||
+            // Popup « vous êtes vérifié » vue : seul ce drapeau, et seulement à true.
+            (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['verifiedPopupShown']) && request.resource.data.verifiedPopupShown == true)
           )
         )
       );
@@ -171,13 +232,18 @@ service cloud.firestore {
         resource.data.merchantId == request.auth.uid ||
         isAdmin()
       );
-      allow create: if isAuth() &&
+      allow create: if isAuth() && safeId(campaignId) &&
         request.resource.data.merchantId == request.auth.uid &&
         request.resource.data.questions.size() <= 3 &&
         request.resource.data.status in ['active', 'draft', 'paused'] &&
         request.resource.data.get('archived', false) == false &&
         getMerchant(request.auth.uid).get('status', null) == 'verified' &&
         campBroadcastOk(request.resource.data) &&
+        // Le nom affiché est celui du commerce (jamais celui d'un autre) ; ni « test », ni compteurs gonflés.
+        request.resource.data.get('merchantName', '') == brandOf(request.auth.uid) &&
+        !request.resource.data.keys().hasAny(['isTest', 'postedByNoova', 'blockedReason']) &&
+        request.resource.data.get('answersCount', 0) == 0 && request.resource.data.get('responsesCount', 0) == 0 &&
+        ownFile(request.resource.data.get('merchantLogoUrl', null), 'merchants', request.auth.uid) &&
         (getMerchant(request.auth.uid).get('city', null) == null ||
          request.resource.data.get('targetCity', null) == getMerchant(request.auth.uid).get('city', null) ||
          (request.resource.data.get('targetCity', null) == 'toutes' && isBroadcaster(request.auth.uid))) &&
@@ -195,7 +261,8 @@ service cloud.firestore {
       allow update: if isAuth() && (
         isAdmin() ||
         (resource.data.merchantId == request.auth.uid &&
-         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['answersCount', 'responsesCount', 'merchantId', 'blockedReason']) &&
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['answersCount', 'responsesCount', 'merchantId', 'blockedReason', 'isTest', 'postedByNoova', 'merchantName']) &&
+         ownFile(request.resource.data.get('merchantLogoUrl', null), 'merchants', request.auth.uid) &&
          (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['targetCity', 'broadcast']) || campBroadcastOk(request.resource.data)) &&
          // Quota mensuel : une campagne bloquée le reste, et on ne peut pas ajouter de questions après coup —
          // mais un BROUILLON (jamais lancé, jamais compté dans le quota) reste librement modifiable, y
@@ -236,9 +303,10 @@ service cloud.firestore {
     // publie ou refuse. Seules les actualités publiées sont lisibles par les habitants.
     match /merchantPosts/{postId} {
       allow read: if isAuth() && (resource.data.status == 'published' || resource.data.merchantId == request.auth.uid || isAdmin());
-      allow create: if isAuth() &&
+      allow create: if isAuth() && safeId(postId) &&
         request.resource.data.merchantId == request.auth.uid &&
         getMerchant(request.auth.uid).get('status', null) == 'verified' &&
+        request.resource.data.get('merchantName', '') == brandOf(request.auth.uid) &&
         request.resource.data.status == 'pending' &&
         request.resource.data.keys().hasOnly(['merchantId', 'merchantName', 'text', 'campaignIds', 'kind', 'status', 'city', 'createdAt']) &&
         request.resource.data.get('kind', 'impact') in ['impact', 'news', 'new', 'top'] &&
@@ -268,6 +336,7 @@ service cloud.firestore {
       allow create: if isAuth() &&
         request.resource.data.merchantId == request.auth.uid &&
         getMerchant(request.auth.uid).get('status', null) in ['pending', 'verified'] &&
+        request.resource.data.get('merchantName', '') == brandOf(request.auth.uid) &&
         request.resource.data.keys().hasOnly(['merchantId','merchantName','city','tier','slot','cost','label','icon','priceConfirmed','monthlyQuota','timeSlots','withPurchase','minPurchase','status','active','approved','redeemedCount','createdAt','updatedAt']) &&
         validTier(request.resource.data.get('tier', null)) &&
         rewardId == request.auth.uid + '_p' + string(request.resource.data.tier) &&
@@ -356,15 +425,19 @@ service cloud.firestore {
       // et éviter de devoir valider un diff de tableau dans les règles.
       match /likes/{uid} {
         allow read: if isAuth();
-        allow create: if isAuth() && uid == request.auth.uid;
+        allow create: if isAuth() && uid == request.auth.uid && request.resource.data.keys().hasOnly(['createdAt']);
         allow delete: if isAuth() && uid == request.auth.uid;
       }
 
       // Commentaires : un par auteur identifié (userId == uid), texte court, supprimables par leur auteur.
       match /comments/{commentId} {
         allow read: if isAuth();
-        allow create: if isAuth() &&
+        allow create: if isAuth() && safeId(commentId) &&
+          request.resource.data.keys().hasOnly(['userId', 'name', 'text', 'createdAt']) &&
           request.resource.data.userId == request.auth.uid &&
+          // Le nom affiché est le sien (impossible de commenter au nom de quelqu'un d'autre).
+          request.resource.data.get('name', '') in [myName(), 'Quelqu\'un'] &&
+          request.resource.data.createdAt == request.time &&
           request.resource.data.text is string &&
           request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 200;
         allow update: if false;
@@ -378,7 +451,7 @@ service cloud.firestore {
     // Retours des testeurs (profil → « Ton avis sur NOOVA ») : un habitant crée les siens, seul l'admin les lit et
     // les traite. Champs et tailles bornés (pas de document géant, pas de champ inattendu).
     match /feedback/{id} {
-      allow create: if isAuth()
+      allow create: if isAuth() && safeId(id)
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.keys().hasOnly(['uid', 'name', 'email', 'city', 'rating', 'likes', 'dislikes', 'kind', 'text', 'platform', 'standalone', 'status', 'createdAt'])
         && request.resource.data.rating is int && request.resource.data.rating >= 0 && request.resource.data.rating <= 5
@@ -395,7 +468,8 @@ service cloud.firestore {
       allow read: if isAuth() && (resource.data.get('city', null) == 'all' || resource.data.get('city', null) == myCity() || isAdmin());
       allow create, update, delete: if isAdmin();
       match /votes/{uid} {
-        allow read: if isAuth();
+        // Son propre vote seulement (les totaux sont sur la question) : personne ne voit ce qu'un autre a voté.
+        allow read: if isOwner(uid) || isAdmin();
         // Un vote = un choix valide de la question, rien d'autre (pas d'index hors liste, pas de champ en plus).
         allow create: if isAuth() && uid == request.auth.uid
           && request.resource.data.keys().hasOnly(['optionIndex', 'createdAt'])
@@ -411,8 +485,10 @@ service cloud.firestore {
     // Seul le propriétaire du code peut le créer (uid == auth.uid)
     match /friendCodes/{code} {
       allow read: if isAuth();
-      allow create: if isAuth() && request.resource.data.uid == request.auth.uid;
-      allow update: if isAuth() && resource.data.uid == request.auth.uid;
+      allow create: if isAuth() && request.resource.data.uid == request.auth.uid && code.matches('NOOVA-[A-Z0-9]{4,10}') &&
+        request.resource.data.keys().hasOnly(['uid', 'name']) && shortStr(request.resource.data, 'name', 60);
+      allow update: if isAuth() && resource.data.uid == request.auth.uid && request.resource.data.uid == request.auth.uid &&
+        request.resource.data.keys().hasOnly(['uid', 'name']) && shortStr(request.resource.data, 'name', 60);
       allow delete: if isAuth() && (resource.data.uid == request.auth.uid || isAdmin());
     }
 
@@ -427,14 +503,17 @@ service cloud.firestore {
     // Accès uniquement aux participants (stockés dans participants map du doc chat)
     match /chats/{chatId} {
       allow read: if isAuth() && (resource == null || request.auth.uid in resource.data.participants || isAdmin());
-      allow create: if isAuth() && request.auth.uid in request.resource.data.participants;
+      allow create: if isAuth() && safeId(chatId) && request.auth.uid in request.resource.data.participants &&
+        request.resource.data.keys().hasOnly(['participants']) && request.resource.data.participants.size() == 2;
       allow update: if false;
       allow delete: if isAdmin();
       match /messages/{msgId} {
         allow read: if isAuth() &&
           (request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants || isAdmin());
-        allow create: if isAuth() &&
+        allow create: if isAuth() && safeId(msgId) &&
+          request.resource.data.keys().hasOnly(['fromUid', 'text', 'createdAt']) &&
           request.resource.data.fromUid == request.auth.uid &&
+          request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000 &&
           request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
         allow update: if false;
         allow delete: if isAdmin();
@@ -444,20 +523,25 @@ service cloud.firestore {
     // ─── Cities ──────────────────────────────────────────────────────────────
     match /cities/{cityId} {
       allow read: if isAuth();
-      allow create: if isAuth();
-      // Un habitant peut toujours créer/mettre à jour label+count (inscription) ;
-      // seul l'admin peut changer 'active' (ouverture/fermeture de la ville).
-      allow update: if isAuth() && (
-        (resource == null || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['label','count'])) ||
-        isAdmin()
-      );
+      // Inscription : un habitant crée/met à jour le libellé (court) et le compteur de sa ville, rien d'autre ;
+      // seul l'admin peut changer 'active' (ouverture/fermeture de la ville). Le compteur est recalculé par le serveur.
+      allow create: if isAdmin() || (isAuth() && cityId.matches('[a-z0-9-]{1,60}') &&
+        request.resource.data.keys().hasOnly(['label', 'count']) &&
+        request.resource.data.label is string && request.resource.data.label.size() <= 60 &&
+        request.resource.data.get('count', 0) is int);
+      allow update: if isAdmin() || (isAuth() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['label','count']) &&
+        request.resource.data.label is string && request.resource.data.label.size() <= 60 &&
+        request.resource.data.count is int);
       allow delete: if false;
     }
 
     // ─── Friend notifications ─────────────────────────────────────────────────
     match /friendNotifications/{notifId} {
       allow read: if isAuth() && resource.data.toUid == request.auth.uid;
-      allow create: if isAuth() && request.resource.data.fromUid == request.auth.uid;
+      allow create: if isAuth() && safeId(notifId) && request.resource.data.fromUid == request.auth.uid &&
+        request.resource.data.keys().hasOnly(['fromUid', 'toUid', 'fromName', 'type', 'read', 'createdAt']) &&
+        shortStr(request.resource.data, 'fromName', 60);
       allow update: if isAuth() && resource.data.toUid == request.auth.uid;
       allow delete: if isAdmin();
     }
@@ -467,7 +551,10 @@ service cloud.firestore {
     // Création : uniquement par l'utilisateur concerné. Lecture : l'utilisateur,
     // le commerçant concerné, ou l'admin. Jamais modifiable ni supprimable (journal).
     match /consentEvents/{eventId} {
-      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow create: if isAuth() && safeId(eventId) && request.resource.data.userId == request.auth.uid &&
+        request.resource.data.keys().hasOnly(['userId', 'merchantId', 'action', 'segment', 'createdAt']) &&
+        request.resource.data.merchantId is string && request.resource.data.action in ['granted', 'revoked'] &&
+        request.resource.data.createdAt == request.time;
       allow read: if isAuth() && (
         resource.data.userId == request.auth.uid ||
         resource.data.merchantId == request.auth.uid ||
@@ -484,6 +571,7 @@ service cloud.firestore {
     // Compteurs de réponses par option (reveal) : serveur uniquement, jamais lisibles avant d'avoir répondu.
     match /campaignStats/{id}  { allow read, write: if false; }
     match /compatCache/{id}    { allow read, write: if false; }
+    match /consentState/{id}   { allow read, write: if false; }
     // Réglages d'engagement : lus/écrits uniquement par les fonctions (l'admin passe par getEngagementConfig).
     match /appConfig/{id}      { allow read, write: if false; }
     match /mail/{id}           { allow read, write: if false; }

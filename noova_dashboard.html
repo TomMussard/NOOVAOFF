@@ -1305,13 +1305,13 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div class="setting-row">
               <div id="set-logo-preview" style="width:40px;height:40px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--icon-gray);overflow:hidden;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M4 9.5 5 4h14l1 5.5"/><path d="M4 9.5a2.3 2.3 0 0 0 4.5.6 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5 0 2.3 2.3 0 0 0 4.5-.6"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg></div>
               <div class="setting-info"><div class="setting-name">Photo / logo</div><div class="setting-desc">Visible dans l'app et sur votre fiche commerce</div></div>
-              <input type="file" id="logo-file-inp" accept="image/*" style="display:none" onchange="changeMerchantLogo(this.files[0])">
+              <input type="file" id="logo-file-inp" accept="image/png,image/jpeg,image/webp,image/gif,image/heic" style="display:none" onchange="changeMerchantLogo(this.files[0])">
               <button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="document.getElementById('logo-file-inp').click()">Modifier</button>
             </div>
             <div class="setting-row">
               <div id="set-cover-preview" style="width:64px;height:40px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--icon-gray);overflow:hidden;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:50%;height:50%"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15l4.5-4.5a2 2 0 0 1 2.8 0L15 15"/><path d="M14 14l1.5-1.5a2 2 0 0 1 2.8 0L21 15"/><circle cx="8" cy="8.5" r="1.5"/></svg></div>
               <div class="setting-info"><div class="setting-name">Photo de couverture</div><div class="setting-desc">Affichée derrière vos questions et sur votre fiche. Une photo de votre établissement, pas votre logo.</div></div>
-              <input type="file" id="cover-file-inp" accept="image/*" style="display:none" onchange="changeMerchantCoverPhoto(this.files[0])">
+              <input type="file" id="cover-file-inp" accept="image/png,image/jpeg,image/webp,image/gif,image/heic" style="display:none" onchange="changeMerchantCoverPhoto(this.files[0])">
               <button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="removeMerchantCoverPhoto()">Retirer</button>
               <button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="document.getElementById('cover-file-inp').click()">Modifier</button>
             </div>
@@ -1328,7 +1328,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
             <div class="setting-row">
               <div class="setting-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
               <div class="setting-info"><div class="setting-name">Document d'identité / Kbis</div><div class="setting-desc" id="set-iddoc">Non fourni — utile pour accélérer votre vérification</div></div>
-              <input type="file" id="iddoc-file-inp" accept="image/*,.pdf" style="display:none" onchange="changeMerchantIdDocument(this.files[0])">
+              <input type="file" id="iddoc-file-inp" accept="image/png,image/jpeg,image/webp,image/heic,application/pdf,.pdf" style="display:none" onchange="changeMerchantIdDocument(this.files[0])">
               <button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="document.getElementById('iddoc-file-inp').click()">Envoyer</button>
             </div>
           </div>
@@ -1516,7 +1516,7 @@ function renderResultsList(){
   const g = resGroups();
   if(!_resTab) _resTab = g.done.length ? 'done' : (g.live.length ? 'live' : (g.archived.length ? 'archived' : 'done'));
   const tabs = [['done', 'Terminées'], ['live', 'En cours'], ['archived', 'Archivées']];
-  sel.innerHTML = `<div class="rs-tabs" role="tablist" aria-label="Campagnes">${tabs.map(([k, l]) => `<button type="button" role="tab" aria-selected="${_resTab === k}" class="rs-tab${_resTab === k ? ' on' : ''}" onclick="resTab('${k}')">${l} <span class="rs-tab-n">${g[k].length}</span></button>`).join('')}</div>`;
+  sel.innerHTML = `<div class="rs-tabs" role="tablist" aria-label="Campagnes">${tabs.map(([k, l]) => `<button type="button" role="tab" aria-selected="${_resTab === k}" class="rs-tab${_resTab === k ? ' on' : ''}" onclick="resTab(${jsa(k)})">${l} <span class="rs-tab-n">${g[k].length}</span></button>`).join('')}</div>`;
   const list = [...g[_resTab]].sort((a, b) => (campMs(b.endsAt) || campMs(b.createdAt)) - (campMs(a.endsAt) || campMs(a.createdAt)));
   const intro = { done: 'Les résultats complets des campagnes terminées. Une fois consultées, archivez-les pour garder cet écran lisible : l\'archivage est réversible et ne rend aucune question au quota.',
     live: 'Les campagnes encore ouvertes : leurs résultats se mettent à jour en direct. Elles pourront être archivées une fois terminées.',
@@ -1535,7 +1535,7 @@ function renderResultsList(){
       <div class="rs-card-t">${esc(c.name || c.question || '—')}</div>
       <div class="rs-card-s">${nq} question${nq > 1 ? 's' : ''} · ${esc(c.cityLabel || cityName(c.targetCity))}</div>
       <div class="rs-card-n"><b>${c.answersCount || 0}</b> réponse${(c.answersCount || 0) > 1 ? 's' : ''}</div>
-      <div class="rs-card-a"><button class="tb-btn tb-btn-primary" onclick="openResults('${c.id}')">Voir les résultats</button>${kind === 'done' ? `<button class="tb-btn tb-btn-ghost" onclick="archiveCampaign('${c.id}',true)">Archiver</button>` : kind === 'archived' ? `<button class="tb-btn tb-btn-ghost" onclick="archiveCampaign('${c.id}',false)">Désarchiver</button>` : ''}</div>
+      <div class="rs-card-a"><button class="tb-btn tb-btn-primary" onclick="openResults(${jsa(c.id)})">Voir les résultats</button>${kind === 'done' ? `<button class="tb-btn tb-btn-ghost" onclick="archiveCampaign(${jsa(c.id)},true)">Archiver</button>` : kind === 'archived' ? `<button class="tb-btn tb-btn-ghost" onclick="archiveCampaign(${jsa(c.id)},false)">Désarchiver</button>` : ''}</div>
     </div>`; }).join('')}</div>`;
 }
 function resTab(k){ _resTab = k; renderResultsList(); }
@@ -1694,11 +1694,11 @@ function renderResultsDetail(c){
   const head = `<div class="rs-head card"><div class="rs-head-main"><div class="rs-card-top"><span class="rs-pill ${kind}">${stLbl}</span><span class="rs-card-d">Du ${fmtDayLong(r.start)}${end ? ' au ' + fmtDayLong(end) : (kind === 'live' ? ' · en cours' : '')} · ${esc(c.cityLabel || cityName(c.targetCity))}${(c.ageRanges || []).length ? ' · ' + esc(c.ageRanges.join(', ')) + ' ans' : ''}</span></div>
       <h2 class="rs-h-t">${esc(c.name || c.question || '—')}</h2>${qs.length > 1 || (c.name && c.question && c.name !== c.question) ? `<div class="rs-h-q">${qs.map((q, i) => `${i + 1}. ${esc(q.q)}`).join('<br>')}</div>` : ''}</div>
     <div class="rs-actions">
-      ${kind === 'done' ? `<button class="tb-btn tb-btn-primary" onclick="archiveCampaign('${c.id}',true)">Archiver la campagne</button>` : kind === 'archived' ? `<button class="tb-btn tb-btn-primary" onclick="archiveCampaign('${c.id}',false)">Désarchiver</button>` : `<span class="rs-hint">Archivable une fois terminée</span>`}
+      ${kind === 'done' ? `<button class="tb-btn tb-btn-primary" onclick="archiveCampaign(${jsa(c.id)},true)">Archiver la campagne</button>` : kind === 'archived' ? `<button class="tb-btn tb-btn-primary" onclick="archiveCampaign(${jsa(c.id)},false)">Désarchiver</button>` : `<span class="rs-hint">Archivable une fois terminée</span>`}
       <button class="tb-btn tb-btn-ghost" onclick="exportCampCSV()">Résumé (CSV)</button>
       <button class="tb-btn tb-btn-ghost" onclick="exportCampRawCSV()">Réponses (CSV)</button>
-      <button class="tb-btn tb-btn-ghost" onclick="openEditCamp('${c.id}')">Modifier</button>
-      <button class="tb-btn tb-btn-ghost rs-del" onclick="deleteCampaign('${c.id}','${(c.name || c.question || '').replace(/['"\\]/g, '').substring(0, 40)}')">Supprimer</button>
+      <button class="tb-btn tb-btn-ghost" onclick="openEditCamp(${jsa(c.id)})">Modifier</button>
+      <button class="tb-btn tb-btn-ghost rs-del" onclick="deleteCampaign(${jsa(c.id)},${jsa((c.name || c.question || '').substring(0, 40))})">Supprimer</button>
     </div></div>`;
   if(!_resAnswers.length){ box.innerHTML = head + '<div class="rs-empty"><div class="rs-empty-t">Aucune réponse pour l\'instant</div><div class="rs-empty-d">Les résultats apparaîtront dès les premières réponses.</div></div>'; return; }
   const kpis = `<div class="rs-kpis">
@@ -1804,7 +1804,7 @@ function openEditCamp(id) {
       <strong style="color:var(--ink);">Question :</strong> ${c.question||'—'}
     </div>
     <div style="display:flex;gap:9px">
-      <button onclick="saveEditCamp('${id}')" style="flex:1;background:var(--coral);color:var(--ink);border:none;border-radius:var(--rx);padding:11px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px var(--cg)">Enregistrer</button>
+      <button onclick="saveEditCamp(${jsa(id)})" style="flex:1;background:var(--coral);color:var(--ink);border:none;border-radius:var(--rx);padding:11px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px var(--cg)">Enregistrer</button>
       <button onclick="closeCampModal()" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer">Annuler</button>
     </div>`;
 }
@@ -2302,7 +2302,10 @@ async function resolveCityZone(norm,rawLabel){
     return (r.data&&r.data.slug)||norm;
   }catch(e){ console.warn('resolveCityZone:',e); return norm; }
 }
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function esc(s){return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+// Valeur insérée dans un attribut onclick="…" : chaîne JavaScript sûre (JSON), puis échappée pour l'attribut HTML.
+// Jamais '${esc(x)}' : l'attribut est décodé avant l'exécution, une apostrophe y refermerait la chaîne (injection de code).
+function jsa(v){return esc(JSON.stringify(v==null?'':String(v)));}
 // Icône de repli affichée à la place du logo commerçant si l'image ne charge pas
 // (Storage supprimé, URL cassée...) — évite l'icône "image cassée" du navigateur.
 function merchantLogoFallbackHTML(){
@@ -2362,6 +2365,12 @@ async function confirmEditField() {
   const trimmed = val.trim();
   const uid = auth.currentUser && auth.currentUser.uid;
   if(!uid) { closeEditFieldModal(); return; }
+  // Un commerce vérifié ne change ni de nom, ni de SIRET, ni de ville sans repasser par NOOVA (règles Firestore).
+  if(_mData && _mData.status === 'verified' && ['brandName', 'siret', 'cityLabel'].includes(field)) {
+    closeEditFieldModal();
+    showToast('Votre commerce est vérifié : pour changer de nom, de SIRET ou de ville, écrivez à NOOVA.', 'warning');
+    return;
+  }
   const upd = {};
   if(field === 'siret') {
     const digits = trimmed.replace(/\s+/g,'');
@@ -2598,7 +2607,7 @@ window.addEventListener('load',()=>{
         <div style="font-size:13px;font-weight:700;color:var(--ink)">Photo de devanture (facultatif)</div>
         <div style="font-size:11.5px;color:var(--ink3);margin-top:3px;line-height:1.5">Les commerces avec photo reçoivent nettement plus de réponses.</div>
         <div id="aw-cover-name" style="font-size:11.5px;color:var(--coral-text);font-weight:700;margin-top:4px"></div>
-        <input id="aw-cover" type="file" accept="image/*" style="display:none" onchange="document.getElementById('aw-cover-name').textContent=this.files[0]?this.files[0].name:''">
+        <input id="aw-cover" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/heic" style="display:none" onchange="document.getElementById('aw-cover-name').textContent=this.files[0]?this.files[0].name:''">
       </label>
       <div id="aw-name-row" style="display:none;gap:10px">
         <input id="aw-firstname" type="text" placeholder="Prénom" autocomplete="given-name" style="flex:1;min-width:0;padding:13px 15px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;outline:none;font-family:var(--fb);box-sizing:border-box">
@@ -3212,7 +3221,7 @@ function renderFilteredCampaigns(camps) {
     const stCl  = { active:'st-active', ended:'st-ended', draft:'st-draft', paused:'st-draft' };
     const row = document.createElement('div');
     row.className = 'camp-row';
-    row.innerHTML = `<div>${c.name||c.question||'—'}</div><div><span class="camp-status ${stCl[c.status]||''}">${stMap[c.status]||c.status||'—'}</span></div><div>${c.answersCount||0} rép.</div><div><button class="tb-btn" style="padding:4px 10px;font-size:11px" onclick="openEditCamp('${c.id}')">Voir</button></div>`;
+    row.innerHTML = `<div>${c.name||c.question||'—'}</div><div><span class="camp-status ${stCl[c.status]||''}">${stMap[c.status]||c.status||'—'}</span></div><div>${c.answersCount||0} rép.</div><div><button class="tb-btn" style="padding:4px 10px;font-size:11px" onclick="openEditCamp(${jsa(c.id)})">Voir</button></div>`;
     table.appendChild(row);
   });
 }
@@ -3267,9 +3276,9 @@ function renderFirestoreCampaigns(camps) {
         <div><div class="camp-metric">${c.answersCount||0}</div><div class="camp-metric-sub">${c.answersCount===1?'réponse':'réponses'}</div></div>
         <div class="camp-prog">${pct===null?`<div class="cprog-lbl" style="white-space:nowrap">Sans limite</div>`:`<div class="cprog-bar"><div class="cprog-fill" style="width:${pct}%;background:var(--mint)"></div></div><div class="cprog-lbl">${campEndLabel(c)}</div>`}</div>
         <div class="camp-actions" style="display:flex;gap:6px;justify-content:flex-end">
-          <button class="camp-act-btn" style="background:var(--md);color:var(--mint-text)" onclick="event.stopPropagation();viewCampaign('${c.id}')">Voir</button>
-          <button class="camp-act-btn" style="background:var(--vd);color:var(--violet)" onclick="event.stopPropagation();openEditCamp('${c.id}')">Modifier</button>
-          <button class="camp-act-btn" style="background:rgba(239,68,68,.1);color:var(--red-text)" onclick="event.stopPropagation();deleteCampaign('${c.id}','${(c.name||c.question||'').replace(/'/g,'')}')">Supprimer</button>
+          <button class="camp-act-btn" style="background:var(--md);color:var(--mint-text)" onclick="event.stopPropagation();viewCampaign(${jsa(c.id)})">Voir</button>
+          <button class="camp-act-btn" style="background:var(--vd);color:var(--violet)" onclick="event.stopPropagation();openEditCamp(${jsa(c.id)})">Modifier</button>
+          <button class="camp-act-btn" style="background:rgba(239,68,68,.1);color:var(--red-text)" onclick="event.stopPropagation();deleteCampaign(${jsa(c.id)},${jsa((c.name||c.question||'').substring(0, 40))})">Supprimer</button>
         </div>`;
       card.appendChild(row);
     });
@@ -3992,7 +4001,7 @@ async function validateVoucher() {
         <input class="field-inp" id="vch-basket" type="number" min="0.5" max="5000" step="0.1" placeholder="ex. 12,50" style="max-width:180px;margin-bottom:12px">` : ''}
         <label style="display:flex;gap:9px;align-items:center;font-size:13px;color:var(--ink);cursor:pointer"><input type="checkbox" id="vch-new"> C'est un nouveau client (première visite chez nous)</label>
       </div>
-      <button class="tb-btn tb-btn-primary" style="width:100%;padding:12px" onclick="confirmValidateVoucher('${doc.id}',this,${d.minPurchase||0})">Confirmer l'utilisation</button>
+      <button class="tb-btn tb-btn-primary" style="width:100%;padding:12px" onclick="confirmValidateVoucher(${jsa(doc.id)},this,${d.minPurchase||0})">Confirmer l'utilisation</button>
     </div>`;
     loadRecentRedemptions();
   } catch(e) { el.innerHTML = `<div style="color:var(--ink3);font-size:13px">Erreur : ${e.message}</div>`; }
@@ -4089,7 +4098,7 @@ function renderNewsList(){
       note=p.notifyNote==='feed_only'?'Visible dans le fil des habitants qui ont autorisé votre commerce':p.notifyNote==='sent'?`${n} habitant${n>1?'s':''} prévenu${n>1?'s':''}`:p.notifyNote==='gap'?'Visible dans la communauté (habitants non prévenus : une actualité notifiée tous les 14 jours)':p.notifyNote==='no_audience'?'Visible dans la communauté':'';
     }
     if(p.status==='rejected')note=p.rejectionReason?'Motif : '+p.rejectionReason:'';
-    const acts=p.status==='published'?'':`<div style="display:flex;gap:8px;margin-top:10px">${p.status==='rejected'?`<button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editNews('${esc(p.id)}')">Corriger et renvoyer</button>`:''}<button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="deleteNews('${esc(p.id)}')">Supprimer</button></div>`;
+    const acts=p.status==='published'?'':`<div style="display:flex;gap:8px;margin-top:10px">${p.status==='rejected'?`<button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="editNews(${jsa(p.id)})">Corriger et renvoyer</button>`:''}<button class="tb-btn tb-btn-ghost" style="font-size:12px" onclick="deleteNews(${jsa(p.id)})">Supprimer</button></div>`;
     return `<div class="card" style="padding:16px 18px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:6px"><span style="padding:2px 9px;border-radius:99px;font-size:10.5px;font-weight:700;background:${st[1]}18;color:${st[1]}">${st[0]}</span><span style="font-size:11px;color:var(--ink3)">${p.createdAt?new Date(p.createdAt.seconds*1000).toLocaleDateString('fr-FR'):''}</span></div><div style="font-size:13.5px;color:var(--ink);line-height:1.55;white-space:pre-wrap">${esc(p.text)}</div>${note?`<div style="font-size:11.5px;color:var(--ink3);margin-top:6px">${esc(note)}</div>`:''}${acts}</div>`;
   }).join('');
 }
@@ -4106,7 +4115,7 @@ async function submitNews(){
     if(_newsEditId){
       await db.collection('merchantPosts').doc(_newsEditId).update({text,campaignIds,kind,status:'pending',rejectionReason:firebase.firestore.FieldValue.delete()});
     }else{
-      await db.collection('merchantPosts').add({merchantId:u.uid,merchantName:_mData.brandName||_mData.name||'',text,campaignIds,kind,status:'pending',city:String(_mData.city||'').toLowerCase(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      await db.collection('merchantPosts').add({merchantId:u.uid,merchantName:_mData.brandName||'',text,campaignIds,kind,status:'pending',city:String(_mData.city||'').toLowerCase(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     }
     resetNewsForm();showToast('Actualité envoyée : elle sera publiée après validation.','check');
   }catch(e){console.warn('submitNews:',e);showToast("Impossible d'envoyer l'actualité.",'warning');}

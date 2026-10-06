@@ -20,7 +20,7 @@ const db = () => getFirestore();
 const CFG_REF = () => db().collection("config").doc("adminAlerts");
 const DEFAULTS = { to: ADMIN_EMAILS, user: true, merchant: true, feedback: true, digest: true };
 const ADMIN_URL = "https://noovaoff.fr/noova_admin.html";
-const isAdmin = (request) => { const e = request.auth && request.auth.token && request.auth.token.email; return !!e && ADMIN_EMAILS.includes(e); };
+const isAdmin = (request) => require("./lib").isAdminRequest(request);
 const escH = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const validEmail = (e) => typeof e === "string" && /^[^\s@<>"]{1,64}@[^\s@<>"]{1,190}\.[a-z]{2,}$/i.test(e.trim());
 
