@@ -39,7 +39,10 @@ messaging.onBackgroundMessage((payload) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const d = event.notification.data || {};
-  const url = d.url || '/app-v2';
+  // Un clic sur une notification n'ouvre JAMAIS un autre site que NOOVA (même si le contenu de la notification
+  // était détourné) : toute adresse extérieure est remplacée par l'app.
+  let url = '/app-v2';
+  try { const u = new URL(d.url || '/app-v2', self.location.origin); if (u.origin === self.location.origin) url = u.pathname + u.search; } catch (e) {}
   let go = 'home';
   try { go = new URL(url, self.location.origin).searchParams.get('go') || 'home'; } catch (e) {}
   event.waitUntil(
