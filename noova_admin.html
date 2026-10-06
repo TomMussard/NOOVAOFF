@@ -408,10 +408,20 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       </div>
     </div>
 
-    <!-- Inscriptions récentes -->
+    <!-- Tous les inscrits (liste complète, recherche, filtre, tri, export) -->
     <div class="card">
-      <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg> Inscrits récemment <span class="badge badge-pending" id="u-recent-count">—</span></div>
-      <div id="recent-users-wrap"><div class="loading">Chargement</div></div>
+      <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 20c-.3-1.8-1.1-3.3-2.3-4.3"/></svg> Tous les inscrits <span class="badge badge-pending" id="u-recent-count">—</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--border)">
+        <input id="ul-q" type="search" placeholder="Rechercher un nom, un e-mail, une ville" oninput="_ulPage=1;renderUserList()" style="flex:1;min-width:200px;padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink);font-family:var(--fb)">
+        <select id="ul-city" onchange="_ulPage=1;renderUserList()" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink);font-family:var(--fb)"><option value="">Toutes les villes</option></select>
+        <select id="ul-sort" onchange="renderUserList()" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink);font-family:var(--fb)">
+          <option value="recent">Plus récents</option><option value="old">Plus anciens</option><option value="points">Points</option>
+          <option value="xp">XP</option><option value="streak">Série</option><option value="name">Nom (A-Z)</option>
+        </select>
+        <button onclick="exportUsersCsv()" style="padding:8px 14px;border-radius:99px;font-size:12px;font-weight:700;border:none;background:var(--coral);color:var(--ink);cursor:pointer">Exporter (CSV)</button>
+      </div>
+      <div id="recent-users-wrap" style="overflow-x:auto"><div class="loading">Chargement</div></div>
+      <div id="ul-more" style="padding:12px 18px;text-align:center;display:none"><button onclick="_ulPage++;renderUserList()" style="padding:8px 16px;border-radius:99px;font-size:12px;font-weight:700;border:1.5px solid var(--border);background:var(--bg3);color:var(--ink);cursor:pointer">Afficher 50 de plus</button></div>
     </div>
   </div>
 
@@ -1734,14 +1744,22 @@ async function loadUsers(force) {
   statIds.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '…'; });
   document.getElementById('geo-chart-wrap').innerHTML = '<div class="loading">Chargement</div>';
   try {
-    const snap = await db.collection('users').limit(500).get();
+    // TOUS les comptes, par paquets de 1 000 (plus de plafond à 500).
     const users = [];
-    snap.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+    let last = null;
+    for (;;) {
+      let q = db.collection('users').orderBy(firebase.firestore.FieldPath.documentId()).limit(1000);
+      if (last) q = q.startAfter(last);
+      const snap = await q.get();
+      snap.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+      if (snap.size < 1000) break;
+      last = snap.docs[snap.docs.length - 1];
+    }
     _usersLoaded = true;
     renderUsers(users);
-    document.getElementById('tb-usr').textContent = users.length >= 500 ? '500+' : users.length;
+    document.getElementById('tb-usr').textContent = users.length;
     const capWarn = document.getElementById('u-cap-warn');
-    if(capWarn) capWarn.style.display = users.length >= 500 ? 'block' : 'none';
+    if(capWarn) capWarn.style.display = 'none';
   } catch(e) {
     _usersLoaded = false;
     statIds.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '—'; });
@@ -1851,33 +1869,55 @@ function renderUsers(users) {
   document.getElementById('m-hasfriends').textContent = total ? Math.round((hasFriends/total)*100)+'%' : '—';
   document.getElementById('m-streak5').textContent   = total ? Math.round((streak5/total)*100)+'%' : '—';
 
-  // ── Inscriptions récentes
-  const recent = [...users]
-    .filter(u => u.createdAt)
-    .sort((a,b) => (b.createdAt.seconds||0) - (a.createdAt.seconds||0))
-    .slice(0, 10);
-
-  const COLORS = ['#f29715','#7C3AED','#0BAB84','#EF4444','#3B82F6','#EC4899'];
-  const rWrap = document.getElementById('recent-users-wrap');
-  document.getElementById('u-recent-count').textContent = recent.length + ' affichés';
-
-  if (!recent.length) {
-    rWrap.innerHTML = '<div class="empty">Aucun utilisateur avec date d\'inscription enregistrée.</div>';
-  } else {
-    rWrap.innerHTML = recent.map((u, i) => {
-      const name = u.name || 'Utilisateur';
-      const col  = COLORS[i % COLORS.length];
-      const meta = [u.city, u.age ? u.age+' ans' : null].filter(Boolean).join(' · ') || 'Profil incomplet';
-      return `<div class="act-row">
-        <div class="act-av" style="background:${col}18;color:${col}">${name[0].toUpperCase()}</div>
-        <div class="act-info">
-          <div class="act-name">${esc(name)}</div>
-          <div class="act-meta">${esc(meta)} · <span style="font-family:monospace;font-size:10px;color:var(--ink3)">${esc(u.id.slice(0,8))}…</span></div>
-        </div>
-        <div class="act-time">${fmtDate(u.createdAt)}</div>
-      </div>`;
-    }).join('');
+  // ── Tous les inscrits
+  _ulAll = users.filter(u => !u.role || u.role === 'user');
+  const sel = document.getElementById('ul-city');
+  if (sel) {
+    const cur = sel.value;
+    const cities = [...new Set(_ulAll.map(u => u.cityLabel || u.city).filter(Boolean))].sort((a, b) => String(a).localeCompare(String(b), 'fr'));
+    sel.innerHTML = '<option value="">Toutes les villes</option>' + cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    sel.value = cur;
   }
+  _ulPage = 1;
+  renderUserList();
+}
+
+// Liste complète des habitants : recherche, filtre par ville, tri, 50 par page, export CSV.
+let _ulAll = [], _ulPage = 1;
+const _ulTs = (t) => (t && (t.seconds || (t.toMillis && t.toMillis() / 1000))) || 0;
+function _ulFiltered() {
+  const q = (document.getElementById('ul-q').value || '').trim().toLowerCase();
+  const city = document.getElementById('ul-city').value;
+  const sort = document.getElementById('ul-sort').value;
+  let list = _ulAll.filter(u => (!city || (u.cityLabel || u.city) === city) &&
+    (!q || [u.name, u.email, u.city, u.cityLabel].some(v => String(v || '').toLowerCase().includes(q))));
+  const by = {
+    recent: (a, b) => _ulTs(b.createdAt) - _ulTs(a.createdAt), old: (a, b) => _ulTs(a.createdAt) - _ulTs(b.createdAt),
+    points: (a, b) => (b.points || 0) - (a.points || 0), xp: (a, b) => (b.xp || 0) - (a.xp || 0),
+    streak: (a, b) => (b.streak || 0) - (a.streak || 0), name: (a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'fr'),
+  }[sort];
+  return list.sort(by);
+}
+function renderUserList() {
+  const wrap = document.getElementById('recent-users-wrap');
+  if (!wrap) return;
+  const list = _ulFiltered(), shown = list.slice(0, _ulPage * 50);
+  document.getElementById('u-recent-count').textContent = list.length === _ulAll.length ? `${_ulAll.length} habitants` : `${list.length} sur ${_ulAll.length}`;
+  document.getElementById('ul-more').style.display = list.length > shown.length ? 'block' : 'none';
+  if (!list.length) { wrap.innerHTML = '<div class="empty">Aucun habitant ne correspond.</div>'; return; }
+  wrap.innerHTML = `<table class="st-tbl"><thead><tr><th>Nom</th><th>E-mail</th><th>Ville</th><th>Âge</th><th>Points</th><th>XP</th><th>Série</th><th>Notifs</th><th>Inscrit le</th></tr></thead><tbody>`
+    + shown.map(u => `<tr><td><strong>${esc(u.name || '—')}</strong></td><td>${esc(u.email || '—')}</td><td>${esc(u.cityLabel || u.city || '—')}</td><td>${esc(u.ageRange || u.age || '—')}</td><td>${Number(u.points) || 0}</td><td>${Number(u.xp) || 0}</td><td>${Number(u.streak) || 0} j</td><td>${u.pushEnabled ? 'oui' : 'non'}</td><td>${u.createdAt ? esc(fmtDate(u.createdAt)) : '—'}</td></tr>`).join('')
+    + '</tbody></table>';
+}
+// Export CSV de la liste filtrée (séparateur « ; » pour Excel en français). Une cellule commençant par = + - @ est
+// préfixée d'une apostrophe : un nom piégé ne peut pas devenir une formule à l'ouverture dans Excel.
+function exportUsersCsv() {
+  const cell = (v) => { let x = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(x)) x = "'" + x; return '"' + x.replace(/"/g, '""') + '"'; };
+  const rows = [['Nom', 'E-mail', 'Ville', 'Âge', 'Points', 'XP', 'Série', 'Notifications', 'Inscrit le']].concat(
+    _ulFiltered().map(u => [u.name || '', u.email || '', u.cityLabel || u.city || '', u.ageRange || u.age || '', u.points || 0, u.xp || 0, u.streak || 0, u.pushEnabled ? 'oui' : 'non', u.createdAt ? fmtDate(u.createdAt) : '']));
+  const blob = new Blob(['\ufeff' + rows.map(r => r.map(cell).join(';')).join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'noova-habitants.csv'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 
 // ── Diffusion ──────────────────────────────────────────────────────────────
