@@ -12,6 +12,7 @@
  */
 const { onDocumentWritten } = require("firebase-functions/v2/firestore");
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 
 const db = () => getFirestore();
@@ -79,4 +80,15 @@ const adminSyncPublic = onCall({ region: "europe-west1", timeoutSeconds: 540, me
   return backfill();
 });
 
-module.exports = { syncUserPublic, syncMerchantPublic, adminSyncPublic, _t: { boardOf, profileOf, merchantOf, backfill, MERCHANT_PUBLIC } };
+// Remplissage automatique juste après le déploiement : toutes les 10 minutes, une seule lecture tant que c'est fait ;
+// la première fois, recopie tous les comptes existants (plus besoin d'ouvrir l'admin).
+async function backfillIfNeeded() {
+  const c = await db().collection("config").doc("publicProfiles").get();
+  if (c.exists && (c.data().version || 0) >= 1) return { skipped: true };
+  return backfill();
+}
+const publicProfilesAutoSync = onSchedule({ schedule: "every 10 minutes", region: "europe-west1", timeoutSeconds: 540, memory: "512MiB", retryCount: 0 }, async () => {
+  await backfillIfNeeded();
+});
+
+module.exports = { syncUserPublic, syncMerchantPublic, adminSyncPublic, publicProfilesAutoSync, _t: { backfillIfNeeded, boardOf, profileOf, merchantOf, backfill, MERCHANT_PUBLIC } };
