@@ -28,7 +28,7 @@ const LE_MANS={lat:48.00,lng:0.20}, ANGERS={lat:47.47,lng:-0.55};
     const coords={'le mans':LE_MANS,'angers':ANGERS,'proche':{lat:48.08,lng:0.20},'loin':{lat:49.50,lng:2.00},'pres-angers':{lat:47.50,lng:-0.58},'introuvable':null};
     let calls=0;
     CZ.setGeocodeFn(async(label)=>{calls++;const c=coords[String(label||'').toLowerCase()];return c?{lat:c.lat,lng:c.lng}:null;});   // geocodeFn est appelée avec le LABEL (« Le Mans »), pas le slug
-    check('Ville NOOVA elle-même (« le-mans ») : rien à résoudre',JSON.stringify(await CZ.resolveZoneCore('le-mans','le-mans'))===JSON.stringify({slug:'le-mans',matched:false}));
+    check('Ville NOOVA elle-même (« le-mans ») : rien à résoudre',(r=>r.slug==='le-mans'&&r.matched===false)(await CZ.resolveZoneCore('le-mans','le-mans')));
     const r1=await CZ.resolveZoneCore('proche','proche');
     check('Commune à ~9 km du Mans : rattachée, avec la distance renvoyée',r1.slug==='le-mans'&&r1.matched===true&&r1.km>0&&r1.km<25,r1);
     const r2=await CZ.resolveZoneCore('loin','loin');

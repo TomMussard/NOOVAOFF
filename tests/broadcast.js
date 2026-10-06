@@ -48,6 +48,9 @@ const mkUser=async(uid,city,o={})=>{await db.doc('users/'+uid).set({role:'user',
     await aauth.createUser({uid:id,email:id+'@shop.fr',password:'secret123'});
   }
   const ntok=await idTokenOf('nv@shop.fr'),mtok=await idTokenOf('m2@shop.fr');
+  // Horloge figée en journée (14h, heure de Paris) : sinon, lancé après 21h, l'envoi part en attente jusqu'à 9h (silence).
+  const day=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});
+  await db.doc('_testClock/now').set({ms:Date.parse(day+'T14:00:00+02:00')});
   await mkUser('pa','paris');await mkUser('lm','le-mans');await mkUser('an','angers');
   check('Règles : un commerçant ne peut pas s\'activer la diffusion lui-même',await patch(mtok,'merchants/m2',{broadcast:true})===403);
   check('Règles : un commerçant normal ne peut pas viser toutes les villes',await create(mtok,'campaigns','bad',{...Q,merchantId:'m2',merchantName:'Salon Belle',targetCity:'toutes',city:'toutes',broadcast:true})===403);
