@@ -36,6 +36,18 @@ const J=n=>`');window.__pwn=(window.__pwn||[]).concat('${n}');//`;
     await p.evaluate(()=>{try{renderBrandsFromFirestore([{id:'m1',brandName:'Le Fournil'+"');window.__pwn=(window.__pwn||[]).concat('liste');//",sector:'Boulangerie',address:'1 rue<img src=x onerror="window.__pwn=(window.__pwn||[]).concat(\'liste-adresse\')">',city:'le-mans',logoUrl:'https://firebasestorage.googleapis.com/x/o/merchants%2Fm1%2Fbad.png'}]);}catch(e){}});
     await sleep(1500);
     check('Liste des commerces (inscription), logo cassé compris : rien ne s\'exécute',await p.evaluate(()=>!window.__pwn),await p.evaluate(()=>window.__pwn));
+    // Admin : un commerce en attente au nom piégé, affiché dans la liste, la fiche et les boutons « Valider / Refuser »
+    await db.doc('merchants/evil').set({role:'merchant',ownerUid:'evil',brandName:"Evil');window.__pwn=(window.__pwn||[]).concat('admin-bouton');//",name:'Evil',firstName:'<img src=x onerror="window.__pwn=(window.__pwn||[]).concat(\'admin-gerant\')">',sector:'Commerce',city:'le-mans',status:'pending',email:'evil@shop.fr',createdAt:Timestamp.now()});
+    await db.doc('feedback/f1').set({uid:'me',name:'<img src=x onerror="window.__pwn=(window.__pwn||[]).concat(\'admin-retour\')">',kind:'bug',rating:1,text:'<img src=x onerror="window.__pwn=(window.__pwn||[]).concat(\'admin-texte\')">',likes:[],dislikes:[],status:'nouveau',createdAt:Timestamp.now()});
+    await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
+    const a=await browser.newPage();await a.goto('http://localhost:8950/admin.html',{waitUntil:'load'});await sleep(1200);
+    await a.evaluate(async()=>{await auth.signInWithEmailAndPassword('tomussproduction@gmail.com','secret123');});
+    await wf(a,()=>document.getElementById('main').style.display==='block',null,20000);
+    await sleep(2500);
+    await a.evaluate(()=>{try{openModal('evil')}catch(e){}});await sleep(1500);
+    await a.evaluate(()=>{const b=document.querySelector('button[onclick^="approveMerchant"]');if(b){window.confirm=()=>false;b.click();}});await sleep(800);
+    await a.evaluate(()=>{const b=[...document.querySelectorAll('.tab-btn-main')].find(x=>/Retours/.test(x.textContent));if(b)b.click();});await sleep(2500);
+    check('Admin : nom, gérant et retour piégés n\'exécutent rien (liste, fiche, bouton Valider, onglet Retours)',await a.evaluate(()=>!window.__pwn),await a.evaluate(()=>window.__pwn));
   }catch(e){fail++;console.log('FAIL exception -> '+String(e.stack||e).slice(0,300));}
   await browser.close();
   console.log(`\n${pass} ok, ${fail} échec(s)`);process.exit(0);

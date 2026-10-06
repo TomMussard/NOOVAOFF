@@ -3898,7 +3898,7 @@ function openBrand(name,back){
     </div>
     <div class="bp-stats">${stats.map(s=>`<div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center;gap:4px">${s[0]} ${s[1]}</div><div class="bp-stat-l">${s[2]}</div></div>`).join('')}</div>
     <div class="bp-body">
-      <div class="bp-block"><div class="bp-sec">À propos</div><div class="bp-text">${p.about||''}</div></div>
+      <div class="bp-block"><div class="bp-sec">À propos</div><div class="bp-text">${esc(p.about||'')}</div></div>
       <div class="bp-block"><div class="bp-sec">En bref</div><div class="bp-info">${info.map(i=>`<div class="bp-info-it"><div class="bp-info-l">${i[0]}</div><div class="bp-info-v">${i[1]}</div></div>`).join('')}</div></div>
       <div class="bp-block"><div class="bp-sec">Leurs sondages</div>${sv}</div>
       <div class="bp-block"><div class="bp-sec">Tes données</div><div class="bp-data"><span class="di" style="display:inline-flex"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div class="bp-text" style="font-size:var(--fs-2)">${p.why||'Données agrégées et anonymes.'}</div></div></div>
@@ -3943,7 +3943,7 @@ async function openBrandById(mid, fallbackName) {
       <div class="bp-cover${m.coverUrl?' has-img':''}"${m.coverUrl?` style="--bp-img:url('${String(m.coverUrl).replace(/['"()\\\s<>]/g,'')}')"`:''}>
         <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
         <div class="bp-logo-wrap">${logoHTML(brandName,60,m.logoUrl)}<div><div class="bp-name">${esc(brandName)}${testTagHTML(m.isTest)}</div><div class="bp-tag">${esc(m.sector||'Commerce local')}${m.city?' '+esc(cityPhrase(m.cityLabel||m.city)):''}</div></div></div>
-        <div class="bp-chips"><span class="bp-chip">${icon('check',{size:11})} Commerce vérifié</span>${m.city?`<span class="bp-chip">${icon('pin',{size:11})} ${m.cityLabel||m.city}</span>`:''}${m.sector?`<span class="bp-chip">${m.sector}</span>`:''}</div>
+        <div class="bp-chips"><span class="bp-chip">${icon('check',{size:11})} Commerce vérifié</span>${m.city?`<span class="bp-chip">${icon('pin',{size:11})} ${esc(m.cityLabel||m.city)}</span>`:''}${m.sector?`<span class="bp-chip">${esc(m.sector)}</span>`:''}</div>
       </div>
       <div class="bp-stats">
         <div class="bp-stat"><div class="bp-stat-n" style="display:flex;align-items:center;justify-content:center;gap:4px">${icon('document',{size:14})} ${camps.length}</div><div class="bp-stat-l">Sondage${camps.length>1?'s':''}</div></div>
@@ -4185,7 +4185,7 @@ async function renderNearbyGrid(){
   el.classList.remove('all');{const b=document.getElementById('dnb-more');if(b)b.textContent='Plus de commerces ('+(withDist.length-4)+')';}
   el.innerHTML = withDist.map((c,i) => `
     <div class="dnb-card${i>=4?' dnb-extra':''}" ${c._merchantId?`onclick="openBrandById(${jsa(c._merchantId)},${jsa(c.name)})"`:''}>
-      <div class="dnb-photo">${c.photoUrl?`<img src="${c.photoUrl}" alt="Photo de ${esc(c.name)}" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}</div>
+      <div class="dnb-photo">${c.photoUrl?`<img src="${esc(c.photoUrl)}" alt="Photo de ${esc(c.name)}" onerror="this.remove()" onload="this.decode?this.decode().catch(()=>this.remove()):0">`:''}</div>
       <div class="dnb-scrim"></div>
       <div class="dnb-badge${c.hasQ?'':' soon'}">${c.hasQ?'1 question':(c.request?'À découvrir':'Bientôt')}</div>
       <div class="dnb-body"><div class="dnb-name">${esc(c.name)}${testTagHTML(c.isTest)}</div><div class="dnb-meta">${esc(c.sector)}${c._dist!=null?', à '+fmtDist(c._dist):''}</div></div>
@@ -4214,7 +4214,7 @@ let _mapSt={filter:'all',list:[],markers:{},sel:null,loc:null,token:0,userMarker
 function mapDist(m){return (_mapSt.loc&&m.lat!=null)?distMeters(_mapSt.loc,m):null;}
 function mapDirections(id){
   const m=_mapSt.list.find(x=>x.id===id);if(!m||m.lat==null)return;
-  const url=NV_IS_IOS?`https://maps.apple.com/?daddr=${m.lat},${m.lng}&dirflg=w`:`https://www.google.com/maps/dir/?api=1&destination=${m.lat},${m.lng}&travelmode=walking`;
+  const url=NV_IS_IOS?`https://maps.apple.com/?daddr=${Number(m.lat)},${Number(m.lng)}&dirflg=w`:`https://www.google.com/maps/dir/?api=1&destination=${Number(m.lat)},${Number(m.lng)}&travelmode=walking`;
   trackEvent('map_directions');
   window.open(url,'_blank','noopener');
 }
