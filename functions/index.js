@@ -31,6 +31,7 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./cityZones")));
 Object.assign(exports, require("./seedDemo"));
 // Mois de test : commerces fictifs autonomes (voir testMonth.js).
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./testMonth")));
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./publicProfiles")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./adminStats")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./adminAlerts")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./mailer")));
@@ -394,11 +395,19 @@ async function awardWeeklyNoovs(uid, qId) {
  */
 exports.countConsent = onDocumentCreated("consentEvents/{eventId}", async (event) => {
   const e = event.data && event.data.data();
-  if (!e || !e.merchantId || !["granted", "revoked"].includes(e.action)) return;
-  const ref = db.collection("merchants").doc(e.merchantId);
-  const snap = await ref.get();
-  if (!snap.exists) return;
-  await ref.update({ consentCount: FieldValue.increment(e.action === "granted" ? 1 : -1) });
+  if (!e || !e.merchantId || !e.userId || !["granted", "revoked"].includes(e.action)) return;
+  const ref = db.collection("merchants").doc(String(e.merchantId));
+  // État par habitant et par commerce : un même habitant ne compte qu'une fois, même s'il envoie 100 « granted »
+  // (le journal reste complet ; seul le compteur affiché est protégé contre le gonflage).
+  const stateRef = db.collection("consentState").doc(`${e.merchantId}_${e.userId}`.slice(0, 400));
+  await db.runTransaction(async (tx) => {
+    const [m, st] = await Promise.all([tx.get(ref), tx.get(stateRef)]);
+    if (!m.exists) return;
+    const was = st.exists && st.data().granted === true, now = e.action === "granted";
+    if (was === now) return;
+    tx.set(stateRef, { granted: now, at: FieldValue.serverTimestamp() });
+    tx.update(ref, { consentCount: FieldValue.increment(now ? 1 : -1) });
+  });
 });
 
 /**
@@ -479,8 +488,7 @@ exports.estimateCampaign = onCall(async (request) => {
  * comptes Auth sauf les comptes admin eux-mêmes (pour ne pas se déconnecter soi-même).
  */
 exports.adminResetAllData = onCall({ timeoutSeconds: 300 }, async (request) => {
-  const email = request.auth && request.auth.token && request.auth.token.email;
-  if (!email || !ADMIN_EMAILS.includes(email)) {
+  if (!require("./lib").isAdminRequest(request)) {
     throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   }
 
@@ -528,8 +536,7 @@ exports.adminResetAllData = onCall({ timeoutSeconds: 300 }, async (request) => {
  * toutes, avec leurs réponses. Les points et NOOVS déjà gagnés par les habitants restent acquis.
  */
 exports.adminNoovaQuestions = onCall({ timeoutSeconds: 300 }, async (request) => {
-  const email = request.auth && request.auth.token && request.auth.token.email;
-  if (!email || !ADMIN_EMAILS.includes(email)) {
+  if (!require("./lib").isAdminRequest(request)) {
     throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   }
   const camps = await db.collection("campaigns").where("merchantId", "==", null).get();
@@ -553,8 +560,7 @@ exports.adminNoovaQuestions = onCall({ timeoutSeconds: 300 }, async (request) =>
  * (données liées comprises) ET le compte Auth associé. Réservé admin.
  */
 exports.adminDeleteAccount = onCall(async (request) => {
-  const email = request.auth && request.auth.token && request.auth.token.email;
-  if (!email || !ADMIN_EMAILS.includes(email)) {
+  if (!require("./lib").isAdminRequest(request)) {
     throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   }
   const { uid, role } = request.data || {};

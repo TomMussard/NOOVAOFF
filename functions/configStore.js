@@ -53,9 +53,8 @@ function effective() {
   return out;
 }
 function assertAdmin(request) {
-  const email = request.auth && request.auth.token && request.auth.token.email;
-  if (!email || !ADMIN_EMAILS.includes(email)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
-  return email;
+  if (!require("./lib").isAdminRequest(request)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
+  return request.auth.token.email;
 }
 
 const getEngagementConfig = onCall(async (request) => {

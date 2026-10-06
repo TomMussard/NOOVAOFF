@@ -604,8 +604,7 @@ async function notifDiagCore({ email, send = false, reset = false }, now = Date.
   };
 }
 const adminNotifDiag = onCall({ region: "europe-west1" }, async (request) => {
-  const email = request.auth && request.auth.token && request.auth.token.email;
-  if (!email || !require("./lib").ADMIN_EMAILS.includes(email)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
+  if (!require("./lib").isAdminRequest(request)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   return notifDiagCore(request.data || {});
 });
 

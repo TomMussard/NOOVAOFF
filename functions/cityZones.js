@@ -81,8 +81,11 @@ async function resolveZoneCore(rawSlug, rawLabel) {
 }
 
 const resolveCityZone = onCall(async (request) => {
+  // Appelée AVANT la création du compte (inscription) : pas de connexion exigée, mais entrées strictement bornées
+  // (identifiant de ville court, en minuscules) pour qu'on ne puisse pas remplir le cache de villes avec n'importe quoi.
   const { slug, label } = request.data || {};
-  if (!slug || typeof slug !== "string") throw new HttpsError("invalid-argument", "Ville invalide.");
+  if (!slug || typeof slug !== "string" || !/^[a-z0-9-]{1,60}$/.test(slug)) throw new HttpsError("invalid-argument", "Ville invalide.");
+  if (label != null && (typeof label !== "string" || label.length > 80)) throw new HttpsError("invalid-argument", "Ville invalide.");
   try {
     return await resolveZoneCore(slug, String(label || slug));
   } catch (e) {

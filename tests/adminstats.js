@@ -34,7 +34,7 @@ async function wipe(){await fetch('http://127.0.0.1:8080/emulator/v1/projects/no
   check('Questions et commerces les plus répondus',s.topCampaigns[0].question==='Ta boisson ?'&&s.topMerchants[0].answers===42&&s.topMerchants[0].questions===2,{c:s.topCampaigns[0],m:s.topMerchants[0]});
   check('Notifications par type (envois, ouvertures, coupées)',s.notifications[0].type==='question_du_jour'&&s.notifications[0].opened===30&&s.notifications[0].disabled===2,s.notifications);
   // Admin : l'onglet s'affiche avec ses graphiques
-  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
   await aauth.createUser({uid:'nope',email:'u@t.fr',password:'secret123'});
   const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
   for(const [w,h] of [[1280,900],[390,844]]){

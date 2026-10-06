@@ -20,7 +20,7 @@ const track=(p,label)=>{p.on('pageerror',e=>errs.push(label+' : '+e.message));};
 
 (async()=>{
   await wipe();
-  await aauth.createUser({uid:'admtest',email:'tomussproduction@gmail.com',password:'secret123'});
+  await aauth.createUser({uid:'admtest',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
   const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox'],protocolTimeout:120000});
 
   const mctx=await browser.createBrowserContext();const mp=await mctx.newPage();track(mp,'commerçant');

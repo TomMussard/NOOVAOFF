@@ -24,7 +24,7 @@ const mkUser=async(uid,city,o={})=>{await db.doc('users/'+uid).set({role:'user',
 (async()=>{
   await wipe();
   // ── Anciennes questions NOOVA : comptées puis supprimées (avec leurs réponses) depuis l'admin
-  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
   const atok=await idTokenOf('tomussproduction@gmail.com');
   await db.doc('campaigns/old1').set({...Q,merchantId:null,merchantName:'NOOVA',postedByNoova:true,targetCity:'paris',city:'paris',createdAt:Timestamp.now()});
   await db.doc('campaigns/old2').set({...Q,merchantId:null,merchantName:'NOOVA',postedByNoova:true,targetCity:'le-mans',city:'le-mans',createdAt:Timestamp.now()});

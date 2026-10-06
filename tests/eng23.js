@@ -22,7 +22,7 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
 (async()=>{
   await wipe();
   await db.doc('merchants/m1').set({role:'merchant',ownerUid:'m1',brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:'m1@shop.fr',seenDashTour:true,verifiedPopupShown:true,cashierAck:true,monthlyQuestionQuota:50,pointsGenerated:45,pointsSpent:300});
-  await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+  await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
   const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
   const p=await browser.newPage();PG=p;await p.setViewport({width:1280,height:1000});const errs=[];p.on('pageerror',e=>errs.push(e.message));
   await p.evaluateOnNewDocument(()=>{try{localStorage.setItem('nv_pro_intro','1');}catch(e){}});

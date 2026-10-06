@@ -24,7 +24,7 @@ const del=async(t,pathDoc)=>(await fetch(`${ROOT}/${pathDoc}`,{method:'DELETE',h
 const get=async(t,pathDoc)=>(await fetch(`${ROOT}/${pathDoc}`,{headers:H(t)})).status;
 const ok=s=>s===200,no=s=>s===403;
 const now=()=>new Date();
-const reward=(mid,tier,o={})=>({merchantId:mid,merchantName:'Commerce '+mid,city:'le-mans',tier,slot:tier,cost:(TIERS[tier-1]||{pts:2000}).pts,label:'Café offert',icon:'☕',priceConfirmed:true,monthlyQuota:20,timeSlots:[],withPurchase:false,minPurchase:null,status:'pending',active:false,approved:false,redeemedCount:0,createdAt:now(),updatedAt:now(),...o});
+const reward=(mid,tier,o={})=>({merchantId:mid,merchantName:({m1:'Le Fournil',m2:'Studio Fit'})[mid]||'Commerce '+mid,city:'le-mans',tier,slot:tier,cost:(TIERS[tier-1]||{pts:2000}).pts,label:'Café offert',icon:'☕',priceConfirmed:true,monthlyQuota:20,timeSlots:[],withPurchase:false,minPurchase:null,status:'pending',active:false,approved:false,redeemedCount:0,createdAt:now(),updatedAt:now(),...o});
 
 (async()=>{
   await T('TIERS identique partout',async()=>{
@@ -39,7 +39,7 @@ const reward=(mid,tier,o={})=>({merchantId:mid,merchantName:'Commerce '+mid,city
   });
 
   await wipe();
-  const mkAuth=async(uid,email)=>aauth.createUser({uid,email,password:'secret123'});
+  const mkAuth=async(uid,email)=>aauth.createUser({uid,email,password:'secret123',emailVerified:/@gmail\.com$/.test(email)});
   await db.doc('merchants/m1').set({role:'merchant',ownerUid:'m1',brandName:'Le Fournil',city:'le-mans',status:'verified',email:'m1@s.fr'});
   await db.doc('merchants/m2').set({role:'merchant',ownerUid:'m2',brandName:'Studio Fit',city:'le-mans',status:'verified',email:'m2@s.fr'});
   await db.doc('users/u1').set({role:'user',name:'Alex',city:'le-mans',points:500,xp:500,welcomeClaimed:true,friendUids:[]});
@@ -93,7 +93,7 @@ const reward=(mid,tier,o={})=>({merchantId:mid,merchantName:'Commerce '+mid,city
     check('Il peut toujours modifier son profil (nom)',ok(await patch(U1,'users/u1',{name:'Alexandre'})));
     check('Inscription : avec 50 points de départ ou welcomeClaimed = true : refusé',no(await create(NU,'users','nu',{role:'user',name:'N',points:50,xp:0,noovs:0}))&&no(await create(NU,'users','nu',{role:'user',name:'N',points:0,xp:0,noovs:0,welcomeClaimed:true})));
     check('Inscription à zéro : acceptée',ok(await create(NU,'users','nu',{role:'user',name:'N',points:0,xp:0,noovs:0,welcomeClaimed:false})));
-    check('Un commerçant ne peut pas écrire pointsGenerated / pointsSpent sur son compte',no(await patch(M1,'merchants/m1',{pointsGenerated:99999}))&&no(await patch(M1,'merchants/m1',{pointsSpent:1}))&&ok(await patch(M1,'merchants/m1',{brandName:'Le Fournil 2'})));
+    check('Un commerçant ne peut pas écrire pointsGenerated / pointsSpent sur son compte',no(await patch(M1,'merchants/m1',{pointsGenerated:99999}))&&no(await patch(M1,'merchants/m1',{pointsSpent:1}))&&ok(await patch(M1,'merchants/m1',{description:'Pain au levain'})));
   });
 
   await T('bons (redemptions)',async()=>{

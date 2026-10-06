@@ -74,7 +74,7 @@ function pageAudit(rootSel){
   await db.doc('redemptions/r2').set({userId:'me',merchantId:'m1',merchantName:'Le Fournil',label:'Croissant offert',cost:300,status:'pending',code:'A7K2',createdAt:Timestamp.now(),expiresAt:Timestamp.fromMillis(Date.now()+86400000)});
   await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});
   await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});
-  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
 
   const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
   for(const [w,h] of [[390,844],[360,640]]){

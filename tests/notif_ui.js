@@ -39,7 +39,7 @@ async function login(browser,email,{ua,perm='default',standalone=false}={}){
   await adb.doc('merchants/m1').set({brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:'m1@shop.fr',ownerUid:'m1',cashierAck:true,verifiedPopupShown:true});
   await aauth.createUser({uid:'m1',email:'m1@shop.fr',password:'secret123'});
   await adb.doc('campaigns/c1').set({merchantId:'m1',merchantName:'Le Fournil',status:'active',targetCity:'le-mans',city:'le-mans',question:QUESTION,questions:[{q:QUESTION,format:'mcq',options:['Café','Thé']}],targetVolume:500,answersCount:0,createdAt:Timestamp.now()});
-  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});
+  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
   const browser=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox']});
   let errs=[];
 

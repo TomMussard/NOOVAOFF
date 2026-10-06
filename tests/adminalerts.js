@@ -48,7 +48,7 @@ const until=async(fn,t=15000)=>{const s=Date.now();while(Date.now()-s<t){if(awai
   await A.digestCore(Date.now());
   check('Résumé : un seul par jour (id déterministe)',(await mails()).filter(x=>x.id.startsWith('alert_digest_')).length===1);
   // Réglages (callable admin)
-  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123'});await aauth.createUser({uid:'u9',email:'u9@t.fr',password:'secret123'});
+  await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});await aauth.createUser({uid:'u9',email:'u9@t.fr',password:'secret123'});
   const tok=await idTokenOf('tomussproduction@gmail.com'),utok=await idTokenOf('u9@t.fr');
   check('Réglages : refusés à un non-admin',(await call('adminAlerts',{},utok)).error==='PERMISSION_DENIED');
   const bad=await call('adminAlerts',{action:'save',to:['pas-une-adresse']},tok);
