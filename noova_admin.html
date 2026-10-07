@@ -14,7 +14,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --ink:#17141A;--ink2:rgba(23,20,26,.72);--ink3:rgba(23,20,26,.64);--icon-gray:#6A6470;
-  --bg:#F5F3EF;--bg2:#EEECEA;--card:#fff;--border:rgba(23,20,26,.09);
+  --bg:#F5F3EF;--bg2:#EEECEA;--card:#fff;--border:rgba(23,20,26,.09);--border-ctl:rgba(23,20,26,.32);--red-strong:#B42318;
   --coral:#f29715;--coral-text:#8F5400;--mint-text:#087355;--red-text:#B91C1C;--cd:rgba(242,151,21,.1);--cg:rgba(242,151,21,.25);
   --amber:#ffda09;--brown:#1c0e02;--cream:#fffbd7;
   --mint:#0BAB84;--red:#EF4444;--violet:#7C3AED;
@@ -97,7 +97,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 .btn-approve:hover{opacity:.88}
 .btn-reject{padding:6px 11px;background:rgba(239,68,68,.1);color:var(--red-text);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:background .15s;white-space:nowrap}
 .btn-reject:hover{background:rgba(239,68,68,.18)}
-.btn-detail{padding:6px 11px;background:var(--bg2);color:var(--ink2);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:background .15s;white-space:nowrap}
+.btn-detail{padding:6px 11px;background:var(--card);color:var(--ink);border:1.5px solid var(--border-ctl);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:background .15s;white-space:nowrap}
 .btn-detail:hover{background:var(--border);color:var(--ink)}
 .empty{text-align:center;padding:40px 20px;color:var(--ink3);font-size:13px;line-height:1.6}
 
@@ -303,7 +303,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <button class="tab-btn-main" onclick="switchTab('lancement',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 3c3 1 5 4 5 8 0 3-2 6-5 9-3-3-5-6-5-9 0-4 2-7 5-8z"/><circle cx="12" cy="10" r="1.6"/><path d="M9 16.5 6.5 19M15 16.5 17.5 19"/></svg> Lancement</button>
     <button class="tab-btn-main" onclick="switchTab('moderation',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M6 21V4"/><path d="M6 4h12l-3 4.5L18 13H6"/></svg> Modération</button>
     <button class="tab-btn-main" onclick="switchTab('notifications',this)">Notifications</button>
-    <button class="tab-btn-main" onclick="switchTab('danger',this)" style="color:#EF4444;display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg> Zone de danger</button>
+    <button class="tab-btn-main" onclick="switchTab('danger',this)" style="color:var(--red-text);display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg> Zone de danger</button>
   </div>
 
   <!-- ══════════════ TAB ENTREPRISES ══════════════ -->
@@ -347,9 +347,9 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div class="card-title">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg> Toutes les entreprises
         <div class="ct-right" style="display:flex;gap:6px">
-          <button onclick="filterMerchants('all')" id="f-all" style="padding:4px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:var(--ink);color:#fff;font-family:var(--fb)">Tous</button>
-          <button onclick="filterMerchants('verified')" id="f-verified" style="padding:4px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:var(--ink3);font-family:var(--fb)">Vérifiés</button>
-          <button onclick="filterMerchants('rejected')" id="f-rejected" style="padding:4px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:var(--ink3);font-family:var(--fb)">Rejetés</button>
+          <button onclick="filterMerchants('all')" id="f-all" style="padding:4px 10px;border:1.5px solid var(--border-ctl);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:var(--ink);color:#fff;font-family:var(--fb)">Tous</button>
+          <button onclick="filterMerchants('verified')" id="f-verified" style="padding:4px 10px;border:1.5px solid var(--border-ctl);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:var(--ink3);font-family:var(--fb)">Vérifiés</button>
+          <button onclick="filterMerchants('rejected')" id="f-rejected" style="padding:4px 10px;border:1.5px solid var(--border-ctl);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:none;color:var(--ink3);font-family:var(--fb)">Rejetés</button>
         </div>
       </div>
       <div class="thead"><div>Commerce</div><div>Secteur</div><div>Ville</div><div style="text-align:right">Statut</div></div>
@@ -412,16 +412,16 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
     <div class="card">
       <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 20c-.3-1.8-1.1-3.3-2.3-4.3"/></svg> Tous les inscrits <span class="badge badge-pending" id="u-recent-count">—</span></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--border)">
-        <input id="ul-q" type="search" placeholder="Rechercher un nom, un e-mail, une ville" oninput="_ulPage=1;renderUserList()" style="flex:1;min-width:200px;padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink);font-family:var(--fb)">
-        <select id="ul-city" onchange="_ulPage=1;renderUserList()" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink);font-family:var(--fb)"><option value="">Toutes les villes</option></select>
-        <select id="ul-sort" onchange="renderUserList()" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink);font-family:var(--fb)">
+        <input id="ul-q" type="search" placeholder="Rechercher un nom, un e-mail, une ville" oninput="_ulPage=1;renderUserList()" style="flex:1;min-width:200px;padding:8px 10px;border:1.5px solid var(--border-ctl);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink);font-family:var(--fb)">
+        <select id="ul-city" onchange="_ulPage=1;renderUserList()" style="padding:8px 10px;border:1.5px solid var(--border-ctl);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink);font-family:var(--fb)"><option value="">Toutes les villes</option></select>
+        <select id="ul-sort" onchange="renderUserList()" style="padding:8px 10px;border:1.5px solid var(--border-ctl);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink);font-family:var(--fb)">
           <option value="recent">Plus récents</option><option value="old">Plus anciens</option><option value="points">Points</option>
           <option value="xp">XP</option><option value="streak">Série</option><option value="name">Nom (A-Z)</option>
         </select>
         <button onclick="exportUsersCsv()" style="padding:8px 14px;border-radius:99px;font-size:12px;font-weight:700;border:none;background:var(--coral);color:var(--ink);cursor:pointer">Exporter (CSV)</button>
       </div>
       <div id="recent-users-wrap" style="overflow-x:auto"><div class="loading">Chargement</div></div>
-      <div id="ul-more" style="padding:12px 18px;text-align:center;display:none"><button onclick="_ulPage++;renderUserList()" style="padding:8px 16px;border-radius:99px;font-size:12px;font-weight:700;border:1.5px solid var(--border);background:var(--bg3);color:var(--ink);cursor:pointer">Afficher 50 de plus</button></div>
+      <div id="ul-more" style="padding:12px 18px;text-align:center;display:none"><button onclick="_ulPage++;renderUserList()" style="padding:8px 16px;border-radius:99px;font-size:12px;font-weight:700;border:1.5px solid var(--border-ctl);background:var(--bg3);color:var(--ink);cursor:pointer">Afficher 50 de plus</button></div>
     </div>
   </div>
 
@@ -436,7 +436,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
         <div style="padding:20px">
           <div style="margin-bottom:14px">
             <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Destinataires</label>
-            <select id="broadcast-audience" onchange="updateAudienceCount()" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+            <select id="broadcast-audience" onchange="updateAudienceCount()" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
               <option value="users">Habitants</option>
               <option value="merchants">Commerçants</option>
               <option value="both">Habitants + Commerçants</option>
@@ -444,7 +444,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
           </div>
           <div style="margin-bottom:14px">
             <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Message</label>
-            <textarea id="broadcast-msg" maxlength="240" placeholder="Ex : Nouvelle fonctionnalité disponible ! Découvrez les récompenses exclusives ce week-end…" style="width:100%;height:110px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:14px;color:var(--ink);resize:none;outline:none;line-height:1.5" oninput="updateCharCount()"></textarea>
+            <textarea id="broadcast-msg" maxlength="240" placeholder="Ex : Nouvelle fonctionnalité disponible ! Découvrez les récompenses exclusives ce week-end…" style="width:100%;height:110px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:10px;font-family:var(--fb);font-size:14px;color:var(--ink);resize:none;outline:none;line-height:1.5" oninput="updateCharCount()"></textarea>
             <div style="display:flex;justify-content:space-between;margin-top:6px">
               <span id="char-count" style="font-size:11px;color:var(--ink3)">0 / 240 caractères</span>
               <span id="audience-count" style="font-size:11px;color:var(--ink3)"></span>
@@ -490,19 +490,19 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
         <div style="padding:20px">
           <div style="margin-bottom:14px">
             <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Ville concernée</label>
-            <select id="wq-city" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+            <select id="wq-city" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
               <option value="all">Toutes les villes</option>
             </select>
           </div>
           <div style="margin-bottom:14px">
             <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Question</label>
-            <textarea id="wq-text" maxlength="150" placeholder="Ex : Pizza ananas : crime ou génie ?" style="width:100%;height:70px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:var(--fb);font-size:14px;color:var(--ink);resize:none;outline:none;line-height:1.5"></textarea>
+            <textarea id="wq-text" maxlength="150" placeholder="Ex : Pizza ananas : crime ou génie ?" style="width:100%;height:70px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:10px;font-family:var(--fb);font-size:14px;color:var(--ink);resize:none;outline:none;line-height:1.5"></textarea>
           </div>
           <div style="margin-bottom:14px">
             <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Réponses possibles</label>
             <div id="wq-opts-list" style="display:flex;flex-direction:column;gap:8px">
-              <input class="wq-opt-inp" placeholder="Option 1" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
-              <input class="wq-opt-inp" placeholder="Option 2" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+              <input class="wq-opt-inp" placeholder="Option 1" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+              <input class="wq-opt-inp" placeholder="Option 2" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
             </div>
             <button type="button" onclick="addWqOpt()" style="margin-top:8px;background:none;border:none;padding:0;font-size:12px;font-weight:700;color:var(--coral-text);cursor:pointer">+ Ajouter une option (4 max)</button>
           </div>
@@ -538,7 +538,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
         <div id="tm-status" style="margin:12px 0;font-weight:700;color:var(--ink)">Chargement…</div>
         <label style="display:flex;gap:8px;align-items:flex-start;margin:10px 0"><input type="checkbox" id="tm-delete" onchange="document.getElementById('tm-confirm-wrap').style.display=this.checked?'block':'none'">
           <span>Supprimer définitivement les commerces réels (<span id="tm-real-n">…</span>) : <span id="tm-real-names" style="color:var(--ink3)"></span></span></label>
-        <div id="tm-confirm-wrap" style="display:none;margin:8px 0">Pour confirmer, tape <b>SUPPRIMER</b> : <input id="tm-confirm" autocomplete="off" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit"></div>
+        <div id="tm-confirm-wrap" style="display:none;margin:8px 0">Pour confirmer, tape <b>SUPPRIMER</b> : <input id="tm-confirm" autocomplete="off" style="padding:8px 10px;border:1.5px solid var(--border-ctl);border-radius:8px;font-family:inherit"></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
           <button class="btn-approve" id="tm-setup-btn" onclick="setupTestMonth(this)">Préparer et lancer le mois de test</button>
           <button class="btn-approve" onclick="refreshTestVisuals(this)">Mettre à jour les commerces test (nouvelles villes, logos, devantures)</button>
@@ -572,7 +572,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div id="eng-cfg-rows" style="padding:0 18px 4px"><div class="loading">Chargement</div></div>
       <div style="padding:8px 18px 16px;display:flex;gap:10px;flex-wrap:wrap">
         <button onclick="saveEngagementConfig()" style="padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:700;border:none;background:var(--coral);color:var(--ink);cursor:pointer">Enregistrer</button>
-        <button onclick="resetEngagementConfig()" style="padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:700;border:1.5px solid var(--border);background:transparent;color:var(--ink2);cursor:pointer">Revenir aux valeurs par défaut</button>
+        <button onclick="resetEngagementConfig()" style="padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:700;border:1.5px solid var(--border-ctl);background:transparent;color:var(--ink2);cursor:pointer">Revenir aux valeurs par défaut</button>
       </div>
     </div>
     <div class="card" style="margin-bottom:20px">
@@ -602,7 +602,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div style="padding:14px 18px;display:grid;gap:10px">
         <p style="font-size:12.5px;color:var(--ink3);line-height:1.5">Reçois un e-mail quand un habitant ou un commerce s'inscrit, quand un testeur envoie un retour, et un résumé chaque soir à 20h. L'envoi part de la boîte noovaoffr@gmail.com (mot de passe d'application à enregistrer une fois au déploiement).</p>
         <label style="font-size:12px;font-weight:700;color:var(--ink2)">Adresses (séparées par des virgules, 5 au maximum)
-          <input id="al-to" type="text" style="margin-top:4px;width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13px"></label>
+          <input id="al-to" type="text" style="margin-top:4px;width:100%;padding:9px 12px;border:1.5px solid var(--border-ctl);border-radius:9px;font-family:var(--fb);font-size:13px"></label>
         <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px">
           <label><input type="checkbox" id="al-user"> Nouvel habitant inscrit</label>
           <label><input type="checkbox" id="al-merchant"> Nouveau commerce inscrit (à valider)</label>
@@ -618,7 +618,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div style="padding:14px 18px">
         <p style="font-size:12.5px;color:var(--ink3);margin-bottom:10px;line-height:1.5">Un habitant ne reçoit rien ? Entre son e-mail : tu vois pourquoi, et tu peux lui envoyer une notification de test (elle ignore le plafond, les heures de silence et les réglages).</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <input id="nd-email" type="email" placeholder="email@exemple.fr" style="flex:1;min-width:200px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13px">
+          <input id="nd-email" type="email" placeholder="email@exemple.fr" style="flex:1;min-width:200px;padding:9px 12px;border:1.5px solid var(--border-ctl);border-radius:9px;font-family:var(--fb);font-size:13px">
           <button class="btn-approve" onclick="notifDiag({})">Diagnostiquer</button>
           <button class="btn-approve" onclick="notifDiag({send:true})">Envoyer une notification test</button>
           <button class="btn-reject" onclick="notifDiag({reset:true})">Réactiver ses notifications</button>
@@ -639,9 +639,9 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <div id="tab-danger" style="display:none">
     <div class="sec-hdr"><h2 style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;vertical-align:-2px"><path d="M12 4 21.5 20h-19z"/><path d="M12 10v4.5"/><path d="M12 17.7v.01"/></svg> Zone de danger</h2><p>Supprime des comptes de test avant un vrai lancement. Efface <strong>tout</strong> : données Firestore (campagnes, récompenses, réponses, échanges, notifications, chats liés) <strong>ET le compte de connexion (Auth)</strong> — plus rien ne reste. Irréversible.</p>
     <div class="card" style="margin-bottom:20px;border-color:rgba(239,68,68,.35)">
-      <div class="card-title" style="color:#EF4444;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M5 7h14"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v6M14 11v6"/></svg> Tout supprimer</div>
+      <div class="card-title" style="color:var(--red-text);display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M5 7h14"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><path d="M10 11v6M14 11v6"/></svg> Tout supprimer</div>
       <div style="padding:16px 18px">
-        <button id="danger-delete-all-btn" onclick="dangerDeleteAll()" style="padding:11px 20px;background:#EF4444;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--fb)">Supprimer TOUS les commerçants et utilisateurs</button>
+        <button id="danger-delete-all-btn" onclick="dangerDeleteAll()" style="padding:11px 20px;background:var(--red-strong);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--fb)">Supprimer TOUS les commerçants et utilisateurs</button>
         <div id="danger-progress" style="margin-top:12px;font-size:12.5px;color:var(--ink3)"></div>
       </div>
     </div>
@@ -649,7 +649,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M14.5 6.5a4 4 0 0 1-5.3 5.3L4 17l3 3 5.2-5.2a4 4 0 0 1 5.3-5.3l-3 3-2-2z"/></svg> Corriger les soldes négatifs</div>
       <div style="padding:16px 18px">
         <div style="font-size:12.5px;color:var(--ink3);margin-bottom:12px">Remet à 0 le solde de tout compte passé en négatif (bug corrigé, mais répare les comptes déjà affectés).</div>
-        <button onclick="dangerFixNegativeBalances()" style="padding:11px 20px;background:var(--bg2);color:var(--ink);border:1.5px solid var(--border);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--fb)">Corriger les soldes négatifs</button>
+        <button onclick="dangerFixNegativeBalances()" style="padding:11px 20px;background:var(--bg2);color:var(--ink);border:1.5px solid var(--border-ctl);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--fb)">Corriger les soldes négatifs</button>
         <div id="danger-fix-status" style="margin-top:12px;font-size:12.5px;color:var(--ink3)"></div>
       </div>
     </div>
@@ -701,9 +701,9 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 <div id="text-prompt-modal" onclick="if(event.target===this)closeTextPromptModal(null)" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:24px">
   <div style="background:var(--card);border-radius:20px;max-width:420px;width:100%;padding:28px 26px;box-shadow:0 24px 64px rgba(0,0,0,.25)">
     <div id="tpm-label" style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink);margin-bottom:14px">—</div>
-    <textarea id="tpm-input" rows="3" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--ink);font-size:14px;font-family:var(--fb);outline:none;resize:vertical;box-sizing:border-box"></textarea>
+    <textarea id="tpm-input" rows="3" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border-ctl);background:var(--bg);color:var(--ink);font-size:14px;font-family:var(--fb);outline:none;resize:vertical;box-sizing:border-box"></textarea>
     <div style="display:flex;gap:10px;margin-top:18px">
-      <button onclick="closeTextPromptModal(null)" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-weight:700;font-family:var(--fb);cursor:pointer">Annuler</button>
+      <button onclick="closeTextPromptModal(null)" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border-ctl);color:var(--ink2);font-weight:700;font-family:var(--fb);cursor:pointer">Annuler</button>
       <button onclick="closeTextPromptModal(document.getElementById('tpm-input').value)" style="flex:1;padding:12px;border-radius:10px;background:var(--grad);border:none;color:var(--brown);font-weight:800;font-family:var(--fd);cursor:pointer">Confirmer</button>
     </div>
   </div>
@@ -900,7 +900,7 @@ async function loadNotifMetrics() {
       tot += sent;
       const rate = sent ? opened / sent : 0;
       const verdict = sent >= 200
-        ? (rate < 0.05 ? '<span style="color:#EF4444;font-weight:800">À supprimer</span>' : '<span style="color:#0BAB84;font-weight:700">À garder</span>')
+        ? (rate < 0.05 ? '<span style="color:var(--red-text);font-weight:800">À supprimer</span>' : '<span style="color:var(--mint-text);font-weight:700">À garder</span>')
         : '<span style="color:var(--ink3)">En observation (' + sent + '/200)</span>';
       return '<tr><td style="text-align:left;padding:10px 18px;font-weight:600">' + esc(NOTIF_LABELS[t]) + '</td><td>' + sent + '</td><td>' + opened + '</td><td>' + (sent ? (rate * 100).toFixed(1) + ' %' : '—') + '</td><td>' + off + (x.autoDisabled ? ' <small style="color:var(--ink3)">(dont ' + x.autoDisabled + ' auto)</small>' : '') + '</td><td>' + verdict + '</td></tr>';
     }).join('');
@@ -1340,7 +1340,7 @@ function loadRewardModeration() {
           <div style="font-size:11.5px;color:var(--ink3);margin-top:2px">${esc(r.merchantName||'')} · ${esc(r.city||'')} · palier ${r.tier||'?'} · ${r.cost||0} pts · prix carte confirmé entre ${((window.NOOVA_TIERS||[]).find(t=>t.n===r.tier)||{}).min||'?'} et ${((window.NOOVA_TIERS||[]).find(t=>t.n===r.tier)||{}).max||'?'} € · quota ${r.monthlyQuota||'?'}/mois${r.withPurchase?' · avec achat (min. '+r.minPurchase+' €)':''}${r.purchaseCondition?' · '+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;vertical-align:-2px"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5V8h4"/><path d="M9.5 12.5h5M9.5 15.5h5"/></svg>'+' '+esc(r.purchaseCondition):''}</div>
         </div>
         <button onclick="approveReward(${jsa(r.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> Valider</button>
-        <button onclick="rejectReward(${jsa(r.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Refuser</button>
+        <button onclick="rejectReward(${jsa(r.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:var(--red-text);cursor:pointer;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="M6 6l12 12M18 6 6 18"/></svg> Refuser</button>
       </div>`).join('');
   }, e => {
     el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
@@ -1379,7 +1379,7 @@ async function renderMerchantQuota(m) {
   if (!el) return;
   el.textContent = 'Chargement…';
   const own = Number.isInteger(m.monthlyQuestionQuota) ? m.monthlyQuestionQuota : '';
-  el.innerHTML = `<input id="md-quota-inp" type="number" min="0" max="1000" value="${own}" placeholder="défaut" style="width:90px;padding:7px 9px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink)">
+  el.innerHTML = `<input id="md-quota-inp" type="number" min="0" max="1000" value="${own}" placeholder="défaut" style="width:90px;padding:7px 9px;border:1.5px solid var(--border-ctl);border-radius:9px;font-size:13px;background:var(--bg3);color:var(--ink)">
     <button onclick="saveMerchantQuota(${jsa(m.id)})" style="padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;border:none;background:var(--coral);color:var(--ink);cursor:pointer">Enregistrer</button>
     <span style="font-size:11px;color:var(--ink3)">Vide = quota par défaut de la plateforme</span>
     <label style="display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:13px;color:var(--ink);cursor:pointer;flex-basis:100%">
@@ -1412,7 +1412,7 @@ async function loadEngagementConfig() {
       const b = _engCfg.bounds[k], v = _engCfg.values[k], d = _engCfg.defaults[k];
       return `<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)">
         <div style="flex:1;font-size:13px;color:var(--ink)">${esc(b.label)}<div style="font-size:11px;color:var(--ink3)">Défaut ${d} · entre ${b.min} et ${b.max}</div></div>
-        <input data-k="${esc(k)}" type="number" step="${b.int ? 1 : 0.05}" min="${b.min}" max="${b.max}" value="${v}" style="width:84px;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;text-align:right;background:var(--bg3);color:var(--ink)">
+        <input data-k="${esc(k)}" type="number" step="${b.int ? 1 : 0.05}" min="${b.min}" max="${b.max}" value="${v}" style="width:84px;padding:8px 10px;border:1.5px solid var(--border-ctl);border-radius:10px;font-size:14px;text-align:right;background:var(--bg3);color:var(--ink)">
       </div>`;
     }).join('');
   } catch (e) { el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`; }
@@ -1447,7 +1447,7 @@ function loadPostModeration() {
           <div class="post-text" style="font-size:13px;color:var(--ink2);margin-top:5px;line-height:1.5;white-space:pre-wrap">${esc(p.text || '')}</div>
         </div>
         <button class="post-ok" onclick="approvePost(${jsa(p.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(11,171,132,.35);background:rgba(11,171,132,.1);color:#0BAB84;cursor:pointer;white-space:nowrap;flex-shrink:0">Publier</button>
-        <button class="post-ko" onclick="rejectPost(${jsa(p.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Refuser</button>
+        <button class="post-ko" onclick="rejectPost(${jsa(p.id)},this)" style="padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:var(--red-text);cursor:pointer;white-space:nowrap;flex-shrink:0">Refuser</button>
       </div>`).join('');
   }, e => { el.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`; });
 }
@@ -1529,13 +1529,13 @@ async function loadDangerZone() {
     mEl.innerHTML = merchants.length ? merchants.map(m => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border)">
         <div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--ink)">${esc(m.brandName||m.name||'—')}</div><div style="font-size:11px;color:var(--ink3)">${esc(m.email||'')} · ${esc(m.city||'')} · ${esc(m.status||'')}</div></div>
-        <button onclick="dangerDeleteMerchant(${jsa(m.id)},this)" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:rgba(239,68,68,.1);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Supprimer</button>
+        <button onclick="dangerDeleteMerchant(${jsa(m.id)},this)" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:rgba(239,68,68,.1);color:var(--red-text);cursor:pointer;white-space:nowrap;flex-shrink:0">Supprimer</button>
       </div>`).join('') : '<div class="empty">Aucun commerçant.</div>';
 
     uEl.innerHTML = users.length ? users.map(u => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border)">
         <div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--ink)">${esc(u.name||'—')}</div><div style="font-size:11px;color:var(--ink3)">${esc(u.email||'')} · ${esc(u.city||'')}</div></div>
-        <button onclick="dangerDeleteUser(${jsa(u.id)},this)" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:rgba(239,68,68,.1);color:#EF4444;cursor:pointer;white-space:nowrap;flex-shrink:0">Supprimer</button>
+        <button onclick="dangerDeleteUser(${jsa(u.id)},this)" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:rgba(239,68,68,.1);color:var(--red-text);cursor:pointer;white-space:nowrap;flex-shrink:0">Supprimer</button>
       </div>`).join('') : '<div class="empty">Aucun utilisateur.</div>';
   } catch (e) {
     mEl.innerHTML = uEl.innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`;
@@ -2006,7 +2006,7 @@ async function publishWeeklyQuestion() {
     });
     await batch.commit();
     document.getElementById('wq-text').value = '';
-    document.getElementById('wq-opts-list').innerHTML = '<input class="wq-opt-inp" placeholder="Option 1" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none"><input class="wq-opt-inp" placeholder="Option 2" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">';
+    document.getElementById('wq-opts-list').innerHTML = '<input class="wq-opt-inp" placeholder="Option 1" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none"><input class="wq-opt-inp" placeholder="Option 2" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:9px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">';
     statusEl.style.color = 'var(--mint)';
     statusEl.textContent = 'Question publiée !';
     setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 4000);
@@ -2049,7 +2049,7 @@ async function renderActiveWeeklyQuestion() {
         <div style="font-size:11px;font-weight:700;color:var(--coral-text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${esc(cityLbl)}</div>
         <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px">${esc(q.text||'')}</div>
         <div style="font-size:12px;color:var(--ink3);margin-bottom:10px">${(q.options||[]).map(o=>esc(o)).join(' · ')}</div>
-        <button onclick="stopWeeklyQuestion(${jsa(d.id)})" style="padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer">Arrêter</button>
+        <button onclick="stopWeeklyQuestion(${jsa(d.id)})" style="padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:var(--red-text);cursor:pointer">Arrêter</button>
       </div>`;
     }).join('');
   } catch(e) { el.innerHTML = '<div class="empty">Erreur de chargement.</div>'; }

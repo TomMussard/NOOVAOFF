@@ -232,6 +232,9 @@ cartes. Respecter `prefers-reduced-motion`.
 ## 12. Cohérence à vérifier avant chaque livraison
 
 - Un seul bouton jaune par écran.
+- Chaque bouton se voit : texte à 4,5:1 sur son fond réel, et un bouton blanc ou de la couleur du fond a une bordure
+  franche (`--text-3` sur l'app sombre, `--border-ctl` sur le dashboard et l'admin). Vérifié par
+  `SUITES=contrast_audit sh tests/run.sh` sur tous les écrans de l'app, du dashboard et de l'admin.
 - Aucune ombre dans le CSS produit.
 - Aucune valeur en dur hors de `tokens.css`.
 - Espace insécable avant `?`, `!`, `:` et `;` (typographie française).

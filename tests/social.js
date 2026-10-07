@@ -74,6 +74,7 @@ const day=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});
     const names=(r.suggestions||[]).map(x=>x.name+':'+x.mutual);
     check('Suggestions pour Ana : Dan (2 amis en commun), jamais un ami actuel',names.join()==='Dan:2',names);
     check('Eve (qui ne veut pas être proposée) n\'apparaît pas',!names.some(n=>/Eve/.test(n)));
+    check('Les amis en commun sont nommés (uniquement mes propres amis)',((r.suggestions||[])[0]||{}).via&&r.suggestions[0].via.slice().sort().join()==='ben,cle',r.suggestions&&r.suggestions[0]);
     const h=e=>crypto.createHash('sha256').update(e).digest('hex');
     await until(async()=>(await db.doc('emailIndex/'+h('fay@t.fr')).get()).exists);
     const m=await call('matchContacts',{hashes:[h('fay@t.fr'),h('eve@t.fr'),h('inconnu@t.fr'),h('ben@t.fr')]},A);
