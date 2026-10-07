@@ -817,6 +817,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .chat-inp:focus{border-color:var(--coral)}.chat-inp::placeholder{color:var(--ink3)}
 .chat-send{width:40px;height:40px;background:var(--surface-2);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:var(--fs-4);flex-shrink:0;color:var(--blanc);transition:transform .13s}
 .chat-send:active{transform:scale(.9)}
+.chat-day{align-self:center;font-size:var(--fs-1);font-weight:700;color:var(--ink3);background:var(--bg2);padding:4px 12px;border-radius:var(--r-pill);margin:6px 0 2px}
+.chat-plus{width:40px;height:40px;background:var(--bg2);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--ink)}
+.msg.poll{min-width:62%}
+.poll-q{font-weight:700;margin-bottom:8px}
+.poll-opt{display:block;width:100%;text-align:left;position:relative;overflow:hidden;margin-top:6px;padding:9px 12px;border-radius:var(--r-sm);border:1.5px solid var(--trait);background:var(--surface);color:var(--ink);font-family:var(--fb);font-size:var(--fs-2);cursor:pointer}
+.poll-opt .pb{position:absolute;inset:0 auto 0 0;background:var(--jaune-faible);z-index:0}
+.poll-opt span{position:relative;z-index:1;display:flex;justify-content:space-between;gap:8px}
+.poll-opt.mine{border-color:var(--marque-encre);font-weight:700}
+.poll-n{font-size:var(--fs-1);opacity:.75;margin-top:6px}
+#poll-sheet{position:absolute;inset:auto 0 0 0;background:var(--card);border-top:1px solid var(--bg3);padding:14px 16px 18px;display:none;flex-direction:column;gap:8px;z-index:5}
+#poll-sheet input{padding:11px 14px;background:var(--cream);border:none;border-radius:var(--r-btn);color:var(--ink);font-size:var(--fs-3);font-family:var(--fb);outline:none}
 /* SKELETON LOADER */
 @keyframes sk-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .sk{background:var(--bg2);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite;border-radius:var(--r-sm)}
@@ -1688,9 +1699,19 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
     <div><div style="font-family:var(--fd);font-weight:700;font-size:var(--fs-4);color:var(--ink)" id="ch-name">Marie</div><div style="font-size:var(--fs-1);font-weight:500;color:var(--ink3)" id="ch-status">Ami Noova</div></div>
   </div>
   <div class="chat-msgs" id="chat-msgs"></div>
+  <div id="poll-sheet" role="dialog" aria-label="Créer un sondage">
+    <div style="font-family:var(--fd);font-weight:800;font-size:var(--fs-4);color:var(--ink)">Poser une question</div>
+    <input id="poll-q" maxlength="200" placeholder="Ta question (ex. : On se fait un café samedi ?)">
+    <input class="poll-o" maxlength="60" value="Oui" aria-label="Réponse 1">
+    <input class="poll-o" maxlength="60" value="Non" aria-label="Réponse 2">
+    <input class="poll-o" maxlength="60" placeholder="Réponse 3 (facultatif)" aria-label="Réponse 3">
+    <input class="poll-o" maxlength="60" placeholder="Réponse 4 (facultatif)" aria-label="Réponse 4">
+    <div style="display:flex;gap:8px;margin-top:4px"><button class="btn-s" style="flex:1" onclick="closePollComposer()">Annuler</button><button class="btn-p" style="flex:1" onclick="sendPoll()">Envoyer</button></div>
+  </div>
   <div class="chat-inp-row">
+    <button class="chat-plus" onclick="openPollComposer()" aria-label="Poser une question ou un sondage">+</button>
     <input class="chat-inp" id="chat-inp" placeholder="Message…" onkeydown="if(event.key==='Enter')sendMsg()">
-    <button class="chat-send" onclick="sendMsg()">↑</button>
+    <button class="chat-send" onclick="sendMsg()" aria-label="Envoyer">↑</button>
   </div>
 </div>
 
@@ -1825,6 +1846,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
       <div class="acc-body">
       <div class="consent-it" style="cursor:pointer" onclick="openPrivacyData()"><span class="set-ico mint"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="flex:1;font-size:var(--fs-2);font-weight:600;color:var(--ink)">Données et confidentialité</div><span style="color:var(--ink3);font-size:var(--fs-4)">›</span></div>
       <div class="consent-it"><div style="flex:1;min-width:0"><div class="dconsent-name">Montrer mes réponses à mes amis</div><div class="dconsent-sub" style="white-space:normal">Tes amis voient ce que tu as répondu. Tu comptes toujours dans les résultats.</div></div><label class="tgl"><input type="checkbox" id="share-answers-inp" aria-label="Montrer mes réponses à mes amis" checked onchange="setShareAnswers(this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>
+      <div class="consent-it"><div style="flex:1;min-width:0"><div class="dconsent-name">Me proposer à d'autres habitants</div><div class="dconsent-sub" style="white-space:normal">Suggestions d'amis (amis de tes amis) et recherche par contacts. Coupé, personne ne te retrouve ainsi.</div></div><label class="tgl"><input type="checkbox" id="discoverable-inp" aria-label="Me proposer à d'autres habitants" checked onchange="setDiscoverable(this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label></div>
       <div class="consent-it" style="cursor:pointer" onclick="goTo('how-it-works');document.getElementById('bnav').classList.remove('show')"><span class="set-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg></span><div style="flex:1;font-size:var(--fs-2);font-weight:600;color:var(--ink)">Comment ça marche</div><span style="color:var(--ink3);font-size:var(--fs-4)">›</span></div>
       <div style="display:flex;align-items:center;gap:11px;background:var(--md);border-radius:var(--r-md);padding:13px 14px;margin-top:12px"><span style="display:inline-flex;width:17px;height:17px;color:var(--mint);flex-shrink:0"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg></span><div style="font-size:var(--fs-1);color:var(--ink2);line-height:1.6">Données <strong style="color:var(--mint)">chiffrées, jamais revendues</strong>. Tu peux révoquer tes consentements ou supprimer ton compte à tout moment, juste en dessous.</div></div>
       <div class="set-danger">
@@ -2408,10 +2430,27 @@ function renderHeaderStats(){
   document.querySelectorAll('.hdr-streak-n-el').forEach(e=>e.textContent=S.streak||0);
   document.querySelectorAll('.hdr-flame-el').forEach(e=>e.innerHTML=nvImg('flame',FLAME_SVG,''));
 }
+// À l'ouverture de l'app (une fois par session) : d'abord la tranche d'âge et les centres d'intérêt s'ils manquent
+// (pop-up), puis la demande de notifications si elles ne sont pas activées sur ce téléphone et jamais refusées.
+// Désactivé sur localhost (tests automatiques), sauf avec ?prompts=1.
+const NV_LAUNCH_PROMPTS=!(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)&&!/[?&]prompts=1/.test(location.search));
+function runLaunchPrompts(){
+  if(window._launchPromptsDone||!NV_LAUNCH_PROMPTS||!auth.currentUser)return;
+  window._launchPromptsDone=true;
+  const needAge=!S._age,needInt=!(S._interests||[]).length;
+  if(needAge||needInt){ setTimeout(()=>showCategoryWall(auth.currentUser.uid,{ageOnly:needAge&&!needInt,interestsOnly:needInt&&!needAge,then:askNotifAtLaunch}),700); return; }
+  setTimeout(askNotifAtLaunch,1500);
+}
+function askNotifAtLaunch(){
+  const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
+  let on=false;try{on=localStorage.getItem('nv_fcm_optin_'+uid)==='1'&&typeof Notification!=='undefined'&&Notification.permission==='granted';}catch(e){}
+  if(!on)askNotifFlow(false);
+}
 function refreshHome(){
   if(!S.user)return;
   renderHeaderStats();   // met aussi à jour #home-pts (S.pts), en plus des NOOVS/série
   renderAgeNudge();
+  runLaunchPrompts();
   if(S.qs&&S.qs.length){const q=S.qs[0];document.getElementById('today-card').classList.toggle('disc',!!q._discovery);document.getElementById('tc-brand').innerHTML=esc(q.brand)+testTagHTML(q._isTest);document.getElementById('tc-pts').textContent=ptsTag(q);document.getElementById('tc-q').textContent=q.q;document.getElementById('today-card').style.opacity='1';document.querySelector('#today-card .dtoday-cta').style.display='flex';
     const tcPhoto=document.getElementById('dtoday-photo');const existingImg=tcPhoto.querySelector(':scope > img');
     if(q.photoUrl){
@@ -3019,6 +3058,7 @@ function initFriendsPanel(){
         <button class="cm-btn" onclick="shareInvite()">Inviter un ami</button>
         <button class="cm-code" id="inv-code" onclick="copyMyCode()" title="Copier mon code">${myCode}</button>
       </div>
+      <button class="cm-link" style="margin-top:10px" onclick="findContacts()">Retrouver mes contacts sur NOOVA</button>
     </div>
     <div class="cm-sec" style="display:flex;align-items:center;justify-content:space-between;padding:0 18px">
       <span>Mes amis <span id="friends-count" style="color:var(--blanc);font-weight:800"></span></span>
@@ -3032,8 +3072,61 @@ function initFriendsPanel(){
       <div id="fi-err" style="font-size:var(--fs-2);color:var(--danger);min-height:18px;margin-top:6px"></div>
     </div>
     <div id="compat-notice"></div>
-    <div id="friends-list"></div>`;
+    <div id="friends-list"></div>
+    <div id="friend-contacts"></div>
+    <div id="friend-sugg"></div>`;
   renderFriends();
+  loadFriendSuggestions();
+}
+
+// ─── Suggestions d'amis : amis de mes amis, et contacts du téléphone (avec autorisation) ───
+function suggRowHTML(x,extra){
+  const sent=(S._sentReqs||new Set()).has(x.uid);
+  return `<div class="fi"><div class="fi-av" style="background:var(--bg2);color:var(--ink)">${avInner(x.photoUrl,x.name)}</div><div style="flex:1;min-width:0"><div class="fi-name">${esc(x.name)}</div><div class="fi-pts">${esc(extra)}</div></div>${x.friend?'<span class="fi-pts">Déjà ami</span>':`<button class="cm-link" ${sent?'disabled':''} onclick="addSuggested(${jsa(x.uid)},this)">${sent?'Demande envoyée':'Ajouter'}</button>`}</div>`;
+}
+async function loadFriendSuggestions(){
+  const el=document.getElementById('friend-sugg');if(!el||!auth.currentUser)return;
+  try{
+    const r=(await fx.httpsCallable('friendSuggestions')({})).data||{};
+    const list=(r.suggestions||[]).filter(x=>!(S._friendUids||[]).includes(x.uid));
+    el.innerHTML=list.length?`<div class="cm-sec" style="padding:0 18px">Suggestions</div>`+list.map(x=>suggRowHTML(x,x.mutual+' ami'+(x.mutual>1?'s':'')+' en commun')).join(''):'';
+  }catch(e){console.warn('friendSuggestions:',e);el.innerHTML='';}
+}
+// Demande d'ami directe (suggestion ou contact) : même document que la demande par code.
+async function addSuggested(uid,btn){
+  const me=auth.currentUser&&auth.currentUser.uid;if(!me||uid===me)return;
+  if(btn){btn.disabled=true;btn.textContent='…';}
+  try{
+    await db.collection('users').doc(uid).collection('notifications').doc('friendreq_'+me).set({type:'friend_request',fromUid:me,fromName:(S.user&&S.user.name)||'Un utilisateur',fromCode:S._friendCode||'',read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    (S._sentReqs=S._sentReqs||new Set()).add(uid);
+    if(btn)btn.textContent='Demande envoyée';
+    showToast('Demande d\'ami envoyée','success');
+  }catch(e){
+    if(btn){btn.textContent=e&&e.code==='permission-denied'?'Demande envoyée':'Ajouter';btn.disabled=!!(e&&e.code==='permission-denied');}
+    if(!(e&&e.code==='permission-denied'))showToast("Impossible d'envoyer la demande.",'error');
+  }
+}
+// Contacts : seulement avec l'accord de l'habitant, et seulement là où le navigateur le permet (Android / Chrome).
+// Les adresses e-mail ne quittent jamais le téléphone : seule leur empreinte est envoyée, rien n'est conservé.
+function findContacts(){
+  if(!('contacts' in navigator&&'select' in navigator.contacts)){
+    showToast("Ton téléphone ne permet pas encore de parcourir tes contacts depuis NOOVA : invite tes amis avec le bouton « Inviter un ami ».",'warning');
+    return;
+  }
+  askPerm({key:'contacts',force:true,title:'Retrouver tes amis',text:"NOOVA peut regarder les adresses e-mail des contacts que tu choisis pour te montrer ceux qui sont déjà inscrits. Les adresses ne quittent pas ton téléphone en clair et ne sont jamais enregistrées.",cta:'Choisir mes contacts',onAccept:doFindContacts});
+}
+async function sha256Hex(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function doFindContacts(){
+  const el=document.getElementById('friend-contacts');if(!el)return;
+  try{
+    const picked=await navigator.contacts.select(['name','email'],{multiple:true});
+    const emails=[...new Set(picked.flatMap(c=>c.email||[]).map(e=>String(e).trim().toLowerCase()).filter(e=>e.includes('@')))].slice(0,500);
+    if(!emails.length){showToast('Aucune adresse e-mail dans les contacts choisis.','warning');return;}
+    const hashes=await Promise.all(emails.map(sha256Hex));
+    const r=(await fx.httpsCallable('matchContacts')({hashes})).data||{};
+    const list=r.matches||[];
+    el.innerHTML=`<div class="cm-sec" style="padding:0 18px">Dans tes contacts</div>`+(list.length?list.map(x=>suggRowHTML(x,'Dans tes contacts')).join(''):`<div class="fi-pts" style="padding:0 18px 12px">Aucun de ces contacts n'est encore sur NOOVA. Invite-les !</div>`);
+  }catch(e){console.warn('findContacts:',e);if(!(e&&e.name==='AbortError'))showToast('Recherche des contacts impossible.','error');}
 }
 
 function shareCode(code){
@@ -3540,7 +3633,8 @@ function openChatFor(friend){
   document.getElementById('ch-name').textContent=friendName;
   const st=document.getElementById('ch-status');if(st){st.textContent='Ami Noova';st.style.color='var(--ink3)';}
   if(_chatUnsub){_chatUnsub();_chatUnsub=null;}
-  _chatMessages=[];renderChat();
+  if(_chatDocUnsub){_chatDocUnsub();_chatDocUnsub=null;}
+  _chatMessages=[];_chatLastRead={};closePollComposer();renderChat();
   const myUid=auth.currentUser&&auth.currentUser.uid;if(!myUid){goTo('chat');return;}
   const chatId=[myUid,friendUid].sort().join('_');
   const myToken=++_chatOpenToken;
@@ -3554,10 +3648,28 @@ function openChatFor(friend){
   }).catch(()=>{}).then(()=>{
     if(myToken!==_chatOpenToken) return; // un autre chat a été ouvert entre-temps
     _chatUnsub=db.collection('chats').doc(chatId).collection('messages').orderBy('createdAt','asc').limit(100).onSnapshot(snap=>{
-      _chatMessages=snap.docs.map(d=>({id:d.id,...d.data()}));renderChat();
+      _chatMessages=snap.docs.map(d=>({id:d.id,...d.data()}));renderChat();markChatRead(chatId);
     },err=>console.warn('chat:',err));
+    // « Vu » : date de dernière lecture de chaque participant (chats/{id}.lastRead).
+    _chatDocUnsub=chatRef.onSnapshot(d=>{_chatLastRead=(d.exists&&d.data().lastRead)||{};renderChat();},()=>{});
   });
   goTo('chat');
+}
+let _chatDocUnsub=null,_chatLastRead={},_chatReadAt=0;
+const _tsMs=t=>t&&t.toMillis?t.toMillis():(t&&t.seconds?t.seconds*1000:0);
+// Jour d'un message : « Aujourd'hui », « Hier », sinon « lun. 5 oct. ».
+function chatDayLabel(ms){
+  const d=new Date(ms),k=x=>x.toLocaleDateString('sv-SE'),now=new Date();
+  if(k(d)===k(now))return "Aujourd'hui";
+  if(k(d)===k(new Date(now.getTime()-86400000)))return 'Hier';
+  return d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short',year:d.getFullYear()!==now.getFullYear()?'numeric':undefined});
+}
+// Lu : la date de lecture est posée par le serveur (au plus une fois toutes les 3 s).
+function markChatRead(chatId){
+  const me=auth.currentUser&&auth.currentUser.uid;if(!me||cur!=='chat')return;
+  const lastOther=[..._chatMessages].reverse().find(m=>m.fromUid!==me);if(!lastOther)return;
+  if(Date.now()-_chatReadAt<3000)return;_chatReadAt=Date.now();
+  db.collection('chats').doc(chatId).update({['lastRead.'+me]:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
 }
 function renderChat(){
   const myUid=auth.currentUser&&auth.currentUser.uid;
@@ -3566,14 +3678,48 @@ function renderChat(){
     el.innerHTML=`<div style="text-align:center;padding:32px 16px;color:var(--ink3);font-size:var(--fs-2)">Dis bonjour à ${esc(_chatFriendName||'ton ami')}</div>`;
     return;
   }
-  _chatMessages.forEach(m=>{
-    const isMe=m.fromUid===myUid;
-    const ts=m.createdAt?new Date(m.createdAt.seconds*1000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+  const friendRead=_tsMs(_chatLastRead[_chatFriendUid]);
+  let lastMine=-1;_chatMessages.forEach((m,i)=>{if(m.fromUid===myUid)lastMine=i;});
+  let prevDay='';
+  _chatMessages.forEach((m,i)=>{
+    const isMe=m.fromUid===myUid,ms=_tsMs(m.createdAt)||Date.now();
+    const day=chatDayLabel(ms);
+    if(day!==prevDay){const sep=document.createElement('div');sep.className='chat-day';sep.textContent=day;el.appendChild(sep);prevDay=day;}
+    const ts=new Date(ms).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
     const w=document.createElement('div');w.style.cssText=`display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}`;
-    const b=document.createElement('div');b.className='msg '+(isMe?'me':'them');b.textContent=m.text;w.appendChild(b);
-    const t=document.createElement('div');t.className='msg-t'+(isMe?' r':'');t.textContent=ts;w.appendChild(t);el.appendChild(w);
+    const b=document.createElement('div');b.className='msg '+(isMe?'me':'them');
+    if(m.type==='poll'&&Array.isArray(m.options)){
+      b.classList.add('poll');
+      const votes=m.votes||{},n=Object.keys(votes).length,mine=votes[myUid];
+      b.innerHTML=`<div class="poll-q">${esc(m.text)}</div>`+m.options.map((o,k)=>{const c=Object.values(votes).filter(v=>v===k).length,pc=n?Math.round(c*100/n):0;
+        return `<button class="poll-opt${mine===k?' mine':''}" onclick="votePoll(${jsa(m.id)},${k})"><div class="pb" style="width:${pc}%"></div><span><span>${esc(o)}</span><span>${n?c:''}</span></span></button>`;}).join('')
+        +`<div class="poll-n">${n?n+' vote'+(n>1?'s':''):'Touchez une réponse pour voter'}</div>`;
+    } else b.textContent=m.text;
+    w.appendChild(b);
+    const t=document.createElement('div');t.className='msg-t'+(isMe?' r':'');
+    t.textContent=ts+(isMe&&i===lastMine&&friendRead&&friendRead>=ms?' · Vu':'');
+    w.appendChild(t);el.appendChild(w);
   });
   el.scrollTop=el.scrollHeight;
+}
+function chatIdWith(){const me=auth.currentUser&&auth.currentUser.uid;return me&&_chatFriendUid?[me,_chatFriendUid].sort().join('_'):null;}
+async function votePoll(msgId,k){
+  const me=auth.currentUser&&auth.currentUser.uid,id=chatIdWith();if(!me||!id)return;
+  try{await db.collection('chats').doc(id).collection('messages').doc(msgId).update({['votes.'+me]:k});}
+  catch(e){console.warn('votePoll:',e);showToast('Vote impossible, réessaie.','error');}
+}
+function openPollComposer(){const sh=document.getElementById('poll-sheet');if(!sh)return;sh.style.display='flex';setTimeout(()=>document.getElementById('poll-q').focus(),50);}
+function closePollComposer(){const sh=document.getElementById('poll-sheet');if(sh)sh.style.display='none';}
+async function sendPoll(){
+  const q=document.getElementById('poll-q').value.trim();
+  const opts=[...document.querySelectorAll('#poll-sheet .poll-o')].map(i=>i.value.trim()).filter(Boolean).slice(0,4);
+  if(!q){showToast('Écris ta question.','warning');return;}
+  if(opts.length<2){showToast('Il faut au moins 2 réponses.','warning');return;}
+  const me=auth.currentUser&&auth.currentUser.uid,id=chatIdWith();if(!me||!id)return;
+  try{
+    await db.collection('chats').doc(id).collection('messages').add({fromUid:me,type:'poll',text:q,options:opts,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    document.getElementById('poll-q').value='';closePollComposer();
+  }catch(e){console.warn('sendPoll:',e);showToast("Impossible d'envoyer le sondage.",'error');}
 }
 async function sendMsg(){
   const inp=document.getElementById('chat-inp');const txt=inp.value.trim();if(!txt)return;
@@ -3583,7 +3729,7 @@ async function sendMsg(){
   try{await db.collection('chats').doc(chatId).collection('messages').add({fromUid:myUid,text:txt,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}
   catch(e){console.warn('sendMsg:',e);inp.value=txt;}
 }
-function leaveChat(){if(_chatUnsub){_chatUnsub();_chatUnsub=null;}_chatMessages=[];goTo('social');}
+function leaveChat(){if(_chatUnsub){_chatUnsub();_chatUnsub=null;}if(_chatDocUnsub){_chatDocUnsub();_chatDocUnsub=null;}closePollComposer();_chatMessages=[];goTo('social');}
 
 // ─── Pull-to-refresh ─────────────────────────────────────────
 function initPullToRefresh(scrollEl, ptrBarId, refreshFn) {
@@ -4562,8 +4708,8 @@ async function enableNotifications(uid) {
   try {
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') {
-      // Refus : on ne redemande pas avant 7 jours (et jamais si le système a bloqué définitivement).
-      try{ localStorage.setItem('nv_perm_notif', String(Date.now())); }catch(e){}
+      // Refus : on ne redemande plus jamais d'office (l'habitant peut toujours les activer depuis son profil).
+      try{ localStorage.setItem('nv_perm_notif', String(Date.now())); localStorage.setItem('nv_notif_never','1'); }catch(e){}
       showToast('Notifications refusées. Tu pourras les activer dans les réglages du téléphone.', 'warning');
       refreshNotifSettingsUI();
       return;
@@ -4591,7 +4737,8 @@ const NOTIF_GROUPS=[
   {g:'resultats',t:'Résultats',d:'Quand les résultats de ta réponse sont prêts'},
   {g:'serie',t:'Ma série',d:'Un rappel le soir si ta série est en jeu'},
   {g:'recompenses',t:'Mes récompenses',d:'Récompense débloquée, code bientôt expiré'},
-  {g:'amis',t:'Mes amis',d:"Demandes d'ami et réponses en commun"},
+  {g:'messages',t:'Messages privés',d:"Quand un ami t'écrit"},
+  {g:'amis',t:'Mes amis',d:"Demandes d'ami, réponses en commun, J'aime et commentaires sur tes publications"},
   {g:'actualites',t:'Actualités des commerces',d:"Quand un commerce t'annonce ce qui a changé grâce à ton avis"}
 ];
 function notifPrefOn(g){return (S._notifPrefs||{})[g]!==false;}
@@ -4626,7 +4773,15 @@ async function flushNotifOpen(){
   if(!o||!auth.currentUser) return;
   try{ sessionStorage.removeItem('nv_open'); }catch(e){}
   try{ await callTrackNotifOpen({nid:o.nid}); trackEvent('notif_open'); }catch(e){ console.warn('trackNotifOpen:',e); }
+  if(o.go&&/^chat-[A-Za-z0-9_-]+$/.test(o.go)) { openChatWithUid(o.go.slice(5)); return; }
   if(o.go&&o.go!=='home'&&document.getElementById(o.go)) goNav(o.go);
+}
+// Notification d'un message : ouvre la conversation avec cet ami (la liste d'amis peut arriver juste après).
+function openChatWithUid(uid, tries){
+  const f=(S.friends||[]).find(x=>x.uid===uid);
+  if(f){ openChatFor(f); return; }
+  if((tries||0)<10) setTimeout(()=>openChatWithUid(uid,(tries||0)+1),500);
+  else goNav('social');
 }
 if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message',e=>{
   const d=e.data||{};
@@ -4886,8 +5041,9 @@ async function afterAccountCreated(uid){
 // Inscription (toutes méthodes : e-mail, Google, Apple) : tranche d'âge puis centres d'intérêt, sur le même écran.
 // ageOnly : compte existant sans tranche d'âge, on ne demande que l'âge.
 function showCategoryWall(uid,opts){
-  const ageOnly=!!(opts&&opts.ageOnly);
-  const w=document.getElementById('cat-wall');w._uid=uid;w._ageOnly=ageOnly;
+  const ageOnly=!!(opts&&opts.ageOnly),intOnly=!!(opts&&opts.interestsOnly);
+  const w=document.getElementById('cat-wall');w._uid=uid;w._ageOnly=ageOnly;w._intOnly=intOnly;w._then=(opts&&opts.then)||null;
+  document.getElementById('cat-age-wrap').style.display=intOnly?'none':'';
   document.getElementById('cat-grid').innerHTML=interestChipsHTML('toggleCat(this)',true);
   const have=S._interests||[];
   w.querySelectorAll('.int-chip').forEach(c=>c.classList.toggle('sel',have.includes(c.dataset.cat)));
@@ -4920,18 +5076,20 @@ async function saveCategories(){
   const w=document.getElementById('cat-wall');const uid=w._uid||(auth.currentUser&&auth.currentUser.uid);
   const cats=[...w.querySelectorAll('.int-chip.sel')].map(c=>c.dataset.cat).filter(c=>c!=='all');
   const age=w._age||'';
-  if(!age){document.getElementById('cat-age-err').style.display='block';return;}
+  if(!w._intOnly&&!age){document.getElementById('cat-age-err').style.display='block';return;}
   if(!w._ageOnly&&!cats.length){document.getElementById('cat-err').style.display='block';return;}
   if(!uid)return;
   const btn=document.getElementById('cat-submit');btn.disabled=true;btn.textContent='…';
   try{
-    const upd={ageRange:age,age:age,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+    const upd={updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+    if(!w._intOnly){upd.ageRange=age;upd.age=age;}
     if(!w._ageOnly){upd.interests=cats;upd.onboardingStep='done';}
     await db.collection('users').doc(uid).update(upd);
-    S._age=age;
+    if(!w._intOnly)S._age=age;
     if(!w._ageOnly)S._interests=cats;
     w.style.display='none';
-    if(w._ageOnly){btn.disabled=false;btn.textContent='Continuer';renderAgeNudge();showToast('Merci !','success');return;}
+    // Pop-up de lancement (compte existant) : on complète sans recharger l'app, puis on enchaîne (notifications).
+    if(w._ageOnly||w._intOnly||w._then){btn.disabled=false;btn.textContent='Continuer';renderAgeNudge();showToast('Merci !','success');const t=w._then;w._then=null;if(t)setTimeout(t,800);return;}
     loadUserAndStart(uid);
   }catch(e){console.warn('saveCategories:',e);document.getElementById('cat-err').textContent='Erreur, réessaie.';document.getElementById('cat-err').style.display='block';}
   btn.disabled=false;btn.textContent='Continuer';
@@ -5098,6 +5256,11 @@ async function answerPrediction(guess){
     showReveal(c.q,c.qIdx);      // l'offre a expiré ou échoué : on affiche simplement la répartition
   }
 }
+async function setDiscoverable(v){
+  const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
+  try{await db.collection('users').doc(uid).update({discoverable:!!v});S._discoverable=!!v;showToast(v?'Tu peux être suggéré à d\'autres habitants.':'Tu n\'apparais plus dans les suggestions.','success');}
+  catch(e){console.warn('setDiscoverable:',e);const i=document.getElementById('discoverable-inp');if(i)i.checked=!v;showToast("Impossible d'enregistrer ce réglage.",'error');}
+}
 async function setShareAnswers(v){
   const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
   const prev=S._shareAnswers!==false;S._shareAnswers=!!v;syncShareToggles();
@@ -5185,6 +5348,8 @@ function permAccept(){
 function permLater(){
   document.getElementById('perm-sheet').style.display='none';
   try{localStorage.setItem('nv_perm_'+_permKey,String(Date.now()));}catch(e){}
+  // Notifications refusées : on ne les redemande plus jamais d'office (seulement depuis Profil → Notifications).
+  if(/^notif/.test(_permKey||'')){try{localStorage.setItem('nv_notif_never','1');}catch(e){}}
   _permCb=null;
 }
 // Demande de permission : JAMAIS à l'ouverture. Après la première réponse validée (puis au plus une
@@ -5194,6 +5359,7 @@ function permLater(){
 // les instructions Android, et inversement.
 function askNotifFlow(force){
   if(!auth.currentUser) return;
+  if(!force){try{if(localStorage.getItem('nv_notif_never')==='1')return;}catch(e){}}
   if(NV_IS_IOS && !nvIsStandalone()){
     askPerm({key:'notif_install',force,title:'Reçois tes notifications',text:"Sur iPhone, les notifications fonctionnent une fois NOOVA ajoutée à ton écran d'accueil : appuie sur Partager, puis sur « Sur l'écran d'accueil ».",cta:'Voir comment faire',onAccept:showIOSInstallSheet});
     return;
@@ -5818,6 +5984,8 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   S.noovs            = data.noovs || 0;
   S._pointsToday     = data.dailyPointsDate === parisToday() ? (data.dailyPoints || 0) : 0;
   S._shareAnswers    = data.shareAnswers !== false;
+  S._discoverable    = data.discoverable !== false;
+  { const di = document.getElementById('discoverable-inp'); if (di) di.checked = S._discoverable; }
   S._pred            = data.predStats || null;
   S._notifPrefs      = data.notifPrefs || {};
   if ((data.fcmTokens || []).length && !data.pushEnabled) db.collection('users').doc(uid).update({ pushEnabled: true }).catch(() => {});

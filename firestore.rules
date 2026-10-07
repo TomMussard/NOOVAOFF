@@ -49,6 +49,12 @@ service cloud.firestore {
     // Identifiant de document créé par un client : lettres, chiffres, _ et - seulement (jamais de guillemet ni de
     // chevron, qui pourraient être réinjectés dans une page).
     function safeId(id) { return id.matches('[A-Za-z0-9_-]{1,128}'); }
+    function pollOptionsOk(o) {
+      return o is list && o.size() >= 2 && o.size() <= 4 &&
+        o[0] is string && o[0].size() > 0 && o[0].size() <= 60 && o[1] is string && o[1].size() > 0 && o[1].size() <= 60 &&
+        (o.size() < 3 || (o[2] is string && o[2].size() > 0 && o[2].size() <= 60)) &&
+        (o.size() < 4 || (o[3] is string && o[3].size() > 0 && o[3].size() <= 60));
+    }
     function myName() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('name', '');
     }
@@ -505,17 +511,31 @@ service cloud.firestore {
       allow read: if isAuth() && (resource == null || request.auth.uid in resource.data.participants || isAdmin());
       allow create: if isAuth() && safeId(chatId) && request.auth.uid in request.resource.data.participants &&
         request.resource.data.keys().hasOnly(['participants']) && request.resource.data.participants.size() == 2;
-      allow update: if false;
+      // Accusé de lecture : chaque participant ne met à jour que SA date de dernière lecture (lastRead.<son uid>).
+      allow update: if isAuth() && request.auth.uid in resource.data.participants &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastRead']) &&
+        request.resource.data.lastRead.diff(resource.data.get('lastRead', {})).affectedKeys().hasOnly([request.auth.uid]) &&
+        request.resource.data.lastRead[request.auth.uid] == request.time;
       allow delete: if isAdmin();
       match /messages/{msgId} {
         allow read: if isAuth() &&
           (request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants || isAdmin());
+        // Message texte, ou sondage (« type: poll ») : une question et 2 à 4 réponses courtes.
         allow create: if isAuth() && safeId(msgId) &&
-          request.resource.data.keys().hasOnly(['fromUid', 'text', 'createdAt']) &&
+          request.resource.data.keys().hasOnly(['fromUid', 'text', 'createdAt', 'type', 'options']) &&
           request.resource.data.fromUid == request.auth.uid &&
+          request.resource.data.createdAt == request.time &&
           request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000 &&
+          (request.resource.data.get('type', 'text') == 'text' && !('options' in request.resource.data) ||
+           (request.resource.data.get('type', 'text') == 'poll' && pollOptionsOk(request.resource.data.get('options', null)))) &&
           request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
-        allow update: if false;
+        // Vote à un sondage : chaque participant écrit seulement SON choix (votes.<son uid> = numéro d'une réponse).
+        allow update: if isAuth() && resource.data.get('type', 'text') == 'poll' &&
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['votes']) &&
+          request.resource.data.votes.diff(resource.data.get('votes', {})).affectedKeys().hasOnly([request.auth.uid]) &&
+          request.resource.data.votes[request.auth.uid] is int &&
+          request.resource.data.votes[request.auth.uid] >= 0 && request.resource.data.votes[request.auth.uid] < resource.data.options.size();
         allow delete: if isAdmin();
       }
     }
@@ -579,5 +599,7 @@ service cloud.firestore {
     match /config/{id}         { allow read: if isAdmin(); allow write: if false; }
     // Zones ouvertes automatiquement (functions/autoZones.js) : écrites par le serveur, lues par l'admin.
     match /zones/{id}          { allow read: if isAdmin(); allow write: if false; }
+    // Index des empreintes d'e-mail (recherche par contacts) : serveur uniquement, jamais lisible par un client.
+    match /emailIndex/{id}     { allow read, write: if false; }
   }
 }

@@ -15,7 +15,11 @@ const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 
+const crypto = require("crypto");
 const db = () => getFirestore();
+// Empreinte d'une adresse e-mail (recherche par contacts) : l'adresse elle-même n'est jamais stockée dans l'index.
+const emailHash = (e) => (typeof e === "string" && e.includes("@") ? crypto.createHash("sha256").update(e.trim().toLowerCase()).digest("hex") : null);
+const findable = (u) => !!u && (!u.role || u.role === "user") && u.discoverable !== false;
 const pick = (src, keys) => { const o = {}; keys.forEach((k) => { if (src[k] !== undefined) o[k] = src[k]; }); return o; };
 const str = (v, n) => (typeof v === "string" ? v.slice(0, n) : null);
 
@@ -45,6 +49,9 @@ async function mirror(ref, before, after) {
 }
 
 async function syncUser(uid, before, after) {
+  const hb = findable(before) ? emailHash(before.email) : null, ha = findable(after) ? emailHash(after.email) : null;
+  if (hb && hb !== ha) await db().collection("emailIndex").doc(hb).delete().catch(() => {});
+  if (ha && (hb !== ha || !before)) await db().collection("emailIndex").doc(ha).set({ uid });
   await Promise.all([
     mirror(db().collection("cityBoard").doc(uid), boardOf(before), boardOf(after)),
     mirror(db().collection("publicProfiles").doc(uid), profileOf(before), profileOf(after)),
@@ -68,14 +75,14 @@ async function backfill() {
   let users = 0, merchants = 0;
   for (const d of (await db().collection("users").get()).docs) { await syncUser(d.id, null, d.data()); users++; }
   for (const d of (await db().collection("merchants").get()).docs) { await syncMerchant(d.id, null, d.data()); merchants++; }
-  await db().collection("config").doc("publicProfiles").set({ version: 1, users, merchants, at: FieldValue.serverTimestamp() });
+  await db().collection("config").doc("publicProfiles").set({ version: 2, users, merchants, at: FieldValue.serverTimestamp() });
   return { users, merchants };
 }
 const adminSyncPublic = onCall({ region: "europe-west1", timeoutSeconds: 540, memory: "512MiB" }, async (request) => {
   if (!require("./lib").isAdminRequest(request)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   if (request.data && request.data.ifNeeded) {
     const c = await db().collection("config").doc("publicProfiles").get();
-    if (c.exists && (c.data().version || 0) >= 1) return { skipped: true };
+    if (c.exists && (c.data().version || 0) >= 2) return { skipped: true };
   }
   return backfill();
 });
@@ -84,7 +91,7 @@ const adminSyncPublic = onCall({ region: "europe-west1", timeoutSeconds: 540, me
 // la première fois, recopie tous les comptes existants (plus besoin d'ouvrir l'admin).
 async function backfillIfNeeded() {
   const c = await db().collection("config").doc("publicProfiles").get();
-  if (c.exists && (c.data().version || 0) >= 1) return { skipped: true };
+  if (c.exists && (c.data().version || 0) >= 2) return { skipped: true };
   return backfill();
 }
 const publicProfilesAutoSync = onSchedule({ schedule: "every 10 minutes", region: "europe-west1", timeoutSeconds: 540, memory: "512MiB", retryCount: 0 }, async () => {
