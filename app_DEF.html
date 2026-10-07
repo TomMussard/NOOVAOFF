@@ -739,6 +739,23 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .soc-title{font-family:var(--fd);font-weight:800;font-size:var(--fs-6);letter-spacing:var(--lettrage-titre);color:var(--blanc)}
 .soc-bell{width:40px;height:40px;border-radius:var(--r-btn);background:var(--surface);color:var(--ink);border:none;display:flex;align-items:center;justify-content:center;font-size:var(--fs-4);cursor:pointer;position:relative}
 .soc-acts{display:flex;gap:var(--s2)}
+/* Pop-ups centrées : voile sombre, carte au centre, bouton fermer ; l'app dessous ne réagit plus (inert) */
+.nv-modal{position:fixed;inset:0;z-index:10040;background:var(--voile);display:none;align-items:center;justify-content:center;padding:var(--s5) var(--s4);overflow-y:auto}
+.nv-modal-card{position:relative;width:100%;max-width:360px;max-height:100%;overflow-y:auto;background:var(--surface);color:var(--text);border:1px solid var(--trait);border-radius:var(--r-md);padding:var(--s6) var(--s5) var(--s5)}
+.nv-modal-x{position:absolute;top:var(--s1);right:var(--s1);width:var(--tactile-min);height:var(--tactile-min);display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--text);cursor:pointer;border-radius:var(--r-sm)}
+.nv-modal-x svg{width:20px;height:20px}
+.nv-pop-t{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-5);letter-spacing:var(--lettrage-titre);color:var(--text);margin-bottom:var(--s2);padding-right:var(--s5)}
+.nv-pop-d{font-size:var(--fs-3);line-height:1.6;color:var(--text-2);margin-bottom:var(--s5)}
+#nv-pop-av:empty{display:none}
+#nv-pop-av{margin-bottom:var(--s3)}
+#nv-pop-av .fi-av{width:56px;height:56px;background:var(--surface-2);color:var(--jaune);font-size:var(--fs-5)}
+/* Bandeau « nouveau message » quand l'app est ouverte ailleurs que dans la conversation */
+#msg-banner{position:fixed;left:var(--s4);right:var(--s4);top:calc(var(--s3) + env(safe-area-inset-top,0px));z-index:10050;max-width:420px;margin:0 auto;display:none;align-items:center;gap:var(--s3);padding:var(--s3);background:var(--bandeau);color:var(--bandeau-texte);border:1px solid var(--jaune);border-radius:var(--r-md);cursor:pointer;text-align:left;font-family:var(--font);width:auto}
+#msg-banner.show{display:flex}
+#msg-banner .fi-av{width:40px;height:40px;background:var(--jaune);color:var(--jaune-ink)}
+#msg-banner .mb-n{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3)}
+#msg-banner .mb-t{font-size:var(--fs-2);opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#msg-banner .mb-mid{flex:1;min-width:0}
 button.soc-bell{padding:0;font-family:var(--font)}
 .msg-badge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:var(--r-pill);background:var(--jaune);color:var(--jaune-ink);font-size:var(--fs-1);font-weight:800;font-variant-numeric:tabular-nums;display:none;align-items:center;justify-content:center;border:2px solid var(--bg)}
 /* Messages : liste des conversations */
@@ -1459,8 +1476,20 @@ button.soc-bell{padding:0;font-family:var(--font)}
 </div>
 
 <!-- U5 : catégories qui intéressent l'habitant -->
-<div id="cat-wall" style="position:fixed;inset:0;z-index:10001;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;overflow-y:auto">
-  <div style="width:100%;max-width:340px">
+<!-- Pop-up centrée (lancement de l'app) : l'app est figée dessous tant qu'elle est ouverte -->
+<div id="nv-pop" class="nv-modal" role="dialog" aria-modal="true" aria-labelledby="nv-pop-t" style="display:none">
+  <div class="nv-modal-card">
+    <button type="button" class="nv-modal-x" aria-label="Fermer" onclick="closePop()"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div id="nv-pop-av"></div>
+    <div id="nv-pop-t" class="nv-pop-t"></div>
+    <div id="nv-pop-d" class="nv-pop-d"></div>
+    <button type="button" class="btn-p" id="nv-pop-cta" onclick="popCta()"></button>
+    <button type="button" class="btn-s" id="nv-pop-later" style="margin-top:8px" onclick="closePop()">Plus tard</button>
+  </div>
+</div>
+<div id="cat-wall" class="nv-modal" role="dialog" aria-modal="true" aria-label="Complète ton profil" style="z-index:10001;display:none">
+  <div class="nv-modal-card">
+    <button type="button" class="nv-modal-x" id="cat-close" aria-label="Fermer" onclick="closeCategoryWall()"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <div id="cat-age-wrap">
       <div style="font-family:var(--fd);font-weight:800;font-size:var(--fs-6);color:var(--ink);letter-spacing:var(--lettrage-titre);margin-bottom:8px">Ton âge</div>
       <div style="font-size:var(--fs-3);color:var(--ink2);margin-bottom:14px;line-height:1.7">Les commerces voient seulement ta tranche d'âge, jamais ton identité.</div>
@@ -1493,9 +1522,9 @@ button.soc-bell{padding:0;font-family:var(--font)}
 </div>
 
 <!-- Feuille d'explication avant une permission système (notifications, position) -->
-<div id="perm-sheet" onclick="if(event.target===this)permLater()" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:center">
-  <div style="background:var(--card);border-radius:var(--r-lg) var(--r-lg) 0 0;max-width:430px;width:100%;padding:22px 22px calc(24px + env(safe-area-inset-bottom,0px))">
-    <div style="width:36px;height:4px;background:var(--bg3);border-radius:var(--r-pill);margin:0 auto 18px"></div>
+<div id="perm-sheet" class="nv-modal" role="dialog" aria-modal="true" aria-labelledby="perm-title" style="display:none;z-index:10003">
+  <div class="nv-modal-card">
+    <button type="button" class="nv-modal-x" aria-label="Fermer" onclick="permLater()"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <div id="perm-title" style="font-family:var(--fd);font-weight:800;font-size:var(--fs-5);letter-spacing:var(--lettrage-titre);color:var(--ink);margin-bottom:8px">Titre</div>
     <div id="perm-text" style="font-size:var(--fs-3);color:var(--ink2);line-height:1.65;margin-bottom:20px">Texte</div>
     <button class="btn-p" id="perm-cta" onclick="permAccept()">Activer</button>
@@ -1733,6 +1762,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
 </div>
 
 <!-- CHAT -->
+<button id="msg-banner" type="button" aria-live="polite" onclick="openMsgBanner()"></button>
 <div id="inbox" class="screen">
   <div class="chat-hdr">
     <div class="back-btn" style="margin-bottom:0;margin-right:4px" role="button" aria-label="Retour" onclick="goTo('social')">←</div>
@@ -2479,22 +2509,111 @@ function renderHeaderStats(){
   document.querySelectorAll('.hdr-streak-n-el').forEach(e=>e.textContent=S.streak||0);
   document.querySelectorAll('.hdr-flame-el').forEach(e=>e.innerHTML=nvImg('flame',FLAME_SVG,''));
 }
-// À l'ouverture de l'app (une fois par session) : d'abord la tranche d'âge et les centres d'intérêt s'ils manquent
-// (pop-up), puis la demande de notifications si elles ne sont pas activées sur ce téléphone et jamais refusées.
-// Désactivé sur localhost (tests automatiques), sauf avec ?prompts=1.
+// ─── Pop-ups centrées ───────────────────────────────────────
+// Une pop-up ouverte fige l'app : le reste de l'écran devient inerte (ni toucher ni clavier) jusqu'à sa fermeture.
+function nvModalSync(){
+  const shown=[...document.querySelectorAll('.nv-modal')].filter(m=>m.style.display&&m.style.display!=='none');
+  const open=shown.length>0;
+  // Tout ce qui est dans #app devient inerte, sauf la pop-up elle-même (certaines sont rangées dans #app).
+  const app=document.getElementById('app');
+  if(app)[...app.children].forEach(c=>{c.inert=open&&!shown.some(m=>m===c||c.contains(m));});
+  document.body.style.overflow=open?'hidden':'';
+}
+document.querySelectorAll('.nv-modal').forEach(m=>new MutationObserver(nvModalSync).observe(m,{attributes:true,attributeFilter:['style']}));
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;
+  if(document.getElementById('nv-pop').style.display==='flex')closePop();
+  else if(document.getElementById('perm-sheet').style.display==='flex')permLater();
+  else{const w=document.getElementById('cat-wall');if(w.style.display==='flex'&&w._closable)closeCategoryWall();}});
+let _popCb=null,_popDone=null;
+// o = { title, text, cta, onCta, later ('Plus tard' par défaut, '' pour aucun), avatar: {photoUrl, n} }
+function showPop(o){
+  return new Promise(res=>{
+    _popCb=o.onCta||null;_popDone=res;
+    document.getElementById('nv-pop-t').textContent=o.title;
+    document.getElementById('nv-pop-d').textContent=o.text||'';
+    document.getElementById('nv-pop-cta').textContent=o.cta||'OK';
+    const l=document.getElementById('nv-pop-later');l.textContent=o.later||'Plus tard';l.style.display=o.later===''?'none':'';
+    document.getElementById('nv-pop-av').innerHTML=o.avatar?`<span class="fi-av">${avInner(o.avatar.photoUrl,o.avatar.n)}</span>`:'';
+    document.getElementById('nv-pop').style.display='flex';
+    setTimeout(()=>{const b=document.getElementById('nv-pop-cta');if(b)b.focus();},50);
+  });
+}
+function closePop(){document.getElementById('nv-pop').style.display='none';const d=_popDone;_popDone=null;_popCb=null;if(d)d(false);}
+function popCta(){const cb=_popCb,d=_popDone;_popCb=null;_popDone=null;document.getElementById('nv-pop').style.display='none';if(d)d(true);if(cb)setTimeout(cb,60);}
+
+// ─── À l'ouverture de l'app : l'app vit ─────────────────────
+// Une fois par session, jusqu'à 3 pop-ups, par priorité : âge et centres d'intérêt manquants, notifications pas
+// activées (redemandées au plus tous les 3 jours), demande d'ami reçue, messages non lus, nouvel ami, nouveau commerce
+// dans la ville. Chacune se ferme d'un toucher (croix ou « Plus tard »). Désactivé sur localhost sauf ?prompts=1.
 const NV_LAUNCH_PROMPTS=!(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)&&!/[?&]prompts=1/.test(location.search));
+const NV_MAX_POPS=3;
 function runLaunchPrompts(){
   if(window._launchPromptsDone||!NV_LAUNCH_PROMPTS||!auth.currentUser)return;
   window._launchPromptsDone=true;
-  const needAge=!S._age,needInt=!(S._interests||[]).length;
-  if(needAge||needInt){ setTimeout(()=>showCategoryWall(auth.currentUser.uid,{ageOnly:needAge&&!needInt,interestsOnly:needInt&&!needAge,then:askNotifAtLaunch}),700); return; }
-  setTimeout(askNotifAtLaunch,1500);
+  setTimeout(launchPopQueue,900);
 }
-function askNotifAtLaunch(){
+function popSeenKey(){return 'nv_pop_seen_'+((auth.currentUser&&auth.currentUser.uid)||'');}
+async function launchPopQueue(){
   const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
-  let on=false;try{on=localStorage.getItem('nv_fcm_optin_'+uid)==='1'&&typeof Notification!=='undefined'&&Notification.permission==='granted';}catch(e){}
-  if(!on)askNotifFlow(false);
+  let last=0;try{last=+localStorage.getItem(popSeenKey())||0;}catch(e){}
+  try{localStorage.setItem(popSeenKey(),String(Date.now()));}catch(e){}
+  // Laisse arriver notifications, conversations et commerces (abonnements en cours) avant de choisir.
+  for(let i=0;i<10&&!(_notifs&&_notifs.length)&&!S._chats;i++)await new Promise(r=>setTimeout(r,300));
+  const steps=[popProfile,popNotif,popFriendRequest,popMessages,popNewFriend,popNewMerchant];
+  let shown=0;
+  for(const st of steps){
+    if(shown>=NV_MAX_POPS||!auth.currentUser||auth.currentUser.uid!==uid)break;
+    if(cur==='question'||cur==='chat')break;     // jamais par-dessus une réponse en cours ou une conversation
+    try{if(await st(last))shown++;}catch(e){console.warn('pop:',e);}
+  }
 }
+// Chaque étape renvoie true si elle a affiché une pop-up (après sa fermeture).
+function popProfile(){
+  const needAge=!S._age,needInt=!(S._interests||[]).length;
+  if(!needAge&&!needInt)return false;
+  return new Promise(res=>showCategoryWall(auth.currentUser.uid,{ageOnly:needAge&&!needInt,interestsOnly:needInt&&!needAge,then:()=>res(true)}));
+}
+function notifOn(){const uid=auth.currentUser&&auth.currentUser.uid;try{return localStorage.getItem('nv_fcm_optin_'+uid)==='1'&&typeof Notification!=='undefined'&&Notification.permission==='granted';}catch(e){return false;}}
+function popNotif(){
+  if(notifOn())return false;
+  return new Promise(res=>{const shown=askNotifFlow(false,()=>res(true));if(!shown)res(false);});
+}
+async function popFriendRequest(){
+  const r=(_notifs||[]).find(n=>n.type==='friend_request'&&!n.read&&n.fromUid&&!(S._friendUids||[]).includes(n.fromUid));
+  if(!r)return false;
+  await showPop({title:(r.fromName||'Quelqu\'un')+' veut être ton ami',text:'Acceptez-vous pour comparer vos réponses, vous écrire et grimper au classement ensemble.',cta:'Accepter',later:'Plus tard',avatar:{n:r.fromName||'?'},onCta:()=>acceptFriendRequest(r.id,r.fromUid,r.fromName||'')});
+  return true;
+}
+async function popMessages(){
+  const me=auth.currentUser.uid,un=(S._chats||[]).filter(c=>chatUnread(c,me));
+  if(!un.length)return false;
+  const p=inboxPeer(un[0],me);
+  const text=un.length>1?'Et '+(un.length-1)+' autre'+(un.length>2?'s':'')+' conversation'+(un.length>2?'s':'')+' non lue'+(un.length>2?'s':'')+'.':(un[0].lastType==='poll'?'Sondage : ':'')+(un[0].lastText||'');
+  await showPop({title:p.n+' t\'a écrit',text,cta:un.length>1?'Voir mes messages':'Lire',avatar:p,onCta:()=>un.length>1?(goNav('social'),openInbox()):openInboxChat(p.uid)});
+  return true;
+}
+async function popNewFriend(last){
+  const since=Math.max(last,Date.now()-7*86400000);   // depuis la dernière visite (une semaine au plus)
+  const n=(_notifs||[]).find(x=>x.type==='friend_accepted'&&_tsMs(x.createdAt)>since);
+  if(!n)return false;
+  const name=n.fromName||'Ton ami';
+  await showPop({title:name+' a accepté ta demande',text:'Vous êtes amis : écris-lui ou compare vos réponses.',cta:'Lui écrire',avatar:{n:name},onCta:()=>{goNav('social');openChatWithUid(n.fromUid);}});
+  return true;
+}
+async function popNewMerchant(){
+  const city=normalizeCity(S._city||'');if(!city)return false;
+  const all=Object.entries(_verifiedMerchantsCache||{}).map(([id,m])=>({id,...m})).filter(m=>!m.broadcast);
+  if(!all.length)return false;
+  const key='nv_known_m_'+city;let known=null;try{known=JSON.parse(localStorage.getItem(key)||'null');}catch(e){}
+  try{localStorage.setItem(key,JSON.stringify(all.map(m=>m.id).slice(0,500)));}catch(e){}
+  if(!known)return false;                      // première ouverture dans cette ville : on mémorise, sans pop-up
+  const fresh=all.filter(m=>!known.includes(m.id));
+  if(!fresh.length)return false;
+  const m=fresh[0],name=m.brandName||m.name||'Un commerce';
+  await showPop({title:fresh.length>1?fresh.length+' nouveaux commerces près de chez toi':name+' arrive sur NOOVA',text:fresh.length>1?name+' et '+(fresh.length-1)+' autre'+(fresh.length>2?'s':'')+' viennent de rejoindre NOOVA. Découvre-les et réponds à leurs questions.':(m.sector?m.sector+', ':'')+'tout près de chez toi. Découvre-le et réponds à ses questions.',cta:fresh.length>1?'Voir les commerces':'Découvrir',avatar:{photoUrl:m.logoUrl||m.photoUrl||null,n:name},onCta:()=>fresh.length>1?goNav('home'):openBrandById(m.id,name)});
+  return true;
+}
+function askNotifAtLaunch(){ if(!notifOn())askNotifFlow(false); }
 function refreshHome(){
   if(!S.user)return;
   renderHeaderStats();   // met aussi à jour #home-pts (S.pts), en plus des NOOVS/série
@@ -3158,7 +3277,7 @@ async function loadFriendSuggestions(){
   const el=document.getElementById('friend-sugg');if(!el||!auth.currentUser)return;
   try{
     const r=(await fx.httpsCallable('friendSuggestions')({})).data||{};
-    S._suggList=r.suggestions||[];renderSuggestions();
+    S._suggList=r.suggestions||[];S._suggList.forEach(x=>{if(x.sent)(S._sentReqs=S._sentReqs||new Set()).add(x.uid);});renderSuggestions();
   }catch(e){console.warn('friendSuggestions:',e);el.innerHTML='';}
 }
 // Réaffichée quand la liste d'amis arrive (prénoms des amis en commun) ou change.
@@ -3207,7 +3326,7 @@ async function doFindContacts(){
     if(!emails.length){showToast('Aucune adresse e-mail dans les contacts choisis.','warning');return;}
     const hashes=await Promise.all(emails.map(sha256Hex));
     const r=(await fx.httpsCallable('matchContacts')({hashes})).data||{};
-    const list=r.matches||[];
+    const list=r.matches||[];list.forEach(x=>{if(x.sent)(S._sentReqs=S._sentReqs||new Set()).add(x.uid);});
     el.innerHTML=`<div class="cm-sec" style="padding:0 18px">Dans tes contacts</div>`+(list.length?'<div class="sg-wrap">'+list.map(x=>suggCardHTML(x,'Dans tes contacts',false)).join('')+'</div>':`<div class="sg-empty">Aucun de ces contacts n'est encore sur NOOVA. Invite-les avec « Inviter un ami ».</div>`);
   }catch(e){console.warn('findContacts:',e);if(!(e&&e.name==='AbortError'))showToast('Recherche des contacts impossible.','error');}
 }
@@ -3730,7 +3849,7 @@ function openChatFor(friend,fromInbox){
   // rétablit jamais tout seul (le SDK Firestore ne retente pas après une erreur de permission).
   const chatRef=db.collection('chats').doc(chatId);
   chatRef.get().then(snap=>{
-    if(!snap.exists) return chatRef.set({participants:{[myUid]:true,[friendUid]:true}});
+    if(!snap.exists) return chatRef.set({participants:{[myUid]:true,[friendUid]:true},members:[myUid,friendUid],startedAt:firebase.firestore.FieldValue.serverTimestamp()});
   }).catch(()=>{}).then(()=>{
     if(myToken!==_chatOpenToken) return; // un autre chat a été ouvert entre-temps
     _chatUnsub=db.collection('chats').doc(chatId).collection('messages').orderBy('createdAt','asc').limit(100).onSnapshot(snap=>{
@@ -3823,14 +3942,32 @@ function leaveChat(){if(_chatUnsub){_chatUnsub();_chatUnsub=null;}if(_chatDocUns
 
 // ─── Messages : toutes mes conversations, la plus récente en haut ───
 // Le résumé (members, dernier message, prénoms) est tenu par le serveur à chaque message (functions/social.js).
-let _inboxUnsub=null,_chatFromInbox=false;
+let _inboxUnsub=null,_chatFromInbox=false,_inboxSeen=null,_bannerUid=null,_bannerT=null;
+function showMsgBanner(p,text){
+  const b=document.getElementById('msg-banner');if(!b)return;
+  _bannerUid=p.uid;
+  b.innerHTML=`<span class="fi-av">${avInner(p.photoUrl,p.n)}</span><span class="mb-mid"><span class="mb-n" style="display:block">${esc(p.n)}</span><span class="mb-t" style="display:block">${esc(text)}</span></span>`;
+  b.setAttribute('aria-label',p.n+' t\'a écrit : '+text);
+  b.classList.add('show');try{navigator.vibrate&&navigator.vibrate(60);}catch(e){}
+  clearTimeout(_bannerT);_bannerT=setTimeout(()=>b.classList.remove('show'),6000);
+}
+function openMsgBanner(){const b=document.getElementById('msg-banner');b.classList.remove('show');if(_bannerUid)openInboxChat(_bannerUid);}
 function initInbox(uid){
   if(_inboxUnsub)_inboxUnsub();
-  _inboxUnsub=db.collection('chats').where('members','array-contains',uid).limit(50).onSnapshot(snap=>{
-    S._chats=snap.docs.map(d=>({id:d.id,...d.data({serverTimestamps:'estimate'})})).filter(c=>c.lastAt).sort((a,b)=>_tsMs(b.lastAt)-_tsMs(a.lastAt));
+  _inboxSeen=null;
+  // Une conversation lancée reste dans la liste pour toujours (même sans message, même si l'amitié est retirée).
+  _inboxUnsub=db.collection('chats').where('members','array-contains',uid).limit(500).onSnapshot(snap=>{
+    S._chats=snap.docs.map(d=>({id:d.id,...d.data({serverTimestamps:'estimate'})})).sort((a,b)=>chatTime(b)-chatTime(a));
+    // Nouveau message reçu pendant que l'app est ouverte (hors de cette conversation) : bandeau en haut de l'écran.
+    const first=!_inboxSeen;_inboxSeen=_inboxSeen||{};
+    S._chats.forEach(c=>{const t=_tsMs(c.lastAt),prev=_inboxSeen[c.id];_inboxSeen[c.id]=Math.max(prev||0,t);
+      if(first||!(t>(prev||0))||!c.lastFrom||c.lastFrom===uid)return;
+      const p=inboxPeer(c,uid);if(cur==='inbox'||(cur==='chat'&&_chatFriendUid===p.uid))return;
+      showMsgBanner(p,(c.lastType==='poll'?'Sondage : ':'')+(c.lastText||''));});
     updateMsgBadge();if(cur==='inbox')renderInbox();
   },err=>console.warn('inbox:',err));
 }
+function chatTime(c){return _tsMs(c.lastAt)||_tsMs(c.startedAt);}
 function chatUnread(c,me){return !!(c.lastFrom&&c.lastFrom!==me&&_tsMs((c.lastRead||{})[me])<_tsMs(c.lastAt));}
 function updateMsgBadge(){
   const me=auth.currentUser&&auth.currentUser.uid,b=document.getElementById('msg-badge');if(!b)return;
@@ -3857,8 +3994,8 @@ function renderInbox(){
   const me=auth.currentUser&&auth.currentUser.uid,chats=S._chats||[];
   const rows=chats.map(c=>{
     const p=inboxPeer(c,me),un=chatUnread(c,me);
-    const txt=(c.lastType==='poll'?'Sondage : ':'')+(c.lastText||'');
-    return `<button class="ib-row${un?' unread':''}" onclick="openInboxChat(${jsa(p.uid)})"><div class="fi-av">${avInner(p.photoUrl,p.n)}</div><div class="ib-mid"><div class="ib-top"><span class="ib-name">${esc(p.n)}</span><span class="ib-time">${esc(inboxTime(_tsMs(c.lastAt)))}</span></div><div class="ib-last">${c.lastFrom===me?'Toi : ':''}${esc(txt)}</div></div>${un?'<span class="ib-dot" aria-label="Non lu"></span>':''}</button>`;
+    const txt=c.lastAt?(c.lastType==='poll'?'Sondage : ':'')+(c.lastText||''):'Conversation démarrée, écris le premier message';
+    return `<button class="ib-row${un?' unread':''}" onclick="openInboxChat(${jsa(p.uid)})"><div class="fi-av">${avInner(p.photoUrl,p.n)}</div><div class="ib-mid"><div class="ib-top"><span class="ib-name">${esc(p.n)}</span><span class="ib-time">${esc(inboxTime(chatTime(c)))}</span></div><div class="ib-last">${c.lastAt&&c.lastFrom===me?'Toi : ':''}${esc(txt)}</div></div>${un?'<span class="ib-dot" aria-label="Non lu"></span>':''}</button>`;
   }).join('');
   const talked=new Set(chats.map(c=>inboxPeer(c,me).uid));
   const others=(S.friends||[]).filter(f=>f.mutual&&!talked.has(f.uid));
@@ -4815,7 +4952,7 @@ let _fcmMessaging = null;
       _fcmMessaging.onMessage((payload) => {
         const d = payload.data || {};
         const t = d.title || (payload.notification && payload.notification.title);
-        if (t) showToast(t, 'success');
+        if (t && d.ntype !== 'message') showToast(t, 'success');   // message : bandeau dédié (voir showMsgBanner)
         // Reçue app ouverte : ni ouverture ni non-ouverture (n'entre pas dans la décroissance).
         if (d.nid && auth.currentUser) callTrackNotifOpen({ nid: d.nid, foreground: true }).catch(() => {});
       });
@@ -4850,7 +4987,7 @@ async function enableNotifications(uid) {
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') {
       // Refus : on ne redemande plus jamais d'office (l'habitant peut toujours les activer depuis son profil).
-      try{ localStorage.setItem('nv_perm_notif', String(Date.now())); localStorage.setItem('nv_notif_never','1'); }catch(e){}
+      try{ localStorage.setItem('nv_perm_notif', String(Date.now())); }catch(e){}
       showToast('Notifications refusées. Tu pourras les activer dans les réglages du téléphone.', 'warning');
       refreshNotifSettingsUI();
       return;
@@ -4880,7 +5017,7 @@ const NOTIF_GROUPS=[
   {g:'recompenses',t:'Mes récompenses',d:'Récompense débloquée, code bientôt expiré'},
   {g:'messages',t:'Messages privés',d:"Quand un ami t'écrit"},
   {g:'amis',t:'Mes amis',d:"Demandes d'ami, réponses en commun, J'aime et commentaires sur tes publications"},
-  {g:'actualites',t:'Actualités des commerces',d:"Quand un commerce t'annonce ce qui a changé grâce à ton avis"}
+  {g:'actualites',t:'Actualités et rendez-vous',d:"Quand un commerce t'annonce ce qui a changé grâce à ton avis, et un petit rendez-vous les jours sans autre nouvelle"}
 ];
 function notifPrefOn(g){return (S._notifPrefs||{})[g]!==false;}
 function refreshNotifSettingsUI() {
@@ -5193,7 +5330,13 @@ function showCategoryWall(uid,opts){
   document.getElementById('cat-int-wrap').style.display=ageOnly?'none':'';
   document.getElementById('cat-err').style.display='none';
   document.getElementById('cat-age-err').style.display='none';
+  // Inscription : étape obligatoire (pas de croix). Compte existant (pop-up d'ouverture) : on peut fermer.
+  w._closable=!!opts;document.getElementById('cat-close').style.display=w._closable?'':'none';
   w.style.display='flex';
+}
+function closeCategoryWall(){
+  const w=document.getElementById('cat-wall');if(!w._closable)return;
+  w.style.display='none';const t=w._then;w._then=null;if(t)setTimeout(t,60);
 }
 // Compte inscrit avant que la tranche d'âge soit demandée : petite carte sur l'accueil (jamais bloquante).
 function renderAgeNudge(){
@@ -5472,10 +5615,10 @@ async function shareNoova(){
 
 // ─── Permissions en contexte (U7) : explication maison avant la pop-up système ─
 // Refus ou « pas maintenant » : on ne redemande pas avant 7 jours.
-let _permCb=null,_permKey=null;
+let _permCb=null,_permKey=null,_permDone=null;
 function askPerm(o){
-  try{const t=+localStorage.getItem('nv_perm_'+o.key)||0;if(!o.force&&Date.now()-t<7*86400000)return false;}catch(e){}
-  _permCb=o.onAccept;_permKey=o.key;
+  try{const t=+localStorage.getItem('nv_perm_'+o.key)||0;if(!o.force&&Date.now()-t<(o.snoozeDays||7)*86400000)return false;}catch(e){}
+  _permCb=o.onAccept;_permKey=o.key;_permDone=o.onClose||null;
   document.getElementById('perm-title').textContent=o.title;
   document.getElementById('perm-text').textContent=o.text;
   document.getElementById('perm-cta').textContent=o.cta;
@@ -5484,33 +5627,33 @@ function askPerm(o){
 }
 function permAccept(){
   document.getElementById('perm-sheet').style.display='none';
-  const cb=_permCb;_permCb=null;if(cb)cb();
+  const cb=_permCb,d=_permDone;_permCb=null;_permDone=null;if(cb)cb();if(d)d();
 }
 function permLater(){
   document.getElementById('perm-sheet').style.display='none';
   try{localStorage.setItem('nv_perm_'+_permKey,String(Date.now()));}catch(e){}
-  // Notifications refusées : on ne les redemande plus jamais d'office (seulement depuis Profil → Notifications).
-  if(/^notif/.test(_permKey||'')){try{localStorage.setItem('nv_notif_never','1');}catch(e){}}
-  _permCb=null;
+  // « Plus tard » : notifications redemandées au plus tous les 3 jours, à l'ouverture (voir askNotifFlow).
+  const d=_permDone;_permCb=null;_permDone=null;if(d)d();
 }
 // Demande de permission : JAMAIS à l'ouverture. Après la première réponse validée (puis au plus une
 // fois tous les 7 jours si l'habitant repousse), précédée d'un écran d'explication maison : on n'a
 // qu'une chance, un refus iOS est définitif. Sur iPhone hors écran d'accueil le push n'existe pas
 // encore : on propose d'abord d'ajouter l'app (instructions iOS uniquement), sans jamais afficher
 // les instructions Android, et inversement.
-function askNotifFlow(force){
-  if(!auth.currentUser) return;
-  if(!force){try{if(localStorage.getItem('nv_notif_never')==='1')return;}catch(e){}}
+// Renvoie true si une pop-up est affichée ; onClose est appelé à sa fermeture. Refus dans les réglages du téléphone
+// (« denied ») : plus rien d'office. « Plus tard » : redemandé au plus tous les 3 jours.
+function askNotifFlow(force,onClose){
+  if(!auth.currentUser) return false;
   if(NV_IS_IOS && !nvIsStandalone()){
-    askPerm({key:'notif_install',force,title:'Reçois tes notifications',text:"Sur iPhone, les notifications fonctionnent une fois NOOVA ajoutée à ton écran d'accueil : appuie sur Partager, puis sur « Sur l'écran d'accueil ».",cta:'Voir comment faire',onAccept:showIOSInstallSheet});
+    return askPerm({key:'notif_install',force,snoozeDays:3,onClose,title:'Reçois tes notifications',text:"Sur iPhone, les notifications fonctionnent une fois NOOVA ajoutée à ton écran d'accueil : appuie sur Partager, puis sur « Sur l'écran d'accueil ».",cta:'Voir comment faire',onAccept:showIOSInstallSheet});
     return;
   }
-  if(typeof Notification==='undefined'||notifSupportReason()!=='ok'){ if(force) showToast("Ton navigateur ne permet pas les notifications. Ouvre NOOVA depuis ton écran d'accueil.",'warning'); return; }
+  if(typeof Notification==='undefined'||notifSupportReason()!=='ok'){ if(force) showToast("Ton navigateur ne permet pas les notifications. Ouvre NOOVA depuis ton écran d'accueil.",'warning'); return false; }
   // Permission déjà accordée sur ce téléphone (avant une déconnexion, un autre compte, une remise à zéro) mais
   // appareil pas rattaché à CE compte : pas de nouvelle demande, on enregistre directement le téléphone.
-  if(Notification.permission==='granted'){ if(force) enableNotifications(auth.currentUser.uid); return; }
-  if(Notification.permission==='denied'){ if(force) showToast('Les notifications sont bloquées pour NOOVA : réactive-les dans les réglages de ton téléphone.','warning'); return; }
-  askPerm({key:'notif',force,title:'Ne rate aucune question',text:"NOOVA te prévient quand un commerce a besoin de ton avis : quelques notifications par jour au maximum, jamais la nuit. Tu choisis lesquelles dans ton profil.",cta:'Activer les notifications',onAccept:()=>enableNotifications(auth.currentUser.uid)});
+  if(Notification.permission==='granted'){ if(force) enableNotifications(auth.currentUser.uid); return false; }
+  if(Notification.permission==='denied'){ if(force) showToast('Les notifications sont bloquées pour NOOVA : réactive-les dans les réglages de ton téléphone.','warning'); return false; }
+  return askPerm({key:'notif',force,snoozeDays:3,onClose,title:'Ne rate aucune question',text:"NOOVA te prévient quand un commerce a besoin de ton avis : quelques notifications par jour au maximum, jamais la nuit. Tu choisis lesquelles dans ton profil.",cta:'Activer les notifications',onAccept:()=>enableNotifications(auth.currentUser.uid)});
 }
 function maybeAskNotifications(){ askNotifFlow(false); }
 function geoAllowed(){try{return localStorage.getItem('nv_geo_ok')==='1';}catch(e){return false;}}

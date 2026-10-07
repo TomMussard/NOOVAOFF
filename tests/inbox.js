@@ -63,11 +63,11 @@ const msg=(chat,id,from,text,ms,o={})=>db.doc(`chats/${chat}/messages/${id}`).se
     await p.evaluate(()=>goNav('social'));await sleep(500);
     const hdr=await p.evaluate(()=>{const m=document.getElementById('soc-msg'),b=document.getElementById('soc-bell');return {side:!!m&&!!b&&m.parentElement===b.parentElement,badge:getComputedStyle(document.getElementById('msg-badge')).display!=='none'?document.getElementById('msg-badge').textContent:'',label:m.getAttribute('aria-label')};});
     check('Icône Messages à côté des notifications, avec le nombre de conversations non lues (Ben et Dan)',hdr.side&&hdr.badge==='2'&&/2 non lus/.test(hdr.label),hdr);
-    if(process.env.SHOTS_DIR)await p.screenshot({path:process.env.SHOTS_DIR+'/inbox_hdr.png'});
+    if(process.env.SHOTS_DIR)await p.screenshot({path:process.env.SHOTS_DIR+'/inbox_hdr.png'}).catch(()=>{});
     await p.evaluate(()=>document.getElementById('soc-msg').click());
     await wf(p,()=>cur==='inbox'&&document.querySelectorAll('#inbox-list .ib-row').length===3,null,10000);
     const rows=await p.evaluate(()=>[...document.querySelectorAll('#inbox-list .ib-row')].map(r=>({n:r.querySelector('.ib-name').textContent,t:r.querySelector('.ib-time').textContent,l:r.querySelector('.ib-last').textContent,u:r.classList.contains('unread')})));
-    if(process.env.SHOTS_DIR){await sleep(700);await p.screenshot({path:process.env.SHOTS_DIR+'/inbox.png'});}
+    if(process.env.SHOTS_DIR){await sleep(700);await p.screenshot({path:process.env.SHOTS_DIR+'/inbox.png'}).catch(()=>{});}
     check('Liste : la plus récente en haut (Ben, Clé, Dan)',rows.map(r=>r.n).join()==='Ben,Clé,Dan',rows);
     check('Aperçu du dernier message, « Toi : » pour les miens, « Sondage : » pour un sondage',rows[0].l==='Oui, à quelle heure ?'&&rows[1].l==='Toi : Merci pour hier'&&rows[2].l==='Sondage : Sondage du jour',rows.map(r=>r.l));
     check('Heure aujourd\'hui, sinon jour ou date',/^\d\d:\d\d$/.test(rows[0].t)&&rows[1].t&&rows[2].t,rows.map(r=>r.t));
@@ -88,13 +88,31 @@ const msg=(chat,id,from,text,ms,o={})=>db.doc(`chats/${chat}/messages/${id}`).se
     await wf(p,()=>{const r=document.querySelector('#inbox-list .ib-row');return r&&/Avec plaisir/.test(r.textContent)&&r.classList.contains('unread');},null,15000).catch(()=>{});
     const r1=await p.evaluate(()=>({first:document.querySelector('#inbox-list .ib-name').textContent,b:document.getElementById('msg-badge').textContent}));
     check('Message reçu : la conversation remonte en haut, en non lu, en direct',r1.first==='Clé'&&r1.b==='2',r1);
-    await db.doc('chats/ana_dan').delete();await db.doc('users/ana').update({friendUids:['ben','cle','dan']});
+    await db.doc('chats/ana_dan/messages/a').delete();await db.doc('chats/ana_dan').delete();await db.doc('users/ana').update({friendUids:['ben','cle','dan']});
     await p.evaluate(()=>{S._chats=S._chats.filter(c=>c.id!=='ana_dan');renderInbox();});
     await wf(p,()=>/Dan/.test((document.querySelector('#inbox-list .ib-new')||{}).textContent||''),null,15000).catch(()=>{});
     check('« Écrire à un ami » propose les amis sans conversation',await p.evaluate(()=>/Dan/.test((document.querySelector('#inbox-list .ib-new')||{}).textContent||'')));
     await p.evaluate(()=>document.querySelector('#inbox-list .ib-new button').click());
     await wf(p,()=>cur==='chat'&&document.getElementById('ch-name').textContent==='Dan',null,10000).catch(()=>{});
     check('… et ouvre la conversation',await p.evaluate(()=>cur==='chat'&&document.getElementById('ch-name').textContent==='Dan'));
+    // Conversation lancée sans message : elle entre dans la liste et n'en sort plus.
+    await p.evaluate(()=>leaveChat());
+    await wf(p,()=>[...document.querySelectorAll('#inbox-list .ib-row')].some(r=>/Dan/.test(r.textContent)&&/Conversation démarrée/.test(r.textContent)),null,10000).catch(()=>{});
+    check('Conversation ouverte sans message : déjà dans la liste (« Conversation démarrée »)',await p.evaluate(()=>[...document.querySelectorAll('#inbox-list .ib-row')].some(r=>/Dan/.test(r.textContent)&&/Conversation démarrée/.test(r.textContent))));
+    await db.doc('users/ana').update({friendUids:['ben','cle']});await db.doc('users/dan').update({friendUids:[]});
+    await sleep(1500);await p.evaluate(()=>renderInbox());
+    check('… et y reste, même si l\'amitié est retirée',await p.evaluate(()=>[...document.querySelectorAll('#inbox-list .ib-name')].some(e=>e.textContent==='Dan')));
+    // Message reçu pendant qu'on est ailleurs dans l'app : bandeau en haut, qui ouvre la conversation.
+    await p.evaluate(()=>goNav('home'));await sleep(500);
+    await msg('ana_ben','z','ben','Tu es où ?',Date.now());
+    await wf(p,()=>document.getElementById('msg-banner').classList.contains('show')&&/Tu es où/.test(document.getElementById('msg-banner').textContent),null,15000).catch(()=>{});
+    const bn=await p.evaluate(()=>({show:document.getElementById('msg-banner').classList.contains('show'),t:document.getElementById('msg-banner').textContent}));
+    check('App ouverte sur l\'accueil : bandeau « Ben — Tu es où ? »',bn.show&&/Ben/.test(bn.t)&&/Tu es où/.test(bn.t),bn);
+    await p.evaluate(()=>document.getElementById('msg-banner').click());
+    await wf(p,()=>cur==='chat'&&document.getElementById('ch-name').textContent==='Ben',null,10000).catch(()=>{});
+    check('… le toucher ouvre la conversation',await p.evaluate(()=>cur==='chat'&&document.getElementById('ch-name').textContent==='Ben'));
+    await msg('ana_ben','y','ben','Je t\'attends',Date.now()+1000);await sleep(2500);
+    check('Dans la conversation elle-même : pas de bandeau',await p.evaluate(()=>!/attends/.test(document.getElementById('msg-banner').textContent)));
     check('Aucune erreur JavaScript',errs.length===0,errs);
     await p.close();
   });

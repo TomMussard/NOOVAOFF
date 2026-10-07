@@ -34,5 +34,26 @@ const HUBS={'le mans':[48.0061,0.1996],'angers':[47.4784,-0.5632],'paris':[48.85
   check('Commune inconnue : aucune zone ni commerce créés',!(await db.doc('zones/nullepart').get()).exists&&(await db.collection('merchants').where('city','==','nullepart').get()).size===0);
   await user('l1','le-mans','Le Mans');await sleep(2000);
   check('Ville déjà NOOVA (Le Mans) : rien de créé',(await db.collection('merchants').where('city','==','le-mans').get()).size===0&&!(await db.doc('zones/le-mans').get()).exists);
+  // Maisons-Alfort (à ~9 km de Paris) : rattaché à Paris, voit donc les questions de Paris.
+  await db.doc('_testGeocode/maisons-alfort').set({lat:48.8058,lng:2.4378});
+  await user('ma1','maisons-alfort','Maisons-Alfort');
+  const ma=await until(async()=>(await db.doc('users/ma1').get()).data().city==='paris');
+  check('Maisons-Alfort : rattaché à la zone de Paris (questions de Paris), nom de commune gardé',ma&&(await db.doc('users/ma1').get()).data().cityLabel==='Maisons-Alfort');
+  // Questions du jour automatiques dans une zone créée toute seule, même sans « mois de test » lancé par l'admin.
+  const TM=require(__dirname+'/../functions/testMonth.js')._t;
+  const tomorrow=new Date(Date.now()+86400000).toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});
+  const before=(await db.collection('campaigns').where('targetCity','==','brest').get()).size;
+  const r=await TM.autopilotCore(Date.parse(tomorrow+'T20:00:00+02:00'));
+  const after=(await db.collection('campaigns').where('targetCity','==','brest').get()).size;
+  check('Lendemain : chaque commerce de la zone automatique pose sa nouvelle question, sans action de l\'admin',r.questions===5&&after===before+5,{r,before,after});
+  // Habitant inscrit avant l'ouverture automatique (commune encore inconnue à son inscription) : rattrapé.
+  await user('o1','quimper','Quimper');await sleep(3000);
+  check('(commune non reconnue au moment de l\'inscription : rien)',!(await db.doc('zones/quimper').get()).exists);
+  await db.doc('_testGeocode/quimper').set({lat:47.996,lng:-4.1024});
+  const Zm=require(__dirname+'/../functions/autoZones.js')._t;
+  require(__dirname+'/../functions/cityZones.js')._t.resetZonesCache();
+  const bf=await Zm.backfillCore();
+  check('Rattrapage : zone de Quimper ouverte pour l\'habitant déjà inscrit, avec ses 5 commerces',bf.done>=1&&(await db.doc('zones/quimper').get()).exists&&(await db.collection('merchants').where('city','==','quimper').get()).size===5,bf);
+  check('… une seule fois',(await Zm.backfillCore()).skipped===true);
   console.log(`\n${pass} ok, ${fail} échec(s)`);process.exit(0);
 })().catch(e=>{console.log('FAIL '+String(e.stack||e).slice(0,400));process.exit(1);});

@@ -18,6 +18,13 @@ const MAX_FRIENDS = 40, MAX_RESULTS = 10, MAX_HASHES = 500;
 const card = (uid, u, extra) => ({ uid, name: String(u.name || "Habitant").slice(0, 40), photoUrl: u.photoUrl || null, ...extra });
 const usable = (u) => u && (!u.role || u.role === "user") && u.discoverable !== false;
 
+// Demande d'ami déjà envoyée (et pas encore traitée) : la carte affiche « Demande envoyée », même après avoir
+// rouvert l'app — on ne peut pas la renvoyer.
+async function markSent(uid, list) {
+  if (!list.length) return list;
+  const reqs = await db().getAll(...list.map((x) => db().collection("users").doc(x.uid).collection("notifications").doc("friendreq_" + uid)));
+  return list.map((x, i) => ({ ...x, sent: reqs[i].exists }));
+}
 async function suggestionsCore(uid) {
   const me = (await db().collection("users").doc(uid).get()).data() || {};
   const mine = new Set((me.friendUids || []).filter(Boolean));
@@ -39,7 +46,7 @@ async function suggestionsCore(uid) {
   const cDocs = ranked.length ? await db().getAll(...ranked.map(([c]) => db().collection("users").doc(c))) : [];
   const out = [];
   cDocs.forEach((d, i) => { if (d.exists && usable(d.data())) out.push(card(d.id, d.data(), { mutual: ranked[i][1], via: via.get(d.id) || [] })); });
-  return { suggestions: out.slice(0, MAX_RESULTS) };
+  return { suggestions: await markSent(uid, out.slice(0, MAX_RESULTS)) };
 }
 
 async function matchCore(uid, hashes) {
@@ -51,7 +58,7 @@ async function matchCore(uid, hashes) {
   const uids = [...new Set(idx.filter((d) => d.exists).map((d) => d.data().uid).filter((u) => u && u !== uid))];
   if (!uids.length) return { matches: [] };
   const docs = await db().getAll(...uids.map((u) => db().collection("users").doc(u)));
-  return { matches: docs.filter((d) => d.exists && usable(d.data())).map((d) => card(d.id, d.data(), { friend: mine.has(d.id) })) };
+  return { matches: await markSent(uid, docs.filter((d) => d.exists && usable(d.data())).map((d) => card(d.id, d.data(), { friend: mine.has(d.id) }))) };
 }
 
 const friendSuggestions = onCall({ region: "europe-west1" }, async (request) => {
@@ -77,6 +84,7 @@ async function summarizeChat(chatId) {
   const who = {};
   users.forEach((d) => { if (d.exists) who[d.id] = { name: String(d.data().name || "Habitant").slice(0, 40), photoUrl: d.data().photoUrl || null }; });
   const out = { members, who };
+  if (!chat.data().startedAt) out.startedAt = chat.createTime || FieldValue.serverTimestamp();
   if (last) {
     const m = last.data();
     Object.assign(out, { lastAt: m.createdAt || FieldValue.serverTimestamp(), lastText: String(m.text || "").slice(0, 120), lastFrom: m.fromUid || null, lastType: m.type === "poll" ? "poll" : "text" });
@@ -87,14 +95,18 @@ async function summarizeChat(chatId) {
 const onChatMessageSummary = onDocumentCreated({ document: "chats/{chatId}/messages/{msgId}", region: "europe-west1" }, async (event) => {
   await summarizeChat(event.params.chatId);
 });
+// Conversation ouverte (pas encore de message) : prénoms et photos tout de suite, pour la liste « Messages ».
+const onChatCreatedSummary = onDocumentCreated({ document: "chats/{chatId}", region: "europe-west1" }, async (event) => {
+  await summarizeChat(event.params.chatId);
+});
 // Conversations antérieures à cette mise à jour : résumées une fois, automatiquement après le déploiement.
-const CHATS_VERSION = 1;
+const CHATS_VERSION = 2;   // 2 : aussi les conversations ouvertes sans message (startedAt)
 async function backfillChatsIfNeeded() {
   const cfg = db().collection("config").doc("chatSummary");
   const c = await cfg.get();
   if (c.exists && (c.data().version || 0) >= CHATS_VERSION) return { skipped: true };
   let n = 0;
-  for (const d of (await db().collection("chats").get()).docs) { if (!Array.isArray(d.data().members)) { await summarizeChat(d.id); n++; } }
+  for (const d of (await db().collection("chats").get()).docs) { if (!Array.isArray(d.data().members) || !d.data().startedAt) { await summarizeChat(d.id); n++; } }
   await cfg.set({ version: CHATS_VERSION, chats: n, at: FieldValue.serverTimestamp() });
   return { chats: n };
 }
@@ -102,4 +114,4 @@ const chatsAutoSync = onSchedule({ schedule: "every 10 minutes", region: "europe
   await backfillChatsIfNeeded();
 });
 
-module.exports = { friendSuggestions, matchContacts, onChatMessageSummary, chatsAutoSync, _t: { suggestionsCore, matchCore, summarizeChat, backfillChatsIfNeeded } };
+module.exports = { friendSuggestions, matchContacts, onChatMessageSummary, onChatCreatedSummary, chatsAutoSync, _t: { suggestionsCore, matchCore, summarizeChat, backfillChatsIfNeeded } };
