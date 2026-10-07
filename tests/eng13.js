@@ -102,6 +102,7 @@ const ansX=(u,cid,o={})=>db.doc(`answers/${u}_${cid}_q0`).set({userId:u,campaign
     check('Fil : un inconnu n\'apparaît jamais',!fd.cards.some(c=>/Inconnu/.test(c.txt)),fd.cards.map(c=>c.txt));
     // onglet Amis
     await p.evaluate(()=>socTab('friends',document.querySelector('.tab-btn[onclick*="friends"]')));await sleep(1200);
+    await p.waitForFunction(()=>/NOOVA-/.test((document.getElementById('inv-code')||{}).textContent||''),{timeout:10000,polling:200}).catch(()=>{});   // code créé en arrière-plan à la 1re connexion
     const fr=await p.evaluate(()=>({invite:!!document.querySelector('.cm-invite .cm-btn'),code:document.getElementById('inv-code').textContent,boxHidden:document.getElementById('add-friend-box').style.display==='none',rows:document.querySelectorAll('#friends-list .cp-row').length,compatList:!!document.getElementById('compat-list')}));
     await p.screenshot({path:'/tmp/shots/cm_friends_new.png'});
     check('Amis : bouton « Inviter un ami » et code en évidence ; ajout par code replié ; une seule liste (plus de doublon compatibilité)',fr.invite&&/NOOVA-/.test(fr.code)&&fr.boxHidden&&fr.rows===2&&!fr.compatList,fr);

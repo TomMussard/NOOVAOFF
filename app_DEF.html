@@ -6087,7 +6087,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   S._friendCode = (data.friendCode && data.friendCode.startsWith('NOOVA-')) ? data.friendCode : '';
   processPendingInvite();
   ensureFriendCode(uid, resolvedName, data.friendCode).then(c => {
-    if(c && c !== S._friendCode){ S._friendCode = c; const fp=document.getElementById('panel-friends'); if(fp && fp.style.display!=='none') initFriendsPanel(); }
+    if(c && c !== S._friendCode){ S._friendCode = c; const ic=document.getElementById('inv-code'); if(ic) ic.textContent = c; }
     processPendingInvite();
   });
   if(S._friendUids.length) loadFriendsFromFirestore(S._friendUids);
