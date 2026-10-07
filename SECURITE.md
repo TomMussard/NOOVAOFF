@@ -24,9 +24,13 @@ Un testeur a eu accès à l'ensemble des données. La cause la plus probable est
 - `users/{uid}` (e-mail, âge, centres d'intérêt, appareils, points) : lisible **uniquement** par l'habitant lui-même et l'admin.
 - `merchants/{uid}` (e-mail, téléphone, gérant, SIRET, pièce d'identité) : lisible **uniquement** par le commerçant et l'admin.
 - Les autres comptes lisent des copies réduites, écrites **seulement** par le serveur (`functions/publicProfiles.js`) :
-  - `cityBoard` : classement et groupes de la ville (prénom, photo, XP, série) ;
+  - `cityBoard` : classement et groupes de la ville (**prénom + initiale** — « Tom M. » —, photo, XP, série) ;
   - `publicProfiles` : profil vu par un ami **réciproque** ;
-  - `merchantsPublic` : vitrine d'un commerce vérifié (nom, secteur, adresse, description, logo, photo).
+  - `merchantsPublic` : vitrine d'un commerce vérifié (nom, secteur, adresse professionnelle, description, logo, photo) ;
+    le compte de diffusion NOOVA n'a **ni adresse ni position** dans sa vitrine.
+- Codes ami : on peut lire UN code qu'on connaît (pour ajouter un ami), jamais la liste.
+- Recherche de contacts : seules des empreintes d'e-mails sont envoyées, 3 recherches par jour au plus (impossible de
+  tester des milliers d'adresses pour savoir qui est inscrit) ; un habitant peut refuser d'être proposé.
 - Un vote à la question de la semaine n'est visible que par son auteur.
 
 ### 2.3 Intégrité (triche, usurpation)
@@ -50,6 +54,17 @@ Un testeur a eu accès à l'ensemble des données. La cause la plus probable est
 
 ### 2.6 Tests automatiques
 - `tests/security.js` joue l'attaquant (faux admin, lecture de données d'autrui, triche, usurpation, injection) : chaque attaque doit être refusée. Lancé avec toute la suite (`sh tests/run.sh`).
+- `tests/privacy_sweep.js` : un habitant malveillant, **ami** de la victime et dans sa ville, lit **toutes** les
+  collections déclarées dans `firestore.rules` (en liste et document par document) et les sous-collections sensibles ;
+  chaque champ lisible est fouillé (e-mail, téléphone, adresse, nom de famille, date de naissance, SIRET, jetons).
+  Aucune donnée personnelle ne doit sortir. Une collection ajoutée plus tard est balayée automatiquement.
+
+### 2.7 Réglages à faire dans les consoles (hors du code)
+- Firebase Console → Authentication → Paramètres → **Protection contre l'énumération des e-mails** : activée
+  (sinon on peut demander à Firebase si une adresse a un compte).
+- **Validation en deux étapes** sur les comptes Google des administrateurs (ceux de `ADMIN_EMAILS`) et sur les
+  comptes qui ont accès à Firebase, Google Cloud, GitHub et Vercel.
+- Firebase Console → Paramètres du projet → Utilisateurs et autorisations : seuls les fondateurs.
 
 ## 3. App Check (bloque les appels qui ne viennent pas de l'app)
 1. https://www.google.com/recaptcha/admin : créer une clé reCAPTCHA **v3** pour le domaine `noovaoff.fr` (et `www.`).
