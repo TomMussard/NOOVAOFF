@@ -36,10 +36,12 @@ const base={role:'user',city:'le-mans',cityLabel:'Le Mans',welcomeClaimed:true,o
     await sleep(800);
     const u=(await db.doc('users/old').get()).data();
     check('… enregistrés, la pop-up se ferme',u.ageRange==='35-49'&&u.interests.includes('restauration'),{a:u.ageRange,i:u.interests});
-    const never=await p.evaluate(()=>{_permKey='notif';permLater();return localStorage.getItem('nv_notif_never');});
-    check('Notifications refusées (« Plus tard ») : plus jamais redemandées d\'office',never==='1');
-    const asked=await p.evaluate(()=>{document.getElementById('perm-sheet').style.display='none';askNotifFlow(false);return document.getElementById('perm-sheet').style.display;});
-    check('… la pop-up ne revient pas',asked==='none',asked);
+    const snooze=await p.evaluate(()=>{_permKey='notif';permLater();const t=localStorage.getItem('nv_perm_notif');
+      const o={key:'notif',snoozeDays:3,title:'t',text:'x',cta:'c',onAccept:()=>{}};
+      const soon=askPerm(o);document.getElementById('perm-sheet').style.display='none';
+      localStorage.setItem('nv_perm_notif',String(Date.now()-4*86400000));const later=askPerm(o);document.getElementById('perm-sheet').style.display='none';
+      return {t:!!t,soon,later};});
+    check('Notifications « Plus tard » : pas redemandées avant 3 jours, puis redemandées',snooze.t&&snooze.soon===false&&snooze.later===true,snooze);
     await p.evaluate(()=>auth.signOut());await sleep(500);
     await p.close();
   });

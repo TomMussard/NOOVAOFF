@@ -29,6 +29,9 @@
   --jaune-ink:  #1C0E02;   /* texte posé sur le jaune */
   --blanc:      #FFFFFF;   /* texte sur photo ou sur aplat sombre de marque */
   --jaune-faible: #3D2B08; /* fond discret d'un état jaune, jamais un bouton */
+  --bandeau:       var(--marque-encre);  /* bandeau et pop-up par-dessus n'importe quel écran (message reçu) */
+  --bandeau-texte: var(--marque-creme);
+  --voile:         rgba(28,14,2,.72);     /* fond assombri derrière une pop-up : l'app est figée dessous */
   --jaune-pale: #FFF3D1;   /* bandeau clair de marque (illustrations d’accueil), toutes ambiances */
 
   /* --- États --- */

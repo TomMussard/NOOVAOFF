@@ -41,13 +41,15 @@ const IMMINENT_UNIT_PTS = CFG.POINTS.PER_ANSWER;    // points d'une réponse (ba
 // code) n'y sont pas soumis. Plafond quotidien : 2 notifications « normales » au maximum ; un type
 // « exceptional » peut utiliser un 3e créneau, jamais plus (voir deliver()).
 const TYPES = {
-  question_du_jour:     { group: "question",    nudge: true,  gapDays: 1 },
+  // Rendez-vous quotidien : jamais ralenti ni coupé automatiquement (noDecay) — l'habitant peut toujours le couper
+  // lui-même dans son profil. L'objectif : revenir sur NOOVA chaque jour.
+  question_du_jour:     { group: "question",    nudge: true,  gapDays: 1, noDecay: true },
   // Rappel de 18h30 : 2e rendez-vous du jour, seulement s'il reste des questions et que l'habitant n'a pas pris
   // ses 3 réponses à points (voir runTick). Pas « nudge » : il peut partir après une ou deux réponses.
-  rappel_soir:          { group: "question",    nudge: false, gapDays: 1 },
+  rappel_soir:          { group: "question",    nudge: false, gapDays: 1, noDecay: true },
   // Nouvelle question de l'après-midi : un commerce vient de poser une question aujourd'hui (heure propre à chaque
   // habitant, tirée au hasard entre 14h et 17h30, pour que les envois ne tombent pas tous à la même minute).
-  nouvelle_question:    { group: "question",    nudge: false, gapDays: 1 },
+  nouvelle_question:    { group: "question",    nudge: false, gapDays: 1, noDecay: true },
   // Un commerce que l'habitant suit (ou NOOVA) vient de poser une question : envoyée tout de suite, une par question.
   // Pas de ralentissement automatique : l'habitant a choisi de suivre ce commerce (il peut le retirer ou couper
   // « Mes questions »). Une question posée pendant le silence part à 9h si elle est encore récente.
@@ -57,13 +59,16 @@ const TYPES = {
   nouveau_commerce:     { group: "commerces",   nudge: true,  gapDays: 7, deferQuiet: true, ttlH: 24 },
   resultat_dispo:       { group: "resultats",   nudge: false, deferQuiet: true, deferBusy: true, ttlH: 72 },
   recompense_debloquee: { group: "recompenses", nudge: false, exceptional: true, deferQuiet: true, deferBusy: true, ttlH: 48 },
-  serie_en_danger:      { group: "serie",       nudge: true,  exceptional: true, gapDays: 1 },
+  serie_en_danger:      { group: "serie",       nudge: true,  exceptional: true, gapDays: 1, noDecay: true },
+  // Filet du jour (18h) : l'habitant n'a reçu AUCUNE notification aujourd'hui et n'a pas répondu (par exemple plus
+  // de question disponible) : un rendez-vous quand même, pour revenir chaque jour.
+  rendez_vous:          { group: "actualites",  nudge: true,  gapDays: 1, noDecay: true },
   code_expire:          { group: "recompenses", nudge: false, exceptional: true },
   points_expirant:      { group: "recompenses", nudge: false, exceptional: true, deferQuiet: true, ttlH: 72 },
   ami:                  { group: "amis",        nudge: true,  gapDays: 1, deferQuiet: true, ttlH: 12 },
-  // Message privé d'un ami : envoyé tout de suite, même le soir (c'est une vraie personne qui écrit), au plus une
-  // notification par conversation et par tranche de 10 minutes, 30 par jour ; compteur à part.
-  message:              { group: "messages",    nudge: false, ownCap: 30, bucket: "msg", noDecay: true, quietOk: true },
+  // Message privé d'un ami : une notification pour CHAQUE message, tout de suite, même le soir (c'est une vraie
+  // personne qui écrit) ; 150 par jour au plus (garde-fou), compteur à part. App ouverte : bandeau dans l'app.
+  message:              { group: "messages",    nudge: false, ownCap: 150, bucket: "msg", noDecay: true, quietOk: true },
   // Quelqu'un a aimé ou commenté une publication de l'habitant dans le fil : 8 par jour, à part ; la nuit, à 9h.
   reaction:             { group: "amis",        nudge: false, ownCap: 8, bucket: "social", deferQuiet: true, ttlH: 12 },
   // « Ton avis a compté » : issu de l'action de l'habitant (il a répondu), donc pas une relance.
@@ -77,7 +82,7 @@ const GROUPS = {
   recompenses: ["recompense_debloquee", "code_expire", "points_expirant"],
   amis: ["ami", "reaction"],
   messages: ["message"],
-  actualites: ["impact"],
+  actualites: ["impact", "rendez_vous"],
 };
 const INTERESTS = require("./interests");
 const CAT_KEYS = INTERESTS.KEYS;   // interests.js : la même liste que l'app et le dashboard
@@ -142,6 +147,11 @@ const copy = {
   serie: ({ n, merchant }) => finish({ title: `Ta série est à ${n} jours`, body: `${short(merchant, 30)} a une question : réponds à 3 questions aujourd'hui pour la garder`, screen: "home" }),
   code: ({ reward, merchant, when, until }) => finish({ title: `Ton ${short(reward, 26)} expire ${when}`, body: `Chez ${short(merchant, 30)}, à utiliser avant ${until}`, screen: "rewards-tab" }),
   pointsExpirant: ({ points }) => finish({ title: `Tes ${points} pts expirent dans 30 jours`, body: "Réponds à une question pour les garder", screen: "rewards-tab" }),
+  rendezVous: ({ points, cityLabel, reward }) => reward
+    ? finish({ title: `Ton ${short(reward.label, 26)} chez ${short(reward.merchantName, 20)} se rapproche`, body: `Tu as ${points} points : regarde ce qui t'attend aujourd'hui`, screen: "rewards-tab" })
+    : points > 0
+      ? finish({ title: `Tes ${points} points t'attendent`, body: "Regarde ce que tu peux t'offrir près de chez toi", screen: "rewards-tab" })
+      : finish({ title: `Quoi de neuf ${cityLabel ? "à " + short(cityLabel, 30) : "près de chez toi"} ?`, body: "Tes commerces et tes voisins sont sur NOOVA", screen: "home" }),
   impact: ({ merchant, text }) => finish({ title: `Ton avis a compté chez ${short(merchant, 30)}`, body: short(text, 110), screen: "social" }),
   amiRequest: ({ name }) => finish({ title: `${short(name, 30)} veut être ton ami`, body: "Accepte sa demande dans NOOVA", screen: "social" }),
   amiAccepted: ({ name }) => finish({ title: `${short(name, 30)} est maintenant ton ami`, body: "Découvre votre classement", screen: "social" }),
@@ -479,6 +489,14 @@ async function runTick(now = Date.now()) {
       const r = await deliver(uid, "rappel_soir", copy.rappelSoir({ merchant: m, answered: doneToday }), { key: p.day, now });
       if (r.status === "sent") out.soir++;
     }
+    // Rendez-vous du jour (18h00-18h29) : rien reçu aujourd'hui, rien répondu (souvent : plus de question disponible).
+    const nd = u.notifDaily && u.notifDaily.date === p.day ? u.notifDaily : {};
+    const gotToday = (nd.count || 0) + (nd.suivi || 0) + (nd.msg || 0) + (nd.social || 0) > 0;
+    if (p.hour === 18 && p.minute < 30 && !gotToday && !answeredToday(u, p.day) && (stats.rendez_vous || {}).lastSentDay !== p.day) {
+      const near = nearestReward(u, caches.rewards.get(city));
+      const r = await deliver(uid, "rendez_vous", copy.rendezVous({ points: u.points || 0, cityLabel: u.cityLabel, reward: near && near.reward }), { key: p.day, now });
+      if (r.status === "sent") out.rdv = (out.rdv || 0) + 1;
+    }
     // Série en danger : 20h, série >= 3 jours encore vivante (répondu hier), rien répondu aujourd'hui.
     if (p.hour === 20 && (u.streak || 0) >= 3 && (u.streakDate !== undefined ? u.streakDate : u.lastAnswerDate) === yesterdayDay(now) && ptsQs.length && !answeredToday(u, p.day)) {
       const r = await deliver(uid, "serie_en_danger", copy.serie({ n: u.streak, merchant: ptsQs[0].merchantName }), { key: p.day, now });
@@ -715,7 +733,7 @@ const onChatMessageNotif = onDocumentCreated({ document: "chats/{chatId}/message
   const name = (from.exists && from.data().name) || "Un ami";
   const now = await nowMs();
   const content = { ...copy.message({ name, text: String(m.text || ""), poll: m.type === "poll" }), screen: `chat-${m.fromUid}` };
-  for (const uid of to) await deliver(uid, "message", content, { key: `${event.params.chatId}_${Math.floor(now / 600000)}`, now });
+  for (const uid of to) await deliver(uid, "message", content, { key: `${event.params.chatId}_${event.params.msgId}`, now });
 });
 
 // Publication du fil (palier, série) aimée ou commentée → son auteur. J'aime : au plus une notification par publication

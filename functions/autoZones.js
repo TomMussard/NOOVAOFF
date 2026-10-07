@@ -12,6 +12,7 @@
  * l'inscription), une commune inconnue de l'API ne crée rien, et au plus MAX_PER_DAY zones sont ouvertes par jour.
  */
 const { onDocumentWritten } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const logger = require("firebase-functions/logger");
 
@@ -61,4 +62,33 @@ const ensureZone = onDocumentWritten({ document: "users/{uid}", region: "europe-
   try { await ensureZoneCore(event.params.uid, b, a); } catch (e) { logger.error("autoZones", { message: e.message }); }
 });
 
-module.exports = { ensureZone, _t: { ensureZoneCore, MAX_PER_DAY } };
+// Habitants inscrits AVANT l'ouverture automatique des zones (ou pendant un jour où le plafond était atteint) :
+// une fois par heure, chaque commune d'habitant qui n'est encore rattachée à aucune zone est traitée comme une
+// nouvelle inscription. Une seule lecture de config quand tout est fait.
+const BACKFILL_VERSION = 1;
+async function backfillCore(now = Date.now()) {
+  const cfgRef = db().collection("config").doc("autoZonesBackfill");
+  const c = await cfgRef.get();
+  if (c.exists && (c.data().version || 0) >= BACKFILL_VERSION) return { skipped: true };
+  const Z = require("./cityZones")._t;
+  const zones = new Set((await Z.allZones()).map((z) => z.slug));
+  const seen = new Set();
+  let done = 0, capped = false;
+  for (const d of (await db().collection("users").get()).docs) {
+    const u = d.data(), city = String(u.city || "").toLowerCase().trim();
+    if ((u.role && u.role !== "user") || !city || zones.has(city)) continue;   // chaque habitant (rattachement individuel)
+    seen.add(city);
+    const r = await ensureZoneCore(d.id, null, u, now).catch((e) => ({ error: e.message }));
+    if (r.skipped === "daily_cap") { capped = true; break; }
+    if (r.created || r.attached) done++;
+    if (r.created) zones.add(city);
+  }
+  if (!capped) await cfgRef.set({ version: BACKFILL_VERSION, cities: seen.size, done, at: FieldValue.serverTimestamp() });
+  return { cities: seen.size, done, capped };
+}
+const autoZonesBackfill = onSchedule({ schedule: "every 60 minutes", region: "europe-west1", timeoutSeconds: 540, retryCount: 0 }, async () => {
+  const r = await backfillCore();
+  if (!r.skipped) logger.info("autoZonesBackfill", r);
+});
+
+module.exports = { ensureZone, autoZonesBackfill, _t: { ensureZoneCore, backfillCore, MAX_PER_DAY } };

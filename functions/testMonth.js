@@ -369,12 +369,13 @@ function postSlot(id, day) {
 
 // onlyNew : seulement les commerces qui n'ont encore jamais posé de question (nouvelle ville ajoutée en cours de test).
 // dueOnly : une question par commerce et par jour, à son heure du jour (pilote automatique).
-async function postNextQuestions(now = Date.now(), { onlyNew = false, dueOnly = false } = {}) {
+async function postNextQuestions(now = Date.now(), { onlyNew = false, dueOnly = false, cities = null } = {}) {
   const snap = await db().collection("merchants").where("isTest", "==", true).where("status", "==", "verified").get();
   const p = parisNow(now);
   let created = 0;
   for (const doc of snap.docs) {
     const m = doc.data();
+    if (cities && !cities.has(m.city)) continue;
     if (onlyNew && Number(m.testQIdx) > 0) continue;
     if (dueOnly && (m.testLastDay === p.day || p.min < postSlot(doc.id, p.day))) continue;
     const type = String(doc.id).split("_").pop();
@@ -437,7 +438,13 @@ async function syncCore(now = Date.now()) {
 
 async function autopilotCore(now = Date.now()) {
   const cfg = await CONFIG_REF().get();
-  if (!cfg.exists || cfg.data().active !== true) return { skipped: true };
+  if (!cfg.exists || cfg.data().active !== true) {
+    // Zones ouvertes automatiquement (functions/autoZones.js) : leurs 5 commerces publient leur question du jour
+    // même hors « mois de test » — une nouvelle ville vit toute seule, sans action de l'admin.
+    const auto = await db().collection("cities").where("autoZone", "==", true).get();
+    if (auto.empty) return { skipped: true };
+    return { autoZones: auto.size, questions: await postNextQuestions(now, { dueOnly: true, cities: new Set(auto.docs.map((d) => d.id)) }) };
+  }
   const sync = await syncCore(now);                     // une ville ajoutée apparaît au plus tard au passage suivant
   return { sync, questions: await postNextQuestions(now, { dueOnly: true }) };
 }

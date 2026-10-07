@@ -511,8 +511,12 @@ service cloud.firestore {
       // members (écrit par le serveur) : permet la requête « mes conversations » (array-contains).
       allow read: if isAuth() && (resource == null || request.auth.uid in resource.data.participants ||
         request.auth.uid in resource.data.get('members', []) || isAdmin());
+      // Création : les deux participants ; members (= les mêmes) et startedAt (heure serveur) pour que la conversation
+      // apparaisse tout de suite dans « Messages », même avant le premier message.
       allow create: if isAuth() && safeId(chatId) && request.auth.uid in request.resource.data.participants &&
-        request.resource.data.keys().hasOnly(['participants']) && request.resource.data.participants.size() == 2;
+        request.resource.data.keys().hasOnly(['participants', 'members', 'startedAt']) && request.resource.data.participants.size() == 2 &&
+        (!('members' in request.resource.data) || request.resource.data.members.toSet() == request.resource.data.participants.keys().toSet()) &&
+        (!('startedAt' in request.resource.data) || request.resource.data.startedAt == request.time);
       // Accusé de lecture : chaque participant ne met à jour que SA date de dernière lecture (lastRead.<son uid>).
       allow update: if isAuth() && request.auth.uid in resource.data.participants &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastRead']) &&

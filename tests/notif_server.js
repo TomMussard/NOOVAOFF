@@ -83,8 +83,8 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     check('Rappel soir : aussi pour qui a déjà répondu une fois', s2.filter(x => x.ntype === 'rappel_soir').length === 1, s2.map(x => x.ntype));
     check('Rappel soir : texte sans « from », nomme le commerce', s1[1] && !/from/i.test(s1[1].title + s1[1].body) && s1[1].title.length > 0, s1[1]);
     check('Rappel soir : rien si quota du jour atteint', (await sink('r3')).length === 0);
-    check('Rappel soir : rien si plus de question', (await sink('r4')).length === 0);
-    check('Rappel soir : respecte le réglage', (await sink('r5')).length === 0);
+    check('Rappel soir : rien si plus de question (seulement le rendez-vous du jour)', (await sink('r4')).filter(x => x.ntype !== 'rendez_vous').length === 0, await sink('r4'));
+    check('Rappel soir : respecte le réglage', (await sink('r5')).filter(x => x.ntype === 'rappel_soir' || x.ntype === 'question_du_jour').length === 0);
   });
   await T('nouvelle question', async () => {
     await wipe();
@@ -417,10 +417,11 @@ const tick = (day, hm) => N.runTick(at(day, hm));
   await T('decay', async () => {
     await wipe();
     await mkUser('u');
+    // (type « impact » : la question du jour, elle, n'est jamais ralentie — voir daily_notifs.js)
     let day = D1, sent = 0, log = [];
-    const send = async (d) => { const r = await N.deliver('u', 'question_du_jour', N.copy.questionDuJour({ merchant: 'X' }), { key: d, now: at(d, '12:30') }); if (r.status === 'sent') sent++; return r; };
+    const send = async (d) => { const r = await N.deliver('u', 'impact', N.copy.impact({ merchant: 'X', text: 'Merci' }), { key: d, now: at(d, '12:30') }); if (r.status === 'sent') sent++; return r; };
     for (let i = 0; i < 3; i++) { await send(day); await N.processMisses(at(day, '12:30') + 25 * 3600000); day = addDays(day, 1); }
-    let st = ((await db.doc('users/u').get()).data().notifStats || {}).question_du_jour;
+    let st = ((await db.doc('users/u').get()).data().notifStats || {}).impact;
     check('Décroissance : 3 non-ouvertures d\'affilée -> fréquence hebdomadaire', st.missStreak === 3 && st.weekly === true && !st.autoOff, st);
     const r4 = await send(day);
     check('Décroissance : le lendemain, rien (hebdomadaire)', r4.reason === 'weekly', r4);
@@ -430,18 +431,18 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await N.processMisses(at(wk, '12:30') + 25 * 3600000);
     let d2 = addDays(wk, 7); await send(d2); await N.processMisses(at(d2, '12:30') + 25 * 3600000);
     let d3 = addDays(d2, 7); await send(d3); await N.processMisses(at(d3, '12:30') + 25 * 3600000);
-    st = ((await db.doc('users/u').get()).data().notifStats || {}).question_du_jour;
+    st = ((await db.doc('users/u').get()).data().notifStats || {}).impact;
     check('Décroissance : 6 non-ouvertures -> type désactivé pour cet utilisateur', st.missStreak === 6 && st.autoOff === true, st);
     const r7 = await send(addDays(d3, 7));
     check('Décroissance : plus aucun envoi de ce type', r7.reason === 'auto_off', r7);
-    const m = (await db.doc('notifMetrics/question_du_jour').get()).data();
+    const m = (await db.doc('notifMetrics/impact').get()).data();
     check('Métriques : désactivation automatique comptée', m.autoDisabled === 1 && m.sent === 6, m);
     const lastLog = (await db.collection('notifLog').where('uid', '==', 'u').where('status', '==', 'missed').get()).docs[0];
     const op = await N.trackOpen('u', lastLog.id, false);
-    st = ((await db.doc('users/u').get()).data().notifStats || {}).question_du_jour;
+    st = ((await db.doc('users/u').get()).data().notifStats || {}).impact;
     check('Ouverture : le compteur repart à zéro dès la première ouverture', st.missStreak === 0 && st.weekly === false && st.autoOff === false && st.opened === 1, st);
     const op2 = await N.trackOpen('u', lastLog.id, false);
-    check('Ouverture : comptée une seule fois', op2.already === true && (await db.doc('notifMetrics/question_du_jour').get()).data().opened === 1);
+    check('Ouverture : comptée une seule fois', op2.already === true && (await db.doc('notifMetrics/impact').get()).data().opened === 1);
   });
   await T('open + foreground', async () => {
     await wipe();
