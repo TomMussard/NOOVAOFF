@@ -9,7 +9,9 @@
  * suggestion ni recherche de contacts.
  */
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
-const { getFirestore } = require("firebase-admin/firestore");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 
 const db = () => getFirestore();
 const MAX_FRIENDS = 40, MAX_RESULTS = 10, MAX_HASHES = 500;
@@ -61,4 +63,43 @@ const matchContacts = onCall({ region: "europe-west1" }, async (request) => {
   return matchCore(request.auth.uid, request.data && request.data.hashes);
 });
 
-module.exports = { friendSuggestions, matchContacts, _t: { suggestionsCore, matchCore } };
+// ─── Messagerie : résumé de chaque conversation, pour la liste « Messages » ───
+// Écrit par le serveur seulement (les règles interdisent ces champs aux clients) : membres (pour la requête
+// « mes conversations »), dernier message (aperçu de 120 caractères, auteur, heure, type) et prénom/photo des deux
+// participants. La date de lecture de chacun (lastRead) reste écrite par l'app.
+async function summarizeChat(chatId) {
+  const ref = db().collection("chats").doc(chatId);
+  const chat = await ref.get();
+  if (!chat.exists) return null;
+  const members = Object.keys(chat.data().participants || {}).filter(Boolean).slice(0, 2);
+  const last = (await ref.collection("messages").orderBy("createdAt", "desc").limit(1).get()).docs[0];
+  const users = members.length ? await db().getAll(...members.map((u) => db().collection("users").doc(u))) : [];
+  const who = {};
+  users.forEach((d) => { if (d.exists) who[d.id] = { name: String(d.data().name || "Habitant").slice(0, 40), photoUrl: d.data().photoUrl || null }; });
+  const out = { members, who };
+  if (last) {
+    const m = last.data();
+    Object.assign(out, { lastAt: m.createdAt || FieldValue.serverTimestamp(), lastText: String(m.text || "").slice(0, 120), lastFrom: m.fromUid || null, lastType: m.type === "poll" ? "poll" : "text" });
+  }
+  await ref.set(out, { merge: true });
+  return out;
+}
+const onChatMessageSummary = onDocumentCreated({ document: "chats/{chatId}/messages/{msgId}", region: "europe-west1" }, async (event) => {
+  await summarizeChat(event.params.chatId);
+});
+// Conversations antérieures à cette mise à jour : résumées une fois, automatiquement après le déploiement.
+const CHATS_VERSION = 1;
+async function backfillChatsIfNeeded() {
+  const cfg = db().collection("config").doc("chatSummary");
+  const c = await cfg.get();
+  if (c.exists && (c.data().version || 0) >= CHATS_VERSION) return { skipped: true };
+  let n = 0;
+  for (const d of (await db().collection("chats").get()).docs) { if (!Array.isArray(d.data().members)) { await summarizeChat(d.id); n++; } }
+  await cfg.set({ version: CHATS_VERSION, chats: n, at: FieldValue.serverTimestamp() });
+  return { chats: n };
+}
+const chatsAutoSync = onSchedule({ schedule: "every 10 minutes", region: "europe-west1", timeoutSeconds: 540, retryCount: 0 }, async () => {
+  await backfillChatsIfNeeded();
+});
+
+module.exports = { friendSuggestions, matchContacts, onChatMessageSummary, chatsAutoSync, _t: { suggestionsCore, matchCore, summarizeChat, backfillChatsIfNeeded } };
