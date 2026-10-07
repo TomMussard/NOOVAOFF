@@ -21,7 +21,7 @@ async function suggestionsCore(uid) {
   const mine = new Set((me.friendUids || []).filter(Boolean));
   const fids = [...mine].slice(0, MAX_FRIENDS);
   const fDocs = fids.length ? await db().getAll(...fids.map((f) => db().collection("users").doc(f))) : [];
-  const mutual = new Map();
+  const mutual = new Map(), via = new Map();
   for (const d of fDocs) {
     if (!d.exists) continue;
     const f = d.data();
@@ -29,12 +29,14 @@ async function suggestionsCore(uid) {
     for (const c of (f.friendUids || []).slice(0, 100)) {
       if (!c || c === uid || mine.has(c)) continue;
       mutual.set(c, (mutual.get(c) || 0) + 1);
+      if (!via.has(c)) via.set(c, []);
+      if (via.get(c).length < 3) via.get(c).push(d.id);             // mes amis en commun (déjà connus de moi)
     }
   }
   const ranked = [...mutual.entries()].sort((a, b) => b[1] - a[1]).slice(0, 30);
   const cDocs = ranked.length ? await db().getAll(...ranked.map(([c]) => db().collection("users").doc(c))) : [];
   const out = [];
-  cDocs.forEach((d, i) => { if (d.exists && usable(d.data())) out.push(card(d.id, d.data(), { mutual: ranked[i][1] })); });
+  cDocs.forEach((d, i) => { if (d.exists && usable(d.data())) out.push(card(d.id, d.data(), { mutual: ranked[i][1], via: via.get(d.id) || [] })); });
   return { suggestions: out.slice(0, MAX_RESULTS) };
 }
 

@@ -59,6 +59,7 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
   --card: #FFFFFF;
   --border: rgba(23,20,26,.08);
   --border2: rgba(23,20,26,.14);
+  --border-ctl: rgba(23,20,26,.32); /* contour des boutons et champs : bien visibles sur blanc et crème */
   --ink: #17141A;
   --ink2: rgba(23,20,26,.72);
   --icon-gray: #6A6470;
@@ -191,11 +192,11 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
   display: flex; align-items: center; gap: 7px;
   padding: 9px 16px; border-radius: var(--rs);
   font-size: 13px; font-weight: 700; cursor: pointer;
-  border: none; transition: all .15s; font-family: var(--fd);
+  background: var(--card); color: var(--ink); border: 1.5px solid var(--border-ctl); transition: all .15s; font-family: var(--fd);
 }
-.tb-btn-primary { background: var(--nv-yellow); color: var(--ink); box-shadow: 0 4px 16px var(--ng); }
+.tb-btn-primary { background: var(--nv-yellow); color: var(--ink); border-color: transparent; box-shadow: 0 4px 16px var(--ng); }
 .tb-btn-primary:active { transform: scale(.97); }
-.tb-btn-ghost { background: var(--card); color: var(--ink2); border: 1.5px solid var(--border2); }
+.tb-btn-ghost { background: var(--card); color: var(--ink); border: 1.5px solid var(--border-ctl); }
 .tb-btn-ghost:active { background: var(--bg3); }
 .tb-notif { width: 38px; height: 38px; border-radius: var(--rx); background: var(--card); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 17px; position: relative; flex-shrink: 0; }
 .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--coral); border-radius: 50%; border: 2px solid var(--bg2); }
@@ -305,7 +306,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .field-lbl { display: block; font-size: 10px; font-weight: 700;  color: var(--ink3); margin-bottom: 7px; }
 .field-inp {
   width: 100%; padding: 12px 14px;
-  background: var(--bg3); border: 1.5px solid var(--border);
+  background: var(--bg3); border: 1.5px solid var(--border-ctl);
   border-radius: var(--rs); color: var(--ink); font-size: 14px;
   outline: none; transition: border-color .17s, box-shadow .17s; font-family: var(--fb);
 }
@@ -350,7 +351,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .mcq-opt-inp { flex: 1; padding: 10px 12px; background: var(--bg3); border: 1.5px solid var(--border); border-radius: var(--rx); color: var(--ink); font-size: 13px; outline: none; font-family: var(--fb); }
 .mcq-opt-inp:focus { border-color: var(--coral); }
 .mcq-opt-inp::placeholder { color: var(--ink4); }
-.mcq-remove { width: 30px; height: 30px; border-radius: 7px; background: rgba(239,68,68,.1); border: none; cursor: pointer; color: #F87171; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .13s; }
+.mcq-remove { width: 30px; height: 30px; border-radius: 7px; background: rgba(239,68,68,.1); border: 1.5px solid rgba(185,28,28,.35); cursor: pointer; color: var(--red-text); font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .13s; }
 .mcq-remove:hover { background: rgba(239,68,68,.2); }
 .add-option-btn { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--violet); background: none; border: none; cursor: pointer; padding: 4px 0; transition: opacity .13s; font-family: var(--fb); }
 .add-option-btn:hover { opacity: .75; }
@@ -389,11 +390,11 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .loc-fixed b { color: var(--ink); font-size: 14px; }
 /* Résultats */
 .rs-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-.rs-tab { padding: 9px 16px; border-radius: 99px; border: 1.5px solid var(--border); background: var(--card); color: var(--ink2); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--fb); }
+.rs-tab { padding: 9px 16px; border-radius: 99px; border: 1.5px solid var(--border-ctl); background: var(--card); color: var(--ink2); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--fb); }
 .rs-tab.on { background: var(--ink); border-color: var(--ink); color: #fff; }
 .rs-tab-n { display: inline-block; min-width: 20px; margin-left: 4px; padding: 1px 6px; border-radius: 99px; background: rgba(23,20,26,.1); font-size: 11px; text-align: center; }
 .rs-tab.on .rs-tab-n { background: rgba(255,255,255,.2); }
-.rs-back { padding: 9px 16px; border-radius: 99px; border: 1.5px solid var(--border); background: var(--card); color: var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--fb); }
+.rs-back { padding: 9px 16px; border-radius: 99px; border: 1.5px solid var(--border-ctl); background: var(--card); color: var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--fb); }
 .rs-intro { font-size: 13px; color: var(--ink2); line-height: 1.6; margin: 0 0 16px; max-width: 720px; }
 .rs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
 .rs-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; display: flex; flex-direction: column; gap: 6px; }
@@ -499,7 +500,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .risk-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); flex-shrink: 0; margin-top: 5px; }
 /* Wizard actions */
 .wizard-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
-.wiz-btn-back { padding: 12px 20px; border-radius: var(--rs); background: var(--card); border: 1.5px solid var(--border2); color: var(--ink2); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .13s; font-family: var(--fb); }
+.wiz-btn-back { padding: 12px 20px; border-radius: var(--rs); background: var(--card); border: 1.5px solid var(--border-ctl); color: var(--ink); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .13s; font-family: var(--fb); }
 .wiz-btn-next { padding: 12px 24px; border-radius: var(--rs); background: var(--nv-yellow); border: none; color:var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; transition: all .13s; font-family: var(--fd); box-shadow: 0 5px 18px var(--ng); display: flex; align-items: center; gap: 7px; }
 .wiz-btn-next:hover { box-shadow: 0 7px 22px var(--ng); transform: translateY(-1px); }
 .wiz-btn-next:active { transform: scale(.97); }
@@ -867,7 +868,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 
     <!-- TOPBAR -->
     <header class="topbar" id="topbar">
-      <button id="mob-menu-btn" aria-label="Ouvrir le menu" onclick="toggleMobMenu()" style="display:none;width:38px;height:38px;border-radius:10px;background:var(--card);border:1.5px solid var(--border);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:var(--ink)">
+      <button id="mob-menu-btn" aria-label="Ouvrir le menu" onclick="toggleMobMenu()" style="display:none;width:38px;height:38px;border-radius:10px;background:var(--card);border:1.5px solid var(--border-ctl);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:var(--ink)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
       </button>
       <div style="flex:1;min-width:0">
@@ -1050,7 +1051,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <button class="add-option-btn" onclick="addQOpt('q3-mcq-opts')">+ Ajouter une option</button>
                     </div>
                   </div>
-                <button id="wz-add-q-btn" onclick="addWizQ()" style="display:flex;align-items:center;gap:6px;background:none;border:1.5px dashed var(--border2);border-radius:var(--rx);padding:9px 14px;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;width:100%;justify-content:center">+ Ajouter une question <span style="font-size:10px;color:var(--ink4)">(max 3 au total)</span></button>
+                <button id="wz-add-q-btn" onclick="addWizQ()" style="display:flex;align-items:center;gap:6px;background:none;border:1.5px dashed var(--border-ctl);border-radius:var(--rx);padding:9px 14px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;width:100%;justify-content:center">+ Ajouter une question <span style="font-size:11px;color:var(--ink2)">(max 3 au total)</span></button>
                 <div class="qb" style="margin-top:14px">
                   <div class="field" style="margin-bottom:0">
                     <label class="field-lbl">Contexte interne (non visible des répondants)</label>
@@ -1442,7 +1443,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
     <div id="efm-label" style="font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ink);margin-bottom:14px">Modifier</div>
     <textarea id="efm-input" rows="1" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);color:var(--ink);font-size:14px;font-family:var(--fb);outline:none;resize:vertical;box-sizing:border-box" onkeydown="if(event.key==='Enter'&&!event.shiftKey&&this.rows===1){event.preventDefault();confirmEditField();}"></textarea>
     <div style="display:flex;gap:10px;margin-top:18px">
-      <button onclick="closeEditFieldModal()" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-weight:700;font-family:var(--fb);cursor:pointer">Annuler</button>
+      <button onclick="closeEditFieldModal()" style="flex:1;padding:12px;border-radius:10px;background:var(--card);border:1.5px solid var(--border-ctl);color:var(--ink);font-weight:700;font-family:var(--fb);cursor:pointer">Annuler</button>
       <button onclick="confirmEditField()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:var(--ink);font-weight:700;font-family:var(--fd);cursor:pointer">Enregistrer</button>
     </div>
   </div>
@@ -1774,7 +1775,7 @@ function openEditCamp(id) {
   document.getElementById('camp-modal-body').innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
       <div style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--ink)">Modifier la campagne</div>
-      <button onclick="closeCampModal()" style="background:var(--bg3);border:none;border-radius:99px;width:30px;height:30px;cursor:pointer;font-size:16px;color:var(--ink3);display:flex;align-items:center;justify-content:center">×</button>
+      <button onclick="closeCampModal()" aria-label="Fermer" style="background:var(--card);border:1.5px solid var(--border-ctl);border-radius:99px;width:36px;height:36px;cursor:pointer;font-size:18px;color:var(--ink);display:flex;align-items:center;justify-content:center">×</button>
     </div>
     <div class="field">
       <label class="field-lbl">Nom de la campagne</label>
@@ -1805,7 +1806,7 @@ function openEditCamp(id) {
     </div>
     <div style="display:flex;gap:9px">
       <button onclick="saveEditCamp(${jsa(id)})" style="flex:1;background:var(--coral);color:var(--ink);border:none;border-radius:var(--rx);padding:11px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px var(--cg)">Enregistrer</button>
-      <button onclick="closeCampModal()" style="background:var(--bg3);color:var(--ink2);border:none;border-radius:var(--rx);padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer">Annuler</button>
+      <button onclick="closeCampModal()" style="background:var(--card);color:var(--ink);border:1.5px solid var(--border-ctl);border-radius:var(--rx);padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer">Annuler</button>
     </div>`;
 }
 
@@ -2518,7 +2519,7 @@ window.addEventListener('load',()=>{
       <div id="rs-err" style="display:none;color:#EF4444;font-size:12px"></div>
     </div>
     <div style="display:flex;gap:10px;margin-top:16px">
-      <button onclick="document.getElementById('resubmit-modal').style.display='none'" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-weight:700;cursor:pointer">Annuler</button>
+      <button onclick="document.getElementById('resubmit-modal').style.display='none'" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border-ctl);color:var(--ink2);font-weight:700;cursor:pointer">Annuler</button>
       <button onclick="submitResubmit()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:var(--ink);font-weight:700;font-family:var(--fd);cursor:pointer">Renvoyer</button>
     </div>
   </div>
@@ -2534,10 +2535,10 @@ window.addEventListener('load',()=>{
       <li>Vous le saisissez dans l'onglet « Valider un code » du dashboard.</li>
       <li>Le code devient inutilisable : il ne peut servir qu'une fois.</li>
     </ol>
-    <button onclick="printCashierSheet()" style="background:var(--bg2);border:1.5px solid var(--border);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:12.5px;font-weight:700;cursor:pointer;margin-bottom:16px;font-family:var(--fb)">Imprimer la fiche pour la caisse</button>
+    <button onclick="printCashierSheet()" style="background:var(--bg2);border:1.5px solid var(--border-ctl);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:12.5px;font-weight:700;cursor:pointer;margin-bottom:16px;font-family:var(--fb)">Imprimer la fiche pour la caisse</button>
     <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink);line-height:1.5;cursor:pointer"><input type="checkbox" id="cashier-check" style="margin-top:3px;width:17px;height:17px;accent-color:var(--coral)" onchange="document.getElementById('cashier-ok').disabled=!this.checked"> J'ai compris et j'ai informé mon équipe.</label>
     <div style="display:flex;gap:10px;margin-top:18px">
-      <button onclick="document.getElementById('cashier-modal').style.display='none'" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink2);font-weight:700;cursor:pointer">Annuler</button>
+      <button onclick="document.getElementById('cashier-modal').style.display='none'" style="flex:1;padding:12px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border-ctl);color:var(--ink2);font-weight:700;cursor:pointer">Annuler</button>
       <button id="cashier-ok" disabled onclick="confirmCashierAck()" style="flex:1;padding:12px;border-radius:10px;background:var(--coral);border:none;color:var(--ink);font-weight:700;font-family:var(--fd);cursor:pointer;opacity:1">Continuer</button>
     </div>
   </div>
@@ -2627,7 +2628,7 @@ window.addEventListener('load',()=>{
         <div style="flex:1;height:1px;background:var(--border)"></div>
       </div>
 
-      <button onclick="signInWithGoogle()" style="width:100%;padding:13px 16px;border-radius:11px;background:var(--card);border:1.5px solid var(--border);color:var(--ink);font-size:13px;font-weight:600;font-family:var(--fb);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px">
+      <button onclick="signInWithGoogle()" style="width:100%;padding:13px 16px;border-radius:11px;background:var(--card);border:1.5px solid var(--border-ctl);color:var(--ink);font-size:13px;font-weight:600;font-family:var(--fb);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px">
         <svg width="17" height="17" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
         Continuer avec Google
       </button>

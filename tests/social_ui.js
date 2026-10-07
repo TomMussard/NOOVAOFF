@@ -78,9 +78,13 @@ const base={role:'user',city:'le-mans',cityLabel:'Le Mans',welcomeClaimed:true,o
     await p.evaluate(()=>{goNav('social');socTab('friends',document.querySelector('.tab-btn[onclick*="friends"]'));});
     await wf(p,()=>/Dan/.test((document.getElementById('friend-sugg')||{}).textContent||''),null,15000).catch(()=>{});
     const sg=await p.evaluate(()=>(document.getElementById('friend-sugg')||{}).textContent||'');
-    check('Suggestions : Dan, ami de Clé (1 ami en commun)',/Dan/.test(sg)&&/1 ami en commun/.test(sg),sg);
-    await p.evaluate(()=>document.querySelector('#friend-sugg button').click());await sleep(1500);
+    check('Suggestions : Dan, avec le prénom de l\'ami en commun (« Ami avec Clé »)',/Dan/.test(sg)&&/Ami avec Clé/.test(sg),sg);
+    await p.evaluate(()=>document.querySelector('#friend-sugg .sg-add').click());await sleep(1500);
     check('« Ajouter » envoie la demande d\'ami',(await db.doc('users/dan/notifications/friendreq_ana').get()).exists);
+    const st=await p.evaluate(()=>{const b=document.querySelector('#friend-sugg .sg-add');return b?{d:b.disabled,t:b.textContent,h:document.getElementById('friend-sugg').textContent}:document.getElementById('friend-sugg').innerHTML;});
+    check('… le bouton passe à « Demande envoyée »',st.d&&/Demande envoyée/.test(st.t),st);
+    await p.evaluate(()=>document.querySelector('#friend-sugg .sg-x').click());
+    check('« Masquer » retire la suggestion, et elle ne revient pas',await p.evaluate(()=>{const gone=!document.querySelector('#friend-sugg .sg-card');renderSuggestions();return gone&&!document.querySelector('#friend-sugg .sg-card')&&JSON.parse(localStorage.getItem('nv_sugg_hide')).includes('dan');}));
     check('Aucune erreur JavaScript',errs.length===0,errs);
     await p.close();
   });
