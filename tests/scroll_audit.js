@@ -115,6 +115,7 @@ function pageAudit(rootSel){
     await step('app notifications',async()=>{await p.evaluate(()=>goNav('social'));await sleep(800);await p.evaluate(()=>toggleNotifPanel());},'#notif-panel');
     await p.evaluate(()=>{try{closeNotifPanel()}catch(e){}});
     await step('app profil d\'un ami',async()=>{await p.evaluate(()=>goNav('social'));await sleep(1500);await p.evaluate(()=>openFriendProfile((S.friends||[])[0]));},'#fprofile');
+    await step('app messages',()=>p.evaluate(()=>openInbox()),'#inbox');
     await step('app discussion',()=>p.evaluate(()=>openChatFor((S.friends||[])[0])),'#chat');
     await step('app bon en caisse',()=>p.evaluate(()=>showVoucherModal({id:'r2',code:'A7K2',label:'Croissant offert',merchantName:'Le Fournil',cost:300,purchaseCondition:null,expiresAt:new Date(Date.now()+86400000)})),'#voucher-full');
     await p.evaluate(()=>{try{closeVoucherFull()}catch(e){}});

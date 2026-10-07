@@ -738,6 +738,31 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .soc-hdr{padding:0 20px 11px;display:flex;align-items:center;justify-content:space-between}
 .soc-title{font-family:var(--fd);font-weight:800;font-size:var(--fs-6);letter-spacing:var(--lettrage-titre);color:var(--blanc)}
 .soc-bell{width:40px;height:40px;border-radius:var(--r-btn);background:var(--surface);color:var(--ink);border:none;display:flex;align-items:center;justify-content:center;font-size:var(--fs-4);cursor:pointer;position:relative}
+.soc-acts{display:flex;gap:var(--s2)}
+button.soc-bell{padding:0;font-family:var(--font)}
+.msg-badge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:var(--r-pill);background:var(--jaune);color:var(--jaune-ink);font-size:var(--fs-1);font-weight:800;font-variant-numeric:tabular-nums;display:none;align-items:center;justify-content:center;border:2px solid var(--bg)}
+/* Messages : liste des conversations */
+#inbox{display:flex;flex-direction:column}
+.inbox-list{flex:1;overflow-y:auto;padding:var(--s3) var(--s4) var(--s6)}
+.ib-row{display:flex;align-items:center;gap:var(--s3);width:100%;padding:var(--s3);background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-md);margin-bottom:var(--s2);cursor:pointer;text-align:left;font-family:var(--font);color:var(--text)}
+.ib-row .fi-av,.ib-new .fi-av{background:var(--surface-2);color:var(--jaune)}
+.ib-row .fi-av{width:48px;height:48px}
+.ib-mid{flex:1;min-width:0}
+.ib-top{display:flex;align-items:baseline;gap:var(--s2)}
+.ib-name{flex:1;min-width:0;font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib-time{flex-shrink:0;font-size:var(--fs-1);color:var(--text-2);font-variant-numeric:tabular-nums}
+.ib-last{margin-top:2px;font-size:var(--fs-2);color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib-row.unread{border-color:var(--jaune)}
+.ib-row.unread .ib-last{color:var(--text);font-weight:700}
+.ib-row.unread .ib-time{color:var(--jaune);font-weight:800}
+.ib-dot{width:10px;height:10px;border-radius:var(--r-pill);background:var(--jaune);flex-shrink:0}
+.ib-sec{font:var(--t-label);color:var(--text-2);margin:var(--s5) 0 var(--s2)}
+.ib-new{display:flex;gap:var(--s2);overflow-x:auto;scrollbar-width:none;padding-bottom:var(--s1)}
+.ib-new::-webkit-scrollbar{display:none}
+.ib-new button{flex:0 0 72px;display:flex;flex-direction:column;align-items:center;gap:var(--s1);min-height:var(--tactile-min);background:none;border:none;color:var(--text);font-size:var(--fs-1);font-weight:600;font-family:var(--font);cursor:pointer}
+.ib-new button span:last-child{max-width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib-new .fi-av{width:52px;height:52px;border:1px solid var(--text-3)}
+.ib-empty{padding:var(--s5) var(--s4);text-align:center;color:var(--text-2);font-size:var(--fs-2);line-height:1.5}
 .bell-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--coral);border:2px solid var(--card);display:none}
 .notif-panel{position:fixed;top:60px;right:16px;width:min(320px,calc(100vw - 32px));max-height:420px;background:var(--surface);border:none;border-radius:var(--r-card);overflow-y:auto;z-index:9000;display:none}
 .notif-panel.open{display:block}
@@ -1677,7 +1702,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
   <div class="social-wrap">
     <div class="soc-hdr">
       <div class="soc-title">Communauté</div>
-      <div class="soc-bell" id="soc-bell" onclick="toggleNotifPanel(event)"><div class="bell-dot" id="bell-dot"></div><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></div>
+      <div class="soc-acts">
+        <button class="soc-bell" id="soc-msg" aria-label="Messages" onclick="openInbox()"><span class="msg-badge" id="msg-badge"></span><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/></svg></button>
+        <div class="soc-bell" id="soc-bell" onclick="toggleNotifPanel(event)"><div class="bell-dot" id="bell-dot"></div><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></div>
+      </div>
     </div>
     <div class="notif-panel" id="notif-panel">
       <div class="notif-hdr"><span>Notifications</span><span class="notif-close" onclick="closeNotifPanel()">✕</span></div>
@@ -1705,6 +1733,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 </div>
 
 <!-- CHAT -->
+<div id="inbox" class="screen">
+  <div class="chat-hdr">
+    <div class="back-btn" style="margin-bottom:0;margin-right:4px" role="button" aria-label="Retour" onclick="goTo('social')">←</div>
+    <div style="font-family:var(--fd);font-weight:800;font-size:var(--fs-5);color:var(--ink)">Messages</div>
+  </div>
+  <div class="inbox-list" id="inbox-list"></div>
+</div>
+
 <div id="chat" class="screen">
   <div class="chat-hdr">
     <div class="back-btn" style="margin-bottom:0;margin-right:4px" onclick="leaveChat()">←</div>
@@ -3227,6 +3263,7 @@ function renderFriends(){
   applyStagger(el);
   fillFriendCompat();
   renderSuggestions();
+  if(cur==='inbox')renderInbox();
 }
 async function fillFriendCompat(){
   try{
@@ -3673,7 +3710,8 @@ async function autoAddFriend(notif,uid){
   }catch(e){console.warn('autoAddFriend:',e);}
   finally{_friendBusy.delete('auto_'+notif.fromUid);}
 }
-function openChatFor(friend){
+function openChatFor(friend,fromInbox){
+  _chatFromInbox=!!fromInbox;
   const friendUid=friend.uid,friendName=friend.n;
   _chatFriendUid=friendUid;_chatFriendName=friendName;
   const idx=S.friends.findIndex(f=>f.uid===friendUid);const c=idx>=0?AVC[idx%AVC.length]:'#A14E08';
@@ -3716,7 +3754,10 @@ function chatDayLabel(ms){
 function markChatRead(chatId){
   const me=auth.currentUser&&auth.currentUser.uid;if(!me||cur!=='chat')return;
   const lastOther=[..._chatMessages].reverse().find(m=>m.fromUid!==me);if(!lastOther)return;
-  if(Date.now()-_chatReadAt<3000)return;_chatReadAt=Date.now();
+  // Au plus une écriture toutes les 3 s ; un message reçu entre-temps est marqué lu à la fin du délai.
+  const wait=3000-(Date.now()-_chatReadAt);
+  if(wait>0){clearTimeout(window._chatReadT);window._chatReadT=setTimeout(()=>markChatRead(chatId),wait+50);return;}
+  _chatReadAt=Date.now();
   db.collection('chats').doc(chatId).update({['lastRead.'+me]:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
 }
 function renderChat(){
@@ -3777,7 +3818,59 @@ async function sendMsg(){
   try{await db.collection('chats').doc(chatId).collection('messages').add({fromUid:myUid,text:txt,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}
   catch(e){console.warn('sendMsg:',e);inp.value=txt;}
 }
-function leaveChat(){if(_chatUnsub){_chatUnsub();_chatUnsub=null;}if(_chatDocUnsub){_chatDocUnsub();_chatDocUnsub=null;}closePollComposer();_chatMessages=[];goTo('social');}
+function leaveChat(){if(_chatUnsub){_chatUnsub();_chatUnsub=null;}if(_chatDocUnsub){_chatDocUnsub();_chatDocUnsub=null;}closePollComposer();_chatMessages=[];
+  const back=_chatFromInbox?'inbox':'social';_chatFromInbox=false;goTo(back);if(back==='inbox')renderInbox();}
+
+// ─── Messages : toutes mes conversations, la plus récente en haut ───
+// Le résumé (members, dernier message, prénoms) est tenu par le serveur à chaque message (functions/social.js).
+let _inboxUnsub=null,_chatFromInbox=false;
+function initInbox(uid){
+  if(_inboxUnsub)_inboxUnsub();
+  _inboxUnsub=db.collection('chats').where('members','array-contains',uid).limit(50).onSnapshot(snap=>{
+    S._chats=snap.docs.map(d=>({id:d.id,...d.data({serverTimestamps:'estimate'})})).filter(c=>c.lastAt).sort((a,b)=>_tsMs(b.lastAt)-_tsMs(a.lastAt));
+    updateMsgBadge();if(cur==='inbox')renderInbox();
+  },err=>console.warn('inbox:',err));
+}
+function chatUnread(c,me){return !!(c.lastFrom&&c.lastFrom!==me&&_tsMs((c.lastRead||{})[me])<_tsMs(c.lastAt));}
+function updateMsgBadge(){
+  const me=auth.currentUser&&auth.currentUser.uid,b=document.getElementById('msg-badge');if(!b)return;
+  const n=(S._chats||[]).filter(c=>chatUnread(c,me)).length;
+  b.textContent=n>9?'9+':String(n);b.style.display=n?'flex':'none';
+  const btn=document.getElementById('soc-msg');if(btn)btn.setAttribute('aria-label',n?'Messages, '+n+' non lu'+(n>1?'s':''):'Messages');
+}
+// « 14:05 » aujourd'hui, « Hier », « lun. » dans la semaine, sinon « 5 oct. »
+function inboxTime(ms){
+  if(!ms)return '';const d=new Date(ms),now=new Date(),k=x=>x.toLocaleDateString('sv-SE');
+  if(k(d)===k(now))return d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  if(k(d)===k(new Date(now.getTime()-86400000)))return 'Hier';
+  if(now-d<6*86400000)return d.toLocaleDateString('fr-FR',{weekday:'short'});
+  return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+}
+function inboxPeer(c,me){
+  const uid=(c.members||[]).find(u=>u!==me)||'';
+  const f=(S.friends||[]).find(x=>x.uid===uid&&x.mutual),w=(c.who||{})[uid]||{};
+  return {uid,n:(f&&f.n)||w.name||'Ami',photoUrl:(f&&f.photoUrl)||w.photoUrl||null};
+}
+function openInbox(){goTo('inbox');renderInbox();}
+function renderInbox(){
+  const el=document.getElementById('inbox-list');if(!el)return;
+  const me=auth.currentUser&&auth.currentUser.uid,chats=S._chats||[];
+  const rows=chats.map(c=>{
+    const p=inboxPeer(c,me),un=chatUnread(c,me);
+    const txt=(c.lastType==='poll'?'Sondage : ':'')+(c.lastText||'');
+    return `<button class="ib-row${un?' unread':''}" onclick="openInboxChat(${jsa(p.uid)})"><div class="fi-av">${avInner(p.photoUrl,p.n)}</div><div class="ib-mid"><div class="ib-top"><span class="ib-name">${esc(p.n)}</span><span class="ib-time">${esc(inboxTime(_tsMs(c.lastAt)))}</span></div><div class="ib-last">${c.lastFrom===me?'Toi : ':''}${esc(txt)}</div></div>${un?'<span class="ib-dot" aria-label="Non lu"></span>':''}</button>`;
+  }).join('');
+  const talked=new Set(chats.map(c=>inboxPeer(c,me).uid));
+  const others=(S.friends||[]).filter(f=>f.mutual&&!talked.has(f.uid));
+  const start=others.length?`<div class="ib-sec">Écrire à un ami</div><div class="ib-new">${others.map(f=>`<button onclick="openInboxChat(${jsa(f.uid)})"><span class="fi-av">${avInner(f.photoUrl,f.n)}</span><span>${esc(f.n)}</span></button>`).join('')}</div>`:'';
+  el.innerHTML=(rows||`<div class="ib-empty">Aucune conversation pour l'instant.${others.length?'<br>Écris à un ami pour commencer.':'<br>Ajoute des amis dans Communauté, onglet Amis, pour discuter avec eux.'}</div>`)+start;
+}
+function openInboxChat(uid){
+  const me=auth.currentUser&&auth.currentUser.uid;
+  const c=(S._chats||[]).find(x=>(x.members||[]).includes(uid));
+  const f=(S.friends||[]).find(x=>x.uid===uid)||(c?inboxPeer(c,me):{uid,n:'Ami',photoUrl:null});
+  openChatFor(f,true);
+}
 
 // ─── Pull-to-refresh ─────────────────────────────────────────
 function initPullToRefresh(scrollEl, ptrBarId, refreshFn) {
@@ -6093,6 +6186,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   if(S._friendUids.length) loadFriendsFromFirestore(S._friendUids);
   else if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }
   initNotifications(uid);
+  initInbox(uid);
   restorePushForUser(uid);
   loadHistFromFirestore(uid);
 
