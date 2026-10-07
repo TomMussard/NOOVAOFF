@@ -23,10 +23,17 @@ const findable = (u) => !!u && (!u.role || u.role === "user") && u.discoverable 
 const pick = (src, keys) => { const o = {}; keys.forEach((k) => { if (src[k] !== undefined) o[k] = src[k]; }); return o; };
 const str = (v, n) => (typeof v === "string" ? v.slice(0, n) : null);
 
+// Classement de la ville (lisible par tous les habitants de la ville) : prénom + initiale seulement — « Tom Mussard »
+// devient « Tom M. ». Le nom complet reste réservé aux amis (publicProfiles).
+function shortName(n) {
+  const parts = String(n || "").trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "";
+  return (parts.length > 1 ? `${parts[0]} ${parts[1][0].toUpperCase()}.` : parts[0]).slice(0, 40);
+}
 function boardOf(u) {
   if (!u || (u.role && u.role !== "user") || !u.city) return null;
   return {
-    name: str(u.name, 40) || "Anonyme", photoUrl: str(u.photoUrl, 600), xp: Number(u.xp) || 0, streak: Number(u.streak) || 0,
+    name: shortName(u.name) || "Anonyme", photoUrl: str(u.photoUrl, 600), xp: Number(u.xp) || 0, streak: Number(u.streak) || 0,
     groups: Array.isArray(u.groups) ? u.groups.filter((g) => typeof g === "string").slice(0, 20) : [], city: String(u.city).toLowerCase(),
   };
 }
@@ -37,7 +44,10 @@ function profileOf(u) {
 const MERCHANT_PUBLIC = ["brandName", "name", "sector", "theme", "city", "cityLabel", "address", "description", "website", "logoUrl", "coverUrl", "status", "broadcast", "isTest", "lat", "lng", "createdAt"];
 function merchantOf(m) {
   if (!m || m.status !== "verified") return null;      // seuls les commerces vérifiés ont une vitrine publique
-  return pick(m, MERCHANT_PUBLIC);
+  const out = pick(m, MERCHANT_PUBLIC);
+  // Compte de diffusion NOOVA (pas un commerce physique) : aucune adresse ni position dans la vitrine, jamais.
+  if (m.broadcast === true) { delete out.address; delete out.lat; delete out.lng; }
+  return out;
 }
 
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -75,14 +85,14 @@ async function backfill() {
   let users = 0, merchants = 0;
   for (const d of (await db().collection("users").get()).docs) { await syncUser(d.id, null, d.data()); users++; }
   for (const d of (await db().collection("merchants").get()).docs) { await syncMerchant(d.id, null, d.data()); merchants++; }
-  await db().collection("config").doc("publicProfiles").set({ version: 2, users, merchants, at: FieldValue.serverTimestamp() });
+  await db().collection("config").doc("publicProfiles").set({ version: 4, users, merchants, at: FieldValue.serverTimestamp() });
   return { users, merchants };
 }
 const adminSyncPublic = onCall({ region: "europe-west1", timeoutSeconds: 540, memory: "512MiB" }, async (request) => {
   if (!require("./lib").isAdminRequest(request)) throw new HttpsError("permission-denied", "Réservé aux administrateurs Noova.");
   if (request.data && request.data.ifNeeded) {
     const c = await db().collection("config").doc("publicProfiles").get();
-    if (c.exists && (c.data().version || 0) >= 2) return { skipped: true };
+    if (c.exists && (c.data().version || 0) >= 4) return { skipped: true };
   }
   return backfill();
 });
@@ -91,11 +101,11 @@ const adminSyncPublic = onCall({ region: "europe-west1", timeoutSeconds: 540, me
 // la première fois, recopie tous les comptes existants (plus besoin d'ouvrir l'admin).
 async function backfillIfNeeded() {
   const c = await db().collection("config").doc("publicProfiles").get();
-  if (c.exists && (c.data().version || 0) >= 2) return { skipped: true };
+  if (c.exists && (c.data().version || 0) >= 4) return { skipped: true };
   return backfill();
 }
 const publicProfilesAutoSync = onSchedule({ schedule: "every 10 minutes", region: "europe-west1", timeoutSeconds: 540, memory: "512MiB", retryCount: 0 }, async () => {
   await backfillIfNeeded();
 });
 
-module.exports = { syncUserPublic, syncMerchantPublic, adminSyncPublic, publicProfilesAutoSync, _t: { backfillIfNeeded, boardOf, profileOf, merchantOf, backfill, MERCHANT_PUBLIC } };
+module.exports = { syncUserPublic, syncMerchantPublic, adminSyncPublic, publicProfilesAutoSync, _t: { shortName, backfillIfNeeded, boardOf, profileOf, merchantOf, backfill, MERCHANT_PUBLIC } };

@@ -65,8 +65,23 @@ const friendSuggestions = onCall({ region: "europe-west1" }, async (request) => 
   if (!request.auth) throw new HttpsError("unauthenticated", "Connecte-toi.");
   return suggestionsCore(request.auth.uid);
 });
+// 3 recherches par jour et par habitant : sans plafond, on pourrait tester des milliers d'adresses e-mail pour savoir
+// qui est inscrit sur NOOVA.
+const CONTACTS_PER_DAY = 3;
+async function takeContactsQuota(uid, now = Date.now()) {
+  const day = new Date(now).toLocaleDateString("sv-SE", { timeZone: "Europe/Paris" });
+  const ref = db().collection("rateLimits").doc("contacts_" + uid);
+  return db().runTransaction(async (tx) => {
+    const d = (await tx.get(ref)).data() || {};
+    const n = d.day === day ? d.n || 0 : 0;
+    if (n >= CONTACTS_PER_DAY) return false;
+    tx.set(ref, { day, n: n + 1 });
+    return true;
+  });
+}
 const matchContacts = onCall({ region: "europe-west1" }, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Connecte-toi.");
+  if (!(await takeContactsQuota(request.auth.uid))) throw new HttpsError("resource-exhausted", "Tu as déjà cherché tes contacts 3 fois aujourd'hui : réessaie demain.");
   return matchCore(request.auth.uid, request.data && request.data.hashes);
 });
 

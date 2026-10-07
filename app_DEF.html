@@ -3328,7 +3328,7 @@ async function doFindContacts(){
     const r=(await fx.httpsCallable('matchContacts')({hashes})).data||{};
     const list=r.matches||[];list.forEach(x=>{if(x.sent)(S._sentReqs=S._sentReqs||new Set()).add(x.uid);});
     el.innerHTML=`<div class="cm-sec" style="padding:0 18px">Dans tes contacts</div>`+(list.length?'<div class="sg-wrap">'+list.map(x=>suggCardHTML(x,'Dans tes contacts',false)).join('')+'</div>':`<div class="sg-empty">Aucun de ces contacts n'est encore sur NOOVA. Invite-les avec « Inviter un ami ».</div>`);
-  }catch(e){console.warn('findContacts:',e);if(!(e&&e.name==='AbortError'))showToast('Recherche des contacts impossible.','error');}
+  }catch(e){console.warn('findContacts:',e);if(e&&/resource-exhausted/.test(e.code||''))showToast(e.message,'warning');else if(!(e&&e.name==='AbortError'))showToast('Recherche des contacts impossible.','error');}
 }
 
 function shareCode(code){

@@ -490,7 +490,8 @@ service cloud.firestore {
     // Annuaire public des codes amis — lecture ouverte à tous les users connectés
     // Seul le propriétaire du code peut le créer (uid == auth.uid)
     match /friendCodes/{code} {
-      allow read: if isAuth();
+      // Lecture d'UN code connu seulement (ajout d'ami) : jamais la liste (elle donnerait le prénom de tous les inscrits).
+      allow get: if isAuth();
       allow create: if isAuth() && request.resource.data.uid == request.auth.uid && code.matches('NOOVA-[A-Z0-9]{4,10}') &&
         request.resource.data.keys().hasOnly(['uid', 'name']) && shortStr(request.resource.data, 'name', 60);
       allow update: if isAuth() && resource.data.uid == request.auth.uid && request.resource.data.uid == request.auth.uid &&
@@ -607,5 +608,6 @@ service cloud.firestore {
     match /zones/{id}          { allow read: if isAdmin(); allow write: if false; }
     // Index des empreintes d'e-mail (recherche par contacts) : serveur uniquement, jamais lisible par un client.
     match /emailIndex/{id}     { allow read, write: if false; }
+    match /rateLimits/{id}     { allow read, write: if false; }
   }
 }
