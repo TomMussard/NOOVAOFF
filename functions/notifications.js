@@ -61,6 +61,11 @@ const TYPES = {
   code_expire:          { group: "recompenses", nudge: false, exceptional: true },
   points_expirant:      { group: "recompenses", nudge: false, exceptional: true, deferQuiet: true, ttlH: 72 },
   ami:                  { group: "amis",        nudge: true,  gapDays: 1, deferQuiet: true, ttlH: 12 },
+  // Message privé d'un ami : envoyé tout de suite, même le soir (c'est une vraie personne qui écrit), au plus une
+  // notification par conversation et par tranche de 10 minutes, 30 par jour ; compteur à part.
+  message:              { group: "messages",    nudge: false, ownCap: 30, bucket: "msg", noDecay: true, quietOk: true },
+  // Quelqu'un a aimé ou commenté une publication de l'habitant dans le fil : 8 par jour, à part ; la nuit, à 9h.
+  reaction:             { group: "amis",        nudge: false, ownCap: 8, bucket: "social", deferQuiet: true, ttlH: 12 },
   // « Ton avis a compté » : issu de l'action de l'habitant (il a répondu), donc pas une relance.
   impact:               { group: "actualites",  nudge: false, deferQuiet: true, ttlH: 48 },
 };
@@ -70,7 +75,8 @@ const GROUPS = {
   resultats: ["resultat_dispo"],
   serie: ["serie_en_danger"],
   recompenses: ["recompense_debloquee", "code_expire", "points_expirant"],
-  amis: ["ami"],
+  amis: ["ami", "reaction"],
+  messages: ["message"],
   actualites: ["impact"],
 };
 const INTERESTS = require("./interests");
@@ -105,7 +111,12 @@ function finish(o) {
   if (FORBIDDEN.test(title + " " + body)) throw new Error("copy interdite: " + title);
   return { title, body, screen: o.screen || "home" };
 }
+// Texte écrit par un habitant (message, commentaire) : jamais refusé pour son vocabulaire, simplement raccourci.
+const raw = (o) => ({ title: short(o.title, 59), body: String(o.body || "").replace(/\s+/g, " ").trim().slice(0, 140), screen: o.screen || "home" });
 const copy = {
+  message: ({ name, text, poll }) => raw({ title: `${short(name, 30)} t'a écrit`, body: poll ? `Sondage : ${text}` : text, screen: "social" }),
+  like: ({ name, what }) => raw({ title: `${short(name, 30)} a aimé ta publication`, body: what || "Dans le fil de ta ville", screen: "social" }),
+  comment: ({ name, text }) => raw({ title: `${short(name, 30)} a commenté ta publication`, body: `« ${String(text || "").slice(0, 120)} »`, screen: "social" }),
   questionSuivi: ({ merchant, byNoova }) => byNoova
     ? finish({ title: "NOOVA vient de poser une question", body: "30 secondes, et un NOOV à la clé", screen: "home" })
     : finish({ title: `${short(merchant, 30)} vient de poser une question`, body: "Réponds en 30 secondes, +10 points", screen: "home" }),
@@ -169,6 +180,7 @@ async function sendPush(uid, tokens, payload) {
   return res;
 }
 
+const bucketOf = (cfg) => cfg.bucket || (cfg.ownCap ? "suivi" : "count");
 const answeredToday = (u, day) => u.dailyAnswerDate === day && (u.dailyAnswerCount || 0) > 0;
 
 /**
@@ -197,17 +209,20 @@ async function deliver(uid, type, content, opts = {}) {
     if ((u.notifPrefs || {})[cfg.group] === false) { out = { status: "skip", reason: "pref_off" }; return; }
     const stat = (u.notifStats || {})[type] || {};
     if (stat.autoOff && !cfg.noDecay) { out = { status: "skip", reason: "auto_off" }; return; }
-    if (isQuiet(p)) { out = { status: "blocked", reason: "quiet" }; return; }
+    if (isQuiet(p) && !cfg.quietOk) { out = { status: "blocked", reason: "quiet" }; return; }
     if (cfg.nudge && answeredToday(u, p.day)) { out = { status: "skip", reason: "answered_today" }; return; }
     const weekly = (!!stat.weekly && !cfg.noDecay) || cfg.gapDays >= 7;
     if (weekly) { if (now - (stat.lastSentAt || 0) < 7 * DAY - 3600000) { out = { status: "skip", reason: "weekly" }; return; } }
     else if (cfg.gapDays === 1 && stat.lastSentDay === p.day) { out = { status: "skip", reason: "once_a_day" }; return; }
+    // Compteurs du jour par famille : « count » (3 par jour, 4 avec un type exceptionnel), « suivi » (questions des
+    // commerces suivis), « msg » (messages privés), « social » (J'aime, commentaires) : chacun son plafond.
     const nd = u.notifDaily && u.notifDaily.date === p.day ? u.notifDaily : {};
-    const daily = nd.count || 0, suivi = nd.suivi || 0;
-    if (cfg.ownCap ? suivi >= cfg.ownCap : daily >= (cfg.exceptional ? DAILY_CAP + 1 : DAILY_CAP)) { out = { status: "blocked", reason: "cap" }; return; }   // 3/jour, 4 avec un type exceptionnel ; questions suivies à part
+    const bucket = bucketOf(cfg), used = nd[bucket] || 0;
+    const limit = bucket === "count" ? (cfg.exceptional ? DAILY_CAP + 1 : DAILY_CAP) : cfg.ownCap;
+    if (used >= limit) { out = { status: "blocked", reason: "cap" }; return; }
 
     tx.update(userRef, {
-      notifDaily: cfg.ownCap ? { date: p.day, count: daily, suivi: suivi + 1 } : { date: p.day, count: daily + 1, suivi },
+      notifDaily: { count: 0, suivi: 0, ...nd, date: p.day, [bucket]: used + 1 },
       [`notifStats.${type}.sent`]: FieldValue.increment(1),
       [`notifStats.${type}.lastSentAt`]: now,
       [`notifStats.${type}.lastSentDay`]: p.day,
@@ -224,7 +239,7 @@ async function deliver(uid, type, content, opts = {}) {
     };
     let res = null;
     try { res = await sendPush(uid, out.tokens, payload); } catch (e) { logger.error("sendPush", { message: e.message, type }); }
-    if (!res || res.successCount === 0) await revertSend(uid, type, logId, p.day, !!cfg.ownCap).catch(() => {});
+    if (!res || res.successCount === 0) await revertSend(uid, type, logId, p.day, bucketOf(cfg)).catch(() => {});
     return { status: "sent", nid: logId };
   }
   if (out.status === "blocked") {
@@ -244,10 +259,10 @@ async function deliver(uid, type, content, opts = {}) {
 
 // Envoi FCM totalement échoué : on annule la comptabilité (sinon l'habitant serait pénalisé par la
 // décroissance pour une notification qu'il n'a jamais pu recevoir).
-async function revertSend(uid, type, logId, day, own = false) {
+async function revertSend(uid, type, logId, day, bucket = "count") {
   const batch = db().batch();
   batch.update(db().collection("notifLog").doc(logId), { status: "failed" });
-  batch.update(db().collection("users").doc(uid), { [`notifStats.${type}.sent`]: FieldValue.increment(-1), [`notifStats.${type}.lastSentDay`]: "", [own ? "notifDaily.suivi" : "notifDaily.count"]: FieldValue.increment(-1) });
+  batch.update(db().collection("users").doc(uid), { [`notifStats.${type}.sent`]: FieldValue.increment(-1), [`notifStats.${type}.lastSentDay`]: "", [`notifDaily.${bucket}`]: FieldValue.increment(-1) });
   batch.set(db().collection("notifMetrics").doc(type), { sent: FieldValue.increment(-1) }, { merge: true });
   await batch.commit();
 }
@@ -687,6 +702,40 @@ const onFriendNotif = onDocumentCreated("users/{uid}/notifications/{nid}", async
   await deliver(event.params.uid, "ami", n.type === "friend_request" ? copy.amiRequest({ name }) : copy.amiAccepted({ name }), { key: event.params.nid });
 });
 
+// Message privé reçu → le (ou les) autre(s) participant(s) de la conversation. Au plus une notification par conversation
+// et par tranche de 10 minutes (les messages suivants s'affichent dans l'app).
+const onChatMessageNotif = onDocumentCreated({ document: "chats/{chatId}/messages/{msgId}", region: "europe-west1" }, async (event) => {
+  const m = event.data && event.data.data();
+  if (!m || !m.fromUid) return;
+  const chat = await db().collection("chats").doc(event.params.chatId).get();
+  if (!chat.exists) return;
+  const to = Object.keys(chat.data().participants || {}).filter((u) => u !== m.fromUid);
+  if (!to.length) return;
+  const from = await db().collection("users").doc(m.fromUid).get();
+  const name = (from.exists && from.data().name) || "Un ami";
+  const now = await nowMs();
+  const content = { ...copy.message({ name, text: String(m.text || ""), poll: m.type === "poll" }), screen: `chat-${m.fromUid}` };
+  for (const uid of to) await deliver(uid, "message", content, { key: `${event.params.chatId}_${Math.floor(now / 600000)}`, now });
+});
+
+// Publication du fil (palier, série) aimée ou commentée → son auteur. J'aime : au plus une notification par publication
+// et par heure ; commentaire : une par commentaire. Jamais pour sa propre action.
+const FEED_WHAT = (ev) => ev.type === "levelup" ? `Tu as atteint le palier ${ev.level || ""}`.trim() : ev.type === "streak" ? `Ta série de ${ev.streak || ""} jours`.replace("  ", " ") : (ev.text || "");
+const onFeedLikeNotif = onDocumentCreated({ document: "communityEvents/{eventId}/likes/{uid}", region: "europe-west1" }, async (event) => {
+  const ev = (await db().collection("communityEvents").doc(event.params.eventId).get()).data();
+  if (!ev || !ev.userId || ev.userId === event.params.uid) return;
+  const liker = await db().collection("users").doc(event.params.uid).get();
+  const now = await nowMs();
+  await deliver(ev.userId, "reaction", copy.like({ name: (liker.exists && liker.data().name) || "Un ami", what: FEED_WHAT(ev) }), { key: `${event.params.eventId}_like_${Math.floor(now / 3600000)}`, now });
+});
+const onFeedCommentNotif = onDocumentCreated({ document: "communityEvents/{eventId}/comments/{commentId}", region: "europe-west1" }, async (event) => {
+  const c = event.data && event.data.data();
+  if (!c || !c.userId) return;
+  const ev = (await db().collection("communityEvents").doc(event.params.eventId).get()).data();
+  if (!ev || !ev.userId || ev.userId === c.userId) return;
+  await deliver(ev.userId, "reaction", copy.comment({ name: c.name || "Un ami", text: c.text }), { key: `${event.params.eventId}_com_${event.params.commentId}` });
+});
+
 // Campagne : paliers de réponses → commerçant (email + in-app) et « résultat disponible » aux répondants.
 const MILESTONES = [1, 5, 10, 50, 100];
 const onCampaignProgress = onDocumentUpdated("campaigns/{campaignId}", async (event) => {
@@ -771,7 +820,7 @@ const setNotifPref = onCall(async (request) => {
 });
 
 module.exports = {
-  notifTick, notifyNewCampaign, onAnswerNotifs, onFriendNotif, onCampaignProgress, onRedemptionUpdated, onMerchantStatus,
+  notifTick, notifyNewCampaign, onAnswerNotifs, onFriendNotif, onChatMessageNotif, onFeedLikeNotif, onFeedCommentNotif, onCampaignProgress, onRedemptionUpdated, onMerchantStatus,
   trackNotifOpen, setNotifPref, adminNotifDiag,
   // Internes exposés aux tests
   _t: { deliver, runTick, notifDiagCore, nowMs, trackOpen, setPref, processMisses, drainQueue, habitMinutes, afternoonSlot, availableFor, parisParts, next9h, copy, TYPES, GROUPS, notifyMerchant, notifyExpiringCodes, notifyEndingCampaigns, expireCampaigns, loadCaches, sectorCategory },

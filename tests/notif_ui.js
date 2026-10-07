@@ -53,8 +53,8 @@ async function login(browser,email,{ua,perm='default',standalone=false}={}){
     check('Profil : section « Notifications » en menu déroulant (replié)',secs.notif&&await pa.evaluate(()=>!document.getElementById('notif-section').classList.contains('open')),secs);
     await pa.evaluate(()=>document.querySelector('#notif-section .sc-hdr').click());await sleep(300);
     const rows=await pa.evaluate(()=>[...document.querySelectorAll('#notif-switches .nf-row')].map(r=>({t:r.querySelector('.nf-t').textContent,on:r.querySelector('input').checked,g:r.querySelector('input').dataset.g})));
-    check('Réglages : 7 interrupteurs, libellés en langage utilisateur, dans l\'ordre',rows.map(r=>r.t).join('|')==='Mes questions|Nouveaux commerces|Résultats|Ma série|Mes récompenses|Mes amis|Actualités des commerces',rows.map(r=>r.t));
-    check('Réglages : pas d\'interrupteur global',await pa.evaluate(()=>document.querySelectorAll('#notif-section input[type=checkbox]').length===7));
+    check('Réglages : 8 interrupteurs, libellés en langage utilisateur, dans l\'ordre',rows.map(r=>r.t).join('|')==='Mes questions|Nouveaux commerces|Résultats|Ma série|Mes récompenses|Messages privés|Mes amis|Actualités des commerces',rows.map(r=>r.t));
+    check('Réglages : pas d\'interrupteur global',await pa.evaluate(()=>document.querySelectorAll('#notif-section input[type=checkbox]').length===8));
     check('Réglages : état lu depuis le profil (Mes amis coupé, les autres actifs)',rows.filter(r=>!r.on).map(r=>r.g).join()==='amis',rows);
     await pa.screenshot({path:'/tmp/shots/notif_settings.png'});
     await pa.evaluate(()=>document.querySelector('#notif-switches input[data-g=question]').click());
@@ -192,7 +192,7 @@ async function login(browser,email,{ua,perm='default',standalone=false}={}){
     await p.evaluate(()=>{document.getElementById('tab-notifications').style.display='block';return loadNotifMetrics();});await sleep(1500);
     const rows=await p.evaluate(()=>[...document.querySelectorAll('#notif-rows tr')].map(r=>[...r.children].map(c=>c.textContent.trim())));
     const q=rows.find(r=>/Question du jour/.test(r[0]));const n=rows.find(r=>/Nouveau commerce/.test(r[0]));const a=rows.find(r=>/^Ami/.test(r[0]));
-    check('Back-office : les 13 types listés avec envois, ouvertures, taux, désactivations',rows.length===13&&q[1]==='250'&&q[2]==='5'&&q[3]==='2.0 %'&&/^15/.test(q[4]),rows);
+    check('Back-office : les 15 types listés avec envois, ouvertures, taux, désactivations',rows.length===15&&q[1]==='250'&&q[2]==='5'&&q[3]==='2.0 %'&&/^15/.test(q[4]),rows);
     check('Back-office : sous 5 % sur 200 envois = « À supprimer »',/À supprimer/.test(q[5]),q);
     check('Back-office : au-dessus de 5 % = « À garder »',/À garder/.test(n[5]),n);
     check('Back-office : moins de 200 envois = en observation',/En observation \(40\/200\)/.test(a[5]),a);
