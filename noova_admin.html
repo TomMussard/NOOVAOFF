@@ -16,7 +16,7 @@
   --ink:#17141A;--ink2:rgba(23,20,26,.72);--ink3:rgba(23,20,26,.64);--icon-gray:#6A6470;
   --bg:#F5F3EF;--bg2:#EEECEA;--card:#fff;--border:rgba(23,20,26,.09);--border-ctl:rgba(23,20,26,.32);--red-strong:#B42318;
   --coral:#f29715;--coral-text:#8F5400;--mint-text:#087355;--red-text:#B91C1C;--cd:rgba(242,151,21,.1);--cg:rgba(242,151,21,.25);
-  --amber:#ffda09;--brown:#1c0e02;--cream:#fffbd7;
+  --amber:#ffda09;--brown:#1c0e02;--cream:#fffbd7;--nv-jaune:#FFC300;
   --mint:#0BAB84;--red:#EF4444;--violet:#7C3AED;
   --grad:linear-gradient(135deg,#f29715 0%,#ffda09 79%);
   --fd:'Bricolage Grotesque',sans-serif;--fb:'Plus Jakarta Sans',sans-serif
@@ -427,7 +427,7 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
 
   <!-- ══════════════ TAB DIFFUSION ══════════════ -->
   <div id="tab-diffusion" style="display:none">
-    <div class="sec-hdr"><h2>Diffusion</h2><p>Envoie une notification à tous les utilisateurs de l'app. Elle apparaîtra dans leur cloche.</p></div>
+    <div class="sec-hdr"><h2>Diffusion</h2><p>Une annonce de NOOVA : notification sur le téléphone, carte en haut de l'accueil jusqu'à ce qu'on la ferme, et cloche.</p></div>
 
     <div class="two-col" style="align-items:start">
       <!-- Formulaire d'envoi -->
@@ -443,6 +443,14 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
             </select>
           </div>
           <div style="margin-bottom:14px">
+            <label for="ann-city" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Ville</label>
+            <select id="ann-city" onchange="updateCharCount()" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none"><option value="all">Toutes les villes</option></select>
+          </div>
+          <div style="margin-bottom:14px">
+            <label for="ann-title" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Titre (facultatif)</label>
+            <input id="ann-title" maxlength="60" placeholder="Ex : Nouveau : les sondages entre amis" oninput="updateCharCount()" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+          </div>
+          <div style="margin-bottom:14px">
             <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);display:block;margin-bottom:6px">Message</label>
             <textarea id="broadcast-msg" maxlength="240" placeholder="Ex : Nouvelle fonctionnalité disponible ! Découvrez les récompenses exclusives ce week-end…" style="width:100%;height:110px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:10px;font-family:var(--fb);font-size:14px;color:var(--ink);resize:none;outline:none;line-height:1.5" oninput="updateCharCount()"></textarea>
             <div style="display:flex;justify-content:space-between;margin-top:6px">
@@ -451,6 +459,17 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
             </div>
           </div>
 
+          <div style="margin-bottom:14px">
+            <label for="ann-cta" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Bouton dans l'annonce (habitants)</label>
+            <select id="ann-cta" onchange="updateCharCount()" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none">
+              <option value="">Aucun bouton</option><option value="questions">Répondre aux questions</option><option value="rewards">Voir les récompenses</option><option value="invite">Inviter des amis</option><option value="friends">Voir mes amis</option>
+            </select>
+          </div>
+          <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:16px;font-size:13px;color:var(--ink);line-height:1.45;cursor:pointer">
+            <input type="checkbox" id="ann-important" onchange="updateCharCount()" style="margin-top:3px;width:18px;height:18px;accent-color:var(--brown)">
+            <span><b>Importante</b> : s'ouvre aussi en pop-up au centre de l'écran à la prochaine ouverture de l'app. À garder pour les vraies nouveautés.</span>
+          </label>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.5;margin-bottom:14px">Les habitants la reçoivent sur leur téléphone (notification, à 9h si envoyée la nuit), la voient en carte en haut de l'accueil jusqu'à ce qu'ils la ferment, et dans leur cloche. Ils peuvent couper « Annonces de NOOVA » dans leur profil.</div>
           <button onclick="sendBroadcast()" style="width:100%;padding:12px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--cg);letter-spacing:-.2px">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> Envoyer l'annonce
           </button>
@@ -464,13 +483,15 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
         <div class="card">
           <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> Aperçu</div>
           <div style="padding:16px">
-            <div style="background:var(--bg);border-radius:12px;padding:12px 14px;border:1.5px solid var(--border)">
-              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:8px">Tel qu'il apparaîtra dans l'app :</div>
-              <div style="display:flex;flex-direction:column;gap:4px;background:var(--card);border-radius:10px;padding:12px 14px;border:1px solid var(--border)">
-                <div style="font-size:13px;color:var(--ink);line-height:1.45"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> <strong>Noova</strong> · <span id="preview-msg" style="color:var(--ink2)">Votre message ici…</span></div>
-                <div style="font-size:11px;color:var(--ink3)">À l'instant</div>
-              </div>
+            <div style="font-size:11px;font-weight:700;color:var(--ink3);margin-bottom:8px">En haut de l'accueil de l'app :</div>
+            <div id="ann-preview" style="position:relative;background:var(--brown);color:var(--cream);border:1px solid var(--nv-jaune);border-radius:20px;padding:16px">
+              <div style="position:absolute;top:10px;right:14px;font-size:18px;opacity:.8" aria-hidden="true">×</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><img src="favicon.svg" alt="" style="width:28px;height:28px;border-radius:10px"><span style="font-size:13px;font-weight:600;color:var(--nv-jaune)">Annonce NOOVA</span><span style="font-size:11px;opacity:.75;margin-left:auto;margin-right:26px">aujourd'hui</span></div>
+              <div id="preview-title" style="font-family:var(--fd);font-weight:800;font-size:21px;line-height:1.2;margin-bottom:4px"></div>
+              <div id="preview-msg" style="font-size:15px;line-height:1.55;white-space:pre-line">Votre message ici…</div>
+              <div id="preview-cta" style="display:none;margin-top:12px;padding:12px 16px;border:1px solid var(--nv-jaune);color:var(--nv-jaune);border-radius:10px;font-family:var(--fd);font-weight:800;font-size:15px;width:max-content"></div>
             </div>
+            <div id="preview-pop" style="display:none;font-size:12px;color:var(--ink2);margin-top:8px">+ pop-up au centre de l'écran à la prochaine ouverture.</div>
           </div>
         </div>
 
@@ -886,7 +907,7 @@ async function loadResponseQuality() {
 // ─── Notifications : métriques par type (envois, ouvertures, désactivations) ───
 const NOTIF_LABELS = {
   question_du_jour: 'Question du jour', nouvelle_question: 'Nouvelle question (après-midi)', question_suivi: 'Question d\'un commerce suivi', relance_question: 'Relance (3 h après)', message: 'Message privé', reaction: 'J\'aime / commentaire', rappel_soir: 'Rappel du soir (18h30)', points_expirant: 'Points bientôt expirés', nouveau_commerce: 'Nouveau commerce', resultat_dispo: 'Résultat disponible',
-  recompense_debloquee: 'Récompense débloquée', serie_en_danger: 'Série en danger', code_expire: 'Code bientôt expiré', ami: 'Ami', impact: 'Ton avis a compté', rendez_vous: 'Rendez-vous du jour (18h)'
+  recompense_debloquee: 'Récompense débloquée', serie_en_danger: 'Série en danger', code_expire: 'Code bientôt expiré', ami: 'Ami', impact: 'Ton avis a compté', rendez_vous: 'Rendez-vous du jour (18h)', annonce: 'Annonce de NOOVA'
 };
 async function loadNotifMetrics() {
   const body = document.getElementById('notif-rows');
@@ -1951,9 +1972,7 @@ async function initDiffusion() {
     statusEl.textContent = '';
     updateAudienceCount();
     // Charge l'historique des broadcasts
-    const hSnap = await db.collection('broadcasts').orderBy('sentAt','desc').limit(20).get();
-    _broadcastHistory = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderBroadcastHistory();
+    await loadBroadcastHistory();
     initWeeklyQuestion();
     loadNoovaQuestions();
   } catch(e) {
@@ -1973,6 +1992,8 @@ async function initWeeklyQuestion() {
         const opt = document.createElement('option');
         opt.value = c.id; opt.textContent = c.label || c.id;
         sel.appendChild(opt);
+        const ac = document.getElementById('ann-city');
+        if (ac && !ac.querySelector(`option[value="${CSS.escape(c.id)}"]`)) { const o2 = document.createElement('option'); o2.value = c.id; o2.textContent = c.label || c.id; ac.appendChild(o2); }
       });
   } catch(e) { console.warn('cities for wq:', e); }
   renderActiveWeeklyQuestion();
@@ -2065,59 +2086,59 @@ async function stopWeeklyQuestion(id) {
   renderActiveWeeklyQuestion();
 }
 
+const ANN_CTA_LABEL = { questions: 'Répondre aux questions', rewards: 'Voir les récompenses', invite: 'Inviter des amis', friends: 'Voir mes amis' };
 function updateCharCount() {
   const msg = document.getElementById('broadcast-msg').value;
   document.getElementById('char-count').textContent = msg.length + ' / 240 caractères';
   document.getElementById('preview-msg').textContent = msg || 'Votre message ici…';
+  const t = (document.getElementById('ann-title') || {}).value || '';
+  const pt = document.getElementById('preview-title'); pt.textContent = t; pt.style.display = t ? '' : 'none';
+  const cta = (document.getElementById('ann-cta') || {}).value || '';
+  const pc = document.getElementById('preview-cta'); pc.textContent = ANN_CTA_LABEL[cta] || ''; pc.style.display = cta ? '' : 'none';
+  document.getElementById('preview-pop').style.display = (document.getElementById('ann-important') || {}).checked ? '' : 'none';
 }
 
+// Annonce : un seul document ; le serveur (functions/announcements.js) l'envoie à chacun (cloche + téléphone).
 async function sendBroadcast() {
   const msg = document.getElementById('broadcast-msg').value.trim();
   if (!msg) { showToast('Écris un message avant d\'envoyer', 'warning'); return; }
   const statusEl = document.getElementById('broadcast-status');
   const audience = document.getElementById('broadcast-audience')?.value || 'users';
-  const targets = [];
-  if (audience === 'users' || audience === 'both') _allUserIds.forEach(id => targets.push({ id, col: 'users' }));
-  if (audience === 'merchants' || audience === 'both') _allMerchantIds.forEach(id => targets.push({ id, col: 'merchants' }));
-  const audienceLabel = audience === 'users' ? 'habitants' : audience === 'merchants' ? 'commerçants' : 'habitants + commerçants';
-
-  if (!confirm(`Envoyer cette notification à TOUS les ${audienceLabel} (${targets.length}) ?`)) return;
-
-  statusEl.textContent = `Envoi à ${targets.length} destinataires…`;
+  const citySel = document.getElementById('ann-city');
+  const city = citySel ? citySel.value : 'all', cityLabel = citySel ? citySel.options[citySel.selectedIndex].textContent : 'Toutes les villes';
+  const title = document.getElementById('ann-title').value.trim().slice(0, 60);
+  const cta = document.getElementById('ann-cta').value;
+  const important = document.getElementById('ann-important').checked;
+  const audienceLabel = audience === 'users' ? 'habitants' : audience === 'merchants' ? 'commerçants' : 'habitants et commerçants';
+  if (!confirm(`Envoyer cette annonce aux ${audienceLabel} — ${cityLabel}${important ? ' (importante : pop-up à l\'ouverture)' : ''} ?`)) return;
+  statusEl.style.color = 'var(--ink2)'; statusEl.textContent = 'Envoi…';
   try {
-    const BATCH_SIZE = 499;
-    const ts = firebase.firestore.FieldValue.serverTimestamp();
-    for (let i = 0; i < targets.length; i += BATCH_SIZE) {
-      const batch = db.batch();
-      targets.slice(i, i + BATCH_SIZE).forEach(t => {
-        const ref = db.collection(t.col).doc(t.id).collection('notifications').doc();
-        batch.set(ref, { type: 'noova_message', message: msg, read: false, createdAt: ts });
-      });
-      await batch.commit();
-    }
-
-    await db.collection('broadcasts').add({
-      message: msg,
-      audience,
-      recipientCount: targets.length,
-      sentBy: auth.currentUser.email,
-      sentAt: ts
+    await db.collection('announcements').add({
+      title, message: msg, cta: audience === 'merchants' ? '' : cta, city, important: audience !== 'merchants' && important,
+      forUsers: audience !== 'merchants', forMerchants: audience !== 'users',
+      sentBy: auth.currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
-
-    document.getElementById('broadcast-msg').value = '';
+    ['broadcast-msg', 'ann-title'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('ann-cta').value = ''; document.getElementById('ann-important').checked = false;
     updateCharCount();
-    statusEl.style.color = 'var(--mint)';
-    statusEl.textContent = `Envoyé à ${targets.length} destinataires !`;
-    setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 5000);
-
-    // Rafraîchit l'historique
-    const hSnap = await db.collection('broadcasts').orderBy('sentAt','desc').limit(20).get();
-    _broadcastHistory = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderBroadcastHistory();
-    showToast(`Notification envoyée à ${targets.length} destinataires`, 'broadcast');
-  } catch(e) {
-    statusEl.textContent = 'Erreur : ' + e.message;
+    statusEl.style.color = 'var(--mint-text)';
+    statusEl.textContent = 'Annonce envoyée : elle arrive chez chacun dans la minute.';
+    setTimeout(() => { statusEl.textContent = ''; statusEl.style.color = 'var(--ink2)'; }, 6000);
+    setTimeout(loadBroadcastHistory, 4000);
+    showToast('Annonce envoyée', 'broadcast');
+  } catch (e) {
+    statusEl.style.color = 'var(--red-text)'; statusEl.textContent = 'Erreur : ' + e.message;
   }
+}
+async function loadBroadcastHistory() {
+  const [a, b] = await Promise.all([
+    db.collection('announcements').orderBy('createdAt', 'desc').limit(20).get().catch(() => ({ docs: [] })),
+    db.collection('broadcasts').orderBy('sentAt', 'desc').limit(20).get().catch(() => ({ docs: [] })),
+  ]);
+  _broadcastHistory = a.docs.map(d => ({ id: d.id, ...d.data(), sentAt: d.data().createdAt, ann: true }))
+    .concat(b.docs.map(d => ({ id: d.id, ...d.data() })))
+    .sort((x, y) => ((y.sentAt && y.sentAt.toMillis ? y.sentAt.toMillis() : 0) - (x.sentAt && x.sentAt.toMillis ? x.sentAt.toMillis() : 0))).slice(0, 20);
+  renderBroadcastHistory();
 }
 
 function renderBroadcastHistory() {
@@ -2133,8 +2154,8 @@ function renderBroadcastHistory() {
     return `<div class="act-row">
       <div class="act-av" style="background:var(--cd);color:var(--coral-text);display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg></div>
       <div class="act-info">
-        <div class="act-name" style="font-weight:600">${esc(b.message)}</div>
-        <div class="act-meta">${b.recipientCount||'?'} destinataires · par ${esc(b.sentBy||'admin')}</div>
+        <div class="act-name" style="font-weight:600">${b.title ? esc(b.title) + ' : ' : ''}${esc(b.message)}</div>
+        <div class="act-meta">${b.recipientCount != null ? b.recipientCount + ' destinataires' : 'envoi en cours'}${b.pushSent != null ? ', ' + b.pushSent + ' notifications téléphone' : ''}${b.important ? ', importante' : ''}${b.ann && b.city && b.city !== 'all' ? ', ' + esc(b.city) : ''}, par ${esc(b.sentBy || 'admin')}</div>
       </div>
       <div class="act-time">${ts}</div>
     </div>`;
