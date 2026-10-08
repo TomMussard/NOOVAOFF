@@ -9,7 +9,7 @@
  * Dans l'app, l'annonce s'affiche en carte en haut de l'accueil jusqu'à ce que l'habitant la ferme ; une annonce
  * marquée « importante » s'ouvre aussi en pop-up à la prochaine ouverture de l'app.
  */
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onDocumentCreated, onDocumentDeleted } = require("firebase-functions/v2/firestore");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const logger = require("firebase-functions/logger");
 
@@ -57,4 +57,34 @@ const onAnnouncementCreated = onDocumentCreated({ document: "announcements/{id}"
   logger.info("annonce envoyée", { id: event.params.id, ...r });
 });
 
-module.exports = { onAnnouncementCreated, _t: { fanOut } };
+// Annonce supprimée par l'admin : la ligne correspondante est retirée de la cloche de chacun, et une notification
+// encore en attente (annonce envoyée la nuit, départ à 9h) est annulée.
+async function cleanUp(id, a) {
+  const city = String(a.city || "all");
+  let n = 0;
+  for (const [coll, on] of [["users", a.forUsers], ["merchants", a.forMerchants]]) {
+    if (!on) continue;
+    let q = db().collection(coll);
+    if (city !== "all") q = q.where("city", "==", city);
+    const docs = (await q.get()).docs;
+    for (let i = 0; i < docs.length; i += 400) {
+      const b = db().batch();
+      docs.slice(i, i + 400).forEach((d) => {
+        b.delete(d.ref.collection("notifications").doc("ann_" + id));
+        // Envoyée la nuit et pas encore partie (file de 9h) : elle ne partira plus.
+        if (coll === "users") b.delete(db().collection("notifQueue").doc(`${d.id}_annonce_${id}`));
+      });
+      await b.commit();
+      n += Math.min(400, docs.length - i);
+    }
+  }
+  return n;
+}
+const onAnnouncementDeleted = onDocumentDeleted({ document: "announcements/{id}", region: "europe-west1", timeoutSeconds: 540, memory: "512MiB" }, async (event) => {
+  const a = event.data && event.data.data();
+  if (!a) return;
+  const n = await cleanUp(event.params.id, a);
+  logger.info("annonce supprimée", { id: event.params.id, cloches: n });
+});
+
+module.exports = { onAnnouncementCreated, onAnnouncementDeleted, _t: { fanOut, cleanUp } };

@@ -80,8 +80,37 @@ const commitAnn=async(t,o)=>{const id='a'+Math.random().toString(36).slice(2,10)
     await p.reload({waitUntil:'load'});await wf(p,()=>document.getElementById('home').classList.contains('active'),null,30000);await sleep(3500);
     const after=await p.evaluate(()=>({card:!!document.querySelector('#ann-card .ann-card'),pop:document.getElementById('nv-pop').style.display}));
     check('Rouverte : ni la carte fermée ni la pop-up déjà vue ne reviennent',!after.card&&after.pop!=='flex',after);
+    // Suppression par l'admin pendant que l'app est ouverte : la carte disparaît en direct, la cloche aussi.
+    const a3=await commitAnn(A,{title:'Annonce à retirer',message:'Erreur de date.',cta:'',city:'all',forUsers:true,forMerchants:false,important:false,sentBy:'x'});
+    await wf(p,()=>/Annonce à retirer/.test((document.getElementById('ann-card')||{}).textContent||''),null,15000);
+    await until(async()=>(await db.doc(`users/lm/notifications/ann_${a3}`).get()).exists);
+    check('Un habitant ne peut pas supprimer une annonce',(await fetch(`${FS}/announcements/${a3}`,{method:'DELETE',headers:H(U)})).status===403);
+    const del=await fetch(`${FS}/announcements/${a3}`,{method:'DELETE',headers:H(A)});
+    await wf(p,()=>!/Annonce à retirer/.test((document.getElementById('ann-card')||{}).textContent||''),null,10000).catch(()=>{});
+    check('Admin supprime : la carte disparaît de l\'accueil en direct',del.status===200&&await p.evaluate(()=>!/Annonce à retirer/.test(document.getElementById('ann-card').textContent)));
+    check('… et de la cloche de chacun',await until(async()=>!(await db.doc(`users/lm/notifications/ann_${a3}`).get()).exists&&!(await db.doc(`users/an/notifications/ann_${a3}`).get()).exists));
+    // Vue il y a plus de 3 jours : elle s'efface d'elle-même.
+    const a4=await commitAnn(A,{title:'Vue il y a longtemps',message:'…',cta:'',city:'all',forUsers:true,forMerchants:false,important:false,sentBy:'x'});
+    await wf(p,()=>/Vue il y a longtemps/.test((document.getElementById('ann-card')||{}).textContent||''),null,15000);
+    const seen=await p.evaluate(id=>JSON.parse(localStorage.getItem('nv_ann_seen')||'{}')[id]>0,a4);
+    await p.evaluate(id=>{const s=JSON.parse(localStorage.getItem('nv_ann_seen')||'{}');s[id]=Date.now()-4*86400000;localStorage.setItem('nv_ann_seen',JSON.stringify(s));renderAnnCard();},a4);
+    check('Vue pour la première fois il y a plus de 3 jours : la carte s\'efface toute seule',seen&&await p.evaluate(()=>!/Vue il y a longtemps/.test(document.getElementById('ann-card').textContent)));
     check('Réglages : « Annonces de NOOVA » peut être coupé',await p.evaluate(()=>NOTIF_GROUPS.some(g=>g.g==='noova')));
     check('Aucune erreur JavaScript',errs.length===0,errs);
+    await p.close();
+  });
+  await T('admin : bouton Supprimer',async()=>{
+    const a5=await commitAnn(A,{title:'Test suppression admin',message:'x',cta:'',city:'all',forUsers:true,forMerchants:false,important:false,sentBy:'tomussproduction@gmail.com'});
+    await until(async()=>(await db.doc('announcements/'+a5).get()).data().recipientCount!=null);
+    const p=await browser.newPage();await p.setViewport({width:1280,height:900});p.on('dialog',d=>d.accept());
+    await p.goto('http://localhost:8950/admin.html',{waitUntil:'load'});await sleep(1200);
+    await p.evaluate(async()=>{await auth.signInWithEmailAndPassword('tomussproduction@gmail.com','secret123');});
+    await wf(p,()=>document.getElementById('main').style.display==='block',null,20000);
+    await p.evaluate(()=>{const b=[...document.querySelectorAll('.tab-btn-main')].find(x=>(x.getAttribute('onclick')||'').includes("'diffusion'"));switchTab('diffusion',b);});
+    await wf(p,()=>/Test suppression admin/.test(document.getElementById('broadcast-history').textContent),null,15000);
+    await p.evaluate(()=>{const row=[...document.querySelectorAll('#broadcast-history .act-row')].find(r=>/Test suppression admin/.test(r.textContent));row.querySelector('button.btn-reject').click();});
+    await wf(p,()=>!/Test suppression admin/.test(document.getElementById('broadcast-history').textContent),null,15000).catch(()=>{});
+    check('Admin : « Supprimer » sur une annonce de l\'historique la supprime',!(await db.doc('announcements/'+a5).get()).exists&&await p.evaluate(()=>!/Test suppression admin/.test(document.getElementById('broadcast-history').textContent)));
     await p.close();
   });
   await browser.close();
