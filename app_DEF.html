@@ -757,7 +757,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .rwl-empty{padding:var(--s4);background:var(--surface);border:1px dashed var(--text-3);border-radius:var(--r-md);font-size:var(--fs-2);color:var(--text-2);line-height:1.5}
 .rw-all{margin:var(--s4) 18px var(--s5)}
 /* Accueil façon fil : onglets en haut (soulignés, comme X), puis une carte par question non répondue */
-.hm-tabs{position:sticky;top:0;z-index:6;display:flex;background:var(--bg);border-bottom:1px solid var(--trait);margin:calc(-1 * var(--s5)) 0 var(--s4)}
+.hm-tabs{position:sticky;top:0;z-index:6;display:flex;padding:0 var(--s2);background:var(--bg);border-bottom:1px solid var(--trait);margin:calc(-1 * var(--s5)) 0 var(--s4)}
 #ann-card:not(:empty)+.hm-tabs{margin-top:0}
 .hm-tab{flex:1;position:relative;min-height:48px;padding:0 var(--s2);background:none;border:none;font-family:var(--font);font-weight:700;font-size:var(--fs-3);color:var(--text-2);cursor:pointer}
 .hm-tab.on{color:var(--text)}
@@ -6240,7 +6240,7 @@ function finishAuthTransition() {
 
 // ─── Mini-didacticiel de première connexion : info-bulles sur l'accueil ────
 const HOME_TOUR_STEPS=[
-  {sel:'.hm-tabs', txt:'Toutes tes questions sont ici : celles des commerces, et à côté celles de NOOVA. Touche une carte pour répondre en quelques secondes.'},
+  {sel:'#hm-tab-q', txt:'Toutes tes questions sont ici, et celles de NOOVA dans l\'onglet d\'à côté. Touche une carte pour répondre en quelques secondes.'},
   {sel:'.dh-streak', txt:'Ta série : réponds à 3 questions par jour pour la faire grandir. Se connecter ne suffit pas.'},
   {sel:'#nav-rewards-tab', txt:'Échange tes points contre de vraies récompenses chez les commerces du quartier.'},
   {sel:'#nav-social', txt:'Défie tes amis et grimpe dans le classement de la semaine.'}
@@ -6288,7 +6288,10 @@ function makeTour(cfg){
     document.body.appendChild(ov);
     return ov;
   }
-  const rectOf=()=>{ const r=target.getBoundingClientRect(); return {x:r.left-PAD,y:r.top-PAD,w:r.width+PAD*2,h:r.height+PAD*2}; };
+  // Halo autour de la cible, toujours dans l'écran (une cible collée au bord ne déborde pas).
+  const rectOf=()=>{ const r=target.getBoundingClientRect(),W=innerWidth,H=innerHeight;
+    const x=Math.max(0,r.left-PAD),y=Math.max(0,r.top-PAD),x2=Math.min(W,r.right+PAD),y2=Math.min(H,r.bottom+PAD);
+    return {x,y,w:Math.max(0,x2-x),h:Math.max(0,y2-y)}; };
   function draw(c){
     const ov=$ov(); if(!ov||!target) return;
     const W=innerWidth, H=innerHeight, r=Math.max(0,Math.min(cfg.radius||16,c.w/2,c.h/2));

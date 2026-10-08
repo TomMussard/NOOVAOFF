@@ -65,20 +65,22 @@ const login=async(p,email)=>{await p.goto(APP,{waitUntil:'load'});await wf(p,()=
   });
 
   await T('prochaines récompenses',async()=>{
-    const d=await p.evaluate(()=>{const cards=[...document.querySelectorAll('#dpat-wrap .dpat-mini')].map(c=>{const r=c.getBoundingClientRect();return {t:Math.round(r.top),h:Math.round(r.height),l:Math.round(r.left),w:Math.round(r.width),txt:c.innerText.replace(/\s+/g,' ')};});return {cards,hdr:document.querySelector('#dpat-wrap .dsec-h').textContent,old:!!document.querySelector('#dpat-wrap .dpat-card')};});
-    check('« Ta prochaine récompense » : deux petites cartes côte à côte (même hauteur, 2 colonnes), les plus proches d\'abord (150 pts puis 300 pts)',d.cards.length===2&&d.cards[0].t===d.cards[1].t&&d.cards[0].l<d.cards[1].l&&d.cards[0].w<200&&/Café offert/.test(d.cards[0].txt)&&/encore 30 pts/.test(d.cards[0].txt)&&/Viennoiserie/.test(d.cards[1].txt)&&/encore 180 pts/.test(d.cards[1].txt),d);
-    check('… nettement plus petites qu\'avant (moins de 110 px de haut, plus de grande carte photo)',d.cards.every(c=>c.h<110)&&!d.old,d.cards.map(c=>c.h));
-    await p.evaluate(()=>document.querySelector('#dpat-wrap .dpat-mini').click());await sleep(700);
-    check('Toucher une carte ouvre l\'écran Cadeaux',await p.evaluate(()=>document.getElementById('rewards-tab').classList.contains('active')));
+    // L'accueil n'affiche plus « Ta prochaine récompense » (trop d'informations) : c'est la page Récompenses qui la montre.
+    check('Accueil : plus de bloc « Ta prochaine récompense »',await p.evaluate(()=>!/prochaine récompense/i.test(document.getElementById('home').innerText)));
+    await p.evaluate(()=>goNav('rewards-tab'));await sleep(900);
+    const soon=await p.evaluate(()=>[...document.querySelectorAll('#rw-soon .rwr')].map(c=>c.innerText.replace(/\s+/g,' ')));
+    check('Récompenses, « Bientôt à ta portée » : la plus proche d\'abord (Café offert, encore 30 pts), une barre au lieu d\'un pourcentage',/Café offert/.test(soon[0]||'')&&/encore 30 pts/.test(soon[0]||'')&&!/%/.test(soon[0]||''),soon);
   });
 
   await T('écran Cadeaux',async()=>{
     await sleep(600);
     const w=await p.evaluate(()=>{const top=id=>{const e=document.getElementById(id)||document.querySelector(id);return e?Math.round(e.getBoundingClientRect().top+document.getElementById('rewards-tab').scrollTop):-1;};
       return {pts:top('.wpts-card'),cur:top('#dprog-count'),feat:top('#reward-featured-wrap'),noov:top('.noov-card'),xp:top('#tier-track-wrap'),len:document.getElementById('rewards-tab').innerText.length,txt:document.getElementById('rewards-tab').innerText.replace(/\s+/g,' '),ptsN:document.getElementById('wc-pts-num-hdr').textContent,tiles:document.querySelectorAll('#noov-rewards .noov-tile').length,longp:[...document.querySelectorAll('#rewards-tab p, #rewards-tab .noov-d, #rewards-tab .ns-d')].length};});
-    check('Ordre : 1) points, 2) récompenses en cours, 3) NOOVS, 4) XP',w.pts>=0&&w.pts<w.cur&&w.cur<w.noov&&w.noov<w.xp,w);
-    check('Le solde de points est en grand (120), les NOOVS (12) ont leur pièce',w.ptsN==='120'&&/12 NOOVS/.test(w.txt),w.ptsN);
-    check('Beaucoup moins de texte : plus de paragraphe explicatif, 3 pastilles « Bientôt » d\'un mot (plus d\'échange contre de l\'argent), moins de 450 caractères en tout',w.longp===0&&w.tiles===3&&w.len<450,{len:w.len,txt:w.txt});
+    const w2=await p.evaluate(()=>{const top=sel=>{const e=document.querySelector(sel);return e&&!e.closest('[hidden]')?Math.round(e.getBoundingClientRect().top+document.getElementById('rewards-tab').scrollTop):-1;};
+      return {pts:top('.wpts-card'),noov:top('.rw-noov'),can:top('#rw-can'),soon:top('#rw-soon'),xp:top('#tier-track-wrap'),txt:document.getElementById('rewards-tab').innerText.replace(/\s+/g,' ')};});
+    check('Ordre : 1) points (NOOVS juste dessous), 2) « Tu peux t\'offrir », 3) « Bientôt à ta portée » ; plus de palier ici',w2.pts>=0&&w2.pts<w2.noov&&w2.noov<w2.can&&w2.can<w2.soon&&w2.xp===-1,w2);
+    check('Le solde de points est en grand (120), les NOOVS (12) sur une ligne',w.ptsN==='120'&&/12 NOOVS/.test(w2.txt),w.ptsN);
+    check('Peu de texte : pas de paragraphe explicatif, plus de pastilles « Bientôt », moins de 650 caractères en tout',w.longp===0&&!/Sans pub|Concours/.test(w.txt)&&w.len<650,{len:w.len,txt:w.txt});
     await p.evaluate(()=>{NV_ASSETS.points='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="red"/></svg>';refreshWallet();});
     check('Icône des points personnalisable (NV_ASSETS.points → image)',await p.evaluate(()=>!!document.querySelector('#wpts-ico img')));
     await p.evaluate(()=>{NV_ASSETS.points='';refreshWallet();});await sleep(300);

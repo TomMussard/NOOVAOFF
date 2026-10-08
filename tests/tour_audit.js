@@ -106,13 +106,13 @@ const verdict=(name,i)=>{
   const ctx3=await browser.createBrowserContext();const r=await ctx3.newPage();PG=r;await r.setViewport({width:390,height:700,isMobile:true,hasTouch:true,deviceScaleFactor:2});
   await r.goto(APP,{waitUntil:'load'});await wf(r,()=>document.getElementById('onboard').classList.contains('active'),null,30000);
   await r.evaluate(()=>{                                                        // contenu tardif : une grande bannière qui pousse la suite vers le bas
-    const t=document.getElementById('today-card');const sp=document.createElement('div');sp.id='test-spacer';sp.style.cssText='height:0';t.parentNode.insertBefore(sp,t);
+    const t=document.querySelector('.hm-tabs');const sp=document.createElement('div');sp.id='test-spacer';sp.style.cssText='height:0';t.parentNode.insertBefore(sp,t);
   }).catch(()=>{});
   await r.evaluate(()=>showAuthWall('login'));await setVal(r,'#aw-email','me@t.fr');await setVal(r,'#aw-pass','secret123');await r.evaluate(()=>awSubmit());
   await wf(r,()=>document.getElementById('home-tour')&&document.getElementById('home-tour').classList.contains('show'),null,30000);
   await sleep(900);
   let i0=await stepInfo(r,'app');
-  await r.evaluate(()=>{const t=document.getElementById('today-card');const sp=document.createElement('div');sp.style.cssText='height:140px';t.parentNode.insertBefore(sp,t);});   // la page bouge APRÈS l'affichage du halo
+  await r.evaluate(()=>{const t=document.querySelector('.hm-tabs');const sp=document.createElement('div');sp.style.cssText='height:140px';t.parentNode.insertBefore(sp,t);});   // la page bouge APRÈS l'affichage du halo
   await sleep(900);
   let i1=await stepInfo(r,'app');
   check('La page se décale après coup (+140 px) : le halo suit la cible',near(i1.spot.t+8,i1.target.t)&&i1.target.t>i0.target.t+100,{avant:i0.target,apres:i1.target,spot:i1.spot});
