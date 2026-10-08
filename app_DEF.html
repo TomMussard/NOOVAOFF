@@ -792,19 +792,31 @@ button.soc-bell{padding:0;font-family:var(--font)}
 .ib-new .fi-av{width:52px;height:52px;border:1px solid var(--text-3)}
 .ib-empty{padding:var(--s5) var(--s4);text-align:center;color:var(--text-2);font-size:var(--fs-2);line-height:1.5}
 .bell-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--coral);border:2px solid var(--card);display:none}
-.notif-panel{position:fixed;top:60px;right:16px;width:min(320px,calc(100vw - 32px));max-height:420px;background:var(--surface);border:none;border-radius:var(--r-card);overflow-y:auto;z-index:9000;display:none}
+.notif-panel{position:fixed;top:60px;right:16px;width:min(340px,calc(100vw - 32px));max-height:min(70vh,560px);background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-card);overflow-y:auto;z-index:9000;display:none}
 .notif-panel.open{display:block}
-.notif-hdr{padding:14px 16px 10px;font-family:var(--fd);font-weight:800;font-size:var(--fs-3);color:var(--ink);border-bottom:1.5px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-.notif-close{font-size:var(--fs-4);color:var(--ink3);cursor:pointer;line-height:1}
-.notif-item{padding:12px 16px;border-bottom:1px solid var(--bg2);display:flex;flex-direction:column;gap:5px}
-.notif-item.unread{background:color-mix(in srgb,var(--amber) 8%,var(--card))}
-.notif-txt{font-size:var(--fs-2);color:var(--ink);line-height:1.4}
-.notif-meta{font-size:var(--fs-1);color:var(--ink3)}
-.notif-done{font-size:var(--fs-1);color:var(--ink3);font-style:italic}
-.notif-actions{display:flex;gap:7px;margin-top:4px}
-.notif-btn{padding:7px 16px;border-radius:var(--r-sm);font-size:var(--fs-2);font-weight:700;border:none;cursor:pointer;font-family:var(--fb)}
-.notif-btn.accept{background:var(--grad);color:var(--gi)}
-.notif-btn.decline{background:var(--bg2);color:var(--ink2)}
+.notif-hdr{position:sticky;top:0;z-index:1;background:var(--surface);padding:var(--s2) var(--s2) var(--s2) var(--s4);font-family:var(--fd);font-weight:800;font-size:var(--fs-4);color:var(--ink);border-bottom:1px solid var(--trait);display:flex;align-items:center;gap:var(--s2)}
+.notif-hdr>span{flex:1}
+.notif-all{min-height:var(--tactile-min);padding:0 var(--s2);background:none;border:none;color:var(--ink);font-family:var(--fb);font-size:var(--fs-2);font-weight:700;text-decoration:underline;cursor:pointer}
+.notif-close{width:var(--tactile-min);height:var(--tactile-min);display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--ink);cursor:pointer;border-radius:var(--r-sm)}
+.notif-close svg{width:18px;height:18px}
+.notif-item{position:relative;display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) var(--s5) var(--s3) var(--s4);border-bottom:1px solid var(--trait)}
+.notif-item:last-child{border-bottom:none}
+.notif-item.unread{background:var(--surface-2)}
+.notif-item.unread::after{content:'';position:absolute;top:calc(var(--s3) + 6px);right:var(--s3);width:8px;height:8px;border-radius:var(--r-pill);background:var(--ink)}
+.notif-ic{width:36px;height:36px;flex-shrink:0;border-radius:var(--r-sm);background:var(--jaune-faible);border:1px solid var(--trait);color:var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.notif-ic svg{width:18px;height:18px}
+.notif-ic img{width:36px;height:36px;display:block}
+.notif-body{flex:1;min-width:0}
+.notif-t{font-size:var(--fs-2);font-weight:700;color:var(--ink);line-height:1.35}
+.notif-txt{font-size:var(--fs-2);color:var(--ink2);line-height:1.45;margin-top:2px;overflow-wrap:anywhere}
+.notif-meta{font-size:var(--fs-1);color:var(--ink2);margin-top:var(--s1);font-variant-numeric:tabular-nums}
+.notif-done{font-size:var(--fs-1);color:var(--ink2);margin-top:var(--s1)}
+.notif-actions{display:flex;gap:var(--s2);margin-top:var(--s2)}
+.notif-btn{min-height:40px;padding:0 var(--s4);border-radius:var(--r-sm);font-size:var(--fs-2);font-weight:700;cursor:pointer;font-family:var(--fb)}
+.notif-btn.accept{background:var(--jaune);color:var(--jaune-ink);border:1px solid var(--jaune)}
+.notif-btn.decline{background:transparent;color:var(--ink);border:1px solid var(--ink2)}
+.notif-empty{padding:var(--s6) var(--s4);text-align:center;color:var(--ink2);font-size:var(--fs-2);line-height:1.5}
+.notif-foot{padding:var(--s3) var(--s4);text-align:center;color:var(--ink2);font-size:var(--fs-1)}
 .tab-bar{display:flex;margin:0 18px 16px;background:var(--bg2);border-radius:var(--r-pill);padding:4px;gap:2px}
 .tab-btn{flex:1;padding:9px 4px;border-radius:var(--r-pill);font-size:var(--fs-2);font-weight:700;text-align:center;cursor:pointer;color:var(--muted);transition:all .16s;background:none;border:none;font-family:var(--fb)}
 .tab-btn.on{background:var(--jaune);color:var(--jaune-ink);font-weight:700;}
@@ -1749,8 +1761,8 @@ button.soc-bell{padding:0;font-family:var(--font)}
       </div>
     </div>
     <div class="notif-panel" id="notif-panel">
-      <div class="notif-hdr"><span>Notifications</span><span class="notif-close" onclick="closeNotifPanel()">✕</span></div>
-      <div id="notif-list"><div style="text-align:center;padding:32px 16px;color:var(--ink2);font-size:var(--fs-2)">Aucune notification</div></div>
+      <div class="notif-hdr"><span>Notifications</span><button type="button" class="notif-all" id="notif-all" onclick="markAllNotifsRead()">Tout lire</button><button type="button" class="notif-close" aria-label="Fermer les notifications" onclick="closeNotifPanel()"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div id="notif-list"><div class="notif-empty">Aucune notification</div></div>
     </div>
     <div class="tab-bar">
       <button class="tab-btn on" onclick="socTab('feed',this)">Feed</button>
@@ -3744,39 +3756,49 @@ function fmtNotifTime(ts){
   return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
 }
 
+// Une ligne par notification : icône à gauche, titre en gras, texte, heure. Seules restent visibles les notifications
+// non lues et celles des 7 derniers jours (pas tout l'historique).
+const NOTIF_DAYS=7;
+const NI={
+  friends:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18.5 13.8c1.8.9 3 2.8 3 5"/></svg>',
+  check:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+  bell:'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg>',
+  noova:'<img src="favicon.svg" alt="">'
+};
+function visibleNotifs(){
+  const min=Date.now()-NOTIF_DAYS*86400000,seen=new Set();
+  return (_notifs||[]).filter(n=>{const k=(n.type==='friend_request'||n.type==='friend_accepted')?n.type+'|'+n.fromUid:n.id;return !seen.has(k)&&seen.add(k);})
+    .filter(n=>!n.read||_tsMs(n.createdAt)>min||!_tsMs(n.createdAt));
+}
 function renderNotifications(){
   const el=document.getElementById('notif-list');
   if(!el)return;
-  if(!_notifs.length){
-    el.innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--ink2);font-size:var(--fs-2)">Aucune notification</div>';
-    return;
-  }
-  el.innerHTML='';
-  const _seenN=new Set();
-  _notifs.filter(n=>{const k=(n.type==='friend_request'||n.type==='friend_accepted')?n.type+'|'+n.fromUid:n.id;return !_seenN.has(k)&&_seenN.add(k);}).forEach(n=>{
-    const d=document.createElement('div');
-    d.className='notif-item'+(n.read?'':' unread');
+  const list=visibleNotifs(),hidden=(_notifs||[]).length-list.length;
+  const all=document.getElementById('notif-all');if(all)all.style.display=list.some(n=>!n.read&&n.type!=='friend_request')?'':'none';
+  if(!list.length){el.innerHTML='<div class="notif-empty">Rien de nouveau pour l\'instant.</div>';return;}
+  el.innerHTML=list.map(n=>{
     const ts=fmtNotifTime(n.createdAt);
-    let inner='';
+    let ic=NI.bell,t='',body='',extra='';
     if(n.type==='friend_request'){
-      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15 14.3c2.4.3 4 2 4 4.7"/></svg> <strong>${esc(n.fromName)}</strong> veut être ton ami !</div>
-        <div class="notif-meta">${ts}</div>
-        ${!n.read?`<div class="notif-actions">
-          <button class="notif-btn accept" onclick="acceptFriendRequest(${jsa(n.id)},${jsa(n.fromUid)},${jsa(n.fromName)})">Accepter</button>
-          <button class="notif-btn decline" onclick="declineFriendRequest(${jsa(n.id)})">Refuser</button>
-        </div>`:'<div class="notif-done">Traitée</div>'}`;
+      ic=NI.friends;t=esc(n.fromName||'Quelqu\'un')+' veut être ton ami';
+      extra=!n.read?`<div class="notif-actions"><button class="notif-btn accept" onclick="acceptFriendRequest(${jsa(n.id)},${jsa(n.fromUid)},${jsa(n.fromName)})">Accepter</button><button class="notif-btn decline" onclick="declineFriendRequest(${jsa(n.id)})">Refuser</button></div>`:'<div class="notif-done">Traitée</div>';
     }else if(n.type==='friend_accepted'){
-      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> <strong>${esc(n.fromName)}</strong> a accepté ta demande d'ami !</div>
-        <div class="notif-meta">${ts}</div>`;
+      ic=NI.check;t=esc(n.fromName||'Ton ami')+' a accepté ta demande';body='Vous êtes amis : écris-lui ou compare vos réponses.';
     }else if(n.type==='noova_message'){
-      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> <strong>NOOVA</strong> ${n.title?'<strong>'+esc(n.title)+'</strong> : ':''}${esc(n.message||'')}</div>
-        <div class="notif-meta">${ts}</div>`;
+      ic=NI.noova;t=n.title?esc(n.title):'NOOVA';body=esc(n.message||'');
     }else{
-      inner=`<div class="notif-txt">${esc(n.message||'Notification')}</div><div class="notif-meta">${ts}</div>`;
+      t=esc(n.title||'NOOVA');body=esc(n.message||'Notification');
     }
-    d.innerHTML=inner;
-    el.appendChild(d);
-  });
+    return `<div class="notif-item${n.read?'':' unread'}"><span class="notif-ic">${ic}</span><div class="notif-body"><div class="notif-t">${t}</div>${body?`<div class="notif-txt">${body}</div>`:''}<div class="notif-meta">${ts}</div>${extra}</div></div>`;
+  }).join('')+(hidden>0?`<div class="notif-foot">Les notifications lues de plus de ${NOTIF_DAYS} jours ne sont plus affichées.</div>`:'');
+}
+// « Tout lire » : sauf les demandes d'ami (elles attendent une réponse).
+async function markAllNotifsRead(){
+  const me=auth.currentUser&&auth.currentUser.uid;if(!me)return;
+  const todo=(_notifs||[]).filter(n=>!n.read&&n.type!=='friend_request');
+  if(!todo.length)return;
+  const b=db.batch();todo.slice(0,450).forEach(n=>b.update(db.collection('users').doc(me).collection('notifications').doc(n.id),{read:true}));
+  try{await b.commit();}catch(e){console.warn('markAllNotifsRead:',e);}
 }
 
 const _friendBusy=new Set();
