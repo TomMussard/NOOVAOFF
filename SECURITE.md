@@ -59,7 +59,13 @@ Un testeur a eu accès à l'ensemble des données. La cause la plus probable est
   chaque champ lisible est fouillé (e-mail, téléphone, adresse, nom de famille, date de naissance, SIRET, jetons).
   Aucune donnée personnelle ne doit sortir. Une collection ajoutée plus tard est balayée automatiquement.
 
-### 2.7 Réglages à faire dans les consoles (hors du code)
+- `tests/prod_probe.js` : le même test d'attaque sur la **vraie** base (compte jetable créé puis supprimé, aucune
+  donnée personnelle affichée). **8 octobre 2026 : aucune donnée personnelle accessible** — sans compte : rien de
+  lisible ; habitant connecté au Mans : classement (prénom + initiale, 9 habitants) et vitrines des commerces
+  (sans e-mail, téléphone ni SIRET ; vitrine NOOVA sans adresse) ; fiches des habitants et des commerçants, réponses,
+  messages, notifications : refusés. Mot de passe fort exigé à l'inscription.
+
+### 2.7 Réglages à faire dans les consoles (hors du code) — faits le 8 octobre 2026
 - Firebase Console → Authentication → Paramètres → **Protection contre l'énumération des e-mails** : activée
   (sinon on peut demander à Firebase si une adresse a un compte).
 - **Validation en deux étapes** sur les comptes Google des administrateurs (ceux de `ADMIN_EMAILS`) et sur les
