@@ -61,10 +61,10 @@ const msg=(chat,id,from,text,ms,o={})=>db.doc(`chats/${chat}/messages/${id}`).se
     await p.evaluate(()=>showAuthWall('login'));await setVal(p,'#aw-email','ana@t.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());
     await wf(p,()=>document.getElementById('home').classList.contains('active')&&S._chats&&S._chats.length===3,null,30000);
     await p.evaluate(()=>goNav('social'));await sleep(500);
-    const hdr=await p.evaluate(()=>{const m=document.getElementById('soc-msg'),b=document.getElementById('soc-bell');return {side:!!m&&!!b&&m.parentElement===b.parentElement,badge:getComputedStyle(document.getElementById('msg-badge')).display!=='none'?document.getElementById('msg-badge').textContent:'',label:m.getAttribute('aria-label')};});
-    check('Icône Messages à côté des notifications, avec le nombre de conversations non lues (Ben et Dan)',hdr.side&&hdr.badge==='2'&&/2 non lus/.test(hdr.label),hdr);
+    const hdr=await p.evaluate(()=>{const m=document.getElementById('nav-inbox'),pr=document.getElementById('nav-profile');return {side:!!m&&!!pr&&m.nextElementSibling===pr&&m.closest('#bnav')!==null,badge:getComputedStyle(document.getElementById('msg-badge')).display!=='none'?document.getElementById('msg-badge').textContent:'',label:m.getAttribute('aria-label')};});
+    check('Messages dans la barre du bas, juste avant Profil, avec le nombre de conversations non lues (Ben et Dan)',hdr.side&&hdr.badge==='2'&&/2 non lus/.test(hdr.label),hdr);
     if(process.env.SHOTS_DIR)await p.screenshot({path:process.env.SHOTS_DIR+'/inbox_hdr.png'}).catch(()=>{});
-    await p.evaluate(()=>document.getElementById('soc-msg').click());
+    await p.click('#nav-inbox');
     await wf(p,()=>cur==='inbox'&&document.querySelectorAll('#inbox-list .ib-row').length===3,null,10000);
     const rows=await p.evaluate(()=>[...document.querySelectorAll('#inbox-list .ib-row')].map(r=>({n:r.querySelector('.ib-name').textContent,t:r.querySelector('.ib-time').textContent,l:r.querySelector('.ib-last').textContent,u:r.classList.contains('unread')})));
     if(process.env.SHOTS_DIR){await sleep(700);await p.screenshot({path:process.env.SHOTS_DIR+'/inbox.png'}).catch(()=>{});}
