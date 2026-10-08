@@ -475,7 +475,7 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     check('Réglages : « Mes récompenses » couvre récompense débloquée ET code', a.reason === 'pref_off' && b.reason === 'pref_off', [a, b]);
     let e = null; try { await N.setPref('u', 'inconnu', true); } catch (x) { e = x.code; }
     check('Réglages : groupe inconnu refusé', e === 'invalid-argument', e);
-    check('Réglages : 8 interrupteurs, un par famille (pas de global)', Object.keys(N.GROUPS).length === 8 && Object.keys(N.GROUPS).join() === 'question,commerces,resultats,serie,recompenses,amis,messages,actualites');
+    check('Réglages : 9 interrupteurs, un par famille (pas de global)', Object.keys(N.GROUPS).length === 9 && Object.keys(N.GROUPS).join() === 'question,commerces,resultats,serie,recompenses,amis,messages,actualites,noova');
   });
   await T('tokens', async () => {
     await wipe();

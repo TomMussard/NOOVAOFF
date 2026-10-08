@@ -107,7 +107,7 @@ const settle=async()=>{await sleep(4500);for(const c of ['_pushSink','notifLog',
     await until(async()=>(await db.collection('notifQueue').get()).size>=1);
     const q=await db.collection('notifQueue').get();
     check('Heures de silence : reportée au lendemain 9h (notifQueue), pas envoyée',q.docs.some(d=>d.id==='u1_impact_post_pF')&&(await sink('u1')).length===3,q.docs.map(d=>d.id));
-    check('Type « impact » rattaché au groupe « actualites » (8 réglages avec « Messages privés »)',N.TYPES.impact.group==='actualites'&&N.GROUPS.actualites.includes('impact')&&Object.keys(N.GROUPS).length===8);
+    check('Type « impact » rattaché au groupe « actualites » (9 réglages, avec « Messages privés » et « Annonces de NOOVA »)',N.TYPES.impact.group==='actualites'&&N.GROUPS.actualites.includes('impact')&&Object.keys(N.GROUPS).length===9);
     // — plafond 3 notifications « normales »/jour entre types —
     await db.doc('merchants/m1').update({lastImpactNotifyAt:admin.firestore.FieldValue.delete()});   // isole le plafond quotidien du plafond commerce
     await db.doc('users/u1').update({notifDaily:{date:'2026-11-30',count:3}});
@@ -257,7 +257,7 @@ const settle=async()=>{await sleep(4500);for(const c of ['_pushSink','notifLog',
     check('Habitant : l\'actualité refusée / en attente n\'apparaît pas',!feed.posts.some(t=>/petit-déjeuner|baguettes/.test(t)),feed.posts);
     await up.evaluate(()=>{goNav('profile');refreshProfile();document.getElementById('notif-section').classList.add('open');});await sleep(500);
     const sw=await up.evaluate(()=>[...document.querySelectorAll('#notif-switches .nf-t')].map(e=>e.textContent));
-    check('Réglages : 8 interrupteurs, le dernier « Actualités des commerces »',sw.length===8&&sw[7]==='Actualités des commerces',sw);
+    check('Réglages : 9 interrupteurs, le dernier « Actualités et rendez-vous »',sw.length===9&&sw[8]==='Actualités et rendez-vous',sw);
     await browser.close();
     console.log('JS errors:',[...new Set(errs)].join(' | ')||'aucune');
   });

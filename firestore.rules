@@ -501,6 +501,22 @@ service cloud.firestore {
 
     // ─── Broadcasts ──────────────────────────────────────────────────────────
     // Historique des notifications diffusées par l'admin
+    // ─── Annonces de NOOVA (onglet Diffusion) ─────────────────────────────────
+    // Créées par l'admin ; envoyées (cloche + téléphone) par le serveur (functions/announcements.js). Un habitant lit
+    // celles qui le visent : toutes les villes, ou la sienne.
+    match /announcements/{id} {
+      allow read: if isAdmin() || (isAuth() && resource.data.forUsers == true &&
+        (resource.data.city == 'all' || resource.data.city == myCity()));
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasOnly(['title', 'message', 'cta', 'city', 'forUsers', 'forMerchants', 'important', 'createdAt', 'sentBy']) &&
+        request.resource.data.message is string && request.resource.data.message.size() > 0 && request.resource.data.message.size() <= 240 &&
+        shortStr(request.resource.data, 'title', 60) && request.resource.data.city is string &&
+        request.resource.data.cta in ['', 'questions', 'rewards', 'invite', 'friends'] &&
+        request.resource.data.forUsers is bool && request.resource.data.forMerchants is bool && request.resource.data.important is bool &&
+        request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+
     match /broadcasts/{id} {
       allow read, create: if isAdmin();
       allow update, delete: if false;

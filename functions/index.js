@@ -34,6 +34,7 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./testMonth")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./publicProfiles")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./autoZones")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./social")));
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./announcements")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./adminStats")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./adminAlerts")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./mailer")));

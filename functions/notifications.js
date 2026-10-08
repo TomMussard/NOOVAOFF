@@ -71,6 +71,9 @@ const TYPES = {
   message:              { group: "messages",    nudge: false, ownCap: 150, bucket: "msg", noDecay: true, quietOk: true },
   // Quelqu'un a aimé ou commenté une publication de l'habitant dans le fil : 8 par jour, à part ; la nuit, à 9h.
   reaction:             { group: "amis",        nudge: false, ownCap: 8, bucket: "social", deferQuiet: true, ttlH: 12 },
+  // Annonce de NOOVA (onglet Diffusion de l'admin) : rare, compteur à part (3 par jour au plus), jamais ralentie ;
+  // la nuit, elle part à 9h. L'habitant peut couper « Annonces de NOOVA » dans son profil.
+  annonce:              { group: "noova",       nudge: false, ownCap: 3, bucket: "noova", noDecay: true, deferQuiet: true, ttlH: 24 },
   // « Ton avis a compté » : issu de l'action de l'habitant (il a répondu), donc pas une relance.
   impact:               { group: "actualites",  nudge: false, deferQuiet: true, ttlH: 48 },
 };
@@ -83,6 +86,7 @@ const GROUPS = {
   amis: ["ami", "reaction"],
   messages: ["message"],
   actualites: ["impact", "rendez_vous"],
+  noova: ["annonce"],
 };
 const INTERESTS = require("./interests");
 const CAT_KEYS = INTERESTS.KEYS;   // interests.js : la même liste que l'app et le dashboard

@@ -739,6 +739,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .soc-title{font-family:var(--fd);font-weight:800;font-size:var(--fs-6);letter-spacing:var(--lettrage-titre);color:var(--blanc)}
 .soc-bell{width:40px;height:40px;border-radius:var(--r-btn);background:var(--surface);color:var(--ink);border:none;display:flex;align-items:center;justify-content:center;font-size:var(--fs-4);cursor:pointer;position:relative}
 .soc-acts{display:flex;gap:var(--s2)}
+/* Annonce de NOOVA : bandeau de marque en haut de l'accueil, jusqu'à ce que l'habitant le ferme */
+.ann-card{position:relative;margin:0 22px 14px;padding:var(--s4) var(--s4) var(--s4);background:var(--bandeau);color:var(--bandeau-texte);border:1px solid var(--jaune);border-radius:var(--r-lg)}
+.ann-hd{display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3);padding-right:var(--s6)}
+.ann-hd img{width:28px;height:28px;border-radius:var(--r-sm);flex-shrink:0}
+.ann-lbl{font:var(--t-label);color:var(--jaune)}
+.ann-date{font-size:var(--fs-1);color:var(--bandeau-texte);opacity:.75;margin-left:auto;font-variant-numeric:tabular-nums}
+.ann-t{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-5);line-height:1.2;letter-spacing:var(--lettrage-titre);margin-bottom:var(--s1)}
+.ann-m{font-size:var(--fs-3);line-height:1.55;white-space:pre-line}
+.ann-cta{margin-top:var(--s3);min-height:var(--tactile-min);padding:0 var(--s4);background:transparent;color:var(--jaune);border:1px solid var(--jaune);border-radius:var(--r-sm);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);cursor:pointer}
+.ann-x{position:absolute;top:var(--s1);right:var(--s1);width:var(--tactile-min);height:var(--tactile-min);display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--bandeau-texte);cursor:pointer;border-radius:var(--r-sm)}
+.ann-x svg{width:18px;height:18px}
 /* Pop-ups centrées : voile sombre, carte au centre, bouton fermer ; l'app dessous ne réagit plus (inert) */
 .nv-modal{position:fixed;inset:0;z-index:10040;background:var(--voile);display:none;align-items:center;justify-content:center;padding:var(--s5) var(--s4);overflow-y:auto}
 .nv-modal-card{position:relative;width:100%;max-width:360px;max-height:100%;overflow-y:auto;background:var(--surface);color:var(--text);border:1px solid var(--trait);border-radius:var(--r-md);padding:var(--s6) var(--s5) var(--s5)}
@@ -1621,6 +1632,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
       <div class="dh-streak hdr-streak-wrap-el" id="hdr-streak" role="img" aria-label="Série de 0 jour. Réponds à 3 questions par jour pour la faire grandir."><span class="dh-flame hdr-flame-el" id="hdr-flame"></span><span class="hdr-streak-n-el" id="home-streak">0</span></div>
       <button class="dh-pts hdr-pts-wrap-el" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
     </div>
+    <div id="ann-card"></div>
     <div class="dtoday-card" id="today-card" onclick="openQ(0)">
       <div class="dtoday-photo" id="dtoday-photo">
         <div class="dtoday-info" data-on-photo>
@@ -2559,7 +2571,7 @@ async function launchPopQueue(){
   try{localStorage.setItem(popSeenKey(),String(Date.now()));}catch(e){}
   // Laisse arriver notifications, conversations et commerces (abonnements en cours) avant de choisir.
   for(let i=0;i<10&&!(_notifs&&_notifs.length)&&!S._chats;i++)await new Promise(r=>setTimeout(r,300));
-  const steps=[popProfile,popNotif,popFriendRequest,popMessages,popNewFriend,popNewMerchant];
+  const steps=[popAnnouncement,popProfile,popNotif,popFriendRequest,popMessages,popNewFriend,popNewMerchant];
   let shown=0;
   for(const st of steps){
     if(shown>=NV_MAX_POPS||!auth.currentUser||auth.currentUser.uid!==uid)break;
@@ -3757,7 +3769,7 @@ function renderNotifications(){
       inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 12.5 9.5 18 20 6"/></svg> <strong>${esc(n.fromName)}</strong> a accepté ta demande d'ami !</div>
         <div class="notif-meta">${ts}</div>`;
     }else if(n.type==='noova_message'){
-      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> <strong>Noova</strong> ${esc(n.message||'')}</div>
+      inner=`<div class="notif-txt" style="display:flex;align-items:center;gap:5px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M4 10v4h3l5 4V6l-5 4z"/><path d="M15 9c1 .8 1.6 1.8 1.6 3s-.6 2.2-1.6 3"/><path d="M17.5 6.5c1.8 1.4 2.8 3.3 2.8 5.5s-1 4.1-2.8 5.5"/></svg> <strong>NOOVA</strong> ${n.title?'<strong>'+esc(n.title)+'</strong> : ':''}${esc(n.message||'')}</div>
         <div class="notif-meta">${ts}</div>`;
     }else{
       inner=`<div class="notif-txt">${esc(n.message||'Notification')}</div><div class="notif-meta">${ts}</div>`;
@@ -3966,6 +3978,56 @@ function initInbox(uid){
       showMsgBanner(p,(c.lastType==='poll'?'Sondage : ':'')+(c.lastText||''));});
     updateMsgBadge();if(cur==='inbox')renderInbox();
   },err=>console.warn('inbox:',err));
+}
+// ─── Annonces de NOOVA ───────────────────────────────────────
+// Toutes les villes + la ville de l'habitant, en direct. La plus récente non fermée s'affiche en carte sur l'accueil
+// (14 jours au plus) ; « importante » : pop-up à l'ouverture suivante (voir launchPopQueue).
+let _annUnsubs=[],_annAll={};
+function initAnnouncements(city){
+  _annUnsubs.forEach(u=>u());_annUnsubs=[];_annAll={};
+  const watch=c=>db.collection('announcements').where('forUsers','==',true).where('city','==',c).orderBy('createdAt','desc').limit(5)
+    .onSnapshot(snap=>{_annAll[c]=snap.docs.map(d=>({id:d.id,...d.data({serverTimestamps:'estimate'})}));renderAnnCard();},err=>console.warn('annonces:',err));
+  _annUnsubs.push(watch('all'));if(city)_annUnsubs.push(watch(city));
+}
+function annClosed(){try{return JSON.parse(localStorage.getItem('nv_ann_closed')||'[]');}catch(e){return [];}}
+function currentAnn(){
+  const closed=new Set(annClosed()),min=Date.now()-14*86400000;
+  return Object.values(_annAll).flat().filter(a=>!closed.has(a.id)&&_tsMs(a.createdAt)>min).sort((a,b)=>_tsMs(b.createdAt)-_tsMs(a.createdAt))[0]||null;
+}
+const ANN_CTA={questions:'Répondre aux questions',rewards:'Voir les récompenses',invite:'Inviter des amis',friends:'Voir mes amis'};
+function renderAnnCard(){
+  const el=document.getElementById('ann-card');if(!el)return;
+  const a=currentAnn();
+  if(!a){el.innerHTML='';return;}
+  const d=new Date(_tsMs(a.createdAt)).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+  el.innerHTML=`<section class="ann-card" aria-label="Annonce de NOOVA"><button type="button" class="ann-x" aria-label="Fermer l'annonce" onclick="closeAnn(${jsa(a.id)})"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="ann-hd"><img src="favicon.svg" alt=""><span class="ann-lbl">Annonce NOOVA</span><span class="ann-date">${esc(d)}</span></div>
+    ${a.title?`<div class="ann-t">${esc(a.title)}</div>`:''}<div class="ann-m">${esc(a.message||'')}</div>
+    ${ANN_CTA[a.cta]?`<button type="button" class="ann-cta" onclick="annCta(${jsa(a.id)},${jsa(a.cta)})">${ANN_CTA[a.cta]}</button>`:''}</section>`;
+}
+function closeAnn(id){
+  try{const c=annClosed().filter(x=>x!==id);c.unshift(id);localStorage.setItem('nv_ann_closed',JSON.stringify(c.slice(0,50)));}catch(e){}
+  renderAnnCard();
+  const me=auth.currentUser&&auth.currentUser.uid;
+  if(me)db.collection('users').doc(me).collection('notifications').doc('ann_'+id).update({read:true}).catch(()=>{});
+}
+function annCta(id,cta){
+  closeAnn(id);
+  if(cta==='questions'){goNav('home');if(S.qs&&S.qs.length)openQ(0);}
+  else if(cta==='rewards')goNav('rewards-tab');
+  else if(cta==='invite')shareInvite();
+  else if(cta==='friends'){goNav('social');socTab('friends',document.querySelector('.tab-btn[onclick*="friends"]'));}
+}
+// Pop-up d'ouverture : seulement pour une annonce marquée « importante » et pas encore fermée.
+async function popAnnouncement(){
+  for(let i=0;i<8&&!Object.keys(_annAll).length;i++)await new Promise(r=>setTimeout(r,300));
+  const a=currentAnn();if(!a||!a.important)return false;
+  let shownKey='nv_ann_popped';let popped=[];try{popped=JSON.parse(localStorage.getItem(shownKey)||'[]');}catch(e){}
+  if(popped.includes(a.id))return false;
+  try{popped.unshift(a.id);localStorage.setItem(shownKey,JSON.stringify(popped.slice(0,50)));}catch(e){}
+  const ok=await showPop({title:a.title||'Une nouvelle de NOOVA',text:a.message||'',cta:ANN_CTA[a.cta]||'Compris',later:ANN_CTA[a.cta]?'Plus tard':'',avatar:{photoUrl:'favicon.svg',n:'N'}});
+  if(ok)annCta(a.id,a.cta||'');
+  return true;
 }
 function chatTime(c){return _tsMs(c.lastAt)||_tsMs(c.startedAt);}
 function chatUnread(c,me){return !!(c.lastFrom&&c.lastFrom!==me&&_tsMs((c.lastRead||{})[me])<_tsMs(c.lastAt));}
@@ -5017,6 +5079,7 @@ const NOTIF_GROUPS=[
   {g:'recompenses',t:'Mes récompenses',d:'Récompense débloquée, code bientôt expiré'},
   {g:'messages',t:'Messages privés',d:"Quand un ami t'écrit"},
   {g:'amis',t:'Mes amis',d:"Demandes d'ami, réponses en commun, J'aime et commentaires sur tes publications"},
+  {g:'noova',t:'Annonces de NOOVA',d:"Les nouveautés importantes de NOOVA, rarement"},
   {g:'actualites',t:'Actualités et rendez-vous',d:"Quand un commerce t'annonce ce qui a changé grâce à ton avis, et un petit rendez-vous les jours sans autre nouvelle"}
 ];
 function notifPrefOn(g){return (S._notifPrefs||{})[g]!==false;}
@@ -6330,6 +6393,7 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   else if(!S._celebrationsReady){ S._celebrationsReady = true; checkTierAndBadgeCelebrations(); }
   initNotifications(uid);
   initInbox(uid);
+  initAnnouncements(normalizeCity(data.city||''));
   restorePushForUser(uid);
   loadHistFromFirestore(uid);
 
