@@ -739,6 +739,42 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .soc-title{font-family:var(--fd);font-weight:800;font-size:var(--fs-6);letter-spacing:var(--lettrage-titre);color:var(--blanc)}
 .soc-bell{width:40px;height:40px;border-radius:var(--r-btn);background:var(--surface);color:var(--ink);border:none;display:flex;align-items:center;justify-content:center;font-size:var(--fs-4);cursor:pointer;position:relative}
 .soc-acts{display:flex;gap:var(--s2)}
+/* Récompenses : solde, bons à utiliser, « Tu peux t'offrir », « Bientôt à ta portée » — une ligne par récompense */
+.rw-noov{display:flex;align-items:center;gap:var(--s2);margin:var(--s2) 18px 0;font-size:var(--fs-2);color:var(--text)}
+.rw-noov-ico{width:24px;height:24px;border-radius:var(--r-pill);overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:var(--jaune);color:var(--jaune-ink);font-weight:800;font-size:var(--fs-1)}
+.rw-noov-ico img{width:24px;height:24px}
+.rw-noov-t b{font-variant-numeric:tabular-nums}
+.rw-noov-s{color:var(--text-2)}
+.rwl{display:flex;flex-direction:column;gap:var(--s2);margin:0 18px var(--s5)}
+.rwr{display:flex;align-items:center;gap:var(--s3);padding:var(--s3);background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-md)}
+.rwr-mid{flex:1;min-width:0}
+.rwr-t{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rwr-s{font-size:var(--fs-2);color:var(--text-2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rwr-bar{height:6px;border-radius:var(--r-pill);background:var(--surface-2);margin-top:var(--s2);overflow:hidden}
+.rwr-bar>i{display:block;height:100%;background:var(--jaune);border-radius:var(--r-pill)}
+.rwr-cost{flex-shrink:0;font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);color:var(--text);font-variant-numeric:tabular-nums}
+.rwr-go{flex-shrink:0;min-height:var(--tactile-min);padding:0 var(--s4);background:var(--text);color:var(--surface);border:1px solid var(--text);border-radius:var(--r-sm);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-2);cursor:pointer}
+.rwl-empty{padding:var(--s4);background:var(--surface);border:1px dashed var(--text-3);border-radius:var(--r-md);font-size:var(--fs-2);color:var(--text-2);line-height:1.5}
+.rw-all{margin:var(--s4) 18px var(--s5)}
+/* Accueil façon fil : onglets en haut (soulignés, comme X), puis une carte par question non répondue */
+.hm-tabs{position:sticky;top:0;z-index:6;display:flex;padding:0 var(--s2);background:var(--bg);border-bottom:1px solid var(--trait);margin:calc(-1 * var(--s5)) 0 var(--s4)}
+#ann-card:not(:empty)+.hm-tabs{margin-top:0}
+.hm-tab{flex:1;position:relative;min-height:48px;padding:0 var(--s2);background:none;border:none;font-family:var(--font);font-weight:700;font-size:var(--fs-3);color:var(--text-2);cursor:pointer}
+.hm-tab.on{color:var(--text)}
+.hm-tab.on::after{content:'';position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);width:56px;height:4px;border-radius:var(--r-pill);background:var(--jaune)}
+.hm-n{margin-left:6px;font-size:var(--fs-1);font-weight:800;color:var(--text-2);font-variant-numeric:tabular-nums}
+.hm-feed{display:flex;flex-direction:column;gap:var(--s3);padding:0 var(--s4) var(--s5)}
+.hq-card{display:block;width:100%;padding:0;text-align:left;background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-md);overflow:hidden;cursor:pointer;font-family:var(--font);color:var(--text)}
+.hq-card:active{opacity:.85}
+.hq-photo{position:relative;height:148px;background:var(--surface-2)}
+.hq-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.hq-gain{position:absolute;top:var(--s3);right:var(--s3);padding:var(--s1) var(--s2);border-radius:var(--r-xs);background:var(--jaune);color:var(--jaune-ink);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-2);font-variant-numeric:tabular-nums}
+.hq-body{padding:var(--s3) var(--s4) var(--s4)}
+.hq-brand{display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s2);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);color:var(--text)}
+.hq-brand>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hq-brand .hq-gain{position:static;margin-left:auto;flex-shrink:0}
+.hq-q{font-size:var(--fs-4);font-weight:600;line-height:1.35;color:var(--text);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hm-empty{padding:var(--s6) var(--s4);text-align:center;color:var(--text-2);font-size:var(--fs-3);line-height:1.5}
 /* Annonce de NOOVA : bandeau de marque en haut de l'accueil, jusqu'à ce que l'habitant le ferme */
 .ann-card{position:relative;margin:0 22px 14px;padding:var(--s4) var(--s4) var(--s4);background:var(--bandeau);color:var(--bandeau-texte);border:1px solid var(--jaune);border-radius:var(--r-lg)}
 .ann-hd{display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3);padding-right:var(--s6)}
@@ -771,7 +807,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
 .msg-badge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:var(--r-pill);background:var(--jaune);color:var(--jaune-ink);font-size:var(--fs-1);font-weight:800;font-variant-numeric:tabular-nums;display:none;align-items:center;justify-content:center;border:2px solid var(--bg)}
 /* Messages : liste des conversations */
 #inbox{display:flex;flex-direction:column}
-.inbox-list{flex:1;overflow-y:auto;padding:var(--s3) var(--s4) var(--s6)}
+.inbox-list{flex:1;overflow-y:auto;padding:var(--s3) var(--s4) calc(var(--s7) * 2 + env(safe-area-inset-bottom,0px))}
 .ib-row{display:flex;align-items:center;gap:var(--s3);width:100%;padding:var(--s3);background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-md);margin-bottom:var(--s2);cursor:pointer;text-align:left;font-family:var(--font);color:var(--text)}
 .ib-row .fi-av,.ib-new .fi-av{background:var(--surface-2);color:var(--jaune)}
 .ib-row .fi-av{width:48px;height:48px}
@@ -1029,6 +1065,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
 .nav-lbl{font-size:var(--fs-1);font-weight:500;color:var(--ink3);transition:color .13s}
 .nav-it.on .nav-lbl{color:var(--coral);font-weight:700}
 .nav-it.on .nav-ico{color:var(--coral)}
+.nav-count{position:absolute;top:-2px;right:calc(50% - 22px);min-width:18px;height:18px;padding:0 5px;border-radius:var(--r-pill);background:var(--jaune);color:var(--jaune-ink);font-size:var(--fs-1);font-weight:800;font-variant-numeric:tabular-nums;display:none;align-items:center;justify-content:center;border:2px solid var(--bandeau)}
 .nav-badge{position:absolute;top:1px;right:calc(50% - 16px);width:7px;height:7px;background:var(--coral);border-radius:50%;border:2px solid var(--bg)}
 /* BUTTONS */
 .btn-p{width:100%;padding:15px;border-radius:var(--r-btn);background:var(--yellow);border:none;color:var(--jaune-ink);font-family:var(--fd);font-size:var(--fs-3);font-weight:800;cursor:pointer;transition:all .13s;display:flex;align-items:center;justify-content:center;gap:7px;letter-spacing:var(--lettrage-titre)}
@@ -1645,29 +1682,21 @@ button.soc-bell{padding:0;font-family:var(--font)}
       <button class="dh-pts hdr-pts-wrap-el" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
     </div>
     <div id="ann-card"></div>
-    <div class="dtoday-card" id="today-card" onclick="openQ(0)">
-      <div class="dtoday-photo" id="dtoday-photo">
-        <div class="dtoday-info" data-on-photo>
-          <div id="dtoday-logo"></div>
-          <div style="min-width:0"><div class="dtoday-brand" id="tc-brand">Commerce</div><div class="dtoday-sub" id="dtoday-dist"></div></div>
-        </div>
-      </div>
-      <div class="dt-pts" id="tc-pts">+pts</div>
-      <div class="dtoday-body">
-        <img class="mark" src="logo-mark-white.svg" alt="" aria-hidden="true">
-        <div class="disc-pill" id="tc-disc">Nouveau près de chez toi</div>
-        <div class="dtoday-q" id="tc-q">Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?</div>
-        <div class="dtoday-cta">Répondre en 30 secondes</div>
-      </div>
+    <!-- Accueil façon fil : onglets Questions (commerces) / NOOVA / Commerces -->
+    <div class="hm-tabs" role="tablist" aria-label="Accueil">
+      <button type="button" class="hm-tab on" role="tab" id="hm-tab-q" aria-selected="true" aria-controls="hm-q" onclick="homeTab('q')">Questions<span class="hm-n" id="hm-n-q"></span></button>
+      <button type="button" class="hm-tab" role="tab" id="hm-tab-noova" aria-selected="false" aria-controls="hm-noova" onclick="homeTab('noova')">NOOVA<span class="hm-n" id="hm-n-noova"></span></button>
+      <button type="button" class="hm-tab" role="tab" id="hm-tab-shops" aria-selected="false" aria-controls="hm-shops" onclick="homeTab('shops')">Commerces</button>
     </div>
+    <div class="hm-page" id="hm-q" role="tabpanel" aria-labelledby="hm-tab-q">
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
     <div id="home-requests"></div>
-    <div id="age-nudge" style="display:none;margin:0 22px 14px"></div>
-    <div id="daily-track"></div>
-    <div class="sec-lbl" id="queue-sec">À répondre</div>
-    <div class="q-list" id="queue-list" tabindex="0" role="group" aria-label="Autres questions à répondre"></div>
-    <div style="height:6px"></div>
-    <div id="dpat-wrap"></div>
+      <div class="hm-feed" id="hm-feed-q"></div>
+    </div>
+    <div class="hm-page" id="hm-noova" role="tabpanel" aria-labelledby="hm-tab-noova" hidden>
+      <div class="hm-feed" id="hm-feed-noova"></div>
+    </div>
+    <div class="hm-page" id="hm-shops" role="tabpanel" aria-labelledby="hm-tab-shops" hidden>
     <div class="dsec-row"><div class="dsec-title">À deux pas</div><div class="dsec-link" onclick="openFullMap()">Voir la carte</div></div>
     <div class="dmap-card" id="dmap-card" onclick="openFullMap()">
       <svg viewBox="0 0 340 122" class="dmap-illo" role="img" aria-label="Carte du quartier">
@@ -1688,6 +1717,31 @@ button.soc-bell{padding:0;font-family:var(--font)}
     </div>
     <div class="dnearby-grid" id="dnearby-grid"></div>
     <div class="dnb-more-wrap" id="dnb-more-wrap" style="display:none"><button class="btn-s" id="dnb-more" onclick="toggleNearbyAll()">Plus de commerces</button></div>
+    </div>
+    <!-- Anciens blocs de l'accueil (question du jour, « À répondre », prochaine récompense, compteur du jour) : remplacés
+         par le fil ci-dessus. Gardés masqués le temps que tout le code qui les remplit soit retiré. -->
+    <div id="home-legacy" hidden>
+    <div class="dtoday-card" id="today-card" onclick="openQ(0)">
+      <div class="dtoday-photo" id="dtoday-photo">
+        <div class="dtoday-info" data-on-photo>
+          <div id="dtoday-logo"></div>
+          <div style="min-width:0"><div class="dtoday-brand" id="tc-brand">Commerce</div><div class="dtoday-sub" id="dtoday-dist"></div></div>
+        </div>
+      </div>
+      <div class="dt-pts" id="tc-pts">+pts</div>
+      <div class="dtoday-body">
+        <img class="mark" src="logo-mark-white.svg" alt="" aria-hidden="true">
+        <div class="disc-pill" id="tc-disc">Nouveau près de chez toi</div>
+        <div class="dtoday-q" id="tc-q">Tu viendrais plus souvent si on ouvrait jusqu'à 23h le week-end ?</div>
+        <div class="dtoday-cta">Répondre en 30 secondes</div>
+      </div>
+    </div>
+    <div id="age-nudge" style="display:none;margin:0 22px 14px"></div>
+    <div id="daily-track"></div>
+    <div class="sec-lbl" id="queue-sec">À répondre</div>
+    <div class="q-list" id="queue-list" tabindex="0" role="group" aria-label="Autres questions à répondre"></div>
+    <div id="dpat-wrap"></div>
+    </div>
     <div style="height:10px"></div>
   </div>
 </div>
@@ -1756,7 +1810,6 @@ button.soc-bell{padding:0;font-family:var(--font)}
     <div class="soc-hdr">
       <div class="soc-title">Communauté</div>
       <div class="soc-acts">
-        <button class="soc-bell" id="soc-msg" aria-label="Messages" onclick="openInbox()"><span class="msg-badge" id="msg-badge"></span><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/></svg></button>
         <div class="soc-bell" id="soc-bell" onclick="toggleNotifPanel(event)"><div class="bell-dot" id="bell-dot"></div><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;vertical-align:-2px"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg></div>
       </div>
     </div>
@@ -1789,7 +1842,6 @@ button.soc-bell{padding:0;font-family:var(--font)}
 <button id="msg-banner" type="button" aria-live="polite" onclick="openMsgBanner()"></button>
 <div id="inbox" class="screen">
   <div class="chat-hdr">
-    <div class="back-btn" style="margin-bottom:0;margin-right:4px" role="button" aria-label="Retour" onclick="goTo('social')">←</div>
     <div style="font-family:var(--fd);font-weight:800;font-size:var(--fs-5);color:var(--ink)">Messages</div>
   </div>
   <div class="inbox-list" id="inbox-list"></div>
@@ -1822,15 +1874,28 @@ button.soc-bell{padding:0;font-family:var(--font)}
 <div id="rewards-tab" class="screen amb-creme" tabindex="0" style="outline:none">
   <div class="wallet-wrap" style="padding-top:0">
     <div class="dwal-hdr">
-      <div class="dwal-title">Tes cadeaux</div>
+      <div class="dwal-title">Récompenses</div>
     </div>
-    <!-- 1 · Points : le solde et tout ce qui s'échange avec, dans un seul bloc -->
-    <section class="wsec" aria-label="Tes points et tes récompenses">
-    <div class="wpts-card">
-      <div class="wpts-ico" id="wpts-ico" aria-hidden="true"></div>
-      <div><div class="wpts-n" id="wc-pts-num-hdr">0</div><div class="wpts-l">points</div></div>
-    </div>
-    <!-- Solde détaillé + progression de palier — conservés pour le calcul, visuels sur le Profil -->
+    <!-- 1 · Le solde : points (et NOOVS sur une ligne) -->
+    <section class="wsec" aria-label="Ton solde">
+      <div class="wpts-card">
+        <div class="wpts-ico" id="wpts-ico" aria-hidden="true"></div>
+        <div><div class="wpts-n" id="wc-pts-num-hdr">0</div><div class="wpts-l">points</div></div>
+      </div>
+      <div class="rw-noov"><span class="rw-noov-ico" id="wnoov-ico" aria-hidden="true">N</span><span class="rw-noov-t"><b id="noov-num">0</b> NOOVS</span><span class="rw-noov-s">bientôt échangeables</span></div>
+    </section>
+    <!-- 2 · Mes bons à utiliser (seulement s'il y en a) -->
+    <div class="dsec-h" id="rw-codes-h" hidden>À montrer en caisse</div>
+    <div id="dcode-wrap"></div>
+    <!-- 3 · Ce que je peux m'offrir maintenant, 4 · ce qui arrive bientôt -->
+    <div class="dsec-h">Tu peux t'offrir</div>
+    <div class="rwl" id="rw-can"></div>
+    <div class="dsec-h" id="rw-soon-h">Bientôt à ta portée</div>
+    <div class="rwl" id="rw-soon"></div>
+    <div class="rw-all"><button type="button" class="btn-s" id="rw-all-btn" onclick="openRewardsSheet()">Voir toutes les récompenses</button></div>
+    <!-- Anciens blocs (récompense mise en avant, cercles en %, pastilles NOOVS, palier) : masqués, encore remplis par
+         l'ancien code le temps qu'il soit retiré. Le palier se voit sur le Profil. -->
+    <div id="rw-legacy" hidden>
     <div class="wallet-card" style="display:none">
       <div style="display:flex;align-items:center;gap:16px">
         <div style="flex:1;min-width:0">
@@ -1848,28 +1913,14 @@ button.soc-bell{padding:0;font-family:var(--font)}
         </div>
       </div>
     </div>
-    <!-- 2 · Récompenses en cours -->
-    <div class="dsec-h">En cours <span id="dprog-count" style="font-weight:500;color:var(--ink2);font-size:var(--fs-2);margin-left:2px"></span></div>
-    <div id="dcode-wrap"></div>
+    <div class="dsec-h" style="display:none">En cours <span id="dprog-count"></span></div>
     <div class="dsec-h" id="reward-featured-label" style="display:none"></div>
     <div id="reward-featured-wrap"></div>
-    <div id="dprog-list" class="dprog-scroller" role="region" aria-label="Récompenses en cours" tabindex="0"></div>
-    <div class="dprog-row" id="rewards-all-btn" onclick="openRewardsSheet()" style="cursor:pointer">
-      <div id="rewards-all-ico" style="width:52px;height:52px;border-radius:var(--r-md);background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"></div>
-      <div style="flex:1;min-width:0"><div class="dprog-name">Toutes les récompenses</div><div class="dprog-sub" id="rewards-all-count"></div></div>
-      <span style="color:var(--text-2);font-size:var(--fs-4)" aria-hidden="true">›</span>
-    </div>
-    </section>
-    <!-- 2 · NOOVS : le solde et ce qu'ils permettront d'obtenir, dans un seul bloc -->
-    <section class="wsec" aria-label="Tes NOOVS">
-    <div class="noov-card">
-      <div class="noov-ico" id="wnoov-ico" aria-hidden="true">N</div>
-      <div><div class="noov-t"><span id="noov-num">0</span> NOOVS</div><div class="noov-sub">Bientôt échangeables contre</div></div>
-    </div>
+    <div id="dprog-list"></div>
+    <div id="rewards-all-btn"><div id="rewards-all-ico"></div><div id="rewards-all-count"></div></div>
     <div id="noov-rewards"></div>
-    </section>
-    <!-- 4 · XP -->
     <div id="tier-track-wrap"></div>
+    </div>
   </div>
 </div>
 
@@ -2098,6 +2149,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
   <div class="nav-it" id="nav-home" onclick="goNav('home')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nav-lbl">Accueil</div></div>
   <div class="nav-it" id="nav-social" onclick="goNav('social')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="nav-lbl">Communauté</div><div class="nav-badge"></div></div>
   <div class="nav-it" id="nav-rewards-tab" onclick="goNav('rewards-tab')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M20 6h-2.18c.07-.43.18-.84.18-1.25 0-2.07-1.68-3.75-3.75-3.75-1.03 0-1.96.43-2.63 1.12L10 3.87 8.38 2.12C7.71 1.43 6.78 1 5.75 1 3.68 1 2 2.68 2 4.75c0 .41.11.82.18 1.25H2v2h2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8h2V6h-2zm-7.63-2.38c.35-.36.83-.62 1.63-.62 1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H12.5l-.13-2.38zm-5.12-.25c1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H4.8c-.43-.31-.8-.71-.8-1.25C4 5.07 4.72 4.12 5.75 4.12zM4 19V8h7v11H4zm9 0V8h7v11h-7z"/></svg></div><div class="nav-lbl">Récompenses</div></div>
+  <div class="nav-it" id="nav-inbox" role="button" aria-label="Messages" onclick="goNav('inbox')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/></svg></div><div class="nav-lbl">Messages</div><span class="nav-count" id="msg-badge"></span></div>
   <div class="nav-it" id="nav-profile" onclick="goNav('profile')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="nav-lbl">Profil</div></div>
 </nav>
 
@@ -2386,7 +2438,7 @@ const BDGS=[{id:'first',e:'star',n:'Première réponse'},{id:'trio',e:'target',n
 const GIFTS=[];
 const TIERS=[{n:'Curieux',min:0,max:1000,ico:'seed',c:'#5F594E'},{n:'Actif',min:1000,max:3000,ico:'bolt',c:'#8A5A00'},{n:'Expert',min:3000,max:6000,ico:'target',c:'#A14E08'},{n:'Ambassadeur',min:6000,max:10000,ico:'trophy',c:'#7A3E12'},{n:'Légende',min:10000,max:99999,ico:'crown',c:'#1C1917'}];
 const FEED=[];
-let cur='splash',obIdx=0,boFmt='text',navS=['home','social','rewards-tab','profile'];
+let cur='splash',obIdx=0,boFmt='text',navS=['home','social','rewards-tab','inbox','profile'];
 let _chatUnsub=null,_chatFriendUid=null,_chatFriendName='',_chatMessages=[],_chatOpenToken=0;
 
 function goTo(id){
@@ -2399,7 +2451,7 @@ function goTo(id){
   navS.forEach(s=>{const el=document.getElementById('nav-'+s);if(el)el.classList[s===id?'add':'remove']('on')});
   trackEvent('screen_view', { screen_name: id, firebase_screen: id, firebase_screen_class: id });
 }
-function goNav(id){goTo(id);if(id==='rewards-tab')refreshWallet();if(id==='profile')refreshProfile();if(id==='home'){refreshHome();applyStagger(document.querySelector('#home .si'));}if(id==='social'){renderSocial();const b=document.querySelector('#nav-social .nav-badge');if(b)b.style.display='none';}}
+function goNav(id){goTo(id);if(id==='inbox')renderInbox();if(id==='rewards-tab')refreshWallet();if(id==='profile')refreshProfile();if(id==='home'){refreshHome();applyStagger(document.querySelector('#home .si'));}if(id==='social'){renderSocial();const b=document.querySelector('#nav-social .nav-badge');if(b)b.style.display='none';}}
 
 function obNext(){
   if(obIdx<1){
@@ -2673,10 +2725,36 @@ function refreshHome(){
   }
   renderHomeState();
   renderRequests();
+  renderHomeFeed();
   renderDailyTrack();
   renderQueue();
   renderAlmostReward();
   renderNearbyMap();
+}
+// ─── Accueil : le fil de questions ──────────────────────────
+// Onglet « Questions » : les questions des commerces ; « NOOVA » : celles de NOOVA ; « Commerces » : carte et commerces.
+// Chaque carte : photo, gain (points ou NOOVS), commerce, question ; la toucher ouvre la même réponse qu'avant.
+let _homeTab='q';
+function homeTab(t){
+  _homeTab=t;
+  ['q','noova','shops'].forEach(k=>{const b=document.getElementById('hm-tab-'+k),pg=document.getElementById('hm-'+k);if(!b||!pg)return;
+    b.classList.toggle('on',k===t);b.setAttribute('aria-selected',String(k===t));pg.hidden=k!==t;});
+  if(t==='shops')renderNearbyMap();
+}
+function hqCardHTML(q,i){
+  // Sans photo : pas de grand bloc vide, le gain passe sur la ligne du commerce.
+  const gain=`<span class="hq-gain">${esc(ptsTag(q))}</span>`;
+  const photo=q.photoUrl?`<div class="hq-photo"><img src="${esc(q.photoUrl)}" alt="" loading="lazy" onerror="this.parentNode.remove()">${gain}</div>`:'';
+  return `<button type="button" class="hq-card${q._byNoova?' noova':''}" onclick="openQ(${i})" aria-label="${esc(q.brand)} : ${esc(q.q)}, ${esc(ptsTag(q))}">${photo}<div class="hq-body"><div class="hq-brand">${logoHTML(q.brand,28,q.logoUrl)}<span>${esc(q.brand)}</span>${testTagHTML(q._isTest)}${q.photoUrl?'':gain}</div><div class="hq-q">${esc(q.q)}</div></div></button>`;
+}
+function renderHomeFeed(){
+  const qs=(S.qs||[]).map((q,i)=>({q,i}));
+  const shop=qs.filter(x=>!x.q._byNoova),noova=qs.filter(x=>x.q._byNoova);
+  const fq=document.getElementById('hm-feed-q'),fn=document.getElementById('hm-feed-noova');if(!fq||!fn)return;
+  fq.innerHTML=shop.map(x=>hqCardHTML(x.q,x.i)).join('')||(S.qs&&S.qs.length?'<div class="hm-empty">Tu as répondu à toutes les questions des commerces. Il en arrive de nouvelles chaque jour.</div>':'');
+  fn.innerHTML=noova.map(x=>hqCardHTML(x.q,x.i)).join('')||'<div class="hm-empty">Pas de question de NOOVA en ce moment. Reviens bientôt.</div>';
+  const nq=document.getElementById('hm-n-q'),nn=document.getElementById('hm-n-noova');
+  if(nq)nq.textContent=shop.length?String(shop.length):'';if(nn)nn.textContent=noova.length?String(noova.length):'';
 }
 function renderQueue(){
   const el=document.getElementById('queue-list');el.innerHTML='';
@@ -4066,7 +4144,7 @@ function updateMsgBadge(){
   const me=auth.currentUser&&auth.currentUser.uid,b=document.getElementById('msg-badge');if(!b)return;
   const n=(S._chats||[]).filter(c=>chatUnread(c,me)).length;
   b.textContent=n>9?'9+':String(n);b.style.display=n?'flex':'none';
-  const btn=document.getElementById('soc-msg');if(btn)btn.setAttribute('aria-label',n?'Messages, '+n+' non lu'+(n>1?'s':''):'Messages');
+  const btn=document.getElementById('nav-inbox');if(btn)btn.setAttribute('aria-label',n?'Messages, '+n+' non lu'+(n>1?'s':''):'Messages');
 }
 // « 14:05 » aujourd'hui, « Hier », « lun. » dans la semaine, sinon « 5 oct. »
 function inboxTime(ms){
@@ -4081,7 +4159,7 @@ function inboxPeer(c,me){
   const f=(S.friends||[]).find(x=>x.uid===uid&&x.mutual),w=(c.who||{})[uid]||{};
   return {uid,n:(f&&f.n)||w.name||'Ami',photoUrl:(f&&f.photoUrl)||w.photoUrl||null};
 }
-function openInbox(){goTo('inbox');renderInbox();}
+function openInbox(){goNav('inbox');}
 function renderInbox(){
   const el=document.getElementById('inbox-list');if(!el)return;
   const me=auth.currentUser&&auth.currentUser.uid,chats=S._chats||[];
@@ -4160,6 +4238,7 @@ function refreshWallet(){
   {const nn=document.getElementById('noov-num');if(nn)animateNumber(nn,S.noovs||0);}
   renderHeaderStats();
   renderNoovRewards();
+  renderRewardLists();
   const l=getLvl();const li=TIERS.indexOf(l);const pct=Math.min(98,Math.max(4,((S.xp-l.min)/(l.max-l.min))*100));
   document.getElementById('wc-fill').style.width=pct+'%';
   document.getElementById('wc-level').textContent=l.n+', niveau '+(li+1);
@@ -5888,6 +5967,19 @@ function redeemFeaturedReward(){
   const r = (S._rewardsCache||[]).find(x=>x.id===S._featuredRewardId);
   if(r) redeemReward(r);
 }
+function renderRewardLists(){
+  const can=document.getElementById('rw-can'),soon=document.getElementById('rw-soon');if(!can||!soon)return;
+  const all=S._rewardsCache||[],pts=S.pts||0;
+  const ok=all.filter(r=>rewardCost(r)<=pts).sort((a,b)=>rewardCost(b)-rewardCost(a));
+  const next=all.filter(r=>rewardCost(r)>pts).sort((a,b)=>rewardCost(a)-rewardCost(b)).slice(0,5);
+  can.innerHTML=ok.length?ok.map(r=>`<div class="rwr">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}, ${rewardCost(r)} pts</div></div><button type="button" class="rwr-go" onclick="redeemById(${jsa(r.id)})">Échanger</button></div>`).join('')
+    :`<div class="rwl-empty">${all.length?'Pas encore assez de points : réponds aux questions de l\'accueil, chaque réponse en rapporte.':'Les commerces de ta ville n\'ont pas encore mis de récompense en ligne.'}</div>`;
+  soon.innerHTML=next.map(r=>{const c=rewardCost(r),pct=Math.max(3,Math.min(100,pts/c*100));
+    return `<div class="rwr" role="button" tabindex="0" onclick="openRewardsSheet()" onkeydown="if(event.key==='Enter')openRewardsSheet()">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}, encore ${c-pts} pts</div><div class="rwr-bar" aria-hidden="true"><i style="width:${pct.toFixed(0)}%"></i></div></div><div class="rwr-cost">${c} pts</div></div>`;}).join('');
+  const sh=document.getElementById('rw-soon-h');if(sh)sh.hidden=!next.length;soon.hidden=!next.length;
+  const btn=document.getElementById('rw-all-btn');if(btn){btn.textContent='Voir toutes les récompenses ('+all.length+')';btn.parentNode.hidden=!all.length;}
+}
+function redeemById(id){const r=(S._rewardsCache||[]).find(x=>x.id===id);if(r)redeemReward(r);}
 function renderInProgressRewards(){
   const el = document.getElementById('dprog-list');
   const countEl = document.getElementById('dprog-count');
@@ -5896,6 +5988,7 @@ function renderInProgressRewards(){
     .sort((a,b) => (rewardCost(a)-S.pts) - (rewardCost(b)-S.pts)).slice(0,5);
   if(countEl) countEl.textContent = rewards.length ? '('+rewards.length+')' : '';
   renderTierTrack();
+  renderRewardLists();
   if(!rewards.length){ el.innerHTML='<div style="text-align:center;padding:16px;color:rgba(28,14,2,.65);font-size:var(--fs-2)">Tout est disponible dès maintenant.</div>'; return; }
   el.innerHTML = rewards.map(r => {
     const pct = Math.max(0, Math.min(100, (S.pts / rewardCost(r)) * 100));
@@ -5933,6 +6026,7 @@ function loadActiveRedemptions(){
       active.push({ id: doc.id, ...d, _expMs: expMs });
     });
     active.sort((a,b) => (b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0) - (a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0));
+    {const h=document.getElementById('rw-codes-h');if(h)h.hidden=!active.length;}
     if(!active.length){ wrap.innerHTML=''; return; }
     const r = active[0];
     const exp = r._expMs ? new Date(r._expMs).toLocaleDateString('fr-FR',{day:'numeric',month:'long'}) : '';
@@ -6146,7 +6240,7 @@ function finishAuthTransition() {
 
 // ─── Mini-didacticiel de première connexion : info-bulles sur l'accueil ────
 const HOME_TOUR_STEPS=[
-  {sel:'#today-card', txt:'La question du jour est ici — réponds en quelques secondes pour gagner des points.'},
+  {sel:'#hm-tab-q', txt:'Toutes tes questions sont ici, et celles de NOOVA dans l\'onglet d\'à côté. Touche une carte pour répondre en quelques secondes.'},
   {sel:'.dh-streak', txt:'Ta série : réponds à 3 questions par jour pour la faire grandir. Se connecter ne suffit pas.'},
   {sel:'#nav-rewards-tab', txt:'Échange tes points contre de vraies récompenses chez les commerces du quartier.'},
   {sel:'#nav-social', txt:'Défie tes amis et grimpe dans le classement de la semaine.'}
@@ -6194,7 +6288,10 @@ function makeTour(cfg){
     document.body.appendChild(ov);
     return ov;
   }
-  const rectOf=()=>{ const r=target.getBoundingClientRect(); return {x:r.left-PAD,y:r.top-PAD,w:r.width+PAD*2,h:r.height+PAD*2}; };
+  // Halo autour de la cible, toujours dans l'écran (une cible collée au bord ne déborde pas).
+  const rectOf=()=>{ const r=target.getBoundingClientRect(),W=innerWidth,H=innerHeight;
+    const x=Math.max(0,r.left-PAD),y=Math.max(0,r.top-PAD),x2=Math.min(W,r.right+PAD),y2=Math.min(H,r.bottom+PAD);
+    return {x,y,w:Math.max(0,x2-x),h:Math.max(0,y2-y)}; };
   function draw(c){
     const ov=$ov(); if(!ov||!target) return;
     const W=innerWidth, H=innerHeight, r=Math.max(0,Math.min(cfg.radius||16,c.w/2,c.h/2));

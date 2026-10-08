@@ -93,15 +93,16 @@ const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(
     const shot=async n=>{await p.evaluate(()=>{try{closeCelebration()}catch(e){}});await sleep(600);await p.screenshot({path:'/tmp/shots/'+n+'.png'});};
     await p.evaluate(()=>goNav('social'));
     await p.evaluate(()=>socTab('friends',document.querySelector('.tab-btn[onclick*="friends"]')));
-    await wf(p,()=>document.querySelectorAll('#friends-list .cp-pill.ok').length>=1&&document.querySelectorAll('#friends-list .cp-row').length>=4,null,20000);
+    // Les profils d'amis sont recopiés par le serveur juste après la création des comptes : on attend leurs prénoms.
+    await wf(p,()=>document.querySelectorAll('#friends-list .cp-pill.ok').length>=1&&[...document.querySelectorAll('#friends-list .cp-name')].filter(e=>/^User f/.test(e.textContent)).length>=5&&[...document.querySelectorAll('#friends-list .cp-name')].some(e=>e.textContent==='User F.'),null,45000);
     const rows=await p.evaluate(()=>[...document.querySelectorAll('#friends-list .cp-row')].map(r=>({n:r.querySelector('.cp-name').textContent,p:r.querySelector('.cp-pill').textContent.trim(),t:r.querySelector('.cp-pill').title,s:r.querySelector('.cp-sub').textContent})));
     await shot('compat_list');
-    check('Liste d\'amis unique : triée par compatibilité (100 → 78 → 50 → encore N → privé → en attente)',rows.map(r=>r.n).join()==='User fB,User fA,User fE,User fF,User fC,User fD',rows);
+    check('Liste d\'amis unique : triée par compatibilité (100 → 78 → 50 → encore N → privé → en attente)',rows.map(r=>r.n).join()==='User fB,User fA,User fE,User fF,User fC,User F.',rows);
     check('Liste : pastille de compatibilité (100 %, 78 %)',rows[0].p==='100 %'&&rows[1].p==='78 %',rows.slice(0,2));
     check('Liste : « encore 1 » sous le seuil (détail dans l\'infobulle)',rows[3].p==='encore 1'&&/Réponds à 1 question de plus/.test(rows[3].t),rows[3]);
     check('Liste : « privé » pour l\'ami qui ne partage pas',rows[4].p==='privé'&&/Ne partage pas/.test(rows[4].t),rows[4]);
     check('Chaque ligne affiche ses xp et sa série',rows.every(r=>/xp/.test(r.s)&&/ j/.test(r.s)),rows.map(r=>r.s));
-    check('Liste : l\'ami non réciproque apparaît « en attente » (jamais comparé)',rows.some(r=>r.n==='User fD'&&r.p==='en attente'),rows.filter(r=>r.n==='User fD'));
+    check('Liste : l\'ami non réciproque apparaît « en attente » (jamais comparé)',rows.some(r=>r.n==='User F.'&&r.p==='en attente'),rows.filter(r=>/User F/.test(r.n)));   // pas encore ami : prénom + initiale (copie du classement)
     // profil d'ami
     await p.evaluate(()=>document.querySelector('#friends-list .cp-row[data-uid="fA"]').click());
     await wf(p,()=>document.getElementById('fprofile').classList.contains('active')&&document.querySelector('#fp-compat .fpr-big'),null,15000);
