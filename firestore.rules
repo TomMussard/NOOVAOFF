@@ -514,7 +514,9 @@ service cloud.firestore {
         request.resource.data.cta in ['', 'questions', 'rewards', 'invite', 'friends'] &&
         request.resource.data.forUsers is bool && request.resource.data.forMerchants is bool && request.resource.data.important is bool &&
         request.resource.data.createdAt == request.time;
-      allow update, delete: if false;
+      allow update: if false;
+      // Suppression par l'admin : elle disparaît de l'accueil en direct ; le serveur retire aussi la ligne des cloches.
+      allow delete: if isAdmin();
     }
 
     match /broadcasts/{id} {

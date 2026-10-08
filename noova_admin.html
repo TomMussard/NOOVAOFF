@@ -2130,6 +2130,21 @@ async function sendBroadcast() {
     statusEl.style.color = 'var(--red-text)'; statusEl.textContent = 'Erreur : ' + e.message;
   }
 }
+// Supprimer une annonce : elle disparaît de l'accueil des habitants en direct ; le serveur la retire de chaque cloche
+// et annule les notifications pas encore parties.
+async function deleteAnnouncement(id, btn) {
+  const b = _broadcastHistory.find(x => x.id === id) || {};
+  if (!confirm(`Supprimer l'annonce « ${(b.title || b.message || '').slice(0, 60)} » ?\n\nElle disparaît de l'app et des cloches de tout le monde.`)) return;
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  try {
+    await db.collection('announcements').doc(id).delete();
+    showToast('Annonce supprimée', 'success');
+    await loadBroadcastHistory();
+  } catch (e) {
+    showToast('Suppression impossible : ' + e.message, 'error');
+    if (btn) { btn.disabled = false; btn.textContent = 'Supprimer'; }
+  }
+}
 async function loadBroadcastHistory() {
   const [a, b] = await Promise.all([
     db.collection('announcements').orderBy('createdAt', 'desc').limit(20).get().catch(() => ({ docs: [] })),
@@ -2157,7 +2172,7 @@ function renderBroadcastHistory() {
         <div class="act-name" style="font-weight:600">${b.title ? esc(b.title) + ' : ' : ''}${esc(b.message)}</div>
         <div class="act-meta">${b.recipientCount != null ? b.recipientCount + ' destinataires' : 'envoi en cours'}${b.pushSent != null ? ', ' + b.pushSent + ' notifications téléphone' : ''}${b.important ? ', importante' : ''}${b.ann && b.city && b.city !== 'all' ? ', ' + esc(b.city) : ''}, par ${esc(b.sentBy || 'admin')}</div>
       </div>
-      <div class="act-time">${ts}</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0"><div class="act-time">${ts}</div>${b.ann ? `<button class="btn-reject" onclick="deleteAnnouncement(${jsa(b.id)},this)">Supprimer</button>` : ''}</div>
     </div>`;
   }).join('');
 }

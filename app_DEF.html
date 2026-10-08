@@ -3990,15 +3990,24 @@ function initAnnouncements(city){
   _annUnsubs.push(watch('all'));if(city)_annUnsubs.push(watch(city));
 }
 function annClosed(){try{return JSON.parse(localStorage.getItem('nv_ann_closed')||'[]');}catch(e){return [];}}
+// Une annonce s'efface d'elle-même 3 jours après avoir été vue la première fois (ou si l'habitant la ferme, ou au bout
+// de 14 jours, ou si l'admin la supprime).
+const ANN_SEEN_DAYS=3;
+function annSeen(){try{return JSON.parse(localStorage.getItem('nv_ann_seen')||'{}');}catch(e){return {};}}
 function currentAnn(){
-  const closed=new Set(annClosed()),min=Date.now()-14*86400000;
-  return Object.values(_annAll).flat().filter(a=>!closed.has(a.id)&&_tsMs(a.createdAt)>min).sort((a,b)=>_tsMs(b.createdAt)-_tsMs(a.createdAt))[0]||null;
+  const closed=new Set(annClosed()),seen=annSeen(),now=Date.now(),min=now-14*86400000;
+  return Object.values(_annAll).flat().filter(a=>!closed.has(a.id)&&_tsMs(a.createdAt)>min&&!(seen[a.id]&&now-seen[a.id]>ANN_SEEN_DAYS*86400000))
+    .sort((a,b)=>_tsMs(b.createdAt)-_tsMs(a.createdAt))[0]||null;
+}
+function markAnnSeen(id){
+  try{const s=annSeen();if(s[id])return;s[id]=Date.now();const keep=Object.entries(s).sort((a,b)=>b[1]-a[1]).slice(0,50);localStorage.setItem('nv_ann_seen',JSON.stringify(Object.fromEntries(keep)));}catch(e){}
 }
 const ANN_CTA={questions:'Répondre aux questions',rewards:'Voir les récompenses',invite:'Inviter des amis',friends:'Voir mes amis'};
 function renderAnnCard(){
   const el=document.getElementById('ann-card');if(!el)return;
   const a=currentAnn();
   if(!a){el.innerHTML='';return;}
+  markAnnSeen(a.id);
   const d=new Date(_tsMs(a.createdAt)).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
   el.innerHTML=`<section class="ann-card" aria-label="Annonce de NOOVA"><button type="button" class="ann-x" aria-label="Fermer l'annonce" onclick="closeAnn(${jsa(a.id)})"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <div class="ann-hd"><img src="favicon.svg" alt=""><span class="ann-lbl">Annonce NOOVA</span><span class="ann-date">${esc(d)}</span></div>
