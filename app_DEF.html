@@ -5099,12 +5099,13 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
 <script>
 // Connexion Google « sur le site » : les pages /__/auth/ sont relayées par Vercel vers Firebase (vercel.json), ce qui
 // permet la connexion par redirection (app installée sur l'écran d'accueil, fenêtres surgissantes bloquées).
-// À passer à true UNIQUEMENT après avoir ajouté https://noovaoff.fr/__/auth/handler et https://www.noovaoff.fr/__/auth/handler
-// aux « URI de redirection autorisés » du client OAuth Web (console Google Cloud > API et services > Identifiants).
-const AUTH_ON_SITE = false;
+// Activé le 9 octobre 2026 (URI https://noovaoff.fr/__/auth/handler et https://www.noovaoff.fr/__/auth/handler ajoutées au
+// client OAuth Web). Seulement dans l'app installée sur l'écran d'accueil, où la fenêtre surgissante ne marche pas : dans
+// un navigateur, la connexion par fenêtre via noova-366d0.firebaseapp.com reste celle qui a fait ses preuves.
+const AUTH_ON_SITE = true;
 const firebaseConfig = {
   apiKey: "AIzaSyCU52SgKoIS_P-SEiXFC4d8lQ1rz5mG4to",
-  authDomain: (AUTH_ON_SITE && /^(www\.)?noovaoff\.fr$/.test(location.hostname)) ? location.hostname : "noova-366d0.firebaseapp.com",
+  authDomain: (AUTH_ON_SITE && /^(www\.)?noovaoff\.fr$/.test(location.hostname) && ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true)) ? location.hostname : "noova-366d0.firebaseapp.com",
   projectId: "noova-366d0",
   storageBucket: "noova-366d0.firebasestorage.app",
   messagingSenderId: "710589257687",
