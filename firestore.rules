@@ -67,7 +67,7 @@ service cloud.firestore {
     }
     // Champs d'un habitant tenus par le serveur (solde, réponses, série, notifications…) : jamais écrits par le client.
     function userServerFields() {
-      return ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','welcomeClaimed','streakDate','lastActivityAt','answeredMerchants','discoveryBonusDate','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats','weeklyNoovs','role','createdAt'];
+      return ['points','xp','noovs','dailyEarned','dailyEarnedDate','dailyAnswerCount','dailyAnswerDate','lastQuestionStart','streak','ans','lastAnswerDate','lastDailyDate','answeredCampaigns','demoClaimed','welcomeClaimed','streakDate','lastActivityAt','answeredMerchants','discoveryBonusDate','notifStats','notifPrefs','notifDaily','answerMinutes','dailyPoints','dailyPointsDate','dailyNoovs','dailyNoovsDate','predStats','weeklyNoovs','profileNudges','role','createdAt'];
     }
     function userTextOk(d) {
       return shortStr(d, 'name', 60) && shortStr(d, 'city', 80) && shortStr(d, 'cityLabel', 80) &&

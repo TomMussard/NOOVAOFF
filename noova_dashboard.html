@@ -355,6 +355,9 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
 .mcq-remove:hover { background: rgba(239,68,68,.2); }
 .add-option-btn { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--violet); background: none; border: none; cursor: pointer; padding: 4px 0; transition: opacity .13s; font-family: var(--fb); }
 .add-option-btn:hover { opacity: .75; }
+.qb-multi { display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; font-size: 13px; color: var(--ink); cursor: pointer; line-height: 1.4; }
+.qb-multi input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--ink); flex-shrink: 0; }
+.qb-multi small { display: block; color: var(--ink3); font-size: 11.5px; }
 /* Theme grid */
 .theme-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .th-chip {
@@ -1015,6 +1018,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <div class="qb-sub">Les choix proposés aux répondants (2 à 6 options).</div>
                       <div id="mcq-options"><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option C…"><button class="mcq-remove" onclick="removeOpt(this)">×</button></div></div>
                       <button class="add-option-btn" onclick="addOpt()">+ Ajouter une option</button>
+                      <label class="qb-multi"><input type="checkbox" id="mcq-multi"> <span><b>2 réponses possibles</b> au lieu d'une seule <small>(pas plus : au-delà, les résultats perdent leur sens)</small></span></label>
                     </div>
                 </div>
                 <div class="qb" id="wz-q-extra-2" style="display:none">
@@ -1032,6 +1036,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <div class="qb-sub">Les choix proposés aux répondants (2 à 6 options).</div>
                       <div id="q2-mcq-opts"><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div></div>
                       <button class="add-option-btn" onclick="addQOpt('q2-mcq-opts')">+ Ajouter une option</button>
+                      <label class="qb-multi"><input type="checkbox" id="q2-multi"> <span><b>2 réponses possibles</b> au lieu d'une seule <small>(pas plus : au-delà, les résultats perdent leur sens)</small></span></label>
                     </div>
                   </div>
                 <div class="qb" id="wz-q-extra-3" style="display:none">
@@ -1049,6 +1054,7 @@ button, input, textarea, select { font-family: inherit; color: inherit; }
                       <div class="qb-sub">Les choix proposés aux répondants (2 à 6 options).</div>
                       <div id="q3-mcq-opts"><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option A…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div><div class="mcq-option-row"><input class="mcq-opt-inp" placeholder="Option B…"><button class="mcq-remove" onclick="removeQOpt(this)">×</button></div></div>
                       <button class="add-option-btn" onclick="addQOpt('q3-mcq-opts')">+ Ajouter une option</button>
+                      <label class="qb-multi"><input type="checkbox" id="q3-multi"> <span><b>2 réponses possibles</b> au lieu d'une seule <small>(pas plus : au-delà, les résultats perdent leur sens)</small></span></label>
                     </div>
                   </div>
                 <button id="wz-add-q-btn" onclick="addWizQ()" style="display:flex;align-items:center;gap:6px;background:none;border:1.5px dashed var(--border-ctl);border-radius:var(--rx);padding:9px 14px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;width:100%;justify-content:center">+ Ajouter une question <span style="font-size:11px;color:var(--ink2)">(max 3 au total)</span></button>
@@ -1613,6 +1619,8 @@ function computeResults(c, all, events){
 }
 
 // ── Petits composants d'affichage ──
+// Options choisies dans une réponse : une seule, ou deux pour une question « 2 réponses possibles » (champ answers).
+const ansList = a => Array.isArray(a.answers) ? a.answers.map(String) : [String(a.answer ?? '')];
 function rsBars(rows, opt){
   opt = opt || {}; const max = Math.max(1, ...rows.map(r => r.n));
   return rows.map(r => `<div class="rs-bar-row"><div class="rs-bar-l">${esc(r.label)}</div><div class="rs-bar"><div class="rs-bar-f" style="width:${Math.round(r.n / max * 100)}%;${opt.color ? 'background:' + opt.color : ''}"></div></div><div class="rs-bar-v">${opt.pct ? rsPct(r.n, opt.total) + ' % ' : ''}<span>(${r.n})</span></div></div>`).join('');
@@ -1630,19 +1638,19 @@ const fmtSec = ms => ms == null ? '—' : (ms / 1000 < 10 ? (ms / 1000).toFixed(
 
 function rsQuestionHTML(q, idx, r, total){
   const qa = r.valid.filter(a => (a.questionIdx || 0) === idx);
-  const head = `<div class="rs-q-h"><span class="rs-q-n">Question ${idx + 1}${total > 1 ? ' / ' + total : ''}</span><span class="rs-q-f">${{ mcq: 'Choix multiple', scale: 'Échelle 1–10', rank: 'Classement', text: 'Texte libre' }[q.format] || ''} · ${qa.length} réponse${qa.length > 1 ? 's' : ''}</span></div><div class="rs-q-t">${esc(q.q || '')}</div>`;
+  const head = `<div class="rs-q-h"><span class="rs-q-n">Question ${idx + 1}${total > 1 ? ' / ' + total : ''}</span><span class="rs-q-f">${{ mcq: q.multi ? 'Choix multiple (2 réponses)' : 'Choix multiple', scale: 'Échelle 1–10', rank: 'Classement', text: 'Texte libre' }[q.format] || ''} · ${qa.length} réponse${qa.length > 1 ? 's' : ''}</span></div><div class="rs-q-t">${esc(q.q || '')}</div>`;
   if(qa.length < RES_MIN) return `<div class="rs-q card">${head}${qa.length ? rsMasked(qa.length) : '<div class="rs-masked">Aucune réponse pour cette question.</div>'}</div>`;
   let body = '';
   if(q.format === 'mcq' && (q.options || []).length){
-    const counts = {}; q.options.forEach(o => counts[o] = 0); qa.forEach(a => { if(counts[a.answer] !== undefined) counts[a.answer]++; });
-    const rows = q.options.map(o => ({ label: o, n: counts[o] })).sort((x, y) => y.n - x.n), tot = rows.reduce((s, x) => s + x.n, 0);
-    body = rsBars(rows, { pct: true, total: tot });
+    const counts = {}; q.options.forEach(o => counts[o] = 0); qa.forEach(a => ansList(a).forEach(x => { if(counts[x] !== undefined) counts[x]++; }));
+    const rows = q.options.map(o => ({ label: o, n: counts[o] })).sort((x, y) => y.n - x.n), tot = q.multi ? qa.length : rows.reduce((s, x) => s + x.n, 0);
+    body = (q.multi ? '<div class="rs-sub" style="margin-top:0">2 réponses possibles : pourcentage des répondants qui ont choisi chaque option (le total dépasse 100 %).</div>' : '') + rsBars(rows, { pct: true, total: tot });
     // Réponse par tranche d'âge (abonnés seulement : les réponses de découverte n'ont pas d'âge)
     const aged = qa.filter(a => a.respondentAge);
     if(aged.length >= 1){
       const groups = {}; aged.forEach(a => { const k = resAgeBucket(a.respondentAge); (groups[k] = groups[k] || []).push(a); });
       const cols = RES_AGES.filter(k => (groups[k] || []).length >= 1);
-      if(cols.length >= 2) body += `<div class="rs-sub">Par tranche d'âge <span>(abonnés)</span></div><div class="rs-tblwrap" tabindex="0" role="region" aria-label="Réponses par tranche d'âge"><table class="rs-tbl"><thead><tr><th scope="col">Réponse</th>${cols.map(k => `<th scope="col">${k}</th>`).join('')}</tr></thead><tbody>${rows.map(rw => `<tr><th scope="row">${esc(rw.label)}</th>${cols.map(k => { const g = groups[k]; return `<td>${rsPct(g.filter(a => a.answer === rw.label).length, g.length)} %</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`;
+      if(cols.length >= 2) body += `<div class="rs-sub">Par tranche d'âge <span>(abonnés)</span></div><div class="rs-tblwrap" tabindex="0" role="region" aria-label="Réponses par tranche d'âge"><table class="rs-tbl"><thead><tr><th scope="col">Réponse</th>${cols.map(k => `<th scope="col">${k}</th>`).join('')}</tr></thead><tbody>${rows.map(rw => `<tr><th scope="row">${esc(rw.label)}</th>${cols.map(k => { const g = groups[k]; return `<td>${rsPct(g.filter(a => ansList(a).includes(rw.label)).length, g.length)} %</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`;
     }
   } else if(q.format === 'scale'){
     const vals = qa.map(a => Number(a.answer)).filter(v => v >= 1 && v <= 10);
@@ -1671,7 +1679,7 @@ function rsHighlights(c, r){
     const qa = r.valid.filter(a => (a.questionIdx || 0) === i);
     if(qa.length < RES_MIN) return;
     if(q.format === 'mcq' && (q.options || []).length){
-      const counts = {}; q.options.forEach(o => counts[o] = 0); qa.forEach(a => { if(counts[a.answer] !== undefined) counts[a.answer]++; });
+      const counts = {}; q.options.forEach(o => counts[o] = 0); qa.forEach(a => ansList(a).forEach(x => { if(counts[x] !== undefined) counts[x]++; }));
       const top = Object.entries(counts).sort((x, y) => y[1] - x[1])[0]; if(top && top[1]) out.push(`Question ${i + 1} : « ${esc(top[0])} » arrive en tête avec ${rsPct(top[1], qa.length)} % des réponses.`);
     } else if(q.format === 'scale'){
       const vals = qa.map(a => Number(a.answer)).filter(v => v >= 1 && v <= 10); if(vals.length) out.push(`Question ${i + 1} : note moyenne de ${(vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(1).replace('.', ',')}/10.`);
@@ -1737,7 +1745,7 @@ function exportCampCSV(){
   r.qs.forEach((q, idx) => {
     const qa = r.valid.filter(a => (a.questionIdx || 0) === idx);
     if(qa.length < RES_MIN){ rows.push([q.q, `Moins de ${RES_MIN} réponses, résultats masqués`, qa.length, '']); return; }
-    const counts = {}; qa.forEach(a => { const k = String(a.answer ?? ''); counts[k] = (counts[k] || 0) + 1; });
+    const counts = {}; qa.forEach(a => (q.format === 'mcq' ? ansList(a) : [String(a.answer ?? '')]).forEach(k => { counts[k] = (counts[k] || 0) + 1; }));
     Object.entries(counts).sort((x, y) => y[1] - x[1]).forEach(([k, n]) => rows.push([q.q, k, n, Math.round(n / qa.length * 100) + ' %']));
   });
   csvDownload(rows, `noova-resume-${new Date().toISOString().slice(0, 10)}.csv`);
@@ -1918,6 +1926,7 @@ function wzQuestionsSummary(){
 }
 
 function resetWizard(){
+  ['mcq-multi','q2-multi','q3-multi'].forEach(id=>{const m=document.getElementById(id);if(m)m.checked=false;});
   _wzDays=null;{const di=document.getElementById('dur-days');if(di)di.value='';}renderDuration();
   const ta=document.getElementById('q-text-inp');if(ta)ta.value='';
   const ni=document.getElementById('camp-name-inp');if(ni)ni.value='';
@@ -1970,14 +1979,14 @@ function setFmtNByName(qNum, fmt) {
 }
 function collectWizFormState() {
   const q1opts = needsOptions(curFmt) ? collectOptions('#mcq-options') : [];
-  const questions = [{ q: (document.getElementById('q-text-inp') || {}).value || '', format: curFmt, options: q1opts }];
+  const questions = [qObj(1, (document.getElementById('q-text-inp') || {}).value || '', curFmt, q1opts)];
   for(let i = 2; i <= 3; i++) {
     const block = document.getElementById('wz-q-extra-' + i);
     if(block && block.style.display !== 'none') {
       const fmt = (document.getElementById('q' + i + '-fmt-sel') || {}).value || 'mcq';
       const qText = (document.getElementById('q' + i + '-text-inp') || {}).value || '';
       const qOpts = needsOptions(fmt) ? collectOptions('#q' + i + '-mcq-opts') : [];
-      questions.push({ q: qText, format: fmt, options: qOpts });
+      questions.push(qObj(i, qText, fmt, qOpts));
     }
   }
   return {
@@ -2025,6 +2034,7 @@ async function restoreDraftIfAny() {
   const ta = document.getElementById('q-text-inp'); if(ta) ta.value = qs[0].q || '';
   setFmt1ByName(qs[0].format || 'mcq');
   if(needsOptions(qs[0].format || 'mcq')) fillOptionRows('mcq-options', qs[0].options, 'removeOpt');
+  { const m = document.getElementById('mcq-multi'); if(m) m.checked = qs[0].multi === true; }
   updatePreview(); renderPreviewAnswer();
   for(let i = 1; i < qs.length && i < 3; i++) {
     addWizQ();
@@ -2032,6 +2042,7 @@ async function restoreDraftIfAny() {
     const qta = document.getElementById('q' + qn + '-text-inp'); if(qta) qta.value = qs[i].q || '';
     setFmtNByName(qn, qs[i].format || 'mcq');
     if(needsOptions(qs[i].format || 'mcq')) fillOptionRows('q' + qn + '-mcq-opts', qs[i].options, 'removeQOpt');
+    { const m = document.getElementById('q' + qn + '-multi'); if(m) m.checked = qs[i].multi === true; }
   }
   renderThemeChips(); (d.targetInterests || []).forEach(t => document.querySelectorAll('.th-chip').forEach(c => { if(c.dataset.key === t) c.classList.add('sel'); }));
   (d.ageRanges || []).forEach(a => document.querySelectorAll('.age-chip').forEach(c => { if(c.textContent.trim() === a) c.classList.add('sel'); }));
@@ -2071,7 +2082,11 @@ function removeOpt(btn){ const opts=document.querySelectorAll('#mcq-options .mcq
 // ═══ MCQ BUILDERS Q2 / Q3 ═════════════════════════════════════
 // Un choix multiple ET un classement ont besoin d'une liste d'éléments ; une échelle non.
 const needsOptions = (fmt) => fmt === 'mcq' || fmt === 'rank';
+// Case « 2 réponses possibles » (choix multiple seulement) : question n (1 à 3).
+const multiOf = (n) => !!(document.getElementById(n === 1 ? 'mcq-multi' : 'q' + n + '-multi') || {}).checked;
+const qObj = (n, q, format, options) => ({ q, format, options, ...(format === 'mcq' && multiOf(n) ? { multi: true } : {}) });
 function qbBuilderLabels(builderId, fmt) {
+  const mu = document.querySelector('#' + builderId + ' .qb-multi'); if(mu) mu.style.display = fmt === 'mcq' ? '' : 'none';
   const t = document.querySelector('#' + builderId + ' .qb-title'), u = document.querySelector('#' + builderId + ' .qb-sub');
   if(t) t.textContent = fmt === 'rank' ? 'Éléments à classer' : 'Options de réponse';
   if(u) u.textContent = fmt === 'rank' ? 'Les éléments que les répondants classeront du plus au moins important (2 à 6).' : 'Les choix proposés aux répondants (2 à 6 options).';
@@ -3375,7 +3390,7 @@ launchCampaign = async function() {
   const campName = document.getElementById('camp-name-inp')?.value?.trim() || q1.substring(0,60);
 
   // Collecter les questions supplémentaires
-  const questions = [{ q: q1, format: curFmt, options }];
+  const questions = [qObj(1, q1, curFmt, options)];
   for(let i = 2; i <= 3; i++) {
     const block = document.getElementById('wz-q-extra-' + i);
     if(block && block.style.display !== 'none') {
@@ -3384,7 +3399,7 @@ launchCampaign = async function() {
       const qOpts = needsOptions(qFmt) ? collectOptions('#q' + i + '-mcq-opts') : [];
       if(!qText) { showToast('Question ' + i + ' vide : rédigez-la ou retirez-la.', 'warning'); return; }
       if(needsOptions(qFmt) && qOpts.length < 2) { showToast('Question ' + i + ' : ajoutez au moins 2 ' + (qFmt === 'rank' ? 'éléments à classer' : 'options de réponse') + ' différents.', 'warning'); return; }
-      questions.push({ q: qText, format: qFmt, options: qOpts });
+      questions.push(qObj(i, qText, qFmt, qOpts));
     }
   }
 
