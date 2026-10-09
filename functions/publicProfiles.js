@@ -68,6 +68,10 @@ async function syncUser(uid, before, after) {
   ]);
 }
 async function syncMerchant(mid, before, after) {
+  // Les déclencheurs peuvent arriver dans le désordre (modification juste avant une suppression) : on recopie la fiche
+  // telle qu'elle est maintenant, pour qu'une vitrine ne réapparaisse jamais après la suppression du commerce.
+  const cur = await db().collection("merchants").doc(mid).get();
+  after = cur.exists ? cur.data() : null;
   await mirror(db().collection("merchantsPublic").doc(mid), merchantOf(before), merchantOf(after));
 }
 

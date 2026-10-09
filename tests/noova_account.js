@@ -17,6 +17,8 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
     await db.doc('users/'+u).set({role:'user',name:'U '+u,email:u+'@t.fr',city:c,cityLabel:l,welcomeClaimed:true,onboardingStep:'done',seenHomeTour:true,authorizedMerchants:[],answeredCampaigns:[],points:0,xp:0,streak:0,ageRange:'25-34',interests:['restauration'],friendUids:[]});
     await aauth.createUser({uid:u,email:u+'@t.fr',password:'secret123'});
   }
+  await aauth.createUser({uid:'nv',email:'noova@t.fr',password:'secret123'});
+  await db.doc('merchantPosts/p1').set({merchantId:'nv',merchantName:'NOOVA',city:'le-mans',text:'Bienvenue',createdAt:Timestamp.now()});
   await aauth.createUser({uid:'adm',email:'tomussproduction@gmail.com',password:'secret123',emailVerified:true});
   const b=await puppeteer.launch({executablePath:process.env.CHROME_PATH,headless:'new',args:['--no-sandbox']});
   const errs=[];
@@ -45,6 +47,12 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
     await a.evaluate(async()=>{const el=document.createElement('input');el.type='checkbox';el.checked=false;await saveMerchantBroadcast('nv',el);});
     const back=(await db.doc('campaigns/q1').get()).data();
     check('Diffusion décochée : la question revient à la ville du commerce',back.targetCity==='le-mans'&&back.broadcast===false&&back.cityLabel==='Le Mans',back);
+    // Supprimer l'ancien compte NOOVA (Zone de danger) pour en recréer un : tout part, compte de connexion compris.
+    await a.evaluate(async()=>{await callAdminDeleteAccount({uid:'nv',role:'merchant'});});
+    await sleep(4000);   // les recopies automatiques en retard (diffusion décochée juste avant) ne doivent pas faire revenir la vitrine
+    const left={m:(await db.doc('merchants/nv').get()).exists,pub:(await db.doc('merchantsPublic/nv').get()).exists,camps:(await db.collection('campaigns').where('merchantId','==','nv').get()).size,posts:(await db.collection('merchantPosts').where('merchantId','==','nv').get()).size,auth:await aauth.getUser('nv').then(()=>true,()=>false)};
+    check('Ancien compte NOOVA supprimé : fiche, vitrine, questions, actualités et compte de connexion',!left.m&&!left.pub&&!left.camps&&!left.posts&&!left.auth,left);
+    await aauth.createUser({uid:'nv2',email:'noova@t.fr',password:'secret123'}).then(()=>check('La même adresse peut recréer un compte',true),e=>check('La même adresse peut recréer un compte',false,e.message));
   }catch(e){fail++;console.log('FAIL exception -> '+String(e.stack||e).slice(0,300));}
   check('Aucune erreur JavaScript',errs.length===0,errs);
   await b.close();
