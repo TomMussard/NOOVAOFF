@@ -572,17 +572,19 @@ exports.adminDeleteAccount = onCall(async (request) => {
   }
 
   if (role === "merchant") {
-    const [campSnap, rewSnap, redemSnap, answSnap, consentSnap, invSnap] = await Promise.all([
+    const [campSnap, rewSnap, redemSnap, answSnap, consentSnap, invSnap, postSnap] = await Promise.all([
       db.collection("campaigns").where("merchantId", "==", uid).get(),
       db.collection("rewards").where("merchantId", "==", uid).get(),
       db.collection("redemptions").where("merchantId", "==", uid).get(),
       db.collection("answers").where("merchantId", "==", uid).get(),
       db.collection("consentEvents").where("merchantId", "==", uid).get(),
       db.collection("invoices").where("merchantId", "==", uid).get(),
+      db.collection("merchantPosts").where("merchantId", "==", uid).get(),
     ]);
-    const merchantDocs = [...campSnap.docs, ...rewSnap.docs, ...redemSnap.docs, ...answSnap.docs, ...consentSnap.docs, ...invSnap.docs];
+    const merchantDocs = [...campSnap.docs, ...rewSnap.docs, ...redemSnap.docs, ...answSnap.docs, ...consentSnap.docs, ...invSnap.docs, ...postSnap.docs];
     for (const d of merchantDocs) await db.recursiveDelete(d.ref);
     await db.recursiveDelete(db.collection("merchants").doc(uid));
+    await db.collection("merchantsPublic").doc(uid).delete();   // vitrine publique : sans attendre la recopie automatique
   } else {
     const [answSnap, redemSnap, commSnap, friendCodeSnap, chatSnap, consentSnap, notifFromSnap, notifToSnap] = await Promise.all([
       db.collection("answers").where("userId", "==", uid).get(),
