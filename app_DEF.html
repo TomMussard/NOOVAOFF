@@ -1682,21 +1682,16 @@ button.soc-bell{padding:0;font-family:var(--font)}
       <button class="dh-pts hdr-pts-wrap-el" onclick="goNav('rewards-tab')"><span class="dh-pts-n hdr-pts-n-el" id="home-pts">0</span><span class="dh-pts-l">PTS</span></button>
     </div>
     <div id="ann-card"></div>
-    <!-- Accueil façon fil : onglets Questions (commerces) / NOOVA / Commerces -->
+    <!-- Accueil façon fil : onglets Questions (commerces, puis « À deux pas ») / NOOVA -->
     <div class="hm-tabs" role="tablist" aria-label="Accueil">
       <button type="button" class="hm-tab on" role="tab" id="hm-tab-q" aria-selected="true" aria-controls="hm-q" onclick="homeTab('q')">Questions<span class="hm-n" id="hm-n-q"></span></button>
       <button type="button" class="hm-tab" role="tab" id="hm-tab-noova" aria-selected="false" aria-controls="hm-noova" onclick="homeTab('noova')">NOOVA<span class="hm-n" id="hm-n-noova"></span></button>
-      <button type="button" class="hm-tab" role="tab" id="hm-tab-shops" aria-selected="false" aria-controls="hm-shops" onclick="homeTab('shops')">Commerces</button>
     </div>
     <div class="hm-page" id="hm-q" role="tabpanel" aria-labelledby="hm-tab-q">
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
     <div id="home-requests"></div>
       <div class="hm-feed" id="hm-feed-q"></div>
-    </div>
-    <div class="hm-page" id="hm-noova" role="tabpanel" aria-labelledby="hm-tab-noova" hidden>
-      <div class="hm-feed" id="hm-feed-noova"></div>
-    </div>
-    <div class="hm-page" id="hm-shops" role="tabpanel" aria-labelledby="hm-tab-shops" hidden>
+      <!-- Sous toutes les questions : les commerces à deux pas -->
     <div class="dsec-row"><div class="dsec-title">À deux pas</div><div class="dsec-link" onclick="openFullMap()">Voir la carte</div></div>
     <div class="dmap-card" id="dmap-card" onclick="openFullMap()">
       <svg viewBox="0 0 340 122" class="dmap-illo" role="img" aria-label="Carte du quartier">
@@ -1717,6 +1712,9 @@ button.soc-bell{padding:0;font-family:var(--font)}
     </div>
     <div class="dnearby-grid" id="dnearby-grid"></div>
     <div class="dnb-more-wrap" id="dnb-more-wrap" style="display:none"><button class="btn-s" id="dnb-more" onclick="toggleNearbyAll()">Plus de commerces</button></div>
+    </div>
+    <div class="hm-page" id="hm-noova" role="tabpanel" aria-labelledby="hm-tab-noova" hidden>
+      <div class="hm-feed" id="hm-feed-noova"></div>
     </div>
     <!-- Anciens blocs de l'accueil (question du jour, « À répondre », prochaine récompense, compteur du jour) : remplacés
          par le fil ci-dessus. Gardés masqués le temps que tout le code qui les remplit soit retiré. -->
@@ -2732,14 +2730,13 @@ function refreshHome(){
   renderNearbyMap();
 }
 // ─── Accueil : le fil de questions ──────────────────────────
-// Onglet « Questions » : les questions des commerces ; « NOOVA » : celles de NOOVA ; « Commerces » : carte et commerces.
+// Onglet « Questions » : les questions des commerces, puis « À deux pas » (carte et commerces) ; « NOOVA » : celles de NOOVA.
 // Chaque carte : photo, gain (points ou NOOVS), commerce, question ; la toucher ouvre la même réponse qu'avant.
 let _homeTab='q';
 function homeTab(t){
   _homeTab=t;
-  ['q','noova','shops'].forEach(k=>{const b=document.getElementById('hm-tab-'+k),pg=document.getElementById('hm-'+k);if(!b||!pg)return;
+  ['q','noova'].forEach(k=>{const b=document.getElementById('hm-tab-'+k),pg=document.getElementById('hm-'+k);if(!b||!pg)return;
     b.classList.toggle('on',k===t);b.setAttribute('aria-selected',String(k===t));pg.hidden=k!==t;});
-  if(t==='shops')renderNearbyMap();
 }
 function hqCardHTML(q,i){
   // Sans photo : pas de grand bloc vide, le gain passe sur la ligne du commerce.

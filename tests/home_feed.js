@@ -1,4 +1,4 @@
-// Accueil façon fil (onglets Questions / NOOVA / Commerces, une carte par question), Messages dans la barre du bas,
+// Accueil façon fil (onglets Questions (puis « À deux pas ») / NOOVA, une carte par question), Messages dans la barre du bas,
 // page Récompenses simplifiée (solde, bons, « Tu peux t'offrir », « Bientôt à ta portée »).
 process.env.FIRESTORE_EMULATOR_HOST='127.0.0.1:8080';process.env.FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:9099';process.env.FUNCTIONS_EMULATOR='true';
 const puppeteer=require('puppeteer-core');const admin=require(__dirname+'/helpers/admin');
@@ -28,7 +28,7 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
   await wf(p,()=>document.getElementById('home').classList.contains('active')&&document.querySelectorAll('.hq-card').length>=2);await sleep(1500);
   await shot(p,'home_q');
   const h=await p.evaluate(()=>({tabs:[...document.querySelectorAll('.hm-tab')].map(t=>t.textContent.replace(/\d+/,'').trim()),q:[...document.querySelectorAll('#hm-feed-q .hq-card')].map(c=>c.textContent),legacy:getComputedStyle(document.getElementById('home-legacy')).display,gains:[...document.querySelectorAll('#hm-feed-q .hq-gain')].map(g=>g.textContent),count:document.getElementById('hm-n-q').textContent}));
-  check('Accueil : 3 onglets Questions / NOOVA / Commerces',h.tabs.join()==='Questions,NOOVA,Commerces',h.tabs);
+  check('Accueil : 2 onglets Questions / NOOVA',h.tabs.join()==='Questions,NOOVA',h.tabs);
   check('Onglet Questions : une carte par question de commerce (commerce, question, gain), pas celle de NOOVA',h.q.length===2&&h.q.every(t=>!/NOOVA/.test(t))&&h.q.some(t=>/Le Fournil/.test(t)&&/baguette/.test(t))&&h.gains.every(g=>/\+10 pts/.test(g))&&h.count==='2',h);
   check('Plus de « À répondre », de « prochaine récompense » ni de question du jour séparée',h.legacy==='none'&&!/À répondre|prochaine récompense/.test(await p.evaluate(()=>document.getElementById('home').innerText)));
   await p.evaluate(()=>homeTab('noova'));await sleep(500);await shot(p,'home_noova');
@@ -37,8 +37,10 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
   await p.click('#hm-feed-noova .hq-card');await sleep(700);
   check('Toucher une carte ouvre la question, comme avant',await p.evaluate(()=>cur==='question'&&/revenir chaque jour/.test(document.getElementById('q-text').textContent)));
   await p.evaluate(()=>goNav('home'));await sleep(400);
-  await p.evaluate(()=>homeTab('shops'));await sleep(800);await shot(p,'home_shops');
-  check('Onglet Commerces : la carte et les commerces à deux pas',await p.evaluate(()=>!document.getElementById('hm-shops').hidden&&document.querySelectorAll('#dnearby-grid .dnb-card').length===2));
+  await p.evaluate(()=>homeTab('q'));await sleep(500);
+  const shops=await p.evaluate(()=>{const f=document.getElementById('hm-feed-q'),m=document.getElementById('dmap-card');return {below:!!(f.compareDocumentPosition(m)&Node.DOCUMENT_POSITION_FOLLOWING)&&m.closest('#hm-q')!==null,n:document.querySelectorAll('#dnearby-grid .dnb-card').length};});
+  check('« À deux pas » (carte et commerces) sous toutes les questions, dans l\'onglet Questions',shops.below&&shops.n===2,shops);
+  await p.evaluate(()=>document.getElementById('dmap-card').scrollIntoView());await sleep(400);await shot(p,'home_shops');
   await p.evaluate(()=>{document.querySelectorAll('.firebase-emulator-warning').forEach(e=>e.remove());goNav('inbox');});await sleep(600);await shot(p,'nav_inbox');
   check('Messages dans la barre du bas, juste avant Profil',await p.evaluate(()=>{const m=document.getElementById('nav-inbox');return cur==='inbox'&&m.nextElementSibling.id==='nav-profile'&&document.getElementById('bnav').classList.contains('show')&&m.classList.contains('on');}));
   await p.evaluate(()=>goNav('rewards-tab'));await sleep(1500);await shot(p,'rw1');
