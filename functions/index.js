@@ -35,6 +35,7 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./publicProfiles")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./autoZones")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./social")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./announcements")));
+Object.assign(exports, (({ _t, ...fns }) => fns)(require("./profileNudges")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./adminStats")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./adminAlerts")));
 Object.assign(exports, (({ _t, ...fns }) => fns)(require("./mailer")));
@@ -42,6 +43,8 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./mailer")));
 // Économie NOOVA : seules les N premières réponses de la journée rapportent des POINTS échangeables ;
 // au-delà (« mode libre »), chaque réponse rapporte des NOOVS. Toutes les valeurs : engagementConfig.js.
 const CFG = require("./engagementConfig");
+// Choix multiple « plusieurs réponses possibles » : 2 au plus (au-delà, les statistiques ne veulent plus rien dire).
+const MCQ_MULTI_MAX = 2;
 const { sectorCategory, parisDay, ADMIN_EMAILS, campaignQuestions } = require("./lib");
 const NOOVS_PER_ANSWER = CFG.POINTS.NOOVS_PER_ANSWER;
 const MAX_POINT_ANSWERS_PER_DAY = CFG.POINTS.MAX_ANSWERS_PER_DAY;
@@ -159,10 +162,15 @@ exports.submitAnswer = onCall(async (request) => {
     // Réponse valide pour le format de la question (jamais confiance au client : réponse vide ou hors liste refusée).
     {
       const qd = campaignQuestions(camp)[qIdx] || {};
-      const val = answerValue == null ? "" : String(answerValue);
+      const val = answerValue == null || Array.isArray(answerValue) ? "" : String(answerValue);
       const opts = Array.isArray(qd.options) ? qd.options.map(String) : [];
       let ok = true;
-      if (qd.format === "mcq") ok = opts.includes(val);
+      // Choix multiple « 2 réponses possibles » (multi) : 1 ou 2 options différentes de la liste, jamais plus.
+      if (qd.format === "mcq" && qd.multi === true) {
+        const list = Array.isArray(answerValue) ? answerValue.map(String) : (answerValue == null ? [] : [String(answerValue)]);
+        ok = list.length >= 1 && list.length <= MCQ_MULTI_MAX && new Set(list).size === list.length && list.every((x) => opts.includes(x));
+      } else if (Array.isArray(answerValue)) ok = false;
+      else if (qd.format === "mcq") ok = opts.includes(val);
       else if (qd.format === "scale") ok = /^([1-9]|10)$/.test(val);
       else if (qd.format === "rank") { const parts = val.split(" > "); ok = parts.length === opts.length && [...parts].sort().join("\u0000") === [...opts].sort().join("\u0000"); }
       else if (qd.format === "text") ok = val.trim().length >= 5;
@@ -257,13 +265,20 @@ exports.submitAnswer = onCall(async (request) => {
 
     // Reveal : index de l'option choisie (question à choix) ; le texte reste la référence stockée.
     const qDef = campaignQuestions(camp)[qIdx] || { format: camp.format, options: camp.options };
-    const optionIdx = (qDef.format === "mcq" && Array.isArray(qDef.options)) ? qDef.options.indexOf(answerValue != null ? String(answerValue) : "") : -1;
+    const multi = qDef.format === "mcq" && qDef.multi === true;
+    // Réponses choisies (une seule, ou 1 à 2 pour « 2 réponses possibles »), dans l'ordre de la liste du commerçant.
+    const chosen = multi ? (Array.isArray(answerValue) ? answerValue : [answerValue]).map(String) : [answerValue != null ? String(answerValue) : ""];
+    const optionIdxs = (qDef.format === "mcq" && Array.isArray(qDef.options)) ? qDef.options.map(String).map((o, i) => (chosen.includes(o) ? i : -1)).filter((i) => i >= 0) : [];
+    const optionIdx = optionIdxs.length ? optionIdxs[0] : -1;
+    const answerText = multi ? qDef.options.map(String).filter((o) => chosen.includes(o)).join(" ; ") : (answerValue != null ? String(answerValue) : "");
     const counted = optionIdx >= 0 && (CFG.REVEAL.COUNT_SUSPECT || !suspect) && (CFG.REVEAL.COUNT_FLAGGED || !flagged);
 
     // ── Écritures (transaction atomique) ──
     if (counted) {
       // Compteur serveur-seul par option : le client ne peut jamais lire la répartition avant d'avoir répondu.
-      shared.push(() => db.collection("campaignStats").doc(campaignId).set({ [`q${qIdx}`]: { n: FieldValue.increment(1), c: { [String(optionIdx)]: FieldValue.increment(1) } } }, { merge: true }));
+      // n = nombre de répondants ; chaque option choisie compte (2 réponses possibles : les % dépassent 100 au total).
+      const c = {}; optionIdxs.forEach((i) => { c[String(i)] = FieldValue.increment(1); });
+      shared.push(() => db.collection("campaignStats").doc(campaignId).set({ [`q${qIdx}`]: { n: FieldValue.increment(1), c } }, { merge: true }));
     }
     tx.set(answerRef, {
       campaignId,
@@ -273,7 +288,8 @@ exports.submitAnswer = onCall(async (request) => {
       brand: camp.merchantName || "",
       question: (camp.question || (camp.questions && camp.questions[qIdx] && camp.questions[qIdx].q) || "").toString().substring(0, 120),
       ico: camp.brandEmoji || "❓",
-      answer: answerValue != null ? String(answerValue).substring(0, 500) : "",
+      answer: answerText.substring(0, 500),
+      ...(multi ? { answers: qDef.options.map(String).filter((o) => chosen.includes(o)), optionIdxs } : {}),
       pointsAwarded: totalEarned,
       noovsAwarded: noovsEarned,
       noovsWithheld,

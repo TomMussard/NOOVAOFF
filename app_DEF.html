@@ -615,6 +615,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .ans-ta::placeholder{color:var(--ink3)}
 .char-ct{font-size:var(--fs-1);color:var(--ink3);text-align:right}
 .mcq-list{display:flex;flex-direction:column;gap:8px}
+.mcq-hint{font-size:var(--fs-2);font-weight:700;color:var(--text-2);margin-bottom:var(--s2)}
+.mcq-list.multi .mcq-ck{border-radius:var(--r-xs)}
 .mcq-opt{padding:16px;border-radius:var(--r-md);background:var(--surface);border:1.5px solid var(--line-strong);cursor:pointer;font-size:var(--fs-4);font-weight:500;color:var(--ink);transition:all .13s;display:flex;align-items:center;gap:13px}
 .mcq-opt.sel{border-color:var(--ink);background:var(--surface-2);color:var(--ink);font-weight:700}
 .mcq-ck{width:22px;height:22px;border-radius:var(--r-pill);border:2px solid var(--text-3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0;transition:all .13s}
@@ -2847,10 +2849,20 @@ function buildAns(q){
     ta.oninput=function(){const n=this.value.length;document.getElementById('sub-btn').disabled=n<5;cc.textContent=n<5?`encore ${5-n} car.`:`${n} / 150`;};
     el.appendChild(ta);el.appendChild(cc);
   }else if(q.type==='mcq'){
-    const ul=document.createElement('div');ul.className='mcq-list';
+    const ul=document.createElement('div');ul.className='mcq-list'+(q.multi?' multi':'');
+    // « 2 réponses possibles » : on coche 1 ou 2 options ; une 3e remplace la plus ancienne.
+    let picked=[];
+    if(q.multi){const h=document.createElement('div');h.className='mcq-hint';h.textContent='Jusqu\'à 2 réponses';el.appendChild(h);}
     (q.opts||[]).forEach(opt=>{
-      const d=document.createElement('div');d.className='mcq-opt';d.innerHTML=`<div class="mcq-ck"></div><span>${opt}</span>`;
-      d.onclick=function(){document.querySelectorAll('.mcq-opt').forEach(o=>{o.classList.remove('sel');o.querySelector('.mcq-ck').textContent=''});this.classList.add('sel');this.querySelector('.mcq-ck').textContent='✓';document.getElementById('sub-btn').disabled=false};
+      const d=document.createElement('div');d.className='mcq-opt';d.innerHTML=`<div class="mcq-ck"></div><span>${esc(opt)}</span>`;
+      d.setAttribute('role',q.multi?'checkbox':'radio');d.setAttribute('aria-checked','false');d.tabIndex=0;
+      d.onclick=function(){
+        if(q.multi){picked=picked.includes(this)?picked.filter(x=>x!==this):[...picked,this].slice(-2);}
+        else picked=[this];
+        ul.querySelectorAll('.mcq-opt').forEach(o=>{const on=picked.includes(o);o.classList.toggle('sel',on);o.setAttribute('aria-checked',on?'true':'false');o.querySelector('.mcq-ck').textContent=on?'✓':'';});
+        document.getElementById('sub-btn').disabled=!picked.length;
+      };
+      d.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();this.click();}};
       ul.appendChild(d);
     });el.appendChild(ul);
   }else if(q.type==='scale'){
@@ -3826,7 +3838,7 @@ function initNotifications(uid){
       _notifs=snap.docs.map(d=>({id:d.id,...d.data()}));
       // Auto-traitement des friend_accepted (l'ami s'ajoute sans avoir à ouvrir le panel)
       _notifs.filter(n=>n.type==='friend_accepted'&&!n.read).forEach(n=>autoAddFriend(n,uid));
-      const unread=_notifs.filter(n=>!n.read).length;
+      const unread=_notifs.filter(n=>!n.read&&(n.type!=='profil'||!fixDone(n.fix))).length;
       const dot=document.getElementById('bell-dot');
       if(dot)dot.style.display=unread>0?'block':'none';
       const panel=document.getElementById('notif-panel');
@@ -3885,7 +3897,8 @@ const NI={
 function visibleNotifs(){
   const min=Date.now()-NOTIF_DAYS*86400000,seen=new Set();
   return (_notifs||[]).filter(n=>{const k=(n.type==='friend_request'||n.type==='friend_accepted')?n.type+'|'+n.fromUid:n.id;return !seen.has(k)&&seen.add(k);})
-    .filter(n=>!n.read||_tsMs(n.createdAt)>min||!_tsMs(n.createdAt));
+    .filter(n=>!n.read||_tsMs(n.createdAt)>min||!_tsMs(n.createdAt))
+    .filter(n=>n.type!=='profil'||!fixDone(n.fix));   // relance « profil » : disparaît dès que c'est fait
 }
 function renderNotifications(){
   const el=document.getElementById('notif-list');
@@ -3903,6 +3916,9 @@ function renderNotifications(){
       ic=NI.check;t=esc(n.fromName||'Ton ami')+' a accepté ta demande';body='Vous êtes amis : écris-lui ou compare vos réponses.';
     }else if(n.type==='noova_message'){
       ic=NI.noova;t=n.title?esc(n.title):'NOOVA';body=esc(n.message||'');
+    }else if(n.type==='profil'){
+      ic=NI.noova;t=esc(n.title||'Complète ton profil');body=esc(n.message||'');
+      extra=`<div class="notif-actions"><button class="notif-btn accept" onclick="openFixFromBell(${jsa(n.id)},${jsa(n.fix||'')})">${{'fix-notifs':'Activer','fix-city':'Indiquer ma ville','fix-age':'Indiquer mon âge','fix-interests':'Choisir'}[n.fix]||'J\'y vais'}</button></div>`;
     }else{
       t=esc(n.title||'NOOVA');body=esc(n.message||'Notification');
     }
@@ -4625,8 +4641,8 @@ function startCampaignById(campId) {
     // Mêmes données que sur l'accueil : options PROPRES à chaque question, et questions 2 et 3 à la suite (avant : options de la
     // campagne entière et questions suivantes perdues quand on démarrait depuis la page du commerce).
     const allQs=getCampaignQuestions(d);
-    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:ENGAGEMENT.PTS_PER_ANSWER,type:allQs[0].format||d.format||'text',q:allQs[0].q||d.question,hint:'',opts:allQs[0].options||[],items:allQs[0].options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce'),_surveyCount:allQs.length,
-      survey:allQs.slice(1).map((sq,idx)=>({_firestoreId:doc.id,_merchantId:d.merchantId||null,_questionIdx:idx+1,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',theme:d.sector||'Commerce local',pts:ENGAGEMENT.PTS_PER_ANSWER,type:sq.format||'text',q:sq.q,hint:'',opts:sq.options||[],items:sq.options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce')}))};
+    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:ENGAGEMENT.PTS_PER_ANSWER,type:allQs[0].format||d.format||'text',q:allQs[0].q||d.question,multi:(allQs[0].format||d.format)==='mcq'&&allQs[0].multi===true,hint:'',opts:allQs[0].options||[],items:allQs[0].options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce'),_surveyCount:allQs.length,
+      survey:allQs.slice(1).map((sq,idx)=>({_firestoreId:doc.id,_merchantId:d.merchantId||null,_questionIdx:idx+1,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',theme:d.sector||'Commerce local',pts:ENGAGEMENT.PTS_PER_ANSWER,type:sq.format||'text',q:sq.q,multi:sq.format==='mcq'&&sq.multi===true,hint:'',opts:sq.options||[],items:sq.options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce')}))};
     S.mode='hook';S.curQ=q;
     const pg=document.getElementById('q-prog');pg.innerHTML='';
     const seg=document.createElement('div');seg.className='q-seg cur';pg.appendChild(seg);
@@ -5271,7 +5287,31 @@ async function flushNotifOpen(){
   try{ sessionStorage.removeItem('nv_open'); }catch(e){}
   try{ await callTrackNotifOpen({nid:o.nid}); trackEvent('notif_open'); }catch(e){ console.warn('trackNotifOpen:',e); }
   if(o.go&&/^chat-[A-Za-z0-9_-]+$/.test(o.go)) { openChatWithUid(o.go.slice(5)); return; }
+  if(o.go&&/^fix-/.test(o.go)) { setTimeout(()=>openFix(o.go),600); return; }
   if(o.go&&o.go!=='home'&&document.getElementById(o.go)) goNav(o.go);
+}
+// Relance « profil incomplet » (notification ou ligne de la cloche) : ouvre directement le bon écran.
+function fixDone(go){
+  if(go==='fix-age') return !!S._age;
+  if(go==='fix-interests') return !!(S._interests||[]).length;
+  if(go==='fix-city') return !!S._city;
+  if(go==='fix-notifs') return notifOn();
+  return true;
+}
+function openFix(go){
+  const uid=auth.currentUser&&auth.currentUser.uid;
+  if(!uid) return;
+  const panel=document.getElementById('notif-panel');if(panel)panel.classList.remove('open');
+  if(fixDone(go)){ showToast('C\'est déjà fait, merci !','success'); return; }
+  if(go==='fix-age') showCategoryWall(uid,{ageOnly:true});
+  else if(go==='fix-interests') showCategoryWall(uid,{interestsOnly:true});
+  else if(go==='fix-notifs') askNotifFlow(true);
+  else if(go==='fix-city'){ const g=document.getElementById('google-city-wall'); g._uid=uid; g.style.display='flex'; }
+}
+function openFixFromBell(id,go){
+  const me=auth.currentUser&&auth.currentUser.uid;
+  if(me) db.collection('users').doc(me).collection('notifications').doc(id).update({read:true}).catch(()=>{});
+  openFix(go);
 }
 // Notification d'un message : ouvre la conversation avec cet ami (la liste d'amis peut arriver juste après).
 function openChatWithUid(uid, tries){
@@ -5709,9 +5749,10 @@ async function declineMerchant(mid){
 // ─── Reveal : comment les autres ont répondu (questions à choix, après avoir répondu) ───
 function closeRevealSheet(){const sh=document.getElementById('reveal-sheet');if(sh)sh.style.display='none';}
 function revealCardHTML(r,compact){
-  const friendsBy={};(r.friends||[]).forEach(f=>{if(f.optionIdx>=0)(friendsBy[f.optionIdx]=friendsBy[f.optionIdx]||[]).push(f);});
+  const friendsBy={};(r.friends||[]).forEach(f=>{(f.optionIdxs||(f.optionIdx>=0?[f.optionIdx]:[])).forEach(i=>(friendsBy[i]=friendsBy[i]||[]).push(f));});
+  const mineIdx=r.myIdxs||[r.myIdx];
   const rows=r.options.map((o,i)=>{
-    const mine=i===r.myIdx;
+    const mine=mineIdx.includes(i);
     const av=(friendsBy[i]||[]).map(f=>`<div class="rv-av" title="${esc(f.name)}">${avInner(f.photoUrl,f.name)}</div>`).join('');
     // Sous le seuil de réponses, le serveur ne donne pas de pourcentage : on liste les choix, sans barre.
     const hasPct=typeof o.pct==='number'&&isFinite(o.pct);
@@ -5719,7 +5760,7 @@ function revealCardHTML(r,compact){
   }).join('');
   const below=r.belowThreshold||!r.options.some(o=>typeof o.pct==='number');
   const n=r.n||0,need=r.needed||Math.max(0,(r.min||0)-n);
-  const note=below?`<div class="rv-foot">${n} réponse${n>1?'s':''} pour l'instant. Les résultats s'affichent dès ${n+need} réponses${need?` : encore ${need}`:''}.</div>`:`<div class="rv-foot">${n} réponse${n>1?'s':''}</div>`;
+  const note=below?`<div class="rv-foot">${n} réponse${n>1?'s':''} pour l'instant. Les résultats s'affichent dès ${n+need} réponses${need?` : encore ${need}`:''}.</div>`:`<div class="rv-foot">${n} réponse${n>1?'s':''}${r.multi?' · 2 choix possibles, le total dépasse 100 %':''}</div>`;
   let info='';
   try{if(!localStorage.getItem('nv_reveal_info')){localStorage.setItem('nv_reveal_info','1');info=`<div class="rv-info"><span style="flex:1">Tes amis voient ce que tu réponds. Tu comptes toujours dans les résultats, même si tu coupes ce partage.</span><button onclick="closeRevealSheet();openPrivacySettings()">Régler</button></div>`;}}catch(e){}
   return `<div class="rv"><div class="rv-h">${compact?'Les autres ont répondu':'Comment les autres ont répondu'}</div>${rows}${note}${info}</div>`;
@@ -6996,7 +7037,7 @@ function recomputeCampaignFeed(city) {
         _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: idx + 1, _byNoova: noovaLike,
         brand: brandName, ico: d.brandEmoji || (byNoova ? '✨' : '🏪'),
         theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: noovaLike ? 0 : ENGAGEMENT.PTS_PER_ANSWER,
-        type: sq.format || 'text', q: sq.q, hint: '',
+        type: sq.format || 'text', q: sq.q, hint: '', multi: sq.format === 'mcq' && sq.multi === true,
         opts: sq.options || [], items: sq.options || [],
         usage: usageTxt
       }));
@@ -7011,7 +7052,7 @@ function recomputeCampaignFeed(city) {
         theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: noovaLike ? 0 : 10,
         type: allQs[0].format || d.format || 'text',
         q: allQs[0].q || d.question, hint: '',
-        opts: allQs[0].options || d.options || [], items: allQs[0].options || d.options || [],
+        opts: allQs[0].options || d.options || [], items: allQs[0].options || d.options || [], multi: (allQs[0].format || d.format) === 'mcq' && allQs[0].multi === true,
         usage: usageTxt,
         survey: surveyList
       };
@@ -7046,7 +7087,8 @@ function recomputeCampaignFeed(city) {
 // ─── Lecture de la réponse depuis le DOM ─────────────────────
 function getAnswerValue() {
   const ta  = document.querySelector('#ans-area .ans-ta');  if(ta)  return ta.value;
-  const sel = document.querySelector('#ans-area .mcq-opt.sel span'); if(sel) return sel.textContent;
+  const sels = [...document.querySelectorAll('#ans-area .mcq-opt.sel span')].map(x=>x.textContent);
+  if(sels.length) return document.querySelector('#ans-area .mcq-list.multi') ? sels : sels[0];
   const sv  = document.getElementById('sv');               if(sv)  return sv.textContent;
   const rks = document.querySelectorAll('#ans-area .rank-item .rank-txt');
   if(rks.length) return Array.from(rks).map(r=>r.textContent).join(' > ');

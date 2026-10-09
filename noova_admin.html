@@ -408,6 +408,14 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       </div>
     </div>
 
+    <!-- Profils incomplets : relances (cloche + notification) avec un bouton qui ouvre le bon écran -->
+    <div class="card" id="nudge-card">
+      <div class="card-title">Profils incomplets</div>
+      <p style="margin:0;padding:0 18px 10px;font-size:12.5px;color:var(--ink3);line-height:1.5">Relancés automatiquement chaque jour à 11h47 : une relance par jour au plus, 3 jours entre deux relances du même manque, 3 fois au maximum. La relance arrive dans la cloche (et en notification si elles sont activées), avec un bouton qui ouvre directement le bon écran.</p>
+      <div id="nudge-rows" style="padding:0 18px 14px"><div class="loading">Chargement</div></div>
+      <div id="nudge-status" style="padding:0 18px 14px;font-size:12.5px;color:var(--ink2);min-height:18px"></div>
+    </div>
+
     <!-- Tous les inscrits (liste complète, recherche, filtre, tri, export) -->
     <div class="card">
       <div class="card-title" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 20c-.3-1.8-1.1-3.3-2.3-4.3"/></svg> Tous les inscrits <span class="badge badge-pending" id="u-recent-count">—</span></div>
@@ -762,6 +770,7 @@ const fx  = firebase.app().functions('europe-west1');
 const callAdminResetAllData  = fx.httpsCallable('adminResetAllData');
 const callAdminDeleteAccount = fx.httpsCallable('adminDeleteAccount');
 const callAdminSeedDemoUsers = fx.httpsCallable('adminSeedDemoUsers');
+const callAdminProfileNudges = fx.httpsCallable('adminProfileNudges');
 // ── Mois de test ─────────────────────────────────────────────────────────
 async function loadTestMonth() {
   try {
@@ -908,7 +917,7 @@ async function loadResponseQuality() {
 const NOTIF_LABELS = {
   question_du_jour: 'Question du jour', nouvelle_question: 'Nouvelle question (après-midi)', question_suivi: 'Question d\'un commerce suivi', relance_question: 'Relance (3 h après)', message: 'Message privé', reaction: 'J\'aime / commentaire', rappel_soir: 'Rappel du soir (18h30)', points_expirant: 'Points bientôt expirés', nouveau_commerce: 'Nouveau commerce', resultat_dispo: 'Résultat disponible',
   recompense_debloquee: 'Récompense débloquée', serie_en_danger: 'Série en danger', code_expire: 'Code bientôt expiré', ami: 'Ami', impact: 'Ton avis a compté', rendez_vous: 'Rendez-vous du jour (18h)', annonce: 'Annonce de NOOVA'
-};
+, profil: 'Relance profil incomplet'};
 async function loadNotifMetrics() {
   const body = document.getElementById('notif-rows');
   try {
@@ -1796,7 +1805,38 @@ async function loadUsers(force) {
   }
 }
 
+// Profils incomplets (habitants) : même définition que le serveur (functions/profileNudges.js).
+const NUDGE_ITEMS = [
+  ['city', 'Sans ville', u => !u.city],
+  ['notifs', 'Sans notifications', u => !(u.fcmTokens || []).filter(Boolean).length],
+  ['age', 'Sans âge', u => !u.ageRange && !u.age],
+  ['interests', 'Sans centres d\'intérêt', u => !(u.interests || []).length],
+];
+function renderNudges(users) {
+  const el = document.getElementById('nudge-rows');
+  if (!el) return;
+  const hab = users.filter(u => (!u.role || u.role === 'user') && u.isTest !== true);
+  el.innerHTML = NUDGE_ITEMS.map(([k, lbl, miss]) => {
+    const n = hab.filter(miss).length;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--ink)"><b>${n}</b> ${esc(lbl.toLowerCase())}${k === 'notifs' ? ' <span style="font-size:11px;color:var(--ink3)">(relance dans la cloche seulement)</span>' : ''}</div>
+      <button ${n ? '' : 'disabled'} onclick="sendNudges(${jsa(k)},this)" style="padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;border:none;background:var(--coral);color:var(--ink);cursor:pointer;white-space:nowrap${n ? '' : ';opacity:.45;cursor:default'}">Relancer</button>
+    </div>`;
+  }).join('') + `<div style="padding-top:10px"><button onclick="sendNudges('',this)" style="padding:8px 16px;border-radius:99px;font-size:12px;font-weight:700;border:1.5px solid var(--border-ctl);background:var(--bg2);color:var(--ink);cursor:pointer">Tout relancer maintenant</button></div>`;
+}
+async function sendNudges(only, btn) {
+  const st = document.getElementById('nudge-status');
+  if (!confirm('Envoyer maintenant la relance' + (only ? '' : ' de ce qui manque') + ' ? (une par habitant et par jour au plus)')) return;
+  const txt = btn.textContent; btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = (await callAdminProfileNudges(only ? { only } : {})).data;
+    st.textContent = r.sent ? `${r.sent} relance${r.sent > 1 ? 's' : ''} envoyée${r.sent > 1 ? 's' : ''} (${r.push} notification${r.push > 1 ? 's' : ''} sur téléphone).` : 'Aucune relance à envoyer : déjà relancés aujourd\'hui, ou rien ne manque.';
+  } catch (e) { st.textContent = 'Erreur : ' + e.message; }
+  btn.disabled = false; btn.textContent = txt;
+}
+
 function renderUsers(users) {
+  renderNudges(users);
   const total = users.length;
 
   // ── Stat cards

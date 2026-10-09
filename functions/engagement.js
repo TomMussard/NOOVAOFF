@@ -20,6 +20,8 @@ const uniq = (a) => [...new Set((a || []).filter(Boolean))];
 // Définition d'une question d'une campagne (les anciennes campagnes n'ont pas de tableau `questions`).
 const qDefOf = (camp, idx) => campaignQuestions(camp)[idx] || { q: camp.question, format: camp.format, options: camp.options };
 const clampIdx = (v) => Math.max(0, Math.min(2, Math.floor(Number(v) || 0)));
+// Options choisies dans une réponse : une seule, ou 1 à 2 pour « 2 réponses possibles » (champ answers).
+const chosenIdxs = (a, options) => (Array.isArray(a.answers) ? a.answers : [a.answer]).map((x) => options.indexOf(String(x || ""))).filter((i) => i >= 0);
 
 // ─────────────────────────── Comptage des réponses ───────────────────────────
 // campaignStats/{campagne} : { q0: { n, c: { "0": x, "1": y } }, ... } incrémenté par submitAnswer.
@@ -35,14 +37,14 @@ async function loadStats(campaignId, camp) {
     answers.forEach((d) => {
       const a = d.data(), idx = a.questionIdx || 0, def = qDefOf(camp, idx);
       if (def.format !== "mcq") return;
-      const oi = (def.options || []).map(String).indexOf(String(a.answer || ""));
-      if (oi < 0) return;
+      const ois = chosenIdxs(a, (def.options || []).map(String));
+      if (!ois.length) return;
       if (!CFG.REVEAL.COUNT_SUSPECT && a.suspect) return;
       if (!CFG.REVEAL.COUNT_FLAGGED && a.flagged) return;
       const k = `q${idx}`;
       stats[k] = stats[k] || { n: 0, c: {} };
       stats[k].n++;
-      stats[k].c[oi] = (stats[k].c[oi] || 0) + 1;
+      ois.forEach((oi) => { stats[k].c[oi] = (stats[k].c[oi] || 0) + 1; });
     });
     tx.set(ref, stats);
     return stats;
@@ -66,8 +68,8 @@ async function friendsWhoAnswered(uid, user, campaignId, qIdx, options) {
     if (!(f.friendUids || []).includes(uid)) return;       // amitié non réciproque
     if (f.shareAnswers === false) return;                  // a coupé « Montrer mes réponses à mes amis »
     if (!CFG.REVEAL.COUNT_FLAGGED && fa.data().flagged) return;   // réponse trop rapide pour avoir été lue : pas affichée comme un vrai avis d'ami
-    const ans = String(fa.data().answer || "");
-    out.push({ uid: fid, name: f.name || "Ami", photoUrl: f.photoUrl || null, optionIdx: options.indexOf(ans), answer: ans });
+    const ans = String(fa.data().answer || ""), idxs = chosenIdxs(fa.data(), options);
+    out.push({ uid: fid, name: f.name || "Ami", photoUrl: f.photoUrl || null, optionIdx: idxs.length ? idxs[0] : -1, optionIdxs: idxs, answer: ans });
   });
   return out;
 }
@@ -90,16 +92,18 @@ async function revealCore(uid, data, opts = {}) {
   if (!CFG.REVEAL.FORMATS.includes(def.format)) return { available: false, reason: "format" };
 
   const options = (def.options || []).map(String);
-  const myIdx = options.indexOf(String(aSnap.data().answer || ""));
+  const multi = def.multi === true;
+  const myIdxs = chosenIdxs(aSnap.data(), options), myIdx = myIdxs.length ? myIdxs[0] : -1;
   const stats = await loadStats(campaignId, camp);
   const st = stats[`q${qIdx}`] || { n: 0, c: {} };
   const n = st.n || 0, min = CFG.REVEAL.MIN_ANSWERS;
 
   // Mode prédiction : la répartition est retenue jusqu'à ce que l'habitant ait deviné (ou passé).
-  if (n >= CFG.PREDICTION.MIN_ANSWERS && await maybeOfferPrediction(uid, keyOf(campaignId, qIdx), opts)) {
+  // Pas de prédiction sur une question à 2 réponses possibles (« la plus choisie » y est moins nette).
+  if (!multi && n >= CFG.PREDICTION.MIN_ANSWERS && await maybeOfferPrediction(uid, keyOf(campaignId, qIdx), opts)) {
     return { available: true, myIdx, prediction: { offered: true }, options: options.map((text) => ({ text })) };
   }
-  const out = { available: true, myIdx, n, min, options: options.map((text, i) => ({ text })) };
+  const out = { available: true, myIdx, myIdxs, multi, n, min, options: options.map((text, i) => ({ text })) };
   if (n >= min) {
     out.options = options.map((text, i) => { const count = (st.c && st.c[i]) || 0; return { text, count, pct: Math.round((count * 100) / n) }; });
   } else {
