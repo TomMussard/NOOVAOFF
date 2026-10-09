@@ -27,7 +27,7 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
   await p.evaluate(()=>showAuthWall('login'));await setVal(p,'#aw-email','me@t.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());
   await wf(p,()=>document.getElementById('home').classList.contains('active')&&document.querySelectorAll('.hq-card').length>=2);await sleep(1500);
   await shot(p,'home_q');
-  const h=await p.evaluate(()=>({tabs:[...document.querySelectorAll('.hm-tab')].map(t=>t.textContent.replace(/\d+/,'').trim()),q:[...document.querySelectorAll('#hm-feed-q .hq-card')].map(c=>c.textContent),legacy:getComputedStyle(document.getElementById('home-legacy')).display,gains:[...document.querySelectorAll('#hm-feed-q .hq-gain')].map(g=>g.textContent),count:document.getElementById('hm-n-q').textContent}));
+  const h=await p.evaluate(()=>({tabs:[...document.querySelectorAll('.hm-tab')].map(t=>t.textContent.replace(/\d+/,'').trim()),q:[...document.querySelectorAll('#hm-feed-q .hq-card')].map(c=>c.textContent),legacy:getComputedStyle(document.getElementById('home-legacy')).display,gains:[...document.querySelectorAll('#hm-feed-q .hq-tag')].map(g=>g.textContent),count:document.getElementById('hm-n-q').textContent}));
   check('Accueil : 2 onglets Questions / NOOVA',h.tabs.join()==='Questions,NOOVA',h.tabs);
   check('Onglet Questions : une carte par question de commerce (commerce, question, gain), pas celle de NOOVA',h.q.length===2&&h.q.every(t=>!/NOOVA/.test(t))&&h.q.some(t=>/Le Fournil/.test(t)&&/baguette/.test(t))&&h.gains.every(g=>/\+10 pts/.test(g))&&h.count==='2',h);
   check('Plus de « À répondre », de « prochaine récompense » ni de question du jour séparée',h.legacy==='none'&&!/À répondre|prochaine récompense/.test(await p.evaluate(()=>document.getElementById('home').innerText)));
@@ -46,7 +46,7 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
   await p.evaluate(()=>goNav('rewards-tab'));await sleep(1500);await shot(p,'rw1');
   const r=await p.evaluate(()=>({h:[...document.querySelectorAll('#rewards-tab .dsec-h')].filter(e=>!e.hidden&&getComputedStyle(e).display!=='none'&&!e.closest('[hidden]')).map(e=>e.textContent.trim()),soon:[...document.querySelectorAll('#rw-soon .rwr')].map(e=>e.textContent.replace(/\s+/g,' ')),code:document.getElementById('dcode-wrap').textContent,legacy:document.getElementById('rw-legacy').hidden,all:document.getElementById('rw-all-btn').textContent}));
   check('Récompenses : solde, « À montrer en caisse », « Tu peux t\'offrir », « Bientôt à ta portée »',r.h.join('|')==='À montrer en caisse|Tu peux t\'offrir|Bientôt à ta portée'&&/A 7 K 2/.test(r.code),r);
-  check('« Bientôt à ta portée » : la plus proche en premier, « encore 30 pts », sans pourcentage',/Café offert.*encore 30 pts.*150 pts/.test(r.soon[0])&&!r.soon.slice(0,3).join().includes('%')&&r.legacy,r.soon);
+  check('« Bientôt à ta portée » : la plus proche en premier, « encore 30 pts », sans pourcentage',/Café offert.*encore 30 pts.*150\s*pts/.test(r.soon[0])&&!r.soon.slice(0,3).join().includes('%')&&r.legacy,r.soon);
   check('Bouton « Voir toutes les récompenses (4) »',r.all==='Voir toutes les récompenses (4)',r.all);
   await db.doc('users/me').update({points:320});await sleep(1500);await p.evaluate(()=>{S.pts=320;refreshWallet();});await sleep(800);
   const c=await p.evaluate(()=>[...document.querySelectorAll('#rw-can .rwr')].map(e=>e.textContent.replace(/\s+/g,' ')));

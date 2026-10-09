@@ -740,20 +740,38 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .soc-bell{width:40px;height:40px;border-radius:var(--r-btn);background:var(--surface);color:var(--ink);border:none;display:flex;align-items:center;justify-content:center;font-size:var(--fs-4);cursor:pointer;position:relative}
 .soc-acts{display:flex;gap:var(--s2)}
 /* Récompenses : solde, bons à utiliser, « Tu peux t'offrir », « Bientôt à ta portée » — une ligne par récompense */
-.rw-noov{display:flex;align-items:center;gap:var(--s2);margin:var(--s2) 18px 0;font-size:var(--fs-2);color:var(--text)}
-.rw-noov-ico{width:24px;height:24px;border-radius:var(--r-pill);overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:var(--jaune);color:var(--jaune-ink);font-weight:800;font-size:var(--fs-1)}
+/* Le solde : un ticket or, coin encoché, montant en très grand (la charte : « le ticket ») */
+.rw-tk{position:relative;overflow:hidden;margin:0 18px var(--s5);padding:var(--s4) var(--s5) var(--s4);background:var(--or);color:var(--jaune-ink);border-radius:var(--r-md);clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,0 100%)}
+.rw-tk>*{position:relative;z-index:1}
+.rw-tk .mark{position:absolute;right:-10px;bottom:-18px;width:120px;height:120px;opacity:.22;z-index:0}
+.rw-tk-l{font:var(--t-label);color:var(--jaune-ink)}
+.rw-tk-top{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s1)}
+.rw-tk .wpts-ico{width:44px;height:44px;border-radius:var(--r-sm);background:var(--bandeau);color:var(--jaune);display:inline-flex;align-items:center;justify-content:center;overflow:hidden}
+.rw-tk .wpts-ico img{width:44px;height:44px}
+.rw-tk-n{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-8);line-height:1;letter-spacing:var(--lettrage-titre);font-variant-numeric:tabular-nums}
+.rw-tk-sep{border-top:2px dashed var(--jaune-ink);opacity:.35;margin:var(--s3) 0}
+.rw-noov{display:flex;align-items:center;gap:var(--s2);font-size:var(--fs-2);color:var(--jaune-ink)}
+.rw-noov-ico{width:24px;height:24px;border-radius:var(--r-pill);overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:var(--bandeau);color:var(--jaune);font-weight:800;font-size:var(--fs-1)}
 .rw-noov-ico img{width:24px;height:24px}
 .rw-noov-t b{font-variant-numeric:tabular-nums}
-.rw-noov-s{color:var(--text-2)}
-.rwl{display:flex;flex-direction:column;gap:var(--s2);margin:0 18px var(--s5)}
-.rwr{display:flex;align-items:center;gap:var(--s3);padding:var(--s3);background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-md)}
+.rw-noov-s{opacity:.8}
+/* Chaque récompense est un ticket : le cadeau à gauche, une ligne pointillée encochée, le prix sur le talon */
+.rwl{display:flex;flex-direction:column;gap:var(--s3);margin:0 18px var(--s5)}
+.rwr{--stub:96px;display:flex;align-items:stretch;min-height:92px;background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-md);overflow:hidden;cursor:pointer;
+  -webkit-mask:radial-gradient(circle 9px at calc(100% - var(--stub)) 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at calc(100% - var(--stub)) 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle 9px at calc(100% - var(--stub)) 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at calc(100% - var(--stub)) 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
+.rwr-main{flex:1;min-width:0;display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s3) var(--s3) var(--s4)}
 .rwr-mid{flex:1;min-width:0}
-.rwr-t{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rwr-t{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);color:var(--text);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rwr-s{font-size:var(--fs-2);color:var(--text-2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rwr-left{color:var(--text);font-weight:700}
 .rwr-bar{height:6px;border-radius:var(--r-pill);background:var(--surface-2);margin-top:var(--s2);overflow:hidden}
 .rwr-bar>i{display:block;height:100%;background:var(--jaune);border-radius:var(--r-pill)}
-.rwr-cost{flex-shrink:0;font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);color:var(--text);font-variant-numeric:tabular-nums}
-.rwr-go{flex-shrink:0;min-height:var(--tactile-min);padding:0 var(--s4);background:var(--text);color:var(--surface);border:1px solid var(--text);border-radius:var(--r-sm);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-2);cursor:pointer}
+.rwr-stub{width:var(--stub);flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-left:2px dashed var(--trait);background:var(--surface-2);color:var(--text)}
+.rwr-stub b{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-5);line-height:1;font-variant-numeric:tabular-nums}
+.rwr-stub small{font-size:var(--fs-1);font-weight:700}
+.rwr.ok .rwr-stub{background:var(--jaune);color:var(--jaune-ink);border-left-color:var(--jaune-ink)}
+.rwr-go{margin-top:var(--s2);min-height:40px;padding:0 var(--s4);background:var(--bandeau);color:var(--jaune);border:none;border-radius:var(--r-sm);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-2);cursor:pointer}
 .rwl-empty{padding:var(--s4);background:var(--surface);border:1px dashed var(--text-3);border-radius:var(--r-md);font-size:var(--fs-2);color:var(--text-2);line-height:1.5}
 .rw-all{margin:var(--s4) 18px var(--s5)}
 /* Accueil façon fil : onglets en haut (soulignés, comme X), puis une carte par question non répondue */
@@ -763,17 +781,32 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .hm-tab.on{color:var(--text)}
 .hm-tab.on::after{content:'';position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);width:56px;height:4px;border-radius:var(--r-pill);background:var(--jaune)}
 .hm-n{margin-left:6px;font-size:var(--fs-1);font-weight:800;color:var(--text-2);font-variant-numeric:tabular-nums}
-.hm-feed{display:flex;flex-direction:column;gap:var(--s3);padding:0 var(--s4) var(--s5)}
-.hq-card{display:block;width:100%;padding:0;text-align:left;background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-md);overflow:hidden;cursor:pointer;font-family:var(--font);color:var(--text)}
-.hq-card:active{opacity:.85}
-.hq-photo{position:relative;height:148px;background:var(--surface-2)}
-.hq-photo img{width:100%;height:100%;object-fit:cover;display:block}
-.hq-gain{position:absolute;top:var(--s3);right:var(--s3);padding:var(--s1) var(--s2);border-radius:var(--r-xs);background:var(--jaune);color:var(--jaune-ink);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-2);font-variant-numeric:tabular-nums}
-.hq-body{padding:var(--s3) var(--s4) var(--s4)}
-.hq-brand{display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s2);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);color:var(--text)}
-.hq-brand>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hq-brand .hq-gain{position:static;margin-left:auto;flex-shrink:0}
-.hq-q{font-size:var(--fs-4);font-weight:600;line-height:1.35;color:var(--text);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hm-feed{display:flex;flex-direction:column;gap:var(--s5);padding:0 var(--s4) var(--s5)}
+.hq-card{display:block;position:relative;width:100%;padding:0;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font);color:var(--text)}
+.hq-card:active{transform:scale(.98)}
+/* Bandeau photo : photo du commerce sous un voile, logo et nom par-dessus ; sans photo, brun NOOVA */
+.hq-ph{position:relative;height:132px;border-radius:var(--r-lg) var(--r-lg) 0 0;overflow:hidden;background:var(--bandeau);display:flex;align-items:flex-end;padding:var(--s3) var(--s4)}
+.hq-ph>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hq-ph::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(20,12,4,.84) 0%,rgba(20,12,4,.7) 40%,rgba(20,12,4,0) 90%);pointer-events:none}
+.hq-who{position:relative;z-index:1;display:flex;align-items:center;gap:var(--s2);min-width:0;color:var(--bandeau-texte);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-4);letter-spacing:var(--lettrage-titre)}
+.hq-who>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Étiquette de gain penchée, comme une étiquette de prix : la signature de la carte question */
+.hq-tag{position:absolute;top:116px;right:var(--s4);z-index:3;padding:var(--s2) var(--s3);border-radius:var(--r-xs);background:var(--bandeau);color:var(--jaune);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-2);font-variant-numeric:tabular-nums;transform:rotate(-4deg)}
+.hq-bd{position:relative;overflow:hidden;padding:var(--s5) var(--s4) var(--s4);border-radius:0 0 var(--r-lg) var(--r-lg);background:var(--surface);border:1px solid var(--trait);border-top:none}
+.hq-bd>*{position:relative;z-index:1}
+.hq-bd .mark{opacity:.12;z-index:0}
+.hq-q{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-4);line-height:1.28;letter-spacing:var(--lettrage-titre);color:var(--text);margin-bottom:var(--s4);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hq-cta{display:inline-flex;align-items:center;min-height:var(--tactile-min);padding:0 var(--s4);border-radius:var(--r-sm);background:var(--bandeau);color:var(--jaune);font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3)}
+/* La première question du fil : dégradé or (le moment fort de l'écran, un seul) */
+.hq-card.hero .hq-bd{background:var(--or);border:none}
+.hq-card.hero .hq-bd .mark{opacity:.22}
+.hq-card.hero .hq-q{color:var(--jaune-ink);font-size:var(--fs-5);line-height:1.22}
+/* Questions de NOOVA : brun de marque et illustration NOOVA */
+.hq-card.noova .hq-ph{background:var(--bandeau) url('bg-question-noova.svg') center/cover no-repeat}
+.hq-card.noova .hq-bd{background:var(--bandeau);border-color:var(--bandeau)}
+.hq-card.noova .hq-q{color:var(--bandeau-texte)}
+.hq-card.noova .hq-cta{background:var(--jaune);color:var(--jaune-ink)}
+.hq-card.noova .hq-tag{background:var(--jaune);color:var(--jaune-ink)}
 .hm-empty{padding:var(--s6) var(--s4);text-align:center;color:var(--text-2);font-size:var(--fs-3);line-height:1.5}
 /* Annonce de NOOVA : bandeau de marque en haut de l'accueil, jusqu'à ce que l'habitant le ferme */
 .ann-card{position:relative;margin:0 22px 14px;padding:var(--s4) var(--s4) var(--s4);background:var(--bandeau);color:var(--bandeau-texte);border:1px solid var(--jaune);border-radius:var(--r-lg)}
@@ -1875,12 +1908,14 @@ button.soc-bell{padding:0;font-family:var(--font)}
       <div class="dwal-title">Récompenses</div>
     </div>
     <!-- 1 · Le solde : points (et NOOVS sur une ligne) -->
-    <section class="wsec" aria-label="Ton solde">
-      <div class="wpts-card">
-        <div class="wpts-ico" id="wpts-ico" aria-hidden="true"></div>
-        <div><div class="wpts-n" id="wc-pts-num-hdr">0</div><div class="wpts-l">points</div></div>
+    <section aria-label="Ton solde">
+      <div class="rw-tk">
+        <img class="mark" src="logo-mark-white.svg" alt="" aria-hidden="true">
+        <div class="rw-tk-l">Tes points</div>
+        <div class="rw-tk-top"><span class="wpts-ico" id="wpts-ico" aria-hidden="true"></span><span class="rw-tk-n" id="wc-pts-num-hdr">0</span></div>
+        <div class="rw-tk-sep" aria-hidden="true"></div>
+        <div class="rw-noov"><span class="rw-noov-ico" id="wnoov-ico" aria-hidden="true">N</span><span class="rw-noov-t"><b id="noov-num">0</b> NOOVS</span><span class="rw-noov-s">bientôt échangeables</span></div>
       </div>
-      <div class="rw-noov"><span class="rw-noov-ico" id="wnoov-ico" aria-hidden="true">N</span><span class="rw-noov-t"><b id="noov-num">0</b> NOOVS</span><span class="rw-noov-s">bientôt échangeables</span></div>
     </section>
     <!-- 2 · Mes bons à utiliser (seulement s'il y en a) -->
     <div class="dsec-h" id="rw-codes-h" hidden>À montrer en caisse</div>
@@ -2738,18 +2773,19 @@ function homeTab(t){
   ['q','noova'].forEach(k=>{const b=document.getElementById('hm-tab-'+k),pg=document.getElementById('hm-'+k);if(!b||!pg)return;
     b.classList.toggle('on',k===t);b.setAttribute('aria-selected',String(k===t));pg.hidden=k!==t;});
 }
-function hqCardHTML(q,i){
-  // Sans photo : pas de grand bloc vide, le gain passe sur la ligne du commerce.
-  const gain=`<span class="hq-gain">${esc(ptsTag(q))}</span>`;
-  const photo=q.photoUrl?`<div class="hq-photo"><img src="${esc(q.photoUrl)}" alt="" loading="lazy" onerror="this.parentNode.remove()">${gain}</div>`:'';
-  return `<button type="button" class="hq-card${q._byNoova?' noova':''}" onclick="openQ(${i})" aria-label="${esc(q.brand)} : ${esc(q.q)}, ${esc(ptsTag(q))}">${photo}<div class="hq-body"><div class="hq-brand">${logoHTML(q.brand,28,q.logoUrl)}<span>${esc(q.brand)}</span>${testTagHTML(q._isTest)}${q.photoUrl?'':gain}</div><div class="hq-q">${esc(q.q)}</div></div></button>`;
+function hqCardHTML(q,i,hero){
+  const img=q.photoUrl&&!q._byNoova?`<img src="${esc(q.photoUrl)}" alt="" loading="lazy" onerror="this.remove()">`:'';
+  return `<button type="button" class="hq-card${hero?' hero':''}${q._byNoova?' noova':''}" onclick="openQ(${i})" aria-label="${esc(q.brand)} : ${esc(q.q)}, ${esc(ptsTag(q))}">`
+    +`<div class="hq-ph">${img}<div class="hq-who">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}</span>${testTagHTML(q._isTest)}</div></div>`
+    +`<span class="hq-tag">${esc(ptsTag(q))}</span>`
+    +`<div class="hq-bd"><img class="mark" src="logo-mark-white.svg" alt="" aria-hidden="true"><div class="hq-q">${esc(q.q)}</div><span class="hq-cta">Répondre en 30 secondes</span></div></button>`;
 }
 function renderHomeFeed(){
   const qs=(S.qs||[]).map((q,i)=>({q,i}));
   const shop=qs.filter(x=>!x.q._byNoova),noova=qs.filter(x=>x.q._byNoova);
   const fq=document.getElementById('hm-feed-q'),fn=document.getElementById('hm-feed-noova');if(!fq||!fn)return;
-  fq.innerHTML=shop.map(x=>hqCardHTML(x.q,x.i)).join('')||(S.qs&&S.qs.length?'<div class="hm-empty">Tu as répondu à toutes les questions des commerces. Il en arrive de nouvelles chaque jour.</div>':'');
-  fn.innerHTML=noova.map(x=>hqCardHTML(x.q,x.i)).join('')||'<div class="hm-empty">Pas de question de NOOVA en ce moment. Reviens bientôt.</div>';
+  fq.innerHTML=shop.map((x,k)=>hqCardHTML(x.q,x.i,k===0)).join('')||(S.qs&&S.qs.length?'<div class="hm-empty">Tu as répondu à toutes les questions des commerces. Il en arrive de nouvelles chaque jour.</div>':'');
+  fn.innerHTML=noova.map(x=>hqCardHTML(x.q,x.i,false)).join('')||'<div class="hm-empty">Pas de question de NOOVA en ce moment. Reviens bientôt.</div>';
   const nq=document.getElementById('hm-n-q'),nn=document.getElementById('hm-n-noova');
   if(nq)nq.textContent=shop.length?String(shop.length):'';if(nn)nn.textContent=noova.length?String(noova.length):'';
 }
@@ -5969,10 +6005,11 @@ function renderRewardLists(){
   const all=S._rewardsCache||[],pts=S.pts||0;
   const ok=all.filter(r=>rewardCost(r)<=pts).sort((a,b)=>rewardCost(b)-rewardCost(a));
   const next=all.filter(r=>rewardCost(r)>pts).sort((a,b)=>rewardCost(a)-rewardCost(b)).slice(0,5);
-  can.innerHTML=ok.length?ok.map(r=>`<div class="rwr">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}, ${rewardCost(r)} pts</div></div><button type="button" class="rwr-go" onclick="redeemById(${jsa(r.id)})">Échanger</button></div>`).join('')
+  const stub=c=>`<div class="rwr-stub"><b>${c}</b><small>pts</small></div>`;
+  can.innerHTML=ok.length?ok.map(r=>`<div class="rwr ok"><div class="rwr-main">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}</div><button type="button" class="rwr-go" onclick="redeemById(${jsa(r.id)})">Échanger</button></div></div>${stub(rewardCost(r))}</div>`).join('')
     :`<div class="rwl-empty">${all.length?'Pas encore assez de points : réponds aux questions de l\'accueil, chaque réponse en rapporte.':'Les commerces de ta ville n\'ont pas encore mis de récompense en ligne.'}</div>`;
   soon.innerHTML=next.map(r=>{const c=rewardCost(r),pct=Math.max(3,Math.min(100,pts/c*100));
-    return `<div class="rwr" role="button" tabindex="0" onclick="openRewardsSheet()" onkeydown="if(event.key==='Enter')openRewardsSheet()">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}, encore ${c-pts} pts</div><div class="rwr-bar" aria-hidden="true"><i style="width:${pct.toFixed(0)}%"></i></div></div><div class="rwr-cost">${c} pts</div></div>`;}).join('');
+    return `<div class="rwr" role="button" tabindex="0" onclick="openRewardsSheet()" onkeydown="if(event.key==='Enter')openRewardsSheet()"><div class="rwr-main">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}</div><div class="rwr-s rwr-left">encore ${c-pts} pts</div><div class="rwr-bar" aria-hidden="true"><i style="width:${pct.toFixed(0)}%"></i></div></div></div>${stub(c)}</div>`;}).join('');
   const sh=document.getElementById('rw-soon-h');if(sh)sh.hidden=!next.length;soon.hidden=!next.length;
   const btn=document.getElementById('rw-all-btn');if(btn){btn.textContent='Voir toutes les récompenses ('+all.length+')';btn.parentNode.hidden=!all.length;}
 }
