@@ -2740,7 +2740,7 @@ function siretValid(raw) {
 function awShowErr(msg) { const e=document.getElementById('aw-err'); e.textContent=msg; e.style.display='block'; }
 
 function awFrErr(code) {
-  return ({'auth/wrong-password':'Mot de passe incorrect.','auth/user-not-found':'Aucun compte avec cet email.','auth/invalid-credential':'Email ou mot de passe incorrect.','auth/email-already-in-use':'Cet email est déjà utilisé.','auth/weak-password':'Mot de passe trop court (6 car. min).','auth/invalid-email':'Email invalide.'})[code]||'Erreur. Réessayez.';
+  return ({'auth/wrong-password':'Mot de passe incorrect.','auth/user-not-found':'Aucun compte avec cet email.','auth/invalid-credential':'Email ou mot de passe incorrect.','auth/email-already-in-use':'Cet email est déjà utilisé.','auth/weak-password':'Mot de passe trop court (6 car. min).','auth/invalid-email':'Email invalide.','auth/password-does-not-meet-requirements':'Mot de passe trop simple : il faut une minuscule, une majuscule, un chiffre et un caractère spécial (! ? @ # * - _ .).','auth/missing-password':'Indiquez un mot de passe.','auth/too-many-requests':'Trop de tentatives. Réessayez dans quelques minutes.','auth/network-request-failed':'Connexion impossible. Vérifiez votre connexion internet.'})[code]||('Une erreur est survenue'+(code?' ('+String(code).replace('auth/','')+')':'')+'. Réessayez.');
 }
 
 async function awSubmit() {
@@ -2766,6 +2766,14 @@ async function awSubmit() {
     const ph = document.getElementById('aw-phone').value.trim();
     if(!fn || !ln || !email || !pass || !ph) { awShowErr('Remplissez tous les champs.'); return; }
     if(pass.length < 6) { awShowErr('Mot de passe trop court (6 caractères minimum).'); return; }
+    // Règles réglées dans Firebase (Authentication > Paramètres) : on dit précisément ce qui manque avant l'envoi.
+    try {
+      const st = typeof auth.validatePassword === 'function' ? await auth.validatePassword(pass) : null;
+      if(st && !st.isValid) {
+        const miss = [['containsLowercaseLetter','une minuscule'],['containsUppercaseLetter','une majuscule'],['containsNumericCharacter','un chiffre'],['containsNonAlphanumericCharacter','un caractère spécial (! ? @ # * - _ .)'],['meetsMinPasswordLength','plus de caractères']].filter(([k]) => st[k] === false).map(([, l]) => l);
+        awShowErr('Mot de passe trop simple : il faut ' + miss.join(', ') + '.'); return;
+      }
+    } catch(e) {}
   }
   if(!email || !pass) { awShowErr('Remplissez tous les champs.'); return; }
   btn.textContent = '…'; btn.disabled = true;

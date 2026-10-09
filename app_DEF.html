@@ -984,10 +984,11 @@ button.soc-bell{padding:0;font-family:var(--font)}
 .ptr-bar{text-align:center;height:0;overflow:hidden;transition:height .2s;font-size:var(--fs-2);font-weight:600;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:6px}
 .ptr-bar.active{height:36px}
 /* PASSWORD STRENGTH */
-.pw-str-wrap{display:none;margin-top:5px}
-.pw-str-track{height:3px;background:var(--bg3);border-radius:var(--r-pill);overflow:hidden;margin-bottom:3px}
-.pw-str-bar{height:100%;width:0;border-radius:var(--r-pill);transition:width .25s,background .25s}
-.pw-str-lbl{font-size:var(--fs-1);color:var(--ink3);text-align:right}
+.pw-rules{list-style:none;margin:var(--s2) 0 0;padding:0;display:flex;flex-wrap:wrap;gap:var(--s1) var(--s3);font-size:var(--fs-1);color:var(--text-2)}
+.pw-rules[hidden]{display:none}
+.pw-rules li::before{content:'○ '}
+.pw-rules li.ok{color:var(--ok);font-weight:700}
+.pw-rules li.ok::before{content:'✓ '}
 /* GROUPS */
 .group-tag{font-size:var(--fs-1);font-weight:700;padding:5px 11px;border-radius:var(--r-btn);border:none;cursor:pointer;white-space:nowrap;transition:all .13s}
 /* WALLET */
@@ -5045,10 +5046,7 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
         <input id="aw-pass" type="password" placeholder="Mot de passe" autocomplete="current-password" style="width:100%;padding:14px 48px 14px 16px;border-radius:var(--r-md);border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:var(--fs-3);outline:none;font-family:var(--fb);box-sizing:border-box">
         <button type="button" onclick="togglePassVis()" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:var(--fs-4);color:var(--ink3);padding:10px;line-height:0" aria-label="Afficher le mot de passe"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
       </div>
-      <div class="pw-str-wrap" id="pw-str-wrap">
-        <div class="pw-str-track"><div class="pw-str-bar" id="pw-str-bar"></div></div>
-        <div class="pw-str-lbl" id="pw-str-lbl"></div>
-      </div>
+      <ul class="pw-rules" id="pw-rules" aria-label="Ton mot de passe doit contenir" hidden></ul>
     </div>
     <div id="aw-forgot" style="text-align:right;margin-top:-3px"><button type="button" id="aw-forgot-link" onclick="awForgotPassword()" style="background:none;border:none;padding:0;font-size:var(--fs-2);color:var(--ink3);cursor:pointer;font-family:var(--fb);text-decoration:underline">Mot de passe oublié ?</button></div>
     <div id="aw-err" style="color:var(--erreur);font-size:var(--fs-2);display:none;padding:9px 12px;background:rgba(239,68,68,.08);border-radius:var(--r-sm);text-align:center"></div>
@@ -5321,24 +5319,31 @@ function togglePassVis() {
   p.type = p.type === 'password' ? 'text' : 'password';
 }
 
-function _updatePassStrength(val) {
-  const wrap = document.getElementById('pw-str-wrap');
-  const bar  = document.getElementById('pw-str-bar');
-  const lbl  = document.getElementById('pw-str-lbl');
-  if(!wrap || !bar || !lbl) return;
-  if(_awMode !== 'register' || !val) { wrap.style.display = 'none'; return; }
-  wrap.style.display = 'block';
-  let s = 0;
-  if(val.length >= 6)  s++;
-  if(val.length >= 10) s++;
-  if(/[A-Z]/.test(val)) s++;
-  if(/[0-9!@#$%^&*]/.test(val)) s++;
-  const colors = ['var(--erreur)','var(--jaune)','var(--ok)','var(--ok)'];
-  const labels = ['Trop court','Faible','Correct','Fort'];
-  bar.style.width = (s * 25) + '%';
-  bar.style.background = colors[s - 1] || 'var(--erreur)';
-  lbl.textContent = labels[s - 1] || '';
-  lbl.style.color = colors[s - 1] || 'var(--erreur)';
+// Règles du mot de passe : celles réglées dans Firebase (Authentication > Paramètres > Règles relatives aux mots de passe),
+// lues par validatePassword. Affichées en liste à l'inscription et vérifiées avant l'envoi : sinon Firebase refuse
+// le compte (auth/password-does-not-meet-requirements) et l'habitant ne sait pas pourquoi.
+const PW_RULES = [
+  ['meetsMinPasswordLength', s => (((s.passwordPolicy || {}).customStrengthOptions || {}).minPasswordLength || 6) + ' caractères minimum'],
+  ['containsLowercaseLetter', () => 'une minuscule'],
+  ['containsUppercaseLetter', () => 'une majuscule'],
+  ['containsNumericCharacter', () => 'un chiffre'],
+  ['containsNonAlphanumericCharacter', () => 'un caractère spécial (! ? @ # * - _ .)']
+];
+async function pwStatus(val) {
+  try { if(typeof auth.validatePassword === 'function') return await auth.validatePassword(val); } catch(e) {}
+  // Règles injoignables (hors ligne) : au moins la longueur minimale de Firebase.
+  return { isValid: val.length >= 6, meetsMinPasswordLength: val.length >= 6 };
+}
+function pwMissing(s) { return PW_RULES.filter(([k]) => s[k] === false).map(([k, l]) => l(s)); }
+let _pwSeq = 0;
+async function _updatePassStrength(val) {
+  const box = document.getElementById('pw-rules');
+  if(!box) return;
+  if(_awMode !== 'register') { box.hidden = true; return; }
+  const n = ++_pwSeq, st = await pwStatus(val || '');
+  if(n !== _pwSeq) return;
+  box.innerHTML = PW_RULES.filter(([k]) => st[k] !== undefined).map(([k, l]) => `<li class="${val && st[k] ? 'ok' : ''}">${esc(l(st))}</li>`).join('');
+  box.hidden = _awMode !== 'register';
 }
 
 function awTab(mode) {
@@ -5356,6 +5361,9 @@ function awTab(mode) {
   document.getElementById('aw-err').style.display = 'none';
   const forgot = document.getElementById('aw-forgot');
   if(forgot) forgot.style.display = isReg ? 'none' : 'block';
+  const pw = document.getElementById('aw-pass');
+  pw.autocomplete = isReg ? 'new-password' : 'current-password';
+  _updatePassStrength(pw.value);
 }
 
 function awShowErr(msg) {
@@ -5374,8 +5382,14 @@ function awFrErr(code) {
     'auth/account-exists-with-different-credential':'Un compte existe déjà avec cet email : connecte-toi avec ta première méthode (email, Google ou Apple).',
     'auth/operation-not-allowed':'Cette méthode de connexion n\'est pas encore disponible. Utilise ton email.',
     'auth/network-request-failed':'Connexion impossible. Vérifie ta connexion internet.',
-    'auth/too-many-requests':'Trop de tentatives. Réessaie dans quelques minutes.'
-  })[code] || 'Erreur. Réessaie.';
+    'auth/too-many-requests':'Trop de tentatives. Réessaie dans quelques minutes.',
+    'auth/password-does-not-meet-requirements':'Mot de passe trop simple : suis la liste sous le champ.',
+    'auth/missing-password':'Indique un mot de passe.',
+    'auth/user-disabled':'Ce compte est désactivé. Écris-nous via le site NOOVA.',
+    'auth/web-storage-unsupported':'Ton navigateur bloque la connexion (navigation privée ou navigateur d\'une app comme Instagram). Ouvre NOOVA dans Safari ou Chrome.',
+    'auth/unauthorized-domain':'Connexion impossible depuis cette adresse. Ouvre NOOVA depuis noovaoff.fr.',
+    'auth/popup-blocked':'La fenêtre de connexion a été bloquée. Autorise les fenêtres surgissantes ou utilise ton email.'
+  })[code] || ('Une erreur est survenue' + (code ? ' (' + String(code).replace('auth/', '') + ')' : '') + '. Réessaie.');
 }
 
 async function awSubmit() {
@@ -5393,6 +5407,8 @@ async function awSubmit() {
       const name = document.getElementById('aw-name').value.trim();
       const city = document.getElementById('aw-city').value.trim();
       if(!name || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      const pst = await pwStatus(pass);
+      if(!pst.isValid) { awShowErr('Mot de passe trop simple : il faut ' + (pwMissing(pst).join(', ') || 'un mot de passe plus long') + '.'); _updatePassStrength(pass); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       const cityNorm = await resolveCityZone(normalizeCity(city),city);
       if(!(await isCityOpen(cityNorm))) { awShowErr('Noova n\'est pas encore ouvert dans ta ville — reviens bientôt !'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       _skipNextAuth = true;
@@ -5430,7 +5446,11 @@ async function awSubmit() {
     _skipNextAuth = false;
     btn.textContent = _awMode === 'login' ? 'Se connecter' : 'Créer mon compte';
     btn.disabled = false;
-    awShowErr(awFrErr(e.code));
+    console.warn('awSubmit:', e);
+    // Le compte est créé mais la fiche n'a pas pu être enregistrée (réseau coupé…) : on ne laisse pas l'habitant
+    // bloqué (« e-mail déjà utilisé » au prochain essai), il termine son profil sur l'écran « Dernière étape ».
+    if(_awMode === 'register' && auth.currentUser) { document.getElementById('auth-wall').style.display = 'none'; routeAuthState(auth.currentUser); return; }
+    awShowErr(e.code ? awFrErr(e.code) : 'Connexion impossible. Vérifie ta connexion internet et réessaie.');
   }
 }
 
@@ -6470,6 +6490,19 @@ function showIOSInstallSheet(){
 }
 async function handleUserSnapshot(uid, snap, isFirstLoad) {
   const data = snap.exists ? snap.data() : {};
+  // Fiche absente ou sans ville (inscription interrompue, fenêtre fermée sur « Dernière étape ») : on termine le profil
+  // au lieu d'ouvrir un accueil vide.
+  if (isFirstLoad && !snap.metadata.hasPendingWrites && (!snap.exists || ((!data.role || data.role === 'user') && !data.city))) {
+    // Réponse du cache (hors ligne) : on ne conclut à une fiche absente qu'après l'avis du serveur.
+    if (!snap.exists && snap.metadata.fromCache) {
+      const fresh = await db.collection('users').doc(uid).get({ source: 'server' }).catch(() => null);
+      if (!fresh || fresh.exists) return handleUserSnapshot(uid, fresh || snap, false);
+    }
+    const gcw = document.getElementById('google-city-wall');
+    gcw._uid = uid; gcw.style.display = 'flex';
+    if (_userDocUnsub) { _userDocUnsub(); _userDocUnsub = null; }
+    return;
+  }
   const fbDisplayName = auth.currentUser && auth.currentUser.displayName;
   const resolvedName = data.name || fbDisplayName || 'Toi';
   if (!data.name && fbDisplayName) {
@@ -7365,7 +7398,15 @@ async function saveGoogleCity() {
   errEl.style.display = 'none';
   if(btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
-    await db.collection('users').doc(uid).update({ city: cityNormG, cityLabel: city, onboardingStep: 'categories', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    const uref = db.collection('users').doc(uid);
+    if((await uref.get()).exists) await uref.update({ city: cityNormG, cityLabel: city, onboardingStep: 'categories', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    else {
+      const u = auth.currentUser || {};
+      await uref.set({ role: 'user', name: u.displayName || String(u.email || '').split('@')[0] || 'Utilisateur', email: u.email || '', city: cityNormG, cityLabel: city,
+        ageRange: '', age: '', interests: [], points: 0, xp: 0, streak: 0, lastDailyDate: null, lastAnswerDate: null, dailyEarned: 0, dailyEarnedDate: null,
+        answeredCampaigns: [], authorizedMerchants: [], onboardingStep: 'categories',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    }
     // Update city registry for merchant audience targeting
     db.collection('cities').doc(cityNormG).set({ label: city.charAt(0).toUpperCase()+city.slice(1), count: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(()=>{});
     document.getElementById('google-city-wall').style.display = 'none';
