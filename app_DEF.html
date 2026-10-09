@@ -456,6 +456,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .auth-title{font-family:var(--fd);font-weight:900;font-size:var(--fs-7);letter-spacing:var(--lettrage-titre);line-height:1.08;margin-bottom:7px;color:var(--ink)}
 .auth-sub{font-size:var(--fs-2);color:var(--ink2);margin-bottom:22px;line-height:1.65}
 .sso-wrap{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
+.aw-iab{padding:var(--s3);border:1px solid var(--trait);border-radius:var(--r-md);background:var(--surface);color:var(--ink);font-size:var(--fs-2);line-height:1.5;display:flex;flex-direction:column;gap:var(--s2)}
+.aw-iab[hidden]{display:none}
+.aw-iab p{margin:0}
+.aw-iab .sso-btn{text-decoration:none;font-weight:700}
 .sso-btn{width:100%;padding:14px;border-radius:var(--r-btn);background:var(--surface);border:1px solid var(--text-3);display:flex;align-items:center;justify-content:center;gap:10px;font-size:var(--fs-3);font-weight:600;color:var(--ink);cursor:pointer;transition:all .13s;font-family:var(--fb)}
 .sso-btn:active{transform:scale(.97)}
 .sso-apple{background:#000;color:var(--blanc);margin-top:9px}
@@ -2497,6 +2501,7 @@ function obNext(){
 }
 function showAuthWall(mode){
   if(mode) awTab(mode);
+  if(inAppBrowser()) showInAppNotice();
   const aw=document.getElementById('auth-wall');
   aw.style.display='flex';aw.style.opacity='1';
 }
@@ -5058,6 +5063,10 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
       <div style="flex:1;height:1px;background:var(--bg3)"></div>
     </div>
 
+    <div id="aw-iab" class="aw-iab" hidden>
+      <p>Tu es dans le navigateur d'une app (Instagram, Snapchat…) : Google n'y autorise pas la connexion. Ouvre NOOVA dans ton navigateur, ou inscris-toi avec ton email.</p>
+      <a id="aw-iab-open" class="sso-btn" href="#">Ouvrir dans mon navigateur</a>
+    </div>
     <button onclick="signInWithGoogle()" class="sso-btn">
       <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
       Continuer avec Google
@@ -5088,9 +5097,14 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
 
 <!-- ═══ FIREBASE ══════════════════════════════════════════════ -->
 <script>
+// Connexion Google « sur le site » : les pages /__/auth/ sont relayées par Vercel vers Firebase (vercel.json), ce qui
+// permet la connexion par redirection (app installée sur l'écran d'accueil, fenêtres surgissantes bloquées).
+// À passer à true UNIQUEMENT après avoir ajouté https://noovaoff.fr/__/auth/handler et https://www.noovaoff.fr/__/auth/handler
+// aux « URI de redirection autorisés » du client OAuth Web (console Google Cloud > API et services > Identifiants).
+const AUTH_ON_SITE = false;
 const firebaseConfig = {
   apiKey: "AIzaSyCU52SgKoIS_P-SEiXFC4d8lQ1rz5mG4to",
-  authDomain: "noova-366d0.firebaseapp.com",
+  authDomain: (AUTH_ON_SITE && /^(www\.)?noovaoff\.fr$/.test(location.hostname)) ? location.hostname : "noova-366d0.firebaseapp.com",
   projectId: "noova-366d0",
   storageBucket: "noova-366d0.firebasestorage.app",
   messagingSenderId: "710589257687",
@@ -7341,10 +7355,33 @@ async function _completeSocialSignIn(cred) {
   }
 }
 
-// Connexion Google / Apple par fenêtre surgissante. (La redirection n'est volontairement pas utilisée :
-// elle exige que le domaine d'authentification soit le même que celui du site, sinon Safari et
-// Chrome bloquent le stockage tiers et la connexion échoue sans message.)
+// Navigateurs intégrés aux apps (Instagram, Snapchat, TikTok, Facebook, appli Google…) : Google y refuse la connexion
+// et la fenêtre ne s'ouvre pas. On le dit tout de suite, avec un bouton pour rouvrir la page dans le vrai navigateur.
+function inAppBrowser() {
+  const ua = navigator.userAgent || '';
+  return /Instagram|FBAN|FBAV|FB_IAB|FBIOS|Snapchat|TikTok|musical_ly|BytedanceWebview|Line\/|LinkedInApp|Pinterest|Twitter|GSA\//i.test(ua) || (/Android/i.test(ua) && /; wv\)/.test(ua));
+}
+function openInBrowserURL() {
+  const rest = location.href.replace(/^https?:\/\//, '');
+  return /Android/i.test(navigator.userAgent) ? `intent://${rest}#Intent;scheme=https;package=com.android.chrome;end` : 'x-safari-https://' + rest;
+}
+function showInAppNotice() {
+  const box = document.getElementById('aw-iab');
+  if(!box) return false;
+  document.getElementById('aw-iab-open').href = openInBrowserURL();
+  document.getElementById('aw-iab-open').textContent = /Android/i.test(navigator.userAgent) ? 'Ouvrir dans Chrome' : 'Ouvrir dans Safari';
+  box.hidden = false;
+  return true;
+}
+const _standalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+
+// Connexion Google / Apple par fenêtre surgissante ; par redirection quand la fenêtre ne peut pas s'ouvrir (app
+// installée, fenêtres bloquées) et que la connexion « sur le site » est active (AUTH_ON_SITE) : sans elle, Safari et
+// Chrome bloquent le stockage tiers et la redirection échoue sans message.
 async function _socialSignIn(provider) {
+  if(inAppBrowser()) { showInAppNotice(); return; }
+  const canRedirect = AUTH_ON_SITE && firebaseConfig.authDomain === location.hostname;
+  if(canRedirect && _standalone()) { try { sessionStorage.setItem('nv_redirect', '1'); } catch(e) {} return auth.signInWithRedirect(provider); }
   try {
     // Comme pour l'inscription email/mot de passe : on prend nous-mêmes la main sur la
     // suite (_completeSocialSignIn) plutôt que de laisser onAuthStateChanged se déclencher
@@ -7356,10 +7393,24 @@ async function _socialSignIn(provider) {
   } catch(e) {
     _skipNextAuth = false;
     if(e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') return;
-    awShowErr(e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment'
-      ? 'La fenêtre de connexion n\'a pas pu s\'ouvrir. Autorise les fenêtres surgissantes, ouvre Noova dans Safari ou Chrome, ou utilise ton email.'
+    const blocked = e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment' || e.code === 'auth/web-storage-unsupported';
+    if(blocked && canRedirect) { try { sessionStorage.setItem('nv_redirect', '1'); } catch(_) {} return auth.signInWithRedirect(provider); }
+    awShowErr(blocked
+      ? 'La fenêtre de connexion Google n\'a pas pu s\'ouvrir. Ouvre NOOVA dans Safari ou Chrome (pas depuis l\'app installée), ou inscris-toi avec ton email.'
       : awFrErr(e.code));
   }
+}
+// Retour d'une connexion par redirection : même suite qu'après la fenêtre surgissante.
+if(AUTH_ON_SITE && (() => { try { return sessionStorage.getItem('nv_redirect') === '1'; } catch(e) { return false; } })()) {
+  try { sessionStorage.removeItem('nv_redirect'); } catch(e) {}
+  _skipNextAuth = true;
+  auth.getRedirectResult().then(cred => {
+    if(cred && cred.user) return _completeSocialSignIn(cred);
+    _skipNextAuth = false; routeAuthState(auth.currentUser);
+  }).catch(e => {
+    _skipNextAuth = false; routeAuthState(auth.currentUser);
+    showAuthWall('login'); awShowErr(awFrErr(e.code));
+  });
 }
 function signInWithGoogle() { return _socialSignIn(new firebase.auth.GoogleAuthProvider()); }
 function signInWithApple() {

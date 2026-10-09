@@ -1411,7 +1411,15 @@ async function renderMerchantQuota(m) {
 async function saveMerchantBroadcast(id, el) {
   try {
     await db.collection('merchants').doc(id).update({ broadcast: el.checked });
-    showToast(el.checked ? 'Ce commerce diffuse maintenant dans toutes les villes' : 'Diffusion limitée à sa ville', 'success');
+    // Ses questions déjà publiées suivent : toutes les villes (onglet « NOOVA » de l'app) ou retour à sa ville.
+    const m = (await db.collection('merchants').doc(id).get()).data() || {};
+    const camps = (await db.collection('campaigns').where('merchantId', '==', id).get()).docs.filter(d => !['ended', 'archived'].includes(d.data().status));
+    const b = db.batch();
+    camps.forEach(d => b.update(d.ref, el.checked
+      ? { targetCity: 'toutes', city: 'toutes', cityLabel: 'Toutes les villes', broadcast: true, merchantLogoUrl: m.logoUrl || null }
+      : { targetCity: m.city || '', city: m.city || '', cityLabel: m.cityLabel || m.city || '', broadcast: false }));
+    if (camps.length) await b.commit();
+    showToast((el.checked ? 'Ce commerce diffuse maintenant dans toutes les villes' : 'Diffusion limitée à sa ville') + (camps.length ? ` (${camps.length} question${camps.length > 1 ? 's' : ''} mise${camps.length > 1 ? 's' : ''} à jour)` : ''), 'success');
   } catch (e) { el.checked = !el.checked; showToast(e.message || 'Enregistrement impossible', 'error'); }
 }
 async function saveMerchantQuota(id) {

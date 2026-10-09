@@ -146,6 +146,22 @@ async function finishCats(p){
     await c2.close();
   });
 
+  await T('navigateur d\'Instagram : connexion Google expliquée, bouton pour ouvrir le vrai navigateur',async()=>{
+    const c3=await browser.createBrowserContext();const q=await c3.newPage();q.on('pageerror',e=>errs.push(e.message));
+    await q.setUserAgent('Mozilla/5.0 (Linux; Android 14; Pixel 7 Build/UQ1A; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/129.0 Mobile Safari/537.36 Instagram 350.0.0.0');
+    await q.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
+    await q.goto(APP,{waitUntil:'load'});await onboard(q);
+    await q.evaluate(()=>showAuthWall('login'));await sleep(200);
+    const r=await q.evaluate(()=>({vis:!document.getElementById('aw-iab').hidden,href:document.getElementById('aw-iab-open').href,txt:document.getElementById('aw-iab-open').textContent}));
+    check('Avertissement visible, bouton « Ouvrir dans Chrome » (lien vers Chrome sur Android)',r.vis&&/^intent:\/\/localhost:8950\/app\.html#Intent;scheme=https;package=com\.android\.chrome;end$/.test(r.href)&&r.txt==='Ouvrir dans Chrome',r);
+    await q.evaluate(()=>{window._popup=0;const o=auth.signInWithPopup.bind(auth);auth.signInWithPopup=(...a)=>{window._popup++;return o(...a);};signInWithGoogle();});await sleep(300);
+    check('« Continuer avec Google » n\'essaie pas d\'ouvrir une fenêtre vouée à l\'échec',await q.evaluate(()=>window._popup===0));
+    await c3.close();
+    const n=await ctx.newPage();await n.goto(APP,{waitUntil:'load'});await onboard(n);await n.evaluate(()=>showAuthWall('login'));
+    check('Navigateur normal : pas d\'avertissement',await n.evaluate(()=>document.getElementById('aw-iab').hidden));
+    await n.close();
+  });
+
   await T('tableau de bord commerçant : refus des règles traduit',async()=>{
     const d=await ctx.newPage();await d.goto(DASH,{waitUntil:'load'});await sleep(800);
     const t=await d.evaluate(()=>awFrErr('auth/password-does-not-meet-requirements'));
