@@ -764,6 +764,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .rwr-mid{flex:1;min-width:0}
 .rwr-t{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);color:var(--text);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rwr-s{font-size:var(--fs-2);color:var(--text-2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rwr-left{color:var(--text);font-weight:700}
 .rwr-bar{height:6px;border-radius:var(--r-pill);background:var(--surface-2);margin-top:var(--s2);overflow:hidden}
 .rwr-bar>i{display:block;height:100%;background:var(--jaune);border-radius:var(--r-pill)}
 .rwr-stub{width:var(--stub);flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-left:2px dashed var(--trait);background:var(--surface-2);color:var(--text)}
@@ -1907,7 +1908,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
       <div class="dwal-title">Récompenses</div>
     </div>
     <!-- 1 · Le solde : points (et NOOVS sur une ligne) -->
-    <section class="wsec" aria-label="Ton solde">
+    <section aria-label="Ton solde">
       <div class="rw-tk">
         <img class="mark" src="logo-mark-white.svg" alt="" aria-hidden="true">
         <div class="rw-tk-l">Tes points</div>
@@ -6008,7 +6009,7 @@ function renderRewardLists(){
   can.innerHTML=ok.length?ok.map(r=>`<div class="rwr ok"><div class="rwr-main">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}</div><button type="button" class="rwr-go" onclick="redeemById(${jsa(r.id)})">Échanger</button></div></div>${stub(rewardCost(r))}</div>`).join('')
     :`<div class="rwl-empty">${all.length?'Pas encore assez de points : réponds aux questions de l\'accueil, chaque réponse en rapporte.':'Les commerces de ta ville n\'ont pas encore mis de récompense en ligne.'}</div>`;
   soon.innerHTML=next.map(r=>{const c=rewardCost(r),pct=Math.max(3,Math.min(100,pts/c*100));
-    return `<div class="rwr" role="button" tabindex="0" onclick="openRewardsSheet()" onkeydown="if(event.key==='Enter')openRewardsSheet()"><div class="rwr-main">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}, encore ${c-pts} pts</div><div class="rwr-bar" aria-hidden="true"><i style="width:${pct.toFixed(0)}%"></i></div></div></div>${stub(c)}</div>`;}).join('');
+    return `<div class="rwr" role="button" tabindex="0" onclick="openRewardsSheet()" onkeydown="if(event.key==='Enter')openRewardsSheet()"><div class="rwr-main">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}</div><div class="rwr-s rwr-left">encore ${c-pts} pts</div><div class="rwr-bar" aria-hidden="true"><i style="width:${pct.toFixed(0)}%"></i></div></div></div>${stub(c)}</div>`;}).join('');
   const sh=document.getElementById('rw-soon-h');if(sh)sh.hidden=!next.length;soon.hidden=!next.length;
   const btn=document.getElementById('rw-all-btn');if(btn){btn.textContent='Voir toutes les récompenses ('+all.length+')';btn.parentNode.hidden=!all.length;}
 }
