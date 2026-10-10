@@ -47,7 +47,7 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
   const r=await p.evaluate(()=>({h:[...document.querySelectorAll('#rewards-tab .dsec-h')].filter(e=>!e.hidden&&getComputedStyle(e).display!=='none'&&!e.closest('[hidden]')).map(e=>e.textContent.trim()),soon:[...document.querySelectorAll('#rw-soon .rwr')].map(e=>e.textContent.replace(/\s+/g,' ')),code:document.getElementById('dcode-wrap').textContent,legacy:document.getElementById('rw-legacy').hidden,all:document.getElementById('rw-all-btn').textContent}));
   check('Récompenses : solde, « À montrer en caisse », « Tu peux t\'offrir », « Bientôt à ta portée »',r.h.join('|')==='À montrer en caisse|Tu peux t\'offrir|Bientôt à ta portée'&&/A 7 K 2/.test(r.code),r);
   check('« Bientôt à ta portée » : la plus proche en premier, « encore 30 pts », sans pourcentage',/Café offert.*encore 30 pts.*150\s*pts/.test(r.soon[0])&&!r.soon.slice(0,3).join().includes('%')&&r.legacy,r.soon);
-  check('Bouton « Voir toutes les récompenses (4) »',r.all==='Voir toutes les récompenses (4)',r.all);
+  check('Bouton « Voir toutes les récompenses (2 commerces) »',r.all==='Voir toutes les récompenses (2 commerces)',r.all);
   await db.doc('users/me').update({points:320});await sleep(1500);await p.evaluate(()=>{S.pts=320;refreshWallet();});await sleep(800);
   const c=await p.evaluate(()=>[...document.querySelectorAll('#rw-can .rwr')].map(e=>e.textContent.replace(/\s+/g,' ')));
   check('Avec 320 points : « Tu peux t\'offrir » liste le croissant et le café, avec « Échanger »',c.length===2&&/Croissant offert/.test(c[0])&&c.every(t=>/Échanger/.test(t)),c);

@@ -183,7 +183,7 @@ const BANK = {
     ["Tu fais tes courses chez nous plutôt…", ["Tous les jours", "Quelques fois par semaine", "En dépannage"]],
     ["Le vrac (pâtes, riz, céréales), tu l'utiliserais ?", ["Oui, souvent", "Parfois", "Non"]],
     ["Un service de commande à retirer en magasin, ça t'aiderait ?", ["Oui", "Peut-être", "Non"]],
-    ["Qu'est-ce qui te ferait venir plus souvent ?", ["Des prix plus bas", "Plus de choix", "Des horaires plus larges", "Une carte de fidélité"]],
+    ["Qu'est-ce qui te ferait faire tes courses ici plus souvent ?", ["Des prix plus bas", "Plus de choix", "Des horaires plus larges", "Une carte de fidélité"]],
     ["Tu aimerais trouver du pain frais chez nous ?", ["Oui", "Peut-être", "Non"]],
     ["Quel produit local mettrais-tu en avant ?", ["Fromages", "Miel", "Œufs", "Bière artisanale"]],
     ["Tu paies plutôt…", ["Par carte", "Sans contact sur téléphone", "En espèces"]],
@@ -403,7 +403,14 @@ async function postNextQuestions(now = Date.now(), { onlyNew = false, dueOnly = 
     const type = String(doc.id).split("_").pop();
     const t = TYPES[type], bank = BANK[type];
     if (!t || !bank) continue;
-    const idx = Number(m.testQIdx) || 0;
+    // Jamais deux fois la même question ouverte dans une ville : si elle y est déjà posée (par un autre commerce),
+    // on passe à la suivante de la banque.
+    let idx = Number(m.testQIdx) || 0;
+    for (let tries = 0; tries < bank.length; tries++) {
+      const same = await db().collection("campaigns").where("targetCity", "==", m.city).where("status", "==", "active").where("question", "==", bank[idx % bank.length][0]).limit(1).get();
+      if (same.empty) break;
+      idx++;
+    }
     const [q, options] = bank[idx % bank.length];
     await db().collection("campaigns").add({
       merchantId: doc.id, merchantName: m.brandName, merchantTheme: t.sector, brandEmoji: "🏪",

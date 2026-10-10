@@ -763,6 +763,31 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .rw-noov-s{opacity:.8}
 /* Chaque récompense est un ticket : le cadeau à gauche, une ligne pointillée encochée, le prix sur le talon */
 .rwl{display:flex;flex-direction:column;gap:var(--s3);margin:0 18px var(--s5)}
+/* Récompenses rangées : filtre par catégorie, une ligne par commerce, la feuille « toutes » regroupée par commerce */
+.rw-cats{display:flex;gap:var(--s2);overflow-x:auto;scrollbar-width:none;margin:0 0 var(--s4);padding:0 18px}
+.rw-cats::-webkit-scrollbar{display:none}
+#rewards-tab [hidden],#rewards-sheet [hidden]{display:none!important}   /* .dsec-h et .rwl imposent display : sans ceci, un titre « masqué » restait visible */
+#rewards-sheet .rw-cats{padding:0;margin:var(--s3) 0}
+.rw-cat{flex-shrink:0;min-height:36px;padding:0 var(--s4);border-radius:var(--r-pill);border:1px solid var(--trait);background:var(--surface);color:var(--text);font:inherit;font-size:var(--fs-2);font-weight:700;cursor:pointer;white-space:nowrap}
+.rw-cat[aria-pressed="true"]{background:var(--bandeau);color:var(--jaune);border-color:var(--bandeau)}
+.rw-cat small{font-weight:600;opacity:.7;margin-left:4px}
+.rw-only{display:flex;align-items:center;gap:var(--s2);font-size:var(--fs-2);color:var(--text);margin:0 0 var(--s4);cursor:pointer}
+.rw-only input{width:18px;height:18px;accent-color:var(--bandeau)}
+.rw-more{display:block;width:100%;min-height:44px;margin-top:var(--s1);background:none;border:1px dashed var(--text-3);border-radius:var(--r-md);color:var(--text);font:inherit;font-size:var(--fs-2);font-weight:700;cursor:pointer}
+.rwg-list{display:flex;flex-direction:column;gap:var(--s3);margin-bottom:var(--s5)}
+.rwg{background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-md);padding:var(--s3)}
+.rwg-h{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s3)}
+.rwg-n{flex:1;min-width:0}
+.rwg-t{font-family:var(--font-titre);font-weight:800;font-size:var(--fs-3);color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rwg-s{font-size:var(--fs-1);color:var(--text-2)}
+.rwg-f{flex-shrink:0;font-size:var(--fs-1);font-weight:700;padding:2px var(--s2);border-radius:var(--r-pill);background:var(--jaune-faible);color:var(--text)}
+.rwg-row{display:flex;gap:var(--s2);overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.rwg-row::-webkit-scrollbar{display:none}
+.rwg .gift-c{flex:0 0 132px;padding:var(--s3);border:1px solid var(--trait);border-radius:var(--r-sm);background:var(--surface-2)}
+.rwg .gift-c.ok{background:var(--jaune);border-color:var(--jaune);color:var(--jaune-ink)}
+.rwg-l{font-size:var(--fs-2);font-weight:700;line-height:1.25;min-height:2.5em}
+.rwg-p{margin-top:var(--s1);font-size:var(--fs-1);font-weight:800}
+.rwg .gift-c.locked{opacity:1;pointer-events:none;color:var(--text-2)}
 .rwr{--stub:96px;display:flex;align-items:stretch;min-height:92px;background:var(--surface);border:1px solid var(--trait);border-radius:var(--r-md);overflow:hidden;cursor:pointer;
   -webkit-mask:radial-gradient(circle 9px at calc(100% - var(--stub)) 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at calc(100% - var(--stub)) 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
   mask:radial-gradient(circle 9px at calc(100% - var(--stub)) 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at calc(100% - var(--stub)) 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
@@ -1928,6 +1953,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
     <div class="dsec-h" id="rw-codes-h" hidden>À montrer en caisse</div>
     <div id="dcode-wrap"></div>
     <!-- 3 · Ce que je peux m'offrir maintenant, 4 · ce qui arrive bientôt -->
+    <div class="rw-cats" id="rw-cats" role="group" aria-label="Catégories de récompenses"></div>
     <div class="dsec-h">Tu peux t'offrir</div>
     <div class="rwl" id="rw-can"></div>
     <div class="dsec-h" id="rw-soon-h">Bientôt à ta portée</div>
@@ -3344,8 +3370,10 @@ function closeCompare() {
   const s = document.getElementById('compare-sheet');
   if (s) s.classList.remove('open');
 }
-function openRewardsSheet() {
+function openRewardsSheet(onlyCan) {
   const s = document.getElementById('rewards-sheet');
+  const o = document.getElementById('rw-only-can'); if (o) o.checked = onlyCan === true;
+  renderRewardSheet();
   if (s) s.classList.add('open');
 }
 function closeRewardsSheet() {
@@ -4594,7 +4622,12 @@ async function openBrandById(mid, fallbackName) {
     const camps=[];
     campsSnap.forEach(doc=>camps.push({id:doc.id,...doc.data()}));
     const answered=S._answered||[];
-    const sv=!camps.length
+    // Commerce d'une autre ville (lien partagé, fil d'un ami) : ses questions sont réservées aux habitants de sa zone.
+    // Vitrine illisible : les règles ne montrent que les commerces de sa propre ville.
+    const otherCity=!(merchantSnap&&merchantSnap.exists)||(m.city&&m.broadcast!==true&&normalizeCity(m.city)!==normalizeCity(S._city||''));
+    const sv=otherCity
+      ?`<div class="bp-text">Ce commerce ${m.city?'est '+esc(cityPhrase(m.cityLabel||m.city)):'n\'est pas dans ta ville'} : ses questions sont réservées aux habitants de sa ville.</div>`
+      :!camps.length
       ?'<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>'
       :camps.map(c=>{
           const done=answered.includes(c.id);
@@ -4638,6 +4671,9 @@ function startCampaignById(campId) {
   db.collection('campaigns').doc(campId).get().then(doc=>{
     if(!doc.exists)return;
     const d=doc.data();
+    // Jamais une question d'une autre ville, terminée ou fermée (le serveur la refuserait aussi).
+    const myCity=normalizeCity(S._city||''),cCity=getCampaignCity(d);
+    if((d.targetCity!=='toutes'&&cCity&&cCity!==myCity)||d.status!=='active'||(d.endsAt&&d.endsAt.toMillis&&d.endsAt.toMillis()<Date.now())){showToast('Cette question n\'est pas ouverte dans ta ville.','warning');return;}
     // Mêmes données que sur l'accueil : options PROPRES à chaque question, et questions 2 et 3 à la suite (avant : options de la
     // campagne entière et questions suivantes perdues quand on démarrait depuis la page du commerce).
     const allQs=getCampaignQuestions(d);
@@ -5964,27 +6000,7 @@ async function loadRewardsFromFirestore() {
     rewards.sort((a,b) => rewardCost(a)-rewardCost(b));
     S._rewardsCache = rewards;
 
-    const gg = document.getElementById('gift-grid');
-    if(gg){
-      gg.style.gridTemplateColumns = '';
-      gg.innerHTML = '';
-      if(!rewards.length) {
-        gg.style.gridTemplateColumns = '1fr';
-        gg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--ink2);font-size:var(--fs-2)">Récompenses bientôt disponibles.</div>';
-      } else {
-        // Grille de carrés simples, une carte par récompense (jusqu'à 5 par commerce, du moins
-        // cher au plus cher) — le solde s'utilise chez n'importe quel commerce visible de la ville.
-        rewards.forEach(r => {
-          const locked = S.pts < rewardCost(r);
-          const card = document.createElement('div');
-          card.className = 'gift-c' + (locked ? ' locked' : '');
-          card.innerHTML = `<div style="margin-bottom:7px">${logoHTML(r.merchantName||r.label,38)}</div><div style="font-size:var(--fs-2);font-weight:700;color:var(--ink)">${esc(r.merchantName||'Commerce')}</div><div style="font-size:var(--fs-1);color:var(--ink2);margin-top:2px">${r.icon?esc(r.icon):icon('gift-generic',{size:12})} ${esc(r.label||'Récompense')}</div><div style="margin-top:7px;font-size:var(--fs-1);font-weight:800;padding:3px 9px;border-radius:var(--r-tag);background:${locked?'var(--bg2)':'var(--coral)'};color:${locked?'var(--ink3)':'var(--ink)'};display:inline-block">${esc(tierLabel(r))}</div>`;
-          if(!locked) card.onclick = () => redeemReward(r);
-          gg.appendChild(card);
-        });
-        applyStagger(gg);
-      }
-    }
+    renderRewardSheet();
     renderAlmostReward();
     renderFeaturedReward();
     renderInProgressRewards();
@@ -6076,18 +6092,60 @@ function redeemFeaturedReward(){
   const r = (S._rewardsCache||[]).find(x=>x.id===S._featuredRewardId);
   if(r) redeemReward(r);
 }
+// ─── Récompenses rangées ───────────────────────────────────────────────
+// Avec 30 commerces (5 paliers chacun), on ne liste plus tout : une seule ligne par commerce (sa meilleure récompense
+// accessible, ou la prochaine), les commerces suivis en premier, et un filtre par catégorie.
+const RW_CATS=[['all','Tout'],['restauration','Restauration'],['boulangerie','Boulangerie'],['sport','Sport'],['beaute','Beauté'],['culture','Culture'],['commerce','Boutiques'],['services','Services']];
+const RW_CAN_MAX=5, RW_SOON_MAX=3;
+let _rwCat='all';
+function rwGroups(){
+  const by={},fol=S._authorizedMerchants||[];
+  (S._rewardsCache||[]).forEach(r=>{
+    const k=r.merchantId||r.merchantName||r.id,m=_verifiedMerchantsCache[r.merchantId]||{};
+    if(!by[k])by[k]={mid:r.merchantId,name:r.merchantName||m.brandName||'Commerce',logoUrl:m.logoUrl||r.logoUrl||null,sector:m.sector||'',cat:sectorCat(m.sector||m.theme||''),followed:fol.includes(r.merchantId),items:[]};
+    by[k].items.push(r);
+  });
+  return Object.values(by).map(g=>{g.items.sort((a,b)=>rewardCost(a)-rewardCost(b));return g;})
+    .sort((a,b)=>(b.followed-a.followed)||a.name.localeCompare(b.name,'fr'));
+}
+function renderRwCats(id){
+  const el=document.getElementById(id);if(!el)return;
+  const gs=rwGroups(),n={};gs.forEach(g=>{n[g.cat]=(n[g.cat]||0)+1;});
+  const cats=RW_CATS.filter(([k])=>k==='all'||n[k]);
+  el.hidden=cats.length<3;   // une seule catégorie : pas de filtre
+  if(!cats.some(([k])=>k===_rwCat))_rwCat='all';
+  el.innerHTML=cats.map(([k,l])=>`<button type="button" class="rw-cat" aria-pressed="${k===_rwCat}" onclick="setRwCat(${jsa(k)})">${l}<small>${k==='all'?gs.length:n[k]}</small></button>`).join('');
+}
+function setRwCat(k){_rwCat=k;renderRewardLists();renderRewardSheet();}
+const rwInCat=g=>_rwCat==='all'||g.cat===_rwCat;
 function renderRewardLists(){
   const can=document.getElementById('rw-can'),soon=document.getElementById('rw-soon');if(!can||!soon)return;
-  const all=S._rewardsCache||[],pts=S.pts||0;
-  const ok=all.filter(r=>rewardCost(r)<=pts).sort((a,b)=>rewardCost(b)-rewardCost(a));
-  const next=all.filter(r=>rewardCost(r)>pts).sort((a,b)=>rewardCost(a)-rewardCost(b)).slice(0,5);
+  renderRwCats('rw-cats');
+  const all=S._rewardsCache||[],pts=S.pts||0,gs=rwGroups().filter(rwInCat);
+  const ok=gs.map(g=>({g,r:g.items.filter(r=>rewardCost(r)<=pts).pop()})).filter(x=>x.r)
+    .sort((a,b)=>(b.g.followed-a.g.followed)||(rewardCost(b.r)-rewardCost(a.r)));
+  const next=gs.map(g=>({g,r:g.items.find(r=>rewardCost(r)>pts)})).filter(x=>x.r)
+    .sort((a,b)=>(b.g.followed-a.g.followed)||(rewardCost(a.r)-rewardCost(b.r))).slice(0,RW_SOON_MAX);
   const stub=c=>`<div class="rwr-stub"><b>${c}</b><small>pts</small></div>`;
-  can.innerHTML=ok.length?ok.map(r=>`<div class="rwr ok"><div class="rwr-main">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}</div><button type="button" class="rwr-go" onclick="redeemById(${jsa(r.id)})">Échanger</button></div></div>${stub(rewardCost(r))}</div>`).join('')
+  can.innerHTML=ok.length?ok.slice(0,RW_CAN_MAX).map(({g,r})=>`<div class="rwr ok"><div class="rwr-main">${logoHTML(r.merchantName||r.label,44,g.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}</div><button type="button" class="rwr-go" onclick="redeemById(${jsa(r.id)})">Échanger</button></div></div>${stub(rewardCost(r))}</div>`).join('')
+      +(ok.length>RW_CAN_MAX?`<button type="button" class="rw-more" onclick="openRewardsSheet(true)">Voir les ${ok.length-RW_CAN_MAX} autres commerces où tu peux échanger</button>`:'')
     :`<div class="rwl-empty">${all.length?'Pas encore assez de points : réponds aux questions de l\'accueil, chaque réponse en rapporte.':'Les commerces de ta ville n\'ont pas encore mis de récompense en ligne.'}</div>`;
-  soon.innerHTML=next.map(r=>{const c=rewardCost(r),pct=Math.max(3,Math.min(100,pts/c*100));
-    return `<div class="rwr" role="button" tabindex="0" onclick="openRewardsSheet()" onkeydown="if(event.key==='Enter')openRewardsSheet()"><div class="rwr-main">${logoHTML(r.merchantName||r.label,44,r.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}</div><div class="rwr-s rwr-left">encore ${c-pts} pts</div><div class="rwr-bar" aria-hidden="true"><i style="width:${pct.toFixed(0)}%"></i></div></div></div>${stub(c)}</div>`;}).join('');
+  soon.innerHTML=next.map(({g,r})=>{const c=rewardCost(r),pct=Math.max(3,Math.min(100,pts/c*100));
+    return `<div class="rwr" role="button" tabindex="0" onclick="openRewardsSheet()" onkeydown="if(event.key==='Enter')openRewardsSheet()"><div class="rwr-main">${logoHTML(r.merchantName||r.label,44,g.logoUrl)}<div class="rwr-mid"><div class="rwr-t">${esc(r.label||'Récompense')}</div><div class="rwr-s">${esc(r.merchantName||'')}</div><div class="rwr-s rwr-left">encore ${c-pts} pts</div><div class="rwr-bar" aria-hidden="true"><i style="width:${pct.toFixed(0)}%"></i></div></div></div>${stub(c)}</div>`;}).join('');
   const sh=document.getElementById('rw-soon-h');if(sh)sh.hidden=!next.length;soon.hidden=!next.length;
-  const btn=document.getElementById('rw-all-btn');if(btn){btn.textContent='Voir toutes les récompenses ('+all.length+')';btn.parentNode.hidden=!all.length;}
+  const nG=rwGroups().length;
+  const btn=document.getElementById('rw-all-btn');if(btn){btn.textContent='Voir toutes les récompenses ('+nG+' commerce'+(nG>1?'s':'')+')';btn.parentNode.hidden=!all.length;}
+}
+// Feuille « toutes les récompenses » : un bloc par commerce (suivis d'abord), ses paliers côte à côte.
+function renderRewardSheet(){
+  const gg=document.getElementById('gift-grid');if(!gg)return;
+  renderRwCats('rw-cats-sheet');
+  const pts=S.pts||0,only=!!(document.getElementById('rw-only-can')||{}).checked;
+  const gs=rwGroups().filter(rwInCat).filter(g=>!only||g.items.some(r=>rewardCost(r)<=pts));
+  if(!(S._rewardsCache||[]).length){gg.innerHTML='<div class="rwl-empty">Récompenses bientôt disponibles.</div>';return;}
+  if(!gs.length){gg.innerHTML='<div class="rwl-empty">Rien dans cette catégorie pour l\'instant.</div>';return;}
+  gg.innerHTML=gs.map(g=>`<div class="rwg"><div class="rwg-h">${logoHTML(g.name,40,g.logoUrl)}<div class="rwg-n"><div class="rwg-t">${esc(g.name)}</div><div class="rwg-s">${esc(g.sector)}</div></div>${g.followed?'<span class="rwg-f">Suivi</span>':''}</div>
+    <div class="rwg-row">${g.items.map(r=>{const ok=rewardCost(r)<=pts;return `<div class="gift-c${ok?' ok':' locked'}"${ok?` role="button" tabindex="0" onclick="redeemById(${jsa(r.id)})" onkeydown="if(event.key==='Enter')redeemById(${jsa(r.id)})"`:''}><div class="rwg-l">${esc(r.label||'Récompense')}</div><div class="rwg-p">${esc(tierLabel(r))}</div></div>`;}).join('')}</div></div>`).join('');
 }
 function redeemById(id){const r=(S._rewardsCache||[]).find(x=>x.id===id);if(r)redeemReward(r);}
 function renderInProgressRewards(){
@@ -7571,7 +7629,9 @@ auth.onAuthStateChanged(user => {
     <div class="cs-handle"></div>
     <div class="cs-close-bar"><div class="back-btn" onclick="closeRewardsSheet()">✕</div></div>
     <div class="dsec-h" style="padding:0">Récompenses près de toi</div>
-    <div class="gift-grid" id="gift-grid"></div>
+    <div class="rw-cats" id="rw-cats-sheet" role="group" aria-label="Catégories de récompenses"></div>
+    <label class="rw-only"><input type="checkbox" id="rw-only-can" onchange="renderRewardSheet()"> Seulement ce que je peux m'offrir</label>
+    <div class="rwg-list" id="gift-grid"></div>
     <div class="dsec-h" style="padding:0"><span style="display:inline-flex;width:16px;height:16px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 3.5"/><path d="M17 6h2.5A2.5 2.5 0 0 1 17 9.5"/><path d="M12 15v3"/><path d="M8.5 21h7l-1-3h-5z"/></svg></span> Paliers</div>
     <div id="tiers-list"></div>
   </div>
