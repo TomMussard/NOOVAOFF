@@ -54,6 +54,121 @@ const ICON = {
     <path d="M40 -92l-24 26" stroke="${ink}" stroke-width="7" stroke-linecap="round"/>`,
 };
 
+// ── Les 25 métiers ajoutés (functions/testMonthCatalog.js) ──
+Object.assign(ICON, {
+  restaurant: (ink, acc) => `
+    <circle cx="0" cy="8" r="62" fill="none" stroke="${ink}" stroke-width="12"/>
+    <circle cx="0" cy="8" r="36" fill="${acc}" stroke="${ink}" stroke-width="6"/>
+    <path d="M-92 -70v54M-104 -70v34a12 12 0 0 0 24 0v-34M-92 -16v104" fill="none" stroke="${ink}" stroke-width="8" stroke-linecap="round"/>
+    <path d="M92 88V-70c-18 10-22 40-20 70h20" fill="${ink}" stroke="${ink}" stroke-width="8" stroke-linejoin="round"/>`,
+  pizzeria: (ink, acc) => `
+    <path d="M-80 -60Q0 -96 80 -60L0 88z" fill="${acc}" stroke="${ink}" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M-80 -60Q0 -96 80 -60" fill="none" stroke="${ink}" stroke-width="22" stroke-linecap="round"/>
+    <g fill="${ink}"><circle cx="-26" cy="-30" r="12"/><circle cx="22" cy="-20" r="12"/><circle cx="-4" cy="22" r="11"/></g>`,
+  sushi: (ink, acc) => `
+    <ellipse cx="-20" cy="-6" rx="58" ry="22" fill="${ink}"/>
+    <path d="M-78 -6v48a58 22 0 0 0 116 0V-6" fill="${ink}"/>
+    <ellipse cx="-20" cy="-6" rx="44" ry="15" fill="${acc}"/>
+    <ellipse cx="-20" cy="-6" rx="18" ry="7" fill="${ink}"/>
+    <path d="M30 -88L96 70M54 -92L104 58" stroke="${ink}" stroke-width="9" stroke-linecap="round"/>`,
+  burger: (ink, acc) => `
+    <path d="M-82 -14a82 64 0 0 1 164 0z" fill="${ink}"/>
+    <g fill="${acc}"><circle cx="-30" cy="-44" r="5"/><circle cx="0" cy="-54" r="5"/><circle cx="30" cy="-44" r="5"/></g>
+    <path d="M-90 4h180" stroke="${acc}" stroke-width="12" stroke-linecap="round"/>
+    <rect x="-86" y="16" width="172" height="26" rx="13" fill="${ink}"/>
+    <path d="M-82 54h164a0 0 0 0 1 0 0v8a22 22 0 0 1-22 22h-120a22 22 0 0 1-22-22z" fill="${ink}"/>`,
+  creperie: (ink, acc) => `
+    <ellipse cx="0" cy="40" rx="92" ry="34" fill="none" stroke="${ink}" stroke-width="10"/>
+    <path d="M-70 34L0 -40L70 34z" fill="${acc}" stroke="${ink}" stroke-width="9" stroke-linejoin="round"/>
+    <path d="M-30 4L0 -26L30 4" fill="none" stroke="${ink}" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M40 -86l40 40M58 -68l-24 24" stroke="${ink}" stroke-width="10" stroke-linecap="round"/>`,
+  boulangerie: (ink, acc) => `
+    <path d="M-86 52C-100 38-96 24-80 10L36 -88c16-12 34-14 46 0s10 30-4 44L-38 64c-16 12-34 8-48-12z" fill="${acc}" stroke="${ink}" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M-52 10l20 20M-22 -18l20 20M8 -46l20 20M38 -72l18 18" stroke="${ink}" stroke-width="9" stroke-linecap="round"/>`,
+  patisserie: (ink, acc) => `
+    <path d="M-80 82V-6l160-46v134z" fill="${ink}"/>
+    <path d="M-80 -6l160-46v26L-80 22z" fill="${acc}"/>
+    <path d="M-80 40l160-30" stroke="${acc}" stroke-width="10"/>
+    <circle cx="44" cy="-74" r="18" fill="${acc}" stroke="${ink}" stroke-width="6"/>
+    <path d="M48 -92c4-12 12-16 22-16" fill="none" stroke="${ink}" stroke-width="6" stroke-linecap="round"/>`,
+  chocolatier: (ink, acc) => `
+    <rect x="-70" y="-86" width="140" height="172" rx="12" fill="${ink}"/>
+    <g fill="${acc}">${[-52, -6, 40].map((y) => [-56, 4].map((x) => `<rect x="${x}" y="${y}" width="52" height="38" rx="6"/>`).join("")).join("")}</g>
+    <path d="M18 86l52-52v40a12 12 0 0 1-12 12z" fill="${acc}" stroke="${ink}" stroke-width="6"/>`,
+  fitness: (ink, acc) => `
+    <path d="M-50 0h100" stroke="${ink}" stroke-width="16" stroke-linecap="round"/>
+    <rect x="-90" y="-44" width="26" height="88" rx="8" fill="${ink}"/><rect x="64" y="-44" width="26" height="88" rx="8" fill="${ink}"/>
+    <rect x="-64" y="-30" width="18" height="60" rx="6" fill="${acc}" stroke="${ink}" stroke-width="5"/><rect x="46" y="-30" width="18" height="60" rx="6" fill="${acc}" stroke="${ink}" stroke-width="5"/>`,
+  yoga: (ink, acc) => `
+    <path d="M0 40C-20 0-20 -40 0 -78C20 -40 20 0 0 40z" fill="${acc}" stroke="${ink}" stroke-width="8"/>
+    <path d="M0 40C-40 30-66 0-70 -40C-34 -34-12 -6 0 40z" fill="${acc}" stroke="${ink}" stroke-width="8"/>
+    <path d="M0 40C40 30 66 0 70 -40C34 -34 12 -6 0 40z" fill="${acc}" stroke="${ink}" stroke-width="8"/>
+    <path d="M-86 66h172" stroke="${ink}" stroke-width="12" stroke-linecap="round"/>`,
+  velo: (ink, acc) => `
+    <circle cx="-56" cy="34" r="40" fill="none" stroke="${ink}" stroke-width="11"/>
+    <circle cx="56" cy="34" r="40" fill="none" stroke="${ink}" stroke-width="11"/>
+    <path d="M-56 34L-20 -30h52M-20 -30L4 34h-60M4 34l38-64 14 64M42 -30l-8-24h22M-30 -44h22" fill="none" stroke="${ink}" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="4" cy="34" r="9" fill="${acc}"/>`,
+  barbier: (ink, acc) => `
+    <path d="M0 -6C-14 -30-48 -34-70 -14c-14 12-28 14-34 6 6 30 40 40 66 28C-20 12-6 4 0 -6zM0 -6C14 -30 48 -34 70 -14c14 12 28 14 34 6-6 30-40 40-66 28C20 12 6 4 0 -6z" fill="${ink}"/>
+    <path d="M-34 52h68" stroke="${acc}" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="0" cy="-58" r="14" fill="${acc}" stroke="${ink}" stroke-width="6"/>`,
+  institut: (ink, acc) => `
+    <path d="M-20 -86C-20 -86-74 -14-74 22a54 54 0 0 0 108 0C34 -14-20 -86-20 -86z" fill="${acc}" stroke="${ink}" stroke-width="10"/>
+    <path d="M-44 22a24 24 0 0 0 24 24" fill="none" stroke="${ink}" stroke-width="8" stroke-linecap="round"/>
+    <path d="M44 84C44 40 66 10 96 0c0 40-20 74-52 84z" fill="${ink}"/>`,
+  onglerie: (ink, acc) => `
+    <rect x="-22" y="-92" width="44" height="60" rx="8" fill="${ink}"/>
+    <path d="M-50 -24h100l10 92a20 20 0 0 1-20 22h-80a20 20 0 0 1-20-22z" fill="${acc}" stroke="${ink}" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M-30 20h60" stroke="${ink}" stroke-width="8" stroke-linecap="round"/>`,
+  librairie: (ink, acc) => `
+    <path d="M0 -56C-30 -76-64 -76-92 -64v132c28-12 62-12 92 8 30-20 64-20 92-8V-64C64 -76 30 -76 0 -56z" fill="${acc}" stroke="${ink}" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M0 -56V76" stroke="${ink}" stroke-width="9"/>
+    <path d="M-70 -34c18-6 36-6 52 2M-70 -6c18-6 36-6 52 2M18 -32c16-8 34-8 52-2M18 -4c16-8 34-8 52-2" fill="none" stroke="${ink}" stroke-width="6" stroke-linecap="round"/>`,
+  cinema: (ink, acc) => `
+    <rect x="-84" y="-20" width="168" height="104" rx="10" fill="${ink}"/>
+    <path d="M-84 -26l160-44 8 28-160 44z" fill="${acc}" stroke="${ink}" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M-50 -38l14 24M-6 -50l14 24M38 -62l14 24" stroke="${ink}" stroke-width="10"/>
+    <path d="M-16 14v44l40-22z" fill="${acc}"/>`,
+  disquaire: (ink, acc) => `
+    <circle cx="0" cy="0" r="86" fill="${ink}"/>
+    <circle cx="0" cy="0" r="62" fill="none" stroke="${acc}" stroke-width="3" opacity=".6"/>
+    <circle cx="0" cy="0" r="46" fill="none" stroke="${acc}" stroke-width="3" opacity=".6"/>
+    <circle cx="0" cy="0" r="26" fill="${acc}"/><circle cx="0" cy="0" r="6" fill="${ink}"/>`,
+  jeux: (ink, acc) => `
+    <rect x="-74" y="-74" width="148" height="148" rx="26" fill="${acc}" stroke="${ink}" stroke-width="11" transform="rotate(-10)"/>
+    <g fill="${ink}" transform="rotate(-10)"><circle cx="-36" cy="-36" r="13"/><circle cx="36" cy="-36" r="13"/><circle cx="0" cy="0" r="13"/><circle cx="-36" cy="36" r="13"/><circle cx="36" cy="36" r="13"/></g>`,
+  fromagerie: (ink, acc) => `
+    <path d="M-90 30L70 -60l20 30v84H-90z" fill="${acc}" stroke="${ink}" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M-90 30H90" stroke="${ink}" stroke-width="8"/>
+    <g fill="${ink}"><circle cx="-30" cy="58" r="12"/><circle cx="34" cy="62" r="9"/><circle cx="48" cy="-8" r="10"/><circle cx="4" cy="6" r="7"/></g>`,
+  primeur: (ink, acc) => `
+    <path d="M-62 -26C-30 -46 10 -30 24 -6c10 18-6 34-30 46L-84 86c-6 4-12-2-8-8l30-104z" fill="${acc}" stroke="${ink}" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M-50 4l16 10M-62 40l18 10M-24 -14l12 14" stroke="${ink}" stroke-width="7" stroke-linecap="round"/>
+    <path d="M14 -24C20 -60 46 -84 80 -86M18 -20C46 -40 74 -40 96 -24M10 -28C0 -60 8 -86 28 -96" fill="none" stroke="${ink}" stroke-width="10" stroke-linecap="round"/>`,
+  boucherie: (ink, acc) => `
+    <g transform="rotate(-18)">
+      <path d="M-86 -52h120v78c0 22-18 30-40 30h-80z" fill="${acc}" stroke="${ink}" stroke-width="10" stroke-linejoin="round"/>
+      <circle cx="-62" cy="-28" r="11" fill="${ink}"/>
+      <path d="M-86 30h84" stroke="${ink}" stroke-width="6" opacity=".35"/>
+      <rect x="34" y="-40" width="64" height="30" rx="12" fill="${ink}"/>
+    </g>`,
+  friperie: (ink, acc) => `
+    <path d="M-34 -76l-58 30 22 46 22-10v94h96V-10l22 10 22-46-58-30c-6 18-20 28-34 28s-28-10-34-28z" fill="${acc}" stroke="${ink}" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M-20 30h40" stroke="${ink}" stroke-width="8" stroke-linecap="round"/>`,
+  pressing: (ink, acc) => `
+    <path d="M0 -40v-16a18 18 0 1 0-18-18" fill="none" stroke="${ink}" stroke-width="10" stroke-linecap="round"/>
+    <path d="M0 -40L-92 30a8 8 0 0 0 5 14H87a8 8 0 0 0 5-14z" fill="none" stroke="${ink}" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M-60 44h120v34a10 10 0 0 1-10 10H-50a10 10 0 0 1-10-10z" fill="${acc}" stroke="${ink}" stroke-width="7"/>`,
+  cordonnerie: (ink, acc) => `
+    <path d="M-80 -80h52v70c20 4 70 16 96 34 16 10 18 34-4 40H-80z" fill="${acc}" stroke="${ink}" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M-86 66h176" stroke="${ink}" stroke-width="14" stroke-linecap="round"/>
+    <path d="M-28 -2l14 -14M-10 6l14 -14M8 14l14 -14" stroke="${ink}" stroke-width="7" stroke-linecap="round"/>`,
+  animalerie: (ink, acc) => `
+    <ellipse cx="0" cy="40" rx="46" ry="38" fill="${acc}" stroke="${ink}" stroke-width="9"/>
+    <g fill="${acc}" stroke="${ink}" stroke-width="8"><ellipse cx="-62" cy="-14" rx="18" ry="24"/><ellipse cx="-24" cy="-50" rx="18" ry="24"/><ellipse cx="24" cy="-50" rx="18" ry="24"/><ellipse cx="62" cy="-14" rx="18" ry="24"/></g>`,
+});
+
 // Éléments posés devant la boutique, propres au métier.
 const PROPS = {
   cafe: (v) => ardoise(1010, v) + table(165, v),
@@ -62,6 +177,21 @@ const PROPS = {
   superette: (v) => cageots(960, v) + cageots(140, v),
   bar: (v) => ardoise(1010, v) + tonneau(175, v),
 };
+Object.assign(PROPS, {
+  restaurant: (v) => ardoise(1010, v) + table(165, v), pizzeria: (v) => ardoise(1010, v) + table(165, v),
+  sushi: (v) => plante(1000, v) + table(165, v), burger: (v) => ardoise(1010, v) + tonneau(175, v),
+  creperie: (v) => ardoise(1010, v) + table(165, v), boulangerie: (v) => ardoise(1010, v) + cageots(140, v),
+  patisserie: (v) => plante(1000, v) + table(165, v), chocolatier: (v) => plante(1000, v) + ardoise(190, v),
+  fitness: (v) => plante(1000, v) + plante(190, v), yoga: (v) => plante(1000, v) + plante(190, v),
+  velo: (v) => tonneau(1000, v) + plante(190, v), barbier: (v) => poteau(1000, v) + plante(190, v),
+  institut: (v) => plante(1000, v) + plante(190, v), onglerie: (v) => plante(1000, v) + ardoise(190, v),
+  librairie: (v) => ardoise(1010, v) + cageots(140, v), cinema: (v) => ardoise(1010, v) + ardoise(190, v),
+  disquaire: (v) => cageots(960, v) + ardoise(190, v), jeux: (v) => ardoise(1010, v) + table(165, v),
+  fromagerie: (v) => cageots(960, v) + ardoise(190, v), primeur: (v) => cageots(960, v) + cageots(140, v),
+  boucherie: (v) => ardoise(1010, v) + plante(190, v), friperie: (v) => seaux(950, v) + plante(190, v),
+  pressing: (v) => plante(1000, v) + plante(190, v), cordonnerie: (v) => ardoise(1010, v) + plante(190, v),
+  animalerie: (v) => plante(1000, v) + cageots(140, v),
+});
 function ardoise(x, v) { return `<g transform="translate(${x} 470)"><path d="M-48 70L-30 -60h60L48 70" fill="none" stroke="${C.encre}" stroke-width="10"/><rect x="-44" y="-62" width="88" height="96" rx="6" fill="${C.encre}" stroke="${v.door}" stroke-width="6"/><path d="M-26 -36h52M-26 -16h36M-26 4h46" stroke="${C.creme}" stroke-width="6" stroke-linecap="round" opacity=".85"/></g>`; }
 function table(x, v) { return `<g transform="translate(${x} 470)"><circle cy="-36" r="0"/><rect x="-60" y="-20" width="120" height="14" rx="7" fill="${C.encre}"/><path d="M0 -6v76M-30 70h60" stroke="${C.encre}" stroke-width="10" stroke-linecap="round"/><path d="M-20 -40h30v20h-30zM10 -34h8a6 6 0 0 1 0 12h-8" fill="${v.awA}" stroke="${C.encre}" stroke-width="5"/></g>`; }
 function poteau(x, v) { return `<g transform="translate(${x} 400)"><rect x="-22" y="-120" width="44" height="200" rx="22" fill="${C.creme}" stroke="${C.encre}" stroke-width="8"/><path d="M-22 -96l44 -26M-22 -46l44 -26M-22 4l44 -26M-22 54l44 -26" stroke="${C.brule}" stroke-width="14"/><rect x="-30" y="-136" width="60" height="22" rx="8" fill="${C.encre}"/><rect x="-30" y="76" width="60" height="22" rx="8" fill="${C.encre}"/><path d="M0 98v42" stroke="${C.encre}" stroke-width="10"/></g>`; }

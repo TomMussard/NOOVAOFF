@@ -6,7 +6,7 @@
  *  - qui est déjà une zone NOOVA (une des 10 villes de départ ou une zone créée automatiquement) : rien à faire ;
  *  - à moins de 25 km d'une zone : il est rattaché à cette zone (son nom de commune reste affiché) ;
  *  - à plus de 25 km de toute zone, et reconnue par l'API officielle des communes : sa commune devient une nouvelle
- *    zone, avec 5 commerces test (café, coiffeur, fleuriste, supérette, bar), leurs récompenses et leurs questions, qui
+ *    zone, avec 30 commerces test (un par métier, voir testMonthCatalog.js), leurs récompenses et leurs questions, qui
  *    vivent ensuite tout seuls comme ceux du mois de test (une question par jour et par commerce).
  * Garde-fous : seuls de vrais comptes habitants déclenchent la création (jamais l'appel sans connexion utilisé à
  * l'inscription), une commune inconnue de l'API ne crée rien, et au plus MAX_PER_DAY zones sont ouvertes par jour.
