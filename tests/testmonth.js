@@ -23,8 +23,9 @@ const byName=(r,u)=>r.friends.find(f=>f.uid===u);
 const err=async fn=>{try{await fn();return null;}catch(e){return e.code||String(e);}};
 
 
-// ─── Mois de test : 50 commerces fictifs autonomes (préparation, pilote automatique, app, échange simulé, arrêt) ───
+// ─── Mois de test : 30 commerces fictifs par ville, autonomes (préparation, pilote automatique, app, échange simulé, arrêt) ───
 const TM=require(__dirname+'/../functions/testMonth.js')._t;
+const NT=Object.keys(TM.TYPES).length, NM=NT*TM.CITIES.length;   // 30 métiers × 10 villes
 (async()=>{
   await wipe();
   // Un commerce réel, avec une campagne et une récompense : doit disparaître si la suppression est demandée.
@@ -34,18 +35,19 @@ const TM=require(__dirname+'/../functions/testMonth.js')._t;
   const r=await TM.setupCore({deleteReal:true});
   check('Commerce réel supprimé avec sa campagne et sa récompense',r.deleted.includes('Vraie Boulangerie')&&!(await db.doc('merchants/real1').get()).exists&&!(await db.doc('campaigns/realc').get()).exists&&!(await db.doc('rewards/real1_p1').get()).exists,r.deleted);
   const ms=(await db.collection('merchants').get()).docs.map(d=>d.data());
-  check('50 commerces fictifs (10 villes × 5, Rennes comprise), tous vérifiés et marqués isTest',ms.length===50&&ms.some(m=>m.city==='rennes')&&ms.every(m=>m.isTest===true&&m.status==='verified'),ms.length);
-  check('Chaque ville a son café, coiffeur, fleuriste, supérette et bar',TM.CITIES.every(c=>['Café','Coiffeur','Fleuriste','Supérette','Bar'].every(s=>ms.some(m=>m.city===c.slug&&m.sector===s))));
+  check('300 commerces fictifs (10 villes × 30 métiers, Rennes comprise), tous vérifiés et marqués isTest',NT===30&&ms.length===NM&&ms.some(m=>m.city==='rennes')&&ms.every(m=>m.isTest===true&&m.status==='verified'),ms.length);
+  check('Chaque ville a ses 30 métiers (café, coiffeur, fleuriste, supérette, bar, boulangerie, librairie…)',TM.CITIES.every(c=>Object.values(TM.TYPES).every(t=>ms.some(m=>m.city===c.slug&&m.sector===t.sector))));
+  check('Chaque métier tombe dans son centre d\'intérêt',Object.values(TM.TYPES).every(t=>require(__dirname+'/../functions/lib.js').sectorCategory(t.sector)===t.interest));
   const fs=require('fs');
   check('Chaque commerce fictif a un logo et une devanture, et les fichiers existent',ms.every(m=>/^\/img\/commerces\/[a-z]+-logo-[123]\.svg$/.test(m.logoUrl||'')&&/^\/img\/commerces\/[a-z]+-[123]\.svg$/.test(m.coverUrl||'')&&fs.existsSync(__dirname+'/..'+m.logoUrl)&&fs.existsSync(__dirname+'/..'+m.coverUrl)),ms.filter(m=>!m.coverUrl).length);
   await db.doc('merchants/'+TM.merchantId('angers','cafe')).update({logoUrl:admin.firestore.FieldValue.delete(),coverUrl:admin.firestore.FieldValue.delete()});
   const nv=await TM.visualsCore();const back=(await db.doc('merchants/'+TM.merchantId('angers','cafe')).get()).data();
   check('Mise à jour des visuels : ne touche que les commerces sans visuel, et les remet',nv===1&&back.coverUrl==='/img/commerces/cafe-2.svg'&&back.logoUrl==='/img/commerces/cafe-logo-2.svg',{nv,back:[back.logoUrl,back.coverUrl]});
-  const names=ms.map(m=>m.brandName);check('Aucun nom en double',new Set(names).size===50,names.length);
+  const names=ms.map(m=>m.brandName);check('Aucun nom en double',new Set(names).size===NM,names.length);
   const rw=(await db.collection('rewards').get()).docs.map(d=>d.data());
-  check('Vitrine de 5 paliers par commerce (250 récompenses validées, sans alcool mis en avant)',rw.length===250&&rw.every(x=>x.isTest&&x.approved&&x.active)&&!rw.some(x=>/bière|vin|alcool(?! )/i.test(x.label.replace(/sans alcool/gi,''))),rw.length);
+  check('Vitrine de 5 paliers par commerce (1 500 récompenses validées, sans alcool mis en avant)',rw.length===NM*5&&rw.every(x=>x.isTest&&x.approved&&x.active)&&!rw.some(x=>/bières?\b|\bvins?\b|alcool(?! )/i.test(x.label.replace(/sans alcool/gi,''))),rw.length);
   const cs1=(await db.collection('campaigns').get()).docs.map(d=>d.data());
-  check('Première vague : une question par commerce (50), liée à son métier',cs1.length===50&&cs1.every(c=>c.isTest&&c.status==='active'&&c.questions[0].options.length>=3),cs1.length);
+  check('Première vague : une question par commerce (300), liée à son métier',cs1.length===NM&&cs1.every(c=>c.isTest&&c.status==='active'&&c.questions[0].options.length>=3),cs1.length);
   check('10 villes ouvertes',(await Promise.all(TM.CITIES.map(c=>db.doc('cities/'+c.slug).get()))).every(d=>d.exists&&d.data().active===true));
   // Pilote automatique : une question par commerce et par jour, à une heure tirée pour chaque commerce (8h30-19h30),
   // week-end compris ; la suivante de la banque, jamais la même.
@@ -53,16 +55,19 @@ const TM=require(__dirname+'/../functions/testMonth.js')._t;
   const today=TM.parisNow(Date.now()).day, tomorrow=TM.parisNow(Date.now()+86400000+3600000).day;
   check('Pilote automatique : rien de plus le jour de la préparation (déjà une question chacun)',(await TM.autopilotCore(Date.now())).questions===0);
   check('Pilote automatique : rien avant 8h30',(await TM.autopilotCore(atParis(tomorrow,'08:20'))).questions===0);
-  const slots=Object.keys(TM.TYPES).flatMap(t=>TM.CITIES.map(c=>TM.postSlot(TM.merchantId(c.slug,t),tomorrow)));
+  const dueIds=Object.keys(TM.TYPES).flatMap(t=>TM.CITIES.map(c=>TM.merchantId(c.slug,t))).filter(id=>TM.postsOn(id,tomorrow));
+  check('Un jour sur deux : la moitié des commerces publie demain (15 par ville)',dueIds.length===NM/2&&TM.CITIES.every(c=>dueIds.filter(id=>id.startsWith('test_'+c.slug+'_')).length===NT/2),dueIds.length);
+  const slots=dueIds.map(id=>TM.postSlot(id,tomorrow));
   const mid=await TM.autopilotCore(atParis(tomorrow,'14:00'));
-  check('Pilote automatique : heures différentes selon les commerces, entre 8h30 et 19h30 (à 14h, seuls ceux dont l\'heure est passée ont publié)',mid.questions===slots.filter(m=>m<=840).length&&mid.questions>0&&mid.questions<50&&slots.every(m=>m>=510&&m<=1171),{mid:mid.questions,slots:slots.slice(0,8)});
+  check('Pilote automatique : heures différentes selon les commerces, entre 8h30 et 19h30 (à 14h, seuls ceux dont l\'heure est passée ont publié)',mid.questions===slots.filter(m=>m<=840).length&&mid.questions>0&&mid.questions<NM/2&&slots.every(m=>m>=510&&m<=1171),{mid:mid.questions,slots:slots.slice(0,8)});
   check('Pilote automatique : l\'heure d\'un commerce change d\'un jour à l\'autre',Object.keys(TM.TYPES).some(t=>TM.postSlot(TM.merchantId('paris',t),today)!==TM.postSlot(TM.merchantId('paris',t),tomorrow)));
   const late=await TM.autopilotCore(atParis(tomorrow,'19:40'));
-  check('Pilote automatique : à 19h40, tous les commerces ont publié leur question du jour',mid.questions+late.questions===50,{mid:mid.questions,late:late.questions});
+  check('Pilote automatique : à 19h40, tous les commerces du jour ont publié (la moitié, l\'autre moitié le lendemain)',mid.questions+late.questions===NM/2,{mid:mid.questions,late:late.questions});
   check('Pilote automatique : une seule question par commerce et par jour',(await TM.autopilotCore(atParis(tomorrow,'20:00'))).questions===0);
-  const cs2=(await db.collection('campaigns').where('merchantId','==','test_paris_cafe').get()).docs.map(d=>d.data());
+  const pT=Object.keys(TM.TYPES).find(t=>TM.postsOn(TM.merchantId('paris',t),tomorrow));
+  const cs2=(await db.collection('campaigns').where('merchantId','==',TM.merchantId('paris',pT)).get()).docs.map(d=>d.data());
   check('Pilote automatique : question suivante de la banque, différente de la précédente, ouverte 48 h',cs2.length===2&&cs2[0].question!==cs2[1].question&&cs2.some(c=>Math.abs(c.endsAt.toMillis()-atParis(tomorrow,'00:00')-2*86400000)<2*86400000),cs2.map(c=>c.question));
-  check('Banque : 32 questions par métier, sans doublon (un mois à une par jour)',Object.values(TM.BANK).every(b=>b.length>=30&&new Set(b.map(x=>x[0])).size===b.length));
+  check('Banque : de quoi tenir un mois sans répétition (une question tous les 2 jours), sans doublon',Object.values(TM.BANK).every(b=>b.length*TM.POST_EVERY_DAYS>=30&&new Set(b.map(x=>x[0])).size===b.length));
   // Ville ajoutée en cours de test (ex. Rennes) : la synchro crée ses 5 commerces et leur première question, sans
   // question en plus pour les autres, et sans rouvrir une ville fermée depuis l'admin.
   for(const t of Object.keys(TM.TYPES)){await db.doc('merchants/'+TM.merchantId('rennes',t)).delete();for(let n=1;n<=5;n++)await db.doc(`rewards/${TM.merchantId('rennes',t)}_p${n}`).delete();}
@@ -71,7 +76,7 @@ const TM=require(__dirname+'/../functions/testMonth.js')._t;
   const sy=await TM.syncCore();
   const after=(await db.collection('campaigns').get()).docs.map(d=>d.data());
   const ren=after.filter(c=>String(c.merchantId).startsWith('test_rennes_'));
-  check('Synchro : les 5 commerces de Rennes sont recréés avec récompenses et une première question, rien de plus ailleurs',sy.merchants===5&&sy.firstQuestions===5&&after.length===before+5&&ren.length>=5&&(await db.doc('rewards/'+TM.merchantId('rennes','bar')+'_p1').get()).exists,{sy,before,after:after.length,ren:ren.length});
+  check('Synchro : les 30 commerces de Rennes sont recréés avec récompenses et une première question, rien de plus ailleurs',sy.merchants===NT&&sy.firstQuestions===NT&&after.length===before+NT&&ren.length>=NT&&(await db.doc('rewards/'+TM.merchantId('rennes','bar')+'_p1').get()).exists,{sy,before,after:after.length,ren:ren.length});
   check('Synchro : une ville fermée depuis l\'admin reste fermée',(await db.doc('cities/angers').get()).data().active===false);
   await db.doc('cities/angers').update({active:true});
   check('Banque : 15 questions par métier, sans doublon',Object.values(TM.BANK).every(b=>b.length>=12&&new Set(b.map(x=>x[0])).size===b.length));
@@ -84,7 +89,8 @@ const TM=require(__dirname+'/../functions/testMonth.js')._t;
   await p.evaluate(()=>showAuthWall('login'));await setVal(p,'#aw-email','uPA@t.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());
   await wf(p,()=>document.getElementById('home').classList.contains('active')&&S.user,null,30000);await sleep(3500);
   const v=await p.evaluate(()=>({brands:[...new Set((S.qs||[]).map(q=>q.brand))],tagged:(S.qs||[]).every(q=>q._isTest),today:document.getElementById('tc-brand').innerHTML}));
-  check('App (Paris) : les questions viennent des 5 commerces fictifs de Paris',v.brands.length===5,v.brands);
+  const parisNames=new Set(ms.filter(m=>m.city==='paris').map(m=>m.brandName));
+  check('App (Paris) : les questions viennent des commerces fictifs de Paris (les 5 suivis et des découvertes)',v.brands.length>=5&&v.brands.every(b=>parisNames.has(b)),v.brands);
   check('App : étiquette « Commerce test » sur la question du jour',v.tagged&&/Commerce test/.test(v.today),v.today);
   // Échange simulé : un bon est émis, marqué test
   const red=await p.evaluate(async()=>{try{return (await fx.httpsCallable('redeemReward')({rewardId:'test_paris_cafe_p1'})).data;}catch(e){return {err:e.code||String(e)};}});
@@ -97,6 +103,6 @@ const TM=require(__dirname+'/../functions/testMonth.js')._t;
   await TM.stopCore({hide:false});
   check('Arrêt : le pilote ne pose plus de question',(await TM.autopilotCore(Date.now())).skipped===true);
   const st=await TM.stopCore({hide:true});
-  check('Fin du test : 50 commerces masqués, questions closes',st.hidden===50&&(await db.collection('campaigns').where('status','==','active').get()).size===0,st);
+  check('Fin du test : 300 commerces masqués, questions closes',st.hidden===NM&&(await db.collection('campaigns').where('status','==','active').get()).size===0,st);
   console.log(`\n${pass} ok, ${fail} échec(s)`);process.exit(fail?1:0);
 })().catch(e=>{console.log('FAIL '+String(e.stack||e).slice(0,500));process.exit(1);});

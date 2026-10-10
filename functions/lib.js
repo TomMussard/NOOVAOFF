@@ -2,12 +2,12 @@
 // Petits utilitaires partagés par les fonctions.
 function sectorCategory(sec) {
   const s = String(sec || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  if (/boulang|patiss|viennois/.test(s)) return "boulangerie";
-  if (/restau|cafe|\bbar\b|traiteur|pizz|kebab|snack/.test(s)) return "restauration";
-  if (/sport|fitness|gym/.test(s)) return "sport";
-  if (/beaut|coiff|esthet|\bspa\b|barbier/.test(s)) return "beaute";
-  if (/cultur|librair|cinema|musee|musique/.test(s)) return "culture";
-  if (/service|mairie|ville/.test(s)) return "services";
+  if (/boulang|patiss|viennois|chocolat/.test(s)) return "boulangerie";
+  if (/restau|cafe|\bbar\b|traiteur|pizz|kebab|snack|creper|sushi|burger|japonais|bistro/.test(s)) return "restauration";
+  if (/sport|fitness|gym|yoga|pilates|velo|cycl/.test(s)) return "sport";
+  if (/beaut|coiff|esthet|\bspa\b|barbier|ongl|institut/.test(s)) return "beaute";
+  if (/cultur|librair|cinema|musee|musique|disqu|jeux|ludo/.test(s)) return "culture";
+  if (/service|mairie|ville|pressing|cordonn|laverie|retouche/.test(s)) return "services";
   return "commerce";
 }
 // Jour calendaire à Paris (AAAA-MM-JJ) : base de tous les plafonds « par jour ».

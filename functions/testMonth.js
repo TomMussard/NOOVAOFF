@@ -1,8 +1,10 @@
 "use strict";
 /**
- * Mois de test — 50 commerces FICTIFS (10 villes × café, coiffeur, fleuriste, supérette, bar) qui posent chacun
- * une question par jour, à une heure différente chaque jour (entre 8h30 et 19h30, week-end compris), en totale
- * autonomie, pour faire vivre l'app pendant la phase de test sans aucune vraie entreprise.
+ * Mois de test — 30 commerces FICTIFS par ville (café, coiffeur, fleuriste, supérette, bar et les 25 métiers de
+ * testMonthCatalog.js) qui posent chacun une question un jour sur deux, à une heure différente chaque fois (entre 8h30
+ * et 19h30, week-end compris), en totale autonomie, pour faire vivre l'app pendant la phase de test sans aucune vraie
+ * entreprise. Une question reste ouverte 48 h : chaque commerce a toujours une question en cours, et une ville reçoit
+ * une quinzaine de nouvelles questions par jour.
  *
  *  - adminSetupTestMonth : (admin) supprime, si demandé ET confirmé, les commerces réels ; crée ou met à jour les
  *    commerces fictifs et leurs vitrines ; ouvre les villes ; active le pilote ; pose une première question.
@@ -23,7 +25,10 @@ const TIERS = require("./tiers");
 
 const db = () => getFirestore();
 const DAY = 86400000;
-const QUESTION_DAYS = 2;          // une question reste ouverte 48 h (une nouvelle arrive chaque jour)
+const QUESTION_DAYS = 2;          // une question reste ouverte 48 h
+const POST_EVERY_DAYS = 2;        // chaque commerce publie un jour sur deux (30 commerces : ~15 nouvelles questions par jour et par ville)
+// Version du catalogue des métiers : une ville créée avec moins de métiers reçoit ceux qui manquent (voir upgradeZones).
+const CATALOG_V = 2;
 const CONFIG_REF = () => db().collection("config").doc("testMonth");
 
 const CITIES = [
@@ -242,6 +247,12 @@ const BANK = {
   ],
 };
 
+// Les 25 métiers ajoutés (testMonthCatalog.js) : même forme, banque de questions comprise.
+for (const [k, t] of Object.entries(require("./testMonthCatalog").TYPES)) {
+  const { bank, ...rest } = t;
+  TYPES[k] = rest; BANK[k] = bank;
+}
+
 const merchantId = (city, type) => `test_${city}_${type}`;
 
 function isAdmin(request) {
@@ -319,14 +330,14 @@ async function upsertTestMerchants({ onlyMissing = false } = {}) {
   return n;
 }
 
-// Nouvelle zone créée automatiquement (functions/autoZones.js) : 5 commerces fictifs (café, coiffeur, fleuriste,
-// supérette, bar), leurs vitrines et leurs récompenses, puis leur première question. Noms et visuels choisis d'après
+// Nouvelle zone créée automatiquement (functions/autoZones.js) : un commerce fictif par métier (30), leurs vitrines et
+// leurs récompenses, puis leur première question. Noms et visuels choisis d'après
 // le nom de la ville (stables : relancer ne change rien). Idempotent.
 async function createTestZone(slug, label, now = Date.now()) {
   let h = 2166136261;
   for (const ch of String(slug)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
   const ci = (h >>> 0) % 10;
-  await db().collection("cities").doc(slug).set({ label, active: true, autoZone: true }, { merge: true });
+  await db().collection("cities").doc(slug).set({ label, active: true, autoZone: true, catalogV: CATALOG_V }, { merge: true });
   let n = 0;
   for (const [type, t] of Object.entries(TYPES)) {
     const id = merchantId(slug, type), name = t.names[ci];
@@ -348,7 +359,7 @@ async function createTestZone(slug, label, now = Date.now()) {
     }
     n++;
   }
-  const questions = n ? await postNextQuestions(now, { onlyNew: true }) : 0;
+  const questions = n ? await postNextQuestions(now, { onlyNew: true, cities: new Set([slug]) }) : 0;
   return { merchants: n, questions };
 }
 
@@ -361,6 +372,13 @@ function parisNow(ms) {
 }
 // Heure de la question du jour d'un commerce fictif : tirée au hasard, mais stable pour un commerce et un jour,
 // entre 8h30 et 19h30 — les commerces ne publient jamais tous à la même minute, et l'heure change chaque jour.
+// Un jour sur deux, en alternance selon le commerce : la moitié des commerces d'une ville publie un jour, l'autre moitié
+// le lendemain.
+function postsOn(id, day) {
+  const type = String(id).split("_").pop(), ti = Math.max(0, Object.keys(TYPES).indexOf(type));
+  const dayIdx = Math.floor(Date.parse(day + "T12:00:00Z") / DAY);
+  return (dayIdx + ti) % POST_EVERY_DAYS === 0;
+}
 function postSlot(id, day) {
   let h = 2166136261;
   for (const ch of `${id}|${day}`) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
@@ -370,14 +388,18 @@ function postSlot(id, day) {
 // onlyNew : seulement les commerces qui n'ont encore jamais posé de question (nouvelle ville ajoutée en cours de test).
 // dueOnly : une question par commerce et par jour, à son heure du jour (pilote automatique).
 async function postNextQuestions(now = Date.now(), { onlyNew = false, dueOnly = false, cities = null } = {}) {
-  const snap = await db().collection("merchants").where("isTest", "==", true).where("status", "==", "verified").get();
+  // Une seule ville (zone créée ou complétée) : on ne relit que ses commerces.
+  const one = cities && cities.size === 1 ? [...cities][0] : null;
+  const snap = one ? await db().collection("merchants").where("city", "==", one).get()
+    : await db().collection("merchants").where("isTest", "==", true).where("status", "==", "verified").get();
   const p = parisNow(now);
   let created = 0;
   for (const doc of snap.docs) {
     const m = doc.data();
+    if (m.isTest !== true || m.status !== "verified") continue;
     if (cities && !cities.has(m.city)) continue;
     if (onlyNew && Number(m.testQIdx) > 0) continue;
-    if (dueOnly && (m.testLastDay === p.day || p.min < postSlot(doc.id, p.day))) continue;
+    if (dueOnly && (m.testLastDay === p.day || !postsOn(doc.id, p.day) || p.min < postSlot(doc.id, p.day))) continue;
     const type = String(doc.id).split("_").pop();
     const t = TYPES[type], bank = BANK[type];
     if (!t || !bank) continue;
@@ -407,7 +429,7 @@ async function setupCore({ deleteReal = false } = {}) {
     for (const d of real) { await deleteMerchant(d.id); deleted.push(d.data().brandName || d.data().name || d.id); }
   }
   const merchants = await upsertTestMerchants();
-  await CONFIG_REF().set({ active: true, startedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+  await CONFIG_REF().set({ active: true, catalogV: CATALOG_V, startedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
   const questions = await postNextQuestions();
   return { deleted, merchants, questions, cities: CITIES.length };
 }
@@ -436,17 +458,36 @@ async function syncCore(now = Date.now()) {
   return { merchants, firstQuestions, visuals, cities: CITIES.length };
 }
 
+// Zones ouvertes automatiquement avec un ancien catalogue (5 métiers) : elles reçoivent les métiers qui manquent, une
+// seule fois (catalogV), avec leur première question.
+// 3 villes par passage au plus (le pilote passe toutes les 20 minutes) : jamais trop long pour une seule exécution.
+const UPGRADE_PER_RUN = 3;
+async function upgradeZones(auto, now) {
+  let n = 0, done = 0;
+  for (const d of auto.docs) {
+    if ((d.data().catalogV || 1) >= CATALOG_V) continue;
+    if (done++ >= UPGRADE_PER_RUN) break;
+    const r = await createTestZone(d.id, d.data().label || d.id, now);
+    n += r.merchants;
+  }
+  return n;
+}
+
 async function autopilotCore(now = Date.now()) {
   const cfg = await CONFIG_REF().get();
+  const auto = await db().collection("cities").where("autoZone", "==", true).get();
+  const upgraded = await upgradeZones(auto, now);
   if (!cfg.exists || cfg.data().active !== true) {
-    // Zones ouvertes automatiquement (functions/autoZones.js) : leurs 5 commerces publient leur question du jour
-    // même hors « mois de test » — une nouvelle ville vit toute seule, sans action de l'admin.
-    const auto = await db().collection("cities").where("autoZone", "==", true).get();
+    // Zones ouvertes automatiquement (functions/autoZones.js) : leurs commerces publient leurs questions même hors
+    // « mois de test » — une nouvelle ville vit toute seule, sans action de l'admin.
     if (auto.empty) return { skipped: true };
-    return { autoZones: auto.size, questions: await postNextQuestions(now, { dueOnly: true, cities: new Set(auto.docs.map((d) => d.id)) }) };
+    return { autoZones: auto.size, upgraded, questions: await postNextQuestions(now, { dueOnly: true, cities: new Set(auto.docs.map((d) => d.id)) }) };
   }
-  const sync = await syncCore(now);                     // une ville ajoutée apparaît au plus tard au passage suivant
-  return { sync, questions: await postNextQuestions(now, { dueOnly: true }) };
+  // Une ville ajoutée (ou un métier ajouté au catalogue) apparaît au plus tard au passage suivant ; le reste du temps,
+  // rien n'est relu (catalogV de la configuration).
+  const sync = (cfg.data().catalogV || 1) >= CATALOG_V ? null : await syncCore(now);
+  if (sync) await CONFIG_REF().set({ catalogV: CATALOG_V }, { merge: true });
+  return { sync, upgraded, questions: await postNextQuestions(now, { dueOnly: true }) };
 }
 
 const adminSetupTestMonth = onCall({ region: "europe-west1", timeoutSeconds: 540, memory: "512MiB" }, async (request) => {
@@ -473,4 +514,4 @@ const testMonthAutopilot = onSchedule({ schedule: "*/20 8-20 * * *", timeZone: "
   logger.info("testMonthAutopilot", r);
 });
 
-module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { createTestZone, setupCore, stopCore, autopilotCore, postNextQuestions, postSlot, parisNow, visualsCore, syncCore, visualsFor, CITIES, TYPES, BANK, merchantId } };
+module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { createTestZone, upgradeZones, postsOn, POST_EVERY_DAYS, CATALOG_V, setupCore, stopCore, autopilotCore, postNextQuestions, postSlot, parisNow, visualsCore, syncCore, visualsFor, CITIES, TYPES, BANK, merchantId } };
