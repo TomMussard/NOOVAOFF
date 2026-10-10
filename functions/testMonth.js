@@ -412,7 +412,9 @@ async function postNextQuestions(now = Date.now(), { onlyNew = false, dueOnly = 
       idx++;
     }
     const [q, options] = bank[idx % bank.length];
-    await db().collection("campaigns").add({
+    // Identifiant fixe (commerce + rang dans la banque) : deux passages simultanés (pilote et bouton de l'admin, nouvel
+    // essai après une coupure) ne peuvent jamais créer deux fois la même question.
+    const created1 = await db().collection("campaigns").doc(`${doc.id}_q${idx}`).create({
       merchantId: doc.id, merchantName: m.brandName, merchantTheme: t.sector, brandEmoji: "🏪",
       name: q.slice(0, 60), sector: t.sector, question: q,
       questions: [{ q, format: "mcq", options }], questionsSchema: 2, format: "mcq", options,
@@ -421,9 +423,9 @@ async function postNextQuestions(now = Date.now(), { onlyNew = false, dueOnly = 
       pointsPerAnswer: 20, answersCount: 0, responsesCount: 0, status: "active", isTest: true,
       durationDays: QUESTION_DAYS, endsAt: Timestamp.fromMillis(now + QUESTION_DAYS * DAY),
       createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
-    });
+    }).then(() => true, (e) => { if (e.code === 6 || /already exists/i.test(e.message)) return false; throw e; });
     await doc.ref.update({ testQIdx: idx + 1, testLastDay: p.day });
-    created++;
+    if (created1) created++;
   }
   return created;
 }
@@ -480,8 +482,29 @@ async function upgradeZones(auto, now) {
   return n;
 }
 
+// Nettoyage (une fois) : questions fictives identiques ouvertes en double dans une même ville (créées avant l'identifiant
+// fixe) : on garde la plus ancienne, les autres sont closes.
+const DEDUP_V = 1;
+async function dedupeTestCampaigns() {
+  const cs = (await db().collection("campaigns").where("isTest", "==", true).where("status", "==", "active").get()).docs;
+  const ms = (d) => (d.data().createdAt && d.data().createdAt.toMillis ? d.data().createdAt.toMillis() : 0);
+  const keep = new Map(); let closed = 0;
+  for (const d of cs.sort((a, b) => ms(a) - ms(b))) {
+    const k = `${d.data().targetCity}|${String(d.data().question || "").trim().toLowerCase()}`;
+    if (!keep.has(k)) { keep.set(k, d.id); continue; }
+    await d.ref.update({ status: "completed", completedReason: "duplicate", completedAt: FieldValue.serverTimestamp() });
+    closed++;
+  }
+  return closed;
+}
+
 async function autopilotCore(now = Date.now()) {
   const cfg = await CONFIG_REF().get();
+  if ((cfg.exists ? cfg.data().dedupV || 0 : 0) < DEDUP_V) {
+    const closed = await dedupeTestCampaigns();
+    await CONFIG_REF().set({ dedupV: DEDUP_V }, { merge: true });
+    logger.info("doublons clos", { closed });
+  }
   const auto = await db().collection("cities").where("autoZone", "==", true).get();
   const upgraded = await upgradeZones(auto, now);
   if (!cfg.exists || cfg.data().active !== true) {
@@ -521,4 +544,4 @@ const testMonthAutopilot = onSchedule({ schedule: "*/20 8-20 * * *", timeZone: "
   logger.info("testMonthAutopilot", r);
 });
 
-module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { createTestZone, upgradeZones, postsOn, POST_EVERY_DAYS, CATALOG_V, setupCore, stopCore, autopilotCore, postNextQuestions, postSlot, parisNow, visualsCore, syncCore, visualsFor, CITIES, TYPES, BANK, merchantId } };
+module.exports = { adminSetupTestMonth, adminStopTestMonth, testMonthAutopilot, _t: { dedupeTestCampaigns, createTestZone, upgradeZones, postsOn, POST_EVERY_DAYS, CATALOG_V, setupCore, stopCore, autopilotCore, postNextQuestions, postSlot, parisNow, visualsCore, syncCore, visualsFor, CITIES, TYPES, BANK, merchantId } };

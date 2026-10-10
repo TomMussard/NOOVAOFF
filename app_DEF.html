@@ -5720,7 +5720,7 @@ function matchesCats(m){
 // d'une autre couleur. Il est montré en priorité aux habitants dont les centres d'intérêt correspondent, et à une petite
 // part d'habitants tirée au hasard (stable : même habitant, même commerce, même résultat). L'habitant répond ou non ;
 // après avoir répondu il choisit de suivre le commerce (et de l'autoriser à lui poser d'autres questions) ou non.
-const DISCOVERY = { RANDOM_PCT: 15, MAX_ON_HOME: 3 };
+const DISCOVERY = { RANDOM_PCT: 15, MAX_ON_HOME: 12 };   // jusqu'à 12 commerces à découvrir à la fois sur l'accueil
 function hash01(str){ let h = 2166136261; for(let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 10000) / 10000; }
 // Correspondance STRICTE avec les catégories choisies à l'inscription (contrairement à matchesCats, qui laisse tout passer
 // quand rien n'est choisi ou que « Tout m'intéresse » est coché) : sert au classement de l'accueil.
@@ -7120,15 +7120,15 @@ function recomputeCampaignFeed(city) {
     // Classement : d'abord les questions qui correspondent aux centres d'intérêt de l'habitant (commerces suivis ou à découvrir),
     // puis les commerces suivis, puis les plus récentes. Les questions découverte sont plafonnées pour ne pas noyer l'accueil.
     campaigns.sort((a, b) => (b._strict - a._strict) || (b._followed - a._followed) || (b._createdMs - a._createdMs));
+    // Jamais deux fois la même question à l'écran (même intitulé, même commerce ou non) : on garde la plus ancienne.
+    const seenQ = new Set(), uniq = arr => arr.filter(c => { const k = String(c.q || '').trim().toLowerCase(); if (seenQ.has(k)) return false; seenQ.add(k); return true; });
     let shownDisc = 0;
-    S.qs = campaigns.filter(c => !c._discovery || ++shownDisc <= DISCOVERY.MAX_ON_HOME);
-    // Filet de sécurité : si rien n'a fait remonter de découverte (aucun intérêt qui matche, tirage au
-    // sort raté partout) mais qu'il reste des commerces à découvrir dans la ville, on en propose quand
-    // même un seul — sinon un habitant qui a tout répondu chez les commerces qu'il suit n'a plus rien à
-    // faire alors que la ville compte encore des commerces jamais croisés.
-    if (!S.qs.some(c => c._discovery) && discoveryFallback.length) {
+    S.qs = uniq(campaigns.filter(c => !c._discovery || ++shownDisc <= DISCOVERY.MAX_ON_HOME));
+    // Filet de sécurité : pas assez de découvertes (centres d'intérêt et tirage au sort) alors qu'il reste des commerces
+    // jamais croisés dans la ville : on complète avec eux, jusqu'au plafond, pour que l'accueil ne soit jamais presque vide.
+    if (shownDisc < DISCOVERY.MAX_ON_HOME && discoveryFallback.length) {
       discoveryFallback.sort((a, b) => b._createdMs - a._createdMs);
-      S.qs.push(discoveryFallback[0]);
+      S.qs.push(...uniq(discoveryFallback).slice(0, DISCOVERY.MAX_ON_HOME - Math.min(shownDisc, DISCOVERY.MAX_ON_HOME)));
     }
     S._discovery = Object.values(discoveryMerchants);
     if (S.qIdx === undefined) S.qIdx = 0;
