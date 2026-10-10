@@ -34,6 +34,22 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
     await db.doc('campaigns/real_same').delete();
   });
 
+  await T('deux passages en même temps, doublons d\'avant',async()=>{
+    const y=TM.merchantId('nantes','yoga');
+    await db.doc('merchants/'+y).update({testLastDay:'2000-01-01'});
+    const before=(await db.collection('campaigns').where('merchantId','==',y).get()).size;
+    await Promise.all([TM.postNextQuestions(Date.now(),{cities:new Set(['nantes'])}),TM.postNextQuestions(Date.now(),{cities:new Set(['nantes'])})]);
+    const qs=(await db.collection('campaigns').where('merchantId','==',y).get()).docs.map(d=>d.data().question);
+    check('Pilote et bouton de l\'admin en même temps : une seule nouvelle question, jamais deux fois la même',new Set(qs).size===qs.length,{before,qs});
+    // Doublon créé avant la correction (identifiant aléatoire) : clos au passage suivant du pilote, le plus ancien gardé
+    const src=(await db.collection('campaigns').where('merchantId','==',y).limit(1).get()).docs[0];
+    await db.collection('campaigns').add({...src.data(),createdAt:admin.firestore.Timestamp.now()});
+    await db.doc('config/testMonth').set({dedupV:0},{merge:true});
+    await TM.autopilotCore(Date.now());
+    const act=(await db.collection('campaigns').where('targetCity','==','nantes').where('status','==','active').get()).docs.map(d=>d.data().question);
+    check('Doublon déjà en base : clos automatiquement, une seule fois chaque question dans la ville',new Set(act).size===act.length&&(await db.doc(src.ref.path).get()).data().status==='active',act.length);
+  });
+
   // Habitant de Paris avec 600 points, qui suit 3 commerces
   const fol=['cafe','boulangerie','librairie'].map(t=>TM.merchantId('paris',t));
   await db.doc('users/pa').set({role:'user',name:'Pia',email:'pa@t.fr',city:'paris',cityLabel:'Paris',welcomeClaimed:true,onboardingStep:'done',seenHomeTour:true,authorizedMerchants:fol,answeredCampaigns:[],points:600,xp:600,streak:0,ageRange:'25-34',interests:['restauration','culture'],friendUids:[]});
@@ -94,7 +110,7 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
     check('Aucun débordement horizontal de la page',docW<=390,docW);
   });
   await T('accueil de chaque ville',async()=>{
-    const bad=[];
+    const bad=[];let minQ=99;
     for(const c of TM.CITIES){
       const uid='u_'+c.slug.replace(/-/g,'');
       await db.doc('users/'+uid).set({role:'user',name:'U',email:uid+'@t.fr',city:c.slug,cityLabel:c.label,welcomeClaimed:true,onboardingStep:'done',seenHomeTour:true,authorizedMerchants:[],answeredCampaigns:[],points:0,xp:0,streak:0,ageRange:'25-34',interests:['restauration'],friendUids:[]});
@@ -107,9 +123,11 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
       const r=await q.evaluate(()=>({qs:(S.qs||[]).map(x=>x.q),brands:[...new Set((S.qs||[]).map(x=>x.brand))],cards:document.querySelectorAll('#hm-feed-q .hq-card').length,nearby:document.querySelectorAll('#dnearby-grid .dnb-card').length,rw:new Set((S._rewardsCache||[]).map(x=>x.merchantId)).size}));
       const names=new Set((await db.collection('merchants').where('city','==',c.slug).get()).docs.map(d=>d.data().brandName));
       const ok=r.qs.length>0&&new Set(r.qs).size===r.qs.length&&r.brands.every(x=>names.has(x))&&r.cards===r.qs.length&&r.nearby===30&&r.rw===30;
+      minQ=Math.min(minQ,r.qs.length);
       if(!ok)bad.push({city:c.slug,...r,qs:r.qs.length});
       await ctx.close();
     }
+    check('Nouvel habitant (aucun commerce suivi) : au moins 10 questions sur l\'accueil, pas seulement 3 ou 4',bad.length===0&&minQ>=10,{minQ});
     check('10 villes : questions de la ville seulement, sans doublon, 30 commerces à deux pas, 30 commerces dans les récompenses',bad.length===0,bad);
   });
   check('Aucune erreur JavaScript',errs.length===0,errs);
