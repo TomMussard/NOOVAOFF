@@ -178,19 +178,19 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
   await step('user discovery -> answer -> follow', async () => {
     await waitFn(up, () => S.qs.length === 1 && S.qs[0]._discovery === true, null, 20000);
     check('U6 la question du commerce arrive directement sur l\'accueil, en « découverte » (plus de demande à autoriser)', await up.evaluate(() => document.getElementById('home-requests').textContent.trim() === '' && document.getElementById('today-card').classList.contains('disc') && /Boulangerie du Centre/.test(document.getElementById('tc-brand').textContent)));
+    // Commerce pas encore suivi : « Tu veux suivre … ? » avant de répondre ; « Oui » suit le commerce puis ouvre la question.
     await up.evaluate(() => openQ(0));
-    await waitFn(up, () => document.querySelectorAll('#ans-area .mcq-opt').length > 0);
+    await waitFn(up, () => document.getElementById('nv-pop').style.display === 'flex' && /Tu veux suivre/.test(document.getElementById('nv-pop-t').textContent), null, 10000);
+    check('U6 avant de répondre : choix suivre / pas intéressé', true);
+    await up.evaluate(() => document.getElementById('nv-pop-cta').click());
+    await waitFn(up, () => S._authorizedMerchants.length === 1 && document.querySelectorAll('#ans-area .mcq-opt').length > 0, null, 15000);
     await up.evaluate(() => document.querySelector('#ans-area .mcq-opt').click());
     await sleep(3600);
     await up.evaluate(() => submitAns());
     await sleep(3500);
     const ans = await adb.collection('answers').where('userId', '==', uuid).get();
     const u = (await adb.doc('users/' + uuid).get()).data();
-    check('U6 réponse validée côté serveur (submitAnswer), sans profil pour un commerce non suivi', ans.size === 1 && u.points === 65 && ans.docs[0].data().discovery === true && ans.docs[0].data().respondentAge === '', 'answers=' + ans.size + ' points=' + u.points);
-    await waitFn(up, () => document.querySelector('#rw-follow .follow-card'), null, 10000);
-    check('U6 proposition de suivre le commerce après la réponse', true);
-    await up.evaluate(() => document.querySelector('#rw-follow .btn-p').click());
-    await waitFn(up, () => S._authorizedMerchants.length === 1, null, 15000);
+    check('U6 réponse validée côté serveur (submitAnswer), avec le profil : le commerce est suivi', ans.size === 1 && u.points === 65 && ans.docs[0].data().discovery === false, 'answers=' + ans.size + ' points=' + u.points);
     for (let i = 0; i < 30 && !((await adb.doc('merchants/' + muid).get()).data() || {}).consentCount; i++) await sleep(500);
     const ce = await adb.collection('consentEvents').where('userId', '==', uuid).get();
     const mm = (await adb.doc('merchants/' + muid).get()).data();

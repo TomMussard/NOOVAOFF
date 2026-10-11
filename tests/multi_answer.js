@@ -16,7 +16,7 @@ const OPTS=['Le matin','Le midi','Le soir'];
 (async()=>{
   await fetch('http://127.0.0.1:8080/emulator/v1/projects/noova-366d0/databases/(default)/documents',{method:'DELETE'});await fetch('http://127.0.0.1:9099/emulator/v1/projects/noova-366d0/accounts',{method:'DELETE'});
   await db.doc('merchants/m1').set({role:'merchant',ownerUid:'m1',brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:'m1@s.fr'});
-  const camp=(id,multi)=>db.doc('campaigns/'+id).set({merchantId:'m1',merchantName:'Le Fournil',sector:'Boulangerie',status:'active',targetCity:'le-mans',city:'le-mans',question:'Quand passes-tu ?',questions:[{q:'Quand passes-tu ?',format:'mcq',options:OPTS,...(multi?{multi:true}:{})}],questionsSchema:2,format:'mcq',options:OPTS,answersCount:0,createdAt:Timestamp.now()});
+  const camp=(id,multi)=>{const Q=multi?'Quand passes-tu ?':'À quelle heure passes-tu ?';return db.doc('campaigns/'+id).set({merchantId:'m1',merchantName:'Le Fournil',sector:'Boulangerie',status:'active',targetCity:'le-mans',city:'le-mans',question:Q,questions:[{q:Q,format:'mcq',options:OPTS,...(multi?{multi:true}:{})}],questionsSchema:2,format:'mcq',options:OPTS,answersCount:0,createdAt:Timestamp.now()});};
   await camp('cm',true);await camp('cs',false);
   for(const u of ['u1','u2','u3','u4']){
     await db.doc('users/'+u).set({role:'user',name:'U '+u,email:u+'@t.fr',city:'le-mans',cityLabel:'Le Mans',welcomeClaimed:true,onboardingStep:'done',seenHomeTour:true,authorizedMerchants:['m1'],answeredCampaigns:[],points:0,xp:0,streak:0,ageRange:'25-34',interests:['restauration'],friendUids:[]});

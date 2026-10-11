@@ -56,7 +56,8 @@ const rw=(mid,t,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-mans'
   });
 
   await T('habitant : répond à la question, gagne des points',async()=>{
-    await up.evaluate(()=>openQ(0));await wf(up,()=>document.querySelectorAll('#ans-area .mcq-opt').length>0,null,10000);
+    await up.evaluate(()=>openQ(0));await sleep(400);await up.evaluate(()=>{if(document.getElementById('nv-pop').style.display==='flex')document.getElementById('nv-pop-cta').click();});   // commerce pas encore suivi : « Oui, suivre et répondre »
+    await wf(up,()=>document.querySelectorAll('#ans-area .mcq-opt').length>0,null,10000);
     await up.evaluate(()=>document.querySelector('#ans-area .mcq-opt').click());
     await sleep(3300);   // ANSWER_LOCK_MS = 3000 : délai de lecture minimum avant que submitAns() accepte quoi que ce soit
     await up.evaluate(()=>submitAns());
