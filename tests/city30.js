@@ -59,7 +59,7 @@ const setVal=(p,sel,v)=>p.$eval(sel,(el,v)=>{el.value=v;el.dispatchEvent(new Eve
   const errs=[];p.on('pageerror',e=>errs.push(e.message));
   await p.goto('http://localhost:8950/app.html',{waitUntil:'load'});await wf(p,()=>document.getElementById('onboard').classList.contains('active'));
   await p.evaluate(()=>showAuthWall('login'));await setVal(p,'#aw-email','pa@t.fr');await setVal(p,'#aw-pass','secret123');await p.evaluate(()=>awSubmit());
-  await wf(p,()=>document.getElementById('home').classList.contains('active')&&(S._rewardsCache||[]).length>=150&&document.querySelectorAll('.hq-card').length>0,40000);await sleep(2500);
+  await wf(p,()=>document.getElementById('home').classList.contains('active')&&(S._rewardsCache||[]).length>=150&&document.querySelectorAll('.hq-card').length>0,40000).catch(async e=>{console.log('PASS DBG '+JSON.stringify(await p.evaluate(()=>({home:document.getElementById('home').classList.contains('active'),rw:(S._rewardsCache||[]).length,cards:document.querySelectorAll('.hq-card').length,qs:(S.qs||[]).length}))),errs);throw e;});await sleep(2500);
   await p.evaluate(()=>{document.querySelectorAll('.nv-modal').forEach(m=>m.remove());});
 
   await T('accueil : questions de la ville, sans doublon',async()=>{

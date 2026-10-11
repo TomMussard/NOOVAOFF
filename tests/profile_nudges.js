@@ -32,7 +32,9 @@ const sink=async(uid)=>(await db.collection('_pushSink').where('uid','==',uid).g
     const bell=(await db.doc('users/a/notifications/profil_age').get()).data();
     check('Cloche : ligne « âge » avec le bouton vers le bon écran',bell&&bell.type==='profil'&&bell.fix==='fix-age'&&bell.read===false,bell);
     const sa=await sink('a');
-    check('Notification sur le téléphone, qui ouvre l\'écran de l\'âge',sa.length===1&&sa[0].ntype==='profil'&&/go=fix-age/.test(sa[0].url),sa.map(x=>[x.ntype,x.url]));
+    // La nuit (21h-9h), la notification attend 9h dans la file au lieu de partir tout de suite.
+    const qd=(await db.collection('notifQueue').where('uid','==','a').get()).docs.map(d=>d.data());
+    check('Notification sur le téléphone (ou en file pour 9h la nuit), qui ouvre l\'écran de l\'âge',(sa.length===1&&sa[0].ntype==='profil'&&/go=fix-age/.test(sa[0].url))||(qd.length===1&&qd[0].type==='profil'&&qd[0].content.screen==='fix-age'),{sa:sa.map(x=>[x.ntype,x.url]),qd});
     check('Notifications pas activées : relance dans la cloche seulement',(await db.doc('users/b/notifications/profil_notifs').get()).exists&&(await sink('b')).length===0);
     check('Rien pour le profil complet ni pour l\'inscrit du jour',!(await db.collection('users/c/notifications').get()).size&&!(await db.collection('users/d/notifications').get()).size);
     const r2=await call('adminProfileNudges',{},await idTokenOf('tomussproduction@gmail.com'));
