@@ -837,6 +837,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .hq-card.noova .hq-bd{background:var(--bandeau);border-color:var(--bandeau)}
 .hq-card.noova .hq-q{color:var(--bandeau-texte)}
 .hq-card.noova .hq-cta{background:var(--jaune);color:var(--jaune-ink)}
+/* Découverte : commerce pas encore suivi, choix avant de répondre */
+.hq-card.disc{cursor:default}
+.hq-card.disc .hq-bd{border:2px dashed var(--bandeau);border-top:none}
+.hq-disc-tag{position:absolute;top:116px;right:var(--s4);z-index:3;padding:var(--s1) var(--s3);border-radius:var(--r-pill);background:var(--surface);color:var(--text);border:2px solid var(--bandeau);font-weight:800;font-size:var(--fs-2)}
+.hq-disc-l{font-size:var(--fs-2);font-weight:700;color:var(--text-2);margin-bottom:var(--s1)}
+.hq-gate{margin-top:var(--s3);padding:var(--s3);border-radius:var(--r-md);background:var(--jaune-faible)}
+.hq-gate-t{font-weight:800;font-size:var(--fs-3);color:var(--text);margin-bottom:var(--s3)}
+.hq-gate-b{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.hq-gate .hq-cta{border:none;cursor:pointer;font-family:inherit}
+.hq-no{min-height:var(--tactile-min);padding:0 var(--s4);border-radius:var(--r-sm);border:1.5px solid var(--bandeau);background:var(--surface);color:var(--text);font:inherit;font-weight:700;cursor:pointer}
+.hq-gate-s{margin-top:var(--s2);font-size:var(--fs-1);color:var(--text-2)}
 .hq-card.noova .hq-tag{background:var(--jaune);color:var(--jaune-ink)}
 .hm-empty{padding:var(--s6) var(--s4);text-align:center;color:var(--text-2);font-size:var(--fs-3);line-height:1.5}
 /* Annonce de NOOVA : bandeau de marque en haut de l'accueil, jusqu'à ce que l'habitant le ferme */
@@ -1609,7 +1620,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
     <div id="nv-pop-t" class="nv-pop-t"></div>
     <div id="nv-pop-d" class="nv-pop-d"></div>
     <button type="button" class="btn-p" id="nv-pop-cta" onclick="popCta()"></button>
-    <button type="button" class="btn-s" id="nv-pop-later" style="margin-top:8px" onclick="closePop()">Plus tard</button>
+    <button type="button" class="btn-s" id="nv-pop-later" style="margin-top:8px" onclick="popLater()">Plus tard</button>
   </div>
 </div>
 <div id="cat-wall" class="nv-modal" role="dialog" aria-modal="true" aria-label="Complète ton profil" style="z-index:10001;display:none">
@@ -2667,11 +2678,11 @@ document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;
   if(document.getElementById('nv-pop').style.display==='flex')closePop();
   else if(document.getElementById('perm-sheet').style.display==='flex')permLater();
   else{const w=document.getElementById('cat-wall');if(w.style.display==='flex'&&w._closable)closeCategoryWall();}});
-let _popCb=null,_popDone=null;
+let _popCb=null,_popDone=null,_popLaterCb=null;
 // o = { title, text, cta, onCta, later ('Plus tard' par défaut, '' pour aucun), avatar: {photoUrl, n} }
 function showPop(o){
   return new Promise(res=>{
-    _popCb=o.onCta||null;_popDone=res;
+    _popCb=o.onCta||null;_popLaterCb=o.onLater||null;_popDone=res;
     document.getElementById('nv-pop-t').textContent=o.title;
     document.getElementById('nv-pop-d').textContent=o.text||'';
     document.getElementById('nv-pop-cta').textContent=o.cta||'OK';
@@ -2681,7 +2692,9 @@ function showPop(o){
     setTimeout(()=>{const b=document.getElementById('nv-pop-cta');if(b)b.focus();},50);
   });
 }
-function closePop(){document.getElementById('nv-pop').style.display='none';const d=_popDone;_popDone=null;_popCb=null;if(d)d(false);}
+function closePop(){document.getElementById('nv-pop').style.display='none';const d=_popDone;_popDone=null;_popCb=null;_popLaterCb=null;if(d)d(false);}
+// « Plus tard » / « Pas intéressé » : comme la croix, plus l'action propre au bouton s'il y en a une.
+function popLater(){const cb=_popLaterCb;closePop();if(cb)setTimeout(cb,60);}
 function popCta(){const cb=_popCb,d=_popDone;_popCb=null;_popDone=null;document.getElementById('nv-pop').style.display='none';if(d)d(true);if(cb)setTimeout(cb,60);}
 
 // ─── À l'ouverture de l'app : l'app vit ─────────────────────
@@ -2809,6 +2822,17 @@ function homeTab(t){
 }
 function hqCardHTML(q,i,hero){
   const img=q.photoUrl&&!q._byNoova?`<img src="${esc(q.photoUrl)}" alt="" loading="lazy" onerror="this.remove()">`:'';
+  // Commerce pas encore suivi : on voit sa question, mais on choisit d'abord de le suivre (et de répondre) ou non.
+  if(q._discovery&&!q._byNoova){
+    return `<div class="hq-card disc" role="group" aria-label="Découverte : ${esc(q.brand)}, commerce que tu ne suis pas encore">`
+      +`<div class="hq-ph">${img}<div class="hq-who">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}</span>${testTagHTML(q._isTest)}</div></div>`
+      +`<span class="hq-disc-tag">Découverte</span>`
+      +`<div class="hq-bd"><div class="hq-disc-l">${esc(q.theme||'Commerce')} · tu ne le suis pas encore</div><div class="hq-q">${esc(q.q)}</div>`
+      +`<div class="hq-gate"><div class="hq-gate-t">Tu veux suivre ${esc(q.brand)} et répondre à ses questions ?</div>`
+      +`<div class="hq-gate-b"><button type="button" class="hq-cta" onclick="followAndAnswer(${jsa(q._merchantId)},${jsa(q._firestoreId)})">Oui, suivre et répondre</button>`
+      +`<button type="button" class="hq-no" onclick="notInterested(${jsa(q._merchantId)},${jsa(q.brand)})">Pas intéressé</button></div>`
+      +`<div class="hq-gate-s">« Pas intéressé » : tu ne verras plus aucune question de ce commerce.</div></div></div></div>`;
+  }
   return `<button type="button" class="hq-card${hero?' hero':''}${q._byNoova?' noova':''}" onclick="openQ(${i})" aria-label="${esc(q.brand)} : ${esc(q.q)}, ${esc(ptsTag(q))}">`
     +`<div class="hq-ph">${img}<div class="hq-who">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}</span>${testTagHTML(q._isTest)}</div></div>`
     +`<span class="hq-tag">${esc(ptsTag(q))}</span>`
@@ -4461,7 +4485,25 @@ function fillQuestion(q,opts){
 function curQuestion(){return S.mode==='survey'&&S.sv?S.sv.list[S.sv.idx]:S.curQ;}
 
 /* --- Ouverture d'un hook depuis l'accueil (override) --- */
+// Suivre un commerce découvert, puis ouvrir sa question (l'index change : la liste est recalculée après le suivi).
+async function followAndAnswer(mid,fid){
+  if(!mid)return;
+  await authorizeMerchant(mid);
+  if(!(S._authorizedMerchants||[]).includes(mid))return;
+  const i=(S.qs||[]).findIndex(x=>x._firestoreId===fid&&!x._questionIdx);
+  if(i>=0)openQ(i);
+}
+async function notInterested(mid,brand){
+  if(!mid)return;
+  await declineMerchant(mid);
+  if((S._declinedMerchants||[]).includes(mid))showToast('Tu ne verras plus les questions de '+(brand||'ce commerce')+'. Tu peux changer d\'avis dans Profil.','success');
+}
 function openQ(idx){
+  // Question d'un commerce pas encore suivi (depuis n'importe quel écran) : on demande d'abord.
+  {const d=(S.qs||[])[idx];if(d&&d._discovery&&!d._byNoova&&d._merchantId&&!(S._authorizedMerchants||[]).includes(d._merchantId)){
+    showPop({title:'Tu veux suivre '+d.brand+' ?',text:'Pour répondre à ses questions, suis ce commerce : il pourra t\'en poser d\'autres. Sinon, tu ne verras plus ses questions.',cta:'Oui, suivre et répondre',later:'Pas intéressé',onCta:()=>followAndAnswer(d._merchantId,d._firestoreId),onLater:()=>notInterested(d._merchantId,d.brand)});
+    return;
+  }}
   S.mode='hook';S.qIdx=idx;S.curQ=S.qs[idx];if(!S.curQ)return;const q=S.curQ;
   const pg=document.getElementById('q-prog');pg.innerHTML='';
   S.qs.forEach((_,i)=>{const s=document.createElement('div');s.className='q-seg'+(i<idx?' done':i===idx?' cur':'');pg.appendChild(s)});
@@ -4664,7 +4706,7 @@ async function openBrandById(mid, fallbackName) {
   }
 }
 
-function startCampaignById(campId) {
+function startCampaignById(campId, followed) {
   if((S._answered||[]).includes(campId)) return; // déjà répondu — coupe court même sans reload
   const existing=(S.qs||[]).find(q=>q._firestoreId===campId);
   if(existing){openQ(S.qs.indexOf(existing));return;}
@@ -4674,6 +4716,15 @@ function startCampaignById(campId) {
     // Jamais une question d'une autre ville, terminée ou fermée (le serveur la refuserait aussi).
     const myCity=normalizeCity(S._city||''),cCity=getCampaignCity(d);
     if((d.targetCity!=='toutes'&&cCity&&cCity!==myCity)||d.status!=='active'||(d.endsAt&&d.endsAt.toMillis&&d.endsAt.toMillis()<Date.now())){showToast('Cette question n\'est pas ouverte dans ta ville.','warning');return;}
+    // Commerce pas encore suivi (fiche commerce) : on le suit d'abord, ou pas du tout.
+    if(!followed&&d.merchantId&&d.targetCity!=='toutes'&&!(S._authorizedMerchants||[]).includes(d.merchantId)){
+      if((S._declinedMerchants||[]).includes(d.merchantId)){showToast('Tu as choisi de ne plus voir ce commerce. Tu peux changer d\'avis dans Profil.','warning');return;}
+      const b=d.merchantName||'ce commerce';
+      showPop({title:'Tu veux suivre '+b+' ?',text:'Pour répondre à ses questions, suis ce commerce : il pourra t\'en poser d\'autres. Sinon, tu ne verras plus ses questions.',cta:'Oui, suivre et répondre',later:'Pas intéressé',
+        onCta:async()=>{await authorizeMerchant(d.merchantId);if((S._authorizedMerchants||[]).includes(d.merchantId))startCampaignById(campId,true);},
+        onLater:()=>{notInterested(d.merchantId,b);goNav('home');}});
+      return;
+    }
     // Mêmes données que sur l'accueil : options PROPRES à chaque question, et questions 2 et 3 à la suite (avant : options de la
     // campagne entière et questions suivantes perdues quand on démarrait depuis la page du commerce).
     const allQs=getCampaignQuestions(d);
@@ -5720,7 +5771,7 @@ function matchesCats(m){
 // d'une autre couleur. Il est montré en priorité aux habitants dont les centres d'intérêt correspondent, et à une petite
 // part d'habitants tirée au hasard (stable : même habitant, même commerce, même résultat). L'habitant répond ou non ;
 // après avoir répondu il choisit de suivre le commerce (et de l'autoriser à lui poser d'autres questions) ou non.
-const DISCOVERY = { RANDOM_PCT: 15, MAX_ON_HOME: 12 };   // jusqu'à 12 commerces à découvrir à la fois sur l'accueil
+const DISCOVERY = { RANDOM_PCT: 15, EVERY: 3 };   // une carte « découverte » toutes les 3 questions de commerces suivis
 function hash01(str){ let h = 2166136261; for(let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 10000) / 10000; }
 // Correspondance STRICTE avec les catégories choisies à l'inscription (contrairement à matchesCats, qui laisse tout passer
 // quand rien n'est choisi ou que « Tout m'intéresse » est coché) : sert au classement de l'accueil.
@@ -7082,9 +7133,9 @@ function recomputeCampaignFeed(city) {
       let isFallbackOnly = false;
       if (!followed) {
         if (declined.includes(d.merchantId)) return;                              // écarté par l'habitant : plus jamais proposé
-        if (matchesCats(merchantData)) discoveryReason = 'interest';
-        else if (hash01(myUid + '|' + id) < DISCOVERY.RANDOM_PCT / 100) discoveryReason = 'random';
-        else isFallbackOnly = true;                                                // gardé en réserve (voir discoveryFallback)
+        // Tout commerce de la ville qu'on ne suit pas (et qu'on n'a pas écarté) est proposé en découverte, à tout le
+        // monde : ceux qui correspondent aux centres d'intérêt d'abord.
+        discoveryReason = matchesCats(merchantData) ? 'interest' : 'new';
         discoveryMerchants[d.merchantId] = { id: d.merchantId, ...merchantData };
       }
 
@@ -7122,14 +7173,15 @@ function recomputeCampaignFeed(city) {
     campaigns.sort((a, b) => (b._strict - a._strict) || (b._followed - a._followed) || (b._createdMs - a._createdMs));
     // Jamais deux fois la même question à l'écran (même intitulé, même commerce ou non) : on garde la plus ancienne.
     const seenQ = new Set(), uniq = arr => arr.filter(c => { const k = String(c.q || '').trim().toLowerCase(); if (seenQ.has(k)) return false; seenQ.add(k); return true; });
-    let shownDisc = 0;
-    S.qs = uniq(campaigns.filter(c => !c._discovery || ++shownDisc <= DISCOVERY.MAX_ON_HOME));
-    // Filet de sécurité : pas assez de découvertes (centres d'intérêt et tirage au sort) alors qu'il reste des commerces
-    // jamais croisés dans la ville : on complète avec eux, jusqu'au plafond, pour que l'accueil ne soit jamais presque vide.
-    if (shownDisc < DISCOVERY.MAX_ON_HOME && discoveryFallback.length) {
-      discoveryFallback.sort((a, b) => b._createdMs - a._createdMs);
-      S.qs.push(...uniq(discoveryFallback).slice(0, DISCOVERY.MAX_ON_HOME - Math.min(shownDisc, DISCOVERY.MAX_ON_HOME)));
-    }
+    // Questions des commerces suivis, avec une carte « découverte » (un seul commerce à la fois, une carte par commerce)
+    // glissée toutes les DISCOVERY.EVERY questions ; les découvertes restantes à la suite.
+    const all = uniq(campaigns), noovaQs = all.filter(c => c._byNoova), followedQs = all.filter(c => !c._byNoova && !c._discovery);
+    const discByM = new Map();
+    all.filter(c => c._discovery).forEach(c => { if (!discByM.has(c._merchantId)) discByM.set(c._merchantId, c); });
+    const disc = [...discByM.values()];
+    const mixed = [];
+    followedQs.forEach((c, i) => { mixed.push(c); if ((i + 1) % DISCOVERY.EVERY === 0 && disc.length) mixed.push(disc.shift()); });
+    S.qs = [...mixed, ...disc, ...noovaQs];
     S._discovery = Object.values(discoveryMerchants);
     if (S.qIdx === undefined) S.qIdx = 0;
     // Rafraîchit l'écran uniquement pour les mises à jour en direct (le premier
