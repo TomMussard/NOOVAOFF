@@ -107,10 +107,20 @@ const SUBJ='Rejoins la phase test de NOOVA',TXT='Salut !\n\nRejoindre le test : 
     const info=await a.evaluate(()=>({c:document.getElementById('mc-count').textContent,imp:document.getElementById('mc-imp').textContent,l:_mcList}));
     check('CSV : 2 adresses sans doublon, aperçu masqué, bouton « Ajouter 2 adresses à la base »',JSON.stringify(info.l)==='["camille@exemple.fr","leo.martin@exemple.fr"]'&&/c•••@exemple\.fr/.test(info.c)&&!/camille@/.test(info.c)&&info.imp==='Ajouter 2 adresses à la base',info);
     await a.evaluate(()=>mcImport());
-    check('Sans la case cochée : rien n\'est ajouté',/consentement/.test(await a.$eval('#mc-base-status',e=>e.textContent))&&(await db.collection('newsletter').get()).size===46);
+    check('Sans la case cochée : rien n\'est ajouté, message sous le bouton',/consentement/.test(await a.$eval('#mc-imp-status',e=>e.textContent))&&(await db.collection('newsletter').get()).size===46);
     await a.evaluate(()=>{document.getElementById('mc-consent').checked=true;});await a.evaluate(()=>mcImport());
-    await wf(a,()=>/2 ajoutées/.test(document.getElementById('mc-base-status').textContent),15000);
+    await wf(a,()=>/2 ajoutées/.test(document.getElementById('mc-imp-status').textContent),15000);
     check('Ajout : 45 abonnés, liste vidée dans le navigateur',await a.evaluate(()=>/45 abonnés/.test(document.getElementById('mc-base').textContent)&&_mcList.length===0));
+    // CSV enregistré par Excel en « Texte Unicode » (UTF-16), fichier Excel non converti, adresses collées
+    fs.writeFileSync(f,Buffer.concat([Buffer.from([0xFF,0xFE]),Buffer.from('Nom\tE-mail\r\nZoé\tzoe@exemple.fr\r\nMax\tmax@exemple.fr\r\n','utf16le')]));await fi.uploadFile(f);
+    await wf(a,()=>/2 adresses/.test(document.getElementById('mc-count').textContent),8000);
+    check('CSV Excel en UTF-16 : adresses lues',await a.evaluate(()=>JSON.stringify(_mcList))==='["zoe@exemple.fr","max@exemple.fr"]');
+    const fx=f.replace('.csv','.xlsx');fs.writeFileSync(fx,Buffer.from('PK\x03\x04 zip excel'));await fi.uploadFile(fx);
+    await wf(a,()=>/fichier Excel/.test(document.getElementById('mc-count').textContent),8000);
+    check('Fichier Excel non converti : explication (enregistrer en CSV ou coller la colonne), rien en attente',await a.evaluate(()=>_mcList.length===0&&document.getElementById('mc-imp').textContent==='Ajouter à la base'));
+    await a.evaluate(()=>{const t=document.getElementById('mc-paste');t.value='sam@exemple.fr\nSAM@exemple.fr\nlou@exemple.fr';t.dispatchEvent(new Event('input'));});
+    check('Adresses collées : 2 sans doublon',await a.evaluate(()=>_mcList.length===2&&document.getElementById('mc-imp').textContent==='Ajouter 2 adresses à la base'));
+    check('Message clair si le serveur n\'est pas encore déployé',await a.evaluate(()=>/firebase deploy/.test(mcErr({code:'functions/not-found',message:'NOT FOUND'}))&&/firebase deploy/.test(mcErr({code:'functions/internal',message:'internal'}))&&/accepté/.test(mcErr({code:'functions/failed-precondition',message:'Confirme que ces personnes ont accepté'}))));
     await a.close();
   });
   check('Aucune erreur JavaScript',errs.length===0,errs);
