@@ -511,6 +511,53 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
       </div>
     </div>
 
+    <!-- Newsletter -->
+    <div class="sec-hdr" style="margin-top:32px"><h2 style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg> Newsletter</h2><p>Ta base d'adresses e-mail, même des personnes pas encore inscrites sur l'app. Chaque abonné reçoit son propre e-mail depuis l'adresse NOOVA (jamais en copie), avec un lien pour se désinscrire. 20 e-mails toutes les 2 minutes, 450 par jour au plus.</p></div>
+    <div class="two-col" style="align-items:start">
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="card">
+          <div class="card-title">Abonnés <span class="badge badge-pending" id="mc-active">…</span></div>
+          <div style="padding:20px">
+            <div id="mc-base" style="font-size:12.5px;color:var(--ink2);margin-bottom:14px;line-height:1.5">Chargement…</div>
+            <label for="mc-file" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Ajouter des adresses (fichier CSV ou liste)</label>
+            <input id="mc-file" type="file" accept=".csv,.txt,text/csv,text/plain" onchange="mcLoadFile(this)" style="width:100%;font-family:var(--fb);font-size:13px;margin-bottom:8px">
+            <div id="mc-count" style="font-size:12.5px;color:var(--ink2);margin-bottom:12px;min-height:18px">Le fichier est lu dans ton navigateur : seules les adresses e-mail sont gardées, sans doublon.</div>
+            <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;font-size:13px;color:var(--ink);line-height:1.45;cursor:pointer">
+              <input type="checkbox" id="mc-consent" style="margin-top:3px;width:18px;height:18px;accent-color:var(--brown)">
+              <span>Je confirme que ces personnes ont accepté de recevoir des nouvelles de NOOVA.</span>
+            </label>
+            <button id="mc-imp" class="btn-approve" onclick="mcImport()">Ajouter à la base</button>
+            <div style="border-top:1px solid var(--border);margin:18px 0 14px"></div>
+            <label for="mc-stop" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Quelqu'un a répondu STOP ? Désinscris son adresse</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <input id="mc-stop" type="email" placeholder="email@exemple.fr" style="flex:1;min-width:180px;padding:9px 12px;border:1.5px solid var(--border-ctl);border-radius:9px;font-family:var(--fb);font-size:13px">
+              <button class="btn-approve" onclick="mcUnsub()">Désinscrire</button>
+            </div>
+            <div id="mc-base-status" role="status" style="margin-top:12px;font-size:13px;font-weight:600;min-height:20px;color:var(--ink2)"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Envois</div>
+          <div id="mc-list"><div class="empty" style="padding:24px 16px">Aucun envoi pour l'instant.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Nouvel e-mail</div>
+        <div style="padding:20px">
+          <label for="mc-subject" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Objet</label>
+          <input id="mc-subject" maxlength="120" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);outline:none;margin-bottom:14px">
+          <label for="mc-text" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Message</label>
+          <textarea id="mc-text" maxlength="5000" style="width:100%;height:300px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:10px;font-family:var(--fb);font-size:13.5px;color:var(--ink);resize:vertical;outline:none;line-height:1.5"></textarea>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.5;margin:6px 0 14px">Une ligne vide sépare les paragraphes ; les liens deviennent cliquables. Le lien « Se désinscrire » est ajouté automatiquement en bas.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn-approve" onclick="mcSend(true)">M'envoyer un essai</button>
+            <button id="mc-go" onclick="mcSend(false)" style="flex:1;padding:12px;background:var(--grad);color:var(--brown);border:none;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--cg)">Envoyer à la base</button>
+          </div>
+          <div id="mc-status" role="status" style="margin-top:12px;font-size:13px;font-weight:600;min-height:20px;color:var(--ink2)"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Question de la semaine -->
     <div class="sec-hdr" style="margin-top:32px"><h2 style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><rect x="2.5" y="8" width="19" height="9.5" rx="4"/><path d="M7 10.5v4.5M4.7 12.75h4.6"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.2" cy="14" r="1"/></svg> Question de la semaine</h2><p>Publie une question dans le feed communauté de l'app — les habitants votent, aucun point en jeu.</p></div>
     <div class="two-col" style="align-items:start">
@@ -771,6 +818,7 @@ const callAdminResetAllData  = fx.httpsCallable('adminResetAllData');
 const callAdminDeleteAccount = fx.httpsCallable('adminDeleteAccount');
 const callAdminSeedDemoUsers = fx.httpsCallable('adminSeedDemoUsers');
 const callAdminProfileNudges = fx.httpsCallable('adminProfileNudges');
+const callAdminMailCampaign  = fx.httpsCallable('adminMailCampaign');
 // ── Mois de test ─────────────────────────────────────────────────────────
 async function loadTestMonth() {
   try {
@@ -2023,9 +2071,108 @@ async function initDiffusion() {
     await loadBroadcastHistory();
     initWeeklyQuestion();
     loadNoovaQuestions();
+    initMailCampaigns();
   } catch(e) {
     statusEl.textContent = 'Erreur : ' + e.message;
   }
+}
+
+// ── Newsletter ───────────────────────────────────────────────────────────
+// Le CSV est lu dans le navigateur : seules les adresses (dédupliquées) partent au serveur, qui les garde dans la base
+// (functions/mailCampaign.js) ; l'admin ne voit ensuite que des compteurs.
+const MC_SUBJECT = 'Rejoins la phase test de NOOVA';
+const MC_TEXT = `Salut !
+
+On lance la phase test de NOOVA, l'app qui te fait découvrir les commerces de ta ville : tu réponds à leurs petites questions (30 secondes chacune), tu gagnes des points et tu débloques des récompenses.
+
+Ce qu'on attend de toi : t'inscrire, répondre à quelques questions quand tu as un moment, et nous dire ce qui coince. Le test dure jusqu'à fin novembre.
+
+Rejoindre le test : https://noovaoff.fr/app-v2
+
+Sur ton téléphone, ajoute NOOVA à ton écran d'accueil pour être prévenu des nouvelles questions. Un bug, une idée ? Profil > « Ton avis sur NOOVA ».
+
+Merci de faire partie des premiers !
+L'équipe NOOVA`;
+let _mcList = [], _mcUnsub = null;
+const MC_RE = /[A-Z0-9._%+'-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+function mcParse(txt) {
+  const seen = new Set(), out = [];
+  for (const m of String(txt).match(MC_RE) || []) { const e = m.toLowerCase().replace(/^'+|'+$/g, ''); if (!seen.has(e)) { seen.add(e); out.push(e); } }
+  return out;
+}
+const mcMask = (e) => e.replace(/^(.)[^@]*(@.*)$/, '$1•••$2');
+function mcLoadFile(inp) {
+  const f = inp.files && inp.files[0], el = document.getElementById('mc-count');
+  if (!f) return;
+  if (f.size > 2e6) { el.textContent = 'Fichier trop lourd (2 Mo au plus).'; return; }
+  const r = new FileReader();
+  r.onload = () => { _mcList = mcParse(r.result); mcRefresh(); };
+  r.readAsText(f);
+}
+function mcRefresh() {
+  const n = _mcList.length, el = document.getElementById('mc-count');
+  el.innerHTML = n ? `<b>${n} adresse${n > 1 ? 's' : ''}</b> trouvée${n > 1 ? 's' : ''}, sans doublon (ex. ${esc(_mcList.slice(0, 3).map(mcMask).join(', '))}).` : 'Aucune adresse e-mail trouvée dans ce fichier.';
+  document.getElementById('mc-imp').textContent = n ? `Ajouter ${n} adresse${n > 1 ? 's' : ''} à la base` : 'Ajouter à la base';
+}
+let _mcActive = 0;
+function mcShowBase(c) {
+  _mcActive = c.active;
+  document.getElementById('mc-active').textContent = c.active;
+  document.getElementById('mc-base').innerHTML = c.active || c.unsub
+    ? `<b>${c.active} abonné${c.active > 1 ? 's' : ''}</b>${c.unsub ? ` · ${c.unsub} désinscrit${c.unsub > 1 ? 's' : ''} (jamais réabonnés par un nouvel import)` : ''}. Un envoi à toute la base prend ~${Math.ceil(c.active / 20) * 2} min${c.active > 450 ? `, sur ${Math.ceil(c.active / 450)} jours` : ''}.`
+    : 'La base est vide : ajoute un fichier CSV.';
+  document.getElementById('mc-go').textContent = c.active ? `Envoyer à ${c.active} abonné${c.active > 1 ? 's' : ''}` : 'Envoyer à la base';
+}
+async function mcLoadBase() {
+  try { mcShowBase((await callAdminMailCampaign({ action: 'stats' })).data); }
+  catch (e) { document.getElementById('mc-base').textContent = 'Erreur : ' + e.message; }
+}
+async function mcImport() {
+  const st = document.getElementById('mc-base-status');
+  if (!_mcList.length) { st.textContent = 'Choisis d\'abord un fichier CSV.'; return; }
+  if (!document.getElementById('mc-consent').checked) { st.textContent = 'Coche la case de consentement.'; return; }
+  st.textContent = 'Ajout…';
+  try {
+    const r = (await callAdminMailCampaign({ action: 'import', recipients: _mcList, consent: true, source: (document.getElementById('mc-file').files[0] || {}).name || 'import' })).data;
+    st.textContent = `${r.added} ajoutée${r.added > 1 ? 's' : ''}${r.already ? `, ${r.already} déjà dans la base` : ''}${r.unsub ? `, ${r.unsub} désinscrite${r.unsub > 1 ? 's' : ''} (ignorée${r.unsub > 1 ? 's' : ''})` : ''}.`;
+    _mcList = []; document.getElementById('mc-file').value = ''; document.getElementById('mc-consent').checked = false; mcRefresh();
+    document.getElementById('mc-count').textContent = 'Les adresses ne restent pas dans le navigateur.';
+    mcShowBase(r);
+  } catch (e) { st.textContent = 'Erreur : ' + e.message; }
+}
+async function mcUnsub() {
+  const st = document.getElementById('mc-base-status'), inp = document.getElementById('mc-stop');
+  try { mcShowBase((await callAdminMailCampaign({ action: 'unsub', email: inp.value })).data); st.textContent = 'Adresse désinscrite.'; inp.value = ''; }
+  catch (e) { st.textContent = 'Erreur : ' + e.message; }
+}
+async function mcSend(test) {
+  const st = document.getElementById('mc-status'), subject = document.getElementById('mc-subject').value.trim(), text = document.getElementById('mc-text').value.trim();
+  if (!test) {
+    if (!_mcActive) { st.textContent = 'La base est vide : ajoute d\'abord un fichier CSV.'; return; }
+    if (!confirm(`Envoyer « ${subject} » à ${_mcActive} abonné${_mcActive > 1 ? 's' : ''} ? Impossible d'annuler une fois lancé.`)) return;
+  }
+  st.textContent = test ? 'Envoi de l\'essai…' : 'Lancement…';
+  try {
+    const r = (await callAdminMailCampaign(test ? { subject, text, test: true } : { action: 'send', subject, text })).data;
+    st.textContent = test ? `Essai envoyé à ${r.to}. Vérifie aussi les spams.` : `C'est parti : ${r.total} e-mails, envoi en ~${r.minutes} min${r.days > 1 ? ` (sur ${r.days} jours)` : ''}. Tu peux fermer cette page.`;
+  } catch (e) { st.textContent = 'Erreur : ' + e.message; }
+}
+function initMailCampaigns() {
+  const s = document.getElementById('mc-subject'), t = document.getElementById('mc-text');
+  if (!s.value) s.value = MC_SUBJECT;
+  if (!t.value) t.value = MC_TEXT;
+  mcLoadBase();
+  if (_mcUnsub) return;
+  const LBL = { sending: 'En cours', done: 'Envoyé', purged: 'Envoyé' };
+  _mcUnsub = db.collection('mailCampaigns').orderBy('createdAt', 'desc').limit(10).onSnapshot((snap) => {
+    const box = document.getElementById('mc-list');
+    if (snap.empty) { box.innerHTML = '<div class="empty" style="padding:24px 16px">Aucun envoi pour l\'instant.</div>'; return; }
+    box.innerHTML = snap.docs.map((d) => { const c = d.data(), done = (c.sent || 0) + (c.skipped || 0), pct = c.total ? Math.round(100 * done / c.total) : 0;
+      return `<div class="mc-row" style="padding:12px 18px;border-top:1px solid var(--border)"><div style="display:flex;justify-content:space-between;gap:10px;font-size:13.5px"><b>${esc(c.subject || '')}</b><span style="color:var(--ink3);white-space:nowrap">${LBL[c.status] || esc(c.status || '')}</span></div>
+        <div style="height:6px;background:var(--bg);border-radius:4px;margin:8px 0 6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--grad)"></div></div>
+        <div style="font-size:12px;color:var(--ink2)">${c.sent || 0} / ${c.total || 0} envoyés${c.skipped ? ` · ${c.skipped} désinscrit${c.skipped > 1 ? 's' : ''} entre-temps` : ''}${c.errors ? ` · ${c.errors} adresse${c.errors > 1 ? 's' : ''} refusée${c.errors > 1 ? 's' : ''}` : ''}${c.createdAt ? ' · ' + c.createdAt.toDate().toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}</div></div>`; }).join('');
+    if (snap.docChanges().some((x) => x.type === 'modified' && x.doc.data().status !== 'sending')) mcLoadBase();
+  }, (e) => { document.getElementById('mc-list').innerHTML = `<div class="empty" style="padding:24px 16px">${esc(e.message)}</div>`; });
 }
 
 // ── Question de la semaine ───────────────────────────────────────────────
