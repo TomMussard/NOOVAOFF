@@ -8,7 +8,7 @@
 <script src="/interests.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Noova, ton quartier te pose une question</title>
-<meta name="description" content="Les commerces du Mans te posent une question. Tu réponds en 30 secondes et tu échanges tes points contre une récompense en boutique.">
+<meta name="description" content="Les commerces de ta ville te posent une question. Tu réponds en 30 secondes et tu échanges tes points contre une récompense en boutique.">
 <meta name="keywords" content="noova, avis consommateurs, récompenses, points fidélité, commerces de proximité, quartier, bons de réduction">
 <meta name="robots" content="index, follow">
 <meta name="author" content="Noova">
@@ -18,7 +18,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.noovaoff.fr/app">
 <meta property="og:title" content="Noova, ton quartier te pose une question">
-<meta property="og:description" content="Les commerces du Mans te posent une question. Tu réponds en 30 secondes et tu échanges tes points contre une récompense en boutique.">
+<meta property="og:description" content="Les commerces de ta ville te posent une question. Tu réponds en 30 secondes et tu échanges tes points contre une récompense en boutique.">
 <meta property="og:image" content="https://www.noovaoff.fr/icon-512.png">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Noova">
@@ -26,7 +26,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Noova, ton quartier te pose une question">
-<meta name="twitter:description" content="Les commerces du Mans te posent une question. Tu réponds en 30 secondes et tu échanges tes points contre une récompense en boutique.">
+<meta name="twitter:description" content="Les commerces de ta ville te posent une question. Tu réponds en 30 secondes et tu échanges tes points contre une récompense en boutique.">
 <meta name="twitter:image" content="https://www.noovaoff.fr/icon-512.png">
 
 <!-- Favicon -->
@@ -60,7 +60,7 @@
   "@type": "WebApplication",
   "name": "Noova",
   "url": "https://www.noovaoff.fr/app",
-  "description": "Les commerces du Mans te posent une question. Tu réponds en 30 secondes et tu échanges tes points contre une récompense en boutique.",
+  "description": "Les commerces de ta ville te posent une question. Tu réponds en 30 secondes et tu échanges tes points contre une récompense en boutique.",
   "applicationCategory": "LifestyleApplication",
   "operatingSystem": "Web",
   "inLanguage": "fr-FR",
@@ -114,12 +114,26 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
    shell fixe ci-dessous) est décalé de sa hauteur — jamais recouvert, jamais à retirer écran par écran. */
 .test-banner{position:fixed;top:0;left:0;right:0;z-index:100000;background:var(--erreur-fort);color:var(--blanc);font-family:var(--fb);font-weight:800;font-size:var(--fs-1);letter-spacing:0;text-align:center;line-height:24px;padding-top:env(safe-area-inset-top,0px)}
 #shell{position:fixed;top:calc(24px + env(safe-area-inset-top,0px));right:0;bottom:0;left:0;background:var(--bg);overflow:hidden}
-@media(min-width:520px){
-  #shell{inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:390px;height:844px;border-radius:var(--r-pill);}
-  #shell::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:37px;background:#17141A;border-radius:0 0 var(--r-lg) var(--r-lg);z-index:999}
-  .bg-label{position:fixed;top:18px;left:50%;transform:translateX(-50%);font-family:var(--fd);font-weight:700;font-size:var(--fs-1);color:rgba(255,255,255,.28);letter-spacing:0;pointer-events:none}
+
+.desk-hint{display:none}
+/* Inscription / choix de la ville : centrés quand ils tiennent, sinon le haut reste atteignable (avec
+   justify-content:center, ce qui dépasse en haut ne peut plus être atteint en défilant). */
+#auth-wall,#google-city-wall{justify-content:flex-start!important}
+#auth-wall>:first-child,#google-city-wall>:first-child{margin-top:auto}
+#auth-wall>:last-child,#google-city-wall>:last-child{margin-bottom:auto}
+/* Ordinateur / tablette : l'app reste un écran de téléphone (390 px de large), centré sur un fond crème, haut
+   ajusté à la fenêtre (jamais coupé sur un portable 1366×768). Les écrans posés hors du #shell (inscription, choix
+   de la ville) prennent exactement le même cadre ; les fenêtres créées en JS sont ajoutées DANS le #shell. */
+@media(min-width:520px) and (min-height:500px){
+  html,body{background:var(--marque-creme)!important}
+  #shell,#auth-wall,#google-city-wall{inset:auto!important;top:calc(50% + 12px)!important;left:50%!important;transform:translate(-50%,-50%);width:390px!important;height:min(844px,calc(100dvh - 64px))!important;border-radius:var(--r-lg);overflow:hidden}
+  #auth-wall,#google-city-wall{overflow-y:auto}
+  #shell{box-shadow:0 0 0 10px var(--marque-encre),0 24px 60px var(--voile)}
+  #shell::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:28px;background:var(--marque-encre);border-radius:0 0 var(--r-md) var(--r-md);z-index:999;pointer-events:none}
+  .desk-hint{display:block;position:fixed;left:calc(50% + 235px);top:50%;transform:translateY(-50%);width:200px;font-family:var(--fb);font-size:var(--fs-2);line-height:1.5;color:var(--marque-encre)}
+  .desk-hint b{font-family:var(--fd);font-weight:800;display:block;font-size:var(--fs-4);margin-bottom:6px}
 }
-@media(max-width:519px){.bg-label{display:none}}
+@media(max-width:899px),(max-height:499px){.desk-hint{display:none!important}}
 #app{position:absolute;inset:0;overflow:hidden;background:var(--bg)}
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .22s ease,transform .22s ease,visibility 0s linear .23s;transform:translateX(26px);-webkit-overflow-scrolling:touch;background:var(--bg)}
 .screen.active{opacity:1;pointer-events:all;visibility:visible;transition-delay:0s;transform:translateX(0)}
@@ -1528,6 +1542,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
 <link rel="stylesheet" href="/noova.css">
 </head>
 <body>
+<div class="desk-hint" aria-hidden="true"><b>NOOVA se vit sur ton téléphone</b>Ouvre noovaoff.fr/app-v2 sur ton mobile et ajoute l'app à ton écran d'accueil : tu seras prévenu des nouvelles questions.</div>
 <div class="test-banner" role="note">Version test — NOOVA n'est pas encore lancée officiellement</div>
 <div id="shell">
 <div id="app">
@@ -1549,7 +1564,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
           </div>
           <div style="font-family:var(--fd);font-weight:800;font-size:var(--fs-5);color:var(--jaune-ink);letter-spacing:var(--lettrage-titre);background:var(--blanc);border-radius:var(--r-md);padding:10px 16px">Une question, 30 secondes ?</div>
         </div>
-        <h1 class="ob-title">Les commerces<br>du Mans te posent<br><em>une question.</em></h1>
+        <h1 class="ob-title">Les commerces<br>de ta ville te posent<br><em>une question.</em></h1>
         <p class="ob-desc">Tu réponds en 30 secondes, depuis ton téléphone.</p>
       </div>
       <div class="ob-slide" id="ob1">
@@ -1585,7 +1600,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
       <div class="bh-logo" id="demo-logo" style="background:transparent;padding:0"></div>
       <div style="flex:1;min-width:0">
         <div class="bh-name" id="demo-brand">Commerce</div>
-        <div class="bh-usage">Commerce du Mans</div>
+        <div class="bh-usage">Commerce de ta ville</div>
       </div>
       <div class="bh-tag" style="background:var(--cd);color:var(--ink)">Exemple</div>
     </div>
@@ -5121,7 +5136,7 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
   <div style="text-align:center;margin-bottom:36px">
     <img class="aw-logo" src="favicon.svg" alt="Logo Noova" style="height:64px;width:64px;border-radius:var(--r-md);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
     <div class="aw-wordmark" style="font-family:var(--fd);font-weight:900;font-size:var(--fs-6);letter-spacing:var(--lettrage-titre);color:var(--ink);line-height:1">Noova</div>
-    <div style="font-size:var(--fs-3);color:var(--ink2);margin-top:8px;line-height:1.7">Les commerces du Mans te posent une question.<br>Tu réponds en 30&nbsp;secondes.</div>
+    <div style="font-size:var(--fs-3);color:var(--ink2);margin-top:8px;line-height:1.7">Les commerces de ta ville te posent une question.<br>Tu réponds en 30&nbsp;secondes.</div>
   </div>
 
   <div style="display:flex;gap:0;background:var(--bg2);border-radius:var(--r-sm);padding:4px;width:100%;max-width:340px;margin-bottom:20px">
@@ -5131,7 +5146,7 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
 
   <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:11px">
     <input id="aw-name" type="text" placeholder="Ton prénom" autocomplete="name" style="display:none;width:100%;padding:14px 16px;border-radius:var(--r-md);border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:var(--fs-3);outline:none;font-family:var(--fb);box-sizing:border-box">
-    <input id="aw-city" type="text" placeholder="Ta ville" list="aw-city-list" value="Le Mans" autocomplete="address-level2" style="display:none;width:100%;padding:14px 16px;border-radius:var(--r-md);border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:var(--fs-3);outline:none;font-family:var(--fb);box-sizing:border-box">
+    <input id="aw-city" type="text" placeholder="Ta ville" list="aw-city-list" value="" autocomplete="address-level2" style="display:none;width:100%;padding:14px 16px;border-radius:var(--r-md);border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:var(--fs-3);outline:none;font-family:var(--fb);box-sizing:border-box">
 
     <div id="aw-age-wrap" style="display:none">
       <div style="font-size:var(--fs-1);font-weight:700;letter-spacing:0;color:var(--ink2);margin-bottom:7px">Ton âge</div>
@@ -5147,7 +5162,7 @@ function closeFullMap(){ _mapSt.token++; goTo('home'); }
 
     <div id="aw-interests-wrap" style="display:none"></div>
 
-    <datalist id="aw-city-list"><option value="Le Mans"><option value="Angers"></datalist>
+    <datalist id="aw-city-list"></datalist>
     <input id="aw-email" type="email" placeholder="Email" autocomplete="email" style="width:100%;padding:14px 16px;border-radius:var(--r-md);border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:var(--fs-3);outline:none;font-family:var(--fb);box-sizing:border-box">
     <div>
       <div style="position:relative">
@@ -5493,6 +5508,9 @@ function awTab(mode) {
   const isReg = mode === 'register';
   document.getElementById('aw-name').style.display = isReg ? 'block' : 'none';
   document.getElementById('aw-city').style.display = isReg ? 'block' : 'none';
+  // Suggestions de villes : toutes les villes ouvertes, par ordre alphabétique (aucune ville mise en avant).
+  const dl = document.getElementById('aw-city-list');
+  if (isReg && dl && !dl.children.length) dl.innerHTML = NOOVA_KNOWN_CITIES.map(c => c.label).sort((x, y) => x.localeCompare(y, 'fr')).map(l => `<option value="${esc(l)}">`).join('');
   document.getElementById('aw-age-wrap').style.display = 'none';
   document.getElementById('aw-interests-wrap').style.display = 'none';
   const aStyle = 'flex:1;padding:11px;border-radius:var(--r-sm);font-size:var(--fs-2);font-weight:700;border:none;background:var(--text);color:var(--bg);font-family:var(--fb);cursor:pointer;';
@@ -6328,7 +6346,7 @@ function askRedeemConfirm(reward) {
       <button class="btn-p" id="rc-yes">Échanger contre ${rewardCost(reward)} pts</button>
       <button class="btn-s" id="rc-no" style="margin-top:8px">Annuler</button>
     </div>`;
-    document.body.appendChild(ov);
+    (document.getElementById('shell')||document.body).appendChild(ov);
     const done = v => { ov.remove(); resolve(v); };
     ov.querySelector('#rc-yes').onclick = () => done(true);
     ov.querySelector('#rc-no').onclick = () => done(false);
@@ -6366,7 +6384,7 @@ function showVoucherModal({ id, code, label, merchantName, cost, purchaseConditi
     </div>
     <button id="vf-ok" class="btn-p" style="background:var(--surface-2);color:var(--blanc);">C'est validé</button>
     <div style="font-size:var(--fs-1);color:var(--ink3);text-align:center;margin-top:8px">À presser devant le commerçant, quand tu as reçu ta récompense.</div>`;
-  document.body.appendChild(ov);
+  (document.getElementById('shell')||document.body).appendChild(ov);
   try { if(navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { _voucherLock = l; }).catch(() => {}); } catch(e) {}
   const tick = () => {
     const t = document.getElementById('vf-timer'); if(!t) return;
@@ -6403,7 +6421,7 @@ function showToast(msg, ico = 'error') {
   const label = document.createElement('span');
   label.textContent = msg;
   ov.appendChild(label);
-  document.body.appendChild(ov);
+  (document.getElementById('shell')||document.body).appendChild(ov);
   requestAnimationFrame(() => { ov.style.opacity = '1'; ov.style.transform = 'translateX(-50%) translateY(0)'; });
   setTimeout(() => { ov.style.opacity = '0'; setTimeout(() => ov.remove(), 300); }, 3000);
 }
@@ -6504,7 +6522,7 @@ function makeTour(cfg){
         else if(document.activeElement!==a && document.activeElement!==b){ e.preventDefault(); b.focus(); }
       }
     });
-    document.body.appendChild(ov);
+    (document.getElementById('shell')||document.body).appendChild(ov);
     return ov;
   }
   // Halo autour de la cible, toujours dans l'écran (une cible collée au bord ne déborde pas).
@@ -6602,7 +6620,7 @@ function maybeShowInstallInvite(){
     <div class="install-banner-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="#1C1917" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M9 7c1-.2 2 .3 2.2 1.5.2 1.3-1.6 1.8-1.6 3.3a1.6 1.6 0 0 0 3.2 0"/><circle cx="12" cy="16.3" r="1.3" fill="#1C1917" stroke="none"/></svg></div>
     <div class="install-banner-txt"><div class="install-banner-title">Installe Noova</div><div class="install-banner-sub">Sur ton écran d'accueil, pour ne rater aucune récompense.</div></div>
     <button class="install-banner-cta" onclick="triggerInstall()">${NV_IS_IOS?'Comment faire':'Installer'}</button>`;
-  document.body.appendChild(b);
+  (document.getElementById('shell')||document.body).appendChild(b);
   requestAnimationFrame(()=>b.classList.add('show'));
   trackEvent('pwa_install_prompt_shown', { platform: NV_IS_IOS?'ios':'android' });
 }
@@ -6626,7 +6644,7 @@ function showAndroidInstallSheet(){
     ov.id='android-install-sheet';
     ov.style.cssText='position:fixed;inset:0;z-index:10060;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center';
     ov.onclick=e=>{ if(e.target===ov){ ov.remove(); dismissInstallInvite(); } };
-    document.body.appendChild(ov);
+    (document.getElementById('shell')||document.body).appendChild(ov);
   }
   const n=(k,t)=>`<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:30px;height:30px;border-radius:50%;background:var(--yellow-soft);color:var(--gold-text);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:var(--fs-2);flex-shrink:0">${k}</div><div style="font-size:var(--fs-2);color:var(--ink);line-height:1.5">${t}</div></div>`;
   ov.innerHTML=`<div style="background:var(--card);border-radius:var(--r-lg) var(--r-lg) 0 0;padding:22px 22px calc(30px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px">
@@ -6643,7 +6661,7 @@ function showIOSInstallSheet(){
     ov.id='ios-install-sheet';
     ov.style.cssText='position:fixed;inset:0;z-index:10060;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center';
     ov.onclick=e=>{ if(e.target===ov){ ov.remove(); dismissInstallInvite(); } };
-    document.body.appendChild(ov);
+    (document.getElementById('shell')||document.body).appendChild(ov);
   }
   ov.innerHTML=`<div style="background:var(--card);border-radius:var(--r-lg) var(--r-lg) 0 0;padding:22px 22px calc(30px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px">
     <div style="width:36px;height:4px;background:var(--bg3);border-radius:var(--r-pill);margin:0 auto 18px"></div>
