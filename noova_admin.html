@@ -520,13 +520,15 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
           <div style="padding:20px">
             <div id="mc-base" style="font-size:12.5px;color:var(--ink2);margin-bottom:14px;line-height:1.5">Chargement…</div>
             <label for="mc-file" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Ajouter des adresses (fichier CSV ou liste)</label>
-            <input id="mc-file" type="file" accept=".csv,.txt,text/csv,text/plain" onchange="mcLoadFile(this)" style="width:100%;font-family:var(--fb);font-size:13px;margin-bottom:8px">
+            <input id="mc-file" type="file" onchange="mcLoadFile(this)" style="width:100%;font-family:var(--fb);font-size:13px;margin-bottom:8px">
+            <textarea id="mc-paste" oninput="mcPaste(this)" placeholder="… ou colle ici les adresses (une par ligne, ou une colonne copiée depuis Excel / Google Sheets)" style="width:100%;height:70px;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border-ctl);border-radius:9px;font-family:var(--fb);font-size:12.5px;color:var(--ink);resize:vertical;outline:none;margin-bottom:8px"></textarea>
             <div id="mc-count" style="font-size:12.5px;color:var(--ink2);margin-bottom:12px;min-height:18px">Le fichier est lu dans ton navigateur : seules les adresses e-mail sont gardées, sans doublon.</div>
             <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;font-size:13px;color:var(--ink);line-height:1.45;cursor:pointer">
               <input type="checkbox" id="mc-consent" style="margin-top:3px;width:18px;height:18px;accent-color:var(--brown)">
               <span>Je confirme que ces personnes ont accepté de recevoir des nouvelles de NOOVA.</span>
             </label>
             <button id="mc-imp" class="btn-approve" onclick="mcImport()">Ajouter à la base</button>
+            <div id="mc-imp-status" role="status" style="margin-top:10px;font-size:13px;font-weight:600;min-height:20px;color:var(--ink2);line-height:1.45"></div>
             <div style="border-top:1px solid var(--border);margin:18px 0 14px"></div>
             <label for="mc-stop" style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Quelqu'un a répondu STOP ? Désinscris son adresse</label>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -2101,18 +2103,41 @@ function mcParse(txt) {
   return out;
 }
 const mcMask = (e) => e.replace(/^(.)[^@]*(@.*)$/, '$1•••$2');
+// Lit le fichier quel que soit son encodage (CSV Excel en UTF-16, UTF-8, Windows-1252) ; repère un fichier Excel non converti.
+function mcDecode(buf) {
+  const b = new Uint8Array(buf);
+  if (b[0] === 0x50 && b[1] === 0x4B) return null;                                   // « PK » : .xlsx / .numbers (archive zip)
+  if (b[0] === 0xFF && b[1] === 0xFE) return new TextDecoder('utf-16le').decode(b);
+  if (b[0] === 0xFE && b[1] === 0xFF) return new TextDecoder('utf-16be').decode(b);
+  let z = 0; for (let k = 1; k < Math.min(b.length, 400); k += 2) if (b[k] === 0) z++;
+  if (z > 50) return new TextDecoder('utf-16le').decode(b);                           // UTF-16 sans BOM
+  return new TextDecoder('utf-8').decode(b);
+}
 function mcLoadFile(inp) {
   const f = inp.files && inp.files[0], el = document.getElementById('mc-count');
   if (!f) return;
-  if (f.size > 2e6) { el.textContent = 'Fichier trop lourd (2 Mo au plus).'; return; }
+  if (f.size > 5e6) { el.textContent = 'Fichier trop lourd (5 Mo au plus).'; return; }
   const r = new FileReader();
-  r.onload = () => { _mcList = mcParse(r.result); mcRefresh(); };
-  r.readAsText(f);
+  r.onerror = () => { el.textContent = 'Impossible de lire ce fichier.'; };
+  r.onload = () => {
+    const txt = mcDecode(r.result);
+    if (txt === null) { _mcList = []; el.innerHTML = '<b>C\'est un fichier Excel ou Numbers</b>, pas un CSV : enregistre-le en « CSV » (Fichier &gt; Enregistrer sous / Exporter), ou copie la colonne des e-mails et colle-la dans le cadre ci-dessous.'; mcRefreshBtn(); return; }
+    _mcList = mcParse(txt); mcRefresh();
+  };
+  r.readAsArrayBuffer(f);
 }
+function mcPaste(t) { _mcList = mcParse(t.value); mcRefresh(); }
+const mcErr = (e) => {
+  const c = String(e && e.code || ''), m = String(e && e.message || e);
+  if (/not-found|internal/.test(c) || /^(internal|not found)$/i.test(m)) return 'Le serveur n\'a pas encore la newsletter : lance « firebase deploy --only firestore:rules,functions » puis recharge la page.';
+  if (/unauthenticated|permission-denied/.test(c) && !/Noova|accepté/.test(m)) return 'Session expirée : recharge la page et reconnecte-toi.';
+  return 'Erreur : ' + m;
+};
+function mcRefreshBtn() { const n = _mcList.length; document.getElementById('mc-imp').textContent = n ? `Ajouter ${n} adresse${n > 1 ? 's' : ''} à la base` : 'Ajouter à la base'; }
 function mcRefresh() {
   const n = _mcList.length, el = document.getElementById('mc-count');
-  el.innerHTML = n ? `<b>${n} adresse${n > 1 ? 's' : ''}</b> trouvée${n > 1 ? 's' : ''}, sans doublon (ex. ${esc(_mcList.slice(0, 3).map(mcMask).join(', '))}).` : 'Aucune adresse e-mail trouvée dans ce fichier.';
-  document.getElementById('mc-imp').textContent = n ? `Ajouter ${n} adresse${n > 1 ? 's' : ''} à la base` : 'Ajouter à la base';
+  el.innerHTML = n ? `<b>${n} adresse${n > 1 ? 's' : ''}</b> trouvée${n > 1 ? 's' : ''}, sans doublon (ex. ${esc(_mcList.slice(0, 3).map(mcMask).join(', '))}). Coche la case puis clique sur « Ajouter ».` : 'Aucune adresse e-mail trouvée. Vérifie que le fichier contient bien une colonne d\'e-mails.';
+  mcRefreshBtn();
 }
 let _mcActive = 0;
 function mcShowBase(c) {
@@ -2125,25 +2150,26 @@ function mcShowBase(c) {
 }
 async function mcLoadBase() {
   try { mcShowBase((await callAdminMailCampaign({ action: 'stats' })).data); }
-  catch (e) { document.getElementById('mc-base').textContent = 'Erreur : ' + e.message; }
+  catch (e) { console.error('newsletter stats', e); document.getElementById('mc-base').textContent = mcErr(e); }
 }
 async function mcImport() {
-  const st = document.getElementById('mc-base-status');
-  if (!_mcList.length) { st.textContent = 'Choisis d\'abord un fichier CSV.'; return; }
+  const st = document.getElementById('mc-imp-status');
+  if (!_mcList.length) { st.textContent = 'Choisis d\'abord un fichier CSV (ou colle des adresses) : aucune adresse en attente.'; return; }
   if (!document.getElementById('mc-consent').checked) { st.textContent = 'Coche la case de consentement.'; return; }
-  st.textContent = 'Ajout…';
+  st.textContent = `Ajout de ${_mcList.length} adresse${_mcList.length > 1 ? 's' : ''}…`; document.getElementById('mc-imp').disabled = true;
   try {
     const r = (await callAdminMailCampaign({ action: 'import', recipients: _mcList, consent: true, source: (document.getElementById('mc-file').files[0] || {}).name || 'import' })).data;
     st.textContent = `${r.added} ajoutée${r.added > 1 ? 's' : ''}${r.already ? `, ${r.already} déjà dans la base` : ''}${r.unsub ? `, ${r.unsub} désinscrite${r.unsub > 1 ? 's' : ''} (ignorée${r.unsub > 1 ? 's' : ''})` : ''}.`;
-    _mcList = []; document.getElementById('mc-file').value = ''; document.getElementById('mc-consent').checked = false; mcRefresh();
+    _mcList = []; document.getElementById('mc-file').value = ''; document.getElementById('mc-paste').value = ''; document.getElementById('mc-consent').checked = false; mcRefresh();
     document.getElementById('mc-count').textContent = 'Les adresses ne restent pas dans le navigateur.';
     mcShowBase(r);
-  } catch (e) { st.textContent = 'Erreur : ' + e.message; }
+  } catch (e) { console.error('newsletter import', e); st.textContent = mcErr(e); }
+  finally { document.getElementById('mc-imp').disabled = false; }
 }
 async function mcUnsub() {
   const st = document.getElementById('mc-base-status'), inp = document.getElementById('mc-stop');
   try { mcShowBase((await callAdminMailCampaign({ action: 'unsub', email: inp.value })).data); st.textContent = 'Adresse désinscrite.'; inp.value = ''; }
-  catch (e) { st.textContent = 'Erreur : ' + e.message; }
+  catch (e) { st.textContent = mcErr(e); }
 }
 async function mcSend(test) {
   const st = document.getElementById('mc-status'), subject = document.getElementById('mc-subject').value.trim(), text = document.getElementById('mc-text').value.trim();
@@ -2155,7 +2181,7 @@ async function mcSend(test) {
   try {
     const r = (await callAdminMailCampaign(test ? { subject, text, test: true } : { action: 'send', subject, text })).data;
     st.textContent = test ? `Essai envoyé à ${r.to}. Vérifie aussi les spams.` : `C'est parti : ${r.total} e-mails, envoi en ~${r.minutes} min${r.days > 1 ? ` (sur ${r.days} jours)` : ''}. Tu peux fermer cette page.`;
-  } catch (e) { st.textContent = 'Erreur : ' + e.message; }
+  } catch (e) { st.textContent = mcErr(e); }
 }
 function initMailCampaigns() {
   const s = document.getElementById('mc-subject'), t = document.getElementById('mc-text');
