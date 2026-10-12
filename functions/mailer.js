@@ -54,10 +54,11 @@ function explain(e) {
 
 async function sendCore(ref, data) {
   if (!data || (data.delivery && data.delivery.state)) return { skipped: true };     // déjà traité
-  // Seules les alertes de l'équipe partent ; jamais vers une adresse de commerce fictif (test.noova.fr).
+  // Seules les alertes de l'équipe et les campagnes de l'admin (mailCampaign.js) partent ; jamais vers une adresse de
+  // commerce fictif (test.noova.fr).
   const all = (Array.isArray(data.to) ? data.to : [data.to]).filter(Boolean);
   const to = all.filter((a) => !/@test\.noova\.fr$/i.test(String(a).trim()));
-  if (data.type !== "admin_alert" || (all.length && !to.length)) {
+  if (!["admin_alert", "campaign"].includes(data.type) || (all.length && !to.length)) {
     await ref.update({ delivery: { state: "SKIPPED", error: "Non envoyé : seuls les e-mails d'alerte de l'équipe NOOVA partent.", endTime: FieldValue.serverTimestamp() } });
     return { skipped: true };
   }
@@ -70,7 +71,7 @@ async function sendCore(ref, data) {
   try {
     const info = await transport().sendMail({
       from: emulator() ? "NOOVA <test@noova.local>" : MAIL_FROM.value(),
-      replyTo: data.replyTo || undefined, to, subject: String(m.subject).slice(0, 300), text: m.text || "", html: m.html || undefined,
+      replyTo: data.replyTo || undefined, headers: data.headers || undefined, to, subject: String(m.subject).slice(0, 300), text: m.text || "", html: m.html || undefined,
     });
     await ref.update({ delivery: { state: "SUCCESS", attempts: 1, messageId: info.messageId || null, endTime: FieldValue.serverTimestamp() } });
     return { ok: true };
