@@ -623,6 +623,8 @@ service cloud.firestore {
     // Newsletter : base d'adresses et envois gérés par les fonctions ; l'admin suit l'avancement, jamais les adresses.
     match /mailCampaigns/{id}  { allow read: if isAdmin(); allow write: if false; }
     match /newsletter/{id}     { allow read, write: if false; }
+    // Compteur du parcours d'entrée (functions/funnel.js) : écrit par les fonctions, lu par l'admin.
+    match /funnelDaily/{id}    { allow read: if isAdmin(); allow write: if false; }
     // État du mois de test (commerces fictifs) : écrit par les fonctions, lu par l'admin.
     match /config/{id}         { allow read: if isAdmin(); allow write: if false; }
     // Zones ouvertes automatiquement (functions/autoZones.js) : écrites par le serveur, lues par l'admin.
