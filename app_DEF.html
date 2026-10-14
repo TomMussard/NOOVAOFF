@@ -112,7 +112,7 @@ if (APP_CHECK_SITE_KEY) document.write('<script src="https://www.gstatic.com/fir
 html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb);-webkit-font-smoothing:antialiased}
 /* Bandeau « en phase de test » : bloc normal (pas superposé), donc tout le reste de l'app (dont le
    shell fixe ci-dessous) est décalé de sa hauteur — jamais recouvert, jamais à retirer écran par écran. */
-.test-banner{position:fixed;top:0;left:0;right:0;z-index:100000;background:var(--erreur-fort);color:var(--blanc);font-family:var(--fb);font-weight:800;font-size:var(--fs-1);letter-spacing:0;text-align:center;line-height:24px;padding-top:env(safe-area-inset-top,0px)}
+.test-banner{position:fixed;top:0;left:0;right:0;z-index:100000;background:var(--jaune-pale);color:var(--marque-encre);font-family:var(--fb);font-weight:600;font-size:var(--fs-1);letter-spacing:0;text-align:center;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:env(safe-area-inset-top,0px) 8px 0}
 #shell{position:fixed;top:calc(24px + env(safe-area-inset-top,0px));right:0;bottom:0;left:0;background:var(--bg);overflow:hidden}
 
 .desk-hint{display:none}
@@ -403,11 +403,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .follow-card .fc-b button{flex:1}
 .follow-card .fc-x{display:block;margin:10px auto 0;background:none;border:none;color:var(--ink2);font-size:var(--fs-1);text-decoration:underline;cursor:pointer;font-family:var(--fb);padding:6px}
 .rv-skel .rv-bar{background:var(--bg2);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
-#lock-bar{height:6px;border-radius:var(--r-pill);overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
-#lock-bar.on{opacity:1}
-#lock-fill{height:100%;width:100%;background:var(--yellow);border-radius:var(--r-pill)}
-#lock-bar.on #lock-fill{animation:lockDrain 3s linear forwards}
-@keyframes lockDrain{from{width:100%}to{width:0}}
 .btn-sub.locked{pointer-events:none;opacity:.27;}
 .dtrack{margin:0 22px 14px;background:var(--surface);border-radius:var(--r-card);padding:12px 14px;display:flex;align-items:center;gap:12px;}
 .dt-dots{display:flex;gap:6px;flex-shrink:0}
@@ -595,7 +590,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 #question.qmode-noova.qfull .rank-txt{color:var(--marque-creme);font-size:var(--fs-3);font-weight:700}
 #question.qmode-noova.qfull .rank-num{background:var(--surface-2);color:var(--text)}
 #question.qmode-noova.qfull .rank-arr{background:rgba(255,251,215,.12);border:none;color:var(--marque-creme)}
-#question.qmode-noova.qfull #lock-fill{background:var(--nv-yellow)}
 #question.qmode-noova.qfull .skip-btn{background:rgba(255,251,215,.12);color:var(--marque-creme)}
 #question.qmode-noova.qfull .btn-sub{background:var(--nv-yellow);color:var(--nv-black);}
 #question.qmode-noova.qfull .btn-sub:disabled,#question.qmode-noova.qfull .btn-sub.locked{opacity:1;background:rgba(255,251,215,.14);color:var(--marque-creme)}
@@ -678,7 +672,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 #question.qfull .rank-txt{color:var(--blanc);font-size:var(--fs-3);font-weight:700}
 #question.qfull .rank-num{background:var(--surface-2);color:var(--text)}
 #question.qfull .rank-arr{background:rgba(255,255,255,.14);border:none;color:var(--blanc)}
-#question.qfull #lock-fill{background:var(--text-3)}
 #question.qfull .skip-btn{background:rgba(28,14,2,.12);color:var(--nv-black)}
 #question.qfull .btn-sub{background:var(--surface-2);color:var(--nv-yellow);}
 #question.qfull .btn-sub:disabled,#question.qfull .btn-sub.locked{opacity:1;background:rgba(28,14,2,.16);color:var(--nv-black)}
@@ -1543,7 +1536,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
 </head>
 <body>
 <div class="desk-hint" aria-hidden="true"><b>NOOVA se vit sur ton téléphone</b>Ouvre noovaoff.fr/app-v2 sur ton mobile et ajoute l'app à ton écran d'accueil : tu seras prévenu des nouvelles questions.</div>
-<div class="test-banner" role="note">Version test — NOOVA n'est pas encore lancée officiellement</div>
+<div class="test-banner" role="note"><b>Phase de test</b> · commerces et récompenses fictifs</div>
 <div id="shell">
 <div id="app">
 
@@ -1593,8 +1586,8 @@ button.soc-bell{padding:0;font-family:var(--font)}
   <div class="qw">
     <div class="q-nav">
       <div class="q-close" onclick="goTo('onboard')">✕</div>
-      <div class="q-prog"><div class="q-seg cur"></div></div>
-      <div class="q-pts">+50 pts</div>
+      <div class="q-prog" id="demo-prog"><div class="q-seg cur"></div><div class="q-seg"></div><div class="q-seg"></div></div>
+      <div class="q-pts" id="demo-count">1 / 3</div>
     </div>
     <div class="brand-hdr">
       <div class="bh-logo" id="demo-logo" style="background:transparent;padding:0"></div>
@@ -1615,14 +1608,14 @@ button.soc-bell{padding:0;font-family:var(--font)}
 <div id="demo-result" class="screen">
   <div class="qw" style="justify-content:center">
     <div class="rw-title" style="text-align:left;margin-bottom:4px">Merci, ta voix compte.</div>
-    <div class="rw-sub" style="text-align:left;margin-bottom:16px" id="demo-res-sub">Voilà ce que répondent les autres habitants.</div>
+    <div class="rw-sub" style="text-align:left;margin-bottom:16px" id="demo-res-sub">Exemple : voilà à quoi ressemblent les réponses des habitants.</div>
     <div id="demo-bars" style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px"></div>
-    <div class="pts-earned" style="margin-bottom:14px"><div class="pe-plus">+</div><div class="pe-num">50</div><div class="pe-right"><div class="pe-lbl">Points de bienvenue</div><div class="pe-tot" style="font-size:var(--fs-2)">Crée ton compte pour les recevoir</div></div></div>
+    <div class="pts-earned" id="demo-pts" style="margin-bottom:14px"><div class="pe-plus">+</div><div class="pe-num">50</div><div class="pe-right"><div class="pe-lbl">Points de bienvenue</div><div class="pe-tot" style="font-size:var(--fs-2)">Crée ton compte pour les recevoir</div></div></div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <button class="btn-p" style="background:var(--surface-2);color:var(--blanc);" onclick="showAuthWall('register')">Récupérer mes 50 points</button>
-      <button class="btn-s" id="demo-later-btn" onclick="demoLater()">Plus tard</button>
+      <button class="btn-p" id="demo-next-btn" onclick="demoNext()">Question suivante</button>
+      <button class="btn-s" id="demo-reg-btn" onclick="showAuthWall('register')">Créer mon compte</button>
     </div>
-    <div style="font-size:var(--fs-1);color:var(--ink3);text-align:center;margin-top:12px;line-height:1.6">Résultats d'exemple. Les vraies questions arrivent dès que ton commerce de quartier rejoint NOOVA.</div>
+    <div style="font-size:var(--fs-1);color:var(--ink3);text-align:center;margin-top:12px;line-height:1.6">Questions et résultats d'exemple. Une fois inscrit, tu réponds aux questions des commerces de ta ville (fictifs pendant la phase de test).</div>
   </div>
 </div>
 
@@ -1863,7 +1856,6 @@ button.soc-bell{padding:0;font-family:var(--font)}
       <div class="disc-note" id="q-disc-note" style="display:none"></div>
     </div>
     <div class="ans-area" id="ans-area"></div>
-    <div id="lock-bar"><div id="lock-fill"></div></div>
     <div class="q-actions">
       <button class="skip-btn" id="skip-btn" onclick="goNav('home')">Passer</button>
       <button class="btn-sub" id="sub-btn" onclick="submitAns()" disabled>Valider</button>
@@ -2550,7 +2542,8 @@ function obNext(){
     document.getElementById('ob'+obIdx).classList.remove('active');document.getElementById('ob'+obIdx).classList.add('done');
     document.getElementById('d'+obIdx).classList.remove('on');obIdx++;
     document.getElementById('ob'+obIdx).classList.add('active');document.getElementById('d'+obIdx).classList.add('on');
-    document.getElementById('ob-btn').textContent='Essayer une question';
+    document.getElementById('ob-btn').textContent='Essayer 3 questions';
+    trackFunnel('onboard_2');
   }else startDemo();
 }
 function showAuthWall(mode){
@@ -5236,6 +5229,16 @@ if (APP_CHECK_SITE_KEY) { try { firebase.appCheck().activate(APP_CHECK_SITE_KEY,
 const auth = firebase.auth();
 const db = firebase.firestore();
 const fx  = firebase.app().functions('europe-west1');
+// Compteur du parcours d'entrée (functions/funnel.js) : seul le nom de l'étape part, une fois par étape et par visite.
+// Rien n'est stocké sur l'appareil et aucun identifiant n'est envoyé : ce n'est pas un traceur (cf. confidentialite.html,
+// « aucun traceur de mesure d'audience sans accord »). Les comptes créés sont comptés par le serveur.
+const FUNNEL_STEPS = ['open','onboard_2','demo_start','demo_1','demo_2','demo_3','signup_open'];
+const _funnelSent = new Set();
+function trackFunnel(step){
+  if(!FUNNEL_STEPS.includes(step) || _funnelSent.has(step)) return;
+  _funnelSent.add(step);
+  try{ fx.httpsCallable('trackFunnel')({ step }).catch(() => {}); }catch(e){}
+}
 // Analytics : peut échouer silencieusement (bloqueur de pub, ITP Safari...) sans jamais
 // casser l'app — trackEvent() encapsule cette tolérance pour tous les appels du fichier.
 let analytics = null;
@@ -5431,20 +5434,13 @@ const callGetReveal = fx.httpsCallable('getReveal');
 const callSetNotifPref = fx.httpsCallable('setNotifPref');
 const callTrackNotifOpen = fx.httpsCallable('trackNotifOpen');
 const callBeginQuestion = fx.httpsCallable('beginQuestion');
-// Délai de lecture : « Valider » reste verrouillé 3 s après l'affichage d'une question (barre jaune
-// qui se vide). Le serveur mesure lui-même ce temps depuis beginQuestion : impossible à contourner.
+// Délai de lecture : le serveur refuse une réponse envoyée moins de 3 s après l'affichage de la question (mesuré depuis
+// beginQuestion : impossible à contourner). Rien ne s'affiche (une barre qui se vide stressait les testeurs) : si on
+// valide plus tôt, la réponse part toute seule à la fin du délai.
 const ANSWER_LOCK_MS = 3000;
 function startAnswerLock(){
   S._qLockUntil = Date.now() + ANSWER_LOCK_MS;
-  const bar = document.getElementById('lock-bar'), btn = document.getElementById('sub-btn');
-  if(!bar || !btn) return;
-  bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on');
-  btn.classList.add('locked');
-  const LOCK_LABEL = 'Prends le temps de lire…';
-  if(!/Prends le temps/.test(btn.textContent)) btn.dataset.label = btn.textContent;
-  btn.textContent = LOCK_LABEL;
-  clearTimeout(S._qLockTimer);
-  S._qLockTimer = setTimeout(() => { btn.classList.remove('locked'); bar.classList.remove('on'); if(btn.textContent === LOCK_LABEL) btn.textContent = btn.dataset.label || 'Valider'; }, ANSWER_LOCK_MS);
+  clearTimeout(S._qLockTimer); S._qLockQueued = false;
 }
 function beginQuestionOnServer(q){
   S._qBegin = null;
@@ -5506,6 +5502,7 @@ async function _updatePassStrength(val) {
 function awTab(mode) {
   _awMode = mode;
   const isReg = mode === 'register';
+  if(isReg) trackFunnel('signup_open');
   document.getElementById('aw-name').style.display = isReg ? 'block' : 'none';
   document.getElementById('aw-city').style.display = isReg ? 'block' : 'none';
   // Suggestions de villes : toutes les villes ouvertes, par ordre alphabétique (aucune ville mise en avant).
@@ -5638,16 +5635,21 @@ async function awForgotPassword() {
 // Exemples fictifs, marqués « Exemple » à l'écran : aucun commerce partenaire n'est
 // lisible sans compte. La réponse est gardée en local puis rattachée au compte à la création.
 const DEMO_QS=[
-  {id:'demo-1',brand:'Boulangerie du Centre',q:"Vous aimeriez qu'on ouvre le dimanche matin ?",opts:['Oui, dès 7h','Oui, mais plus tard','Non, ça me va comme ça','Peu importe'],dist:[46,27,14,13]},
-  {id:'demo-2',brand:'Café des Halles',q:"À quel moment passez-vous le plus volontiers prendre un café ?",opts:['Le matin','Après le déjeuner','En fin d\u2019après-midi','En soirée'],dist:[38,22,27,13]}
+  {id:'demo-1',brand:'Boulangerie du Centre',q:"Tu aimerais qu'on ouvre le dimanche matin ?",opts:['Oui, dès 7h','Oui, mais plus tard','Non, ça me va comme ça','Peu importe'],dist:[46,27,14,13]},
+  {id:'demo-2',brand:'Café des Halles',q:"À quel moment passes-tu le plus volontiers prendre un café ?",opts:['Le matin','Après le déjeuner','En fin d\u2019après-midi','En soirée'],dist:[38,22,27,13]},
+  {id:'demo-3',brand:'Salon Mèche Rebelle',q:"Qu'est-ce qui compte le plus pour toi chez un coiffeur ?",opts:['Le résultat','Le prix','La rapidité','L\u2019accueil'],dist:[44,31,9,16]}
 ];
+// Trois questions d'essai sans compte, puis l'inscription. Les 50 points de bienvenue sont crédités par le serveur à la
+// création du compte (claimWelcomeBonus) : rien n'est promis qui ne soit vrai.
 let _demoIdx=0,_demoSeen=0,_demoSel=-1;
-function startDemo(){_demoSeen=0;trackEvent('demo_start');openDemoQ(0);}
+function startDemo(){_demoSeen=0;trackEvent('demo_start');trackFunnel('demo_start');openDemoQ(0);}
 function openDemoQ(i){
   _demoIdx=i;_demoSel=-1;const q=DEMO_QS[i];
   document.getElementById('demo-logo').innerHTML=logoHTML(q.brand,50);
   document.getElementById('demo-brand').textContent=q.brand;
   document.getElementById('demo-q-text').textContent=q.q;
+  document.getElementById('demo-count').textContent=(i+1)+' / '+DEMO_QS.length;
+  document.querySelectorAll('#demo-prog .q-seg').forEach((g,k)=>{g.classList.toggle('done',k<i);g.classList.toggle('cur',k===i);});
   document.getElementById('demo-sub').disabled=true;
   const list=document.getElementById('demo-opts');list.innerHTML='';
   q.opts.forEach((o,idx)=>{
@@ -5662,7 +5664,7 @@ function submitDemo(){
   if(_demoSel<0)return;
   const q=DEMO_QS[_demoIdx];
   try{ if(!localStorage.getItem('nv_demo')) localStorage.setItem('nv_demo',JSON.stringify({id:q.id,answer:q.opts[_demoSel],ts:Date.now()})); }catch(e){}
-  _demoSeen++;trackEvent('demo_answer',{question_id:q.id});
+  _demoSeen++;trackEvent('demo_answer',{question_id:q.id});trackFunnel('demo_'+(_demoIdx+1));
   const dist=q.dist.slice();dist[_demoSel]+=1;const total=dist.reduce((a,b)=>a+b,0);
   const bars=document.getElementById('demo-bars');bars.innerHTML='';
   q.opts.forEach((o,idx)=>{
@@ -5672,10 +5674,13 @@ function submitDemo(){
     row.querySelector('span').textContent=o+(mine?' (ta réponse)':'');
     bars.appendChild(row);
   });
-  document.getElementById('demo-later-btn').style.display=_demoSeen>=2?'none':'block';
+  const last=_demoIdx>=DEMO_QS.length-1, nb=document.getElementById('demo-next-btn'), rb=document.getElementById('demo-reg-btn');
+  nb.textContent=last?'Créer mon compte et récupérer mes 50 points':'Question suivante ('+(_demoIdx+2)+' / '+DEMO_QS.length+')';
+  rb.style.display=last?'none':'block';
+  document.getElementById('demo-pts').style.display=last?'flex':'none';
   goTo('demo-result');
 }
-function demoLater(){openDemoQ((_demoIdx+1)%DEMO_QS.length);}
+function demoNext(){ if(_demoIdx>=DEMO_QS.length-1) showAuthWall('register'); else openDemoQ(_demoIdx+1); }
 
 // Bonus de bienvenue (+50 pts, une seule fois) : crédité CÔTÉ SERVEUR (claimWelcomeBonus), jamais par le client.
 // Idempotent : appelé à chaque création de compte, quelle que soit la méthode (email, Google, Apple), et par précaution à la connexion.
@@ -7234,7 +7239,12 @@ const _origSubmitAns = submitAns;
 submitAns = function() {
   const q = curQuestion();
   if(!q || S._submitting) return;
-  if(Date.now() < (S._qLockUntil || 0)) return; // délai de lecture de 3 s
+  const wait = (S._qLockUntil || 0) - Date.now();   // délai de lecture de 3 s : on envoie dès qu'il est écoulé
+  if(wait > 0) {
+    if(!S._qLockQueued) { S._qLockQueued = true; const b = document.getElementById('sub-btn'); if(b) b.textContent = 'Envoi…';
+      S._qLockTimer = setTimeout(() => { S._qLockQueued = false; if(curQuestion() === q) submitAns(); }, wait + 60); }
+    return;
+  }
   const qIdx = q._questionIdx || 0;
   // « Déjà répondu » se juge PAR QUESTION : avant, la campagne entière était marquée dès la question 1, ce qui rendait
   // les questions 2 et 3 impossibles à valider.
@@ -7671,6 +7681,7 @@ function routeAuthState(user) {
     document.querySelectorAll('#onboard .ob-dot').forEach((d,i)=>d.classList.toggle('on',i===0));
     const obBtn=document.getElementById('ob-btn');if(obBtn)obBtn.textContent='Suivant';
     goTo('onboard');
+    trackFunnel('open');
   }
 }
 auth.onAuthStateChanged(user => {
