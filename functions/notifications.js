@@ -25,6 +25,12 @@ const QUIET_FROM = 21 * 60;      // 21h
 const QUIET_TO = 9 * 60;         // 9h
 const DEFAULT_HABIT_MIN = 12 * 60 + 30;
 const DAILY_CAP = 3;             // notifications « normales » par jour (+1 pour un type exceptionnel : série, récompense, code)
+// Plafond GLOBAL (retour des testeurs : 7 notifications dans une journée, c'est trop) : 3 notifications par jour au
+// plus, tous types confondus, sauf les messages privés d'amis (une vraie personne qui écrit). Variété : jamais deux
+// fois le même type le même jour. Une des 3 places est gardée pour une notification qui invite à répondre à une
+// question : les autres types n'en prennent que 2.
+const TOTAL_CAP = 3;
+const NON_QUESTION_MAX = 2;
 // Questions des commerces suivis : compteur à part (l'habitant a choisi de suivre ces commerces), 6 par jour au plus,
 // relance comprise. Elles ne prennent pas les créneaux des autres notifications.
 const SUIVI_CAP = 6;
@@ -237,9 +243,17 @@ async function deliver(uid, type, content, opts = {}) {
     const bucket = bucketOf(cfg), used = nd[bucket] || 0;
     const limit = bucket === "count" ? (cfg.exceptional ? DAILY_CAP + 1 : DAILY_CAP) : cfg.ownCap;
     if (used >= limit) { out = { status: "blocked", reason: "cap" }; return; }
+    let global = {};
+    if (bucket !== "msg") {
+      const total = nd.total || 0, isQ = cfg.group === "question", types = nd.types || [];
+      if (total >= TOTAL_CAP) { out = { status: "blocked", reason: "cap" }; return; }
+      if (types.includes(type)) { out = { status: "skip", reason: "same_type_today" }; return; }
+      if (!isQ && (nd.other || 0) >= NON_QUESTION_MAX) { out = { status: "blocked", reason: "cap" }; return; }
+      global = { total: total + 1, types: [...types, type], ...(isQ ? { q: (nd.q || 0) + 1 } : { other: (nd.other || 0) + 1 }) };
+    }
 
     tx.update(userRef, {
-      notifDaily: { count: 0, suivi: 0, ...nd, date: p.day, [bucket]: used + 1 },
+      notifDaily: { count: 0, suivi: 0, ...nd, date: p.day, [bucket]: used + 1, ...global },
       [`notifStats.${type}.sent`]: FieldValue.increment(1),
       [`notifStats.${type}.lastSentAt`]: now,
       [`notifStats.${type}.lastSentDay`]: p.day,
@@ -256,7 +270,7 @@ async function deliver(uid, type, content, opts = {}) {
     };
     let res = null;
     try { res = await sendPush(uid, out.tokens, payload); } catch (e) { logger.error("sendPush", { message: e.message, type }); }
-    if (!res || res.successCount === 0) await revertSend(uid, type, logId, p.day, bucketOf(cfg)).catch(() => {});
+    if (!res || res.successCount === 0) await revertSend(uid, type, logId, p.day, bucketOf(cfg), cfg.group === "question").catch(() => {});
     return { status: "sent", nid: logId };
   }
   if (out.status === "blocked") {
@@ -276,10 +290,11 @@ async function deliver(uid, type, content, opts = {}) {
 
 // Envoi FCM totalement échoué : on annule la comptabilité (sinon l'habitant serait pénalisé par la
 // décroissance pour une notification qu'il n'a jamais pu recevoir).
-async function revertSend(uid, type, logId, day, bucket = "count") {
+async function revertSend(uid, type, logId, day, bucket = "count", isQ = false) {
   const batch = db().batch();
   batch.update(db().collection("notifLog").doc(logId), { status: "failed" });
-  batch.update(db().collection("users").doc(uid), { [`notifStats.${type}.sent`]: FieldValue.increment(-1), [`notifStats.${type}.lastSentDay`]: "", [`notifDaily.${bucket}`]: FieldValue.increment(-1) });
+  const global = bucket === "msg" ? {} : { "notifDaily.total": FieldValue.increment(-1), "notifDaily.types": FieldValue.arrayRemove(type), [`notifDaily.${isQ ? "q" : "other"}`]: FieldValue.increment(-1) };
+  batch.update(db().collection("users").doc(uid), { [`notifStats.${type}.sent`]: FieldValue.increment(-1), [`notifStats.${type}.lastSentDay`]: "", [`notifDaily.${bucket}`]: FieldValue.increment(-1), ...global });
   batch.set(db().collection("notifMetrics").doc(type), { sent: FieldValue.increment(-1) }, { merge: true });
   await batch.commit();
 }

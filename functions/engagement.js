@@ -11,7 +11,7 @@ const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { getFirestore, Timestamp } = require("firebase-admin/firestore");
 const CFG = require("./engagementConfig");
 const crypto = require("crypto");
-const { sectorCategory, parisDay, campaignQuestions } = require("./lib");
+const { sectorCategory, parisDay, campaignQuestions, isMultiQ } = require("./lib");
 const { applyOverrides } = require("./configStore")._t;
 
 const db = () => getFirestore();
@@ -92,15 +92,16 @@ async function revealCore(uid, data, opts = {}) {
   if (!CFG.REVEAL.FORMATS.includes(def.format)) return { available: false, reason: "format" };
 
   const options = (def.options || []).map(String);
-  const multi = def.multi === true;
+  const multi = isMultiQ(def);
   const myIdxs = chosenIdxs(aSnap.data(), options), myIdx = myIdxs.length ? myIdxs[0] : -1;
   const stats = await loadStats(campaignId, camp);
   const st = stats[`q${qIdx}`] || { n: 0, c: {} };
   const n = st.n || 0, min = CFG.REVEAL.MIN_ANSWERS;
 
   // Mode prédiction : la répartition est retenue jusqu'à ce que l'habitant ait deviné (ou passé).
-  // Pas de prédiction sur une question à 2 réponses possibles (« la plus choisie » y est moins nette).
-  if (!multi && n >= CFG.PREDICTION.MIN_ANSWERS && await maybeOfferPrediction(uid, keyOf(campaignId, qIdx), opts)) {
+  // Aussi sur une question à 2 réponses possibles (désormais presque toutes) : « la plus choisie » se lit en % des
+  // répondants.
+  if (n >= CFG.PREDICTION.MIN_ANSWERS && await maybeOfferPrediction(uid, keyOf(campaignId, qIdx), opts)) {
     return { available: true, myIdx, prediction: { offered: true }, options: options.map((text) => ({ text })) };
   }
   const out = { available: true, myIdx, myIdxs, multi, n, min, options: options.map((text, i) => ({ text })) };

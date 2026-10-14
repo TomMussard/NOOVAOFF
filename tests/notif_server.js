@@ -197,13 +197,22 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     const r1 = await N.deliver('u', 'impact', N.copy.impact({ merchant: 'Le Fournil', text: 'Ouvert plus tôt' }), { key: 'x1', now });
     check('Plafond : une 4e notification NORMALE (pas exceptionnelle) est refusée — 3 normales par jour au maximum', r1.status === 'skip' && r1.reason === 'cap', r1);
     const r2 = await N.deliver('u', 'recompense_debloquee', N.copy.recompense({ reward: 'café', merchant: 'Café', cost: 200 }), { key: 'x2', now });
-    check('Plafond : une notification EXCEPTIONNELLE peut prendre le 4e créneau du jour — jusqu\'à 4 au total', r2.status === 'sent', r2);
-    check('Plafond : 4 envoyées ce jour-là', (await sink('u')).length === 4);
-    const r3 = await N.deliver('u', 'recompense_debloquee', N.copy.recompense({ reward: 'thé', merchant: 'Café', cost: 300 }), { key: 'x3', now: at(D1, '20:31') });
-    check('Plafond : une 5e, même exceptionnelle, est refusée — jamais plus de 4 par jour, reportée au lendemain', r3.status === 'queued', r3);
+    check('Plafond global : 3 par jour au plus, même une notification exceptionnelle attend le lendemain', r2.status === 'queued' && r2.reason === 'cap', r2);
+    check('Plafond : 3 envoyées ce jour-là', (await sink('u')).length === 3);
     await N.drainQueue(at(addDays(D1, 1), '09:00'));
     const s2 = await sink('u');
-    check('Reportée : envoyée le lendemain à 9h (5e au total)', s2.length === 5 && s2[4].ntype === 'recompense_debloquee', s2.map(x => x.ntype));
+    check('Reportée : envoyée le lendemain à 9h', s2.length === 4 && s2[3].ntype === 'recompense_debloquee', s2.map(x => x.ntype));
+    // Une place gardée pour une question, et jamais deux fois le même type le même jour
+    await mkUser('v');
+    const nowV = at(addDays(D1, 1), '15:00');
+    const a1 = await N.deliver('v', 'ami', N.copy.amiRequest({ name: 'Zoé' }), { key: 'v1', now: nowV });
+    const a2 = await N.deliver('v', 'ami', N.copy.amiRequest({ name: 'Léo' }), { key: 'v2', now: nowV });
+    check('Variété : jamais deux fois le même type le même jour', a1.status === 'sent' && a2.status === 'skip', [a1, a2]);
+    const a3 = await N.deliver('v', 'impact', N.copy.impact({ merchant: 'Le Fournil', text: 'Ouvert plus tôt' }), { key: 'v3', now: nowV });
+    const a4 = await N.deliver('v', 'resultat_dispo', N.copy.resultat({ merchant: 'Le Fournil', pct: 60 }), { key: 'v4', now: nowV });
+    check('2 notifications hors question : la 3e place reste gardée pour une question', a3.status === 'sent' && a4.status !== 'sent', [a3, a4]);
+    const a5 = await N.deliver('v', 'question_suivi', N.copy.questionSuivi({ merchant: 'Le Fournil' }), { key: 'v5', now: nowV });
+    check('… et la question passe : 3 au total, dont une qui invite à répondre', a5.status === 'sent' && (await sink('v')).length === 3, a5);
   });
   await T('quiet', async () => {
     await wipe();
@@ -282,18 +291,20 @@ const tick = (day, hm) => N.runTick(at(day, hm));
       await setClock(at(D1, `1${i}:00`));
       await mkCampaign('q' + i, { merchantId: id, merchantName: name, createdAt: Timestamp.fromMillis(at(D1, `1${i}:00`)) });
     }
-    await until(async () => (await sink('F1')).length === 4, 30000);
+    await until(async () => (await db.collection('notifLog').where('uid', '==', 'F1').get()).size >= 1, 30000); await sleep(6000);
     s = await sink('F1');
-    check('Suivi : une notification par question, sans être bloquée par le plafond des 3 notifications normales', s.length === 4 && s.every(x => x.ntype === 'question_suivi'), s.map(x => x.ntype));
+    check('Suivi : 4 commerces posent une question, une seule notification « question suivie » dans la journée (variété, 3 par jour au plus)', s.length === 1 && s.every(x => x.ntype === 'question_suivi'), s.map(x => x.ntype));
     const u = (await db.doc('users/F1').get()).data();
-    check('Suivi : compteur à part, les 3 créneaux normaux restent libres', u.notifDaily.suivi === 4 && (u.notifDaily.count || 0) === 0, u.notifDaily);
+    check('Compteur global du jour : 1 sur 3, comptée comme question', u.notifDaily.total === 1 && u.notifDaily.q === 1, u.notifDaily);
     await tick(D1, '12:30');
     check('Suivi : pas de « question du jour » à heure fixe le jour où ses commerces l\'ont déjà prévenu', (await sink('F1')).filter(x => x.ntype === 'question_du_jour').length === 0);
     check('Ne suit personne : la question du jour à 12h30 reste son rendez-vous', (await sink('F2')).filter(x => x.ntype === 'question_du_jour').length === 1, (await sink('F2')).map(x => x.ntype));
     await tick(D1, '13:00');
     check('Relance : rien avant 3 h', (await sink('F1')).filter(x => x.ntype === 'relance_question').length === 0);
     await tick(D1, '13:15');
-    check('Relance : jamais moins de 2 h après une autre notification de question (doublon)', (await sink('F1')).filter(x => x.ntype === 'relance_question').length === 0);
+    // Les questions de 11h-14h n'ont pas été notifiées (une seule « question suivie » par jour) : la relance de la
+    // question de 10h05 part dès 3 h écoulées.
+    check('Relance : 3 h après la seule question notifiée, restée sans réponse', (await sink('F1')).filter(x => x.ntype === 'relance_question').length === 1);
     await tick(D1, '16:15'); await tick(D1, '17:00');
     s = (await sink('F1')).filter(x => x.ntype === 'relance_question');
     check('Relance : 3 h après la question restée sans réponse, une seule par jour', s.length === 1 && /t'attend/.test(s[0].title), s.map(x => x.title));
@@ -303,7 +314,7 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await db.doc('users/F1').update({ answeredCampaigns: ['q1', 'q2', 'q3', 'q4'] });
     await setClock(at(addDays(D1, 1), '09:30'));
     await mkCampaign('q5', { merchantId: 's1', merchantName: 'Café Plume', createdAt: Timestamp.fromMillis(at(addDays(D1, 1), '09:30')) });
-    await until(async () => (await sink('F1')).filter(x => x.ntype === 'question_suivi').length === 5, 30000);
+    await until(async () => (await sink('F1')).filter(x => x.ntype === 'question_suivi').length === 2, 30000);
     await db.doc('users/F1').update({ answeredCampaigns: ['q1', 'q2', 'q3', 'q4', 'q5'] });
     await tick(addDays(D1, 1), '13:00');
     check('Relance : jamais pour une question déjà répondue', (await sink('F1')).filter(x => x.ntype === 'relance_question').length === 1);
@@ -311,9 +322,9 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     await setClock(at(addDays(D1, 1), '22:10'));
     await mkCampaign('q6', { merchantId: 's2', merchantName: 'Salon Belle', createdAt: Timestamp.fromMillis(at(addDays(D1, 1), '22:10')) });
     await until(async () => (await db.collection('notifQueue').get()).size >= 1, 15000);
-    check('Suivi : question publiée pendant le silence, rien la nuit', (await sink('F1')).filter(x => x.ntype === 'question_suivi').length === 5);
+    check('Suivi : question publiée pendant le silence, rien la nuit', (await sink('F1')).filter(x => x.ntype === 'question_suivi').length === 2);
     await N.drainQueue(at(addDays(D1, 2), '09:00'));
-    check('Suivi : envoyée à 9h le lendemain', (await sink('F1')).filter(x => x.ntype === 'question_suivi').length === 6);
+    check('Suivi : envoyée à 9h le lendemain', (await sink('F1')).filter(x => x.ntype === 'question_suivi').length === 3);
     // Question de NOOVA : tout le monde est prévenu
     await setClock(at(addDays(D1, 2), '11:00'));
     await mkCampaign('qn', { merchantId: null, merchantName: 'NOOVA', postedByNoova: true, createdAt: Timestamp.fromMillis(at(addDays(D1, 2), '11:00')) });
@@ -322,7 +333,7 @@ const tick = (day, hm) => N.runTick(at(day, hm));
     check('Question de NOOVA : notification immédiate pour tous les habitants de la ville', n2.length === 1 && n2[0].title === 'NOOVA vient de poser une question', n2.map(x => x.title));
     // Pas de ralentissement automatique pour les commerces suivis
     await db.doc('users/F1').update({ 'notifStats.question_suivi.missStreak': 9, 'notifStats.question_suivi.weekly': true, 'notifStats.question_suivi.autoOff': true });
-    const r = await N.deliver('F1', 'question_suivi', N.copy.questionSuivi({ merchant: 'Le Zinc' }), { key: 'zz', now: at(addDays(D1, 2), '12:00') });
+    const r = await N.deliver('F1', 'question_suivi', N.copy.questionSuivi({ merchant: 'Le Zinc' }), { key: 'zz', now: at(addDays(D1, 3), '12:00') });
     check('Suivi : jamais coupée automatiquement (l\'habitant a choisi de suivre ce commerce)', r.status === 'sent', r);
   });
 
