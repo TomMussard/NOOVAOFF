@@ -623,8 +623,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .ans-ta::placeholder{color:var(--ink3)}
 .char-ct{font-size:var(--fs-1);color:var(--ink3);text-align:right}
 .mcq-list{display:flex;flex-direction:column;gap:8px}
-.mcq-hint{font-size:var(--fs-2);font-weight:700;color:var(--text-2);margin-bottom:var(--s2)}
-.mcq-list.multi .mcq-ck{border-radius:var(--r-xs)}
 .mcq-opt{padding:16px;border-radius:var(--r-md);background:var(--surface);border:1.5px solid var(--line-strong);cursor:pointer;font-size:var(--fs-4);font-weight:500;color:var(--ink);transition:all .13s;display:flex;align-items:center;gap:13px}
 .mcq-opt.sel{border-color:var(--ink);background:var(--surface-2);color:var(--ink);font-weight:700}
 .mcq-ck{width:22px;height:22px;border-radius:var(--r-pill);border:2px solid var(--text-3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0;transition:all .13s}
@@ -777,6 +775,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 #rewards-sheet .rw-cats{padding:0;margin:var(--s3) 0}
 .rw-cat{flex-shrink:0;min-height:36px;padding:0 var(--s4);border-radius:var(--r-pill);border:1px solid var(--trait);background:var(--surface);color:var(--text);font:inherit;font-size:var(--fs-2);font-weight:700;cursor:pointer;white-space:nowrap}
 .rw-cat[aria-pressed="true"]{background:var(--bandeau);color:var(--jaune);border-color:var(--bandeau)}
+.hm-filt-n{font-weight:600;opacity:.75;margin-left:2px}
+.hq-left{font-size:var(--fs-1);font-weight:700;color:inherit;opacity:.8;margin:calc(-1 * var(--s2)) 0 var(--s4)}
+.bh-left{font-weight:700}
+#hm-filters{margin:0 0 var(--s3)}
 .rw-cat small{font-weight:600;opacity:.7;margin-left:4px}
 .rw-only{display:flex;align-items:center;gap:var(--s2);font-size:var(--fs-2);color:var(--text);margin:0 0 var(--s4);cursor:pointer}
 .rw-only input{width:18px;height:18px;accent-color:var(--bandeau)}
@@ -1774,6 +1776,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
     <div class="hm-page" id="hm-q" role="tabpanel" aria-labelledby="hm-tab-q">
     <div id="home-state" style="display:none;margin:0 22px 14px"></div>
     <div id="home-requests"></div>
+      <div class="rw-cats" id="hm-filters" role="group" aria-label="Filtrer les questions par type de commerce" hidden></div>
       <div class="hm-feed" id="hm-feed-q"></div>
       <!-- Sous toutes les questions : les commerces à deux pas -->
     <div class="dsec-row"><div class="dsec-title">À deux pas</div><div class="dsec-link" onclick="openFullMap()">Voir la carte</div></div>
@@ -1847,6 +1850,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
         <div style="flex:1;min-width:0">
           <div class="bh-name" id="bh-name">Commerce</div>
           <div class="bh-usage" id="bh-usage"></div>
+          <div class="bh-usage bh-left" id="bh-left" hidden></div>
         </div>
         <div class="bh-tag" id="bh-tag" style="background:var(--cd);color:var(--ink)">Manger &amp; boire</div>
         <div style="color:var(--ink3);font-size:var(--fs-5);margin-left:2px;flex-shrink:0">›</div>
@@ -2828,14 +2832,25 @@ function homeTab(t){
   ['q','noova'].forEach(k=>{const b=document.getElementById('hm-tab-'+k),pg=document.getElementById('hm-'+k);if(!b||!pg)return;
     b.classList.toggle('on',k===t);b.setAttribute('aria-selected',String(k===t));pg.hidden=k!==t;});
 }
+// Temps restant d'une question (retour des testeurs) : rien si le commerce n'a pas fixé de fin.
+function timeLeftTxt(ms){
+  if(!ms)return '';
+  const left=ms-Date.now();if(left<=0)return 'Se termine bientôt';
+  const h=Math.ceil(left/3600000);
+  if(h<=1)return 'Se termine dans moins d\'une heure';
+  if(h<24)return `Encore ${h} h pour répondre`;
+  const d=Math.floor(left/86400000);
+  return d<=1?'Encore 1 jour pour répondre':`Encore ${d} jours pour répondre`;
+}
 function hqCardHTML(q,i,hero){
+  const left=timeLeftTxt(q._endsMs),leftHTML=left?`<div class="hq-left">${esc(left)}</div>`:'';
   const img=q.photoUrl&&!q._byNoova?`<img src="${esc(q.photoUrl)}" alt="" loading="lazy" onerror="this.remove()">`:'';
   // Commerce pas encore suivi : on voit sa question, mais on choisit d'abord de le suivre (et de répondre) ou non.
   if(q._discovery&&!q._byNoova){
     return `<div class="hq-card disc" role="group" aria-label="Découverte : ${esc(q.brand)}, commerce que tu ne suis pas encore">`
       +`<div class="hq-ph">${img}<div class="hq-who">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}</span>${testTagHTML(q._isTest)}</div></div>`
       +`<span class="hq-disc-tag">Découverte</span>`
-      +`<div class="hq-bd"><div class="hq-disc-l">${esc(q.theme||'Commerce')} · tu ne le suis pas encore</div><div class="hq-q">${esc(q.q)}</div>`
+      +`<div class="hq-bd"><div class="hq-disc-l">${esc(q.theme||'Commerce')} · tu ne le suis pas encore</div><div class="hq-q">${esc(q.q)}</div>${leftHTML}`
       +`<div class="hq-gate"><div class="hq-gate-t">Tu veux suivre ${esc(q.brand)} et répondre à ses questions ?</div>`
       +`<div class="hq-gate-b"><button type="button" class="hq-cta" onclick="followAndAnswer(${jsa(q._merchantId)},${jsa(q._firestoreId)})">Oui, suivre et répondre</button>`
       +`<button type="button" class="hq-no" onclick="notInterested(${jsa(q._merchantId)},${jsa(q.brand)})">Pas intéressé</button></div>`
@@ -2844,13 +2859,50 @@ function hqCardHTML(q,i,hero){
   return `<button type="button" class="hq-card${hero?' hero':''}${q._byNoova?' noova':''}" onclick="openQ(${i})" aria-label="${esc(q.brand)} : ${esc(q.q)}, ${esc(ptsTag(q))}">`
     +`<div class="hq-ph">${img}<div class="hq-who">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}</span>${testTagHTML(q._isTest)}</div></div>`
     +`<span class="hq-tag">${esc(ptsTag(q))}</span>`
-    +`<div class="hq-bd"><img class="mark" src="logo-mark-white.svg" alt="" aria-hidden="true"><div class="hq-q">${esc(q.q)}</div><span class="hq-cta">Répondre en 30 secondes</span></div></button>`;
+    +`<div class="hq-bd"><img class="mark" src="logo-mark-white.svg" alt="" aria-hidden="true"><div class="hq-q">${esc(q.q)}</div>${leftHTML}<span class="hq-cta">Répondre en 30 secondes</span></div></button>`;
+}
+// Filtres de l'accueil (retour des testeurs : « je veux aider les bars pour avoir des avantages là-bas ») : par type de
+// commerce, plus fin que les centres d'intérêt. Seuls les types qui ont des questions en ce moment sont proposés ; le
+// choix est retenu sur cet appareil (simple confort).
+const FEED_TYPES=[
+  ['bars','Bars et cafés',/\bbar\b|cafe|bistro|brasserie|\bpub\b|salon de the/],
+  ['resto','Restaurants',/restau|pizz|kebab|snack|burger|sushi|japonais|creper|traiteur|cantine/],
+  ['douceurs','Boulangeries et douceurs',/boulang|patiss|chocolat|viennois|glacier/],
+  ['courses','Courses et épicerie',/superette|supermarch|epicer|primeur|fromag|bouch|charcut|caviste|marche|biocoop|\bbio\b/],
+  ['beaute','Beauté et coiffure',/beaut|coiff|barbier|ongl|institut|esthet|\bspa\b/],
+  ['sport','Sport',/sport|fitness|gym|yoga|pilates|velo|cycl/],
+  ['loisirs','Culture et loisirs',/cultur|librair|cinema|musee|musique|disqu|jeux|ludo/],
+  ['services','Services',/service|pressing|cordonn|laverie|retouche|mairie/],
+  ['boutiques','Boutiques',/./],
+];
+function feedType(sec){
+  const x=(sec||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  return (FEED_TYPES.find(t=>t[2].test(x))||FEED_TYPES[FEED_TYPES.length-1])[0];
+}
+let _feedType=(()=>{try{return localStorage.getItem('nv_feed_type')||'all';}catch(e){return 'all';}})();
+function setFeedType(t){
+  _feedType=t;try{localStorage.setItem('nv_feed_type',t);}catch(e){}
+  renderHomeFeed();
 }
 function renderHomeFeed(){
   const qs=(S.qs||[]).map((q,i)=>({q,i}));
-  const shop=qs.filter(x=>!x.q._byNoova),noova=qs.filter(x=>x.q._byNoova);
+  const allShop=qs.filter(x=>!x.q._byNoova),noova=qs.filter(x=>x.q._byNoova);
   const fq=document.getElementById('hm-feed-q'),fn=document.getElementById('hm-feed-noova');if(!fq||!fn)return;
-  fq.innerHTML=shop.map((x,k)=>hqCardHTML(x.q,x.i,k===0)).join('')||(S.qs&&S.qs.length?'<div class="hm-empty">Tu as répondu à toutes les questions des commerces. Il en arrive de nouvelles chaque jour.</div>':'');
+  // Filtres : un type par commerce (secteur), proposés seulement s'il y en a au moins deux.
+  const typeOf=x=>feedType(x.q.theme||x.q.sector),present={};
+  allShop.forEach(x=>{const t=typeOf(x);present[t]=(present[t]||0)+1;});
+  const types=FEED_TYPES.filter(t=>present[t[0]]);
+  const fl=document.getElementById('hm-filters');
+  if(fl){
+    fl.hidden=types.length<2&&_feedType==='all';
+    fl.innerHTML=[['all','Tout',allShop.length],...types.map(t=>[t[0],t[1],present[t[0]]])]
+      .map(([k,l,n])=>`<button type="button" class="rw-cat" aria-pressed="${_feedType===k}" aria-label="${esc(l)} : ${n} question${n>1?'s':''}" onclick="setFeedType(${jsa(k)})">${esc(l)} <span class="hm-filt-n">${n}</span></button>`).join('');
+  }
+  const shop=_feedType==='all'?allShop:allShop.filter(x=>typeOf(x)===_feedType);
+  const label=(FEED_TYPES.find(t=>t[0]===_feedType)||[])[1];
+  fq.innerHTML=shop.map((x,k)=>hqCardHTML(x.q,x.i,k===0)).join('')
+    ||(_feedType!=='all'&&allShop.length?`<div class="hm-empty">Plus de question « ${esc(label||'')} » pour l'instant. Il en arrive de nouvelles chaque jour.<br><button type="button" class="hq-no" style="margin-top:var(--s3)" onclick="setFeedType('all')">Voir toutes les questions</button></div>`
+    :(S.qs&&S.qs.length?'<div class="hm-empty">Tu as répondu à toutes les questions des commerces. Il en arrive de nouvelles chaque jour.</div>':''));
   fn.innerHTML=noova.map(x=>hqCardHTML(x.q,x.i,false)).join('')||'<div class="hm-empty">Pas de question de NOOVA en ce moment. Reviens bientôt.</div>';
   const nq=document.getElementById('hm-n-q'),nn=document.getElementById('hm-n-noova');
   if(nq)nq.textContent=shop.length?String(shop.length):'';if(nn)nn.textContent=noova.length?String(noova.length):'';
@@ -2896,6 +2948,7 @@ function openQ(idx){
   setQPtsTag(q);
   {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}document.getElementById('bh-name').innerHTML=esc(q.brand)+testTagHTML(q._isTest);
   document.getElementById('bh-usage').textContent=q.usage||'Ta réponse aidera '+q.brand+'.';
+  {const lt=document.getElementById('bh-left'),t=timeLeftTxt(q._endsMs);lt.textContent=t;lt.hidden=!t;}
   document.getElementById('bh-tag').textContent=q.theme;document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||defaultHint(q.type);
   document.getElementById('sub-btn').disabled=true;buildAns(q);goTo('question');
 }
@@ -2908,9 +2961,9 @@ function buildAns(q){
     el.appendChild(ta);el.appendChild(cc);
   }else if(q.type==='mcq'){
     const ul=document.createElement('div');ul.className='mcq-list'+(q.multi?' multi':'');
-    // « 2 réponses possibles » : on coche 1 ou 2 options ; une 3e remplace la plus ancienne.
+    // 2 réponses possibles (toute question d'au moins 3 options, cf. isMultiQ) : on coche 1 ou 2 options, une 3e
+    // remplace la plus ancienne. Volontairement rien ne l'annonce (décision produit).
     let picked=[];
-    if(q.multi){const h=document.createElement('div');h.className='mcq-hint';h.textContent='Jusqu\'à 2 réponses';el.appendChild(h);}
     (q.opts||[]).forEach(opt=>{
       const d=document.createElement('div');d.className='mcq-opt';d.innerHTML=`<div class="mcq-ck"></div><span>${esc(opt)}</span>`;
       d.setAttribute('role',q.multi?'checkbox':'radio');d.setAttribute('aria-checked','false');d.tabIndex=0;
@@ -4484,6 +4537,7 @@ function fillQuestion(q,opts){
   {const bl=document.getElementById('bh-logo');bl.style.background='transparent';bl.style.padding='0';bl.innerHTML=logoHTML(q.brand,50,q.logoUrl);}
   document.getElementById('bh-name').innerHTML=esc(q.brand)+testTagHTML(q._isTest);
   document.getElementById('bh-usage').textContent=q.usage||('Ta réponse aide '+q.brand+'.');
+  {const lt=document.getElementById('bh-left'),t=timeLeftTxt(q._endsMs);if(lt){lt.textContent=t;lt.hidden=!t;}}
   document.getElementById('bh-tag').textContent=q.theme||'';
   document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||defaultHint(q.type);
   const sk=document.getElementById('skip-btn');if(sk){sk.textContent=opts.skipLabel;sk.setAttribute('onclick',opts.skipFn);}
@@ -4736,8 +4790,8 @@ function startCampaignById(campId, followed) {
     // Mêmes données que sur l'accueil : options PROPRES à chaque question, et questions 2 et 3 à la suite (avant : options de la
     // campagne entière et questions suivantes perdues quand on démarrait depuis la page du commerce).
     const allQs=getCampaignQuestions(d);
-    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:ENGAGEMENT.PTS_PER_ANSWER,type:allQs[0].format||d.format||'text',q:allQs[0].q||d.question,multi:(allQs[0].format||d.format)==='mcq'&&allQs[0].multi===true,hint:'',opts:allQs[0].options||[],items:allQs[0].options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce'),_surveyCount:allQs.length,
-      survey:allQs.slice(1).map((sq,idx)=>({_firestoreId:doc.id,_merchantId:d.merchantId||null,_questionIdx:idx+1,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',theme:d.sector||'Commerce local',pts:ENGAGEMENT.PTS_PER_ANSWER,type:sq.format||'text',q:sq.q,multi:sq.format==='mcq'&&sq.multi===true,hint:'',opts:sq.options||[],items:sq.options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce')}))};
+    const q={_firestoreId:doc.id,_merchantId:d.merchantId,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',pts:ENGAGEMENT.PTS_PER_ANSWER,type:allQs[0].format||d.format||'text',q:allQs[0].q||d.question,multi:isMultiQ({format:allQs[0].format||d.format,options:allQs[0].options||d.options,multi:allQs[0].multi}),hint:'',opts:allQs[0].options||[],items:allQs[0].options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce'),_surveyCount:allQs.length,_endsMs:(d.endsAt&&d.endsAt.toMillis?d.endsAt.toMillis():0),
+      survey:allQs.slice(1).map((sq,idx)=>({_firestoreId:doc.id,_merchantId:d.merchantId||null,_questionIdx:idx+1,brand:d.merchantName||'Commerce',ico:d.brandEmoji||'🏪',theme:d.sector||'Commerce local',pts:ENGAGEMENT.PTS_PER_ANSWER,type:sq.format||'text',q:sq.q,multi:isMultiQ(sq),hint:'',opts:sq.options||[],items:sq.options||[],usage:'Ta réponse aide '+(d.merchantName||'ce commerce')}))};
     S.mode='hook';S.curQ=q;
     const pg=document.getElementById('q-prog');pg.innerHTML='';
     const seg=document.createElement('div');seg.className='q-seg cur';pg.appendChild(seg);
@@ -5438,6 +5492,8 @@ const callBeginQuestion = fx.httpsCallable('beginQuestion');
 // beginQuestion : impossible à contourner). Rien ne s'affiche (une barre qui se vide stressait les testeurs) : si on
 // valide plus tôt, la réponse part toute seule à la fin du délai.
 const ANSWER_LOCK_MS = 3000;
+// Même règle que le serveur (functions/lib.js isMultiQ) : 2 réponses possibles dès 3 options, sauf multi: false.
+function isMultiQ(q){ return !!q && q.format === 'mcq' && q.multi !== false && Array.isArray(q.options) && q.options.length >= 3; }
 function startAnswerLock(){
   S._qLockUntil = Date.now() + ANSWER_LOCK_MS;
   clearTimeout(S._qLockTimer); S._qLockQueued = false;
@@ -7169,9 +7225,9 @@ function recomputeCampaignFeed(city) {
         _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: idx + 1, _byNoova: noovaLike,
         brand: brandName, ico: d.brandEmoji || (byNoova ? '✨' : '🏪'),
         theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: noovaLike ? 0 : ENGAGEMENT.PTS_PER_ANSWER,
-        type: sq.format || 'text', q: sq.q, hint: '', multi: sq.format === 'mcq' && sq.multi === true,
+        type: sq.format || 'text', q: sq.q, hint: '', multi: isMultiQ(sq),
         opts: sq.options || [], items: sq.options || [],
-        usage: usageTxt
+        usage: usageTxt, _endsMs: (d.endsAt && d.endsAt.toMillis ? d.endsAt.toMillis() : 0)
       }));
       const built = {
         _firestoreId: id, _merchantId: d.merchantId || null, _questionIdx: 0, _byNoova: noovaLike,
@@ -7181,10 +7237,11 @@ function recomputeCampaignFeed(city) {
         photoUrl: merchantData ? merchantData.coverUrl || null : null, logoUrl: merchantData ? merchantData.logoUrl || null : null,
         _discovery: !followed, _reason: discoveryReason || (isFallbackOnly ? 'fallback' : ''), _strict: (merchantData && interestMatch(merchantData)) ? 1 : 0, _followed: followed ? 1 : 0,
         _createdMs: (d.createdAt && d.createdAt.toMillis ? d.createdAt.toMillis() : 0),
+        _endsMs: (d.endsAt && d.endsAt.toMillis ? d.endsAt.toMillis() : 0),
         theme: d.sector || (byNoova ? 'NOOVA' : 'Commerce local'), pts: noovaLike ? 0 : 10,
         type: allQs[0].format || d.format || 'text',
         q: allQs[0].q || d.question, hint: '',
-        opts: allQs[0].options || d.options || [], items: allQs[0].options || d.options || [], multi: (allQs[0].format || d.format) === 'mcq' && allQs[0].multi === true,
+        opts: allQs[0].options || d.options || [], items: allQs[0].options || d.options || [], multi: isMultiQ({ format: allQs[0].format || d.format, options: allQs[0].options || d.options, multi: allQs[0].multi }),
         usage: usageTxt,
         survey: surveyList
       };

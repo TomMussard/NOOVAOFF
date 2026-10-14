@@ -47,7 +47,7 @@ Object.assign(exports, (({ _t, ...fns }) => fns)(require("./mailer")));
 const CFG = require("./engagementConfig");
 // Choix multiple « plusieurs réponses possibles » : 2 au plus (au-delà, les statistiques ne veulent plus rien dire).
 const MCQ_MULTI_MAX = 2;
-const { sectorCategory, parisDay, ADMIN_EMAILS, campaignQuestions } = require("./lib");
+const { sectorCategory, parisDay, ADMIN_EMAILS, campaignQuestions, isMultiQ } = require("./lib");
 const NOOVS_PER_ANSWER = CFG.POINTS.NOOVS_PER_ANSWER;
 const MAX_POINT_ANSWERS_PER_DAY = CFG.POINTS.MAX_ANSWERS_PER_DAY;
 const MIN_ANSWER_MS = CFG.RESPONSE_TIME.MIN_FOR_GAIN_MS;
@@ -168,7 +168,7 @@ exports.submitAnswer = onCall(async (request) => {
       const opts = Array.isArray(qd.options) ? qd.options.map(String) : [];
       let ok = true;
       // Choix multiple « 2 réponses possibles » (multi) : 1 ou 2 options différentes de la liste, jamais plus.
-      if (qd.format === "mcq" && qd.multi === true) {
+      if (isMultiQ(qd)) {
         const list = Array.isArray(answerValue) ? answerValue.map(String) : (answerValue == null ? [] : [String(answerValue)]);
         ok = list.length >= 1 && list.length <= MCQ_MULTI_MAX && new Set(list).size === list.length && list.every((x) => opts.includes(x));
       } else if (Array.isArray(answerValue)) ok = false;
@@ -267,7 +267,7 @@ exports.submitAnswer = onCall(async (request) => {
 
     // Reveal : index de l'option choisie (question à choix) ; le texte reste la référence stockée.
     const qDef = campaignQuestions(camp)[qIdx] || { format: camp.format, options: camp.options };
-    const multi = qDef.format === "mcq" && qDef.multi === true;
+    const multi = isMultiQ(qDef);
     // Réponses choisies (une seule, ou 1 à 2 pour « 2 réponses possibles »), dans l'ordre de la liste du commerçant.
     const chosen = multi ? (Array.isArray(answerValue) ? answerValue : [answerValue]).map(String) : [answerValue != null ? String(answerValue) : ""];
     const optionIdxs = (qDef.format === "mcq" && Array.isArray(qDef.options)) ? qDef.options.map(String).map((o, i) => (chosen.includes(o) ? i : -1)).filter((i) => i >= 0) : [];

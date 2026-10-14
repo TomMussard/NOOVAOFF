@@ -61,6 +61,8 @@ const day=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});
     const ok=await until(async()=>(await sink('ana')).some(x=>x.ntype==='reaction'));
     const l=(await sink('ana')).find(x=>x.ntype==='reaction'&&/aimé/.test(x.title))||{};
     check('J\'aime : « Ben a aimé ta publication »',ok&&l.title==='Ben a aimé ta publication'&&/palier Actif/.test(l.body),l);
+    // Une seule réaction par jour (3 notifications par jour au plus, jamais deux fois le même type) : on passe au lendemain.
+    await db.doc('users/ana').update({notifDaily:{date:'2000-01-01'}});
     await createTs(B,'communityEvents/ev1/comments/c1',{userId:'ben',name:'Ben',text:'Bravo !'});
     await until(async()=>(await sink('ana')).filter(x=>x.ntype==='reaction').length===2);
     const c=(await sink('ana')).find(x=>x.ntype==='reaction'&&/commenté/.test(x.title))||{};

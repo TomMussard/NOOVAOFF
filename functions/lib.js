@@ -43,4 +43,9 @@ function campaignQuestions(camp) {
   first.options = o;
   return qs;
 }
-module.exports = { sectorCategory, parisDay, ADMIN_EMAILS, isAdminToken, isAdminRequest, campaignQuestions };
+// Choix multiple : 2 réponses possibles pour TOUTE question à choix d'au moins 3 options (décision produit : un avis
+// tient rarement en une seule case, ex. « le résultat ET le prix » chez le coiffeur). Une question à 2 options (oui /
+// non) reste à une réponse ; multi: false force une seule réponse. Rien ne l'annonce à l'habitant dans l'app.
+const isMultiQ = (q) => !!q && q.format === "mcq" && q.multi !== false && Array.isArray(q.options) && q.options.length >= 3;
+
+module.exports = { sectorCategory, parisDay, ADMIN_EMAILS, isAdminToken, isAdminRequest, campaignQuestions, isMultiQ };
