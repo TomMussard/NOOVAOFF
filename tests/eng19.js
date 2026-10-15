@@ -65,7 +65,7 @@ const H=3600000;
     const q=await p.evaluate(()=>({pop:document.getElementById('nv-pop').style.display,txt:document.getElementById('q-text').textContent,opts:document.querySelectorAll('#ans-area .mcq-opt').length,note:document.getElementById('q-disc-note').textContent,noteShown:document.getElementById('q-disc-note').style.display!=='none',badge:!!document.querySelector('#bh-name .bh-disc'),follow:document.getElementById('q-follow').hidden?'':document.getElementById('q-follow').textContent,skip:document.getElementById('skip-btn').textContent,sub:document.getElementById('sub-btn').textContent}));
     check('La question et ses réponses sont visibles tout de suite, sans pop-up qui les cache',q.pop!=='flex'&&/Studio Fit/.test(q.txt)&&q.opts===2,q);
     check('Bulle « Découverte » et explication : répondre = suivre, « Passer » = ne plus voir ses questions',q.badge&&q.noteShown&&/En répondant, tu le suis/.test(q.note)&&/« Passer » : tu ne verras plus ses questions/.test(q.note),q.note);
-    check('3 boutons : « Valider » (grand), « Passer », « Suivre Studio Fit sans répondre »',/Valider/.test(q.sub)&&q.skip==='Passer'&&q.follow==='Suivre Studio Fit sans répondre',q);
+    check('3 boutons : « Valider » (grand, verrouillé 3 s le temps de lire), « Passer », « Suivre Studio Fit sans répondre »',/Valider|Prends le temps de lire/.test(q.sub)&&q.skip==='Passer'&&q.follow==='Suivre Studio Fit sans répondre',q);
     await p.screenshot({path:(process.env.SHOTS_DIR||'/tmp/shots')+'/disc_question.png'}).catch(()=>{});
     await p.evaluate(()=>document.getElementById('q-follow').click());
     await until(async()=>((await db.doc('users/me').get()).data().authorizedMerchants||[]).includes('m2'));await sleep(400);
