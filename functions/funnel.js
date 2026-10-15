@@ -39,4 +39,16 @@ const funnelSignup = onDocumentCreated({ document: "users/{uid}", region: "europ
   await bump("signup_done");
 });
 
-module.exports = { trackFunnel, funnelSignup, _t: { bump, STEPS } };
+// Erreurs d'inscription / de connexion vues par les habitants (retour : « des personnes ont des messages d'erreur ») :
+// code d'erreur, étape et type d'appareil seulement — jamais l'e-mail ni le mot de passe. Lues dans l'admin (Statistiques).
+const ERR_WHERE = ["register", "login", "google", "apple", "profile", "reset"];
+const logClientError = onCall({ region: "europe-west1", maxInstances: 5 }, async (request) => {
+  const d = request.data || {};
+  const where = ERR_WHERE.includes(d.where) ? d.where : "other";
+  const code = String(d.code || "inconnu").replace(/[^a-z0-9/_.-]/gi, "").slice(0, 60) || "inconnu";
+  const device = ["android", "ios", "desktop"].includes(d.device) ? d.device : "autre";
+  await db().collection("clientErrors").add({ where, code, device, inApp: !!d.inApp, standalone: !!d.standalone, day: parisDay(Date.now()), at: FieldValue.serverTimestamp() });
+  return { ok: true };
+});
+
+module.exports = { trackFunnel, funnelSignup, logClientError, _t: { bump, STEPS } };

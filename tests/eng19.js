@@ -51,46 +51,65 @@ const H=3600000;
   await p.addStyleTag({content:'body>div[style*="emulator"]{display:none!important}'});await sleep(800);
   await p.evaluate(()=>{document.querySelectorAll('[id*=tour],.tour-ov').forEach(e=>e.remove());});
 
-  await T7('accueil : commerces à découvrir, choix avant de répondre',async()=>{
+  await T7('accueil : questions suivies d\'abord, puis découvertes',async()=>{
     await p.evaluate(()=>{goNav('home');refreshHome();});await sleep(600);
-    const f=await p.evaluate(()=>({order:S.qs.map(q=>q._merchantId+':'+(q._discovery?'D':'F')),disc:[...document.querySelectorAll('#hm-feed-q .hq-card.disc')].map(c=>({tag:(c.querySelector('.hq-disc-tag')||{}).textContent,txt:c.textContent.replace(/\s+/g,' '),btns:[...c.querySelectorAll('button:not(.hq-who-btn)')].map(b=>b.textContent),border:getComputedStyle(c.querySelector('.hq-bd')).borderLeftStyle})),fol:[...document.querySelectorAll('#hm-feed-q .hq-card:not(.disc)')].map(c=>c.tagName)}));
-    check('Le commerce suivi d\'abord (Le Bar), puis chaque commerce de la ville pas encore suivi, une seule carte par commerce (Studio Fit, Le Fournil) ; jamais le commerce écarté, ni un commerce non vérifié ou d\'une autre ville',f.order.join()==='m3:F,m2:D,m1:D',f.order);
-    check('Carte « Découverte » distincte : pastille, « tu ne le suis pas encore », bordure en pointillés',f.disc.length===2&&f.disc.every(d=>d.tag==='Découverte'&&/tu ne le suis pas encore/.test(d.txt)&&d.border==='dashed'),f.disc);
-    check('Avant de répondre : « Tu veux suivre … et répondre à ses questions ? » avec « Oui, suivre et répondre » / « Pas intéressé », sans bouton pour répondre directement',f.disc.every(d=>/Tu veux suivre .+ et répondre à ses questions/.test(d.txt)&&d.btns.join('|')==='Oui, suivre et répondre|Pas intéressé'&&!/Répondre en 30 secondes/.test(d.txt)),f.disc.map(d=>d.btns));
-    check('La question du commerce suivi s\'ouvre directement (carte-bouton)',f.fol.length===1&&f.fol[0]==='BUTTON',f.fol);
-    await p.evaluate(()=>document.querySelector('#hm-feed-q .hq-card.disc').scrollIntoView());await sleep(300);await p.screenshot({path:(process.env.SHOTS_DIR||'/tmp/shots')+'/disc_home.png'});await axeCheck(p,'accueil avec commerces à découvrir');
+    const f=await p.evaluate(()=>({order:S.qs.map(q=>q._merchantId+':'+(q._discovery?'D':'F')),disc:[...document.querySelectorAll('#hm-feed-q .hq-card.disc')].map(c=>({tag:c.tagName,lbl:(c.querySelector('.hq-disc-tag')||{}).textContent,txt:c.textContent.replace(/\s+/g,' '),border:getComputedStyle(c.querySelector('.hq-bd')).borderStyle}))}));
+    check('Ordre : toutes les questions des commerces suivis (Le Bar), puis les commerces ni suivis ni écartés (Studio Fit, Le Fournil) ; jamais l\'écarté, le non vérifié ou une autre ville',f.order.join()==='m3:F,m2:D,m1:D',f.order);
+    check('Carte « Découverte » : une carte qui ouvre la question (plus de pop-up ni de boutons sur la carte), pastille, pointillés',f.disc.length===2&&f.disc.every(d=>d.tag==='BUTTON'&&d.lbl==='Découverte'&&/tu ne le suis pas encore/.test(d.txt)&&/dashed/.test(d.border)),f.disc);
+    await p.screenshot({path:(process.env.SHOTS_DIR||'/tmp/shots')+'/disc_home.png'}).catch(()=>{});await axeCheck(p,'accueil avec commerces à découvrir');
   });
 
-  await T7('« Oui, suivre et répondre »',async()=>{
-    await p.evaluate(()=>{const c=[...document.querySelectorAll('#hm-feed-q .hq-card.disc')].find(x=>/Studio Fit/.test(x.textContent));c.querySelector('.hq-cta').click();});
-    await until(async()=>((await db.doc('users/me').get()).data().authorizedMerchants||[]).includes('m2'));
+  await T7('écran de la question découverte : Valider / Passer / Suivre',async()=>{
+    await p.evaluate(()=>[...document.querySelectorAll('#hm-feed-q .hq-card.disc')].find(x=>/Studio Fit/.test(x.textContent)).click());
     await wf(p,()=>document.getElementById('question').classList.contains('active')&&S.curQ&&S.curQ._firestoreId==='cS',null,10000);
+    const q=await p.evaluate(()=>({pop:document.getElementById('nv-pop').style.display,txt:document.getElementById('q-text').textContent,opts:document.querySelectorAll('#ans-area .mcq-opt').length,note:document.getElementById('q-disc-note').textContent,noteShown:document.getElementById('q-disc-note').style.display!=='none',badge:!!document.querySelector('#bh-name .bh-disc'),follow:document.getElementById('q-follow').hidden?'':document.getElementById('q-follow').textContent,skip:document.getElementById('skip-btn').textContent,sub:document.getElementById('sub-btn').textContent}));
+    check('La question et ses réponses sont visibles tout de suite, sans pop-up qui les cache',q.pop!=='flex'&&/Studio Fit/.test(q.txt)&&q.opts===2,q);
+    check('Bulle « Découverte » et explication : répondre = suivre, « Passer » = ne plus voir ses questions',q.badge&&q.noteShown&&/En répondant, tu le suis/.test(q.note)&&/« Passer » : tu ne verras plus ses questions/.test(q.note),q.note);
+    check('3 boutons : « Valider » (grand), « Passer », « Suivre Studio Fit sans répondre »',/Valider/.test(q.sub)&&q.skip==='Passer'&&q.follow==='Suivre Studio Fit sans répondre',q);
+    await p.screenshot({path:(process.env.SHOTS_DIR||'/tmp/shots')+'/disc_question.png'}).catch(()=>{});
+    await p.evaluate(()=>document.getElementById('q-follow').click());
+    await until(async()=>((await db.doc('users/me').get()).data().authorizedMerchants||[]).includes('m2'));await sleep(400);
     const ev=(await db.collection('consentEvents').where('userId','==','me').get()).docs.map(d=>d.data().merchantId+':'+d.data().action);
-    check('Le commerce est suivi (consentement journalisé) et sa question s\'ouvre aussitôt',ev.includes('m2:granted'),ev);
-    await p.evaluate(()=>document.querySelector('#ans-area .mcq-opt').click());await sleep(3600);await p.evaluate(()=>submitAns());
+    const st=await p.evaluate(()=>({f:document.getElementById('q-follow').textContent,dis:document.getElementById('q-follow').disabled,q:cur==='question'&&S.curQ._firestoreId==='cS',badge:!!document.querySelector('#bh-name .bh-disc')}));
+    check('« Suivre » : commerce autorisé (consentement journalisé), on reste sur la question, « Tu suis Studio Fit ✓ »',ev.includes('m2:granted')&&st.q&&st.dis&&st.f==='Tu suis Studio Fit ✓'&&!st.badge,{ev,st});
+    await p.evaluate(()=>document.querySelector('#ans-area .mcq-opt').click());await sleep(3400);await p.evaluate(()=>submitAns());
     await until(async()=>(await db.doc('answers/me_cS_q0').get()).exists);
     const ans=(await db.doc('answers/me_cS_q0').get()).data();
-    check('Réponse complète (commerce suivi) : tranche d\'âge et centres d\'intérêt, non marquée « découverte »',ans.discovery===false&&ans.respondentAge==='18-24',ans);
-    await p.evaluate(()=>goNav('home'));await sleep(800);
-    check('Studio Fit n\'est plus une découverte',await p.evaluate(()=>!S.qs.some(q=>q._merchantId==='m2'&&q._discovery)));
+    check('Réponse complète (commerce suivi) : tranche d\'âge, non marquée « découverte »',ans.discovery===false&&ans.respondentAge==='18-24',ans);
   });
 
-  await T7('« Pas intéressé »',async()=>{
-    await p.evaluate(()=>{const c=[...document.querySelectorAll('#hm-feed-q .hq-card.disc')].find(x=>/Le Fournil/.test(x.textContent));c.querySelector('.hq-no').click();});
-    await until(async()=>((await db.doc('users/me').get()).data().declinedMerchants||[]).includes('m1'));
-    await sleep(500);
+  await T7('« Passer » sur une découverte = ne plus voir ce commerce',async()=>{
+    await p.evaluate(()=>goNav('home'));await sleep(800);
+    await p.evaluate(()=>openQ(S.qs.findIndex(q=>q._merchantId==='m1')));await sleep(400);
+    check('Question du Fournil ouverte en découverte',await p.evaluate(()=>cur==='question'&&S.curQ._merchantId==='m1'&&!document.getElementById('q-follow').hidden));
+    await p.evaluate(()=>document.getElementById('skip-btn').click());
+    await until(async()=>((await db.doc('users/me').get()).data().declinedMerchants||[]).includes('m1'));await sleep(600);
     const u=(await db.doc('users/me').get()).data();
-    check('Le Fournil est écarté (jamais suivi) et toutes ses questions disparaissent',u.declinedMerchants.includes('m1')&&!u.authorizedMerchants.includes('m1')&&await p.evaluate(()=>!S.qs.some(q=>q._merchantId==='m1')&&![...document.querySelectorAll('#hm-feed-q .hq-card')].some(c=>/Le Fournil/.test(c.textContent))),u);
-    // Question d'un autre commerce non suivi, ouverte depuis ailleurs que l'accueil : le choix est demandé d'abord.
+    check('« Passer » : Le Fournil écarté (jamais suivi), toutes ses questions disparaissent et ne reviennent plus',u.declinedMerchants.includes('m1')&&!u.authorizedMerchants.includes('m1')&&await p.evaluate(()=>!S.qs.some(q=>q._merchantId==='m1')),u);
+    await p.evaluate(()=>{refreshHome();});await sleep(300);
+    check('Après un rechargement de l\'accueil : toujours absent',await p.evaluate(()=>![...document.querySelectorAll('#hm-feed-q .hq-card')].some(c=>/Le Fournil/.test(c.textContent))));
+  });
+
+  await T7('répondre directement à une découverte = suivre',async()=>{
     await db.doc('campaigns/cN').set({merchantId:'m7',merchantName:'Zen Sport',sector:'Sport',status:'active',targetCity:'le-mans',city:'le-mans',question:'Q Zen ?',questions:[{q:'Q Zen ?',format:'mcq',options:['Oui','Non']}],answersCount:0,createdAt:Timestamp.now()});
     await wf(p,()=>S.qs.some(q=>q._firestoreId==='cN'),null,10000);
     await p.evaluate(()=>openQ(S.qs.findIndex(q=>q._firestoreId==='cN')));await sleep(400);
-    const pop=await p.evaluate(()=>({show:document.getElementById('nv-pop').style.display,t:document.getElementById('nv-pop-t').textContent,q:document.getElementById('question').classList.contains('active')}));
-    check('Ouvrir la question d\'un commerce non suivi : « Tu veux suivre Zen Sport ? » d\'abord, la question ne s\'ouvre pas',pop.show==='flex'&&/Tu veux suivre Zen Sport/.test(pop.t)&&!pop.q,pop);
-    await p.evaluate(()=>document.getElementById('nv-pop-later').click());
-    await until(async()=>((await db.doc('users/me').get()).data().declinedMerchants||[]).includes('m7'));
-    await sleep(400);
-    check('« Pas intéressé » dans la fenêtre : Zen Sport écarté',await p.evaluate(()=>!S.qs.some(q=>q._merchantId==='m7')));
+    await p.evaluate(()=>document.querySelector('#ans-area .mcq-opt').click());await sleep(3400);await p.evaluate(()=>submitAns());
+    await until(async()=>(await db.doc('answers/me_cN_q0').get()).exists,15000);
+    const u=(await db.doc('users/me').get()).data(),a=(await db.doc('answers/me_cN_q0').get()).data();
+    check('Zen Sport : suivi en répondant, réponse complète',u.authorizedMerchants.includes('m7')&&a.discovery===false,{auth:u.authorizedMerchants,disc:a.discovery});
+  });
+
+  await T7('« Passer » sur une question suivie = question suivante',async()=>{
+    await db.doc('campaigns/cF2').set({merchantId:'m3',merchantName:'Le Bar',sector:'Restauration',status:'active',targetCity:'le-mans',city:'le-mans',question:'Autre question du Bar ?',questions:[{q:'Autre question du Bar ?',format:'mcq',options:['Oui','Non']}],answersCount:0,createdAt:Timestamp.now()});
+    await p.evaluate(()=>goNav('home'));
+    await wf(p,()=>S.qs.some(q=>q._firestoreId==='cF2'),null,10000);
+    await p.evaluate(()=>openQ(S.qs.findIndex(q=>q._firestoreId==='cF')));await sleep(400);
+    check('Question suivie : pas de bouton « Suivre », pas de bulle « Découverte »',await p.evaluate(()=>document.getElementById('q-follow').hidden&&!document.querySelector('#bh-name .bh-disc')));
+    await p.evaluate(()=>document.getElementById('skip-btn').click());await sleep(500);
+    const st=await p.evaluate(()=>({cur,id:S.curQ&&S.curQ._firestoreId}));
+    const u=(await db.doc('users/me').get()).data();
+    check('« Passer » : la question suivante s\'ouvre (pas l\'accueil), et le commerce suivi n\'est pas écarté',st.cur==='question'&&st.id==='cF2'&&!(u.declinedMerchants||[]).includes('m3'),st);
     check('Aucune erreur JavaScript',errs.length===0,errs);
   });
 

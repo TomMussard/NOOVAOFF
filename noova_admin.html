@@ -311,12 +311,17 @@ body{background:var(--bg);font-family:var(--fb);color:var(--ink);min-height:100v
   <div id="tab-stats" style="display:none">
     <div class="st-head">
       <div class="sec-hdr" style="margin:0"><h2>Statistiques</h2><p>Toute l'activité NOOVA en un coup d'œil, calculée sur l'ensemble des comptes.</p></div>
-      <div style="display:flex;align-items:center;gap:10px"><span class="st-upd" id="st-upd"></span><button class="btn-approve" id="st-refresh" onclick="loadStats(true);loadFunnel()">Actualiser</button></div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="st-upd" id="st-upd"></span><button class="btn-approve" id="st-refresh" onclick="loadStats(true);loadFunnel();loadClientErrors()">Actualiser</button></div>
     </div>
     <div class="card" style="margin-bottom:20px">
       <div class="card-title">Parcours d'entrée : où les gens décrochent</div>
       <div style="padding:6px 18px 4px;font-size:12.5px;color:var(--ink3);line-height:1.5">Chaque visite n'est comptée qu'une fois par étape, sans rien enregistrer sur l'appareil ni aucune donnée personnelle (une personne qui revient compte à nouveau). Le % se lit par rapport à « Ouvre l'app ».</div>
       <div id="fn-root" style="padding:8px 18px 16px"><div class="loading">Chargement</div></div>
+    </div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title">Erreurs à l'inscription et à la connexion (7 jours)</div>
+      <div style="padding:6px 18px 4px;font-size:12.5px;color:var(--ink3);line-height:1.5">Ce que les habitants ont vu comme message d'erreur, avec l'étape et le type de téléphone. Aucune adresse e-mail n'est enregistrée.</div>
+      <div id="err-root" style="padding:8px 18px 16px"><div class="loading">Chargement</div></div>
     </div>
     <div id="st-root"><div class="loading">Chargement</div></div>
   </div>
@@ -1050,7 +1055,7 @@ function switchTab(tab, btn) {
   ['stats','retours','entreprises','utilisateurs','diffusion','lancement','moderation','notifications','danger'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
   });
-  if (tab === 'stats') { loadStats(false); loadFunnel(); }
+  if (tab === 'stats') { loadStats(false); loadFunnel(); loadClientErrors(); }
   if (tab === 'retours') loadFeedback();
   if (tab === 'entreprises') loadMerchants();
   if (tab === 'utilisateurs') { _usersLoaded = false; loadUsers(); }
@@ -1115,6 +1120,24 @@ function getAdminStats(force) {
 let _statsTimer = null;
 // ── Parcours d'entrée (functions/funnel.js) ──
 const FN_STEPS = [['open', 'Ouvre l\'app (sans compte)'], ['onboard_2', 'Voit la 2e page de présentation'], ['demo_start', 'Commence les questions d\'essai'], ['demo_1', 'Répond à la question d\'essai 1'], ['demo_2', 'Répond à la question d\'essai 2'], ['demo_3', 'Répond à la question d\'essai 3'], ['signup_open', 'Ouvre l\'inscription'], ['signup_done', 'Crée son compte']];
+// ── Erreurs d'inscription / connexion (functions/funnel.js logClientError) ──
+const ERR_LABELS = { 'champs_vides': 'Champs vides', 'prenom_vide': 'Prénom manquant', 'ville_vide': 'Ville manquante', 'ville_fermee': 'Ville pas encore ouverte', 'auth/email-already-in-use': 'E-mail déjà utilisé (compte existant)', 'auth/invalid-email': 'E-mail invalide', 'auth/invalid-credential': 'E-mail ou mot de passe incorrect', 'auth/wrong-password': 'Mot de passe incorrect', 'auth/user-not-found': 'Aucun compte avec cet e-mail', 'auth/password-does-not-meet-requirements': 'Mot de passe refusé par Firebase (règles)', 'auth/network-request-failed': 'Pas de connexion internet', 'auth/too-many-requests': 'Trop de tentatives', 'auth/web-storage-unsupported': 'Navigateur qui bloque la connexion (app intégrée, navigation privée)' };
+const errLabel = (c) => ERR_LABELS[c] || (c.startsWith('mdp_regles:') ? 'Mot de passe trop simple (manque : ' + c.slice(11).replace(/\+/g, ', ') + ')' : c.startsWith('google:') ? 'Google : ' + (ERR_LABELS[c.slice(7)] || c.slice(7)) : c);
+async function loadClientErrors() {
+  const root = document.getElementById('err-root');
+  try {
+    const since = firebase.firestore.Timestamp.fromMillis(Date.now() - 7 * 86400000);
+    const snap = await db.collection('clientErrors').where('at', '>=', since).orderBy('at', 'desc').limit(500).get();
+    if (snap.empty) { root.innerHTML = '<div class="empty" style="padding:12px 0">Aucune erreur ces 7 derniers jours.</div>'; return; }
+    const g = {};
+    snap.forEach((d) => { const x = d.data(), k = x.where + '|' + x.code; const e = g[k] || (g[k] = { where: x.where, code: x.code, n: 0, dev: {}, inApp: 0 }); e.n++; e.dev[x.device] = (e.dev[x.device] || 0) + 1; if (x.inApp) e.inApp++; });
+    const W = { register: 'Inscription', login: 'Connexion', google: 'Google', apple: 'Apple', profile: 'Profil', reset: 'Mot de passe oublié', other: 'Autre' };
+    root.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:left;color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.6px"><th style="padding:6px 0">Étape</th><th>Message</th><th style="text-align:right">Fois</th><th style="text-align:right">Téléphones</th></tr></thead><tbody>`
+      + Object.values(g).sort((a, b) => b.n - a.n).map((e) => `<tr class="err-row" style="border-top:1px solid var(--border)"><td style="padding:8px 0">${esc(W[e.where] || e.where)}</td><td>${esc(errLabel(e.code))}</td><td style="text-align:right;font-weight:700">${e.n}</td><td style="text-align:right;color:var(--ink2)">${esc(Object.entries(e.dev).map(([k, v]) => k + ' ' + v).join(', '))}${e.inApp ? ' · ' + e.inApp + ' dans une app' : ''}</td></tr>`).join('')
+      + '</tbody></table>';
+  } catch (e) { root.innerHTML = `<div class="empty" style="padding:12px 0">${esc(e.message)}</div>`; }
+}
+
 async function loadFunnel() {
   const root = document.getElementById('fn-root');
   try {
