@@ -178,12 +178,11 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
   await step('user discovery -> answer -> follow', async () => {
     await waitFn(up, () => S.qs.length === 1 && S.qs[0]._discovery === true, null, 20000);
     check('U6 la question du commerce arrive directement sur l\'accueil, en « découverte » (plus de demande à autoriser)', await up.evaluate(() => document.getElementById('home-requests').textContent.trim() === '' && document.getElementById('today-card').classList.contains('disc') && /Boulangerie du Centre/.test(document.getElementById('tc-brand').textContent)));
-    // Commerce pas encore suivi : « Tu veux suivre … ? » avant de répondre ; « Oui » suit le commerce puis ouvre la question.
+    // Commerce pas encore suivi : la question s'ouvre directement en « découverte » (Valider / Passer / Suivre) ; y
+    // répondre, c'est suivre le commerce.
     await up.evaluate(() => openQ(0));
-    await waitFn(up, () => document.getElementById('nv-pop').style.display === 'flex' && /Tu veux suivre/.test(document.getElementById('nv-pop-t').textContent), null, 10000);
-    check('U6 avant de répondre : choix suivre / pas intéressé', true);
-    await up.evaluate(() => document.getElementById('nv-pop-cta').click());
-    await waitFn(up, () => S._authorizedMerchants.length === 1 && document.querySelectorAll('#ans-area .mcq-opt').length > 0, null, 15000);
+    await waitFn(up, () => document.getElementById('question').classList.contains('active') && document.querySelectorAll('#ans-area .mcq-opt').length > 0 && !document.getElementById('q-follow').hidden, null, 10000);
+    check('U6 question découverte ouverte directement, avec « Suivre » et « Passer »', true);
     await up.evaluate(() => document.querySelector('#ans-area .mcq-opt').click());
     await sleep(3600);
     await up.evaluate(() => submitAns());
