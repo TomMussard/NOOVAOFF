@@ -776,6 +776,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .rw-cat{flex-shrink:0;min-height:36px;padding:0 var(--s4);border-radius:var(--r-pill);border:1px solid var(--trait);background:var(--surface);color:var(--text);font:inherit;font-size:var(--fs-2);font-weight:700;cursor:pointer;white-space:nowrap}
 .rw-cat[aria-pressed="true"]{background:var(--bandeau);color:var(--jaune);border-color:var(--bandeau)}
 .hm-filt-n{font-weight:600;opacity:.75;margin-left:2px}
+.logout-link{display:flex;align-items:center;justify-content:center;gap:var(--s2);width:100%;min-height:var(--tactile-min);margin-top:var(--s2);background:none;border:0;color:var(--erreur);font:inherit;font-size:var(--fs-3);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.hq-addr{display:block;font-family:var(--font);font-weight:600;font-size:var(--fs-1);opacity:.8;letter-spacing:0}
+.hq-who-btn{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left}
+.hist-more{display:block;width:100%;min-height:var(--tactile-min);background:none;border:0;color:var(--text);font:inherit;font-size:var(--fs-2);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .hq-left{font-size:var(--fs-1);font-weight:700;color:inherit;opacity:.8;margin:calc(-1 * var(--s2)) 0 var(--s4)}
 .bh-left{font-weight:700}
 #hm-filters{margin:0 0 var(--s3)}
@@ -1722,7 +1726,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
 <div id="manage-merchants" class="screen">
   <div class="brands-body">
     <div style="padding:56px 20px 10px">
-      <div class="back-btn" role="button" tabindex="0" aria-label="Retour au profil" onclick="mmBack()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();mmBack()}">←</div>
+      <div class="back-btn" role="button" tabindex="0" aria-label="Retour" onclick="mmBack()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();mmBack()}">←</div>
       <div class="auth-badge">Mes commerces</div>
       <h2 class="auth-title" style="margin-top:8px">Gérer mes<br>commerces</h2>
       <p class="auth-sub" style="margin-bottom:12px">Les commerces que tu suis te posent leurs questions à l'accueil et voient alors tes réponses et ton profil anonyme (ville, tranche d'âge, centres d'intérêt). Les autres peuvent te proposer une question « découverte » : tu réponds ou non, et ils ne reçoivent que ta réponse.</p>
@@ -1737,6 +1741,11 @@ button.soc-bell{padding:0;font-family:var(--font)}
       <div class="brand-cat-hdr" style="display:flex;align-items:center;gap:6px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px"><path d="M12 5v14M5 12h14"/></svg> Autres commerces près de toi</div>
       <div id="mm-available-list"></div>
     </div>
+    <div id="mm-declined-section" style="margin-top:8px;display:none">
+      <div class="brand-cat-hdr">Pas intéressé</div>
+      <div style="padding:0 18px 6px;color:var(--ink2);font-size:var(--fs-2);line-height:1.5">Tu ne vois plus leurs questions. Active un commerce pour le suivre à nouveau.</div>
+      <div id="mm-declined-list"></div>
+    </div>
     <div id="mm-nomatch" style="display:none;text-align:center;padding:26px 24px;color:var(--ink2);font-size:var(--fs-2)">Aucun commerce ne correspond à ta recherche.</div>
     <div class="consent-note" style="margin:14px 18px"><strong style="color:var(--text)">Tu gardes le contrôle.</strong> Un commerce retiré ne pourra plus te contacter. Aucune revente à des tiers.</div>
     <div class="mm-savebar">
@@ -1749,7 +1758,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
 <div id="privacy-data" class="screen">
   <div class="brands-body">
     <div style="padding:56px 20px 6px">
-      <div class="back-btn" role="button" tabindex="0" aria-label="Retour au profil" onclick="goNav('profile')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goNav('profile')}">←</div>
+      <div class="back-btn" role="button" tabindex="0" aria-label="Retour" onclick="goBackScreen()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goBackScreen()}">←</div>
       <div class="auth-badge">Confidentialité</div>
       <h2 class="auth-title" style="margin-top:8px">Données et<br>confidentialité</h2>
       <p class="auth-sub" style="margin-bottom:6px">Ce que Noova sait de toi, qui peut le voir, et comment garder la main.</p>
@@ -2127,7 +2136,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
       </div>
     </div>
     <div style="padding:22px 0 12px">
-      <button onclick="logout()" class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fd)"><span style="display:inline-flex;width:16px;height:16px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M20 12H10"/><path d="M16 8l4 4-4 4"/></svg></span> Se déconnecter</button>
+      <button onclick="logout()" class="logout-link"><span style="display:inline-flex;width:16px;height:16px"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9"/><path d="M20 12H10"/><path d="M16 8l4 4-4 4"/></svg></span> Se déconnecter</button>
     </div>
     <nav class="legal-links" aria-label="Informations légales">
       <a href="/confidentialite.html" target="_blank" rel="noopener">Confidentialité</a>
@@ -2234,11 +2243,11 @@ button.soc-bell{padding:0;font-family:var(--font)}
 
 <!-- BOTTOM NAV -->
 <nav class="bnav" id="bnav">
-  <div class="nav-it" id="nav-home" onclick="goNav('home')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nav-lbl">Accueil</div></div>
-  <div class="nav-it" id="nav-social" onclick="goNav('social')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="nav-lbl">Communauté</div><div class="nav-badge"></div></div>
-  <div class="nav-it" id="nav-rewards-tab" onclick="goNav('rewards-tab')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M20 6h-2.18c.07-.43.18-.84.18-1.25 0-2.07-1.68-3.75-3.75-3.75-1.03 0-1.96.43-2.63 1.12L10 3.87 8.38 2.12C7.71 1.43 6.78 1 5.75 1 3.68 1 2 2.68 2 4.75c0 .41.11.82.18 1.25H2v2h2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8h2V6h-2zm-7.63-2.38c.35-.36.83-.62 1.63-.62 1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H12.5l-.13-2.38zm-5.12-.25c1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H4.8c-.43-.31-.8-.71-.8-1.25C4 5.07 4.72 4.12 5.75 4.12zM4 19V8h7v11H4zm9 0V8h7v11h-7z"/></svg></div><div class="nav-lbl">Récompenses</div></div>
-  <div class="nav-it" id="nav-inbox" role="button" aria-label="Messages" onclick="goNav('inbox')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/></svg></div><div class="nav-lbl">Messages</div><span class="nav-count" id="msg-badge"></span></div>
-  <div class="nav-it" id="nav-profile" onclick="goNav('profile')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="nav-lbl">Profil</div></div>
+  <div class="nav-it" id="nav-home" onclick="navTap('home')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nav-lbl">Accueil</div></div>
+  <div class="nav-it" id="nav-social" onclick="navTap('social')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="nav-lbl">Communauté</div><div class="nav-badge"></div></div>
+  <div class="nav-it" id="nav-rewards-tab" onclick="navTap('rewards-tab')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M20 6h-2.18c.07-.43.18-.84.18-1.25 0-2.07-1.68-3.75-3.75-3.75-1.03 0-1.96.43-2.63 1.12L10 3.87 8.38 2.12C7.71 1.43 6.78 1 5.75 1 3.68 1 2 2.68 2 4.75c0 .41.11.82.18 1.25H2v2h2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8h2V6h-2zm-7.63-2.38c.35-.36.83-.62 1.63-.62 1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H12.5l-.13-2.38zm-5.12-.25c1.03 0 1.75.72 1.75 1.75 0 .54-.37.94-.8 1.25H4.8c-.43-.31-.8-.71-.8-1.25C4 5.07 4.72 4.12 5.75 4.12zM4 19V8h7v11H4zm9 0V8h7v11h-7z"/></svg></div><div class="nav-lbl">Récompenses</div></div>
+  <div class="nav-it" id="nav-inbox" role="button" aria-label="Messages" onclick="navTap('inbox')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/></svg></div><div class="nav-lbl">Messages</div><span class="nav-count" id="msg-badge"></span></div>
+  <div class="nav-it" id="nav-profile" onclick="navTap('profile')"><div class="nav-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="nav-lbl">Profil</div></div>
 </nav>
 
 </div>
@@ -2529,7 +2538,16 @@ const FEED=[];
 let cur='splash',obIdx=0,boFmt='text',navS=['home','social','rewards-tab','inbox','profile'];
 let _chatUnsub=null,_chatFriendUid=null,_chatFriendName='',_chatMessages=[],_chatOpenToken=0;
 
+// Historique de navigation (bouton retour d'Android, flèches retour) : les onglets du bas sont des racines ; les écrans
+// de passage (question, récompense…) ne sont jamais rouverts par un retour.
+let _navStack=[],_navBackMode=false;
+const NAV_TRANSIENT=['splash','question','reward','survey-offer','demo-result'];
 function goTo(id){
+  if(!_navBackMode&&id!==cur){
+    if(navS.includes(id))_navStack=[];
+    // La question reste dans l'historique quand on ouvre la fiche du commerce depuis elle (retour = la question).
+    else if(cur&&(!NAV_TRANSIENT.includes(cur)||(cur==='question'&&id==='brand-page'))){_navStack.push(cur);if(_navStack.length>20)_navStack.shift();}
+  }
   const p=document.getElementById(cur);
   if(p){p.classList.remove('active');p.classList.add('exit');setTimeout(()=>{p&&p.classList.remove('exit')},280)}
   cur=id;const n=document.getElementById(id);
@@ -2539,6 +2557,50 @@ function goTo(id){
   navS.forEach(s=>{const el=document.getElementById('nav-'+s);if(el)el.classList[s===id?'add':'remove']('on')});
   trackEvent('screen_view', { screen_name: id, firebase_screen: id, firebase_screen_class: id });
 }
+// Onglet du bas déjà affiché : on remonte en haut au lieu de tout recharger.
+function navTap(id){
+  if(id===cur){const sc=document.getElementById(id);if(sc)sc.scrollTo({top:0,behavior:'smooth'});return;}
+  goNav(id);
+}
+// Retour à l'écran précédent (flèches retour, bouton retour du téléphone).
+function goBackScreen(){
+  let prev=null;
+  while(_navStack.length&&!prev){const x=_navStack.pop();if(x!==cur&&document.getElementById(x))prev=x;}
+  if(!prev){if(S.user)goNav('home');else goTo('onboard');return;}
+  _navBackMode=true;
+  try{ if(navS.includes(prev))goNav(prev); else { goTo(prev); if(prev==='privacy-data')renderPrivacyData(); } }
+  finally{_navBackMode=false;}
+}
+// Bouton retour d'Android (et retour du navigateur) : ferme d'abord ce qui est ouvert par-dessus, puis revient à
+// l'écran précédent ; ne quitte l'app que depuis l'accueil (2e appui).
+function nvHandleBack(){
+  const vis=el=>el&&getComputedStyle(el).display!=='none'&&getComputedStyle(el).visibility!=='hidden';
+  const modal=[...document.querySelectorAll('.nv-modal')].reverse().find(vis);
+  if(modal){const x=modal.querySelector('.nv-modal-x');if(x)x.click();else modal.style.display='none';return true;}
+  const sheet=[...document.querySelectorAll('[id$="-sheet"]')].reverse().find(el=>el.classList.contains('open')||(el.style.display&&el.style.display!=='none'&&vis(el)));
+  if(sheet){const ov=sheet.querySelector('.cs-ov,[aria-label="Fermer"]');if(ov)ov.click();else{sheet.classList.remove('open');sheet.style.display='none';}return true;}
+  const np=document.getElementById('notif-panel');if(np&&np.classList.contains('open')){closeNotifPanel();return true;}
+  const shell=document.getElementById('shell');
+  const ov=shell&&[...shell.children].reverse().find(el=>el.id!=='app'&&el.style&&el.style.position==='fixed'&&(el.style.inset==='0px'||el.style.inset==='0'));
+  if(ov){ov.remove();return true;}
+  const aw=document.getElementById('auth-wall');
+  if(aw&&aw.style.display==='flex'){aw.style.display='none';return true;}
+  if(['home','onboard','splash'].includes(cur))return false;
+  if(cur==='manage-merchants'){mmBack();return true;}
+  goBackScreen();return true;
+}
+(function(){
+  try{
+    history.replaceState({nv:'root'},'');history.pushState({nv:'app'},'');
+    let warned=0;
+    window.addEventListener('popstate',()=>{
+      if(nvHandleBack()){history.pushState({nv:'app'},'');return;}
+      if(Date.now()-warned<2500){history.back();return;}   // 2e appui sur l'accueil : on quitte
+      warned=Date.now();history.pushState({nv:'app'},'');
+      if(typeof showToast==='function')showToast('Appuie encore sur retour pour quitter NOOVA');
+    });
+  }catch(e){}
+})();
 function goNav(id){goTo(id);if(id==='inbox')renderInbox();if(id==='rewards-tab')refreshWallet();if(id==='profile')refreshProfile();if(id==='home'){refreshHome();applyStagger(document.querySelector('#home .si'));}if(id==='social'){renderSocial();const b=document.querySelector('#nav-social .nav-badge');if(b)b.style.display='none';}}
 
 function obNext(){
@@ -2833,6 +2895,14 @@ function homeTab(t){
     b.classList.toggle('on',k===t);b.setAttribute('aria-selected',String(k===t));pg.hidden=k!==t;});
 }
 // Temps restant d'une question (retour des testeurs) : rien si le commerce n'a pas fixé de fin.
+// Adresse courte du commerce pour les cartes (« 12 rue Gambetta », « Centre-ville ») : sans la ville, déjà connue.
+function addrShort(a,cityLabel){
+  let t=String(a||'').trim();if(!t)return '';
+  const parts=t.split(',').map(x=>x.trim()).filter(Boolean);
+  if(parts.length>1&&cityLabel&&parts[parts.length-1].toLowerCase().includes(String(cityLabel).toLowerCase()))parts.pop();
+  t=parts.join(', ').replace(/\b\d{5}\b/g,'').trim().replace(/,$/,'');
+  return t.length>40?t.slice(0,39)+'…':t;
+}
 function timeLeftTxt(ms){
   if(!ms)return '';
   const left=ms-Date.now();if(left<=0)return 'Se termine bientôt';
@@ -2844,11 +2914,11 @@ function timeLeftTxt(ms){
 }
 function hqCardHTML(q,i,hero){
   const left=timeLeftTxt(q._endsMs),leftHTML=left?`<div class="hq-left">${esc(left)}</div>`:'';
-  const img=q.photoUrl&&!q._byNoova?`<img src="${esc(q.photoUrl)}" alt="" loading="lazy" onerror="this.remove()">`:'';
+  const img=q.photoUrl&&!q._byNoova?`<img src="${esc(q.photoUrl)}" alt="Devanture de ${esc(q.brand)}" loading="lazy" onerror="this.remove()">`:'';
   // Commerce pas encore suivi : on voit sa question, mais on choisit d'abord de le suivre (et de répondre) ou non.
   if(q._discovery&&!q._byNoova){
     return `<div class="hq-card disc" role="group" aria-label="Découverte : ${esc(q.brand)}, commerce que tu ne suis pas encore">`
-      +`<div class="hq-ph">${img}<div class="hq-who">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}</span>${testTagHTML(q._isTest)}</div></div>`
+      +`<div class="hq-ph">${img}<button type="button" class="hq-who hq-who-btn" aria-label="Voir la fiche de ${esc(q.brand)}" onclick="openBrandById(${jsa(q._merchantId)},${jsa(q.brand)})">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}${q._addr?`<span class="hq-addr">${esc(q._addr)}</span>`:''}</span>${testTagHTML(q._isTest)}</button></div>`
       +`<span class="hq-disc-tag">Découverte</span>`
       +`<div class="hq-bd"><div class="hq-disc-l">${esc(q.theme||'Commerce')} · tu ne le suis pas encore</div><div class="hq-q">${esc(q.q)}</div>${leftHTML}`
       +`<div class="hq-gate"><div class="hq-gate-t">Tu veux suivre ${esc(q.brand)} et répondre à ses questions ?</div>`
@@ -2857,7 +2927,7 @@ function hqCardHTML(q,i,hero){
       +`<div class="hq-gate-s">« Pas intéressé » : tu ne verras plus aucune question de ce commerce.</div></div></div></div>`;
   }
   return `<button type="button" class="hq-card${hero?' hero':''}${q._byNoova?' noova':''}" onclick="openQ(${i})" aria-label="${esc(q.brand)} : ${esc(q.q)}, ${esc(ptsTag(q))}">`
-    +`<div class="hq-ph">${img}<div class="hq-who">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}</span>${testTagHTML(q._isTest)}</div></div>`
+    +`<div class="hq-ph">${img}<div class="hq-who">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}${q._addr?`<span class="hq-addr">${esc(q._addr)}</span>`:''}</span>${testTagHTML(q._isTest)}</div></div>`
     +`<span class="hq-tag">${esc(ptsTag(q))}</span>`
     +`<div class="hq-bd"><img class="mark" src="logo-mark-white.svg" alt="" aria-hidden="true"><div class="hq-q">${esc(q.q)}</div>${leftHTML}<span class="hq-cta">Répondre en 30 secondes</span></div></button>`;
 }
@@ -4349,22 +4419,32 @@ function openInboxChat(uid){
 }
 
 // ─── Pull-to-refresh ─────────────────────────────────────────
+// Tirer vers le bas en haut de l'écran : le bandeau « Actualisation… » reste visible le temps du rechargement (au moins
+// 0,7 s, pour qu'on voie qu'il s'est passé quelque chose). Le défilement se juge sur l'écran lui-même (.screen), qui est
+// l'élément qui défile : avant, il se jugeait sur son contenu, toujours « en haut », d'où un geste peu fiable.
 function initPullToRefresh(scrollEl, ptrBarId, refreshFn) {
-  let startY=0, pulling=false;
+  let startY=0, pulling=false, busy=false;
   const bar=document.getElementById(ptrBarId);
-  scrollEl.addEventListener('touchstart', e=>{
-    if(scrollEl.scrollTop===0){ startY=e.touches[0].clientY; pulling=true; }
+  const scroller=scrollEl.closest('.screen')||scrollEl;
+  const atTop=()=>scroller.scrollTop<=0;
+  scroller.addEventListener('touchstart', e=>{
+    pulling=!busy&&atTop(); if(pulling) startY=e.touches[0].clientY;
   },{passive:true});
-  scrollEl.addEventListener('touchmove', e=>{
+  scroller.addEventListener('touchmove', e=>{
     if(!pulling) return;
+    if(!atTop()){pulling=false;if(bar)bar.classList.remove('active');return;}
     const dy=e.touches[0].clientY-startY;
-    if(bar) bar.classList.toggle('active', dy>60);
+    if(bar){bar.classList.toggle('active', dy>50);bar.textContent=dy>80?'↻ Relâche pour actualiser':'↓ Tire pour actualiser';}
   },{passive:true});
-  scrollEl.addEventListener('touchend', e=>{
+  scroller.addEventListener('touchend', async e=>{
     if(!pulling) return; pulling=false;
     const dy=e.changedTouches[0].clientY-startY;
-    if(bar) bar.classList.remove('active');
-    if(dy>80) refreshFn();
+    if(dy<=80){ if(bar) bar.classList.remove('active'); return; }
+    busy=true; if(bar){bar.classList.add('active');bar.textContent='↻ Actualisation…';}
+    const t0=Date.now();
+    try{ await refreshFn(); }catch(err){ console.warn('actualisation:', err); }
+    await new Promise(r=>setTimeout(r, Math.max(0, 700-(Date.now()-t0))));
+    if(bar) bar.classList.remove('active'); busy=false;
   },{passive:true});
 }
 
@@ -4489,6 +4569,7 @@ function refreshProfile(){if(!_redemptionsUnsub)loadActiveRedemptions();
   const _cm=S._nearbyMerchants||[];
   if(!_cm.length){cm.innerHTML='<div style="font-size:var(--fs-2);color:var(--ink2);text-align:center;padding:8px 0">Tu ne suis aucun commerce pour l\'instant. Réponds à une question « découverte » sur ton accueil, puis suis le commerce si ça te plaît.</div>';}
   else{_cm.slice(0,6).forEach(m=>{const label=m.brandName||m.name||'Commerce';const d=document.createElement('div');d.className='dconsent-row';d.innerHTML=`${logoHTML(label,40,m.logoUrl)}<div style="flex:1;min-width:0"><div class="dconsent-name">${esc(label)}</div><div class="dconsent-sub">${esc(m.sector||m.address||'')}, ${questionsAsked(label)} question${questionsAsked(label)>1?'s':''} posée${questionsAsked(label)>1?'s':''}</div></div><label class="tgl"><input type="checkbox" checked aria-label="Autoriser ${esc(label)}" onchange="toggleMerchantConsentQuick(${jsa(m.id)},this.checked)"><span class="tgl-t"></span><span class="tgl-k"></span></label>`;cm.appendChild(d)});if(_cm.length>6){const more=document.createElement('div');more.style.cssText='font-size:var(--fs-1);color:var(--ink3);text-align:center;padding:4px 0';more.textContent=`Gérer les ${_cm.length-6} autres`;more.onclick=openManageMerchants;more.style.cursor='pointer';cm.appendChild(more);}}
+  {const nd=(S._declinedMerchants||[]).length,gb=document.createElement('button');gb.type='button';gb.className='hq-no';gb.style.cssText='width:100%;margin-top:var(--s3)';gb.textContent='Gérer mes commerces'+(nd?' ('+nd+' « Pas intéressé »)':'');gb.onclick=()=>openManageMerchants();cm.appendChild(gb);}
   const bl=document.getElementById('badges-list');bl.innerHTML='';
   checkTierAndBadgeCelebrations();
   const earned=S._lastEarnedBadges||[];
@@ -4496,7 +4577,9 @@ function refreshProfile(){if(!_redemptionsUnsub)loadActiveRedemptions();
   BDGS.forEach(b=>{const e=earned.includes(b.id);const d=document.createElement('div');d.className='bp '+(e?'earned':'locked');d.innerHTML=`<div class="bp-ico">${icon(e?b.e:'lock',{size:18})}</div><div class="bp-lbl">${esc(b.n)}</div>`;bl.appendChild(d)});
   const hl=document.getElementById('hist-list');hl.innerHTML='';
   if(!S.hist||!S.hist.length){hl.innerHTML='<div style="text-align:center;padding:16px;color:var(--ink2);font-size:var(--fs-2)">Aucune réponse pour l\'instant.</div>';return}
-  S.hist.slice(0,6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?esc(h.ico):'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:var(--fs-2);font-weight:600;color:var(--ink)">${esc(h.brand)}</div><div style="font-size:var(--fs-1);color:var(--ink2);margin-top:1px">${esc(h.q)}…</div></div><div style="font-size:var(--fs-2);font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">${h.noovs?'+'+h.noovs+' NOOV'+(h.noovs>1?'S':''):'+'+h.pts+' pts'}</div>`;hl.appendChild(d)});
+  const _all=!!S._histAll;
+  S.hist.slice(0,_all?S.hist.length:6).forEach(h=>{const d=document.createElement('div');d.className='hist-it';d.innerHTML=`<div style="width:34px;height:34px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;background:var(--cd);color:var(--icon-gray);flex-shrink:0">${h.ico&&h.ico!=="🏪"?esc(h.ico):'<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.8.8c0 1.7-2.3 2-2.3 3.5"/><path d="M12 17v.01"/></svg>' }</div><div style="flex:1;min-width:0"><div style="font-size:var(--fs-2);font-weight:600;color:var(--ink)">${esc(h.brand)}</div><div style="font-size:var(--fs-1);color:var(--ink2);margin-top:1px">${esc(h.q)}…</div></div><div style="font-size:var(--fs-2);font-weight:700;color:var(--violet);margin-left:auto;white-space:nowrap">${h.noovs?'+'+h.noovs+' NOOV'+(h.noovs>1?'S':''):'+'+h.pts+' pts'}</div>`;hl.appendChild(d)});
+  if(S.hist.length>6){const mb=document.createElement('button');mb.type='button';mb.className='hist-more';mb.textContent=_all?'Voir moins':'Voir tout ('+S.hist.length+')';mb.onclick=()=>{S._histAll=!_all;refreshProfile();};hl.appendChild(mb);}
 }
 function boTab(tab,btn){document.querySelectorAll('.bo-tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');['dashboard','create','results'].forEach(t=>document.getElementById('bo-'+t).style.display=t===tab?'block':'none');if(tab==='create')wzStep(0)}
 function renderCampaigns(){
@@ -4558,7 +4641,7 @@ async function followAndAnswer(mid,fid){
 async function notInterested(mid,brand){
   if(!mid)return;
   await declineMerchant(mid);
-  if((S._declinedMerchants||[]).includes(mid))showToast('Tu ne verras plus les questions de '+(brand||'ce commerce')+'. Tu peux changer d\'avis dans Profil.','success');
+  if((S._declinedMerchants||[]).includes(mid))showToast('Tu ne verras plus les questions de '+(brand||'ce commerce')+'. Tu peux changer d\'avis dans Profil > Commerces autorisés.','success');
 }
 function openQ(idx){
   // Question d'un commerce pas encore suivi (depuis n'importe quel écran) : on demande d'abord.
@@ -4616,8 +4699,10 @@ function submitAns(){
       list:q.survey.map(x=>Object.assign({},x,{brand:q.brand,ico:q.ico,theme:q.theme,usage:q.usage}))};
     showSurveyOffer();
   }else{
-    refreshHome();refreshWallet();
+    // L'écran de gain s'affiche d'abord ; l'accueil (toutes les cartes et leurs photos) se recalcule une fois
+    // l'animation passée, hors du chemin critique (retour testeur : l'app ramait juste après avoir validé).
     openReward({pts:q.pts,total:S.pts,brand:q.brand,usage:q.usage,title:'Bien joué !',sub:'Ta réponse a été envoyée',brandName:q.brand,merchantId:q._merchantId});
+    setTimeout(()=>{ const run=()=>{refreshHome();refreshWallet();}; (window.requestIdleCallback||((f)=>setTimeout(f,0)))(run,{timeout:1500}); },450);
   }
 }
 
@@ -4693,7 +4778,7 @@ function openBrand(name,back){
   if(!surveys.length)sv='<div class="bp-text">Aucun sondage pour le moment. Reviens bientôt !</div>';
   document.getElementById('bp-wrap').innerHTML=`
     <div class="bp-cover" style="background:${cover}">
-      <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
+      <button class="bp-back" aria-label="Retour" onclick="goBackScreen()">←</button>
       <div class="bp-logo-wrap">${logoHTML(name,60)}<div><div class="bp-name">${esc(name)}</div><div class="bp-tag">${esc(p.tagline||'')}</div></div></div>
       <div class="bp-chips"><span class="bp-chip">${icon('check',{size:11})} Commerce du quartier</span><span class="bp-chip">${icon('pin',{size:11})} ${esc((p.loc||'').split(',').pop().trim())}</span><span class="bp-chip">${esc(p.sector||'')}</span></div>
     </div>
@@ -4747,7 +4832,7 @@ async function openBrandById(mid, fallbackName) {
         }).join('');
     document.getElementById('bp-wrap').innerHTML=`
       <div class="bp-cover${m.coverUrl?' has-img':''}"${m.coverUrl?` style="--bp-img:url('${String(m.coverUrl).replace(/['"()\\\s<>]/g,'')}')"`:''}>
-        <button class="bp-back" onclick="goTo(S.brandBack)">←</button>
+        <button class="bp-back" aria-label="Retour" onclick="goBackScreen()">←</button>
         <div class="bp-logo-wrap">${logoHTML(brandName,60,m.logoUrl)}<div><div class="bp-name">${esc(brandName)}${testTagHTML(m.isTest)}</div><div class="bp-tag">${esc(m.sector||'Commerce local')}${m.city?' '+esc(cityPhrase(m.cityLabel||m.city)):''}</div></div></div>
         <div class="bp-chips"><span class="bp-chip">${icon('check',{size:11})} Commerce vérifié</span>${m.city?`<span class="bp-chip">${icon('pin',{size:11})} ${esc(m.cityLabel||m.city)}</span>`:''}${m.sector?`<span class="bp-chip">${esc(m.sector)}</span>`:''}</div>
       </div>
@@ -4780,7 +4865,7 @@ function startCampaignById(campId, followed) {
     if((d.targetCity!=='toutes'&&cCity&&cCity!==myCity)||d.status!=='active'||(d.endsAt&&d.endsAt.toMillis&&d.endsAt.toMillis()<Date.now())){showToast('Cette question n\'est pas ouverte dans ta ville.','warning');return;}
     // Commerce pas encore suivi (fiche commerce) : on le suit d'abord, ou pas du tout.
     if(!followed&&d.merchantId&&d.targetCity!=='toutes'&&!(S._authorizedMerchants||[]).includes(d.merchantId)){
-      if((S._declinedMerchants||[]).includes(d.merchantId)){showToast('Tu as choisi de ne plus voir ce commerce. Tu peux changer d\'avis dans Profil.','warning');return;}
+      if((S._declinedMerchants||[]).includes(d.merchantId)){showToast('Tu as choisi de ne plus voir ce commerce. Tu peux changer d\'avis dans Profil > Commerces autorisés.','warning');return;}
       const b=d.merchantName||'ce commerce';
       showPop({title:'Tu veux suivre '+b+' ?',text:'Pour répondre à ses questions, suis ce commerce : il pourra t\'en poser d\'autres. Sinon, tu ne verras plus ses questions.',cta:'Oui, suivre et répondre',later:'Pas intéressé',
         onCta:async()=>{await authorizeMerchant(d.merchantId);if((S._authorizedMerchants||[]).includes(d.merchantId))startCampaignById(campId,true);},
@@ -5882,7 +5967,7 @@ function dismissFollow(){const el=document.getElementById('rw-follow');if(el)el.
 async function blockFromReward(mid){
   await declineMerchant(mid);
   const el=document.getElementById('rw-follow');
-  if(el&&(S._declinedMerchants||[]).includes(mid))el.innerHTML='<div class="follow-card"><div class="fc-d" style="margin:0">C\'est noté : on ne te proposera plus ce commerce. Tu peux changer d\'avis dans Profil.</div></div>';
+  if(el&&(S._declinedMerchants||[]).includes(mid))el.innerHTML='<div class="follow-card"><div class="fc-d" style="margin:0">C\'est noté : on ne te proposera plus ce commerce. Tu peux changer d\'avis dans Profil > Commerces autorisés.</div></div>';
 }
 async function authorizeMerchant(mid){
   const uid=auth.currentUser&&auth.currentUser.uid;if(!uid)return;
@@ -6018,8 +6103,14 @@ function renderDailyTrack(){
   const n=Math.min(MAX_POINT_ANSWERS,getAnswersToday());
   const left=MAX_POINT_ANSWERS-n;
   el.className='dtrack';
+  // Le système des points se lit sur l'accueil (retour testeur) : réponses à points du jour, et quand ça repart.
+  const p=new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+  const hh=+p.find(x=>x.type==='hour').value,mm=+p.find(x=>x.type==='minute').value,toMid=24*60-(hh*60+mm);
+  const reset=Math.floor(toMid/60)+' h '+String(toMid%60).padStart(2,'0');
   el.innerHTML='<div class="dt-dots">'+[0,1,2].map(i=>'<div class="dt-dot'+(i<n?' on':'')+'"></div>').join('')+'</div>'
-    +(left<=0?'<div class="dt-txt">Tes '+(S._pointsToday||0)+' pts du jour sont validés</div>':'');
+    +(left<=0
+      ?'<div class="dt-txt">Tes '+(S._pointsToday||0)+' pts du jour sont validés · de nouveau des points dans '+reset+'</div>'
+      :'<div class="dt-txt">'+n+'/'+MAX_POINT_ANSWERS+' réponses à points aujourd\'hui · '+ENGAGEMENT.PTS_PER_ANSWER+' pts chacune</div>');
 }
 function renderHomeState(){
   const el=document.getElementById('home-state'),card=document.getElementById('today-card');
@@ -6369,6 +6460,7 @@ async function redeemReward(reward) {
     const res = await fx.httpsCallable('redeemReward')({ rewardId: reward.id });
     const d = res.data || {};
     S.pts = typeof d.totalPoints === 'number' ? d.totalPoints : Math.max(0, S.pts - cost);
+    S._ptsFloor = null;   // échange : le solde baisse vraiment
     S._everRedeemed = true;
     setTimeout(maybeShowInstallInvite, 2500);
     refreshWallet();
@@ -6521,8 +6613,14 @@ function finishAuthTransition() {
     window._ptrInited = true;
     const homeScroll = document.querySelector('#home .si');
     const socScroll  = document.querySelector('#social .social-wrap');
-    if(homeScroll) initPullToRefresh(homeScroll, 'ptr-home', ()=>{ refreshHome(); loadNearbyMerchants(S._authorizedMerchants); });
-    if(socScroll)  initPullToRefresh(socScroll,  'ptr-social', ()=>{ loadCommunityFeed(); });
+    if(homeScroll) initPullToRefresh(homeScroll, 'ptr-home', async ()=>{
+      await Promise.all([
+        loadCampaignsFromFirestore({ city:S._city, interests:S._interests, answeredCampaigns:S._answered||[], authorizedMerchants:S._authorizedMerchants||[] }),
+        loadNearbyMerchants(S._authorizedMerchants)
+      ]);
+      refreshHome();
+    });
+    if(socScroll)  initPullToRefresh(socScroll,  'ptr-social', ()=>loadCommunityFeed());
   }
   refreshHome(); renderSocial(); goTo('home');
   // Le teaser « Ta prochaine récompense » (accueil) dépend de S._rewardsCache, sinon rempli
@@ -6755,6 +6853,9 @@ async function handleUserSnapshot(uid, snap, isFirstLoad) {
   const resolvedEmail = data.email || (auth.currentUser && auth.currentUser.email) || '';
   S.user = { name: resolvedName, uid, photoUrl: data.photoUrl || null, email: resolvedEmail };
   S.pts              = data.points || 0;
+  // Juste après une réponse, une mise à jour encore servie par le cache peut porter l'ancien solde : on garde le
+  // total confirmé par le serveur (les points ne baissent que par un échange, qui annule S._ptsFloor).
+  if (S._ptsFloor && Date.now() < S._ptsFloor.until && S.pts < S._ptsFloor.pts) S.pts = S._ptsFloor.pts;
   S.xp               = data.xp !== undefined ? data.xp : (data.points || 0);
   S.streak           = data.streak || 0;
   S.ans              = data.ans || 0;
@@ -6948,7 +7049,7 @@ function mmUpdateBar() {
 }
 function mmBack() {
   if(mmDirtyCount() && !confirm('Abandonner tes modifications ?')) return;
-  goNav('profile');
+  goBackScreen();   // revient d'où l'on vient (Données et confidentialité, ou le profil)
 }
 function mmDisableAll() {
   Object.keys(_mmConsents).forEach(id => { _mmConsents[id] = false; });
@@ -6964,7 +7065,8 @@ function mmRender() {
     const checked = !!_mmConsents[m.id];
     const label = m.brandName || m.name || 'Commerce';
     const n = questionsAsked(label);
-    const sub = (m.sector || m.address || m.city || '') + (_mmOrig.has(m.id) ? ', ' + n + ' question' + (n > 1 ? 's' : '') + ' posée' + (n > 1 ? 's' : '') : '');
+    const declined = (S._declinedMerchants || []).includes(m.id) && !_mmOrig.has(m.id);
+    const sub = (m.sector || m.address || m.city || '') + (_mmOrig.has(m.id) ? ', ' + n + ' question' + (n > 1 ? 's' : '') + ' posée' + (n > 1 ? 's' : '') : '') + (declined ? ' · « Pas intéressé » : active pour le suivre à nouveau' : '');
     const d = document.createElement('div');
     d.className = 'brand-item' + (checked ? ' on' : '');
     d.innerHTML = `${logoHTML(label,44,m.logoUrl)}<div style="flex:1;min-width:0"><div class="bi-name">${esc(label)}</div><div class="bi-use">${esc(sub)}</div></div><label class="tgl"><input type="checkbox" ${checked?'checked':''} data-mid="${esc(m.id)}" aria-label="Autoriser ${esc(label)}"><div class="tgl-t"></div><div class="tgl-k"></div></label>`;
@@ -6976,9 +7078,15 @@ function mmRender() {
     container.appendChild(d);
   }
   const auth = _mmAll.filter(m => _mmOrig.has(m.id) && match(m));
+  const isDecl = m => (S._declinedMerchants || []).includes(m.id);
   const avail = _mmAll.filter(m => !_mmOrig.has(m.id) && match(m));
+  const declinedList = document.getElementById('mm-declined-list');
+  if(declinedList) declinedList.innerHTML = '';
   auth.forEach(m => item(m, authList));
-  avail.forEach(m => item(m, availList));
+  avail.filter(m => !isDecl(m) || !declinedList).forEach(m => item(m, availList));
+  const decl = avail.filter(isDecl);
+  if(declinedList) decl.forEach(m => item(m, declinedList));
+  { const ds = document.getElementById('mm-declined-section'); if(ds) ds.style.display = decl.length ? '' : 'none'; }
   const hasAuthAtAll = _mmAll.some(m => _mmOrig.has(m.id)), hasAvailAtAll = _mmAll.some(m => !_mmOrig.has(m.id));
   document.getElementById('mm-authorized-section').style.display = (auth.length || (!q && !hasAuthAtAll)) ? '' : 'none';
   document.getElementById('mm-available-section').style.display = (avail.length || (!q && !hasAvailAtAll)) ? '' : 'none';
@@ -7055,13 +7163,16 @@ async function saveMerchantConsents() {
   try {
     const prevAuthorized = new Set(S._authorizedMerchants || []);
     const batch = db.batch();
-    batch.update(db.collection('users').doc(uid), { authorizedMerchants: newAuthorized });
+    // Suivre un commerce écarté (« Pas intéressé ») : il n'est plus écarté.
+    const reFollowed = newAuthorized.filter(id => (S._declinedMerchants || []).includes(id));
+    batch.update(db.collection('users').doc(uid), { authorizedMerchants: newAuthorized, ...(reFollowed.length ? { declinedMerchants: firebase.firestore.FieldValue.arrayRemove(...reFollowed) } : {}) });
     logConsentEvents(batch, uid, prevAuthorized, newAuthorized);
     await batch.commit();
     S._authorizedMerchants = newAuthorized;
+    if(reFollowed.length) S._declinedMerchants = (S._declinedMerchants || []).filter(x => !reFollowed.includes(x));
     if(newAuthorized.length) loadNearbyMerchants(newAuthorized);
     _mmOrig = new Set(newAuthorized);
-    goNav('profile');
+    goBackScreen();
     showToast('Modifications enregistrées.', 'success');
   } catch(e) {
     console.warn('saveMerchantConsents:', e);
@@ -7235,6 +7346,7 @@ function recomputeCampaignFeed(city) {
         _surveyCount: allQs.length,
         brand: brandName, ico: d.brandEmoji || (byNoova ? '✨' : '🏪'),
         photoUrl: merchantData ? merchantData.coverUrl || null : null, logoUrl: merchantData ? merchantData.logoUrl || null : null,
+        _addr: merchantData && !byNoova ? addrShort(merchantData.address, merchantData.cityLabel) : '',
         _discovery: !followed, _reason: discoveryReason || (isFallbackOnly ? 'fallback' : ''), _strict: (merchantData && interestMatch(merchantData)) ? 1 : 0, _followed: followed ? 1 : 0,
         _createdMs: (d.createdAt && d.createdAt.toMillis ? d.createdAt.toMillis() : 0),
         _endsMs: (d.endsAt && d.endsAt.toMillis ? d.endsAt.toMillis() : 0),
@@ -7332,7 +7444,12 @@ submitAns = function() {
       // Capturé avant _origSubmitAns() : détermine si cette soumission alimente S.sv.earned.
       const touchesSurvey = (S.mode === 'survey') || !!(q && q.survey && q.survey.length);
       const totalEarned = typeof data.pointsAwarded === 'number' ? data.pointsAwarded : q.pts;
-      _origSubmitAns(); // affiche l'écran de récompense/confettis (ajoute optimistiquement q.pts)
+      // L'écran de récompense part directement des chiffres du serveur (avant : +10 affiché d'office puis corrigé,
+      // d'où un « 95 pts » qui redescendait à 85 quand la réponse ne rapportait pas de points).
+      if (typeof data.totalPoints === 'number') S.pts = data.totalPoints - totalEarned;
+      q.pts = totalEarned;
+      _origSubmitAns(); // affiche l'écran de récompense/confettis (ajoute q.pts, désormais le gain réel)
+      if (typeof data.totalPoints === 'number') S._ptsFloor = { pts: data.totalPoints, until: Date.now() + 20000 };
 
       // Corrige l'affichage optimiste avec les totaux qui font foi (serveur).
       const correction = totalEarned - q.pts;
@@ -7531,7 +7648,7 @@ async function loadHistFromFirestore(uid) {
     const snap = await db.collection('answers')
       .where('userId', '==', uid)
       .orderBy('createdAt', 'desc')
-      .limit(20)
+      .limit(100)
       .get();
     if(snap.empty) return;
     S.hist = snap.docs.map(d => {
