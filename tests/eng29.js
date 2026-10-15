@@ -50,7 +50,7 @@ const track=(p,label)=>{p.on('pageerror',e=>errs.push(label+' : '+e.message));};
     await mp.evaluate(()=>saveReward(1,{disabled:false,textContent:''}));
     await wf(mp,()=>_rewardSlots.length>=1,null,10000);
     const r1=(await db.doc('rewards/'+uid+'_p1').get()).data();
-    check('Palier 1 créé via l\'interface, en attente de validation, coût imposé (150 pts)',r1&&r1.status==='pending'&&r1.approved===false&&r1.cost===150,r1);
+    check('Palier 1 créé via l\'interface, en attente de validation, coût imposé (400 pts)',r1&&r1.status==='pending'&&r1.approved===false&&r1.cost===400,r1);
   });
 
   const TIERS=require('../functions/tiers.js');

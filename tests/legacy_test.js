@@ -98,7 +98,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
       }
     }
     const rw = await adb.collection('rewards').where('merchantId', '==', muid).get();
-    check('C4 5 paliers créés par un commerçant non vérifié (règles) : un document par palier, coût imposé par le palier', rw.size === 5 && rw.docs.every(d => d.id === muid + '_p' + d.data().tier && d.data().cost === [150, 300, 500, 900, 1500][d.data().tier - 1] && d.data().status === 'pending' && d.data().approved === false && d.data().priceConfirmed === true), rw.docs.map(d => d.id + ':' + d.data().cost).join());
+    check('C4 5 paliers créés par un commerçant non vérifié (règles) : un document par palier, coût imposé par le palier', rw.size === 5 && rw.docs.every(d => d.id === muid + '_p' + d.data().tier && d.data().cost === [400, 800, 1500, 2500, 4000][d.data().tier - 1] && d.data().status === 'pending' && d.data().approved === false && d.data().priceConfirmed === true), rw.docs.map(d => d.id + ':' + d.data().cost).join());
     await mp.evaluate(() => navTo('create', document.getElementById('nav-create')));
     await waitFn(mp, () => curPage === 'create', null, 8000).catch(() => {});
     check('C4 création autorisée avec 5 récompenses', await mp.evaluate(() => curPage === 'create'));
@@ -167,7 +167,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     await waitFn(up, () => document.getElementById('cat-wall').style.display === 'flex', null, 15000);
     uuid = await up.evaluate(() => auth.currentUser.uid);
     const u = (await adb.doc('users/' + uuid).get()).data();
-    check('U4 +50 points de bienvenue crédités par le serveur (claimWelcomeBonus), une seule fois', u.points === 50 && u.welcomeClaimed === true && !!u.lastActivityAt, 'points=' + u.points);
+    check('U4 +20 points de bienvenue crédités par le serveur (claimWelcomeBonus), une seule fois', u.points === 20 && u.welcomeClaimed === true && !!u.lastActivityAt, 'points=' + u.points);
     // Tranche d'âge demandée à l'inscription : sans elle, on ne peut pas continuer
     const ageMsg = await up.evaluate(() => { document.querySelector('#cat-grid [data-cat=restauration]').click(); saveCategories(); return getComputedStyle(document.getElementById('cat-age-err')).display; });
     check('Inscription : la tranche d\'âge est obligatoire (message si elle manque)', ageMsg === 'block', ageMsg);
@@ -189,7 +189,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     await sleep(3500);
     const ans = await adb.collection('answers').where('userId', '==', uuid).get();
     const u = (await adb.doc('users/' + uuid).get()).data();
-    check('U6 réponse validée côté serveur (submitAnswer), avec le profil : le commerce est suivi', ans.size === 1 && u.points === 65 && ans.docs[0].data().discovery === false, 'answers=' + ans.size + ' points=' + u.points);
+    check('U6 réponse validée côté serveur (submitAnswer), avec le profil : le commerce est suivi', ans.size === 1 && u.points === 35 && ans.docs[0].data().discovery === false, 'answers=' + ans.size + ' points=' + u.points);
     for (let i = 0; i < 30 && !((await adb.doc('merchants/' + muid).get()).data() || {}).consentCount; i++) await sleep(500);
     const ce = await adb.collection('consentEvents').where('userId', '==', uuid).get();
     const mm = (await adb.doc('merchants/' + muid).get()).data();
@@ -201,13 +201,13 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     check('Serveur refuse un commerce non autorisé', /permission-denied/.test(res), res);
   });
   await step('redeem + voucher + merchant validate', async () => {
-    await adb.doc('users/' + uuid).update({ points: 400 });   // le solde ne s'écrit que côté serveur : on le pose ici en administrateur
+    await adb.doc('users/' + uuid).update({ points: 650 });   // le solde ne s'écrit que côté serveur : on le pose ici en administrateur
     const rw = (await adb.collection('rewards').where('merchantId', '==', muid).get()).docs.find(d => d.data().tier === 1);
     const rdata = { id: rw.id, ...rw.data() };
     await up.evaluate(r => { window.__p = redeemReward(r); }, rdata);
     await waitFn(up, () => document.getElementById('redeem-confirm'), null, 8000);
     const conf = await up.$eval('#redeem-confirm', e => e.textContent);
-    check('Confirmation d\'échange maison (« Palier 1, 150 pts », solde restant, validité), sans aucun euro', /Débité/.test(conf) && /Palier 1, 150 pts/.test(conf) && /250 pts/.test(conf) && /24 h/.test(conf) && !/€/.test(conf), conf.replace(/\s+/g, ' ').slice(0, 120));
+    check('Confirmation d\'échange maison (« Palier 1, 400 pts », solde restant, validité), sans aucun euro', /Débité/.test(conf) && /Palier 1, 400 pts/.test(conf) && /250 pts/.test(conf) && /24 h/.test(conf) && !/€/.test(conf), conf.replace(/\s+/g, ' ').slice(0, 120));
     await up.evaluate(() => document.getElementById('rc-yes').click());
     await waitFn(up, () => document.getElementById('voucher-full'), null, 10000);
     const red = await adb.collection('redemptions').where('userId', '==', uuid).get();
@@ -215,7 +215,7 @@ const MEMAIL = `merchant${stamp}@test.fr`, UEMAIL = `habitant${stamp}@test.fr`;
     const shown = await up.$eval('#voucher-full', e => e.textContent);
     check('Code à 4 caractères affiché plein écran', /^[A-Z2-9]{4}$/.test(code) && shown.includes(code) && /Valable encore/.test(shown), 'code=' + code);
     const u = (await adb.doc('users/' + uuid).get()).data();
-    check('Points débités à l\'échange par le serveur (150 pts, palier 1)', u.points === 250 && red.docs[0].data().tier === 1 && red.docs[0].data().cost === 150, 'points=' + u.points);
+    check('Points débités à l\'échange par le serveur (400 pts, palier 1)', u.points === 250 && red.docs[0].data().tier === 1 && red.docs[0].data().cost === 400, 'points=' + u.points);
     // marchand valide le code
     await mp.evaluate(() => { navTo('validate', document.getElementById('nav-validate')); });
     await setVal(mp, '#voucher-code-inp', code.toLowerCase());

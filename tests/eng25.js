@@ -69,7 +69,7 @@ const login=async(p,email)=>{await p.goto(APP,{waitUntil:'load'});await wf(p,()=
     check('Accueil : plus de bloc « Ta prochaine récompense »',await p.evaluate(()=>!/prochaine récompense/i.test(document.getElementById('home').innerText)));
     await p.evaluate(()=>goNav('rewards-tab'));await sleep(900);
     const soon=await p.evaluate(()=>[...document.querySelectorAll('#rw-soon .rwr')].map(c=>c.innerText.replace(/\s+/g,' ')));
-    check('Récompenses, « Bientôt à ta portée » : la plus proche d\'abord (Café offert, encore 30 pts), une barre au lieu d\'un pourcentage',/Café offert/.test(soon[0]||'')&&/encore 30 pts/.test(soon[0]||'')&&!/%/.test(soon[0]||''),soon);
+    check('Récompenses, « Bientôt à ta portée » : la plus proche d\'abord (Café offert, encore 280 pts), une barre au lieu d\'un pourcentage',/Café offert/.test(soon[0]||'')&&/encore 280 pts/.test(soon[0]||'')&&!/%/.test(soon[0]||''),soon);
   });
 
   await T('écran Cadeaux',async()=>{
