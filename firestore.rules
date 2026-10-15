@@ -86,7 +86,7 @@ service cloud.firestore {
     // répétées ici ; tests/points_rules.js vérifie qu'elles restent identiques à tiers.js.
     //   palier :  1    2    3     4     5(gros lot)
     //   points : 150  300  500   900   1500     · prix carte : 1-3 €, 3-6 €, 6-10 €, 10-18 €, 18-30 €
-    function tierPts(t) { return t == 1 ? 150 : (t == 2 ? 300 : (t == 3 ? 500 : (t == 4 ? 900 : 1500))); }
+    function tierPts(t) { return t == 1 ? 400 : (t == 2 ? 800 : (t == 3 ? 1500 : (t == 4 ? 2500 : 4000))); }
     function tierMax(t) { return t == 1 ? 3 : (t == 2 ? 6 : (t == 3 ? 10 : (t == 4 ? 18 : 30))); }
     function validTier(t) { return t is int && t >= 1 && t <= 5; }
     // Réglages d'une récompense (quota mensuel, créneaux, « avec achat »). Ne contient ni prix ni points : le commerçant n'en saisit jamais.

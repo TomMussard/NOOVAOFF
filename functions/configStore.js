@@ -17,7 +17,7 @@ const TUNABLE = {
   "REVEAL.MIN_ANSWERS":               { min: 1, max: 50, int: true, label: "Reveal : réponses minimum avant d'afficher les pourcentages" },
   "COMPAT.MIN_COMMON":                { min: 1, max: 30, int: true, label: "Compatibilité : questions en commun minimum" },
   "COMPAT.MIN_COMMON_PER_CATEGORY":   { min: 1, max: 20, int: true, label: "Compatibilité : questions en commun minimum par catégorie" },
-  "NOOVS.DAILY_CAP":                  { min: 1, max: 500, int: true, label: "NOOVS : plafond par jour et par habitant" },
+  "NOOVS.DAILY_CAP":                  { min: 1, max: 1000000, int: true, label: "NOOVS : plafond par jour et par habitant" },
   "NOOVS.MIN_RESPONSE_MS":            { min: 0, max: 15000, int: true, label: "NOOVS : temps de réponse minimum en ms (0 = désactivé)" },
   "NOOVS.PENDING_DAYS":               { min: 0, max: 30, int: true, label: "NOOVS : jours de validation avant utilisation" },
   "IMPACT.NOTIFY_GAP_DAYS":           { min: 1, max: 90, int: true, label: "Actualités : jours entre deux actualités notifiées d'un même commerce" },

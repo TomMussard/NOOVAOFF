@@ -8,11 +8,13 @@
  * répètent ces valeurs, et le même test les compare. Changer un palier = modifier ce fichier, sa copie et les règles. */
 (function (root) {
   var TIERS = [
-    { n: 1, pts: 150,  min: 1,  max: 3  },
-    { n: 2, pts: 300,  min: 3,  max: 6  },
-    { n: 3, pts: 500,  min: 6,  max: 10 },
-    { n: 4, pts: 900,  min: 10, max: 18 },
-    { n: 5, pts: 1500, min: 18, max: 30 }, // gros lot
+    // Barème (octobre) : ~1 € de valeur en boutique pour 130 à 150 points ; à 30 pts/jour, le café (palier 1) arrive
+    // en ~2 semaines d'usage régulier et le gros lot en ~4 mois et demi.
+    { n: 1, pts: 400,  min: 1,  max: 3  },
+    { n: 2, pts: 800,  min: 3,  max: 6  },
+    { n: 3, pts: 1500, min: 6,  max: 10 },
+    { n: 4, pts: 2500, min: 10, max: 18 },
+    { n: 5, pts: 4000, min: 18, max: 30 }, // gros lot
   ];
   if (typeof module !== "undefined" && module.exports) module.exports = TIERS;
   else root.NOOVA_TIERS = TIERS;

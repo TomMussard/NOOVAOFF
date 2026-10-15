@@ -1620,7 +1620,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
     <div class="rw-title" style="text-align:left;margin-bottom:4px">Merci, ta voix compte.</div>
     <div class="rw-sub" style="text-align:left;margin-bottom:16px" id="demo-res-sub">Exemple : voilà à quoi ressemblent les réponses des habitants.</div>
     <div id="demo-bars" style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px"></div>
-    <div class="pts-earned" id="demo-pts" style="margin-bottom:14px"><div class="pe-plus">+</div><div class="pe-num">50</div><div class="pe-right"><div class="pe-lbl">Points de bienvenue</div><div class="pe-tot" style="font-size:var(--fs-2)">Crée ton compte pour les recevoir</div></div></div>
+    <div class="pts-earned" id="demo-pts" style="margin-bottom:14px"><div class="pe-plus">+</div><div class="pe-num">20</div><div class="pe-right"><div class="pe-lbl">Points de bienvenue</div><div class="pe-tot" style="font-size:var(--fs-2)">Crée ton compte pour les recevoir</div></div></div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <button class="btn-p" id="demo-next-btn" onclick="demoNext()">Question suivante</button>
       <button class="btn-s" id="demo-reg-btn" onclick="showAuthWall('register')">Créer mon compte</button>
@@ -1703,7 +1703,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
     <div class="q-hint">Quatre étapes, aucune obligation.</div>
     <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
       <div class="how-row"><div class="how-n">1</div><div><div class="how-t">Un commerce te pose une question</div><div class="how-d">Les commerces que tu suis, et parfois un nouveau commerce à découvrir (d'une autre couleur). Tu réponds en 30 secondes, ou tu passes.</div></div></div>
-      <div class="how-row"><div class="how-n">2</div><div><div class="how-t">Tu gagnes des points, puis des NOOVS</div><div class="how-d">Chaque réponse rapporte 10 points, pour tes 3 premières réponses du jour (30 points par jour au maximum). Tu reçois aussi 50 points de bienvenue, et 5 points la première fois que tu réponds à un commerce. Ensuite, tu peux répondre sans points, et gagner des NOOVS, la monnaie de NOOVA. Tes points expirent après 6 mois sans aucune activité.</div></div></div>
+      <div class="how-row"><div class="how-n">2</div><div><div class="how-t">Tu gagnes des points, puis des NOOVS</div><div class="how-d">Chaque réponse rapporte 10 points, pour tes 3 premières réponses du jour (30 points par jour au maximum). Tu reçois aussi 20 points de bienvenue, et 5 points la première fois que tu réponds à un commerce. Ensuite, tu peux répondre sans points, et gagner des NOOVS, la monnaie de NOOVA. Tes points expirent après 6 mois sans aucune activité.</div></div></div>
       <div class="how-row"><div class="how-n">3</div><div><div class="how-t">Tu échanges tes points</div><div class="how-d">Contre une récompense choisie par le commerce, à récupérer chez lui : une par commerce et par semaine.</div></div></div>
       <div class="how-row"><div class="how-n">4</div><div><div class="how-t">Tu montres ton code en caisse</div><div class="how-d">Il est valable 24 h et ne sert qu'une fois.</div></div></div>
     </div>
@@ -5815,7 +5815,7 @@ const DEMO_QS=[
   {id:'demo-2',brand:'Café des Halles',q:"À quel moment passes-tu le plus volontiers prendre un café ?",opts:['Le matin','Après le déjeuner','En fin d\u2019après-midi','En soirée'],dist:[38,22,27,13]},
   {id:'demo-3',brand:'Salon Mèche Rebelle',q:"Qu'est-ce qui compte le plus pour toi chez un coiffeur ?",opts:['Le résultat','Le prix','La rapidité','L\u2019accueil'],dist:[44,31,9,16]}
 ];
-// Trois questions d'essai sans compte, puis l'inscription. Les 50 points de bienvenue sont crédités par le serveur à la
+// Trois questions d'essai sans compte, puis l'inscription. Les 20 points de bienvenue sont crédités par le serveur à la
 // création du compte (claimWelcomeBonus) : rien n'est promis qui ne soit vrai.
 let _demoIdx=0,_demoSeen=0,_demoSel=-1;
 function startDemo(){_demoSeen=0;trackEvent('demo_start');trackFunnel('demo_start');openDemoQ(0);}
@@ -5851,14 +5851,14 @@ function submitDemo(){
     bars.appendChild(row);
   });
   const last=_demoIdx>=DEMO_QS.length-1, nb=document.getElementById('demo-next-btn'), rb=document.getElementById('demo-reg-btn');
-  nb.textContent=last?'Créer mon compte et récupérer mes 50 points':'Question suivante ('+(_demoIdx+2)+' / '+DEMO_QS.length+')';
+  nb.textContent=last?'Créer mon compte et récupérer mes 20 points':'Question suivante ('+(_demoIdx+2)+' / '+DEMO_QS.length+')';
   rb.style.display=last?'none':'block';
   document.getElementById('demo-pts').style.display=last?'flex':'none';
   goTo('demo-result');
 }
 function demoNext(){ if(_demoIdx>=DEMO_QS.length-1) showAuthWall('register'); else openDemoQ(_demoIdx+1); }
 
-// Bonus de bienvenue (+50 pts, une seule fois) : crédité CÔTÉ SERVEUR (claimWelcomeBonus), jamais par le client.
+// Bonus de bienvenue (+20 pts, une seule fois) : crédité CÔTÉ SERVEUR (claimWelcomeBonus), jamais par le client.
 // Idempotent : appelé à chaque création de compte, quelle que soit la méthode (email, Google, Apple), et par précaution à la connexion.
 async function claimPendingDemo(){
   if(!auth.currentUser)return 0;
@@ -6129,9 +6129,10 @@ function cityPhrase(label){
 // Récompenses payables en NOOVS : annoncées, pas encore ouvertes.
 function renderNoovRewards(){
   const el=document.getElementById('noov-rewards');if(!el)return;
+  // Pas de cadeau à moins de 100 NOOVS (barème d'octobre).
   const items=[{ico:'gift-generic',t:'Bons'},{ico:'eye',t:'Sans pub'},{ico:'trophy',t:'Concours'}];
   el.className='noov-tiles';
-  el.innerHTML=items.map(i=>`<div class="noov-tile"><div class="ns-ico">${icon(i.ico,{size:20})}</div><div class="ns-t">${i.t}</div><div class="ns-tag">Bientôt</div></div>`).join('');
+  el.innerHTML=items.map(i=>`<div class="noov-tile"><div class="ns-ico">${icon(i.ico,{size:20})}</div><div class="ns-t">${i.t}</div><div class="ns-tag">Bientôt · dès 100 NOOVS</div></div>`).join('');
 }
 function renderDailyTrack(){
   const el=document.getElementById('daily-track');if(!el)return;
