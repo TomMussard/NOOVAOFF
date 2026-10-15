@@ -100,7 +100,7 @@ const T4=async(n,fn)=>{try{await fn();}catch(e){fail++;console.log('FAIL '+n+' (
     const before=(await db.doc('users/me').get()).data().authorizedMerchants;
     await p.evaluate(()=>saveMerchantConsents());await sleep(1500);
     const after=(await db.doc('users/me').get()).data().authorizedMerchants;
-    check('Enregistrer : seul Studio Fit reste autorisé côté serveur ; retour au profil (barre de navigation visible)',JSON.stringify(before)==='["m1","m2"]'&&JSON.stringify(after)==='["m2"]'&&await p.evaluate(()=>document.getElementById('profile').classList.contains('active')&&document.getElementById('bnav').classList.contains('show')),{before,after});
+    check('Enregistrer : seul Studio Fit reste autorisé côté serveur ; retour à « Données et confidentialité », d\'où l\'on venait',JSON.stringify(before)==='["m1","m2"]'&&JSON.stringify(after)==='["m2"]'&&await p.evaluate(()=>document.getElementById('privacy-data').classList.contains('active')),{before,after});
     const ev=(await db.collection('consentEvents').where('userId','==','me').get()).docs.map(d=>d.data().merchantId+':'+d.data().action);
     check('Journal des consentements (preuve RGPD) : le retrait de Le Fournil est enregistré',ev.includes('m1:revoked'),ev);
   });
