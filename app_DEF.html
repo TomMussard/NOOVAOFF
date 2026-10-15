@@ -407,6 +407,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .follow-card .fc-b button{flex:1}
 .follow-card .fc-x{display:block;margin:10px auto 0;background:none;border:none;color:var(--ink2);font-size:var(--fs-1);text-decoration:underline;cursor:pointer;font-family:var(--fb);padding:6px}
 .rv-skel .rv-bar{background:var(--bg2);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite}
+#lock-bar{height:6px;border-radius:var(--r-pill);overflow:hidden;margin-top:10px;opacity:0;flex-shrink:0}
+#lock-bar.on{opacity:1}
+#lock-fill{height:100%;width:100%;background:var(--yellow);border-radius:var(--r-pill)}
+#lock-bar.on #lock-fill{animation:lockDrain 3s linear forwards}
+@keyframes lockDrain{from{width:100%}to{width:0}}
+#question.qmode-noova.qfull #lock-fill{background:var(--nv-yellow)}
+#question.qfull #lock-fill{background:var(--text-3)}
 .btn-sub.locked{pointer-events:none;opacity:.27;}
 .dtrack{margin:0 22px 14px;background:var(--surface);border-radius:var(--r-card);padding:12px 14px;display:flex;align-items:center;gap:12px;}
 .dt-dots{display:flex;gap:6px;flex-shrink:0}
@@ -1874,6 +1881,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
     </div>
     <div class="ans-area" id="ans-area"></div>
     <button type="button" class="q-follow" id="q-follow" hidden onclick="discFollow()">Suivre ce commerce</button>
+    <div id="lock-bar"><div id="lock-fill"></div></div>
     <div class="q-actions">
       <button class="skip-btn" id="skip-btn" onclick="goNav('home')">Passer</button>
       <button class="btn-sub" id="sub-btn" onclick="submitAns()" disabled>Valider</button>
@@ -5597,16 +5605,24 @@ const callGetReveal = fx.httpsCallable('getReveal');
 const callSetNotifPref = fx.httpsCallable('setNotifPref');
 const callTrackNotifOpen = fx.httpsCallable('trackNotifOpen');
 const callBeginQuestion = fx.httpsCallable('beginQuestion');
-// Délai de lecture : le serveur refuse une réponse envoyée moins de 3 s après l'affichage de la question (mesuré depuis
-// beginQuestion : impossible à contourner). Rien ne s'affiche (une barre qui se vide stressait les testeurs) : si on
-// valide plus tôt, la réponse part toute seule à la fin du délai.
+// Délai de lecture : « Valider » reste verrouillé 3 s après l'affichage d'une question, avec une barre jaune qui se vide
+// (remise à la demande de l'équipe : elle invite à lire la question). Le serveur mesure lui-même ce temps depuis
+// beginQuestion : impossible à contourner.
 const ANSWER_LOCK_MS = 3000;
-// Même règle que le serveur (functions/lib.js isMultiQ) : 2 réponses possibles dès 3 options, sauf multi: false.
-function isMultiQ(q){ return !!q && q.format === 'mcq' && q.multi !== false && Array.isArray(q.options) && q.options.length >= 3; }
 function startAnswerLock(){
   S._qLockUntil = Date.now() + ANSWER_LOCK_MS;
-  clearTimeout(S._qLockTimer); S._qLockQueued = false;
+  const bar = document.getElementById('lock-bar'), btn = document.getElementById('sub-btn');
+  if(!bar || !btn) return;
+  bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on');
+  btn.classList.add('locked');
+  const LOCK_LABEL = 'Prends le temps de lire…';
+  if(!/Prends le temps/.test(btn.textContent)) btn.dataset.label = btn.textContent;
+  btn.textContent = LOCK_LABEL;
+  clearTimeout(S._qUnlockTimer);
+  S._qUnlockTimer = setTimeout(() => { btn.classList.remove('locked'); bar.classList.remove('on'); if(btn.textContent === LOCK_LABEL) btn.textContent = btn.dataset.label || 'Valider'; }, ANSWER_LOCK_MS);
 }
+// Même règle que le serveur (functions/lib.js isMultiQ) : 2 réponses possibles dès 3 options, sauf multi: false.
+function isMultiQ(q){ return !!q && q.format === 'mcq' && q.multi !== false && Array.isArray(q.options) && q.options.length >= 3; }
 function beginQuestionOnServer(q){
   S._qBegin = null;
   if(!q || !q._firestoreId) return;
@@ -7441,12 +7457,7 @@ const _origSubmitAns = submitAns;
 submitAns = function() {
   const q = curQuestion();
   if(!q || S._submitting) return;
-  const wait = (S._qLockUntil || 0) - Date.now();   // délai de lecture de 3 s : on envoie dès qu'il est écoulé
-  if(wait > 0) {
-    if(!S._qLockQueued) { S._qLockQueued = true; const b = document.getElementById('sub-btn'); if(b) b.textContent = 'Envoi…';
-      S._qLockTimer = setTimeout(() => { S._qLockQueued = false; if(curQuestion() === q) submitAns(); }, wait + 60); }
-    return;
-  }
+  if(Date.now() < (S._qLockUntil || 0)) return; // délai de lecture de 3 s (bouton verrouillé, barre jaune)
   const qIdx = q._questionIdx || 0;
   // « Déjà répondu » se juge PAR QUESTION : avant, la campagne entière était marquée dès la question 1, ce qui rendait
   // les questions 2 et 3 impossibles à valider.

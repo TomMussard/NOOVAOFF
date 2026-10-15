@@ -60,8 +60,9 @@ const ADMIN='http://localhost:8950/admin.html';
     const q1=await p.evaluate(()=>({hint:document.getElementById('q-hint').textContent,usage:document.getElementById('bh-usage').textContent,btn:document.getElementById('sub-btn').textContent}));
     check('Question à choix : consigne adaptée, plus de « Donne ton avis »',/Choisis la réponse/.test(q1.hint)&&!/Donne ton avis/.test(q1.hint),q1);
     check('Ligne d\'utilité sans répéter le nom (« Ta réponse aide … »)',/^Ta réponse aide/.test(q1.usage)&&!/veut ton avis/.test(q1.usage),q1.usage);
-    check('Pas de compte à rebours stressant : bouton « Valider » normal dès l\'ouverture, pas de barre qui se vide',/Valider/.test(q1.btn)&&await p.evaluate(()=>!document.getElementById('sub-btn').classList.contains('locked')&&!document.getElementById('lock-bar')),q1.btn);
+    check('Bouton verrouillé pendant la lecture : « Prends le temps de lire… »',/Prends le temps de lire/.test(q1.btn),q1.btn);
     await sleep(3300);
+    check('… puis retrouve son libellé « Valider »',/Valider/.test(await p.$eval('#sub-btn',e=>e.textContent)),await p.$eval('#sub-btn',e=>e.textContent));
     await p.evaluate(()=>{goNav('home');openQ(S.qs.findIndex(q=>q.type==='text'));});await sleep(400);
     check('Question texte : consigne « Écris ce que tu en penses »',/Écris ce que tu en penses/.test(await p.$eval('#q-hint',e=>e.textContent)));
     // cadeaux + profil
