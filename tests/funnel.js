@@ -38,7 +38,7 @@ const call=async(name,data)=>{const r=await fetch('http://127.0.0.1:5001/noova-3
     check('3e question : le coiffeur',/coiffeur/.test(await p.$eval('#demo-q-text',e=>e.textContent)));
     await answer();
     const r3=await p.evaluate(()=>({next:document.getElementById('demo-next-btn').textContent,reg:getComputedStyle(document.getElementById('demo-reg-btn')).display,pts:getComputedStyle(document.getElementById('demo-pts')).display}));
-    check('Après la 3e : « Créer mon compte et récupérer mes 50 points » (bonus de bienvenue réel)',r3.next==='Créer mon compte et récupérer mes 50 points'&&r3.reg==='none'&&r3.pts==='flex',r3);
+    check('Après la 3e : « Créer mon compte et récupérer mes 20 points » (bonus de bienvenue réel)',r3.next==='Créer mon compte et récupérer mes 20 points'&&r3.reg==='none'&&r3.pts==='flex',r3);
     await p.evaluate(()=>demoNext());await wf(p,()=>document.getElementById('auth-wall').style.display==='flex'&&document.getElementById('aw-name').style.display==='block');
     check('Le bouton ouvre l\'inscription',true);
     const ok6=x=>x.onboard_2===1&&x.demo_start===1&&x.demo_1===1&&x.demo_2===1&&x.demo_3===1&&x.signup_open===1;
@@ -48,7 +48,7 @@ const call=async(name,data)=>{const r=await fetch('http://127.0.0.1:5001/noova-3
     await p.evaluate(()=>awSubmit());
     check('Compte créé : compté par le serveur',await until(async()=>(await total()).signup_done===1,20000),await total());
     const uid=await p.evaluate(()=>auth.currentUser&&auth.currentUser.uid);
-    check('Les 50 points promis sont bien crédités',await until(async()=>((await db.doc('users/'+uid).get()).data()||{}).points===50,20000));
+    check('Les 20 points promis sont bien crédités',await until(async()=>((await db.doc('users/'+uid).get()).data()||{}).points===20,20000));
   });
   await T('compteur : par visite, rien sur l\'appareil',async()=>{
     await p.evaluate(()=>{trackFunnel('open');trackFunnel('demo_1');});await sleep(1500);

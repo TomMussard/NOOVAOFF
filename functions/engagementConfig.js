@@ -11,7 +11,7 @@ module.exports = {
   POINTS: {
     PER_ANSWER: 10,              // chaque réponse valide, quelle que soit sa position dans la campagne
     MAX_ANSWERS_PER_DAY: 3,      // seules les N premières réponses du jour rapportent des points (30 pts/jour au maximum)
-    WELCOME_BONUS: 50,           // une seule fois, à l'inscription
+    WELCOME_BONUS: 20,           // une seule fois, à l'inscription
     DISCOVERY_BONUS: 5,          // 1re réponse à un commerçant donné, 1 fois par jour au maximum
     EXPIRY_MONTHS: 6,            // les points expirent après ce délai sans aucune activité (réponse ou échange)
     NOOVS_PER_ANSWER: 1,         // au-delà du quota du jour (« mode libre ») : monnaie séparée, inchangée
@@ -75,7 +75,7 @@ module.exports = {
 
   // ─── NOOVS (monnaie virtuelle) ─── bornent le coût et la fraude avant toute conversion (bons, argent…)
   NOOVS: {
-    DAILY_CAP: 30,               // NOOVS maximum par jour et par habitant (les réponses restent enregistrées au-delà)
+    DAILY_CAP: 1000000,          // pas de plafond par jour (décision produit) : on ne répond qu'une fois à chaque question
     PENDING_DAYS: 3,             // délai de validation avant qu'un NOOV soit utilisable (enregistré sur la réponse)
     MIN_RESPONSE_MS: 0,          // temps minimum (mesuré serveur) pour gagner des NOOVS ; 0 = désactivé (à monter si des abus apparaissent)
     PER_NOOVA_QUESTION: 1,       // TOUTE question posée par NOOVA (compte NOOVA, question de la semaine) rapporte 1 NOOV,

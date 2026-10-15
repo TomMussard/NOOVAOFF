@@ -38,7 +38,7 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
     await p.evaluate(()=>navTo('rewards',document.getElementById('nav-rewards')));await wf(p,()=>document.querySelectorAll('#reward-slots .card').length===5,null,10000);
     const v=await p.evaluate(()=>({nav:document.getElementById('nav-rewards').textContent.trim(),title:document.querySelector('#page-rewards').firstElementChild.textContent.replace(/\s+/g,' ').trim().slice(0,60),txt:document.getElementById('page-rewards').innerText.replace(/\s+/g,' '),inputs:document.querySelectorAll('#page-rewards input').length,heads:[...document.querySelectorAll('#reward-slots .card')].map(c=>c.firstElementChild.firstElementChild.firstElementChild.textContent.replace(/\s+/g,' ').trim()),prog:document.getElementById('rewards-progress').textContent.replace(/\s+/g,' ')}));
     check('Le menu et le titre sont renommés « Ma vitrine récompenses » (plus « Mes récompenses »)',v.nav==='Ma vitrine récompenses'&&/Ma vitrine récompenses/.test(v.title)&&!/Mes récompenses/.test(v.txt),v);
-    check('5 cartes de palier : Palier N · X pts (150 / 300 / 500 / 900 / 1500, gros lot au 5e)',v.heads.length===5&&TIERS.every((t,i)=>v.heads[i].startsWith('Palier '+t.n+' · '+t.pts+' pts'))&&/gros lot/.test(v.heads[4]),v.heads);
+    check('5 cartes de palier : Palier N · X pts (400 / 800 / 1500 / 2500 / 4000, gros lot au 5e)',v.heads.length===5&&TIERS.every((t,i)=>v.heads[i].startsWith('Palier '+t.n+' · '+t.pts+' pts'))&&/gros lot/.test(v.heads[4]),v.heads);
     check('Fourchette de prix carte par palier : 1–3 €, 3–6 €, 6–10 €, 10–18 €, 18–30 €',TIERS.every(t=>v.txt.includes('entre '+t.min+' € et '+t.max+' €')),v.txt.slice(0,300));
     check('Aucun champ de saisie de prix ni de points avant de choisir une récompense',v.inputs===0,v.inputs);
     check('Les mots « coût » et « valeur » n\'apparaissent nulle part dans la vitrine',!/co[uû]t|valeur/i.test(v.txt),v.txt.match(/.{20}(co[uû]t|valeur).{20}/i));
@@ -50,7 +50,7 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
     const f=await p.evaluate(()=>({label:document.getElementById('rf-label-1').value,icon:document.getElementById('rf-icon-1').value,chips:[...document.querySelectorAll('#rf-chips-1 button')].map(b=>b.textContent),price:document.getElementById('rf-price-1').parentElement.textContent.replace(/\s+/g,' ').trim(),quota:document.getElementById('rf-quota-1').value,inputs:[...document.querySelectorAll('#rw-card-1 input')].map(i=>i.id||i.className).join(),txt:document.getElementById('rw-card-1').innerText.replace(/\s+/g,' ')}));
     check('Suggestions liées à la catégorie (boulangerie, palier 1) et 1re suggestion pré-remplie',f.label==='Viennoiserie offerte'&&f.chips.length===3&&f.chips.some(c=>/Cookie offert/.test(c)),f);
     check('Case à cocher « le prix carte de cet article est entre 1 € et 3 € »',/prix carte de cet article est entre 1 € et 3 €/.test(f.price),f.price);
-    check('Formulaire : aucun champ prix ni points (seulement récompense, quota, créneaux, avec achat)',!/co[uû]t|valeur|points?\b/i.test(f.txt.replace(/Palier 1 · 150 pts/,''))&&!/value|cost|pts|price-eur/i.test(f.inputs.replace('rf-price-1','')),f.inputs);
+    check('Formulaire : aucun champ prix ni points (seulement récompense, quota, créneaux, avec achat)',!/co[uû]t|valeur|points?\b/i.test(f.txt.replace(/Palier 1 · 400 pts/,''))&&!/value|cost|pts|price-eur/i.test(f.inputs.replace('rf-price-1','')),f.inputs);
     await p.evaluate(()=>{document.querySelector('#rf-chips-1 button:nth-child(2)').click();});
     check('Cliquer une suggestion remplit l\'intitulé et l\'icône',await p.evaluate(()=>document.getElementById('rf-label-1').value==='Cookie offert'&&document.getElementById('rf-icon-1').value==='🍪'));
     await p.evaluate(()=>saveReward(1,{disabled:false,textContent:''}));await sleep(500);
@@ -60,7 +60,7 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
     check('Quota 0 : refusé',(await toasts()).some(t=>/quota mensuel/.test(t))&&!(await doc('m1_p1')));
     await setVal(p,'#rf-quota-1','15');await p.evaluate(()=>saveReward(1,{disabled:false,textContent:''}));await wf(p,()=>_rewardSlots.length===1,null,10000);
     const d=await doc('m1_p1');
-    check('Palier 1 enregistré : identifiant m1_p1, coût 150 imposé par le palier, en attente de validation, prix confirmé, quota 15',d&&d.tier===1&&d.cost===150&&d.status==='pending'&&d.approved===false&&d.active===false&&d.priceConfirmed===true&&d.monthlyQuota===15&&d.label==='Cookie offert'&&d.withPurchase===false,d);
+    check('Palier 1 enregistré : identifiant m1_p1, coût 400 imposé par le palier, en attente de validation, prix confirmé, quota 15',d&&d.tier===1&&d.cost===400&&d.status==='pending'&&d.approved===false&&d.active===false&&d.priceConfirmed===true&&d.monthlyQuota===15&&d.label==='Cookie offert'&&d.withPurchase===false,d);
     // palier 2 : créneau + avec achat
     await p.evaluate(()=>openRewardForm(2));
     await p.evaluate(()=>{document.getElementById('rf-price-2').checked=true;addRewardSlotRow(2);document.getElementById('rf-buy-2').click();});
@@ -69,12 +69,12 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
     await setVal(p,'#rf-min-2','12');await p.evaluate(()=>{const r=document.querySelector('#rf-slots-2 .rw-slot');r.querySelectorAll('.rw-day').forEach(c=>{c.checked=[1,2,3].includes(+c.value);});});
     await p.evaluate(()=>saveReward(2,{disabled:false,textContent:''}));await wf(p,()=>_rewardSlots.length===2,null,10000);
     const d2=await doc('m1_p2');
-    check('Palier 2 : coût 300, créneaux lun–mer 14h–17h, avec achat minimum 12 €',d2&&d2.cost===300&&d2.withPurchase===true&&d2.minPurchase===12&&d2.timeSlots.length===1&&d2.timeSlots[0].from==='14:00'&&d2.timeSlots[0].to==='17:00'&&d2.timeSlots[0].days.slice().sort().join()==='1,2,3',d2);
+    check('Palier 2 : coût 800, créneaux lun–mer 14h–17h, avec achat minimum 12 €',d2&&d2.cost===800&&d2.withPurchase===true&&d2.minPurchase===12&&d2.timeSlots.length===1&&d2.timeSlots[0].from==='14:00'&&d2.timeSlots[0].to==='17:00'&&d2.timeSlots[0].days.slice().sort().join()==='1,2,3',d2);
     await p.evaluate(()=>navTo('create',document.getElementById('nav-create')));await sleep(1200);
     check('Première campagne bloquée tant que les 5 paliers ne sont pas remplis (2 sur 5)',await p.evaluate(()=>curPage)!=='create'&&(await toasts()).some(t=>/Remplissez encore 3 palier/.test(t)));
     for(const t of [3,4,5]){await p.evaluate(t=>{openRewardForm(t);document.getElementById('rf-price-'+t).checked=true;document.getElementById('rf-label-'+t).value='Ma récompense libre '+t;},t);await p.evaluate(t=>saveReward(t,{disabled:false,textContent:''}),t);await wf(p,n=>_rewardSlots.length>=n,t,10000);}
     const all=(await db.collection('rewards').where('merchantId','==','m1').get()).docs.map(x=>x.id+':'+x.data().cost).sort().join();
-    check('Texte libre accepté ; 5 paliers, un document par palier, coût = celui du palier',all==='m1_p1:150,m1_p2:300,m1_p3:500,m1_p4:900,m1_p5:1500',all);
+    check('Texte libre accepté ; 5 paliers, un document par palier, coût = celui du palier',all==='m1_p1:400,m1_p2:800,m1_p3:1500,m1_p4:2500,m1_p5:4000',all);
     check('Progression : « 5 / 5 paliers remplis »',/5 \/ 5 paliers remplis/.test(await p.evaluate(()=>document.getElementById('rewards-progress').textContent)));
     await p.evaluate(()=>navTo('create',document.getElementById('nav-create')));await wf(p,()=>curPage==='create',null,8000).catch(()=>{});
     check('Avec les 5 paliers remplis : la création de campagne s\'ouvre',await p.evaluate(()=>curPage)==='create');
@@ -150,7 +150,7 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
   await T('app habitant : Palier N, X pts, aucun euro',async()=>{
     await wipe();
     await db.doc('merchants/m1').set({role:'merchant',ownerUid:'m1',brandName:'Le Fournil',name:'Le Fournil',sector:'Boulangerie',city:'le-mans',cityLabel:'Le Mans',status:'verified',email:'m1@shop.fr'});
-    await db.doc('users/me').set({role:'user',welcomeClaimed:true,name:'Alex',email:'me@t.fr',city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:400,xp:400,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true});
+    await db.doc('users/me').set({role:'user',welcomeClaimed:true,name:'Alex',email:'me@t.fr',city:'le-mans',cityLabel:'Le Mans',authorizedMerchants:['m1'],friendUids:[],answeredCampaigns:[],points:1100,xp:1100,streak:0,interests:['restauration'],onboardingStep:'done',seenHomeTour:true});
     await aauth.createUser({uid:'me',email:'me@t.fr',password:'secret123'});
     for(let t=1;t<=5;t++)await db.doc('rewards/m1_p'+t).set(rw('m1',t,{label:['Café offert','Viennoiserie','Menu midi','Panier surprise','Gros lot'][t-1],withPurchase:t===2,minPurchase:t===2?12:null,monthlyQuota:50}));
     const u=await browser.newPage();const uerrs=[];u.on('pageerror',e=>uerrs.push(e.message));await u.setViewport({width:390,height:900,isMobile:true,hasTouch:true});
@@ -159,7 +159,7 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
     await wf(u,()=>document.getElementById('home').classList.contains('active')&&S.user&&(S._rewardsCache||[]).length===5,null,30000);
     await u.evaluate(()=>{document.querySelectorAll('[id*=tour],.tour-ov').forEach(e=>e.remove());openRewardsSheet();});await sleep(800);
     const g=await u.evaluate(()=>({cards:[...document.querySelectorAll('#gift-grid .gift-c')].map(c=>c.textContent.replace(/\s+/g,' ').trim()),sheet:document.getElementById('rewards-sheet').innerText,locked:document.querySelectorAll('#gift-grid .gift-c.locked').length}));
-    check('Cartes : « Palier N, X pts » pour chaque récompense (150, 300, 500 débloquées avec 400 pts : 2 ; 900 et 1500 verrouillées)',g.cards.length===5&&g.cards[0].includes('Palier 1, 150 pts')&&g.cards[4].includes('Palier 5, 1500 pts')&&g.locked===3,g);
+    check('Cartes : « Palier N, X pts » pour chaque récompense (400 et 800 débloquées avec 1100 pts ; 1500, 2500 et 4000 verrouillées)',g.cards.length===5&&g.cards[0].includes('Palier 1, 400 pts')&&g.cards[4].includes('Palier 5, 4000 pts')&&g.locked===3,g);
     check('Aucun euro nulle part côté habitant (feuille des récompenses)',!/€|euro/i.test(g.sheet),g.sheet.match(/.{15}(€|euro).{15}/i));
     await u.evaluate(()=>closeRewardsSheet&&closeRewardsSheet());
     await u.evaluate(()=>goNav('rewards-tab'));await sleep(800);
@@ -168,11 +168,11 @@ const rw=(mid,tier,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-ma
     // échange puis limite hebdomadaire
     await u.evaluate(()=>{window.__r=redeemReward((S._rewardsCache||[]).find(r=>r.tier===2));});await wf(u,()=>document.getElementById('redeem-confirm'),null,8000);
     const conf=await u.$eval('#redeem-confirm',e=>e.innerText.replace(/\s+/g,' '));
-    check('Confirmation : Palier 2, 300 pts, il reste 100 pts, sans euro',/Palier 2, 300 pts/.test(conf)&&/100 pts/.test(conf)&&!/€/.test(conf),conf);
+    check('Confirmation : Palier 2, 800 pts, il reste 300 pts, sans euro',/Palier 2, 800 pts/.test(conf)&&/300 pts/.test(conf)&&!/€/.test(conf),conf);
     await u.evaluate(()=>document.getElementById('rc-yes').click());await wf(u,()=>document.getElementById('voucher-full'),null,15000);
     const vt=await u.$eval('#voucher-full',e=>e.innerText.replace(/\s+/g,' '));
     check('Bon plein écran : le code, la condition « avec un achat » SANS montant en euros',/Valable avec un achat/.test(vt)&&!/€/.test(vt)&&/^[A-Z2-9]{4}$/.test((await db.collection('redemptions').where('userId','==','me').get()).docs[0].data().code),vt);
-    check('Solde débité côté serveur (400 → 100)',(await db.doc('users/me').get()).data().points===100);
+    check('Solde débité côté serveur (1100 → 300)',(await db.doc('users/me').get()).data().points===300);
     await u.evaluate(()=>closeVoucherFull());
     await db.doc('users/me').update({points:2000});await sleep(800);
     await u.evaluate(()=>{window.__toasts=[];const o=window.showToast;window.showToast=(m,i)=>{window.__toasts.push(m);return o(m,i);};window.__r=redeemReward((S._rewardsCache||[]).find(r=>r.tier===1));});await sleep(1500);

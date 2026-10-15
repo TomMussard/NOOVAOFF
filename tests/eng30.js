@@ -40,7 +40,7 @@ const rw=(mid,t,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-mans'
     await wf(up,()=>document.getElementById('cat-wall').style.display==='flex',null,20000);
     const uid=await up.evaluate(()=>auth.currentUser.uid);up.__uid=uid;
     const u=(await db.doc('users/'+uid).get()).data();
-    check('Bonus de bienvenue crédité (+50 pts) dès l\'inscription',u.points===50&&u.welcomeClaimed===true,u.points);
+    check('Bonus de bienvenue crédité (+20 pts) dès l\'inscription',u.points===20&&u.welcomeClaimed===true,u.points);
     await up.evaluate(()=>{document.querySelector('#cat-grid [data-cat=all]').click();document.querySelector('#cat-age-grid [data-age="25-34"]').click();saveCategories();});
     await wf(up,()=>document.getElementById('home').classList.contains('active')&&Array.isArray(S.qs),null,25000);
   });
@@ -67,7 +67,7 @@ const rw=(mid,t,o={})=>({merchantId:mid,merchantName:'Le Fournil',city:'le-mans'
     check('Écran de récompense affiché avec le total de points',/pts/.test(rw),rw.slice(0,200));
     await up.screenshot({path:'/tmp/shots/audit_reward.png'});
     const u=(await db.doc('users/'+up.__uid).get()).data();
-    check('Points bien crédités en base (bonus 50 + réponse)',u.points>=50,u.points);
+    check('Points bien crédités en base (bonus 20 + réponse)',u.points>20,u.points);
   });
 
   let voucherCode=null;

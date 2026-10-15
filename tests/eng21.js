@@ -31,9 +31,9 @@ const setClock=ms=>db.doc('_testClock/now').set({ms});
   await mkCamp('c1','m1');await mkCamp('c2','m1');await mkCamp('c3','m2');await mkCamp('c4','m3');await mkCamp('c5','m3');await mkCamp('c6','m4');
 
   await T('config',async()=>{
-    check('Config unique : 10 pts/réponse, 3 réponses/jour, +50 bienvenue, +5 découverte, expiration 6 mois',CFG.POINTS.PER_ANSWER===10&&CFG.POINTS.MAX_ANSWERS_PER_DAY===3&&CFG.POINTS.WELCOME_BONUS===50&&CFG.POINTS.DISCOVERY_BONUS===5&&CFG.POINTS.EXPIRY_MONTHS===6,CFG.POINTS);
+    check('Config unique : 10 pts/réponse, 3 réponses/jour, +20 bienvenue, +5 découverte, expiration 6 mois',CFG.POINTS.PER_ANSWER===10&&CFG.POINTS.MAX_ANSWERS_PER_DAY===3&&CFG.POINTS.WELCOME_BONUS===20&&CFG.POINTS.DISCOVERY_BONUS===5&&CFG.POINTS.EXPIRY_MONTHS===6,CFG.POINTS);
     check('Anciennes constantes supprimées (barème par question, bonus de série, points de démo)',!('BY_QUESTION_INDEX' in CFG.POINTS)&&!('STREAK_BONUS' in CFG.POINTS)&&!('SERIE_BONUS' in CFG.POINTS)&&!('DEMO_POINTS' in CFG.POINTS));
-    check('5 paliers : 150/300/500/900/1500 pts, prix carte 1-3, 3-6, 6-10, 10-18, 18-30 €',JSON.stringify(TIERS.map(t=>[t.pts,t.min,t.max]))==='[[150,1,3],[300,3,6],[500,6,10],[900,10,18],[1500,18,30]]',TIERS);
+    check('5 paliers : 400/800/1500/2500/4000 pts, prix carte 1-3, 3-6, 6-10, 10-18, 18-30 €',JSON.stringify(TIERS.map(t=>[t.pts,t.min,t.max]))==='[[400,1,3],[800,3,6],[1500,6,10],[2500,10,18],[4000,18,30]]',TIERS);
   });
 
   await T('bonus de bienvenue',async()=>{
@@ -41,9 +41,9 @@ const setClock=ms=>db.doc('_testClock/now').set({ms});
     check('Sans connexion : refusé',(await callFn('claimWelcomeBonus',{})).error==='UNAUTHENTICATED');
     const tok=await idTokenOf('new1@t.fr');
     const r1=await callFn('claimWelcomeBonus',{},tok);const u1=(await db.doc('users/new1').get()).data();
-    check('Inscription : +50 pts (et +50 xp), welcomeClaimed, lastActivityAt posé',r1.claimed===true&&r1.points===50&&u1.points===50&&u1.xp===50&&u1.welcomeClaimed===true&&!!u1.lastActivityAt,{r1,u1});
+    check('Inscription : +20 pts (et +20 xp), welcomeClaimed, lastActivityAt posé',r1.claimed===true&&r1.points===20&&u1.points===20&&u1.xp===20&&u1.welcomeClaimed===true&&!!u1.lastActivityAt,{r1,u1});
     const r2=await callFn('claimWelcomeBonus',{},tok);const u2=(await db.doc('users/new1').get()).data();
-    check('Une seule fois : le 2e appel ne crédite rien',r2.claimed===false&&u2.points===50,{r2,u2:u2.points});
+    check('Une seule fois : le 2e appel ne crédite rien',r2.claimed===false&&u2.points===20,{r2,u2:u2.points});
     await mkUser('old1',{welcomeClaimed:false,createdAt:Timestamp.fromMillis(Date.now()-10*DAY)});
     const r3=await callFn('claimWelcomeBonus',{},await idTokenOf('old1@t.fr'));const u3=(await db.doc('users/old1').get()).data();
     check('Ancien compte non migré (créé il y a 10 jours) : pas de bonus rétroactif, mais marqué pour ne plus être proposé',r3.claimed===false&&u3.points===0&&u3.welcomeClaimed===true,{r3,u3:u3.points});
@@ -104,7 +104,7 @@ const setClock=ms=>db.doc('_testClock/now').set({ms});
   });
 
   await T('échange',async()=>{
-    await mkUser('r1',{points:2000,xp:2000});await mkUser('r2',{points:100});
+    await mkUser('r1',{points:5000,xp:5000});await mkUser('r2',{points:100});
     await db.doc('rewards/m1_p1').set(rewardDoc('m1',1));await db.doc('rewards/m1_p2').set(rewardDoc('m1',2,{withPurchase:true,minPurchase:8}));
     await db.doc('rewards/m2_p3').set(rewardDoc('m2',3,{monthlyQuota:1}));await db.doc('rewards/m3_p1').set(rewardDoc('m3',1,{status:'pending',active:false,approved:false}));
     const tok=await idTokenOf('r1@t.fr');
@@ -112,38 +112,38 @@ const setClock=ms=>db.doc('_testClock/now').set({ms});
     const bad=await callFn('redeemReward',{rewardId:'m3_p1'},tok);
     check('Récompense non approuvée : refusée',bad.error==='FAILED_PRECONDITION',bad);
     const poor=await callFn('redeemReward',{rewardId:'m1_p1'},await idTokenOf('r2@t.fr'));
-    check('Solde insuffisant (100 pts pour 150) : refusé, message précis, solde inchangé',poor.error==='FAILED_PRECONDITION'&&/50 pts/.test(poor.message)&&(await db.doc('users/r2').get()).data().points===100,poor);
+    check('Solde insuffisant (100 pts pour 400) : refusé, message précis, solde inchangé',poor.error==='FAILED_PRECONDITION'&&/300 pts/.test(poor.message)&&(await db.doc('users/r2').get()).data().points===100,poor);
     const ok=await callFn('redeemReward',{rewardId:'m1_p1'},tok);let u=(await db.doc('users/r1').get()).data();
-    check('Échange : débit de 150 pts (coût du PALIER), bon avec code à 4 caractères, palier 1',ok.cost===150&&ok.tier===1&&/^[A-HJ-NP-Z2-9]{4}$/.test(ok.code)&&u.points===1850&&u.xp===2000,{ok,pts:u.points});
+    check('Échange : débit de 400 pts (coût du PALIER), bon avec code à 4 caractères, palier 1',ok.cost===400&&ok.tier===1&&/^[A-HJ-NP-Z2-9]{4}$/.test(ok.code)&&u.points===4600&&u.xp===5000,{ok,pts:u.points});
     const rd=(await db.doc('redemptions/'+ok.redemptionId).get()).data();
     check('Bon enregistré côté serveur : pending, 24 h, palier, aucun montant en € côté habitant',rd.status==='pending'&&rd.userId==='r1'&&rd.tier===1&&rd.merchantId==='m1'&&Math.abs(rd.expiresAt.toMillis()-Date.now()-24*3600000)<120000&&!/€/.test(JSON.stringify(rd.purchaseCondition)),rd);
         const mon=(await db.doc('rewards/m1_p1/monthly/'+(new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'}).slice(0,7))).get()).data();
     const rw=(await db.doc('rewards/m1_p1').get()).data(),mm=(await db.doc('merchants/m1').get()).data();
-    check('Compteurs : quota du mois = 1, redeemedCount = 1, pointsSpent du commerçant = 150',mon&&mon.used===1&&rw.redeemedCount===1&&mm.pointsSpent===150,{mon,rc:rw.redeemedCount,ps:mm.pointsSpent});
+    check('Compteurs : quota du mois = 1, redeemedCount = 1, pointsSpent du commerçant = 400',mon&&mon.used===1&&rw.redeemedCount===1&&mm.pointsSpent===400,{mon,rc:rw.redeemedCount,ps:mm.pointsSpent});
     const wk=await callFn('redeemReward',{rewardId:'m1_p2'},tok);u=(await db.doc('users/r1').get()).data();
-    check('Une récompense par commerçant et par semaine : 2e échange chez m1 refusé (même une autre récompense), message avec la date de retour, aucun débit',wk.error==='RESOURCE_EXHAUSTED'&&/cette semaine/.test(wk.message)&&u.points===1850,wk);
+    check('Une récompense par commerçant et par semaine : 2e échange chez m1 refusé (même une autre récompense), message avec la date de retour, aucun débit',wk.error==='RESOURCE_EXHAUSTED'&&/cette semaine/.test(wk.message)&&u.points===4600,wk);
     const other=await callFn('redeemReward',{rewardId:'m2_p3'},tok);
-    check('… mais un autre commerçant (m2) est possible le même jour (500 pts, palier 3)',other.cost===500&&other.tier===3&&(await db.doc('users/r1').get()).data().points===1350,other);
+    check('… mais un autre commerçant (m2) est possible le même jour (1500 pts, palier 3)',other.cost===1500&&other.tier===3&&(await db.doc('users/r1').get()).data().points===3100,other);
     await mkUser('r3',{points:2000});
     const quota=await callFn('redeemReward',{rewardId:'m2_p3'},await idTokenOf('r3@t.fr'));
     check('Quota mensuel atteint (1 par mois) : refusé pour un autre habitant, solde intact',quota.error==='RESOURCE_EXHAUSTED'&&/mois/.test(quota.message)&&(await db.doc('users/r3').get()).data().points===2000,quota);
     // Une semaine plus tard (horloge d'émulateur) : l'échange chez m1 redevient possible.
     await setClock(Date.now()+8*DAY);
     const again=await callFn('redeemReward',{rewardId:'m1_p2'},tok);u=(await db.doc('users/r1').get()).data();
-    check('8 jours plus tard : nouvel échange chez m1 possible (300 pts, « avec achat » sans montant côté habitant)',again.cost===300&&u.points===1050&&again.purchaseCondition&&!/€/.test(again.purchaseCondition),again);
+    check('8 jours plus tard : nouvel échange chez m1 possible (800 pts, « avec achat » sans montant côté habitant)',again.cost===800&&u.points===2300&&again.purchaseCondition&&!/€/.test(again.purchaseCondition),again);
     const rd2=(await db.doc('redemptions/'+again.redemptionId).get()).data();
     check('Le minimum d\'achat reste côté commerçant (redemptions.minPurchase = 8)',rd2.minPurchase===8,rd2);
     // Le coût est TOUJOURS celui du palier, même si le document a été falsifié.
-    await db.doc('rewards/m2_p3').update({cost:1,monthlyQuota:50});await mkUser('r4',{points:499});
+    await db.doc('rewards/m2_p3').update({cost:1,monthlyQuota:50});await mkUser('r4',{points:1499});
     const cheat=await callFn('redeemReward',{rewardId:'m2_p3'},await idTokenOf('r4@t.fr'));
-    check('Document falsifié (cost = 1) : le serveur applique quand même 500 pts',cheat.error==='FAILED_PRECONDITION'&&(await db.doc('users/r4').get()).data().points===499,cheat);
+    check('Document falsifié (cost = 1) : le serveur applique quand même 1500 pts',cheat.error==='FAILED_PRECONDITION'&&(await db.doc('users/r4').get()).data().points===1499,cheat);
     // Solde jamais négatif, même en parallèle.
-    await mkUser('r5',{points:300});
+    await mkUser('r5',{points:800});
     for(const m of ['m1','m2','m3'])await db.doc('rewards/'+m+'_p1').set(rewardDoc(m,1,{monthlyQuota:50}));
     const t5=await idTokenOf('r5@t.fr');
     const par=await Promise.all(['m1_p1','m2_p1','m3_p1'].map(id=>callFn('redeemReward',{rewardId:id},t5)));
     const u5=(await db.doc('users/r5').get()).data();
-    check('3 échanges de 150 pts lancés en même temps avec 300 pts : deux passent, le troisième est refusé, le solde tombe à 0 et jamais en dessous',par.filter(x=>x.code).length===2&&par.filter(x=>x.error).length===1&&u5.points===0,{par,pts:u5.points});
+    check('3 échanges de 400 pts lancés en même temps avec 800 pts : deux passent, le troisième est refusé, le solde tombe à 0 et jamais en dessous',par.filter(x=>x.code).length===2&&par.filter(x=>x.error).length===1&&u5.points===0,{par,pts:u5.points});
     await db.doc('_testClock/now').delete();
   });
 
@@ -159,7 +159,7 @@ const setClock=ms=>db.doc('_testClock/now').set({ms});
     check('Échange hors créneau : refusé avec le rappel des créneaux, aucun débit',no.error==='FAILED_PRECONDITION'&&/14:00–17:00/.test(no.message)&&(await db.doc('users/s1').get()).data().points===500,no);
     await setClock(at('2026-06-09T13:00:00Z'));           // mardi 15h
     const yes=await callFn('redeemReward',{rewardId:'m1_p1'},await idTokenOf('s1@t.fr'));
-    check('Échange dans le créneau : accepté',yes.cost===150,yes);
+    check('Échange dans le créneau : accepté',yes.cost===400,yes);
     await db.doc('_testClock/now').delete();
   });
 
