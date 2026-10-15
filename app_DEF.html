@@ -396,6 +396,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb)
 .noova-tag{font-size:var(--fs-1);font-weight:800;color:var(--text);background:var(--surface-2);padding:2px 8px;border-radius:var(--r-tag)}
 .disc-note{margin:0 0 14px;padding:12px 14px;background:var(--bg2);border:1.5px dashed var(--nv-black);border-radius:var(--r-md);font-size:var(--fs-2);line-height:1.55;color:var(--ink)}
 .disc-note b{color:var(--nv-black)}
+.q-follow{display:block;width:100%;min-height:var(--tactile-min);margin-top:auto;flex-shrink:0;background:none;border:0;color:var(--text);font:inherit;font-size:var(--fs-3);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.q-follow[hidden]{display:none}
+.q-follow[disabled]{text-decoration:none;opacity:.8;cursor:default}
+.bh-disc{display:inline-block;margin-left:var(--s2);padding:2px 8px;border-radius:var(--r-xs);background:var(--bandeau);color:var(--jaune);font-family:var(--font);font-size:var(--fs-1);font-weight:800;vertical-align:2px}
 .follow-card{width:100%;margin:0 0 12px;padding:16px;background:var(--bg2);border:1.5px solid var(--bg3);border-radius:var(--r-crisp);text-align:left}
 .follow-card .fc-t{font-family:var(--fd);font-weight:800;font-size:var(--fs-4);color:var(--ink);margin-bottom:4px}
 .follow-card .fc-d{font-size:var(--fs-2);color:var(--ink2);line-height:1.55;margin-bottom:12px}
@@ -1869,6 +1873,7 @@ button.soc-bell{padding:0;font-family:var(--font)}
       <div class="disc-note" id="q-disc-note" style="display:none"></div>
     </div>
     <div class="ans-area" id="ans-area"></div>
+    <button type="button" class="q-follow" id="q-follow" hidden onclick="discFollow()">Suivre ce commerce</button>
     <div class="q-actions">
       <button class="skip-btn" id="skip-btn" onclick="goNav('home')">Passer</button>
       <button class="btn-sub" id="sub-btn" onclick="submitAns()" disabled>Valider</button>
@@ -2916,15 +2921,12 @@ function hqCardHTML(q,i,hero){
   const left=timeLeftTxt(q._endsMs),leftHTML=left?`<div class="hq-left">${esc(left)}</div>`:'';
   const img=q.photoUrl&&!q._byNoova?`<img src="${esc(q.photoUrl)}" alt="Devanture de ${esc(q.brand)}" loading="lazy" onerror="this.remove()">`:'';
   // Commerce pas encore suivi : on voit sa question, mais on choisit d'abord de le suivre (et de répondre) ou non.
+  // Commerce ni suivi ni écarté : même carte, marquée « Découverte » ; la question s'ouvre (Valider / Passer / Suivre).
   if(q._discovery&&!q._byNoova){
-    return `<div class="hq-card disc" role="group" aria-label="Découverte : ${esc(q.brand)}, commerce que tu ne suis pas encore">`
-      +`<div class="hq-ph">${img}<button type="button" class="hq-who hq-who-btn" aria-label="Voir la fiche de ${esc(q.brand)}" onclick="openBrandById(${jsa(q._merchantId)},${jsa(q.brand)})">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}${q._addr?`<span class="hq-addr">${esc(q._addr)}</span>`:''}</span>${testTagHTML(q._isTest)}</button></div>`
+    return `<button type="button" class="hq-card disc" onclick="openQ(${i})" aria-label="Découverte : ${esc(q.brand)}, commerce que tu ne suis pas encore : ${esc(q.q)}">`
+      +`<div class="hq-ph">${img}<div class="hq-who">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}${q._addr?`<span class="hq-addr">${esc(q._addr)}</span>`:''}</span>${testTagHTML(q._isTest)}</div></div>`
       +`<span class="hq-disc-tag">Découverte</span>`
-      +`<div class="hq-bd"><div class="hq-disc-l">${esc(q.theme||'Commerce')} · tu ne le suis pas encore</div><div class="hq-q">${esc(q.q)}</div>${leftHTML}`
-      +`<div class="hq-gate"><div class="hq-gate-t">Tu veux suivre ${esc(q.brand)} et répondre à ses questions ?</div>`
-      +`<div class="hq-gate-b"><button type="button" class="hq-cta" onclick="followAndAnswer(${jsa(q._merchantId)},${jsa(q._firestoreId)})">Oui, suivre et répondre</button>`
-      +`<button type="button" class="hq-no" onclick="notInterested(${jsa(q._merchantId)},${jsa(q.brand)})">Pas intéressé</button></div>`
-      +`<div class="hq-gate-s">« Pas intéressé » : tu ne verras plus aucune question de ce commerce.</div></div></div></div>`;
+      +`<div class="hq-bd"><div class="hq-disc-l">${esc(q.theme||'Commerce')} · tu ne le suis pas encore</div><div class="hq-q">${esc(q.q)}</div>${leftHTML}<span class="hq-cta">Voir la question</span></div></button>`;
   }
   return `<button type="button" class="hq-card${hero?' hero':''}${q._byNoova?' noova':''}" onclick="openQ(${i})" aria-label="${esc(q.brand)} : ${esc(q.q)}, ${esc(ptsTag(q))}">`
     +`<div class="hq-ph">${img}<div class="hq-who">${logoHTML(q.brand,32,q.logoUrl)}<span>${esc(q.brand)}${q._addr?`<span class="hq-addr">${esc(q._addr)}</span>`:''}</span>${testTagHTML(q._isTest)}</div></div>`
@@ -4624,8 +4626,40 @@ function fillQuestion(q,opts){
   document.getElementById('bh-tag').textContent=q.theme||'';
   document.getElementById('q-text').textContent=q.q;document.getElementById('q-hint').textContent=q.hint||defaultHint(q.type);
   const sk=document.getElementById('skip-btn');if(sk){sk.textContent=opts.skipLabel;sk.setAttribute('onclick',opts.skipFn);}
-  {const dn=document.getElementById('q-disc-note');if(dn)dn.style.display='none';}
+  // Question « découverte » (commerce ni suivi ni écarté) : la question et les réponses restent visibles ; répondre ou
+  // « Suivre » = autoriser ce commerce ; « Passer » = ne plus voir ses questions.
+  const disc=isDiscQ(q);
+  {const dn=document.getElementById('q-disc-note');if(dn){dn.style.display=disc?'':'none';if(disc)dn.innerHTML='<b>Découverte</b> : tu ne suis pas encore '+esc(q.brand)+'. En répondant, tu le suis et il pourra te poser d\'autres questions. « Passer » : tu ne verras plus ses questions.';}}
+  if(disc)document.getElementById('bh-name').innerHTML+=' <span class="bh-disc">Découverte</span>';
+  {const fb=document.getElementById('q-follow');if(fb){fb.hidden=!disc;fb.disabled=false;fb.textContent='Suivre '+q.brand+' sans répondre';}}
   document.getElementById('sub-btn').disabled=true;buildAns(q);
+}
+// Une question est « découverte » tant que son commerce n'est ni suivi ni écarté (jamais pour NOOVA).
+function isDiscQ(q){return !!q&&!!q._merchantId&&!q._byNoova&&!(S._authorizedMerchants||[]).includes(q._merchantId)&&!(S._declinedMerchants||[]).includes(q._merchantId);}
+// « Suivre » depuis l'écran de la question : le commerce est autorisé, la question reste à l'écran.
+async function discFollow(){
+  const q=curQuestion();if(!q||!q._merchantId)return;
+  await authorizeMerchant(q._merchantId);
+  if(!(S._authorizedMerchants||[]).includes(q._merchantId))return;
+  q._discovery=false;
+  const fb=document.getElementById('q-follow');if(fb){fb.disabled=true;fb.textContent='Tu suis '+q.brand+' ✓';}
+  const dn=document.getElementById('q-disc-note');if(dn)dn.style.display='none';
+  const bn=document.querySelector('#bh-name .bh-disc');if(bn)bn.remove();
+}
+// « Passer » : question suivante. Sur une découverte, c'est un refus : le commerce est écarté (plus aucune question).
+let _skippedQ=new Set();
+async function skipQuestion(){
+  const q=curQuestion();if(!q)return;
+  if(isDiscQ(q)){await declineMerchant(q._merchantId);showToast('Tu ne verras plus les questions de '+q.brand+'. Tu peux changer d\'avis dans Profil > Commerces autorisés.','success');}
+  else if(q._firestoreId)_skippedQ.add(q._firestoreId);
+  openNextQuestion(q._firestoreId);
+}
+// Question suivante de la file (questions suivies d'abord, puis découvertes) ; les questions passées repassent en fin de file.
+function openNextQuestion(fromId){
+  const list=(S.qs||[]).filter(x=>!x._byNoova&&x._firestoreId!==fromId);
+  const next=list.find(x=>!_skippedQ.has(x._firestoreId))||null;
+  if(!next){goNav('home');return;}
+  openQ(S.qs.indexOf(next));
 }
 function curQuestion(){return S.mode==='survey'&&S.sv?S.sv.list[S.sv.idx]:S.curQ;}
 
@@ -4644,15 +4678,11 @@ async function notInterested(mid,brand){
   if((S._declinedMerchants||[]).includes(mid))showToast('Tu ne verras plus les questions de '+(brand||'ce commerce')+'. Tu peux changer d\'avis dans Profil > Commerces autorisés.','success');
 }
 function openQ(idx){
-  // Question d'un commerce pas encore suivi (depuis n'importe quel écran) : on demande d'abord.
-  {const d=(S.qs||[])[idx];if(d&&d._discovery&&!d._byNoova&&d._merchantId&&!(S._authorizedMerchants||[]).includes(d._merchantId)){
-    showPop({title:'Tu veux suivre '+d.brand+' ?',text:'Pour répondre à ses questions, suis ce commerce : il pourra t\'en poser d\'autres. Sinon, tu ne verras plus ses questions.',cta:'Oui, suivre et répondre',later:'Pas intéressé',onCta:()=>followAndAnswer(d._merchantId,d._firestoreId),onLater:()=>notInterested(d._merchantId,d.brand)});
-    return;
-  }}
+  // Découverte comprise : la question s'ouvre directement (Valider / Passer / Suivre), sans pop-up qui la cache.
   S.mode='hook';S.qIdx=idx;S.curQ=S.qs[idx];if(!S.curQ)return;const q=S.curQ;
   const pg=document.getElementById('q-prog');pg.innerHTML='';
   S.qs.forEach((_,i)=>{const s=document.createElement('div');s.className='q-seg'+(i<idx?' done':i===idx?' cur':'');pg.appendChild(s)});
-  fillQuestion(q,{skipLabel:'Passer',skipFn:"goNav('home')"});
+  fillQuestion(q,{skipLabel:'Passer',skipFn:"skipQuestion()"});
   goTo('question');
 }
 
@@ -4863,15 +4893,9 @@ function startCampaignById(campId, followed) {
     // Jamais une question d'une autre ville, terminée ou fermée (le serveur la refuserait aussi).
     const myCity=normalizeCity(S._city||''),cCity=getCampaignCity(d);
     if((d.targetCity!=='toutes'&&cCity&&cCity!==myCity)||d.status!=='active'||(d.endsAt&&d.endsAt.toMillis&&d.endsAt.toMillis()<Date.now())){showToast('Cette question n\'est pas ouverte dans ta ville.','warning');return;}
-    // Commerce pas encore suivi (fiche commerce) : on le suit d'abord, ou pas du tout.
-    if(!followed&&d.merchantId&&d.targetCity!=='toutes'&&!(S._authorizedMerchants||[]).includes(d.merchantId)){
-      if((S._declinedMerchants||[]).includes(d.merchantId)){showToast('Tu as choisi de ne plus voir ce commerce. Tu peux changer d\'avis dans Profil > Commerces autorisés.','warning');return;}
-      const b=d.merchantName||'ce commerce';
-      showPop({title:'Tu veux suivre '+b+' ?',text:'Pour répondre à ses questions, suis ce commerce : il pourra t\'en poser d\'autres. Sinon, tu ne verras plus ses questions.',cta:'Oui, suivre et répondre',later:'Pas intéressé',
-        onCta:async()=>{await authorizeMerchant(d.merchantId);if((S._authorizedMerchants||[]).includes(d.merchantId))startCampaignById(campId,true);},
-        onLater:()=>{notInterested(d.merchantId,b);goNav('home');}});
-      return;
-    }
+    // Commerce écarté : on ne rouvre pas ses questions. Pas encore suivi : la question s'ouvre en « découverte »
+    // (Valider / Passer / Suivre), sans pop-up.
+    if(d.merchantId&&d.targetCity!=='toutes'&&(S._declinedMerchants||[]).includes(d.merchantId)&&!(S._authorizedMerchants||[]).includes(d.merchantId)){showToast('Tu as choisi de ne plus voir ce commerce. Tu peux changer d\'avis dans Profil > Commerces autorisés.','warning');return;}
     // Mêmes données que sur l'accueil : options PROPRES à chaque question, et questions 2 et 3 à la suite (avant : options de la
     // campagne entière et questions suivantes perdues quand on démarrait depuis la page du commerce).
     const allQs=getCampaignQuestions(d);
@@ -4880,7 +4904,7 @@ function startCampaignById(campId, followed) {
     S.mode='hook';S.curQ=q;
     const pg=document.getElementById('q-prog');pg.innerHTML='';
     const seg=document.createElement('div');seg.className='q-seg cur';pg.appendChild(seg);
-    fillQuestion(q,{skipLabel:'Passer',skipFn:"goTo('brand-page')"});
+    fillQuestion(q,{skipLabel:'Passer',skipFn:"skipQuestion()"});
     goTo('question');
   }).catch(e=>console.warn('startCampaignById:',e));
 }
@@ -5664,9 +5688,20 @@ function awTab(mode) {
   _updatePassStrength(pw.value);
 }
 
-function awShowErr(msg) {
+function awShowErr(msg, code) {
   const e = document.getElementById('aw-err');
   e.textContent = msg; e.style.display = 'block';
+  reportAuthError(_awMode === 'register' ? 'register' : 'login', code || ('msg:' + String(msg).slice(0, 40)));
+}
+// Relevé anonyme des erreurs vues à l'inscription / la connexion (code + étape + type d'appareil) : l'équipe voit dans
+// l'admin ce qui bloque vraiment, sans jamais recevoir l'e-mail ni le mot de passe.
+function reportAuthError(where, code){
+  try{
+    const ua=navigator.userAgent||'';
+    const device=/Android/i.test(ua)?'android':(/iPhone|iPad|iPod/i.test(ua)?'ios':'desktop');
+    const clean=String(code||'inconnu').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'_').replace(/[^a-z0-9/_.:-]/gi,'').slice(0,60);
+    fx.httpsCallable('logClientError')({where,code:clean,device,inApp:typeof inAppBrowser==='function'&&inAppBrowser(),standalone:!!(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)}).catch(()=>{});
+  }catch(e){}
 }
 
 function awFrErr(code) {
@@ -5693,7 +5728,7 @@ function awFrErr(code) {
 async function awSubmit() {
   const email = document.getElementById('aw-email').value.trim();
   const pass  = document.getElementById('aw-pass').value;
-  if(!email || !pass) { awShowErr('Remplis tous les champs.'); return; }
+  if(!email || !pass) { awShowErr('Remplis tous les champs.', 'champs_vides'); return; }
   const btn = document.getElementById('aw-submit');
   btn.textContent = '…'; btn.disabled = true;
   document.getElementById('aw-err').style.display = 'none';
@@ -5704,11 +5739,11 @@ async function awSubmit() {
     } else {
       const name = document.getElementById('aw-name').value.trim();
       const city = document.getElementById('aw-city').value.trim();
-      if(!name || !city) { awShowErr('Remplis tous les champs.'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      if(!name || !city) { awShowErr('Remplis tous les champs.', !name ? 'prenom_vide' : 'ville_vide'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       const pst = await pwStatus(pass);
-      if(!pst.isValid) { awShowErr('Mot de passe trop simple : il faut ' + (pwMissing(pst).join(', ') || 'un mot de passe plus long') + '.'); _updatePassStrength(pass); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      if(!pst.isValid) { awShowErr('Mot de passe trop simple : il faut ' + (pwMissing(pst).join(', ') || 'un mot de passe plus long') + '.', 'mdp_regles:' + PW_RULES.filter(([k]) => pst[k] === false).map(([k]) => k.replace(/^(meets|contains)/, '')).join('+')); _updatePassStrength(pass); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       const cityNorm = await resolveCityZone(normalizeCity(city),city);
-      if(!(await isCityOpen(cityNorm))) { awShowErr('Noova n\'est pas encore ouvert dans ta ville — reviens bientôt !'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
+      if(!(await isCityOpen(cityNorm))) { awShowErr('Noova n\'est pas encore ouvert dans ta ville — reviens bientôt !', 'ville_fermee'); btn.textContent='Créer mon compte'; btn.disabled=false; return; }
       _skipNextAuth = true;
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       cred.user.sendEmailVerification().catch(() => {}); // non bloquant : l'email arrive en tâche de fond
@@ -5748,7 +5783,7 @@ async function awSubmit() {
     // Le compte est créé mais la fiche n'a pas pu être enregistrée (réseau coupé…) : on ne laisse pas l'habitant
     // bloqué (« e-mail déjà utilisé » au prochain essai), il termine son profil sur l'écran « Dernière étape ».
     if(_awMode === 'register' && auth.currentUser) { document.getElementById('auth-wall').style.display = 'none'; routeAuthState(auth.currentUser); return; }
-    awShowErr(e.code ? awFrErr(e.code) : 'Connexion impossible. Vérifie ta connexion internet et réessaie.');
+    awShowErr(e.code ? awFrErr(e.code) : 'Connexion impossible. Vérifie ta connexion internet et réessaie.', e.code || ('js:' + (e.name || 'erreur')));
   }
 }
 
@@ -7365,15 +7400,12 @@ function recomputeCampaignFeed(city) {
     campaigns.sort((a, b) => (b._strict - a._strict) || (b._followed - a._followed) || (b._createdMs - a._createdMs));
     // Jamais deux fois la même question à l'écran (même intitulé, même commerce ou non) : on garde la plus ancienne.
     const seenQ = new Set(), uniq = arr => arr.filter(c => { const k = String(c.q || '').trim().toLowerCase(); if (seenQ.has(k)) return false; seenQ.add(k); return true; });
-    // Questions des commerces suivis, avec une carte « découverte » (un seul commerce à la fois, une carte par commerce)
-    // glissée toutes les DISCOVERY.EVERY questions ; les découvertes restantes à la suite.
+    // D'abord TOUTES les questions des commerces suivis, puis les découvertes (une carte par commerce ni suivi ni écarté).
     const all = uniq(campaigns), noovaQs = all.filter(c => c._byNoova), followedQs = all.filter(c => !c._byNoova && !c._discovery);
     const discByM = new Map();
     all.filter(c => c._discovery).forEach(c => { if (!discByM.has(c._merchantId)) discByM.set(c._merchantId, c); });
     const disc = [...discByM.values()];
-    const mixed = [];
-    followedQs.forEach((c, i) => { mixed.push(c); if ((i + 1) % DISCOVERY.EVERY === 0 && disc.length) mixed.push(disc.shift()); });
-    S.qs = [...mixed, ...disc, ...noovaQs];
+    S.qs = [...followedQs, ...disc, ...noovaQs];
     S._discovery = Object.values(discoveryMerchants);
     if (S.qIdx === undefined) S.qIdx = 0;
     // Rafraîchit l'écran uniquement pour les mises à jour en direct (le premier
@@ -7429,7 +7461,10 @@ submitAns = function() {
   const btn = document.getElementById('sub-btn');
   if(btn) btn.disabled = true;
 
-  Promise.resolve(S._qBegin).then(() => callSubmitAnswer({ campaignId: q._firestoreId, questionIdx: qIdx, answerValue }))
+  // Répondre à une question « découverte », c'est suivre le commerce (expliqué à l'écran) : il est autorisé d'abord.
+  const wasDisc = isDiscQ(q);
+  Promise.resolve(S._qBegin).then(() => wasDisc ? authorizeMerchant(q._merchantId) : null)
+    .then(() => callSubmitAnswer({ campaignId: q._firestoreId, questionIdx: qIdx, answerValue }))
     .then(res => {
       const data = res.data || {};
       // Marque la campagne répondue localement AVANT d'afficher l'écran de récompense :
@@ -7752,7 +7787,7 @@ async function _socialSignIn(provider) {
     if(blocked && canRedirect) { try { sessionStorage.setItem('nv_redirect', '1'); } catch(_) {} return auth.signInWithRedirect(provider); }
     awShowErr(blocked
       ? 'La fenêtre de connexion Google n\'a pas pu s\'ouvrir. Ouvre NOOVA dans Safari ou Chrome (pas depuis l\'app installée), ou inscris-toi avec ton email.'
-      : awFrErr(e.code));
+      : awFrErr(e.code), 'google:' + (e.code || 'erreur'));
   }
 }
 // Retour d'une connexion par redirection : même suite qu'après la fenêtre surgissante.
@@ -7764,7 +7799,7 @@ if(AUTH_ON_SITE && (() => { try { return sessionStorage.getItem('nv_redirect') =
     _skipNextAuth = false; routeAuthState(auth.currentUser);
   }).catch(e => {
     _skipNextAuth = false; routeAuthState(auth.currentUser);
-    showAuthWall('login'); awShowErr(awFrErr(e.code));
+    showAuthWall('login'); awShowErr(awFrErr(e.code), 'google:' + (e.code || 'erreur'));
   });
 }
 function signInWithGoogle() { return _socialSignIn(new firebase.auth.GoogleAuthProvider()); }

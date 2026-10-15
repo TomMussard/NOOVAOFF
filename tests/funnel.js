@@ -61,6 +61,17 @@ const call=async(name,data)=>{const r=await fetch('http://127.0.0.1:5001/noova-3
     const r=await fetch('http://127.0.0.1:8080/v1/projects/noova-366d0/databases/(default)/documents/funnelDaily/total');
     check('Les chiffres ne sont pas lisibles sans être admin',r.status===403,r.status);
   });
+  await T('erreurs d\'inscription relevées (sans e-mail)',async()=>{
+    const qctx=await b.createBrowserContext();const q=await qctx.newPage();q.on('pageerror',e=>errs.push(e.message));await q.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
+    await q.goto('http://localhost:8950/app.html',{waitUntil:'load'});await wf(q,()=>document.getElementById('onboard').classList.contains('active'));
+    await q.evaluate(()=>showAuthWall('register'));
+    await setVal(q,'#aw-name','Léo');await setVal(q,'#aw-city','');await setVal(q,'#aw-email','leo@t.fr');await setVal(q,'#aw-pass','Secret12!');await q.evaluate(()=>awSubmit());
+    await setVal(q,'#aw-city','Angers');await setVal(q,'#aw-email','ines@t.fr');await q.evaluate(()=>awSubmit());
+    await wf(q,()=>/déjà utilisé/.test(document.getElementById('aw-err').textContent),15000);
+    let docs=[];await until(async()=>{docs=(await db.collection('clientErrors').get()).docs.map(d=>d.data());return docs.length>=2;});
+    check('Erreurs relevées : « ville manquante », « e-mail déjà utilisé », avec l\'étape et le téléphone, jamais l\'e-mail',docs.some(d=>d.where==='register'&&d.code==='ville_vide')&&docs.some(d=>d.code==='auth/email-already-in-use'&&d.device==='android'||d.code==='auth/email-already-in-use')&&!JSON.stringify(docs).includes('@'),docs);
+    await qctx.close();
+  });
   await T('admin',async()=>{
     const a=await b.newPage();a.on('pageerror',e=>errs.push(e.message));await a.setViewport({width:1280,height:900});
     await a.goto('http://localhost:8950/admin.html',{waitUntil:'load'});await sleep(1200);
@@ -69,7 +80,10 @@ const call=async(name,data)=>{const r=await fetch('http://127.0.0.1:5001/noova-3
     await a.evaluate(()=>{const b=[...document.querySelectorAll('.tab-btn-main')].find(x=>/Statistiques/.test(x.textContent));b.click();});
     await wf(a,()=>document.querySelectorAll('#fn-root .fn-row').length===8,20000);
     const rows=await a.$$eval('#fn-root .fn-row',l=>l.map(r=>[...r.cells].map(c=>c.textContent.trim()).join(' ')));
-    check('Carte « Parcours d\'entrée » : 8 étapes, de l\'ouverture (100 %) au compte créé',/Ouvre l'app.*1 1 1 100 %/.test(rows[0])&&/Crée son compte.*1 1 1 100 %/.test(rows[7]),rows);
+    await wf(a,()=>document.querySelectorAll('#err-root .err-row').length>=2,15000);
+    const er=await a.$eval('#err-root',e=>e.textContent);
+    check('Carte « Erreurs à l\'inscription » : messages en clair (« E-mail déjà utilisé », « Ville manquante »)',/E-mail déjà utilisé/.test(er)&&/Ville manquante/.test(er),er.slice(0,300));
+    check('Carte « Parcours d\'entrée » : 8 étapes, de l\'ouverture (100 %) au compte créé',/Ouvre l'app.*2 2 2 100 %/.test(rows[0])&&/Crée son compte.*1 1 1 50 %/.test(rows[7]),rows);
     await a.close();
   });
   check('Aucune erreur JavaScript',errs.length===0,errs);
